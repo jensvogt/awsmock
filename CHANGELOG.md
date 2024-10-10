@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.18](https://github.com/jensvogt/awsmock/compare/v0.15.17...v0.15.18) (2024-10-10)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** adding sorting for SQS queues ([f8bd655](https://github.com/jensvogt/awsmock/commit/f8bd655a3a3d37e5ad4292b81352fa987191625c))
+
 ## [0.15.17](https://github.com/jensvogt/awsmock/compare/v0.15.16...v0.15.17) (2024-10-09)
 
 
