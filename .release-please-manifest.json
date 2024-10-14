@@ -1,4 +1,4 @@
 {
-  ".": "0.15.22",
+  ".": "0.15.23",
   "pull-request-header": "A new release has been published, new version: ${version}"
 }
