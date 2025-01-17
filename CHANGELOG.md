@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1](https://github.com/jensvogt/awsmock/compare/v1.0.0...v1.0.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* **653-move-manager-apis-to-gateway:** purge SNS topic also readjust the topic size ([a65773c](https://github.com/jensvogt/awsmock/commit/a65773cbbeac4e2b8cd82fd6b6433bb0b2798162))
+* **864-transfer-details-page-missing-in-frontend:** add transfer server frontend details page ([c9653be](https://github.com/jensvogt/awsmock/commit/c9653be1288fa1b9cad33b2319356950c4794712))
+* **864-transfer-details-page-missing-in-frontend:** add transfer server frontend details page ([fbed165](https://github.com/jensvogt/awsmock/commit/fbed16515f3d4e605086ce882cc276d59579ba74))
+* **864-transfer-details-page-missing-in-frontend:** add transfer server frontend details page ([ce0167d](https://github.com/jensvogt/awsmock/commit/ce0167db68cb0615d447c5465f305323133470ad))
+
 ## 1.0.0 (2025-01-16)
 
 
