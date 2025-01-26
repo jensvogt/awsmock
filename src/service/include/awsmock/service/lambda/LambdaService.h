@@ -124,11 +124,10 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param payload SQS message
          * @param region AWS region
-         * @param user user
          * @param logType logging type
          * @return output string (limited to 4kb) in case logType = 'Tail' and an synchronous invocation.
          */
-        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType = {}) const;
+        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &logType = {}) const;
 
         /**
          * @brief Create a new tag for a lambda functions.

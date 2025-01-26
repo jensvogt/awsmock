@@ -192,7 +192,6 @@ namespace AwsMock::Service {
     std::string LambdaService::InvokeLambdaFunction(const std::string &functionName,
                                                     const std::string &payload,
                                                     const std::string &region,
-                                                    const std::string &user,
                                                     const std::string &logType) const {
         boost::mutex::scoped_lock lock(_mutex);
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");

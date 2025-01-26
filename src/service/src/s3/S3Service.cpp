@@ -1084,7 +1084,7 @@ namespace AwsMock::Service {
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        const std::string output = _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), region, user);
+        const std::string output = _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), region);
         log_debug << "Lambda invocation finished send, output" << output;
     }
 
