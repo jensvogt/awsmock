@@ -29,7 +29,7 @@ namespace AwsMock::Core {
         explicit ServiceException(http::status code = http::status::internal_server_error);
 
         /**
-         *@brief  Constructor.
+         * @brief Constructor.
          *
          * @param msg exception message
          * @param code exception code, default: 0
@@ -49,14 +49,23 @@ namespace AwsMock::Core {
         ~ServiceException() noexcept override;
 
         /**
-         * Returns the exception message.
+         * @brief Returns the exception message.
          */
         [[nodiscard]] std::string message() const noexcept;
 
         /**
-         * Returns the exception message.
+         * @brief Returns the exception message.
          */
         [[nodiscard]] http::status code() const noexcept;
+
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
 
       private:
 

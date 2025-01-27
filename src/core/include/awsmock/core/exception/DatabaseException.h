@@ -22,81 +22,90 @@ namespace AwsMock::Core {
       public:
 
         /**
-       * Constructor.
-       *
-       * @param code exception code, default: 0
-       * @param resource exception resource
-       * @param requestId exception resource ID
-       */
+         * @brief Constructor.
+         *
+         * @param code exception code, default: 0
+         * @param resource exception resource
+         * @param requestId exception resource ID
+         */
         explicit DatabaseException(http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
-       * Constructor.
-       *
-       * @param msg exception message
-       * @param code exception code, default: 0
-       * @param resource exception resource
-       * @param requestId exception resource ID
-       */
+         * @brief Constructor.
+         *
+         * @param msg exception message
+         * @param code exception code, default: 0
+         * @param resource exception resource
+         * @param requestId exception resource ID
+         */
         explicit DatabaseException(const std::string &msg, http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
-       * Copy constructor.
-       *
-       * @param exc parent exception.
-       */
+         * @brief Copy constructor.
+         *
+         * @param exc parent exception.
+         */
         DatabaseException(const DatabaseException &exc);
 
         /**
-       * Destructor
-       */
+         * @brief Destructor
+         */
         ~DatabaseException() noexcept override;
 
         /**
-       * Assigment operator.
-       */
+         * @brief Assigment operator.
+         */
         DatabaseException &operator=(const DatabaseException &exc);
 
         /**
-       * Returns the exception message.
-       */
+         * @brief Returns the exception message.
+         */
         [[nodiscard]] std::string message() const noexcept;
 
         /**
-       * Returns the exception message.
-       */
+         * @brief Returns the exception message.
+         */
         [[nodiscard]] http::status code() const noexcept;
 
         /**
-       * Returns the exception resource.
-       */
+         * @brief Returns the exception resource.
+         */
         [[nodiscard]] const char *resource() const noexcept;
 
         /**
-       * Returns the exception request ID.
-       */
+         * @brief Returns the exception request ID.
+         */
         [[nodiscard]] const char *requestId() const noexcept;
+
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
 
       private:
 
         /**
-       * Code
-       */
+         * Code
+         */
         const http::status _code;
 
         /**
-       * Message
-       */
+         * Message
+         */
         std::string _message;
 
         /**
-       * Resource
-       */
+         * Resource
+         */
         const char *_resource;
 
         /**
-       * Request ID
-       */
+         * Request ID
+         */
         const char *_requestId;
     };
 

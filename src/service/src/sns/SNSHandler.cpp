@@ -175,6 +175,7 @@ namespace AwsMock::Service {
                     snsRequest.FromJson(clientCommand.payload);
                     log_debug << "Purge topic, topicArn: " << snsRequest.topicArn;
 
+                    throw Core::ServiceException("exception test");
                     long deleted = _snsService.PurgeTopic(snsRequest);
 
                     log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
@@ -274,18 +275,8 @@ namespace AwsMock::Service {
                 }
             }
 
-        } catch (Core::DatabaseException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
-        } catch (Core::JsonException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
-        } catch (Core::ServiceException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
-        } catch (Core::NotFoundException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
+        } catch (std::exception &e) {
+            return SendInternalServerError(request, e.what());
         }
     }
 

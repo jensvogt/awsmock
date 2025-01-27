@@ -6,10 +6,10 @@
 
 namespace AwsMock::Core {
 
-    ForbiddenException::ForbiddenException(const boost::beast::http::status code) : code(code) {
+    ForbiddenException::ForbiddenException(const boost::beast::http::status code) : _code(code) {
     }
 
-    ForbiddenException::ForbiddenException(const std::string &msg, const boost::beast::http::status code) : message(msg), code(code) {
+    ForbiddenException::ForbiddenException(const std::string &msg, const boost::beast::http::status code) : _message(msg), _code(code) {
     }
 
     ForbiddenException::ForbiddenException(const ForbiddenException &exc) = default;

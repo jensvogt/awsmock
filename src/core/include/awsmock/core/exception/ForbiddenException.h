@@ -6,10 +6,12 @@
 #define AWSMOCK_CORE_FORBIDDEN_H
 
 // Boost includes
-#include <boost/beast/http/basic_parser.hpp>
+#include <boost/beast/http.hpp>
 #include <boost/beast/http/status.hpp>
 
 namespace AwsMock::Core {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief Resource not found exception class.
@@ -21,46 +23,62 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor.
+         * @brief Constructor.
          *
          * @param code exception code, default: 0
          */
-        explicit ForbiddenException(boost::beast::http::status code = boost::beast::http::status::forbidden);
+        explicit ForbiddenException(http::status code = http::status::forbidden);
 
         /**
-         * Constructor.
+         * @brief Constructor.
          *
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit ForbiddenException(const std::string &msg, boost::beast::http::status code = boost::beast::http::status::forbidden);
+        explicit ForbiddenException(const std::string &msg, http::status code = http::status::forbidden);
 
         /**
-         * Copy constructor.
+         * @brief Copy constructor.
          *
          * @param exc parent exception.
          */
         ForbiddenException(const ForbiddenException &exc);
 
         /**
-         * Destructor
+         * @brief Destructor
          */
         ~ForbiddenException() noexcept override;
 
         /**
-         * Assigment operator.
+         * @brief Assigment operator.
          */
         ForbiddenException &operator=(const ForbiddenException &exc);
 
         /**
-         * Rethrows the exception.
+         * @brief Rethrows the exception.
          */
         void rethrow() const;
 
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
+
       private:
 
-        std::string message;
-        boost::beast::http::status code;
+        /**
+         * Code
+         */
+        const http::status _code;
+
+        /**
+         * Message
+         */
+        std::string _message;
     };
 
 }// namespace AwsMock::Core

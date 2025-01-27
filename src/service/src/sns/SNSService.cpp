@@ -144,25 +144,23 @@ namespace AwsMock::Service {
 
         // Check topic/target ARN
         if (request.topicArn.empty() && request.targetArn.empty()) {
+            log_error << "Either topicArn or targetArn must exist";
             throw Core::ServiceException("Either topicArn or targetArn must exist");
         }
 
         // Check existence
         if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {
-            Database::Entity::SNS::Message message;
 
-            Database::Entity::SNS::Topic topic;
-            if (!request.topicArn.empty()) {
-                topic = _snsDatabase.GetTopicByArn(request.topicArn);
-            } else if (!request.topicArn.empty()) {
-                topic = _snsDatabase.GetTopicByTargetArn(request.targetArn);
-            }
+            // Get the topic by topic ARN or target ARN
+            Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
 
             // Update database
+            Database::Entity::SNS::Message message;
             std::string messageId = Core::AwsUtils::CreateMessageId();
             message = {.region = request.region,
                        .topicArn = request.topicArn,
@@ -170,10 +168,14 @@ namespace AwsMock::Service {
                        .message = request.message,
                        .messageId = messageId,
                        .size = static_cast<long>(request.message.length())};
+
+            // Attributes
             for (const auto &[fst, snd]: request.messageAttributes) {
                 Database::Entity::SNS::MessageAttribute attribute = {.attributeName = fst, .attributeValue = snd.stringValue, .attributeType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))};
                 message.messageAttributes.emplace_back(attribute);
             }
+
+            // Save message
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions

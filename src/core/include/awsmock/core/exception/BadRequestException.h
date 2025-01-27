@@ -65,6 +65,17 @@ namespace AwsMock::Core {
         void rethrow() const;
 
         /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
+
+      private:
+
+        /**
          * HTTP status code
          */
         boost::beast::http::status _code;

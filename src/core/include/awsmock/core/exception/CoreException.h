@@ -7,12 +7,14 @@
 
 // C++ includes
 #include <string>
+#include <utility>
 
 // Boost includes
 #include <boost/beast/http.hpp>
-#include <utility>
 
 namespace AwsMock::Core {
+
+    namespace http = boost::beast::http;
 
     /**
      * @brief Exception class. In case of a COM request failure a COMException is thrown.
@@ -58,17 +60,28 @@ namespace AwsMock::Core {
         /**
          * Return message
          */
-        std::string message() const { return _message; }
+        [[nodiscard]] std::string message() const { return _message; }
+
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
+
+      private:
 
         /**
          * Return code
          */
-        [[nodiscard]] boost::beast::http::status code() const { return _code; }
+        [[nodiscard]] http::status code() const { return _code; }
 
         /**
          * Http status code
          */
-        boost::beast::http::status _code;
+        http::status _code;
 
         /**
        * Http status code
