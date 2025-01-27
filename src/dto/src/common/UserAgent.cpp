@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Common {
                 clientLanguage = parts[1];
                 clientOs = parts[2];
                 clientExecutableType = parts[3];
-                clientPrompt = parts[4] == "ON";
+                clientPrompt = parts[4];
                 const std::string command = Core::StringUtils::Split(parts[parts.size() - 1], '#')[1];
                 clientModule = Core::StringUtils::Split(command, '.')[0];
                 clientCommand = Core::StringUtils::Split(command, '.')[1];
@@ -49,9 +49,9 @@ namespace AwsMock::Dto::Common {
         try {
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "clientApplication", clientApplication);
-            Core::Bson::BsonUtils::SetStringValue(document, "clientLanguage", clientApplication);
-            Core::Bson::BsonUtils::SetStringValue(document, "clientExecutableType", clientApplication);
-            Core::Bson::BsonUtils::SetBoolValue(document, "clientPrompt", clientPrompt);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientLanguage", clientLanguage);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientExecutableType", clientExecutableType);
+            Core::Bson::BsonUtils::SetStringValue(document, "clientPrompt", clientPrompt);
             Core::Bson::BsonUtils::SetStringValue(document, "clientModule", clientModule);
             Core::Bson::BsonUtils::SetStringValue(document, "clientCommand", clientCommand);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);

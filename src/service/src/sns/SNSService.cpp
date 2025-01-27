@@ -143,14 +143,13 @@ namespace AwsMock::Service {
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
-        if (request.targetArn.empty() && request.topicArn.empty()) {
+        if (request.topicArn.empty() && request.targetArn.empty()) {
             throw Core::ServiceException("Either topicArn or targetArn must exist");
         }
 
         // Check existence
         if (!_snsDatabase.TopicExists(request.topicArn)) {
-            log_error << "Topic does not exist: " << request.topicArn;
-            throw Core::ServiceException("SNS topic does not exists");
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
 
         try {

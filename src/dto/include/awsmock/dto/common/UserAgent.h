@@ -79,7 +79,7 @@ namespace AwsMock::Dto::Common {
         /**
          * Client prompt
          */
-        bool clientPrompt;
+        std::string clientPrompt;
 
         /**
          * Client request module
