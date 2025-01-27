@@ -25,7 +25,6 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetStringValue(document, "StateReasonCode", stateReasonCode);
             Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatus", lastUpdateStatusReason);
             Core::Bson::BsonUtils::SetStringValue(document, "LastUpdateStatusCode", lastUpdateStatusReasonCode);
-
             Core::Bson::BsonUtils::SetDateValue(document, "LastModified", lastModified);
 
             // Tags

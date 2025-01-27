@@ -528,14 +528,21 @@ namespace AwsMock::Service {
         DeleteContainer(container.id);
     }
 
-    void ContainerService::DeleteContainer(const std::string &id) const {
+    void ContainerService::DeleteContainer(const std::string &containerId) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "http://localhost/containers/" + id + "?force=true"); statusCode != http::status::no_content) {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "http://localhost/containers/" + containerId + "?force=true"); statusCode != http::status::no_content) {
             log_warning << "Delete container failed, httpStatus: " << statusCode << " body: " << body;
             return;
         }
-        log_debug << "Docker container deleted, id: " << id;
+        log_debug << "Docker container deleted, id: " << containerId;
+    }
+
+    void ContainerService::DeleteContainers(const std::string &imageName, const std::string &tag) const {
+        for (std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); const auto &container: containers) {
+            DeleteContainer(container.id);
+        }
+        log_debug << "All docker containers deleted, id: " << imageName << ":" << tag;
     }
 
     void ContainerService::PruneContainers() const {

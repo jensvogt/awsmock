@@ -29,8 +29,10 @@ namespace AwsMock::Service {
     void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode) {
 
         // Docker tag
-        lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
-        log_debug << "Using docker tag: " << lambdaEntity.dockerTag;
+        if (lambdaEntity.dockerTag.empty()) {
+            lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
+            log_debug << "Using docker tag: " << lambdaEntity.dockerTag;
+        }
 
         // Build the docker image, if not existing
         if (!ContainerService::instance().ImageExists(lambdaEntity.function, lambdaEntity.dockerTag)) {

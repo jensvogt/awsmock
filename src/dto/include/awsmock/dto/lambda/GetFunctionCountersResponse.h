@@ -132,9 +132,19 @@ namespace AwsMock::Dto::Lambda {
     struct GetFunctionCountersResponse {
 
         /**
+         * OID
+         */
+        std::string id;
+
+        /**
          * Region
          */
         std::string region;
+
+        /**
+         * AWS ARN
+         */
+        std::string functionArn;
 
         /**
          * Function name

@@ -127,7 +127,7 @@ namespace AwsMock::Service {
                     std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
                     log_debug << "Lambda function invocation, name: " << functionName;
 
-                    std::string output = _lambdaService.InvokeLambdaFunction(functionName, body, region, user, logType);
+                    std::string output = _lambdaService.InvokeLambdaFunction(functionName, body, region, logType);
                     log_info << "Lambda function invoked, name: " << functionName;
 
                     // Set output, if existing
@@ -199,6 +199,17 @@ namespace AwsMock::Service {
 
                 _lambdaService.ResetFunctionCounters(lambdaRequest);
                 log_trace << "Reset function counters list";
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::UPLOAD_FUNCTION_CODE) {
+
+                Dto::Lambda::UploadFunctionCodeRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.UploadFunctionCode(lambdaRequest);
+                log_trace << "Upload function code, functionArn: " << lambdaRequest.functionArn;
 
                 return SendOkResponse(request);
             }

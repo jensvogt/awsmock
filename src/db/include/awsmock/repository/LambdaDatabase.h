@@ -68,11 +68,11 @@ namespace AwsMock::Database {
         /**
          * @brief Check existence of lambda
          *
-         * @param function AWS function
+         * @param functionName AWS function
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const std::string &function) const;
+        bool LambdaExists(const std::string &functionName) const;
 
         /**
          * @brief Check existence of lambda

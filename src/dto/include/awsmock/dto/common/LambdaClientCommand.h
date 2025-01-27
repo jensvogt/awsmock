@@ -10,13 +10,10 @@
 
 // Boost includes
 #include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -37,6 +34,7 @@ namespace AwsMock::Dto::Common {
         TAG_LAMBDA,
         GET_FUNCTION_COUNTERS,
         RESET_FUNCTION_COUNTERS,
+        UPLOAD_FUNCTION_CODE,
         UNKNOWN
     };
 
@@ -51,9 +49,10 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS, "list-event-source-mappings"},
             {LambdaCommandType::TAG_LAMBDA, "function-tag"},
             {LambdaCommandType::GET_FUNCTION_COUNTERS, "get-function-counters"},
-            {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"}};
+            {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"},
+            {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"}};
 
-    [[maybe_unused]] static std::string LambdaCommandTypeToString(LambdaCommandType commandType) {
+    [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {
         return LambdaCommandTypeNames[commandType];
     }
 

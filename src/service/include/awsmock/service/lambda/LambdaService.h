@@ -39,6 +39,7 @@
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/ResetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
@@ -89,7 +90,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -124,11 +125,10 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param payload SQS message
          * @param region AWS region
-         * @param user user
          * @param logType logging type
          * @return output string (limited to 4kb) in case logType = 'Tail' and an synchronous invocation.
          */
-        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &user, const std::string &logType = {}) const;
+        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &logType = {}) const;
 
         /**
          * @brief Create a new tag for a lambda functions.
@@ -156,6 +156,15 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::Lambda::GetFunctionResponse
          */
         Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name) const;
+
+        /**
+         * @brief Upload new function code
+         *
+         * @param request upload function code request
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::UploadFunctionCodeRequest
+         */
+        void UploadFunctionCode(const Dto::Lambda::UploadFunctionCodeRequest &request) const;
 
         /**
          * @brief Gets a single lambda function counters
@@ -250,6 +259,13 @@ namespace AwsMock::Service {
          * @return containerId of the idle instance
          */
         static std::string FindIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+
+        /**
+         * @brief Stops all running instances and deleted any existing containers and images.
+         *
+         * @param lambda lambda entity to cleanup
+         */
+        static void CleanupDocker(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Returns the host name, to where we send lambda invocation notifications

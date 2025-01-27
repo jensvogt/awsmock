@@ -335,11 +335,19 @@ namespace AwsMock::Service {
         void DeleteContainer(const Dto::Docker::Container &container) const;
 
         /**
+         * @brief Delete all container with the given image name as anchestor
+         *
+         * @param imageName image name
+         * @param tag image tag
+         */
+        void DeleteContainers(const std::string &imageName, const std::string &tag) const;
+
+        /**
          * @brief Deletes the container by ID
          *
-         * @param id container ID
+         * @param containerId container ID
          */
-        void DeleteContainer(const std::string &id) const;
+        void DeleteContainer(const std::string &containerId) const;
 
         /**
          * @brief Deletes all stopped containers.

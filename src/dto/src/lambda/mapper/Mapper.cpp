@@ -102,6 +102,7 @@ namespace AwsMock::Dto::Lambda {
         for (auto &lambdaEntity: lambdaEntities) {
             FunctionCounter counter;
             counter.functionName = lambdaEntity.function;
+            counter.functionArn = lambdaEntity.arn;
             counter.invocations = lambdaEntity.invocations;
             counter.runtime = lambdaEntity.runtime;
             counter.handler = lambdaEntity.handler;

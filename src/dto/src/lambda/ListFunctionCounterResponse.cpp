@@ -17,6 +17,7 @@ namespace AwsMock::Dto::Lambda {
                 for (auto &functionCounter: functionCounters) {
                     document jsonObject;
                     jsonObject.append(kvp("functionName", functionCounter.functionName));
+                    jsonObject.append(kvp("functionArn", functionCounter.functionArn));
                     jsonObject.append(kvp("runtime", functionCounter.runtime));
                     jsonObject.append(kvp("handler", functionCounter.handler));
                     jsonObject.append(kvp("version", functionCounter.version));
@@ -25,7 +26,6 @@ namespace AwsMock::Dto::Lambda {
                     jsonObject.append(kvp("invocations", functionCounter.invocations));
                     jsonBucketArray.append(jsonObject);
                 }
-
                 rootDocument.append(kvp("functionCounters", jsonBucketArray));
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);

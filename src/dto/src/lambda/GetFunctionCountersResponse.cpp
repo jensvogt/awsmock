@@ -12,8 +12,10 @@ namespace AwsMock::Dto::Lambda {
 
             document document;
 
+            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "functionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "functionArn", functionArn);
             Core::Bson::BsonUtils::SetStringValue(document, "handler", handler);
             Core::Bson::BsonUtils::SetStringValue(document, "runtime", runtime);
             Core::Bson::BsonUtils::SetStringValue(document, "user", user);
