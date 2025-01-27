@@ -143,28 +143,28 @@ namespace AwsMock::Service {
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
-        if (request.topicArn.empty() && request.targetArn.empty()) {
-            log_error << "Either topicArn or targetArn must exist";
-            throw Core::ServiceException("Either topicArn or targetArn must exist");
+        if (request.targetArn.empty() && request.topicArn.empty()) {
+            log_error << "Either topicARN or targetArn must exist";
+            throw Core::ServiceException("Either topicARN or targetArn must exist");
         }
 
         // Check existence
-        if (!request.topicArn.empty() && !_snsDatabase.TopicExists(request.topicArn)) {
-            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
-            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
-        }
-        if (!request.targetArn.empty() && !_snsDatabase.TopicExists(request.targetArn)) {
-            log_error << "SNS targetArn does not exists, targetArn: " << request.targetArn;
-            throw Core::ServiceException("SNS targetArn does not exists, targetArn: " + request.targetArn);
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "Topic does not exist: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists");
         }
 
         try {
+            Database::Entity::SNS::Message message;
 
-            // Get the topic by topic ARN or target ARN
-            Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
+            Database::Entity::SNS::Topic topic;
+            if (!request.topicArn.empty()) {
+                topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            } else if (!request.topicArn.empty()) {
+                topic = _snsDatabase.GetTopicByTargetArn(request.targetArn);
+            }
 
             // Update database
-            Database::Entity::SNS::Message message;
             std::string messageId = Core::AwsUtils::CreateMessageId();
             message = {.region = request.region,
                        .topicArn = request.topicArn,
@@ -172,14 +172,10 @@ namespace AwsMock::Service {
                        .message = request.message,
                        .messageId = messageId,
                        .size = static_cast<long>(request.message.length())};
-
-            // Attributes
             for (const auto &[fst, snd]: request.messageAttributes) {
                 Database::Entity::SNS::MessageAttribute attribute = {.attributeName = fst, .attributeValue = snd.stringValue, .attributeType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))};
                 message.messageAttributes.emplace_back(attribute);
             }
-
-            // Save message
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions
@@ -222,7 +218,9 @@ namespace AwsMock::Service {
             if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
 
                 // Add subscription
-                topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
+                topic.subscriptions.push_back({.protocol = request.protocol,
+                                               .endpoint = request.endpoint,
+                                               .subscriptionArn = subscriptionArn});
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
