@@ -144,8 +144,7 @@ namespace AwsMock::Service {
 
         // Check topic/target ARN
         if (request.targetArn.empty() && request.topicArn.empty()) {
-            log_error << "Either topicARN or targetArn must exist";
-            throw Core::ServiceException("Either topicARN or targetArn must exist");
+            throw Core::ServiceException("Either topicArn or targetArn must exist");
         }
 
         // Check existence
@@ -218,9 +217,7 @@ namespace AwsMock::Service {
             if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
 
                 // Add subscription
-                topic.subscriptions.push_back({.protocol = request.protocol,
-                                               .endpoint = request.endpoint,
-                                               .subscriptionArn = subscriptionArn});
+                topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
