@@ -56,10 +56,9 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSMemoryDb::GetTopicByName(const std::string &region, const std::string &topicName) {
 
-        const auto it =
-                std::ranges::find_if(_topics, [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
-                    return topic.second.region == region && topic.second.topicName == topicName;
-                });
+        const auto it = std::ranges::find_if(_topics, [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
+            return topic.second.region == region && topic.second.topicName == topicName;
+        });
 
         if (it != _topics.end()) {
             it->second.oid = it->first;
@@ -70,7 +69,22 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) {
+    Entity::SNS::Topic SNSMemoryDb::GetTopicByTargetArn(const std::string &targetArn) {
+
+        const auto it =
+                std::ranges::find_if(_topics, [targetArn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
+                    return topic.second.targetArn == targetArn;
+                });
+
+        if (it != _topics.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+        log_warning << "Topic not found, targetArn: " << targetArn;
+        return {};
+    }
+
+    Entity::SNS::TopicList SNSMemoryDb::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const {
 
         Entity::SNS::TopicList topics;
         for (const auto &topic: _topics) {
@@ -251,7 +265,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) {
+    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) const {
 
         Entity::SNS::MessageList messageList;
         if (region.empty() && topicArn.empty()) {

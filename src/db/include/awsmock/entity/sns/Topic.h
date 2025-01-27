@@ -56,6 +56,11 @@ namespace AwsMock::Database::Entity::SNS {
         std::string topicArn;
 
         /**
+         * Target ARN
+         */
+        std::string targetArn;
+
+        /**
          * Subscriptions
          */
         SubscriptionList subscriptions;

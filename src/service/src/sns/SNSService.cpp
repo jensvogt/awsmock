@@ -143,7 +143,7 @@ namespace AwsMock::Service {
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
-        if (request.topicArn.empty()) {
+        if (request.targetArn.empty() && request.topicArn.empty()) {
             log_error << "Either topicARN or targetArn must exist";
             throw Core::ServiceException("Either topicARN or targetArn must exist");
         }
@@ -157,7 +157,12 @@ namespace AwsMock::Service {
         try {
             Database::Entity::SNS::Message message;
 
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            Database::Entity::SNS::Topic topic;
+            if (!request.topicArn.empty()) {
+                topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            } else if (!request.topicArn.empty()) {
+                topic = _snsDatabase.GetTopicByTargetArn(request.targetArn);
+            }
 
             // Update database
             std::string messageId = Core::AwsUtils::CreateMessageId();

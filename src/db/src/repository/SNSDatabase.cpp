@@ -126,6 +126,29 @@ namespace AwsMock::Database {
         return _memoryDb.GetTopicByArn(topicArn);
     }
 
+    Entity::SNS::Topic SNSDatabase::GetTopicByTargetArn(const std::string &targetArn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
+
+                if (const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("targetArn", targetArn))); !mResult->empty()) {
+                    Entity::SNS::Topic result;
+                    result.FromDocument(mResult->view());
+                    return result;
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "SNS Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.GetTopicByTargetArn(targetArn);
+    }
+
     Entity::SNS::Topic SNSDatabase::GetTopicByName(const std::string &region, const std::string &topicName) const {
 
         if (HasDatabase()) {
