@@ -6,12 +6,10 @@
 #define AWSMOCK_DTO_SNS_PUBLISH_REQUEST_H
 
 // C++ standard includes
-#include "model/MessageAttribute.h"
-
-
-#include <map>
-#include <sstream>
 #include <string>
+
+// AwsMock includes
+#include <awsmock/dto/sns/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -48,14 +46,21 @@ namespace AwsMock::Dto::SNS {
         std::string requestId;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Convert to JSON representation
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
+
+        /**
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

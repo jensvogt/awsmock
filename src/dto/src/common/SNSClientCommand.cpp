@@ -30,6 +30,8 @@ namespace AwsMock::Dto::Common {
 
             this->command = SNSCommandTypeFromString(userAgent.clientCommand);
         }
+        log_trace << "Client command: " << ToJson();
+        log_trace << "Client payload: " << this->payload;
     }
 
     std::string SNSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) const {
@@ -62,7 +64,9 @@ namespace AwsMock::Dto::Common {
             Core::Bson::BsonUtils::SetStringValue(document, "method", boost::lexical_cast<std::string>(method));
             Core::Bson::BsonUtils::SetStringValue(document, "command", SNSCommandTypeToString(command));
             Core::Bson::BsonUtils::SetStringValue(document, "user", user);
-
+            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            Core::Bson::BsonUtils::SetLongValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetStringValue(document, "requestId", requestId);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

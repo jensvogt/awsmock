@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    LambdaDatabase::LambdaDatabase() : _memoryDb(LambdaMemoryDb::instance()), _databaseName(GetDatabaseName()), _collectionName("lambda") {}
+    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _collectionName("lambda"), _memoryDb(LambdaMemoryDb::instance()) {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
@@ -107,7 +107,7 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) {
+    Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) const {
 
         if (HasDatabase()) {
 
@@ -374,12 +374,14 @@ namespace AwsMock::Database {
 
         // Remove instances, as they will confuse the re-import
         for (auto &lambda: lambdas) {
+            lambda.invocations = 0;
+            lambda.averageRuntime = 0;
             lambda.instances.clear();
         }
         return lambdas;
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, long maxResults, long skip, const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<Core::SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {

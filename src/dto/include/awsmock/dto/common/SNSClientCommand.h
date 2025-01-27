@@ -105,7 +105,7 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return command string
          */
-        std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
+        [[nodiscard]] std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
 
         /**
          * @brief Getś the value from the user-agent string

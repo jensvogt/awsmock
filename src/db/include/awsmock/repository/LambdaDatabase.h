@@ -89,7 +89,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created lambda entity.
          */
-        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
+        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Count all lambdas

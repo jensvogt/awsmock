@@ -149,13 +149,16 @@ namespace AwsMock::Service {
         }
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
+        if (!request.topicArn.empty() && !_snsDatabase.TopicExists(request.topicArn)) {
             log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
             throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
         }
+        if (!request.targetArn.empty() && !_snsDatabase.TopicExists(request.targetArn)) {
+            log_error << "SNS targetArn does not exists, targetArn: " << request.targetArn;
+            throw Core::ServiceException("SNS targetArn does not exists, targetArn: " + request.targetArn);
+        }
 
         try {
-
             // Get the topic by topic ARN or target ARN
             Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
 
