@@ -55,6 +55,7 @@ namespace AwsMock::Dto::Common {
         UPDATE_MESSAGE,
         REDRIVE_MESSAGES,
         DELETE_ATTRIBUTE,
+        UPDATE_DLQ,
         UNKNOWN
     };
 
@@ -87,6 +88,7 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS, "list-lambda-trigger-counters"},
             {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
             {SqsCommandType::UPDATE_MESSAGE, "update-message"},
+            {SqsCommandType::UPDATE_DLQ, "update-dlq"},
             {SqsCommandType::REDRIVE_MESSAGES, "redrive-messages"},
             {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},

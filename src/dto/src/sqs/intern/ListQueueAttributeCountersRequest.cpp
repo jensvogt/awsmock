@@ -2,16 +2,15 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/ListMessageCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListQueueAttributeCountersRequest.h>
 
 namespace AwsMock::Dto::SQS {
 
-    void ListMessageCountersRequest::FromJson(const std::string &jsonString) {
+    void ListQueueAttributeCountersRequest::FromJson(const std::string &jsonString) {
 
         try {
-
             const value document = bsoncxx::from_json(jsonString);
-
+            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
             queueArn = Core::Bson::BsonUtils::GetStringValue(document, "queueArn");
             prefix = Core::Bson::BsonUtils::GetStringValue(document, "prefix");
             pageSize = Core::Bson::BsonUtils::GetIntValue(document, "pageSize");
@@ -25,19 +24,18 @@ namespace AwsMock::Dto::SQS {
                     sortColumns.emplace_back(sortColumn);
                 }
             }
-
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
 
-    std::string ListMessageCountersRequest::ToJson() const {
+    std::string ListQueueAttributeCountersRequest::ToJson() const {
 
         try {
 
             document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "queueArn", queueArn);
             Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
             Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
@@ -59,14 +57,14 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListMessageCountersRequest::ToString() const {
+    std::string ListQueueAttributeCountersRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListMessageCountersRequest &r) {
-        os << "ListMessageCountersRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListQueueAttributeCountersRequest &r) {
+        os << "ListQueueAttributeCountersRequest=" << r.ToJson();
         return os;
     }
 

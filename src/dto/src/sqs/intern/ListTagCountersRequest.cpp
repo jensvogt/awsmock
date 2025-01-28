@@ -2,11 +2,11 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/ListQueueAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListTagCountersRequest.h>
 
 namespace AwsMock::Dto::SQS {
 
-    void ListQueueAttributeCountersRequest::FromJson(const std::string &jsonString) {
+    void ListTagCountersRequest::FromJson(const std::string &jsonString) {
 
         try {
             const value document = bsoncxx::from_json(jsonString);
@@ -30,7 +30,7 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListQueueAttributeCountersRequest::ToJson() const {
+    std::string ListTagCountersRequest::ToJson() const {
 
         try {
 
@@ -57,14 +57,14 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListQueueAttributeCountersRequest::ToString() const {
+    std::string ListTagCountersRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListQueueAttributeCountersRequest &r) {
-        os << "ListQueueAttributeCountersRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListTagCountersRequest &r) {
+        os << "ListTagCountersRequest=" << r.ToJson();
         return os;
     }
 

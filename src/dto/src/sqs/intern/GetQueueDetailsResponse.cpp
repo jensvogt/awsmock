@@ -3,7 +3,7 @@
 //
 
 // AwsMock includes
-#include <awsmock/dto/sqs/GetQueueDetailsResponse.h>
+#include <awsmock/dto/sqs/intern/GetQueueDetailsResponse.h>
 
 namespace AwsMock::Dto::SQS {
 

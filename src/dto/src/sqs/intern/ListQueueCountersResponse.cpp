@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/ListQueueCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListQueueCountersResponse.h>
 
 namespace AwsMock::Dto::SQS {
 

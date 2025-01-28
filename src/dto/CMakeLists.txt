@@ -8,19 +8,19 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
         src/sqs/GetQueueUrlRequest.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp
-        src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp
+        src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp src/sqs/intern/UpdateDqlRequest.cpp
         src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
         src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp
         src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
         src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp
-        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp src/sqs/model/QueueCounter.cpp src/sqs/ListQueueCountersRequest.cpp
-        src/sqs/ListQueueCountersResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
-        src/sqs/ListQueueTagsResponse.cpp src/sqs/GetQueueDetailsRequest.cpp src/sqs/GetQueueDetailsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
+        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp src/sqs/model/QueueCounter.cpp src/sqs/intern/ListQueueCountersRequest.cpp
+        src/sqs/intern/ListQueueCountersResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
+        src/sqs/ListQueueTagsResponse.cpp src/sqs/intern/GetQueueDetailsRequest.cpp src/sqs/intern/GetQueueDetailsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
         src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/model/Message.cpp src/sqs/mapper/Mapper.cpp
-        src/sqs/ListMessageCountersRequest.cpp src/sqs/ListMessageCountersResponse.cpp src/sqs/model/AttributeCounter.cpp src/sqs/ListQueueAttributeCountersRequest.cpp
-        src/sqs/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp src/sqs/ListTagCountersRequest.cpp src/sqs/ListTagCountersResponse.cpp
-        src/sqs/UntagQueueRequest.cpp src/sqs/model/LambdaTriggerCounter.cpp src/sqs/ListLambdaTriggerCountersRequest.cpp src/sqs/ListLambdaTriggerCountersResponse.cpp
-        src/sqs/UpdateMessageRequest.cpp src/sqs/DeleteAttributeRequest.cpp src/sqs/RedriveMessagesRequest.cpp)
+        src/sqs/intern/ListMessageCountersRequest.cpp src/sqs/intern/ListMessageCountersResponse.cpp src/sqs/model/AttributeCounter.cpp src/sqs/intern/ListQueueAttributeCountersRequest.cpp
+        src/sqs/intern/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp src/sqs/intern/ListTagCountersRequest.cpp src/sqs/intern/ListTagCountersResponse.cpp
+        src/sqs/UntagQueueRequest.cpp src/sqs/model/LambdaTriggerCounter.cpp src/sqs/intern/ListLambdaTriggerCountersRequest.cpp src/sqs/intern/ListLambdaTriggerCountersResponse.cpp
+        src/sqs/intern/UpdateMessageRequest.cpp src/sqs/DeleteAttributeRequest.cpp src/sqs/RedriveMessagesRequest.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
         src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
         src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp src/sns/TagResourceRequest.cpp src/sns/TagResourceResponse.cpp src/sns/GetTopicAttributesRequest.cpp

@@ -2,41 +2,39 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/ListTagCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListQueueCountersRequest.h>
 
 namespace AwsMock::Dto::SQS {
 
-    void ListTagCountersRequest::FromJson(const std::string &jsonString) {
+    void ListQueueCountersRequest::FromJson(const std::string &jsonString) {
 
         try {
             const value document = bsoncxx::from_json(jsonString);
             region = Core::Bson::BsonUtils::GetStringValue(document, "region");
-            queueArn = Core::Bson::BsonUtils::GetStringValue(document, "queueArn");
             prefix = Core::Bson::BsonUtils::GetStringValue(document, "prefix");
             pageSize = Core::Bson::BsonUtils::GetIntValue(document, "pageSize");
             pageIndex = Core::Bson::BsonUtils::GetIntValue(document, "pageIndex");
 
             if (document.find("sortColumns") != document.end()) {
-
-                for (const bsoncxx::array::view arrayView{document["sortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
+                array jsonAttributesArray;
+                for (const auto &s: document["sortColumns"].get_array().value) {
                     Core::SortColumn sortColumn;
-                    sortColumn.FromDocument(element.get_document());
+                    sortColumn.FromDocument(s.get_document());
                     sortColumns.emplace_back(sortColumn);
                 }
             }
+
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
 
-    std::string ListTagCountersRequest::ToJson() const {
+    std::string ListQueueCountersRequest::ToJson() const {
 
         try {
-
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "queueArn", queueArn);
             Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
             Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
             Core::Bson::BsonUtils::SetIntValue(document, "pageIndex", pageIndex);
@@ -57,14 +55,14 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListTagCountersRequest::ToString() const {
+    std::string ListQueueCountersRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListTagCountersRequest &r) {
-        os << "ListTagCountersRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListQueueCountersRequest &r) {
+        os << "ListQueueCountersRequest=" << r.ToJson();
         return os;
     }
 

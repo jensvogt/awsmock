@@ -30,28 +30,24 @@ using bsoncxx::document::view;
 using std::chrono::system_clock;
 
 namespace AwsMock::Core::Bson {
-
     inline bool FindBsonObject(const view &value, const std::string &name) {
         return value.find(name) != value.end();
     }
 
-    template<class Element>
-    void ToBsonArray(document &d, const std::string &name, std::vector<Element> a) {
-
+    template<class Element> void ToBsonArray(document &d, const std::string &name, std::vector<Element> a) {
         if (!a.empty()) {
             array jsonArray;
-            for (const auto &e: a) {
+            for (const auto &e : a) {
                 jsonArray.append(e.ToDocument());
             }
             d.append(kvp(name, jsonArray));
         }
     }
 
-    template<class Element>
-    void FromBsonArray(const view &value, const std::string &name, std::vector<Element> *a) {
-
+    template<class Element> void FromBsonArray(const view &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
+                 arrayElement : arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -59,11 +55,10 @@ namespace AwsMock::Core::Bson {
         }
     }
 
-    template<class Element>
-    void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
-
+    template<class Element> void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
+                 arrayElement : arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -72,35 +67,36 @@ namespace AwsMock::Core::Bson {
     }
 
     inline void FromBsonStringArray(const value &value, const std::string &name, std::vector<std::string> *a) {
-
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
+                 arrayElement : arrayView) {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
     }
 
     inline void FromBsonArray(const view &value, const std::string &name, std::vector<std::string> *a) {
-
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
+                 arrayElement : arrayView) {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
     }
 
-    template<class Object>
-    Object FromBsonObject(const value &value, const std::string &name, Object *object) {
+    template<class Object> Object FromBsonObject(const value &value, const std::string &name, Object *object) {
         if (FindBsonObject(value, name)) {
             return object->FromDocument(value[name].get_document().view());
         }
         return {};
     }
 
-    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument, const std::string &name) {
+    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument,
+                                                                const std::string &name) {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
-            for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
+                 &tagElement : tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 valueMap.emplace(key, value);
@@ -111,7 +107,6 @@ namespace AwsMock::Core::Bson {
     }
 
     struct BsonUtils {
-
         static void SetStringValue(document &document, const std::string &name, const std::string &value) {
             if (!value.empty()) {
                 document.append(kvp(name, value));
@@ -138,7 +133,9 @@ namespace AwsMock::Core::Bson {
             rootDocument.append(kvp(name, value));
         }
 
-        static void SetDocumentValue(document &rootDocument, const std::string &name, const view_or_value<view, value> &value) {
+        static void SetDocumentValue(document &rootDocument,
+                                     const std::string &name,
+                                     const view_or_value<view, value> &value) {
             rootDocument.append(kvp(name, value));
         }
 
@@ -155,12 +152,12 @@ namespace AwsMock::Core::Bson {
 
         static std::string GetOidValue(const bsoncxx::document::element &element) {
             switch (element.type()) {
-                case bsoncxx::type::k_null:
-                    return {};
-                case bsoncxx::type::k_oid:
-                    return element.get_oid().value.to_string();
-                default:
-                    break;
+            case bsoncxx::type::k_null:
+                return {};
+            case bsoncxx::type::k_oid:
+                return element.get_oid().value.to_string();
+            default:
+                break;
             }
             return {};
         }
@@ -180,19 +177,20 @@ namespace AwsMock::Core::Bson {
         }
 
         static long GetLongValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return 0;
             }
             switch (element.type()) {
-                case bsoncxx::type::k_int32:
-                    return element.get_int32().value;
-                case bsoncxx::type::k_int64:
-                    return element.get_int64().value;
-                case bsoncxx::type::k_null:
-                    return 0;
-                default:
-                    break;
+            case bsoncxx::type::k_int32:
+                return element.get_int32().value;
+            case bsoncxx::type::k_int64:
+                return element.get_int64().value;
+            case bsoncxx::type::k_string:
+                return std::stol(bsoncxx::string::to_string(element.get_string().value));
+            case bsoncxx::type::k_null:
+                return 0;
+            default:
+                break;
             }
             return 0;
         }
@@ -212,19 +210,20 @@ namespace AwsMock::Core::Bson {
         }
 
         static int GetIntValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return 0;
             }
             switch (element.type()) {
-                case bsoncxx::type::k_int32:
-                    return element.get_int32().value;
-                case bsoncxx::type::k_int64:
-                    return static_cast<int>(element.get_int64().value);
-                case bsoncxx::type::k_null:
-                    return 0;
-                default:
-                    break;
+            case bsoncxx::type::k_int32:
+                return element.get_int32().value;
+            case bsoncxx::type::k_int64:
+                return static_cast<int>(element.get_int64().value);
+            case bsoncxx::type::k_string:
+                return std::stoi(bsoncxx::string::to_string(element.get_string().value));
+            case bsoncxx::type::k_null:
+                return 0;
+            default:
+                break;
             }
             return 0;
         }
@@ -237,17 +236,16 @@ namespace AwsMock::Core::Bson {
         }
 
         static double GetDoubleValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return 0;
             }
             switch (element.type()) {
-                case bsoncxx::type::k_null:
-                    return 0.0;
-                case bsoncxx::type::k_double:
-                    return element.get_double().value;
-                default:
-                    break;
+            case bsoncxx::type::k_null:
+                return 0.0;
+            case bsoncxx::type::k_double:
+                return element.get_double().value;
+            default:
+                break;
             }
             return 0;
         }
@@ -267,18 +265,17 @@ namespace AwsMock::Core::Bson {
         }
 
         static std::string GetStringValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return {};
             }
 
             switch (element.type()) {
-                case bsoncxx::type::k_null:
-                    return {};
-                case bsoncxx::type::k_string:
-                    return bsoncxx::string::to_string(element.get_string().value);
-                default:
-                    break;
+            case bsoncxx::type::k_null:
+                return {};
+            case bsoncxx::type::k_string:
+                return bsoncxx::string::to_string(element.get_string().value);
+            default:
+                break;
             }
             return {};
         }
@@ -295,18 +292,17 @@ namespace AwsMock::Core::Bson {
         }
 
         static bool GetBoolValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return false;
             }
 
             switch (element.type()) {
-                case bsoncxx::type::k_null:
-                    return false;
-                case bsoncxx::type::k_bool:
-                    return element.get_bool().value;
-                default:
-                    break;
+            case bsoncxx::type::k_null:
+                return false;
+            case bsoncxx::type::k_bool:
+                return element.get_bool().value;
+            default:
+                break;
             }
             return {};
         }
@@ -319,20 +315,21 @@ namespace AwsMock::Core::Bson {
         }
 
         static system_clock::time_point GetDateValue(const bsoncxx::document::element &element) {
-
             if (!element) {
                 return {};
             }
 
             switch (element.type()) {
-                case bsoncxx::type::k_null:
-                    return system_clock::now();
-                case bsoncxx::type::k_date:
-                    return bsoncxx::types::b_date(element.get_date());
-                case bsoncxx::type::k_timestamp:
-                    return std::chrono::time_point<system_clock, std::chrono::milliseconds>{std::chrono::milliseconds{element.get_timestamp().timestamp}};
-                default:
-                    break;
+            case bsoncxx::type::k_null:
+                return system_clock::now();
+            case bsoncxx::type::k_date:
+                return bsoncxx::types::b_date(element.get_date());
+            case bsoncxx::type::k_timestamp:
+                return std::chrono::time_point<system_clock, std::chrono::milliseconds>{
+                    std::chrono::milliseconds{element.get_timestamp().timestamp}
+                };
+            default:
+                break;
             }
             return {};
         }
@@ -345,6 +342,6 @@ namespace AwsMock::Core::Bson {
             return bsoncxx::to_json(array);
         }
     };
-}// namespace AwsMock::Core::Bson
+} // namespace AwsMock::Core::Bson
 
 #endif// AWS_MOCK_CORE_BSON_UTILS_H

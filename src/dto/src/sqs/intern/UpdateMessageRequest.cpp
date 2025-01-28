@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/sqs/UpdateMessageRequest.h>
+#include <awsmock/dto/sqs/intern/UpdateMessageRequest.h>
 
 namespace AwsMock::Dto::SQS {
 

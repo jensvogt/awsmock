@@ -6,9 +6,9 @@
 #define AWSMOCK_DTO_SQS_MAPPER_H
 
 // AwsMock includes
-#include <awsmock/dto/sqs/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
+#include <awsmock/dto/sqs/intern/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/entity/sqs/Message.h>
