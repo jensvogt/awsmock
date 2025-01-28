@@ -83,10 +83,13 @@ namespace AwsMock::Core {
         if (const std::vector<std::string> parts = StringUtils::Split(parameter, '='); parts.size() > 1) {
             std::string value = parts[1];
             if (IsUrlEncoded(value)) {
+                log_trace << "Found query parameter value, name: " << parameter << ", value: " << value;
                 return StringUtils::UrlDecode(value);
             }
+            log_trace << "Found query parameter value, name: " << parameter << ", value: " << value;
             return value;
         }
+        log_debug << "Query parameter value not found, name: " << parameter;
         return {};
     }
 

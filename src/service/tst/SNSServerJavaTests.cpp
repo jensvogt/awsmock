@@ -20,6 +20,7 @@
 #define TEST_PORT 10100
 #define TEST_TOPIC std::string("test-topic")
 #define TEST_QUEUE std::string("test-queue")
+#define TEST_MESSAGE_JSON std::string("{\"test-message\":\"test-value\"")
 
 namespace AwsMock::Service {
 
@@ -105,12 +106,12 @@ namespace AwsMock::Service {
     TEST_F(SNSServerJavaTest, TopicListTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        const Core::HttpSocketResponse result = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
         EXPECT_TRUE(result.statusCode == http::status::ok);
         std::string topicArn = result.body;
 
         // act
-        Core::HttpSocketResponse listResult = SendGetCommand(_snsBaseUrl + "listTopics", {});
+        const Core::HttpSocketResponse listResult = SendGetCommand(_snsBaseUrl + "listTopics", {});
         EXPECT_TRUE(listResult.statusCode == http::status::ok);
 
         // assert
@@ -154,6 +155,23 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_TRUE(unsubscribeResult.statusCode == http::status::ok);
+    }
+
+    TEST_F(SNSServerJavaTest, TopicPublishTest) {
+
+        // arrange
+        const Core::HttpSocketResponse createTopicResult = SendPostCommand(_snsBaseUrl + "createTopic?name=" + Core::StringUtils::UrlEncode(TEST_TOPIC), {});
+        EXPECT_TRUE(createTopicResult.statusCode == http::status::ok);
+        const std::string topicArn = createTopicResult.body;
+
+        // act
+        const Core::HttpSocketResponse publishResult = SendPostCommand(_snsBaseUrl + "publish?topicArn=" + Core::StringUtils::UrlEncode(topicArn), Core::StringUtils::UrlEncode(TEST_MESSAGE_JSON));
+        EXPECT_TRUE(publishResult.statusCode == http::status::ok);
+        const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages();
+
+        // assert
+        EXPECT_TRUE(publishResult.statusCode == http::status::ok);
+        EXPECT_EQ(1, messageList.size());
     }
 
     TEST_F(SNSServerJavaTest, TopicDeleteTest) {

@@ -478,15 +478,12 @@ namespace AwsMock::Service {
                     return SendBadRequestError(request, "Unknown method");
             }
 
-        } catch (Core::ServiceException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
-        } catch (Core::JsonException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
+        } catch (...) {
+            log_error << "Unknown exception";
+            return SendInternalServerError(request, "Unknown exception");
         }
     }
 
@@ -669,15 +666,12 @@ namespace AwsMock::Service {
                     return SendBadRequestError(request, "Unknown method");
             }
 
-        } catch (Core::ServiceException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
-        } catch (Core::JsonException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
+        } catch (...) {
+            log_error << "Unknown exception";
+            return SendInternalServerError(request, "Unknown exception");
         }
         log_error << "Unknown method";
         return SendBadRequestError(request, "Unknown method");
@@ -741,15 +735,12 @@ namespace AwsMock::Service {
                     return SendBadRequestError(request, "Unknown method");
             }
 
-        } catch (Core::ServiceException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
-        } catch (Core::JsonException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
+        } catch (...) {
+            log_error << "Unknown exception";
+            return SendInternalServerError(request, "Unknown exception");
         }
     }
 
@@ -794,12 +785,12 @@ namespace AwsMock::Service {
             }
             return SendHeadResponse(request, s3Response.size, headers);
 
-        } catch (Core::NotFoundException &exc) {
-            log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
+        } catch (...) {
+            log_error << "Unknown exception";
+            return SendInternalServerError(request, "Unknown exception");
         }
     }
 

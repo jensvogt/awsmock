@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
     DatabaseException::DatabaseException(const http::status code, const char *resource, const char *requestId) : _code(code), _resource(resource), _requestId(requestId) {}
 
-    DatabaseException::DatabaseException(const std::string &msg, const http::status code, const char *resource, const char *requestId) : _message(msg), _code(code), _resource(resource), _requestId(requestId) {}
+    DatabaseException::DatabaseException(const std::string &msg, const http::status code, const char *resource, const char *requestId) : _code(code), _message(msg), _resource(resource), _requestId(requestId) {}
 
     DatabaseException::DatabaseException(const DatabaseException &exc) = default;
 
