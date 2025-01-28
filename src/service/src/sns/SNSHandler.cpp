@@ -75,6 +75,7 @@ namespace AwsMock::Service {
 
                     Dto::SNS::PublishRequest snsRequest = {.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .messageAttributes = messageAttributes, .requestId = clientCommand.requestId};
                     Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
+                    log_trace << "SNS PUBLISH, request: " << snsRequest.ToString();
 
                     std::map<std::string, std::string> headers;
                     headers["Content-Type"] = "application/xml";
