@@ -156,6 +156,12 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "get_queue_details");
         log_trace << "Get queue details request, queueArn: " << request.queueArn;
 
+        // Check existence. In case the queue exists already return the existing queue.
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_warning << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
         try {
 
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
