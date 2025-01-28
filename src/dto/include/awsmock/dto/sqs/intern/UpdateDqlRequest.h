@@ -70,6 +70,6 @@ namespace AwsMock::Dto::SQS {
          */
         friend std::ostream &operator<<(std::ostream &os, UpdateDqlRequest &r);
     };
-} // namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UPDATE_DQL_REQUEST_H
