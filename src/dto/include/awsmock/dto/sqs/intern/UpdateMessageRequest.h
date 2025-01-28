@@ -115,6 +115,6 @@ namespace AwsMock::Dto::SQS {
          */
         friend std::ostream &operator<<(std::ostream &os, UpdateMessageRequest &r);
     };
-}// namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UPDATE_MESSAGE_REQUEST_H
