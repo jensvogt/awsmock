@@ -73,7 +73,8 @@ namespace AwsMock::Service {
                     std::string message = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Message");
                     std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes = GetMessageAttributes(clientCommand.payload);
 
-                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .messageAttributes = messageAttributes, .requestId = clientCommand.requestId});
+                    Dto::SNS::PublishRequest snsRequest = {.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .messageAttributes = messageAttributes, .requestId = clientCommand.requestId};
+                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
 
                     std::map<std::string, std::string> headers;
                     headers["Content-Type"] = "application/xml";
