@@ -640,6 +640,30 @@ namespace AwsMock::Service {
         }
     }
 
+    void SQSService::UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "update_dlq");
+        log_trace << "Update DQL subscription request, queueArn: " << request.queueArn;
+
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            queue.attributes.redrivePolicy.deadLetterTargetArn = request.targetArn;
+            queue.attributes.redrivePolicy.maxReceiveCount = request.retries;
+
+            // Update queue
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_debug << "Queue DQL subscription updated, queueArn: " << request.queueArn;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     Dto::SQS::DeleteQueueResponse SQSService::DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_queue");
         log_trace << "Delete queue request, request: " << request.ToString();

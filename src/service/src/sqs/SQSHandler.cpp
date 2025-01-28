@@ -271,6 +271,17 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
+                case Dto::Common::SqsCommandType::UPDATE_DLQ: {
+
+                    Dto::SQS::UpdateDqlRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    _sqsService.UpdateDql(sqsRequest);
+
+                    log_info << "Queue DQL subscription updated, queueArn: " << sqsRequest.queueArn;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_QUEUE: {
 
                     Dto::SQS::DeleteQueueRequest sqsRequest;
