@@ -18,6 +18,7 @@
 #define GATEWAY_HTTP_COUNTER "gateway_http_counter"
 #define GATEWAY_HTTP_QUEUE_LENGTH "gateway_http_queue_length"
 
+// Modules
 #define MODULE_HTTP_TIMER "manager_http_timer"
 #define MODULE_HTTP_COUNTER "manager_http_counter"
 #define MODULE_UPDOWN_GAUGE "manager_updown_gauge"
@@ -49,17 +50,21 @@
 #define LAMBDA_INVOCATION_COUNT "lambda_invocation_counter"
 #define LAMBDA_SERVICE_TIMER "lambda_service_timer"
 
+// Dynamodb
 #define DYNAMODB_TABLE_COUNT "dynamodb_table_counter"
 #define DYNAMODB_ITEM_COUNT "dynamodb_item_counter"
 #define DYNAMODB_SERVICE_TIMER "dynamodb_service_timer"
 
+// Secrets manager
 #define SECRETSMANAGER_SECRETS_COUNT "secretsmanager_secret_counter"
 
+// Cognito
 #define COGNITO_USER_COUNT "cognito_user_counter"
 #define COGNITO_USERPOOL_COUNT "cognito_userpool_counter"
 #define COGNITO_USER_BY_USERPOOL_COUNT "cognito_user_by_userpool_counter"
 #define COGNITO_SERVICE_TIMER "cognito_service_timer"
 
+// Transfer server
 #define TRANSFER_SERVER_COUNT "transfer_server_counter"
 #define TRANSFER_SERVER_UPLOAD_COUNT "transfer_upload_counter"
 #define TRANSFER_SERVER_DOWNLOAD_COUNT "transfer_download_counter"
@@ -74,6 +79,7 @@
 #define KMS_DECRYPTION_COUNT "kms_decryption_counter"
 #define KMS_SERVICE_TIMER "kms_service_timer"
 
+// Systems manager
 #define SSM_PARAMETER_COUNT "ssm_parameter_counter"
 #define SSM_SERVICE_TIMER "ssm_service_timer"
 
