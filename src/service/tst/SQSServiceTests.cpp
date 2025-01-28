@@ -38,8 +38,9 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllQueues();
-            _database.DeleteAllMessages();
+            const long queueCount = _database.DeleteAllQueues();
+            const long messageCount = _database.DeleteAllMessages();
+            log_debug << "Queue deleted: " << queueCount << " messages: " << messageCount;
         }
 
         Database::SQSDatabase &_database = Database::SQSDatabase::instance();
@@ -85,6 +86,94 @@ namespace AwsMock::Service {
         EXPECT_TRUE(response.queueList.empty());
     }
 
+    TEST_F(SQSServiceTest, QueueNotExistenceTest) {
+
+        // arrange
+        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
+        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest = {.region = REGION, .queueArn = "notExist"};
+
+        // act
+        EXPECT_THROW({
+        try {
+            Dto::SQS::GetQueueDetailsResponse response = _service.GetQueueDetails(getQueueDetailsRequest);
+        } catch( const Core::ServiceException& e ) {
+            // and this tests that it has the correct message
+            EXPECT_STREQ( "Queue does not exist, queueArn: notExist", e.what() );
+            throw;} }, Core::ServiceException);
+    }
+
+    TEST_F(SQSServiceTest, QueueGetDetailsTest) {
+
+        // arrange
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
+        Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
+        Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
+        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest = {.region = REGION, .queueArn = queueResponse.queueArn};
+
+        // act
+        Dto::SQS::GetQueueDetailsResponse response = _service.GetQueueDetails(getQueueDetailsRequest);
+
+        // assert
+        EXPECT_EQ(1, response.available);
+        EXPECT_EQ(0, response.delayed);
+        EXPECT_EQ(0, response.invisible);
+    }
+
+    TEST_F(SQSServiceTest, QueueListArnsTest) {
+
+        // arrange
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
+        Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
+
+        // act
+        auto [queueArns] = _service.ListQueueArns();
+
+        // assert
+        EXPECT_EQ(1, queueArns.size());
+        EXPECT_TRUE(queueArns.at(0) == queueResponse.queueArn);
+    }
+
+    TEST_F(SQSServiceTest, QueueListCountersTest) {
+
+        // arrange
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
+        Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
+        Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
+        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest = {.region = REGION};
+
+        // act
+        auto [queueCounters, total] = _service.ListQueueCounters(listQueueCountersRequest);
+
+        // assert
+        EXPECT_EQ(1, total);
+        EXPECT_EQ(1, queueCounters.at(0).available);
+    }
+
+    TEST_F(SQSServiceTest, QueueListTagsTest) {
+
+    // arrange
+    std:
+        std::map<std::string, std::string> tags = {{"version", "1.0"}};
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER, .tags = tags};
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
+        Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
+        Dto::SQS::ListQueueTagsRequest listQueueTagsRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl};
+
+        // act
+        Dto::SQS::ListQueueTagsResponse listQueueTagsResponse = _service.ListQueueTags(listQueueTagsRequest);
+
+        // assert
+        EXPECT_EQ(1, listQueueTagsResponse.total);
+        EXPECT_EQ(1, listQueueTagsResponse.tags.size());
+        EXPECT_TRUE(listQueueTagsResponse.tags["version"] == "1.0");
+    }
+
     TEST_F(SQSServiceTest, QueueDeleteTest) {
 
         // arrange
@@ -124,7 +213,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response.messageId.empty());
         EXPECT_TRUE(response.md5Body == BODY_MD5);
         EXPECT_TRUE(response.md5UserAttr == EMPTY_MD5);
-        EXPECT_TRUE(response.md5SystemAttr == EMPTY_MD5);
+        EXPECT_TRUE(response.md5SystemAttr.empty());
     }
 
     TEST_F(SQSServiceTest, MessagesCreateTest) {
@@ -150,11 +239,11 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response1.messageId.empty());
         EXPECT_TRUE(response1.md5Body == BODY_MD5);
         EXPECT_TRUE(response1.md5UserAttr == EMPTY_MD5);
-        EXPECT_TRUE(response1.md5SystemAttr == EMPTY_MD5);
+        EXPECT_TRUE(response1.md5SystemAttr.empty());
         EXPECT_FALSE(response2.messageId.empty());
         EXPECT_TRUE(response2.md5Body == BODY_MD5);
         EXPECT_TRUE(response2.md5UserAttr == EMPTY_MD5);
-        EXPECT_TRUE(response2.md5SystemAttr == EMPTY_MD5);
+        EXPECT_TRUE(response2.md5SystemAttr.empty());
     }
 
     TEST_F(SQSServiceTest, MessageReceiveTest) {

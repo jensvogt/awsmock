@@ -1178,7 +1178,7 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteMessage(message);
     }
 
-    void SQSDatabase::DeleteAllMessages() const {
+    long SQSDatabase::DeleteAllMessages() const {
 
         if (HasDatabase()) {
 
@@ -1197,16 +1197,15 @@ namespace AwsMock::Database {
                 // Adjust all queue counters
                 AdjustAllMessageCounters();
 
+                return result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteAllMessages();
         }
+        return _memoryDb.DeleteAllMessages();
     }
 
     void SQSDatabase::AdjustAllMessageCounters() const {

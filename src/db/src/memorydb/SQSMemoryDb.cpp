@@ -482,7 +482,7 @@ namespace AwsMock::Database {
                                        if (kv.second.queueArn == queue.queueArn) {
                                            return kv.second;
                                        }
-                                       return (Entity::SQS::Message){};
+                                       return (Entity::SQS::Message) {};
                                    });
 
             if (!filtered.empty()) {
@@ -539,10 +539,12 @@ namespace AwsMock::Database {
         return count;
     }
 
-    void SQSMemoryDb::DeleteAllMessages() {
+    long SQSMemoryDb::DeleteAllMessages() {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        log_debug << "All resources deleted, count: " << _messages.size();
+        const long count = _messages.size();
         _messages.clear();
+        log_debug << "All resources deleted, count: " << count;
+        return count;
     }
 }// namespace AwsMock::Database

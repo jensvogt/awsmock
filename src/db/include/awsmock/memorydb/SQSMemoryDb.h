@@ -372,9 +372,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes a resources.
          *
+         * @return total number of message deleted
          * @throws Core::DatabaseException
          */
-        void DeleteAllMessages();
+        long DeleteAllMessages();
 
       private:
 
