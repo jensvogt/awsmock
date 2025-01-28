@@ -155,12 +155,12 @@ namespace AwsMock::Core::Bson {
 
         static std::string GetOidValue(const bsoncxx::document::element &element) {
             switch (element.type()) {
-            case bsoncxx::type::k_null:
-                return {};
-            case bsoncxx::type::k_oid:
-                return element.get_oid().value.to_string();
-            default:
-                break;
+                case bsoncxx::type::k_null:
+                    return {};
+                case bsoncxx::type::k_oid:
+                    return element.get_oid().value.to_string();
+                default:
+                    break;
             }
             return {};
         }
@@ -184,16 +184,16 @@ namespace AwsMock::Core::Bson {
                 return 0;
             }
             switch (element.type()) {
-            case bsoncxx::type::k_int32:
-                return element.get_int32().value;
-            case bsoncxx::type::k_int64:
-                return element.get_int64().value;
-            case bsoncxx::type::k_string:
-                return std::stol(bsoncxx::string::to_string(element.get_string().value));
-            case bsoncxx::type::k_null:
-                return 0;
-            default:
-                break;
+                case bsoncxx::type::k_int32:
+                    return element.get_int32().value;
+                case bsoncxx::type::k_int64:
+                    return element.get_int64().value;
+                case bsoncxx::type::k_string:
+                    return std::stol(bsoncxx::string::to_string(element.get_string().value));
+                case bsoncxx::type::k_null:
+                    return 0;
+                default:
+                    break;
             }
             return 0;
         }
@@ -218,16 +218,16 @@ namespace AwsMock::Core::Bson {
                 return 0;
             }
             switch (element.type()) {
-            case bsoncxx::type::k_int32:
-                return element.get_int32().value;
-            case bsoncxx::type::k_int64:
-                return static_cast<int>(element.get_int64().value);
-            case bsoncxx::type::k_string:
-                return std::stoi(bsoncxx::string::to_string(element.get_string().value));
-            case bsoncxx::type::k_null:
-                return 0;
-            default:
-                break;
+                case bsoncxx::type::k_int32:
+                    return element.get_int32().value;
+                case bsoncxx::type::k_int64:
+                    return static_cast<int>(element.get_int64().value);
+                case bsoncxx::type::k_string:
+                    return std::stoi(bsoncxx::string::to_string(element.get_string().value));
+                case bsoncxx::type::k_null:
+                    return 0;
+                default:
+                    break;
             }
             return 0;
         }
@@ -244,12 +244,12 @@ namespace AwsMock::Core::Bson {
                 return 0;
             }
             switch (element.type()) {
-            case bsoncxx::type::k_null:
-                return 0.0;
-            case bsoncxx::type::k_double:
-                return element.get_double().value;
-            default:
-                break;
+                case bsoncxx::type::k_null:
+                    return 0.0;
+                case bsoncxx::type::k_double:
+                    return element.get_double().value;
+                default:
+                    break;
             }
             return 0;
         }
@@ -275,12 +275,12 @@ namespace AwsMock::Core::Bson {
             }
 
             switch (element.type()) {
-            case bsoncxx::type::k_null:
-                return {};
-            case bsoncxx::type::k_string:
-                return bsoncxx::string::to_string(element.get_string().value);
-            default:
-                break;
+                case bsoncxx::type::k_null:
+                    return {};
+                case bsoncxx::type::k_string:
+                    return bsoncxx::string::to_string(element.get_string().value);
+                default:
+                    break;
             }
             return {};
         }
@@ -302,12 +302,12 @@ namespace AwsMock::Core::Bson {
             }
 
             switch (element.type()) {
-            case bsoncxx::type::k_null:
-                return false;
-            case bsoncxx::type::k_bool:
-                return element.get_bool().value;
-            default:
-                break;
+                case bsoncxx::type::k_null:
+                    return false;
+                case bsoncxx::type::k_bool:
+                    return element.get_bool().value;
+                default:
+                    break;
             }
             return {};
         }
@@ -326,16 +326,15 @@ namespace AwsMock::Core::Bson {
             }
 
             switch (element.type()) {
-            case bsoncxx::type::k_null:
-                return system_clock::now();
-            case bsoncxx::type::k_date:
-                return bsoncxx::types::b_date(element.get_date());
-            case bsoncxx::type::k_timestamp:
-                return std::chrono::time_point<system_clock, std::chrono::milliseconds>{
-                    std::chrono::milliseconds{element.get_timestamp().timestamp}
-                };
-            default:
-                break;
+                case bsoncxx::type::k_null:
+                    return system_clock::now();
+                case bsoncxx::type::k_date:
+                    return bsoncxx::types::b_date(element.get_date());
+                case bsoncxx::type::k_timestamp:
+                    return std::chrono::time_point<system_clock, std::chrono::milliseconds>{
+                            std::chrono::milliseconds{element.get_timestamp().timestamp}};
+                default:
+                    break;
             }
             return {};
         }
