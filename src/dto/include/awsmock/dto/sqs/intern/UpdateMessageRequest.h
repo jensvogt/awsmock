@@ -14,7 +14,6 @@
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
-
     /**
      * @brief Update message request
      *
@@ -78,7 +77,6 @@ namespace AwsMock::Dto::SQS {
      * @endcode
      */
     struct UpdateMessageRequest {
-
         /**
          * Message ID
          */
@@ -117,7 +115,6 @@ namespace AwsMock::Dto::SQS {
          */
         friend std::ostream &operator<<(std::ostream &os, UpdateMessageRequest &r);
     };
-
-}// namespace AwsMock::Dto::SQS
+} // namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UPDATE_MESSAGE_REQUEST_H
