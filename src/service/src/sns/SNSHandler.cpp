@@ -279,6 +279,9 @@ namespace AwsMock::Service {
 
         } catch (std::exception &e) {
             return SendInternalServerError(request, e.what());
+        } catch (...) {
+            log_error << "Unknown exception";
+            return SendInternalServerError(request, "Unknown exception");
         }
     }
 

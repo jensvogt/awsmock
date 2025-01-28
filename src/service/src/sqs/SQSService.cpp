@@ -260,7 +260,7 @@ namespace AwsMock::Service {
             response.attributeCounters = std::vector(response.attributeCounters.begin() + request.pageSize * request.pageIndex, endArray);
             return response;
 
-        } catch (bsoncxx::exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << "SNS get attribute counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
@@ -292,7 +292,7 @@ namespace AwsMock::Service {
             }
             return response;
 
-        } catch (bsoncxx::exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << "SQS get tag counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
@@ -320,7 +320,7 @@ namespace AwsMock::Service {
             }
             return response;
 
-        } catch (bsoncxx::exception &ex) {
+        } catch (Core::DatabaseException &ex) {
             log_error << "SQS get tag counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
@@ -424,66 +424,71 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
-        Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
-        log_debug << "Got queue: " << queue.queueUrl;
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+            log_debug << "Got queue: " << queue.queueUrl;
 
-        Dto::SQS::GetQueueAttributesResponse response;
-        if (CheckAttribute(request.attributeNames, "all")) {
-            response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
-            response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
-            response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
-            response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
-            response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
-            response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
-            response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
-            response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
-            response.attributes.emplace_back("Policy", queue.attributes.policy);
-            response.attributes.emplace_back("QueueArn", queue.queueArn);
-            response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
-            response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
-        } else {
-            if (CheckAttribute(request.attributeNames, "Policy")) {
-                response.attributes.emplace_back("Policy", queue.attributes.policy);
-            }
-            if (CheckAttribute(request.attributeNames, "VisibilityTimeout")) {
-                response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
-            }
-            if (CheckAttribute(request.attributeNames, "MaximumMessageSize")) {
-                response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
-            }
-            if (CheckAttribute(request.attributeNames, "MessageRetentionPeriod")) {
-                response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
-            }
-            if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessages")) {
+            Dto::SQS::GetQueueAttributesResponse response;
+            if (CheckAttribute(request.attributeNames, "all")) {
                 response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
-            }
-            if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
-                response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
-            }
-            if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesDelayed")) {
                 response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
-            }
-            if (CheckAttribute(request.attributeNames, "CreatedTimestamp")) {
+                response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
                 response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
-            }
-            if (CheckAttribute(request.attributeNames, "LastModifiedTimestamp")) {
-                response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
-            }
-            if (CheckAttribute(request.attributeNames, "DelaySeconds")) {
                 response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
-            }
-            if (CheckAttribute(request.attributeNames, "ReceiveMessageWaitTimeSeconds")) {
-                response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
-            }
-            if (CheckAttribute(request.attributeNames, "RedrivePolicy")) {
-                response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
-            }
-            if (CheckAttribute(request.attributeNames, "QueueArn")) {
+                response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
+                response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
+                response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
+                response.attributes.emplace_back("Policy", queue.attributes.policy);
                 response.attributes.emplace_back("QueueArn", queue.queueArn);
+                response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
+                response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
+            } else {
+                if (CheckAttribute(request.attributeNames, "Policy")) {
+                    response.attributes.emplace_back("Policy", queue.attributes.policy);
+                }
+                if (CheckAttribute(request.attributeNames, "VisibilityTimeout")) {
+                    response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
+                }
+                if (CheckAttribute(request.attributeNames, "MaximumMessageSize")) {
+                    response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
+                }
+                if (CheckAttribute(request.attributeNames, "MessageRetentionPeriod")) {
+                    response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
+                }
+                if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessages")) {
+                    response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
+                }
+                if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
+                    response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
+                }
+                if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesDelayed")) {
+                    response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
+                }
+                if (CheckAttribute(request.attributeNames, "CreatedTimestamp")) {
+                    response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
+                }
+                if (CheckAttribute(request.attributeNames, "LastModifiedTimestamp")) {
+                    response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
+                }
+                if (CheckAttribute(request.attributeNames, "DelaySeconds")) {
+                    response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
+                }
+                if (CheckAttribute(request.attributeNames, "ReceiveMessageWaitTimeSeconds")) {
+                    response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
+                }
+                if (CheckAttribute(request.attributeNames, "RedrivePolicy")) {
+                    response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
+                }
+                if (CheckAttribute(request.attributeNames, "QueueArn")) {
+                    response.attributes.emplace_back("QueueArn", queue.queueArn);
+                }
             }
+            return response;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
         }
-        log_debug << response.ToString();
-        return response;
     }
 
     Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
