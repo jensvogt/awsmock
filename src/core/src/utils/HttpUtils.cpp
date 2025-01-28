@@ -125,7 +125,10 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetQueryParameterValueByName(const std::string &uri, const std::string &name) {
 
-        const std::string queryString = GetQueryString(uri);
+        std::string queryString = GetQueryString(uri);
+        if (queryString.at(0) == '&') {
+            queryString = queryString.substr(1);
+        }
 
         for (std::vector<std::string> parameters = StringUtils::Split(queryString, '&'); const auto &it: parameters) {
             if (GetQueryParameterName(it) == name) {
