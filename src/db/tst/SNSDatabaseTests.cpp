@@ -61,7 +61,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
+        const Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
 
         // assert
         EXPECT_TRUE(result.topicArn == topic.topicArn);
@@ -74,7 +74,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
+        const Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
 
         // assert
         EXPECT_TRUE(result.topicArn == topic.topicArn);
@@ -83,13 +83,13 @@ namespace AwsMock::Database {
     TEST_F(SNSDatabaseTest, TopicUpdateTest) {
 
         // arrange
-        Entity::SNS::Topic topic{.region = _region, .topicName = TOPIC, .owner = OWNER};
+        Entity::SNS::Topic topic{.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        std::string url = "http://localhost:4567/" + topic.topicName;
+        const std::string url = "http://localhost:4567/" + topic.topicName;
         topic.topicUrl = url;
-        Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
+        const Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
 
         // assert
         EXPECT_TRUE(result.topicUrl == topic.topicUrl);
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        long result = _snsDatabase.CountTopics(topic.region);
+        const long result = _snsDatabase.CountTopics(topic.region);
 
         // assert
         EXPECT_EQ(1, result);
@@ -115,7 +115,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
+        const Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
 
         // assert
         EXPECT_EQ(result.size(), 1);
@@ -124,16 +124,16 @@ namespace AwsMock::Database {
     TEST_F(SNSDatabaseTest, TopicGetBySubscriptionArnTest) {
 
         // arrange
-        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
+        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
         topic = _snsDatabase.CreateTopic(topic);
         topic.subscriptions.push_back({.protocol = "sqs", .endpoint = QUEUE_URL, .subscriptionArn = SUBSCRIPTION_ARN});
         topic = _snsDatabase.UpdateTopic(topic);
 
         // act
-        Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
+        const Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
 
         // assert
-        EXPECT_EQ(result.size(), 1);
+        EXPECT_EQ(1, result.size());
         EXPECT_TRUE(result[0].topicName == TOPIC);
     }
 

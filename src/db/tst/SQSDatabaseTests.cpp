@@ -190,7 +190,7 @@ namespace AwsMock::Database {
 
         // act
         _sqsDatabase.PurgeQueue(queue.queueArn);
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(0, result);
@@ -199,12 +199,13 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueUpdateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        const std::string _queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
         queue.owner = "root";
-        Entity::SQS::Queue result = _sqsDatabase.UpdateQueue(queue);
+        const Entity::SQS::Queue result = _sqsDatabase.UpdateQueue(queue);
 
         // assert
         EXPECT_TRUE(result.oid == queue.oid);
