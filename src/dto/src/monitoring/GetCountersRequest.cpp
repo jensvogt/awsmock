@@ -16,8 +16,8 @@ namespace AwsMock::Dto::Monitoring {
             request.labelName = Core::Bson::BsonUtils::GetStringValue(documentValue, "labelName");
             request.labelValue = Core::Bson::BsonUtils::GetStringValue(documentValue, "labelValue");
             request.step = Core::Bson::BsonUtils::GetIntValue(documentValue, "step");
-            request.start = Core::DateTimeUtils::FromUnixtimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "start"));
-            request.end = Core::DateTimeUtils::FromUnixtimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "end"));
+            request.start = Core::DateTimeUtils::FromUnixTimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "start"));
+            request.end = Core::DateTimeUtils::FromUnixTimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "end"));
 
             return request;
 

@@ -33,7 +33,7 @@ namespace AwsMock::Core {
         return std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::system_clock::from_time_t(mktime(&t))};
     }
 
-    system_clock::time_point DateTimeUtils::FromUnixtimestamp(const long timestamp) {
+    system_clock::time_point DateTimeUtils::FromUnixTimestamp(const long timestamp) {
         const system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
         return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::hours(2)};
     }
@@ -52,6 +52,10 @@ namespace AwsMock::Core {
 
     long DateTimeUtils::UnixTimestamp(const system_clock::time_point &timePoint) {
         return std::chrono::duration_cast<std::chrono::seconds>(timePoint.time_since_epoch()).count();
+    }
+
+    long DateTimeUtils::UnixTimestampMs(const system_clock::time_point &timePoint) {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(timePoint.time_since_epoch()).count();
     }
 
     long DateTimeUtils::UnixTimestampLocal(const system_clock::time_point &timePoint) {

@@ -781,9 +781,8 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = Dto::SQS::Mapper::map(request);
 
             // System attributes
-            message.attributes["SentTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampNow());
-            message.attributes["ApproximateFirstReceivedTimestamp"] = std::to_string(
-                    Core::DateTimeUtils::UnixTimestampNow());
+            message.attributes["SentTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()));
+            message.attributes["ApproximateFirstReceivedTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()));
             message.attributes["ApproximateReceivedCount"] = std::to_string(0);
             message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
             message.attributes["SenderId"] = request.senderId;
@@ -1121,10 +1120,8 @@ namespace AwsMock::Service {
                                     }) != attributes.end();
     }
 
-    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda,
-                                                 const Database::Entity::SQS::Message &message,
-                                                 const std::string &eventSourceArn) const {
-        log_debug << "Invoke lambda function request, size: " << lambda.function;
+    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
+        log_debug << "Invoke lambda function request, function: " << lambda.function;
 
         const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
         const std::string user = Core::Configuration::instance().GetValueString("awsmock.user");
@@ -1136,6 +1133,7 @@ namespace AwsMock::Service {
                 .receiptHandle = message.receiptHandle,
                 .body = message.body,
                 .attributes = message.attributes,
+                .messagesAttributes = {},
                 .md5Sum = message.md5Body,
                 .eventSource = "aws:sqs",
                 .eventSourceArn = eventSourceArn};

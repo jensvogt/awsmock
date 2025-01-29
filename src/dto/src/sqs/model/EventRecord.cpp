@@ -39,14 +39,17 @@ namespace AwsMock::Dto::SQS {
                     jsonMessageAttributeArray.append(jsonAttribute);
                 }
                 rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
+            } else {
+                document jsonAttributes;
+                rootDocument.append(kvp("messageAttributes", jsonAttributes));
             }
 
             if (!attributes.empty()) {
                 document jsonAttributeObject;
-                for (const auto &[fst, snd]: attributes) {
-                    if (fst == "ApproximateReceiveCount" || fst == "SentTimestamp" || fst == "SenderId" || fst == "ApproximateFirstReceiveTimestamp")
-                        jsonAttributeObject.append(kvp(fst, snd));
-                }
+                jsonAttributeObject.append(kvp("ApproximateReceiveCount", "1"));
+                jsonAttributeObject.append(kvp("ApproximateFirstReceiveTimestamp", Core::DateTimeUtils::UnixTimestampMs(system_clock::now())));
+                jsonAttributeObject.append(kvp("SenderId", Core::AwsUtils::CreateSQSSenderId()));
+                jsonAttributeObject.append(kvp("SentTimestamp", Core::DateTimeUtils::UnixTimestampMs(system_clock::now())));
                 rootDocument.append(kvp("attributes", jsonAttributeObject));
             }
             return rootDocument.extract();

@@ -10,6 +10,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 

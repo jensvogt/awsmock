@@ -103,6 +103,17 @@ namespace AwsMock::Core {
         static long UnixTimestamp(const system_clock::time_point &timePoint);
 
         /**
+         * @brief Returns the time_point in Java Unix epoch timestamp (UTC)
+         *
+         * @par
+         * This returns the number of milliseconds since 01.01.1970.
+         *
+         * @param timePoint point in time
+         * @return time_point as Unix epoch timestamp
+         */
+        static long UnixTimestampMs(const system_clock::time_point &timePoint);
+
+        /**
          * @brief Returns the current Unix epoch timestamp (UTC)
          *
          * @return now as Unix epoch timestamp
@@ -123,7 +134,7 @@ namespace AwsMock::Core {
          * @param timestamp UNIX timestamp
          * @return system_clock::time_point
          */
-        static system_clock::time_point FromUnixtimestamp(long timestamp);
+        static system_clock::time_point FromUnixTimestamp(long timestamp);
 
         /**
          * @brief Get the current local time
