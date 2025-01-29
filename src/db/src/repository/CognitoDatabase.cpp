@@ -491,7 +491,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountUsers(region);
     }
 
-    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) {
+    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) const {
 
         std::vector<Entity::Cognito::User> users;
         if (HasDatabase()) {
@@ -605,7 +605,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateUser(user);
     }
 
-    Entity::Cognito::User CognitoDatabase::CreateOrUpdateUser(Entity::Cognito::User &user) {
+    Entity::Cognito::User CognitoDatabase::CreateOrUpdateUser(Entity::Cognito::User &user) const {
 
         if (UserExists(user.region, user.userPoolId, user.userName)) {
 
@@ -717,8 +717,8 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _userCollection = (*client)[_databaseName][_groupCollectionName];
-                const auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
+                mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+                const auto mResult = _groupCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
                 if (!mResult) {
                     log_error << "Database exception: group not found ";
                     throw Core::DatabaseException("Database exception, group not found ");
@@ -736,6 +736,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetGroupByGroupName(region, userPoolId, groupName);
     }
 
+    // TODO: write tests
     Entity::Cognito::Group CognitoDatabase::CreateGroup(Entity::Cognito::Group &group) const {
 
         if (HasDatabase()) {

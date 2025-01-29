@@ -229,7 +229,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito users
          */
-        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {});
+        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
          * @brief Returns a list of cognito users in given group.
@@ -256,7 +256,7 @@ namespace AwsMock::Database {
          * @return created or updated Cognito user entity
          * @throws DatabaseException
          */
-        Entity::Cognito::User CreateOrUpdateUser(Entity::Cognito::User &user);
+        Entity::Cognito::User CreateOrUpdateUser(Entity::Cognito::User &user) const;
 
         /**
          * @brief Deletes an existing cognito users

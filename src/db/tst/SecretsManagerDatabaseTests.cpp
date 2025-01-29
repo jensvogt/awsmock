@@ -38,10 +38,10 @@ namespace AwsMock::Database {
     TEST_F(SecretsManagerDatabaseTest, SecretCreateTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        const Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
 
         // act
-        Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);
+        const Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);
 
         // assert
         EXPECT_TRUE(result.name == SECRET_NAME);
@@ -56,7 +56,7 @@ namespace AwsMock::Database {
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
-        Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretBySecretId(secret.secretId);
+        const Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretBySecretId(secret.secretId);
 
         // assert
         EXPECT_TRUE(result.name == SECRET_NAME);
@@ -71,7 +71,7 @@ namespace AwsMock::Database {
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
-        Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretByRegionName(secret.region, secret.name);
+        const Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretByRegionName(secret.region, secret.name);
 
         // assert
         EXPECT_TRUE(result.name == SECRET_NAME);
@@ -86,7 +86,7 @@ namespace AwsMock::Database {
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
-        Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretById(secret.oid);
+        const Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretById(secret.oid);
 
         // assert
         EXPECT_TRUE(result.name == SECRET_NAME);
