@@ -158,11 +158,8 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             return GetLambdaById(bsoncxx::oid(oid));
-
-        } else {
-
-            return _memoryDb.GetLambdaById(oid);
         }
+        return _memoryDb.GetLambdaById(oid);
     }
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaByArn(const std::string &arn) const {
