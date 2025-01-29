@@ -675,6 +675,11 @@ namespace AwsMock::Service {
             throw Core::ServiceException("SQS queue topic does not exists");
         }
 
+        if (request.tags.empty()) {
+            log_warning << "Empty tags array, queueUrl: " << request.queueUrl;
+            return;
+        }
+
         try {
             // Get the topic
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
