@@ -93,7 +93,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return KeyList
          */
-        Entity::KMS::KeyList ListKeys(const std::string &region = {});
+        Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
 
         /**
          * @brief Returns the total number of keys

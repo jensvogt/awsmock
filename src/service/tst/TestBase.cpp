@@ -17,7 +17,7 @@ namespace AwsMock::Service {
         _endpoint = "http://" + _host + ":" + _port;
 
         // Start gateway server
-        _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+        _gatewayServer = std::make_shared<GatewayServer>(_ios);
         _thread = boost::thread([&]() {
             boost::asio::io_service::work work(_ios);
             _ios.run();
@@ -33,7 +33,6 @@ namespace AwsMock::Service {
         // Start the gateway
         StartGateway();
     }
-
 
     Core::HttpSocketResponse TestBase::SendGetCommand(const std::string &url, const std::string &payload, const int port) {
         Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::get, "localhost", port, url, payload);

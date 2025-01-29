@@ -75,6 +75,13 @@ namespace AwsMock::Dto::KMS {
         Key key;
 
         /**
+         * @brief Convert to from a JSON string
+         *
+         * @param jsonString JSON string
+         */
+        void FromJson(const std::string &jsonString);
+
+        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string

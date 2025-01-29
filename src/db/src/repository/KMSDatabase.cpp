@@ -94,7 +94,7 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::KMS::KeyList KMSDatabase::ListKeys(const std::string &region) {
+    Entity::KMS::KeyList KMSDatabase::ListKeys(const std::string &region) const {
 
         Entity::KMS::KeyList keyList;
         if (HasDatabase()) {

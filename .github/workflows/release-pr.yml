@@ -34,21 +34,21 @@ jobs:
           cd docker 
           docker build --no-cache --build-arg GH_TOKEN=${GH_TOKEN} -t awsmock:$VERSION .
 
-  #  test:
-  #    needs: build
-  #    runs-on: self-hosted
-  #    steps:
-  #      - name: Checkout
-  #        uses: actions/checkout@v4
-  #
-  #      - run: cmake .
-  #      - run: cmake --build . -j 16
-  #      - run: ctest -V
+  test:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - run: cmake .
+      - run: cmake --build . -j 16
+      - run: ctest -V
 
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: self-hosted
-    needs: [ build ]
+    needs: [ test ]
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4

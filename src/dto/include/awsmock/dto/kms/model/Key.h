@@ -138,6 +138,13 @@ namespace AwsMock::Dto::KMS {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
+         * @brief Convert to from a JSON object
+         *
+         * @param jsonObject JSON object
+         */
+        void FromDocument(const view_or_value<view, value> &jsonObject);
+
+        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string

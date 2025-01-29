@@ -32,7 +32,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSServerJavaTest : public ::testing::Test, public TestBase {
+    class SNSServerJavaTest : public testing::Test, public TestBase {
 
       protected:
 
