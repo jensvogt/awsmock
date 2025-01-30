@@ -73,10 +73,7 @@ namespace AwsMock::Service {
 
                     // Get object request
                     log_debug << "S3 get object request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    Dto::S3::GetObjectRequest s3Request = {
-                            .region = clientCommand.region,
-                            .bucket = clientCommand.bucket,
-                            .key = clientCommand.key};
+                    Dto::S3::GetObjectRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
 
                     // Get version ID
                     if (std::string versionId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "versionId"); !versionId.empty()) {
@@ -294,8 +291,8 @@ namespace AwsMock::Service {
 
                         Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
+                        log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendOkResponse(request, s3Response.ToXml());
-                        log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     }
                     // Checksum
                     std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");

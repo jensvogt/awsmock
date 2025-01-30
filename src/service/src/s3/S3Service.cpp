@@ -1118,8 +1118,15 @@ namespace AwsMock::Service {
             ofs.close();
         }
 
+        // Get size
         long size = Core::FileUtils::FileSize(filePath);
         log_debug << "File received, fileName: " << filePath << " size: " << size;
+
+        // Check file encoding
+        if (Core::FileUtils::IsBase64(filePath)) {
+            log_info << "File is base64 encoded, file: " << filePath;
+            Core::FileUtils::Base64DecodeFile(filePath);
+        }
 
         // Create entity
         Database::Entity::S3::Object object = {

@@ -251,7 +251,7 @@ namespace AwsMock::Core {
         static void CreateHmacKey(unsigned char *key, int length);
 
         /**
-         * Base64 encoding.
+         * @brief Base64 encoding.
          *
          * @param inputString input string
          * @return BASE64 encoded string.
@@ -259,12 +259,20 @@ namespace AwsMock::Core {
         static std::string Base64Encode(const std::string &inputString);
 
         /**
-         * Base64 decoding.
+         * @brief Base64 decoding.
          *
          * @param encodedString encoded input string
          * @return BASE64 decoded string.
          */
         static std::string Base64Decode(const std::string &encodedString);
+
+        /**
+         * @brief Checks whether the input string is Base64 encoded.
+         *
+         * @param inputString input string
+         * @return BASE64 encoded string.
+         */
+        static bool IsBase64(const std::string &inputString);
 
         /**
          * @brief Converts the given string to hex encoded string.

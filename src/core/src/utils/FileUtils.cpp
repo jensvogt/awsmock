@@ -1,3 +1,4 @@
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 
 namespace AwsMock::Core {
@@ -146,7 +147,7 @@ namespace AwsMock::Core {
         for (auto &it: files) {
 
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -216,7 +217,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -370,6 +371,28 @@ namespace AwsMock::Core {
         DeleteFile(path);
         CopyTo(tempFile, path);
         DeleteFile(tempFile);
+    }
+
+    bool FileUtils::IsBase64(const std::string &filePath) {
+        std::fstream s(filePath);
+        char buff[1000]{};
+        s.read(buff, 1000);
+        return Crypto::IsBase64({buff, 1000});
+    }
+
+    void FileUtils::Base64DecodeFile(const std::string &filePath) {
+        std::ifstream in(filePath);
+        std::string line;
+        in >> line;
+        DeleteFile(filePath);
+
+        std::string decoded = Crypto::Base64Decode({line});
+
+        std::string outFilepath = GetTempFile("b64");
+        std::ofstream out(outFilepath, std::ios::binary);
+        out << decoded;
+        out.close();
+        MoveTo(outFilepath, filePath);
     }
 
 }// namespace AwsMock::Core

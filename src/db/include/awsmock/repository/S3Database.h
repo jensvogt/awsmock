@@ -179,6 +179,13 @@ namespace AwsMock::Database {
         long GetBucketSize(const std::string &region, const std::string &bucket) const;
 
         /**
+         * @brief Adjust the bucket counters
+         * @param region AWS region
+         * @param bucketName bucket name
+         */
+        void AdjustBucketCounters(const std::string &region, const std::string &bucketName) const;
+
+        /**
          * @brief Create a new bucket or updated a existing bucket
          *
          * @param bucket bucket entity

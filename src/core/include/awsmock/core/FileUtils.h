@@ -270,6 +270,21 @@ namespace AwsMock::Core {
         static std::string GetContentTypeMagicString(const std::string &content);
 
         /**
+         * @brief Checks whether the file is base64 encoded.
+         *
+         * @param filePath file path
+         * @return true if file is base64 encoded
+         */
+        static bool IsBase64(const std::string &filePath);
+
+        /**
+         * @brief Decodes a Base64 encoded file
+         *
+         * @param filePath file path
+         */
+        static void Base64DecodeFile(const std::string &filePath);
+
+        /**
          * @brief File path separator
          *
          * @return file path separator

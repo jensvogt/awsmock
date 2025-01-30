@@ -81,12 +81,9 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Loop over buckets and do some maintenance work
+        // Loop over buckets and adjust bucket counters
         for (auto &bucket: buckets) {
-            // Get objects and delete object, where the file is not existing anymore
-            bucket.keys = _s3Database.GetBucketObjectCount(region, bucket.name);
-            bucket.size = _s3Database.GetBucketSize(region, bucket.name);
-            bucket = _s3Database.UpdateBucket(bucket);
+            _s3Database.AdjustBucketCounters(region, bucket.name);
         }
         log_debug << "Bucket synchronized finished, bucketCount: " << buckets.size();
     }
