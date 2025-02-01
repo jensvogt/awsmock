@@ -53,6 +53,7 @@ namespace AwsMock::Dto::Common {
         PUT_BUCKET_NOTIFICATION_CONFIGURATION,
         PUT_BUCKET_ENCRYPTION,
         PUT_BUCKET_VERSIONING,
+        GET_OBJECT_COUNTER,
         UNKNOWN
     };
 
@@ -83,6 +84,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PUT_BUCKET_NOTIFICATION_CONFIGURATION"},
             {S3CommandType::PUT_BUCKET_ENCRYPTION, "PUT_BUCKET_ENCRYPTION"},
             {S3CommandType::PUT_BUCKET_VERSIONING, "PUT_BUCKET_VERSIONING"},
+            {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
     };
 
     [[maybe_unused]] static std::string S3CommandTypeToString(S3CommandType commandType) {
@@ -91,7 +93,7 @@ namespace AwsMock::Dto::Common {
 
     [[maybe_unused]] static S3CommandType S3CommandTypeFromString(const std::string &commandType) {
         for (auto &[fst, snd]: S3CommandTypeNames) {
-            if (Core::StringUtils::StartsWith(commandType, snd)) {
+            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
                 return fst;
             }
         }
@@ -106,7 +108,7 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct S3ClientCommand : public BaseClientCommand {
+    struct S3ClientCommand : BaseClientCommand {
 
         /**
          * Client command

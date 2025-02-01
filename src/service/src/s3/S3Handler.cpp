@@ -635,7 +635,21 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, {});
                 }
 
-                    // Should not happen
+                case Dto::Common::S3CommandType::GET_OBJECT_COUNTER: {
+                    log_debug << "S3 get object counter request";
+
+                    // Build request
+                    Dto::S3::GetObjectCounterRequest s3Request;
+                    s3Request.FromJson(clientCommand.payload);
+
+                    // Get object versions
+                    Dto::S3::GetObjectCounterResponse s3Response = _s3Service.GetObjectCounters(s3Request);
+
+                    log_info << "Get object counter, name: " << s3Request.oid;
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
+
+                // Should not happen
                 case Dto::Common::S3CommandType::CREATE_BUCKET:
                 case Dto::Common::S3CommandType::LIST_BUCKETS:
                 case Dto::Common::S3CommandType::DELETE_BUCKET:

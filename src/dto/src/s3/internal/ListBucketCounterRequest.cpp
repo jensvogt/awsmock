@@ -2,7 +2,7 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#include <awsmock/dto/s3/ListBucketCounterRequest.h>
+#include <awsmock/dto/s3/internal/ListBucketCounterRequest.h>
 
 namespace AwsMock::Dto::S3 {
 

@@ -37,12 +37,8 @@
 #include <awsmock/dto/s3/GetObjectRequest.h>
 #include <awsmock/dto/s3/GetObjectResponse.h>
 #include <awsmock/dto/s3/ListAllBucketResponse.h>
-#include <awsmock/dto/s3/ListBucketCounterRequest.h>
-#include <awsmock/dto/s3/ListBucketCounterResponse.h>
 #include <awsmock/dto/s3/ListBucketRequest.h>
 #include <awsmock/dto/s3/ListBucketResponse.h>
-#include <awsmock/dto/s3/ListObjectCounterRequest.h>
-#include <awsmock/dto/s3/ListObjectCounterResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/MoveObjectRequest.h>
@@ -57,6 +53,12 @@
 #include <awsmock/dto/s3/UpdateBucketRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyResponse.h>
+#include <awsmock/dto/s3/internal/GetObjectCounterRequest.h>
+#include <awsmock/dto/s3/internal/GetObjectCounterResponse.h>
+#include <awsmock/dto/s3/internal/ListBucketCounterRequest.h>
+#include <awsmock/dto/s3/internal/ListBucketCounterResponse.h>
+#include <awsmock/dto/s3/internal/ListObjectCounterRequest.h>
+#include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -91,7 +93,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -263,6 +265,14 @@ namespace AwsMock::Service {
          * @return ListObjectCounterResponse
          */
         Dto::S3::ListObjectCounterResponse ListObjectCounters(const Dto::S3::ListObjectCounterRequest &s3Request) const;
+
+        /**
+         * @brief Returns an object counters
+         *
+         * @param request S3 get object counters request
+         * @return GetObjectCounterResponse
+         */
+        Dto::S3::GetObjectCounterResponse GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const;
 
         /**
          * @brief Delete object

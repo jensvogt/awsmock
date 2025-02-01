@@ -1,5 +1,5 @@
 
-#include <awsmock/dto/s3/ListObjectCounterResponse.h>
+#include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
 
 namespace AwsMock::Dto::S3 {
 

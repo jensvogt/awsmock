@@ -934,7 +934,8 @@ namespace AwsMock::Service {
 
         // Check existence
         if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
-            throw Core::NotFoundException("Bucket does not exist");
+            log_error << "Bucket does not exists, name: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exists, name: " + request.bucket);
         }
 
         try {
@@ -996,6 +997,40 @@ namespace AwsMock::Service {
             log_debug << "Count all objects, size: " << objectList.size();
 
             return listAllObjectResponse;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 Create Object failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::GetObjectCounterResponse S3Service::GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const {
+        log_trace << "Get objects counters request";
+
+        // Check existence
+        if (!_database.ObjectExists(request.oid)) {
+            log_error << "Object does not exists, name: " << request.oid;
+            throw Core::NotFoundException("Object does not exists, id: " + request.oid);
+        }
+
+        try {
+
+            const Database::Entity::S3::Object object = _database.GetObjectById(request.oid);
+
+            Dto::S3::GetObjectCounterResponse getObjectCounterResponse;
+
+            Dto::S3::ObjectCounter objectCounter;
+            objectCounter.oid = object.oid;
+            objectCounter.region = object.region;
+            objectCounter.bucketName = object.bucket;
+            objectCounter.key = object.key;
+            objectCounter.size = object.size;
+            objectCounter.contentType = object.contentType;
+            objectCounter.internalName = object.internalName;
+            objectCounter.created = object.created;
+            objectCounter.modified = object.modified;
+            getObjectCounterResponse.objectCounter = objectCounter;
+            return getObjectCounterResponse;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 Create Object failed, message: " << ex.what();

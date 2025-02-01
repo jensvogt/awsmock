@@ -443,6 +443,19 @@ namespace AwsMock::Database {
         return _memoryDb.ObjectExists(object);
     }
 
+    bool S3Database::ObjectExists(const std::string &oid) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
+            const int64_t count = _objectCollection.count_documents(make_document(kvp("_id", bsoncxx::oid(oid))));
+            log_trace << "Object exists: " << std::boolalpha << count;
+            return count > 0;
+        }
+        return _memoryDb.ObjectExists(oid);
+    }
+
     bool S3Database::ObjectExistsInternalName(const std::string &filename) const {
 
         if (HasDatabase()) {
@@ -459,7 +472,7 @@ namespace AwsMock::Database {
             log_trace << "Object exists: " << std::boolalpha << count;
             return count > 0;
         }
-        return _memoryDb.ObjectExists(filename);
+        return _memoryDb.ObjectExistsInternalName(filename);
     }
 
     Entity::S3::Object S3Database::CreateObject(Entity::S3::Object &object) const {

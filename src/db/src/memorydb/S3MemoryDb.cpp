@@ -206,7 +206,15 @@ namespace AwsMock::Database {
                                     }) != _objects.end();
     }
 
-    bool S3MemoryDb::ObjectExists(const std::string &filename) {
+    bool S3MemoryDb::ObjectExists(const std::string &oid) const {
+
+        return std::ranges::find_if(_objects,
+                                    [oid](const std::pair<std::string, Entity::S3::Object> &o) {
+                                        return o.second.oid == oid;
+                                    }) != _objects.end();
+    }
+
+    bool S3MemoryDb::ObjectExistsInternalName(const std::string &filename) {
 
         return std::ranges::find_if(_objects,
                                     [filename](const std::pair<std::string, Entity::S3::Object> &object) {

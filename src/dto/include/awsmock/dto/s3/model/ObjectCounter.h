@@ -22,6 +22,11 @@ namespace AwsMock::Dto::S3 {
         std::string oid;
 
         /**
+         * AWS region
+         */
+        std::string region;
+
+        /**
          * Bucket name
          */
         std::string bucketName;
@@ -37,9 +42,14 @@ namespace AwsMock::Dto::S3 {
         std::string contentType;
 
         /**
-         * Bucket size in bytes
+         * Object size in bytes
          */
         long size;
+
+        /**
+         * Internal file name
+         */
+        std::string internalName;
 
         /**
          * Created timestamp

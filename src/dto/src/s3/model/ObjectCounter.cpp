@@ -12,10 +12,12 @@ namespace AwsMock::Dto::S3 {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "oid", oid);
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
             Core::Bson::BsonUtils::SetStringValue(document, "key", key);
             Core::Bson::BsonUtils::SetLongValue(document, "size", size);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
+            Core::Bson::BsonUtils::SetStringValue(document, "internalName", internalName);
             Core::Bson::BsonUtils::SetDateValue(document, "created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
             return document.extract();

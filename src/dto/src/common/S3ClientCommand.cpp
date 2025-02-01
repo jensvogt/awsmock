@@ -20,6 +20,7 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->host = Core::HttpUtils::GetHost(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
 
         // Core values
         bucket = Core::AwsUtils::GetS3BucketName(request);

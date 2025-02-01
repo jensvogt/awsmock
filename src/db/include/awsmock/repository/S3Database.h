@@ -231,6 +231,15 @@ namespace AwsMock::Database {
         bool ObjectExists(const Entity::S3::Object &object) const;
 
         /**
+         * @brief Check the existence of an object by OID
+         *
+         * @param oid object ID
+         * @return true if existing otherwise false
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &oid) const;
+
+        /**
          * @brief Check the existence of an object by internal name
          *
          * @param filename object internal name

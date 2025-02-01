@@ -150,7 +150,6 @@ namespace AwsMock::Database {
          */
         long BucketCount() const;
 
-
         /**
          * @brief Purges a bucket
          *
@@ -219,7 +218,16 @@ namespace AwsMock::Database {
          * @return true if existing otherwise false
          * @throws DatabaseException
          */
-        bool ObjectExists(const std::string &filename);
+        bool ObjectExistsInternalName(const std::string &filename);
+
+        /**
+         * @brief Check the existence of an object by OID
+         *
+         * @param oid object ID
+         * @return true if existing otherwise false
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &oid) const;
 
         /**
          * @brief Create a new S3 object in the S3 object table
