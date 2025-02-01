@@ -42,12 +42,6 @@ namespace AwsMock::Service {
             HandleContinueRequest(_stream);
         }
 
-        // Handle chunked transfer encoding
-        if (boost::beast::iequals(_parser->get()[http::field::transfer_encoding], "chunked")) {
-            _parser->get().chunked(true);
-            _parser->body_limit(boost::none);
-        }
-
         // Read the rest of the message.
         read(_stream, _buffer, *_parser, ec);
 
