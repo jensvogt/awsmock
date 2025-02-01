@@ -8,7 +8,7 @@ namespace AwsMock::Dto::S3 {
         try {
 
             document rootDocument;
-            rootDocument.append(kvp("objectCounter",objectCounter.ToDocument()));
+            rootDocument.append(kvp("objectCounter", objectCounter.ToDocument()));
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
