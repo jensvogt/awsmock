@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
+        explicit AbstractHandler(std::string name) : _name(std::move(name)){};
 
         /**
          * @brief Handles the HTTP method GET.
