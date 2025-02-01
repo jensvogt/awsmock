@@ -232,10 +232,17 @@ namespace AwsMock::Core {
          * @return HTTP body as string
          */
         static std::string GetBodyAsString(const http::request<http::string_body> &request);
+
+        /**
+         * @brief Gets the version and action from an URI.
+         *
+         * @param request HTTP serer request
+         * @return HTTP body as string
+         */
         static std::string GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
 
         /**
-         * @brief Gets the body as string from a boost dynamic_body
+         * @brief Gets the body as string from a boost dynamic_body request
          *
          * @param request HTTP serer request
          * @return HTTP body as string
@@ -243,13 +250,37 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(const http::request<http::dynamic_body> &request);
 
         /**
+         * @brief Gets the body as string from a boost dynamic_body response
+         *
+         * @param response HTTP serer response
+         * @return HTTP body as string
+         */
+        static std::string GetBodyAsString(const http::response<http::dynamic_body> &response);
+
+        /**
+         * @brief Gets the body as string from a boost string_body response
+         *
+         * @param response HTTP serer response
+         * @return HTTP body as string
+         */
+        static std::string GetBodyAsString(const http::response<http::string_body> &response);
+
+        /**
          * @brief Checks whether a header exists.
          *
          * @param request HTTP request
-         * @param key header key
+         * @param name header key
          * @return header value of empty string.
          */
-        static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &key);
+        static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &name);
+
+        /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param name header key
+         * @return header value of empty string.
+         */
         static bool HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name);
 
         /**
@@ -260,6 +291,26 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static bool HasHeader(const http::request<http::string_body> &request, const std::string &key);
+
+        /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param name header key
+         * @param index index
+         * @return header value of empty string.
+         */
+        static bool HasHeader(const http::request<http::string_body> &request, const std::string &name, int index);
+
+        /**
+         * @brief Checks whether a header exists and has a given value.
+         *
+         * @param request HTTP request
+         * @param name header key
+         * @param value header value
+         * @return header value of empty string.
+         */
+        static bool HasHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &value);
 
         /**
          * @brief Returns a header value by key.
@@ -274,6 +325,19 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
+
+        /**
+         * @brief Returns a header value by key.
+         *
+         * <p>
+         * Returns the default value, if existent, otherwise logs a warning message, in case the request has no value for the given key.
+         * </p>
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @param defaultValue returned when the key was not found
+         * @return header value of empty string.
+         */
         static std::string GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
@@ -340,6 +404,20 @@ namespace AwsMock::Core {
          * @param request HTTP request
          */
         static void DumpRequest(const http::request<http::string_body> &request);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param response HTTP response
+         */
+        static void DumpResponse(const http::response<http::dynamic_body> &response);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param response HTTP response
+         */
+        static void DumpResponse(const http::response<http::string_body> &response);
 
         /**
          * @brief Returns the content type

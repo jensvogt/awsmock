@@ -1,5 +1,8 @@
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
 
@@ -111,6 +114,26 @@ namespace AwsMock::Core {
     std::string FileUtils::GetParentPath(const std::string &fileName) {
         const std::filesystem::path path(fileName);
         return path.parent_path();
+    }
+
+    std::string FileUtils::GetFirstLine(const std::string &filePath) {
+        std::ifstream fileHandler(filePath);
+        std::string line;
+        getline(fileHandler, line);
+        fileHandler.close();
+        return line;
+    }
+
+    void FileUtils::RemoveFirstBytes(const std::string &filePath, const int skip) {
+        const std::string tmpFile = GetTempFile("tmp");
+        std::ofstream ofs(tmpFile);
+        std::ifstream ifs(filePath);
+        ifs.seekg(skip, std::ios::beg);
+        ofs << ifs.rdbuf();
+        ifs.close();
+        ofs.close();
+        DeleteFile(filePath);
+        MoveTo(tmpFile, filePath);
     }
 
     long FileUtils::FileSize(const std::string &fileName) {
@@ -249,7 +272,7 @@ namespace AwsMock::Core {
     }
 
     std::string FileUtils::GetContentType(const std::string &path) {
-        if (const std::string extension = boost::filesystem::path(path).extension().string(); MimeTypes.contains(extension)) {
+        if (const std::string extension = boost::filesystem::path(path).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
         return GetContentTypeMagicFile(path);
@@ -287,12 +310,7 @@ namespace AwsMock::Core {
 
         // load the default magic database (indicated by nullptr)
         if (magic_load(magic, nullptr) != 0) {
-            log_error << "Could not load libmagic";
-        }
-
-        // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, nullptr) != 0) {
-            log_error << "Could not compile libmagic";
+            log_error << "Could not load libmagic mime types, fileName: " << magic_getpath(nullptr, 0);
         }
 
         // get description of the filename argument

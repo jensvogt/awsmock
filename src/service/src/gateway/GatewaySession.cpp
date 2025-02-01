@@ -2,7 +2,6 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#include <awsmock/service/gateway/GatewayRouter.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
@@ -32,30 +31,28 @@ namespace AwsMock::Service {
         // Set the timeout.
         _stream.expires_after(std::chrono::seconds(_timeout));
 
-        // Read a request using the parser-oriented interface
-        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
-    }
-
-    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
-        boost::ignore_unused(bytes_transferred);
-
-        // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
-            return DoShutdown();
-        }
-
-        if (ec) {
+        // Read the header
+        boost::beast::error_code ec;
+        read_header(_stream, _buffer, *_parser, ec);
+        if (ec)
             return;
+
+        // Handle 100-continue requests
+        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
+            HandleContinueRequest(_stream);
         }
 
-        // Send the response
+        // Handle chunked transfer encoding
+        if (boost::beast::iequals(_parser->get()[http::field::transfer_encoding], "chunked")) {
+            _parser->get().chunked(true);
+            _parser->body_limit(boost::none);
+        }
+
+        // Read the rest of the message.
+        read(_stream, _buffer, *_parser, ec);
+
+        // Process the request
         QueueWrite(HandleRequest(_parser->release()));
-
-        // If we aren't at the queue limit, try to pipeline another request
-        if (_response_queue.size() < _queueLimit) {
-            DoRead();
-        }
-        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {
@@ -97,7 +94,7 @@ namespace AwsMock::Service {
             return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
-        // Process OPTIONS requests
+        // Handle OPTIONS requests
         if (request.method() == http::verb::options) {
             return HandleOptionsRequest(request);
         }
@@ -247,6 +244,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
+
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
@@ -266,4 +264,21 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
+
+    void GatewaySession::HandleContinueRequest(boost::beast::tcp_stream &_stream) {
+        http::response<http::empty_body> response;
+        response.version(11);
+        response.result(http::status::continue_);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::allow, "*/*");
+        response.set(http::field::content_length, "0");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::access_control_max_age, "86400");
+        boost::beast::error_code ec;
+        write(_stream, response, ec);
+    }
+
 }// namespace AwsMock::Service

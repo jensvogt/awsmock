@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        explicit AbstractHandler(std::string name) : _name(std::move(name)){};
+        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -166,6 +166,14 @@ namespace AwsMock::Service {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers = {});
+
+        /**
+         * @brief Send continue response
+         *
+         * @param request HTTP request
+         * @return HTTP response
+         */
+        static http::response<http::dynamic_body> SendContinueResponse(const http::request<http::dynamic_body> &request);
 
         /**
          * Get the name

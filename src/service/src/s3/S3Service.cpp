@@ -240,7 +240,7 @@ namespace AwsMock::Service {
                     .modified = object.modified,
             };
             log_trace << "S3 get object response: " << response.ToString();
-            log_info << "Object returned, bucket: " << request.bucket << " key: " << request.key;
+            log_info << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -356,7 +356,7 @@ namespace AwsMock::Service {
         return {.region = s3Request.region, .bucket = s3Request.bucket, .key = s3Request.key, .uploadId = uploadId};
     }
 
-    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, bool chunkEncoding) const {
+    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) const {
         log_trace << "UploadPart request, part: " << part << " updateId: " << updateId;
 
         std::string uploadDir = GetMultipartUploadDirectory(updateId);
@@ -364,19 +364,7 @@ namespace AwsMock::Service {
 
         std::string fileName = uploadDir + Core::FileUtils::separator() + updateId + "-" + std::to_string(part);
         std::ofstream ofs(fileName, std::ios::binary);
-
-        if (chunkEncoding) {
-
-            std::string firstLine;
-            getline(stream, firstLine);
-            int size = Core::NumberUtils::HexToInt(Core::StringUtils::StripLineEndings(firstLine));
-            log_debug << "File size=" << size;
-            std::copy_n(std::istreambuf_iterator(stream), size, std::ostreambuf_iterator(ofs));
-
-        } else {
-
-            std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
-        }
+        std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
         ofs.close();
         log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
 
@@ -495,7 +483,7 @@ namespace AwsMock::Service {
                 .checksumSha256 = object.sha256sum};
     }
 
-    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream, const bool chunkEncoding) const {
+    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const {
         log_trace << "Put object request: " << request.ToString();
 
         // Check existence
@@ -504,12 +492,14 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Bucket does not exist");
         }
 
+        std::string tmp = request.contentType;
+
         try {
             // Get bucket
             if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
                 return SaveVersionedObject(request, bucket, stream);
             } else {
-                return SaveUnversionedObject(request, bucket, stream, chunkEncoding);
+                return SaveUnversionedObject(request, bucket, stream);
             }
 
         } catch (bsoncxx::exception &ex) {
@@ -1088,7 +1078,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda invocation finished send, output" << output;
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding) const {
+    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {
 
         std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
@@ -1096,27 +1086,9 @@ namespace AwsMock::Service {
         // Write file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
-
-        if (chunkEncoding) {
-
-            std::string firstLine;
-            getline(stream, firstLine);
-            int size = Core::NumberUtils::HexToInt(Core::StringUtils::StripLineEndings(firstLine));
-
-            char buffer[size];
-            stream.readsome(buffer, size);
-            buffer[size] = '\0';
-
-            std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-            ofs << buffer;
-            ofs.close();
-
-        } else {
-
-            std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-            ofs << stream.rdbuf();
-            ofs.close();
-        }
+        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
+        ofs << stream.rdbuf();
+        ofs.close();
 
         // Get size
         long size = Core::FileUtils::FileSize(filePath);
@@ -1128,6 +1100,14 @@ namespace AwsMock::Service {
             Core::FileUtils::Base64DecodeFile(filePath);
         }
 
+        // Repair file, AWS CPP SDK puts an additional 10000 into the header
+        if (Core::FileUtils::GetFirstLine(filePath) == "10000\r") {
+            Core::FileUtils::RemoveFirstBytes(filePath, 7);
+        }
+
+        // Get content type
+        std::string contentType = Core::FileUtils::GetContentType(filePath);
+
         // Create entity
         Database::Entity::S3::Object object = {
                 .region = request.region,
@@ -1135,7 +1115,7 @@ namespace AwsMock::Service {
                 .key = request.key,
                 .owner = request.owner,
                 .size = size,
-                .contentType = request.contentType,
+                .contentType = contentType,
                 .metadata = request.metadata,
                 .internalName = fileName};
 

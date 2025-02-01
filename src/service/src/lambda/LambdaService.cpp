@@ -239,7 +239,7 @@ namespace AwsMock::Service {
 
                 // Replace lambda
                 lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
-                log_info << "New lambda instance created, totalSize: " << lambda.instances.size();
+                log_info << "New lambda instance created, name: " << functionName << ", totalSize: " << lambda.instances.size();
             } else {
                 WaitForIdleInstance(lambda);
             }

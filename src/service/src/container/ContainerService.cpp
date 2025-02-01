@@ -79,25 +79,18 @@ namespace AwsMock::Service {
         if (!locked)
             boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
+        const std::string imageName = name + ":" + tag;
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/" + imageName + "/json");
         if (statusCode != http::status::ok) {
             log_error << "Get image by name failed, httpStatus: " << statusCode;
             return {};
         }
-        Dto::Docker::ListImageResponse response;
+        Dto::Docker::Image response;
         response.FromJson(body);
-        if (response.imageList.empty()) {
-            log_warning << "Docker image not found, name: " << name << ":" << tag;
-            return {};
-        }
+        response.id = Core::StringUtils::Split(response.id, ':')[1];
 
-        if (response.imageList.size() > 1) {
-            log_warning << "More than one docker image found, name: " << name << ":" << tag;
-            return {};
-        }
         log_info << "Image found, name: " << name << ":" << tag;
-        return response.imageList[0];
+        return response;
     }
 
     std::string ContainerService::BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const {
@@ -166,7 +159,7 @@ namespace AwsMock::Service {
 
         if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "http://localhost/images/" + id + "?force=true");
             statusCode != http::status::ok) {
-            log_error << "Delete image failed, httpStatus: " << statusCode;
+            log_error << "Delete image failed, httpStatus: " << statusCode << ", id: " << id;
         }
         log_debug << "Image deleted, id: " << id;
     }

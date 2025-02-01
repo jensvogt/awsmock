@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -199,10 +199,9 @@ namespace AwsMock::Service {
          * @param stream input stream
          * @param part part number
          * @param updateId upload ID
-         * @param chunkEncoding use chunked encoding, default: false
          * @return ETag
          */
-        std::string UploadPart(std::istream &stream, int part, const std::string &updateId, bool chunkEncoding = false) const;
+        std::string UploadPart(std::istream &stream, int part, const std::string &updateId) const;
 
         /**
          * @brief Upload a partial file copy.
@@ -237,10 +236,9 @@ namespace AwsMock::Service {
          *
          * @param request put object request
          * @param stream input stream
-         * @param chunkEncoding chunk encoding settings
          * @return PutObjectResponse
          */
-        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream, bool chunkEncoding) const;
+        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
 
         /**
          * @brief Copy object
@@ -419,10 +417,9 @@ namespace AwsMock::Service {
          * @param request put object request
          * @param bucket S3 bucket
          * @param stream input stream
-         * @param chunkEncoding chunk encoding settings
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, bool chunkEncoding) const;
+        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.

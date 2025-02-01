@@ -83,11 +83,11 @@ namespace AwsMock::Core {
         return to_string(boost::uuids::random_generator()());
     }
 
-    std::vector<std::string> StringUtils::Split(const std::string &s, char delimiter) {
+    std::vector<std::string> StringUtils::Split(const std::string &s, const char delim) {
         std::vector<std::string> tokens;
         std::stringstream check1(s);
         std::string intermediate;
-        while (getline(check1, intermediate, delimiter)) {
+        while (getline(check1, intermediate, delim)) {
             tokens.push_back(intermediate);
         }
         return tokens;

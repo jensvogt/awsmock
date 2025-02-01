@@ -93,6 +93,23 @@ namespace AwsMock::Core {
         static std::string GetTempFile(const std::string &dir, const std::string &extension);
 
         /**
+         * @brief Returns the first line of a file
+         *
+         * @param filePath directory to create the file
+         * @return first line
+         */
+        static std::string GetFirstLine(const std::string &filePath);
+
+        /**
+         * @brief Removes the first line of a file
+         *
+         * @param filePath directory to create the file
+         * @param skip number of bytes to skip
+         * @return first line
+         */
+        static void RemoveFirstBytes(const std::string &filePath, int skip);
+
+        /**
          * @brief Creates a temporary file containing a random string
          *
          * @param extension file name extension
