@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()) {};
+        explicit S3Service() : _database(Database::S3Database::instance()){};
 
         /**
          * @brief Checks whether a bucket exists
