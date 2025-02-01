@@ -18,6 +18,7 @@
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
+#include <awsmock/service/gateway/GatewayRouter.h>
 #include <awsmock/service/kms/KMSHandler.h>
 #include <awsmock/service/lambda/LambdaHandler.h>
 #include <awsmock/service/module/ModuleHandler.h>
@@ -74,11 +75,6 @@ namespace AwsMock::Service {
          * @brief Read callback
          */
         void DoRead();
-
-        /**
-         * @brief On read callback
-         */
-        void OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred);
 
         /**
          * @brief Queue write callback
@@ -141,6 +137,13 @@ namespace AwsMock::Service {
          * @return options response
          */
         static http::response<http::dynamic_body> HandleOptionsRequest(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Handles continue request (HTTP status: 100)
+         *
+         * @param _stream HTTP socket stream
+         */
+        static void HandleContinueRequest(boost::beast::tcp_stream &_stream);
 
         /**
          * TCP stream

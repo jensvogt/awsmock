@@ -134,7 +134,7 @@ namespace AwsMock::Service {
 
                     // Send range response
                     log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
-                    return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::ok, headerMap);
+                    return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                 }
 
                 case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS: {
@@ -294,9 +294,9 @@ namespace AwsMock::Service {
                         log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendOkResponse(request, s3Response.ToXml());
                     }
-                    // Checksum
+
+                    // Checksum/chunked encoding
                     std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
-                    bool chunckedEncoding = Core::StringUtils::ContainsIgnoreCase(Core::HttpUtils::GetHeaderValue(request, "Content-Encoding"), "aws-chunked");
 
                     // S3 put object request
                     Dto::S3::PutObjectRequest putObjectRequest = {
@@ -315,7 +315,7 @@ namespace AwsMock::Service {
 
                     log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
-                    Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream, chunckedEncoding);
+                    Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream);
                     stream.clear();
 
                     log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
@@ -352,7 +352,6 @@ namespace AwsMock::Service {
 
                     std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
-                    bool chuncked = Core::StringUtils::ContainsIgnoreCase(Core::HttpUtils::GetHeaderValue(request, "Content-Encoding"), "aws-chunked");
                     std::string contentLength = request.base()[http::field::content_length];
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
@@ -360,8 +359,7 @@ namespace AwsMock::Service {
                     sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
                     std::istream stream(&sb);
 
-                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId, chuncked);
-                    stream.clear();
+                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId);
 
                     std::map<std::string, std::string> headerMap;
                     headerMap["ETag"] = Core::StringUtils::Quoted(eTag);
@@ -796,11 +794,19 @@ namespace AwsMock::Service {
             return;
         }
         const std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "Range");
-        const std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
-        min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
-        max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
-        size = max - min + 1;
-        log_info << "Requested range: " << std::to_string(min) << "-" << std::to_string(max);
+        if (const std::string headerValue = Core::StringUtils::Split(rangeStr, '=')[1]; Core::StringUtils::Contains(headerValue, "/")) {
+            const std::string parts = Core::StringUtils::Split(rangeStr, '/')[0];
+            min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
+            max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
+            size = max - min;
+            const long total = std::stol(Core::StringUtils::Split(headerValue, '/')[1]);
+            log_debug << "Requested range: " << std::to_string(min) << "-" << std::to_string(max) << ", size: " << size << " total: " << total;
+        } else {
+            min = std::stol(Core::StringUtils::Split(headerValue, '-')[0]);
+            max = std::stol(Core::StringUtils::Split(headerValue, '-')[1]);
+            size = max - min;
+            log_debug << "Requested range: " << std::to_string(min) << "-" << std::to_string(max) << ", size: " << size;
+        }
     }
 
     std::map<std::string, std::string> S3Handler::GetMetadata(const http::request<http::dynamic_body> &request) {

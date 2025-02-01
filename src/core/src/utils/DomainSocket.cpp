@@ -73,7 +73,7 @@ namespace AwsMock::Core {
 
     request<string_body> DomainSocket::PrepareJsonMessage(const verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        http::request<http::string_body> request;
+        request<string_body> request;
 
         request.method(method);
         request.target(path);

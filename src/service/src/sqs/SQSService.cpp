@@ -821,7 +821,7 @@ namespace AwsMock::Service {
                     SendLambdaInvocationRequest(lambda, message, queueArn);
                 }
             }
-            log_info << "Send message, queueArn: " << request.queueArn;
+            log_info << "Send message, queueArn: " << queue.queueArn;
 
             return Dto::SQS::Mapper::map(request, message);
         } catch (Core::DatabaseException &ex) {

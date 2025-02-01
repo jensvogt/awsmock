@@ -1470,7 +1470,7 @@ namespace AwsMock::FtpServer {
                 .metadata = metadata};
 
         std::ifstream ifs(fileName, std::ios::binary);
-        _s3Service->PutObject(request, ifs, false);
+        _s3Service->PutObject(request, ifs);
         ifs.close();
 
         _metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);

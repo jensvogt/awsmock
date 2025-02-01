@@ -158,7 +158,7 @@ namespace AwsMock::Service {
 
         // Body
         if (!body.empty()) {
-            boost::beast::ostream(response.body()).write(body.c_str(), body.size());
+            ostream(response.body()).write(body.c_str(), body.size());
         }
         response.prepare_payload();
 
@@ -240,6 +240,23 @@ namespace AwsMock::Service {
                 response.set(fst, snd);
             }
         }
+
+        // Send the response to the client
+        return response;
+    }
+
+    http::response<http::dynamic_body> AbstractHandler::SendContinueResponse(const http::request<http::dynamic_body> &request) {
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::continue_);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
         // Send the response to the client
         return response;
