@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler"){};
+        explicit S3Handler() : AbstractHandler("s3-handler") {};
 
         /**
          * @brief HTTP GET request.
@@ -63,7 +63,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::dynamic_body> HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP POST request.
@@ -120,6 +120,16 @@ namespace AwsMock::Service {
          * @return hash map of key/value pairs.
          */
         static std::map<std::string, std::string> GetMetadata(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief Prepare the body for further processing
+         *
+         * @par AWS puts some extra bytes into the response when chunk encoding is used.
+         *
+         * @param request HTTP request
+         * @param sb prepared strean buffer
+         */
+        static void PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
 
         /**
          * S3 service

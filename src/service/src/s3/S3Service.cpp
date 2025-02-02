@@ -1135,11 +1135,6 @@ namespace AwsMock::Service {
             Core::FileUtils::Base64DecodeFile(filePath);
         }
 
-        // Repair file, AWS CPP SDK puts an additional 10000 into the header
-        if (Core::FileUtils::GetFirstLine(filePath) == "10000\r") {
-            Core::FileUtils::RemoveFirstBytes(filePath, 7);
-        }
-
         // Get content type
         std::string contentType = Core::FileUtils::GetContentType(filePath);
 

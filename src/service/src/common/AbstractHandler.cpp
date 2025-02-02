@@ -8,7 +8,7 @@ namespace AwsMock::Service {
         return {};
     }
 
-    http::response<http::dynamic_body> AbstractHandler::HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
     }

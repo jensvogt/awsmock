@@ -94,6 +94,14 @@ namespace AwsMock::Core {
         static bool IsUuid(const std::string &value);
 
         /**
+         * @brief Check whether the provided string is a hexadecimal digit.
+         *
+         * @param value string value
+         * @return true in case the provided string is a hexadecimal digit, otherwise false.
+         */
+        static bool IsHexString(const std::string &value);
+
+        /**
          * @brief Creates a random UUID and return is as a string
          *
          * @return random UUID as string

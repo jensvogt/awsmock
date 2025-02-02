@@ -60,7 +60,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        virtual http::response<http::dynamic_body> HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Handles the HTTP method POST.

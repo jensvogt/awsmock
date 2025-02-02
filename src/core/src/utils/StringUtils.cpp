@@ -79,6 +79,10 @@ namespace AwsMock::Core {
         return std::regex_match(value, regex);
     }
 
+    bool StringUtils::IsHexString(const std::string &value) {
+        return std::ranges::all_of(value, [](const unsigned char c) { return !std::isxdigit(c); });
+    }
+
     std::string StringUtils::CreateRandomUuid() {
         return to_string(boost::uuids::random_generator()());
     }
@@ -104,22 +108,22 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string StringUtils::StripWhiteSpaces(std::string &str) {
+    std::string StringUtils::StripWhiteSpaces(std::string &s) {
         const std::string &chars = "\t\n\r\v\f ";
-        str.erase(std::ranges::remove_if(str, [&chars](const char &c) {
-                      return chars.find(c) != std::string::npos;
-                  }).begin(),
-                  str.end());
-        return str;
+        s.erase(std::ranges::remove_if(s, [&chars](const char &c) {
+                    return chars.find(c) != std::string::npos;
+                }).begin(),
+                s.end());
+        return s;
     }
 
-    std::string StringUtils::StripLineEndings(std::basic_string<char> str) {
+    std::string StringUtils::StripLineEndings(std::basic_string<char> s) {
         const std::string &chars = "\n\r";
-        str.erase(std::ranges::remove_if(str, [&chars](const char &c) {
-                      return chars.find(c) != std::string::npos;
-                  }).begin(),
-                  str.end());
-        return str;
+        s.erase(std::ranges::remove_if(s, [&chars](const char &c) {
+                    return chars.find(c) != std::string::npos;
+                }).begin(),
+                s.end());
+        return s;
     }
 
     std::string StringUtils::StripBeginning(const std::string &s1, const std::string &s2) {

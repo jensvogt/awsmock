@@ -23,6 +23,7 @@ namespace AwsMock::Service {
 
         // Construct a new parser for each message
         _parser.emplace();
+        _buffer.clear();
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.

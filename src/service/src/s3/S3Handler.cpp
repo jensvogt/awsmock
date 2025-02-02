@@ -1,5 +1,6 @@
 
 #include <awsmock/service/s3/S3Handler.h>
+#include <boost/asio/read_until.hpp>
 
 namespace AwsMock::Service {
 
@@ -246,7 +247,7 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::dynamic_body> S3Handler::HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> S3Handler::HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -310,13 +311,11 @@ namespace AwsMock::Service {
                             .metadata = metadata};
 
                     boost::beast::net::streambuf sb;
-                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+                    PrepareBody(request, sb);
                     std::istream stream(&sb);
-
-                    log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
+                    log_info << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
                     Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream);
-                    stream.clear();
 
                     log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
                     return SendOkResponse(request);
@@ -834,6 +833,30 @@ namespace AwsMock::Service {
         }
         log_info << "Get user metadata, size: " << metadata.size();
         return metadata;
+    }
+
+    void S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
+
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+
+        if (Core::HttpUtils::HasHeaderValue(request, "content-encoding", "aws-chunked")) {
+
+            // Get decoded length from header
+            const long decodedContentLength = std::stol(Core::HttpUtils::GetHeaderValue(request, "x-amz-decoded-content-length"));
+
+            // Skip first line, AWS bug in binary chunk encoding
+            int count = 0;
+            do {
+                if (const char c = sb.sbumpc(); c == '\r') {
+                    if (sb.sbumpc() == '\n') {
+                        count++;
+                    }
+                    break;
+                }
+                count++;
+            } while (sb.sgetc() != boost::asio::error::eof);
+            log_trace << "Skipped count: " << count << " decodedContentLength: " << decodedContentLength;
+        }
     }
 
 }// namespace AwsMock::Service
