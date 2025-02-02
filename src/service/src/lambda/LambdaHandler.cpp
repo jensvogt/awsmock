@@ -213,6 +213,18 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request);
             }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA) {
+
+                Dto::Lambda::DeleteFunctionRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.DeleteFunction(lambdaRequest);
+                log_trace << "Delete function, functionName: " << lambdaRequest.functionName;
+
+                return SendOkResponse(request);
+            }
+
             log_error << "Unknown method";
             return SendBadRequestError(request, "Unknown method");
 

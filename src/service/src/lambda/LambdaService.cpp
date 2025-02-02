@@ -150,6 +150,7 @@ namespace AwsMock::Service {
                     .state = LambdaStateToString(lambda.state),
                     .stateReason = lambda.stateReason,
                     .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
+
             Dto::Lambda::GetFunctionResponse response = {
                     .region = lambda.region,
                     .configuration = configuration,
