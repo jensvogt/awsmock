@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler"){};
+        explicit S3Handler() : AbstractHandler("s3-handler") {};
 
         /**
          * @brief HTTP GET request.
