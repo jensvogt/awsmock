@@ -420,20 +420,6 @@ namespace AwsMock::Core {
         static void DumpResponse(const http::response<http::string_body> &response);
 
         /**
-         * @brief DUmp a chunked request
-         *
-         * @tparam isRequest is request
-         * @tparam SyncReadStream socket stream
-         * @tparam DynamicBuffer parser buffer
-         * @param os output stream
-         * @param stream request stream
-         * @param buffer input buffer
-         * @param ec error code
-         */
-        //template<bool isRequest, class SyncReadStream, class DynamicBuffer>
-        //static void DumpChunks(std::ostream &os, SyncReadStream &stream, DynamicBuffer &buffer, boost::beast::error_code &ec);
-
-        /**
          * @brief Returns the content type
          *
          * @param request HTTP request

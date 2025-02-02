@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.0](https://github.com/jensvogt/awsmock/compare/v1.0.1...v1.1.0) (2025-02-01)
+
+
+### Features
+
+* **903-auto-load-should-load-all-jaon-files:** add all files load ([d96cbe2](https://github.com/jensvogt/awsmock/commit/d96cbe2b8bb70f1dd208d78337ce850455defda1))
+* **903-auto-load-should-load-all-jaon-files:** add all files load ([d77a3b0](https://github.com/jensvogt/awsmock/commit/d77a3b0701be39c0aff0fe3776ed3885afa42cb4))
+* **903-auto-load-should-load-all-jaon-files:** add all files load ([424c333](https://github.com/jensvogt/awsmock/commit/424c333989beee279e1b735cf3f02769dd36aa25))
+* **903-auto-load-should-load-all-jaon-files:** add all files load ([6cd3c3f](https://github.com/jensvogt/awsmock/commit/6cd3c3f77c9f1f715088671fd5836a83fe8eaa76))
+* **903-auto-load-should-load-all-json-files:** add all files load ([eeb8d7b](https://github.com/jensvogt/awsmock/commit/eeb8d7b7155010f690b1de297e204b6ef88c22c2))
+
+
+### Bug Fixes
+
+* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS attribute ([582d29f](https://github.com/jensvogt/awsmock/commit/582d29f3714f0685986c9936457847faa6507919))
+* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS attribute ([9fdc3bc](https://github.com/jensvogt/awsmock/commit/9fdc3bc531485832ad7c919fb87cccc72f2c88d4))
+* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS attribute ([669c0ec](https://github.com/jensvogt/awsmock/commit/669c0ec7c5388616337e23b4b719cd01a7f62a6b))
+* **864-transfer-details-page-missing-in-frontend:** fix FE edit SQS attribute ([bfbf142](https://github.com/jensvogt/awsmock/commit/bfbf142bd821aa2e8759a0cf1cec3e76f8bc5d9b))
+
 ## [1.0.1](https://github.com/jensvogt/awsmock/compare/v1.0.0...v1.0.1) (2025-01-26)
 
 
