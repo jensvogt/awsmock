@@ -2,6 +2,7 @@
 // Created by vogje01 on 5/27/24.
 //
 
+#include <asio/buffers_iterator.hpp>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
@@ -43,8 +44,15 @@ namespace AwsMock::Service {
             HandleContinueRequest(_stream);
         }
 
-        // Read the rest of the message.
+        // Read the rest of the request.
         read(_stream, _buffer, *_parser, ec);
+
+        if (_parser.get().get().chunked()) {
+            std::ofstream ofs("/tmp/test.bin", std::ios::binary);
+            std::string str = boost::beast::buffers_to_string(_buffer.data());
+            //std::string body = buffers_to_string(_parser.get().get().body().cdata());
+            ofs << str;
+        }
 
         // Process the request
         QueueWrite(HandleRequest(_parser->release()));

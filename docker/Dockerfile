@@ -38,7 +38,7 @@ ENV TZ=Europe/Berlin
 RUN apk add -U tzdata
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Make dirctories
+# Make directories
 RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/data/sqs && \
     mkdir -p /home/awsmock/data/sns && \

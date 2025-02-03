@@ -11,6 +11,7 @@
 
 // Boost includes
 #include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
 #include <boost/chrono/duration.hpp>
 #include <boost/noncopyable.hpp>
 
@@ -35,7 +36,7 @@ namespace AwsMock::Core {
 
         [[maybe_unused]] void start_wait();
 
-        boost::asio::io_service &ioService;
+        boost::asio::io_context &ioService;
         boost::asio::deadline_timer timer;
         handler_fn task;
         std::string name;

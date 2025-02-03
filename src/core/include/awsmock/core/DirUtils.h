@@ -9,7 +9,7 @@
 #include <string>
 
 // Boost includes
-#include <boost/algorithm/string/replace.hpp>
+#include <boost/filesystem.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>

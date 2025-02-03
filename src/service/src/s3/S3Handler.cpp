@@ -1,6 +1,5 @@
 
 #include <awsmock/service/s3/S3Handler.h>
-#include <boost/asio/read_until.hpp>
 
 namespace AwsMock::Service {
 
@@ -51,10 +50,10 @@ namespace AwsMock::Service {
                         s3Request = {
                                 .region = clientCommand.region,
                                 .name = clientCommand.bucket,
-                                .listType = listType,
                                 .prefix = prefix,
                                 .delimiter = delimiter,
                                 .encodingType = encodingType};
+                        s3Request.listType = listType;
 
                     } else {
                         s3Request = {
@@ -111,10 +110,7 @@ namespace AwsMock::Service {
 
                     // Get object request
                     log_debug << "S3 get object request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    Dto::S3::GetObjectRequest s3Request = {
-                            .region = clientCommand.region,
-                            .bucket = clientCommand.bucket,
-                            .key = clientCommand.key};
+                    Dto::S3::GetObjectRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
 
                     // Get range
                     long size;
@@ -197,20 +193,11 @@ namespace AwsMock::Service {
                         }
 
                         // Return object list
-                        s3Request = {
-                                .region = clientCommand.region,
-                                .name = clientCommand.bucket,
-                                .listType = listType,
-                                .prefix = prefix,
-                                .delimiter = delimiter,
-                                .encodingType = encodingType};
+                        s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .prefix = prefix, .delimiter = delimiter, .encodingType = encodingType};
+                        s3Request.listType = listType;
 
                     } else {
-                        s3Request = {
-                                .region = clientCommand.region,
-                                .name = clientCommand.bucket,
-                                .listType = 1,
-                                .encodingType = "url"};
+                        s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .listType = 1, .encodingType = "url"};
                     }
 
                     Dto::S3::ListBucketResponse s3Response = _s3Service.ListBucket(s3Request);
@@ -218,21 +205,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
-                    // Should not happen
-                case Dto::Common::S3CommandType::CREATE_BUCKET:
-                case Dto::Common::S3CommandType::PUT_OBJECT:
-                case Dto::Common::S3CommandType::COPY_OBJECT:
-                case Dto::Common::S3CommandType::MOVE_OBJECT:
-                case Dto::Common::S3CommandType::DELETE_BUCKET:
-                case Dto::Common::S3CommandType::DELETE_OBJECTS:
-                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::UPLOAD_PART:
-                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
-                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
-                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
-                case Dto::Common::S3CommandType::UNKNOWN:
                 default:
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
@@ -451,22 +423,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
-                    // Should not happen
-                case Dto::Common::S3CommandType::GET_OBJECT:
-                case Dto::Common::S3CommandType::COPY_OBJECT:
-                case Dto::Common::S3CommandType::LIST_BUCKETS:
-                case Dto::Common::S3CommandType::LIST_OBJECTS:
-                case Dto::Common::S3CommandType::DELETE_BUCKET:
-                case Dto::Common::S3CommandType::DELETE_OBJECT:
-                case Dto::Common::S3CommandType::DELETE_OBJECTS:
-                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
-                case Dto::Common::S3CommandType::UNKNOWN: {
-                    log_error << "Bad request, method: PUT clientCommand: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
-                    return SendBadRequestError(request, "Unknown method");
-                }
                 default:
                     log_error << "Bad request, method: PUT clientCommand: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
                     return SendBadRequestError(request, "Unknown method");
@@ -648,22 +604,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
-                // Should not happen
-                case Dto::Common::S3CommandType::CREATE_BUCKET:
-                case Dto::Common::S3CommandType::LIST_BUCKETS:
-                case Dto::Common::S3CommandType::DELETE_BUCKET:
-                case Dto::Common::S3CommandType::LIST_OBJECTS:
-                case Dto::Common::S3CommandType::PUT_OBJECT:
-                case Dto::Common::S3CommandType::GET_OBJECT:
-                case Dto::Common::S3CommandType::MOVE_OBJECT:
-                case Dto::Common::S3CommandType::DELETE_OBJECT:
-                case Dto::Common::S3CommandType::UPLOAD_PART:
-                case Dto::Common::S3CommandType::ABORT_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
-                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
-                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
-                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
-                    break;
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
@@ -719,25 +659,6 @@ namespace AwsMock::Service {
                     return SendNoContentResponse(request);
                 }
 
-                    // Should not happen
-                case Dto::Common::S3CommandType::CREATE_BUCKET:
-                case Dto::Common::S3CommandType::PUT_OBJECT:
-                case Dto::Common::S3CommandType::GET_OBJECT:
-                case Dto::Common::S3CommandType::COPY_OBJECT:
-                case Dto::Common::S3CommandType::LIST_BUCKETS:
-                case Dto::Common::S3CommandType::LIST_OBJECTS:
-                case Dto::Common::S3CommandType::DELETE_OBJECTS:
-                case Dto::Common::S3CommandType::CREATE_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::UPLOAD_PART:
-                case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD:
-                case Dto::Common::S3CommandType::LIST_OBJECT_VERSIONS:
-                case Dto::Common::S3CommandType::BUCKET_NOTIFICATION:
-                case Dto::Common::S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION:
-                case Dto::Common::S3CommandType::PUT_BUCKET_ENCRYPTION:
-                case Dto::Common::S3CommandType::UNKNOWN: {
-                    log_error << "Unknown method";
-                    return SendBadRequestError(request, "Unknown method");
-                }
                 default:
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
@@ -836,6 +757,8 @@ namespace AwsMock::Service {
     }
 
     void S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
+
+        // std::string str = buffers_to_string(request.body());
 
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
 

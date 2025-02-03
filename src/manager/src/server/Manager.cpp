@@ -14,9 +14,10 @@ namespace AwsMock::Manager {
     void Manager::Initialize() {
 
         InitializeDatabase();
-
+        std::string boostVersion = BOOST_LIB_VERSION;
+        Core::StringUtils::Replace(boostVersion, "_", ".");
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
-                 << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level");
+                 << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level") << " boost version: " << boostVersion;
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
     }

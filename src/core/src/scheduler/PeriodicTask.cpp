@@ -4,12 +4,12 @@
 
 namespace AwsMock::Core {
 
-    PeriodicTask::PeriodicTask(boost::asio::io_service &ioService, std::string const &name, const int interval, handler_fn task, const int delay)
+    PeriodicTask::PeriodicTask(boost::asio::io_context &ioService, std::string const &name, const int interval, handler_fn task, const int delay)
         : ioService(ioService), timer(ioService), task(std::move(task)), name(name), interval(interval), _delay(delay) {
         log_debug << "Create PeriodicTask '" << name << "'";
 
         // Schedule start to be run by the _io_service
-        ioService.post([this] { start(); });
+        post(ioService, [this] { start(); });
     }
 
     [[maybe_unused]] void PeriodicTask::execute(boost::system::error_code const &e) {
