@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
@@ -25,29 +26,16 @@ namespace AwsMock::Service {
     /**
    * AwsMock DynamoDB integration test.
    */
-    class DynamoDbServerCliTest : public ::testing::Test {
+    class DynamoDbServerCliTest : public ::testing::Test, public TestBase {
 
       protected:
 
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
-
-            // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            const std::string _port = _configuration.GetValueString("awsmock.gateway.http.port");
-            const std::string _host = _configuration.GetValueString("awsmock.gateway.http.host");
-            const std::string _address = _configuration.GetValueString("awsmock.gateway.http.address");
-
-            // Set test config
-            _endpoint = "http://" + _host + ":" + _port;
-
-            // Start gateway server
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
-            _thread = boost::thread([&]() {
-                boost::asio::io_service::work work(_ios);
-                _ios.run();
-            });
+            StartGateway();
+            _region = GetRegion();
+            _endpoint = GetEndpoint();
         }
 
         void TearDown() override {

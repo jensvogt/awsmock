@@ -51,7 +51,7 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
         }
 
         void TearDown() override {

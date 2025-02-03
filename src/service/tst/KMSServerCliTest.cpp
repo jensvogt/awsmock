@@ -17,7 +17,6 @@
 #include <awsmock/service/cognito/CognitoService.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 
-#define TEST_PORT 10100
 #define PLAIN_TEXT_BASE64 std::string("VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==")
 
 namespace AwsMock::Service {
@@ -32,7 +31,7 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // Start gateway server
-            StartGateway(TEST_PORT);
+            StartGateway();
 
             // General configuration
             _region = GetRegion();

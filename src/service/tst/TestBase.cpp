@@ -19,7 +19,6 @@ namespace AwsMock::Service {
         // Start gateway server
         _gatewayServer = std::make_shared<GatewayServer>(_ios);
         _thread = boost::thread([&]() {
-            boost::asio::io_service::work work(_ios);
             _ios.run();
         });
     }

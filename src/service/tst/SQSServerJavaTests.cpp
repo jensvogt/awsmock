@@ -206,7 +206,7 @@ namespace AwsMock::Service {
         const std::string queueUrl = result.body;
 
         // act
-        Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "setQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeValue=3600", {});
+        const Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "setQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeValue=3600", {});
 
         // assert
         EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
@@ -314,14 +314,14 @@ namespace AwsMock::Service {
     TEST_F(SQSServerJavaTest, SQSTemplateTest) {
 
         // arrange
-        Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         EXPECT_EQ(http::status::ok, createResult.statusCode);
         std::string queueUrl = createResult.body;
 
         // act
-        TestMessage testMessage = {.testKey = "testKey"};
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "sqsTemplate", testMessage.ToJson());
-        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        const TestMessage testMessage = {.testKey = "testKey"};
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "sqsTemplate", testMessage.ToJson());
+        const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
         EXPECT_TRUE(result.statusCode == http::status::ok);
