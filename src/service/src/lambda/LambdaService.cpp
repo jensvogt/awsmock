@@ -86,7 +86,6 @@ namespace AwsMock::Service {
         lambda.dockerTag = request.version;
         lambda.stateReason = "Initializing";
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
-        lambda.instances.clear();
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
         // Create lambda function asynchronously
@@ -548,12 +547,14 @@ namespace AwsMock::Service {
         return lambdaDir + "/" + lambda.function + "-" + lambda.dockerTag + ".b64";
     }
 
-    void LambdaService::CleanupDocker(const Database::Entity::Lambda::Lambda &lambda) {
+    void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {
         for (const auto &instance: lambda.instances) {
             ContainerService::instance().StopContainer(instance.containerId);
             ContainerService::instance().DeleteContainers(lambda.function, lambda.dockerTag);
         }
         ContainerService::instance().DeleteImage(lambda.imageId);
-        log_info << "Done CleanupDocker, function: " << lambda.function;
+        log_info << "Done cleanup docker, function: " << lambda.function;
+        lambda.instances.clear();
+        log_debug << "Done cleanup instances, function: " << lambda.function;
     }
 }// namespace AwsMock::Service
