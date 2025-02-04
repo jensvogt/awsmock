@@ -118,20 +118,15 @@ namespace AwsMock::Service {
                 continue;
             }
 
-            std::vector<Database::Entity::Lambda::Instance> toBeRemoved;
-            for (const auto &instance: lambda.instances) {
-                if (instance.status == Database::Entity::Lambda::InstanceIdle && instance.created < expired) {
-                    log_info << "Lambda instance expired, function: " << lambda.function << " containerId: " << instance.containerId;
-                    _dockerService.StopContainer({.id = instance.containerId});
-                    toBeRemoved.emplace_back(instance);
-                }
-            }
-            if (!toBeRemoved.empty()) {
-                for (const auto &instance: toBeRemoved) {
-                    lambda.RemoveInstance(instance);
-                }
+            // Remove instance
+            const auto count = std::erase_if(lambda.instances, [expired](const Database::Entity::Lambda::Instance &instance) {
+                return instance.created < expired;
+            });
+
+            // Update lambda
+            if (count > 0) {
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
-                log_debug << "Lambda updated, function" << lambda.function << " removed: " << toBeRemoved.size();
+                log_debug << "Lambda updated, function" << lambda.function << " removed: " << count;
                 _dockerService.PruneContainers();
             }
         }
