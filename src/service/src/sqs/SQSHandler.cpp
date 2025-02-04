@@ -267,10 +267,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SqsCommandType::LIST_TAG_COUNTERS: {
-                    Dto::SQS::ListTagCountersRequest sqsRequest;
+                    Dto::SQS::ListQueueTagCountersRequest sqsRequest;
                     sqsRequest.FromJson(clientCommand.payload);
 
-                    Dto::SQS::ListTagCountersResponse sqsResponse = _sqsService.ListTagCounters(sqsRequest);
+                    Dto::SQS::ListQueueTagCountersResponse sqsResponse = _sqsService.ListTagCounters(sqsRequest);
 
                     log_info << "List tags counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.tagCounters.size();
                     return SendOkResponse(request, sqsResponse.ToJson());

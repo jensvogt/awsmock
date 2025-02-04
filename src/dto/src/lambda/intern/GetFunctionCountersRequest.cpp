@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/lambda/GetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -10,8 +10,7 @@ namespace AwsMock::Dto::Lambda {
 
         try {
             const value document = bsoncxx::from_json(jsonString);
-            region = Core::Bson::BsonUtils::GetStringValue(document, "region");
-            functionName = Core::Bson::BsonUtils::GetStringValue(document, "functionName");
+            functionArn = Core::Bson::BsonUtils::GetStringValue(document, "functionArn");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -24,8 +23,7 @@ namespace AwsMock::Dto::Lambda {
         try {
 
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "functionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(document, "functionArn", functionArn);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

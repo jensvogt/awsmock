@@ -17,14 +17,9 @@ namespace AwsMock::Dto::Lambda {
     struct GetFunctionCountersRequest {
 
         /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
          * function name
          */
-        std::string functionName;
+        std::string functionArn;
 
         /**
          * Convert from a JSON string.

@@ -348,8 +348,8 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListTagCountersResponse
-    SQSService::ListTagCounters(const Dto::SQS::ListTagCountersRequest &request) const {
+    Dto::SQS::ListQueueTagCountersResponse
+    SQSService::ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_tag_counters");
         log_trace << "List tag counters request: " << request.ToString();
 
@@ -362,7 +362,7 @@ namespace AwsMock::Service {
         try {
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
 
-            Dto::SQS::ListTagCountersResponse response;
+            Dto::SQS::ListQueueTagCountersResponse response;
             response.total = queue.tags.size();
             for (const auto &[fst, snd]: queue.tags) {
                 Dto::SQS::TagCounter tagCounter = {.tagKey = fst, .tagValue = snd};
@@ -382,8 +382,7 @@ namespace AwsMock::Service {
         // Check existence
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {

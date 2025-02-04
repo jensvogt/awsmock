@@ -49,15 +49,7 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
-                case Dto::Common::LambdaCommandType::CREATE_LAMBDA:
-                case Dto::Common::LambdaCommandType::DELETE_LAMBDA:
-                case Dto::Common::LambdaCommandType::INVOKE_LAMBDA:
-                case Dto::Common::LambdaCommandType::CREATE_EVENT_SOURCE_MAPPING:
-                case Dto::Common::LambdaCommandType::TAG_LAMBDA:
-                case Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS:
-                case Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS:
-                case Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS:
-                case Dto::Common::LambdaCommandType::UNKNOWN:
+                default:
                     break;
             }
             std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
@@ -189,6 +181,16 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::GetFunctionCountersResponse lambdaResponse = _lambdaService.GetFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list";
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_TAG_COUNTERS) {
+
+                Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                Dto::Lambda::ListLambdaTagCountersResponse lambdaResponse = _lambdaService.ListLambdaTagCounters(lambdaRequest);
+                log_trace << "Lambda tag counters list";
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }

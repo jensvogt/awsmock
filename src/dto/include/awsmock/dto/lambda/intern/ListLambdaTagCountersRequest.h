@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_TAG_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_SQS_LIST_TAG_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -13,19 +13,14 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/SortColumn.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::Lambda {
 
-    struct ListTagCountersRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListLambdaTagCountersRequest {
 
         /**
-         * Queue ARN
+         * Lambda ARN
          */
-        std::string queueArn;
+        std::string lambdaArn;
 
         /**
          * Prefix
@@ -73,9 +68,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTagCountersRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListLambdaTagCountersRequest &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_SQS_LIST_TAG_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_REQUEST_H

@@ -1,5 +1,5 @@
 
-#include <awsmock/dto/lambda/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
 
 namespace AwsMock::Dto::Lambda {
 

@@ -492,7 +492,7 @@ namespace AwsMock::Database {
 
                 const double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.front().created).count();
 
-                if (double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count(); max + min > 5) {
+                if (const double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count(); max + min > 5) {
                     waitTime.waitTime[queue.name] = (max + min) / 2.0;
                 } else {
                     waitTime.waitTime[queue.name] = 0.0;

@@ -18,7 +18,7 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/ListQueueTagsResponse.cpp src/sqs/intern/GetQueueDetailsRequest.cpp src/sqs/intern/GetQueueDetailsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
         src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/model/Message.cpp src/sqs/mapper/Mapper.cpp
         src/sqs/intern/ListMessageCountersRequest.cpp src/sqs/intern/ListMessageCountersResponse.cpp src/sqs/model/AttributeCounter.cpp src/sqs/intern/ListQueueAttributeCountersRequest.cpp
-        src/sqs/intern/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp src/sqs/intern/ListTagCountersRequest.cpp src/sqs/intern/ListTagCountersResponse.cpp
+        src/sqs/intern/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp src/sqs/intern/ListQueueTagCountersRequest.cpp src/sqs/intern/ListQueueTagCountersResponse.cpp
         src/sqs/UntagQueueRequest.cpp src/sqs/model/LambdaTriggerCounter.cpp src/sqs/intern/ListLambdaTriggerCountersRequest.cpp src/sqs/intern/ListLambdaTriggerCountersResponse.cpp
         src/sqs/intern/UpdateMessageRequest.cpp src/sqs/DeleteAttributeRequest.cpp src/sqs/RedriveMessagesRequest.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
@@ -54,8 +54,9 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp
         src/lambda/model/Configuration.cpp src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
         src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp src/lambda/model/EventSourceMapping.cpp
-        src/lambda/model/FunctionCounter.cpp src/lambda/ListFunctionCounterRequest.cpp src/lambda/ListFunctionCounterResponse.cpp src/lambda/GetFunctionCountersRequest.cpp
-        src/lambda/GetFunctionCountersResponse.cpp src/lambda/ResetFunctionCountersRequest.cpp src/lambda/DeleteFunctionRequest.cpp src/lambda/UploadFunctionCodeRequest.cpp)
+        src/lambda/model/FunctionCounter.cpp src/lambda/intern/ListFunctionCounterRequest.cpp src/lambda/intern/ListFunctionCounterResponse.cpp src/lambda/intern/GetFunctionCountersRequest.cpp
+        src/lambda/intern/GetFunctionCountersResponse.cpp src/lambda/ResetFunctionCountersRequest.cpp src/lambda/DeleteFunctionRequest.cpp src/lambda/UploadFunctionCodeRequest.cpp
+        src/lambda/intern/ListLambdaTagCountersRequest.cpp src/lambda/intern/ListLambdaTagCountersResponse.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp src/cognito/model/Group.cpp src/cognito/CreateGroupRequest.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/model/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp

@@ -59,8 +59,8 @@
 #include <awsmock/dto/sqs/intern/ListQueueAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/intern/ListQueueCountersRequest.h>
 #include <awsmock/dto/sqs/intern/ListQueueCountersResponse.h>
-#include <awsmock/dto/sqs/intern/ListTagCountersRequest.h>
-#include <awsmock/dto/sqs/intern/ListTagCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListQueueTagCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListQueueTagCountersResponse.h>
 #include <awsmock/dto/sqs/intern/UpdateDqlRequest.h>
 #include <awsmock/dto/sqs/intern/UpdateMessageRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
@@ -90,7 +90,7 @@ namespace AwsMock::Service {
        * @brief Constructor
        */
         explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()),
-                                _lambdaDatabase(Database::LambdaDatabase::instance()){};
+                                _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
        * @brief Creates a new queue.
@@ -244,7 +244,7 @@ namespace AwsMock::Service {
        * @param request list tag counters request DTO
        * @return ListTagCountersResponse DTO
        */
-        Dto::SQS::ListTagCountersResponse ListTagCounters(const Dto::SQS::ListTagCountersRequest &request) const;
+        Dto::SQS::ListQueueTagCountersResponse ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
 
         /**
        * @brief Delete a queue

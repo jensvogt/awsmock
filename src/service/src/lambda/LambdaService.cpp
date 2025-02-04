@@ -1,10 +1,7 @@
 //
 // Created by vogje01 on 30/05/2023.
 //
-// C++ Test JSON image-transformation:
-//{ "Records" : [ { "awsRegion" : "eu-central-1", "messageId" : "642154cc-7ac4-4d0f-8c6d-ad05f4b1e3fe", "receiptHandle" : "fJBf02J5dcn1cdYFJeks52bDpVIsUslIb1El6GPigH6sXD3HG6eBeVY4jTSR8HhuozLQEwKoJGdnd3jfi8R1zRk34oCwLxiQZRWcAYEO8QW6x56Ng2neeBzKEekx4Zzqhi2kXR991CUM4h31mvsrLLG7i3IPdZvJsdpyGusvrD51YPGfGZR9tzjhct2r5niEshOPjgR0t50Wb5uIFNgM7uFABHpT9Vyrd3fuRXBcDbp7yYi4pEdww761c1ylPRbSz2TihlcYvfLooJ5T20NFy6KcnwLruuv4LCKmo9N6YGCYHgAl9HhOCisCFS2UVn6l1sHTJAqKkCPKyp6oZsN0VY8ykl74iph4HIyAW74feuGnvecyzq8McDVVygGoMeERlutOifxMcJSOzjicXAiBmMEYu9JEHiqQxnP4CF1G4IVyVxJNXn3uR6NzDLCdRKOGr11KdKLlhLQFJ7vXKx4DMTR8fIXGbbmaeYLGn6ARUxjqvpR2TQN1jLgtMdtQ3DPs", "body" : "{\"lieferantenId\":\"ftpuser1\",\"dateinameOriginal\":\"97815662_16122024063817059.jpg\",\"eingangsverzeichnis\":\"ftpuser1/97815662_16122024063817059.jpg\",\"eingangsdatum\":\"2024-12-16T06:38:17.0\",\"dateinameS3\":\"ftpuser1/97815662_16122024063817059.jpg\",\"ablageortS3\":\"file-delivery\",\"fileType\":null}", "md5OfBody" : "76af3472e032f1106f1e8356daf17db3", "eventSource" : "aws:sqs", "eventSourceARN" : "arn:aws:sqs:eu-central-1:000000000000:ftp-file-distribution-image-queue", "attributes" : { "ApproximateFirstReceivedTimestamp" : "1734327509", "ApproximateReceivedCount" : "0", "SenderId" : "none", "SentTimestamp" : "1734327509", "VisibilityTimeout" : "90" } } ] }
 #include <awsmock/service/lambda/LambdaService.h>
-#include <thread>
 
 namespace AwsMock::Service {
     boost::mutex LambdaService::_mutex;
@@ -121,6 +118,7 @@ namespace AwsMock::Service {
         log_debug << "List function counters request, region: " << request.region;
 
         try {
+
             const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
             const long count = _lambdaDatabase.LambdaCount(request.region);
 
@@ -129,6 +127,56 @@ namespace AwsMock::Service {
 
             log_trace << "Lambda list function counters, result: " << response.ToString();
             return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::Lambda::ListLambdaTagCountersResponse LambdaService::ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_tag_counters");
+        log_debug << "List lambda tag counters request, lambdaArn: " << request.lambdaArn;
+
+        try {
+
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+
+            Dto::Lambda::ListLambdaTagCountersResponse response;
+            response.total = lambda.tags.size();
+
+            std::vector<std::pair<std::string, std::string>> tags;
+            for (const auto &[fst, snd]: lambda.tags) {
+                tags.emplace_back(fst, snd);
+            }
+
+            // Sorting
+            if (request.sortColumns.at(0).column == "key") {
+                std::ranges::sort(tags, [request](const std::pair<std::string, std::string> &a, const std::pair<std::string, std::string> &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.first <= b.first;
+                    }
+                    return a.first > b.first;
+                });
+            } else if (request.sortColumns.at(0).column == "value") {
+                std::ranges::sort(tags, [request](const std::pair<std::string, std::string> &a, const std::pair<std::string, std::string> &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.second <= b.second;
+                    }
+                    return a.second > b.second;
+                });
+            }
+
+            // Paging
+            auto endArray = tags.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > tags.size()) {
+                endArray = tags.end();
+            }
+            response.tagCounters = std::vector(tags.begin() + request.pageIndex * request.pageSize, endArray);
+
+            log_trace << "Lambda list tags counters, result: " << response.ToString();
+            return response;
+
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -165,11 +213,11 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::GetFunctionCountersResponse LambdaService::GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_function");
-        log_debug << "Get function request, region: " << request.region << " name: " << request.functionName;
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_function_counters");
+        log_debug << "Get function request, functionArn: " << request.functionArn;
 
         try {
-            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
 
             Dto::Lambda::GetFunctionCountersResponse response;
             response.id = lambda.oid;

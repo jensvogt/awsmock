@@ -2,11 +2,11 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/sqs/intern/ListTagCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListQueueTagCountersResponse.h>
 
 namespace AwsMock::Dto::SQS {
 
-    std::string ListTagCountersResponse::ToJson() const {
+    std::string ListQueueTagCountersResponse::ToJson() const {
 
         try {
 
@@ -28,14 +28,14 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string ListTagCountersResponse::ToString() const {
+    std::string ListQueueTagCountersResponse::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ListTagCountersResponse &r) {
-        os << "ListTagCountersResponse=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ListQueueTagCountersResponse &r) {
+        os << "ListQueueTagCountersResponse=" << r.ToJson();
         return os;
     }
 

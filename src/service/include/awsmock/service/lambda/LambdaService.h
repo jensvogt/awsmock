@@ -29,17 +29,19 @@
 #include <awsmock/dto/lambda/CreateTagRequest.h>
 #include <awsmock/dto/lambda/DeleteFunctionRequest.h>
 #include <awsmock/dto/lambda/DeleteTagsRequest.h>
-#include <awsmock/dto/lambda/GetFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/GetFunctionResponse.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
-#include <awsmock/dto/lambda/ListFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
 #include <awsmock/dto/lambda/ResetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/UploadFunctionCodeRequest.h>
+#include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
+#include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
@@ -90,7 +92,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -113,9 +115,20 @@ namespace AwsMock::Service {
          *
          * @param request list lambda function counters request
          * @return ListFunctionCountersResponse
+         * @see ListFunctionCountersRequest
          * @see ListFunctionCountersResponse
          */
         Dto::Lambda::ListFunctionCountersResponse ListFunctionCounters(const Dto::Lambda::ListFunctionCountersRequest &request) const;
+
+        /**
+         * @brief List lambda tags counters
+         *
+         * @param request list lambda tags counters request
+         * @return ListFunctionCountersResponse
+         * @see ListLambdaTagCountersRequest
+         * @see ListFunctionCountersResponse
+         */
+        Dto::Lambda::ListLambdaTagCountersResponse ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const;
 
         /**
          * @brief Invoke SQS function.

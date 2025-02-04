@@ -2,24 +2,25 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_TAG_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_LIST_TAG_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/lambda/model/Tags.h>
 #include <awsmock/dto/sqs/model/TagCounter.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::Lambda {
 
-    struct ListTagCountersResponse {
+    struct ListLambdaTagCountersResponse {
 
         /**
          * List of tag counters
          */
-        std::vector<TagCounter> tagCounters;
+        std::vector<std::pair<std::string, std::string>> tagCounters;
 
         /**
          * Total number of queues
@@ -45,9 +46,9 @@ namespace AwsMock::Dto::SQS {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListTagCountersResponse &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListLambdaTagCountersResponse &r);
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::Lambda
 
-#endif// AWSMOCK_DTO_SQS_LIST_TAG_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_LAMBDA_LIST_TAG_COUNTERS_RESPONSE_H

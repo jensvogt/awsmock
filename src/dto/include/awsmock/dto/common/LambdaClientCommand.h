@@ -35,6 +35,8 @@ namespace AwsMock::Dto::Common {
         GET_FUNCTION_COUNTERS,
         RESET_FUNCTION_COUNTERS,
         UPLOAD_FUNCTION_CODE,
+        LIST_TAG_COUNTERS,
+        LIST_ENVIRONMENT_COUNTERS,
         UNKNOWN
     };
 
@@ -50,7 +52,10 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::TAG_LAMBDA, "function-tag"},
             {LambdaCommandType::GET_FUNCTION_COUNTERS, "get-function-counters"},
             {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"},
-            {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"}};
+            {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
+            {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+            {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
+    };
 
     [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {
         return LambdaCommandTypeNames[commandType];
