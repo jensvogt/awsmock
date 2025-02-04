@@ -86,6 +86,7 @@ namespace AwsMock::Service {
         lambda.dockerTag = request.version;
         lambda.stateReason = "Initializing";
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
+        lambda.instances.clear();
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
         // Create lambda function asynchronously
@@ -553,5 +554,6 @@ namespace AwsMock::Service {
             ContainerService::instance().DeleteContainers(lambda.function, lambda.dockerTag);
         }
         ContainerService::instance().DeleteImage(lambda.imageId);
+        log_info << "Done CleanupDocker, function: " << lambda.function;
     }
 }// namespace AwsMock::Service
