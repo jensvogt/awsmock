@@ -89,7 +89,7 @@ namespace AwsMock::Service {
         response.FromJson(body);
         response.id = Core::StringUtils::Split(response.id, ':')[1];
 
-        log_info << "Image found, name: " << name << ":" << tag;
+        log_debug << "Image found, name: " << name << ":" << tag;
         return response;
     }
 

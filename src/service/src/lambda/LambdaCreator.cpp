@@ -23,7 +23,7 @@ namespace AwsMock::Service {
         lambdaEntity.codeSize = functionCode.size();
         lambdaEntity = Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
 
-        log_debug << "Lambda function created: " << lambdaEntity.function << " status: " << lambdaEntity.state;
+        log_info << "Lambda function installed: " << lambdaEntity.function << " status: " << lambdaEntity.state;
     }
 
     void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode) {
