@@ -60,13 +60,11 @@ namespace AwsMock::Dto::SQS {
     Database::Entity::SQS::MessageAttributeList Mapper::map(const MessageAttributeList &messageAttributes) {
         Database::Entity::SQS::MessageAttributeList messageAttributeList{};
         for (const auto &[fst, snd]: messageAttributes) {
-            if (std::ranges::find(excludedAttributeNames.begin(), excludedAttributeNames.end(), fst) == excludedAttributeNames.end()) {
                 Database::Entity::SQS::MessageAttribute messageAttribute;
                 messageAttribute.attributeName = fst;
                 messageAttribute.attributeValue = snd.stringValue;
                 messageAttribute.attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type));
                 messageAttributeList.emplace_back(messageAttribute);
-            }
         }
         return messageAttributeList;
     }
