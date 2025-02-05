@@ -36,6 +36,9 @@ namespace AwsMock::Dto::Common {
         RESET_FUNCTION_COUNTERS,
         UPLOAD_FUNCTION_CODE,
         LIST_TAG_COUNTERS,
+        ADD_TAG,
+        DELETE_TAG,
+        UPDATE_TAG,
         LIST_ENVIRONMENT_COUNTERS,
         UNKNOWN
     };
@@ -54,6 +57,9 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"},
             {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
             {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+            {LambdaCommandType::ADD_TAG, "add-function-tag"},
+            {LambdaCommandType::DELETE_TAG, "delete-function-tag"},
+            {LambdaCommandType::UPDATE_TAG, "update-function-tag"},
             {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
     };
 

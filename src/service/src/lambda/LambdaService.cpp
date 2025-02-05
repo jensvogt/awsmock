@@ -183,6 +183,61 @@ namespace AwsMock::Service {
         }
     }
 
+    void LambdaService::AddLambdaTag(const Dto::Lambda::AddFunctionTagRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "add_lambda_tag");
+        log_debug << "List lambda tag counters request, functionArn: " << request.functionArn;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            lambda.tags[request.tagKey] = request.tagValue;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda tags added, lambdaArn: " << lambda.arn;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::UpdateLambdaTag(const Dto::Lambda::UpdateFunctionTagRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "update_lambda_tag");
+        log_debug << "Update lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey << ", value: " << request.tagValue;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            lambda.tags[request.tagKey] = request.tagValue;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda tags updated, lambdaArn: " << lambda.arn;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::DeleteLambdaTag(const Dto::Lambda::DeleteFunctionTagRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_lambda_tag");
+        log_debug << "Delete lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            std::string tagKey = request.tagKey;
+            const auto count = std::erase_if(lambda.tags, [tagKey](const auto &item) {
+                auto const &[key, value] = item;
+                return key == tagKey;
+            });
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda tags deleted, lambdaArn: " << lambda.arn << " count: " << count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     Dto::Lambda::GetFunctionResponse LambdaService::GetFunction(const std::string &region, const std::string &name) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "get_function");
         log_debug << "Get function request, region: " << region << " name: " << name;

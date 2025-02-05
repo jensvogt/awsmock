@@ -34,14 +34,17 @@
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
-#include <awsmock/dto/lambda/ResetFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/UploadFunctionCodeRequest.h>
+#include <awsmock/dto/lambda/intern/AddFunctionTagRequest.h>
+#include <awsmock/dto/lambda/intern/DeleteFunctionTagRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/UpdateFunctionTagRequest.h>
+#include <awsmock/dto/lambda/intern/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
@@ -92,7 +95,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -129,6 +132,30 @@ namespace AwsMock::Service {
          * @see ListFunctionCountersResponse
          */
         Dto::Lambda::ListLambdaTagCountersResponse ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const;
+
+        /**
+         * @brief Add a lambda tags
+         *
+         * @param request add lambda tags request
+         * @see AddFunctionTagRequest
+         */
+        void AddLambdaTag(const Dto::Lambda::AddFunctionTagRequest &request) const;
+
+        /**
+         * @brief Update a lambda tags
+         *
+         * @param request update lambda tags request
+         * @see UpdateFunctionTagRequest
+         */
+        void UpdateLambdaTag(const Dto::Lambda::UpdateFunctionTagRequest &request) const;
+
+        /**
+         * @brief Delete a lambda tags
+         *
+         * @param request delete lambda tags request
+         * @see DeleteFunctionTagRequest
+         */
+        void DeleteLambdaTag(const Dto::Lambda::DeleteFunctionTagRequest &request) const;
 
         /**
          * @brief Invoke SQS function.

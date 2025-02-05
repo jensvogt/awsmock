@@ -2,7 +2,7 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#include <awsmock/dto/lambda/ResetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
 
 namespace AwsMock::Dto::Lambda {
 

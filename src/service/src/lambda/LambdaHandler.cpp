@@ -138,6 +138,7 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
+
             if (action == "tags") {
 
                 std::string arn = Core::HttpUtils::GetPathParameter(request.target(), 2);
@@ -152,6 +153,7 @@ namespace AwsMock::Service {
 
                 return SendNoContentResponse(request);
             }
+
             if (action == "event-source-mappings") {
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
@@ -165,6 +167,7 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
 
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
@@ -174,6 +177,7 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::GetFunctionCountersRequest lambdaRequest;
@@ -184,6 +188,7 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_TAG_COUNTERS) {
 
                 Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest;
@@ -194,6 +199,40 @@ namespace AwsMock::Service {
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_TAG) {
+
+                Dto::Lambda::AddFunctionTagRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.AddLambdaTag(lambdaRequest);
+                log_trace << "Lambda tag added";
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_TAG) {
+
+                Dto::Lambda::UpdateFunctionTagRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.UpdateLambdaTag(lambdaRequest);
+                log_trace << "Lambda tag added";
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_TAG) {
+
+                Dto::Lambda::DeleteFunctionTagRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.DeleteLambdaTag(lambdaRequest);
+                log_trace << "Lambda tag deleted";
+
+                return SendOkResponse(request);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::ResetFunctionCountersRequest lambdaRequest;

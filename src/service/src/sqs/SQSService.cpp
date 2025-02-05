@@ -348,8 +348,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListQueueTagCountersResponse
-    SQSService::ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const {
+    Dto::SQS::ListQueueTagCountersResponse SQSService::ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_tag_counters");
         log_trace << "List tag counters request: " << request.ToString();
 
