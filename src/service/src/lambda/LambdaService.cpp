@@ -568,7 +568,7 @@ namespace AwsMock::Service {
         Database::LambdaDatabase::instance().SetLastInvocation(oid, system_clock::now());
         const system_clock::time_point start = system_clock::now();
 
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/", payload, {});
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload);
         if (response.statusCode != http::status::ok) {
             log_error << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body << " payload: " << payload;
             Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceFailed);
