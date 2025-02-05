@@ -119,13 +119,8 @@ namespace AwsMock::Service {
                     std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
                     log_debug << "Lambda function invocation, name: " << functionName;
 
-                    std::string output = _lambdaService.InvokeLambdaFunction(functionName, body, region);
+                    _lambdaService.InvokeLambdaFunction(region, functionName, body);
                     log_info << "Lambda function invoked, name: " << functionName;
-
-                    // Set output, if existing
-                    if (!output.empty()) {
-                        //  response.set("X-Amz-Log-Result", output);
-                    }
                     return SendOkResponse(request);
                 }
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;

@@ -49,6 +49,7 @@
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
+#include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/container/ContainerService.h>
@@ -95,7 +96,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -162,13 +163,12 @@ namespace AwsMock::Service {
          *
          * If the logType is set and is equal to 'Tail', the function will be invoked synchronously and the output will be appended to the response.
          *
+         * @param region AWS region
          * @param functionName lambda function name
          * @param payload SQS message
-         * @param region AWS region
-         * @param synchron if true use synchronous invocation
-         * @return output string (limited to 4kb) in case of a synchronous invocation.
+         * @param receiptHandle receipt handle of the message which triggered the lambda
          */
-        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, bool synchron = false) const;
+        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}) const;
 
         /**
          * @brief Create a new tag for a lambda functions.

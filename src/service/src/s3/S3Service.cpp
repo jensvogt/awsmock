@@ -1109,8 +1109,8 @@ namespace AwsMock::Service {
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        const std::string output = _lambdaService.InvokeLambdaFunction(functionName, eventNotification.ToJson(), region);
-        log_debug << "Lambda invocation finished send, output" << output;
+        _lambdaService.InvokeLambdaFunction(region, functionName, eventNotification.ToJson());
+        log_debug << "Lambda invocation finished send";
     }
 
     Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {

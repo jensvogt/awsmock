@@ -1165,7 +1165,6 @@ namespace AwsMock::Database {
                 // Adjust queue message counters
                 AdjustMessageCounters(message.queueArn);
 
-                //                log_debug << "Messages deleted, receiptHandle: " << Core::StringUtils::SubString(message.receiptHandle, 0, 40) << "... count: " << result->deleted_count();
                 log_debug << "Messages deleted, receiptHandle: " << message.receiptHandle << ", count: " << result->deleted_count();
                 return result->deleted_count();
 
@@ -1176,6 +1175,16 @@ namespace AwsMock::Database {
             }
         }
         return _memoryDb.DeleteMessage(message);
+    }
+
+    long SQSDatabase::DeleteMessage(const std::string &receiptHandle) const {
+
+        if (HasDatabase()) {
+
+            const Entity::SQS::Message message = GetMessageByReceiptHandle(receiptHandle);
+            return DeleteMessage(message);
+        }
+        return _memoryDb.DeleteMessage(receiptHandle);
     }
 
     long SQSDatabase::DeleteAllMessages() const {

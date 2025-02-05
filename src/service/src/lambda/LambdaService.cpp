@@ -317,7 +317,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, bool synchron) const {
+    void LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle) const {
         boost::mutex::scoped_lock lock(_mutex);
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
@@ -355,26 +355,15 @@ namespace AwsMock::Service {
         std::string hostName = GetHostname(instance);
         int port = GetContainerPort(instance);
 
-        // Send invocation request
-        std::string output;
-        if (synchron) {
-
-            // Synchronous execution
-            output = InvokeLambdaSynchronously(hostName, port, payload, lambda.oid, instance.id);
-
-        } else {
-
-            // Asynchronous execution
-            LambdaExecutor lambdaExecutor;
-            boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload, lambda.function);
-            t.detach();
-        }
+        // Asynchronous execution
+        LambdaExecutor lambdaExecutor;
+        boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload, lambda.function, receiptHandle);
+        t.detach();
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
 
         // Update database
         lambda = _lambdaDatabase.UpdateLambda(lambda);
         log_debug << "Lambda entity invoked, name: " << lambda.function;
-        return output;
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) const {
