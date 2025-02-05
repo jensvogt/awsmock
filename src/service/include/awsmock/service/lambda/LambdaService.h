@@ -92,7 +92,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -138,10 +138,10 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param payload SQS message
          * @param region AWS region
-         * @param logType logging type
-         * @return output string (limited to 4kb) in case logType = 'Tail' and an synchronous invocation.
+         * @param synchron if true use synchronous invocation
+         * @return output string (limited to 4kb) in case of a synchronous invocation.
          */
-        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &logType = {}) const;
+        std::string InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, bool synchron = false) const;
 
         /**
          * @brief Create a new tag for a lambda functions.
@@ -261,9 +261,11 @@ namespace AwsMock::Service {
          * @param host lambda docker container host
          * @param port lambda docker container port
          * @param payload payload for the function
+         * @param oid lambda OID
+         * @param instanceId instance ID
          * @return output from lambda invocation call
          */
-        static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload);
+        static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload, const std::string &oid, const std::string &instanceId);
 
         /**
          * @brief Tries to find an idle instance

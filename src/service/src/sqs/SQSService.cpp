@@ -1141,7 +1141,12 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        std::string output = _lambdaService.InvokeLambdaFunction(lambda.function, eventNotification.ToJson(), region);
+        const std::string output = _lambdaService.InvokeLambdaFunction(lambda.function, eventNotification.ToJson(), region, true);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
+
+        if (Core::StringUtils::Contains(output, "success")) {
+            const long deleted = _sqsDatabase.DeleteMessage(message);
+            log_debug << "Lambda notification message deleted, function: " << lambda.function << " count: " << deleted;
+        }
     }
 }// namespace AwsMock::Service

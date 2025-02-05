@@ -262,7 +262,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, const std::string &logType) const {
+    std::string LambdaService::InvokeLambdaFunction(const std::string &functionName, const std::string &payload, const std::string &region, bool synchron) const {
         boost::mutex::scoped_lock lock(_mutex);
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
@@ -302,10 +302,14 @@ namespace AwsMock::Service {
 
         // Send invocation request
         std::string output;
-        if (!logType.empty() && Core::StringUtils::EqualsIgnoreCase(logType, "Tail")) {
+        if (synchron) {
+
             // Synchronous execution
-            output = InvokeLambdaSynchronously(hostName, port, payload);
+            output = InvokeLambdaSynchronously(hostName, port, payload, lambda.oid, instance.id);
+
         } else {
+
+            // Asynchronous execution
             LambdaExecutor lambdaExecutor;
             boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload, lambda.function);
             t.detach();
@@ -499,15 +503,26 @@ namespace AwsMock::Service {
         log_debug << "Delete tag request succeeded, arn: " + lambdaEntity.arn << " deleted: " << count;
     }
 
-    std::string LambdaService::InvokeLambdaSynchronously(const std::string &host, const int port, const std::string &payload) {
+    std::string LambdaService::InvokeLambdaSynchronously(const std::string &host, const int port, const std::string &payload, const std::string &oid, const std::string &containerId) {
         Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
         log_debug << "Sending lambda invocation request, endpoint: " << host << ":" << port;
 
+        // Set status
+        Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceRunning);
+        Database::LambdaDatabase::instance().SetLastInvocation(oid, system_clock::now());
+        const system_clock::time_point start = system_clock::now();
+
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/", payload, {});
         if (response.statusCode != http::status::ok) {
-            log_debug << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body;
+            log_error << "HTTP error, httpStatus: " << response.statusCode << " body: " << response.body << " payload: " << payload;
+            Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceFailed);
         }
+
+        // Set status
+        Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
+        Database::LambdaDatabase::instance().SetAverageRuntime(oid, std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count());
+
         log_debug << "Lambda invocation finished send, status: " << response.statusCode;
         log_info << "Lambda output: " << response.body;
         return response.body.substr(0, MAX_OUTPUT_LENGTH);
