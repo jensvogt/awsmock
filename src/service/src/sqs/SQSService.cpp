@@ -1132,7 +1132,7 @@ namespace AwsMock::Service {
                 .receiptHandle = message.receiptHandle,
                 .body = message.body,
                 .attributes = message.attributes,
-                .messagesAttributes = {},
+                .messagesAttributes = Dto::SQS::Mapper::map(message.messageAttributes),
                 .md5Sum = message.md5Body,
                 .eventSource = "aws:sqs",
                 .eventSourceArn = eventSourceArn};
