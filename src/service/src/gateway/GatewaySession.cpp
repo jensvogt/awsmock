@@ -33,9 +33,25 @@ namespace AwsMock::Service {
         // Set the timeout.
         _stream.expires_after(std::chrono::seconds(_timeout));
 
+        // Read a request using the parser-oriented interface
+        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
+    }
+
+    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
+        boost::ignore_unused(bytes_transferred);
+
+        // This means they closed the connection
+        if (ec == http::error::end_of_stream) {
+            return DoShutdown();
+        }
+
+        if (ec) {
+            return;
+        }
+
         // Read the header
-        boost::beast::error_code ec;
-        read_header(_stream, _buffer, *_parser, ec);
+        boost::beast::error_code ev;
+        read_header(_stream, _buffer, *_parser, ev);
         if (ec)
             return;
 
@@ -45,17 +61,16 @@ namespace AwsMock::Service {
         }
 
         // Read the rest of the request.
-        read(_stream, _buffer, *_parser, ec);
+        read(_stream, _buffer, *_parser, ev);
 
-        if (_parser.get().get().chunked()) {
-            std::ofstream ofs("/tmp/test.bin", std::ios::binary);
-            std::string str = boost::beast::buffers_to_string(_buffer.data());
-            //std::string body = buffers_to_string(_parser.get().get().body().cdata());
-            ofs << str;
-        }
-
-        // Process the request
+        // Send the response
         QueueWrite(HandleRequest(_parser->release()));
+
+        // If we aren't at the queue limit, try to pipeline another request
+        if (_response_queue.size() < _queueLimit) {
+            DoRead();
+        }
+        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
     void GatewaySession::QueueWrite(http::message_generator response) {

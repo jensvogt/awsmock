@@ -69,6 +69,11 @@ namespace AwsMock::Dto::SQS {
         std::string md5Sum;
 
         /**
+         * Message size
+         */
+        long size = 0;
+
+        /**
          * Message retries
          */
         int retries = 0;

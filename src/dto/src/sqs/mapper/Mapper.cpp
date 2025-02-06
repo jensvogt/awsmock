@@ -48,10 +48,11 @@ namespace AwsMock::Dto::SQS {
             messageEntry.receiptHandle = message.receiptHandle;
             messageEntry.md5Sum = message.md5Body;
             messageEntry.retries = message.retries;
-            messageEntry.created = message.created;
-            messageEntry.modified = message.modified;
+            messageEntry.size = message.size;
             messageEntry.attributes = message.attributes;
             messageEntry.messageAttributes = map(message.messageAttributes);
+            messageEntry.created = message.created;
+            messageEntry.modified = message.modified;
             listMessageCountersResponse.messages.emplace_back(messageEntry);
         }
         return listMessageCountersResponse;

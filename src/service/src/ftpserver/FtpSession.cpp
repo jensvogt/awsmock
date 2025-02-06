@@ -1436,13 +1436,10 @@ namespace AwsMock::FtpServer {
         const FileStatus file_status(local_path);
 
         if (!file_status.isOk()) {
-            return {
-                    FtpReplyCode::ACTION_NOT_TAKEN,
-                    "Failed ot change directory: The given resource does not exist or permission denied."};
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource does not exist or permission denied."};
         }
         if (file_status.type() != FileType::Dir) {
-            return {
-                    FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory."};
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory."};
         }
         if (!file_status.canOpenDir()) {
             return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: Permission denied."};
@@ -1460,6 +1457,7 @@ namespace AwsMock::FtpServer {
 
         // Get content type
         std::string contentType = Core::FileUtils::GetContentType(fileName);
+        long contentLength = Core::FileUtils::FileSize(fileName);
 
         Dto::S3::PutObjectRequest request = {
                 .region = _region,
@@ -1467,6 +1465,7 @@ namespace AwsMock::FtpServer {
                 .key = key,
                 .owner = user,
                 .contentType = contentType,
+                .contentLength = contentLength,
                 .metadata = metadata};
 
         std::ifstream ifs(fileName, std::ios::binary);

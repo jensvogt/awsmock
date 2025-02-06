@@ -77,6 +77,11 @@ namespace AwsMock::Service {
         void DoRead();
 
         /**
+         * @brief On read callback
+         */
+        void OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred);
+
+        /**
          * @brief Queue write callback
          */
         void QueueWrite(http::message_generator response);

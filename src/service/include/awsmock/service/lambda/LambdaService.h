@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
 
         /**
          * @brief Create lambda function

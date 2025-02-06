@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/s3/S3Service.h>
+#include <picojson/picojson.h>
 
 namespace AwsMock::Service {
 
@@ -499,7 +500,7 @@ namespace AwsMock::Service {
             if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
                 return SaveVersionedObject(request, bucket, stream);
             } else {
-                return SaveUnversionedObject(request, bucket, stream);
+                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
             }
 
         } catch (bsoncxx::exception &ex) {
@@ -1113,7 +1114,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda invocation finished send";
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {
+    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const {
 
         std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
@@ -1121,13 +1122,20 @@ namespace AwsMock::Service {
         // Write file
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
-        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-        ofs << stream.rdbuf();
-        ofs.close();
 
-        // Get size
-        long size = Core::FileUtils::FileSize(filePath);
-        log_debug << "File received, fileName: " << filePath << " size: " << size;
+        // Write file in chunks
+        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
+        constexpr std::size_t buffer_size = 4096;
+        char buffer[buffer_size];
+        long count = size;
+        while (count > buffer_size) {
+            stream.read(buffer, buffer_size);
+            ofs.write(buffer, buffer_size);
+            count -= buffer_size;
+        }
+        stream.read(buffer, count);
+        ofs.write(buffer, count);
+        ofs.close();
 
         // Check file encoding
         if (Core::FileUtils::IsBase64(filePath)) {

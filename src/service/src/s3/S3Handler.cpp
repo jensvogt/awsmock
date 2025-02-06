@@ -283,7 +283,7 @@ namespace AwsMock::Service {
                             .metadata = metadata};
 
                     boost::beast::net::streambuf sb;
-                    PrepareBody(request, sb);
+                    putObjectRequest.contentLength = PrepareBody(request, sb);
                     std::istream stream(&sb);
                     log_info << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
@@ -732,13 +732,13 @@ namespace AwsMock::Service {
             const std::string parts = Core::StringUtils::Split(rangeStr, '/')[0];
             min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
             max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
-            size = max - min;
+            size = max - min + 1;
             const long total = std::stol(Core::StringUtils::Split(headerValue, '/')[1]);
             log_debug << "Requested range: " << std::to_string(min) << "-" << std::to_string(max) << ", size: " << size << " total: " << total;
         } else {
             min = std::stol(Core::StringUtils::Split(headerValue, '-')[0]);
             max = std::stol(Core::StringUtils::Split(headerValue, '-')[1]);
-            size = max - min;
+            size = max - min + 1;
             log_debug << "Requested range: " << std::to_string(min) << "-" << std::to_string(max) << ", size: " << size;
         }
     }
@@ -756,7 +756,7 @@ namespace AwsMock::Service {
         return metadata;
     }
 
-    void S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
+    long S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
 
         // std::string str = buffers_to_string(request.body());
 
@@ -779,7 +779,9 @@ namespace AwsMock::Service {
                 count++;
             } while (sb.sgetc() != boost::asio::error::eof);
             log_trace << "Skipped count: " << count << " decodedContentLength: " << decodedContentLength;
+            return decodedContentLength;
         }
+        return request.body().size();
     }
 
 }// namespace AwsMock::Service

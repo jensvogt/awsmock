@@ -29,6 +29,7 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "body", body);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5OfBody", md5Sum);
             Core::Bson::BsonUtils::SetIntValue(rootDocument, "retries", retries);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 

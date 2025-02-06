@@ -129,7 +129,7 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @param sb prepared strean buffer
          */
-        static void PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
+        static long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
 
         /**
          * S3 service

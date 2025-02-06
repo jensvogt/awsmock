@@ -986,8 +986,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListMessageCountersResponse SQSService::ListMessageCounters(
-            const Dto::SQS::ListMessageCountersRequest &request) const {
+    Dto::SQS::ListMessageCountersResponse SQSService::ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_messages");
         log_trace << "List message counters request";
 
