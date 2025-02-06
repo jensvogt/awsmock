@@ -143,7 +143,6 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::CreateContainers() const {
-
         try {
 
             // Get lambda list
@@ -153,6 +152,7 @@ namespace AwsMock::Service {
             }
 
             // Loop over lambdas and create the containers
+            log_info << "Start creating lambda functions, count: " << lambdaList.size();
             for (auto &lambda: lambdaList) {
                 Dto::Lambda::CreateFunctionRequest request = {{.region = _region}, lambda.function, lambda.runtime};
                 Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
