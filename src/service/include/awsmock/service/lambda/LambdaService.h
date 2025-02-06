@@ -40,6 +40,8 @@
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersRequest.h>
+#include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
@@ -96,7 +98,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -133,6 +135,16 @@ namespace AwsMock::Service {
          * @see ListFunctionCountersResponse
          */
         Dto::Lambda::ListLambdaTagCountersResponse ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const;
+
+        /**
+         * @brief List lambda environment counters
+         *
+         * @param request list lambda environment counters request
+         * @return ListLambdaEnvironmentCountersResponse
+         * @see ListLambdaEnvironmentCountersRequest
+         * @see ListLambdaEnvironmentCountersResponse
+         */
+        Dto::Lambda::ListLambdaEnvironmentCountersResponse ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const;
 
         /**
          * @brief Add a lambda tags

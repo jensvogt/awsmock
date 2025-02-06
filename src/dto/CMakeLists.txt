@@ -57,7 +57,8 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/model/FunctionCounter.cpp src/lambda/intern/ListFunctionCounterRequest.cpp src/lambda/intern/ListFunctionCounterResponse.cpp src/lambda/intern/GetFunctionCountersRequest.cpp
         src/lambda/intern/GetFunctionCountersResponse.cpp src/lambda/intern/ResetFunctionCountersRequest.cpp src/lambda/DeleteFunctionRequest.cpp src/lambda/intern/UploadFunctionCodeRequest.cpp
         src/lambda/intern/ListLambdaTagCountersRequest.cpp src/lambda/intern/ListLambdaTagCountersResponse.cpp src/lambda/intern/AddFunctionTagRequest.cpp
-        src/lambda/intern/UpdateFunctionTagRequest.cpp src/lambda/intern/DeleteFunctionTagRequest.cpp)
+        src/lambda/intern/UpdateFunctionTagRequest.cpp src/lambda/intern/DeleteFunctionTagRequest.cpp src/lambda/intern/ListLambdaEnvironmentCountersRequest.cpp
+        src/lambda/intern/ListLambdaEnvironmentCountersResponse.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp src/cognito/model/Group.cpp src/cognito/CreateGroupRequest.cpp
         src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/model/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp

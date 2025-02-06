@@ -40,6 +40,9 @@ namespace AwsMock::Dto::Common {
         DELETE_TAG,
         UPDATE_TAG,
         LIST_ENVIRONMENT_COUNTERS,
+        ADD_ENVIRONMENT,
+        DELETE_ENVIRONMENT,
+        UPDATE_ENVIRONMENT,
         UNKNOWN
     };
 
@@ -61,6 +64,9 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::DELETE_TAG, "delete-function-tag"},
             {LambdaCommandType::UPDATE_TAG, "update-function-tag"},
             {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
+            {LambdaCommandType::ADD_ENVIRONMENT, "add-function-environment"},
+            {LambdaCommandType::DELETE_ENVIRONMENT, "delete-function-environment"},
+            {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
     };
 
     [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {

@@ -134,6 +134,55 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Lambda::ListLambdaEnvironmentCountersResponse LambdaService::ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_environment_counters");
+        log_debug << "List lambda environment counters request, lambdaArn: " << request.lambdaArn;
+
+        try {
+
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+
+            Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
+            response.total = lambda.environment.variables.size();
+
+            std::vector<std::pair<std::string, std::string>> environments;
+            for (const auto &[fst, snd]: lambda.environment.variables) {
+                environments.emplace_back(fst, snd);
+            }
+
+            // Sorting
+            if (request.sortColumns.at(0).column == "key") {
+                std::ranges::sort(environments, [request](const std::pair<std::string, std::string> &a, const std::pair<std::string, std::string> &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.first <= b.first;
+                    }
+                    return a.first > b.first;
+                });
+            } else if (request.sortColumns.at(0).column == "value") {
+                std::ranges::sort(environments, [request](const std::pair<std::string, std::string> &a, const std::pair<std::string, std::string> &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.second <= b.second;
+                    }
+                    return a.second > b.second;
+                });
+            }
+
+            // Paging
+            auto endArray = environments.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > environments.size()) {
+                endArray = environments.end();
+            }
+            response.environmentCounters = std::vector(environments.begin() + request.pageIndex * request.pageSize, endArray);
+
+            log_trace << "Lambda list environments counters, result: " << response.ToString();
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     Dto::Lambda::ListLambdaTagCountersResponse LambdaService::ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_tag_counters");
         log_debug << "List lambda tag counters request, lambdaArn: " << request.lambdaArn;

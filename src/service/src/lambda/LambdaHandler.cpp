@@ -184,6 +184,17 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_ENVIRONMENT_COUNTERS) {
+
+                Dto::Lambda::ListLambdaEnvironmentCountersRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                Dto::Lambda::ListLambdaEnvironmentCountersResponse lambdaResponse = _lambdaService.ListLambdaEnvironmentCounters(lambdaRequest);
+                log_trace << "Lambda environment counters list, count: " << lambdaResponse.environmentCounters.size();
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_TAG_COUNTERS) {
 
                 Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest;
