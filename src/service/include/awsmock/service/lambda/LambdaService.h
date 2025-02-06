@@ -34,7 +34,9 @@
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
+#include <awsmock/dto/lambda/intern/AddFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/intern/AddFunctionTagRequest.h>
+#include <awsmock/dto/lambda/intern/DeleteFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/intern/DeleteFunctionTagRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
@@ -45,6 +47,7 @@
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/intern/UpdateFunctionTagRequest.h>
 #include <awsmock/dto/lambda/intern/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
@@ -98,7 +101,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -145,6 +148,30 @@ namespace AwsMock::Service {
          * @see ListLambdaEnvironmentCountersResponse
          */
         Dto::Lambda::ListLambdaEnvironmentCountersResponse ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const;
+
+        /**
+         * @brief Add a lambda environment variable
+         *
+         * @param request add lambda environment variable request
+         * @see AddFunctionTagRequest
+         */
+        void AddLambdaEnvironment(const Dto::Lambda::AddFunctionEnvironmentRequest &request) const;
+
+        /**
+         * @brief Update a lambda environment variable
+         *
+         * @param request update lambda environment variablerequest
+         * @see UpdateFunctionEnvironmentRequest
+         */
+        void UpdateLambdaEnvironment(const Dto::Lambda::UpdateFunctionEnvironmentRequest &request) const;
+
+        /**
+         * @brief Delete a lambda environment variable
+         *
+         * @param request delete lambda environment variable request
+         * @see DeleteFunctionEnvironmentRequest
+         */
+        void DeleteLambdaEnvironment(const Dto::Lambda::DeleteFunctionEnvironmentRequest &request) const;
 
         /**
          * @brief Add a lambda tags

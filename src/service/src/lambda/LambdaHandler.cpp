@@ -195,6 +195,39 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_ENVIRONMENT) {
+
+                Dto::Lambda::AddFunctionEnvironmentRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.AddLambdaEnvironment(lambdaRequest);
+                log_trace << "Lambda environment added, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_ENVIRONMENT) {
+
+                Dto::Lambda::UpdateFunctionEnvironmentRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.UpdateLambdaEnvironment(lambdaRequest);
+                log_trace << "Lambda environment updated, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_ENVIRONMENT) {
+
+                Dto::Lambda::DeleteFunctionEnvironmentRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.DeleteLambdaEnvironment(lambdaRequest);
+                log_trace << "Lambda environment deleted, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
+
+                return SendOkResponse(request);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_TAG_COUNTERS) {
 
                 Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest;

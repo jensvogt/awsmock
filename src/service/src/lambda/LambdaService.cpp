@@ -183,6 +183,61 @@ namespace AwsMock::Service {
         }
     }
 
+    void LambdaService::AddLambdaEnvironment(const Dto::Lambda::AddFunctionEnvironmentRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "add_lambda_environment");
+        log_debug << "List lambda environment counters request, functionArn: " << request.functionArn;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            lambda.environment.variables[request.environmentKey] = request.environmentValue;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda environments added, lambdaArn: " << lambda.arn;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::UpdateLambdaEnvironment(const Dto::Lambda::UpdateFunctionEnvironmentRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "update_lambda_environment");
+        log_debug << "Update lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey << ", value: " << request.environmentValue;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            lambda.environment.variables[request.environmentKey] = request.environmentValue;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda environments updated, lambdaArn: " << lambda.arn;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::DeleteLambdaEnvironment(const Dto::Lambda::DeleteFunctionEnvironmentRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_lambda_environment");
+        log_debug << "Delete lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey;
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            std::string environmentKey = request.environmentKey;
+            const auto count = std::erase_if(lambda.environment.variables, [environmentKey](const auto &item) {
+                auto const &[key, value] = item;
+                return key == environmentKey;
+            });
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda environments deleted, lambdaArn: " << lambda.arn << " count: " << count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     Dto::Lambda::ListLambdaTagCountersResponse LambdaService::ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "list_tag_counters");
         log_debug << "List lambda tag counters request, lambdaArn: " << request.lambdaArn;
