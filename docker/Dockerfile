@@ -33,11 +33,6 @@ FROM alpine:latest
 
 RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url plog yaml-cpp libarchive libmagic
 
-# Fix timezones
-ENV TZ=Europe/Berlin
-RUN apk add -U tzdata
-RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
 # Make directories
 RUN mkdir -p /home/awsmock/data/s3 && \
     mkdir -p /home/awsmock/data/sqs && \
