@@ -1,0 +1,3627 @@
+<?xml encoding="UTF-8"?>
+<!--
+
+	**************************************************
+	*                                                *
+	*               ONIX INTERNATIONAL               *
+	*                                                *
+	*     BOOK PRODUCT INFORMATION MESSAGE SCHEMA    *
+	*                                                *
+	*                STRUCTURE MODULE                *
+	*                     XML DTD                    *
+	*              REFERENCE TAG VERSION             *
+	*                                                *
+	*          Original author: Francis Cave         *
+	*          Recent revisions: Graham Bell         *
+	*                                                *
+	*                  Release 3.0                   *
+	*                   Revision 8                   *
+	*                Status: RELEASED                *
+	*            Release date: 2009-04-09            *
+	*              Revised: 2021-04-29               *
+	*                                                *
+	*             (c) 2000-2021 EDItEUR              *
+	*             http://www.editeur.org/            *
+	*                                                *
+	**************************************************
+
+
+	TERMS AND CONDITIONS OF USE OF THE ONIX for Books PRODUCT INFORMATION FORMAT AND 
+	ASSOCIATED XML SCHEMAS
+
+	All ONIX standards and documentation – including this document – are copyright 
+	materials, made available free of charge for general use. A full license agreement 
+	(DOI: 10.4400/nwgj) that governs their use is available on the EDItEUR website. In 
+	particular, if you use any of the ONIX for Books Product Information Format schemas 
+	(RNG, XSD or DTD) (‘the schemas’), you will be deemed to have accepted these terms 
+	and conditions:
+
+	1. You agree that you will not add to, delete from, amend or copy for use outside of 
+	the schemas any part thereof except for strictly internal use in your own organization.
+
+	2. You agree that if your business would benefit from future additions or amendments 
+	to or extracts of the schemas for any purpose that is not strictly internal to your own 
+	organisation, you will in the first instance notify EDItEUR and allow EDItEUR to review 
+	and comment on your proposed use, in the interest of securing an orderly 
+	development of the Schema for the benefit of other users.
+
+	If you do not accept these terms, you must not use any version of the ONIX Product 
+	Information Message Schemas.
+
+	Full copies of all published versions of the latest release of this Schema and all 
+	associated documentation are available from the EDItEUR web site, where may also be 
+	found details of how to contact EDItEUR for advice on the use of this Schema. The URL 
+	for the EDItEUR web site is:
+
+	http://www.editeur.org/
+
+
+	SCHEMA REVISION HISTORY (IN REVERSE CHRONOLOGICAL ORDER)
+
+	2022-11-17: corrected an error in the content model of <Audience> introduced in 2021
+
+	2021-04-29: ONIX for Books 3.0 revision 8
+	            1. added <ProductionDetail> block
+	            2. added <AudienceHeadingText> in <Audience>
+	            3. added <SupportingResource> in <PromotionalEvent> and <EventOccurrence>
+	            4. added <TelephoneNumber> in <SupplyContact>, <ProductContact>, <Sender>, <Addressee>
+
+	            (intentionally blank)
+
+	2019-10-31: ONIX for Books 3.0 revision 7
+	            1. added <PromotionalEvent> in <PromotionDetail> block
+	            2. added <ProductClassificationTypeName> in <ProductClassification> composite
+	            3. added <TextSourceDescription> in <TextContent> composite
+	            4. added <RegionCode> and <PrizeRegion> to <Language> and <Prize> composites
+	            5. modified <PrizeStatement> to accept (X)HTML markup
+	            6. modified cardinality of <CopyrightYear> in <CopyrightStatement>
+	            7. added collationkey attribute to imprint, publisher, agent and supplier name
+
+	2019-04-26: ONIX for Books 3.0 revision 6
+	            1. added <Measure> within <ProductPart>
+	            2. made <WebsiteLink> repeatable, added @language
+
+	2018-10-26: ONIX for Books 3.0 revision 5
+	            1. added <AVItem> within <ContentItem>, as an alternative to <TextItem>
+	            2. added <PalletQuantity> within <Supplier>
+	            3. added <TaxExempt/> empty element
+	            4. ensure Blocks 2, 3, 5 can be blank
+
+	2017-11-26: corrected content model for <InitialPrintRun> to match documentation
+
+	2017-10-26: ONIX for Books 3.0 revision 4
+	            1. added <SupplyContact> within <SupplyDetail>
+	            2. added <PricePartDescription> in <Tax>
+	            3. added <EpubTechnicalProtection> and <EpubLicense> in <Price>
+	            4. modified <CollectionSequenceNumber> to accept hyphen for unordered levels in numbering hierarchy
+	            5. added <Reserved> within <Stock>
+	            6. added <Language> in <ContentItem>
+	            7. used gp.authorship in <Collection> and <ContentItem>
+
+	2017-05-22: simplified expression of data model for <Territory>
+
+	2016-04-25: ONIX for Books 3.0 revision 3
+	            1. added Event as near-synonym for Conference
+	               a. choose either elements labelled <Event…> OR <Conference…>, but cannot mix in one <Product> record
+	               b. <EventRole> is mandatory, where <ConferenceRole> is optional and defaults to 01 (currently undefined) if omitted
+	               c. <EventName>, <EventAcronym>, <EventTheme>, <EventPlace> are repeatable in parallel languages, where the <Conference> equivalents are not
+	               d. <EventTheme> is simple string, whereas <ConferenceTheme> accepts XHTML for backward compatibility (though this is deprecated)
+	            2. added <Territory> into <TextContent>, <CitedContent>, <SupportingResource> so that marketing collateral can be region-specific
+	            3. added <ReviewRating> into <TextContent> and <CitedContent> to carry star ratings
+	            4. added <AlternativeName>, <SubjectDate> and <ProfessionalAffiliation> into <NameAsSubject>
+	            5. added <Funding> (including <FundingIdentifier>) into <Publisher> to identify grant funds for open access
+	            6. added <RelatedProduct> within <ContentItem> to allow per-chapter citation lists
+	            7. added <ProductIdentifier> within <Tax> to support German tax requirements
+	            8. added <Gender> within gp.structured_name and gp.unstructured_name
+	            9. added <ProductPackaging> into <ProductPart>
+	           10. added <ReturnsNote> within <ReturnsConditions>
+	           11. added <Prize> within <Contributor>
+	           12. added <UnpricedItemType> within <Price>
+	           13. added <PriceConstraint> within <Price>
+	           14. added <OrderQuantityMinimum> and <OrderQuantityMultiple> within <Price>
+	           15. relocated <UnnamedPersons> within <Contributor>, so an anonymous author can have a name identifier or an alternative name
+	           16. for consistency, <LocationName> within <Stock> is repeatable if the language attribute is provided
+	           17. for consistency, <LocationIdentifier> within <Stock> is repeatable
+	           18. for consistency, added language attribute to <ResourceLink>
+
+	2015-07-29: corrected Flow to dt.NonEmptyString in ConferenceName to match documentation
+
+	2015-01-24: added xmlns attribute to ONIXmessage (xmlns namespace declaration no longer needs to be removed prior to DTD validation)
+
+	            (intentionally blank)
+
+	2014-11-23: enforce 'either <ComponentTypeName> or <TitleDetail> or both' in <ContentItem>
+
+	2014-04-22: corrected error in declaration of <EditionStatement> introduced 2014-01-24
+
+	2014-01-24: ONIX for Books 3.0 revision 2
+	            1. added <NoPrefix> / <x501> within <TitleElement>
+	            2. added <LocationName> / <j349> within <ContributorPlace>
+	            3. added <Proximity> / <x502> within <Stock> - uses List 215
+	            4. changed cardinality of <StockQuantityCoded> to 1…n to allow coded values for OnOrder and CBO etc.
+	            5. added <Velocity> / <velocity> within <Stock>
+	            6. added <VelocityMetric> / <x504> within <Velocity> - uses List 216
+	            7. added <Rate> / <x505> and <Proximity> / <x502> within <Velocity>
+	            8. added <SalesRestriction> within <SalesRights>
+	            9. added <ProductIdentifier> within <PriceCondition>
+	           10. added <PrizeStatement> / <x503> within <Prize>
+	           11. added <PriceIdentifier> within <Price>
+	           12. added <PriceIDType> / <x506> within <PriceIdentifier> - uses list 217
+	           13. added <NoProduct/> / <x507> to support explicitly empty delta updates
+	           14. added <EpubLicense> composite after <EpubUsageConstraint>, to support e-book licenses
+	           15. added <EpubLicenseName> / <x511> inside <EpubLicense>
+	           16. added <EpubLicenseExpression> inside <EpubLicense>
+	           17. added <EpubLicenseExpressionType> / <x508> within <EpubLicenseExpression> - uses list 218
+	           18. added <EpubLicenseExpressionTypeName / <x509> within <EpubLicenseExpression>
+	           19. added <EpubLicenseExpressionLink> / <x510> within <EpubLicenceExpression>
+	           20. added <CopyrightType> / <x512> within <CopyrightStatement> - uses list 219
+	           21. added <SupplierCodeTypeName> / <x513> in <SupplierOwnCoding>
+	           22. added <ToQuantity> / <x514> within <Discount>
+	           23. changed cardinality on <PromotionCampaign>, <InitialPrintRun>,<CopiesSold>, <BookClubAdoption>, <PrizeName>, <ListName>, <SourceTitle>
+	           24. added textformat attribute to <EditionStatement> and changed data type to flow
+	           25. added language attribute to <SourceTitle>, <PartNumber>, ImprintName>, <CityOfPublication>, <ConferencePlace> and to 12 contributor name elements
+	           26. added textscript attribute to <PartNumber>, <TitleText>, <TitlePrefix>, <TitleWithoutPrefix>, <Subtitle>
+	           27. enforce '<ContributorStatement> must be preceded by <Contributor>' within <Collection> (ensures P.5 matches P.7)
+	           28. enforce '<SourceTitle> mandatory except where <ListName> is present' in <CitedContent>
+
+	2013-04-24: 1. enforce 'either <ConferenceSponsorIdentifier>, or either a personal or corporate name, or both' in <ConferenceSponsor>
+	            2. enforce 'either <NameIdentifier> alone, or personal name or corporate name with or without <NameIdentifier>, or <UnnamedPersons>' in <Contributor>, <AlternativeName> and <NameAsSubject>
+
+	2013-01-25: 1. corrected long-standing error in the content model of <TextContent>: <TextAuthor> is repeatable
+	            2. enforce 'either <TaxRatePercent> or <TaxAmount>, or both' in <Tax>
+
+	2012-10-25: 1. enforce 'either <CopyrightOwnerIdentifier> or a personal or corporate name, or both'  in <CopyrightOwner>
+	            2. enforce 'either <SubjectCode> or <SubjectHeadingText> or both' in <Subject>
+	            3. enforce 'at least one of <PartNumber>, <YearOfAnnual>, or either <TitleText> or <TitlePrefix> plus <TitleWithoutPrefix>' in <TitleElement>
+	            4. enforce '<PublishingStatusNote must be preceded by the <PublishingStatus> element'
+	            5. enforce '<ROWSalesRightsType> must be preceded by a <SalesRights> element'
+	            6. modify <RelatedProduct> to disallow <ProductFormDetail> without <ProductForm>
+
+	               note all changes above enforce limitations already expressed clearly in the documentation
+
+	2012-04-20: 1. corrected long-standing error in content model of <CitedContent>: <PositionOnList> is optional
+	            2. enforce 'either <SenderIdentifier> or <SenderName>, or both' in <Sender>
+	            3. enforce 'either <AddresseeIdentifier> or <AddresseeName>, or both' in <Addressee>
+	            4. enforce 'if used, either <TitleText> or <TitlePrefix> with <TitleWithoutPrefix>' in <TitleElement>
+	            5. enforce 'either <CountryCode> or <RegionCode>' in <ContributorPlace>. Note 'both' should probably not be an option, but is allowed (see change of 2009-12-22)
+	            6. enforce 'if used, <EditionVersionNumber> must be preceded by <EditionNumber>'
+	            7. enforce 'either <ExtentValue> or <ExtentValueRoman>, or both' in <Extent>
+	            8. enforce 'either <ImprintIdentifier> or <ImprintName>, or both' in <Imprint>
+	            9. enforce 'either <PublisherIdentifier> or <PublisherName>, or both' in <Publisher>
+	           10. enforce 'either <ProductContactIdentifier> or <ProductContactName>, or both' in <ProductContact> (fixes cardinality limitation inadvertently introduced 2012-01-27)
+	           11. enforce 'either <CountriesIncluded> or <RegionsIncluded>, or both' in <Territory>, and enforce limits on use of <CountriesExcluded> and <RegionsExcluded>
+	           12. enforce 'either <SalesOutletIdentifier> or <SalesOutletName>, or both' in <SalesOutlet>
+	           13. enforce 'either <AgentIdentifier> or <AgentName>, or both' in <PublisherRepresentative>
+	           14. enforce 'either <SupplierIdentifier> or <SupplierName>, or both' in <Supplier>
+	           15. enforce 'either <SupplierIdentifier> or <SupplierName>, or both' in <NewSupplier>
+	           16. enforce 'either <ProfessionalPosition> or <Affiliation>, or both' in <ProfessionalAffiliation>
+	           17. enforce 'either <NumberOfItemsOfThisForm> or <NumberOfCopies>, or both', in <ProductPart>. Note 'both' should probably not be an option, but is allowed
+	           18. enforce 'either <DiscountPercent> or <DiscountAmount>, or both', in <Discount>
+
+	               note changes 2–18 above (and 10 below) enforce limitations expressed clearly in the documentation, but make the schema a little
+	               more complex, and may cause issues when automatically creating object classes from the schema
+
+	2012-01-27: ONIX for Books 3.0 revision 1
+	            1. added collationkey and textscript attributes
+	            2. added <CollectionSequence> composite
+	            3. added <SequenceNumber> within <TitleElement>
+	            4. added <TitleStatement> within <TitleDetail>
+	            5. added <ProductContact> composite
+	            6. modified <ThesisYear> to take dateformat attribute
+	            7. modified <MessageNote> and <AudienceCodeTypeName> to take language attribute
+	            8. modified cardinality of <MessageNote>, <DeletionText>, <ProductFormFeatureDescription>, <ProductFormDescription>, <BiographicalNote>, <ContributorDescription>, <ProfessionalPosition>, <WebsiteDescription>, <ContributorStatement>, <EditionStatement>, <ReligiousTextFeatureDescription>, <IllustrationsNote>, <AncillaryContentDescription>, <SubjectHeadingText>, <AudienceDescription>, <Text>, <FeatureNote>, <CitationNote>, <PrizeJury>, <PublishingStatusNote>, <SalesRestrictionNote>, <MarketPublishingStatusNote>, <PriceTypeDescription>
+	            9. added <ContributorStatement> within <Collection>
+	           10. enforce 'either <Imprint> or <Publisher>, or both' to match documentation
+
+	2011-11-03: corrected cardinality of <ComparisonProductPrice>
+
+	2011-10-21: changed XML namespace to http://ns.editeur.org/onix/3.0/reference
+
+	2011-07-15: 1. simplified DateOrDateTime format, with minor correction in line with documentation
+	            2. corrected data type of EditionNumber to Integer in line with documentation
+
+	2011-05-31: corrected cardinality of <Territory> within <SalesRights> to 1 (from 1…n) to match documentation (reverts change of 2010-05-20)
+
+	2011-05-05: 1. added textformat attribute to <InitialPrintRun> to match documentation
+	            2. added language attribute to <DeletionText> to match documentation
+	            3. removed textformat attribute from <ConferenceName> to match documentation
+
+	2010-11-25: Short tag name for element MarketPublishingStatusNote changed from x408 to x406
+
+	2010-10-29: 1. new ROWSalesRightsType element added
+	            2. cardinality of SupplyDetail and Supplier corrected
+	            3. new CorporateNameInverted element added
+	            4. new dateformat attribute added to date-related elements
+	            5. DateFormat elements made optional, in favour of using new attribute
+	            6. cardinality of NameType element changed within NameAsSubject
+	            7. content model of RelatedProduct changed to include ProductForm and ProductFormDetail
+	            8. cardinality of ProductRelationCode element changed
+	            9. new MarketPublishingStatusNote element added
+	           10. cardinality of MarketDate element changed
+	           11. new PriceCoded composite added, as an alternative to PriceAmount
+	           12. new ComparisonProductPrice composite added
+
+	2010-05-20: 1. Content model of SalesRights corrected to make Territory repeatable
+	            2. Content model of SupplyDate corrected to make DateFormat mandatory
+
+	2009-12-22: 1. Data type 'NonEmptyString' corrected
+	            2. Pattern 'YearOrYearMonth' corrected
+	            3. Content model of ContributorPlace changed to allow both CountryCode and RegionCode
+
+	2009-09-18: Content model of UnnamedPersons corrected
+
+	2009-08-12: 1. Top-level element tag name changed to 'ONIXMessage'
+	            2. Pattern 'CountryCodeList' corrected to allow multiple code values
+	            3. Pattern 'RegionCodeList' corrected to allow multiple code values
+	            4. Pattern 'DateOrDateTime' changed to allow omission of seconds
+
+	2009-07-17: Mandatory 'release' attribute added to top-level element
+
+	2009-05-11: Content model of MarketPublishingDetail corrected
+
+	2009-04-09: Release 3.0 schema for public release
+
+-->
+
+<!ENTITY % ONIX_BookProduct_CodeLists SYSTEM "ONIX_BookProduct_CodeLists.dtd">
+	%ONIX_BookProduct_CodeLists;
+
+<!ENTITY % ONIX_XHTML_Subset SYSTEM "ONIX_XHTML_Subset.dtd">
+	%ONIX_XHTML_Subset;
+
+<!ENTITY % dt.DateOrDateTime "CDATA">
+
+<!ENTITY % generalAttributes "
+	datestamp %dt.DateOrDateTime; #IMPLIED
+	sourcetype (%SourceTypeCode;) #IMPLIED
+	sourcename CDATA #IMPLIED">
+
+<!ENTITY % languageAttribute "language (%List74;) #IMPLIED">
+
+<!ENTITY % textformatAttribute "textformat (%TextFormatCode;) #IMPLIED">
+
+<!ENTITY % textscriptAttribute "textscript (%List121;) #IMPLIED">
+
+<!ENTITY % collationkeyAttribute "collationkey CDATA #IMPLIED">
+
+<!ENTITY % dateformatAttribute "dateformat (%List55;) #IMPLIED">
+
+<!ENTITY % releaseAttribute "release (3.0) #REQUIRED">
+
+<!ENTITY % gp.product_specification "SpecificationBundleName*, SpecificationDetail*, SpecificationFeature*, SpecificationDescription*">
+
+<!ENTITY % gp.resource_specification "ResourceIdentifier*, ResourceRole?, ResourceFileDetail*, ResourceFileFeature*, ResourceFileDescription*, ResourceFileContentDescription*, ResourceFileLink+, ResourceFileDate*">
+
+<!ELEMENT ProductionDetail (ProductionManifest*)>
+<!ATTLIST ProductionDetail
+	refname (ProductionDetail) #FIXED "ProductionDetail"
+	shortname (productiondetail) #FIXED "productiondetail"
+	%generalAttributes;>
+
+<!ELEMENT ProductionManifest (ProductIdentifier*, CoverManifest?, BodyManifest, InsertManifest*, SupplementManifest*)>
+<!ATTLIST ProductionManifest
+	refname (ProductionManifest) #FIXED "ProductionManifest"
+	shortname (productionmanifest) #FIXED "productionmanifest"
+	%generalAttributes;>
+
+<!ELEMENT CoverManifest ((%gp.product_specification;), CoverResource+)>
+<!ATTLIST CoverManifest
+	refname (CoverManifest) #FIXED "CoverManifest"
+	shortname (covermanifest) #FIXED "covermanifest"
+	%generalAttributes;>
+
+<!ELEMENT BodyManifest ((%gp.product_specification;), BodyResource+)>
+<!ATTLIST BodyManifest
+	refname (BodyManifest) #FIXED "BodyManifest"
+	shortname (bodymanifest) #FIXED "bodymanifest"
+	%generalAttributes;>
+
+<!ELEMENT InsertManifest ((%gp.product_specification;), InsertPoint, InsertResource+)>
+<!ATTLIST InsertManifest
+	refname (InsertManifest) #FIXED "InsertManifest"
+	shortname (insertmanifest) #FIXED "insertmanifest"
+	%generalAttributes;>
+
+<!ELEMENT SupplementManifest (SequenceNumber?, SalesOutlet*, ((ProductIdentifier*, ProductForm, ProductFormDetail*, ProductFormDescription*, Measure*, CoverManifest?, BodyManifest, InsertManifest*) | NoSupplement))>
+<!ATTLIST SupplementManifest
+	refname (SupplementManifest) #FIXED "SupplementManifest"
+	shortname (supplementmanifest) #FIXED "supplementmanifest"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationBundleName (SpecificationBundleNameTypeName, SpecificationBundleNameValue)>
+<!ATTLIST SpecificationBundleName
+	refname (SpecificationBundleName) #FIXED "SpecificationBundleName"
+	shortname (specificationbundlename) #FIXED "specificationbundlename"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationBundleNameTypeName (#PCDATA)>
+<!ATTLIST SpecificationBundleNameTypeName
+	refname (SpecificationBundleNameTypeName) #FIXED "SpecificationBundleNameTypeName"
+	shortname (x558) #FIXED "x558"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SpecificationBundleNameValue (#PCDATA)>
+<!ATTLIST SpecificationBundleNameValue
+	refname (SpecificationBundleNameValue) #FIXED "SpecificationBundleNameValue"
+	shortname (x559) #FIXED "x559"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationDetail (#PCDATA)>
+<!ATTLIST SpecificationDetail
+	refname (SpecificationDetail) #FIXED "SpecificationDetail"
+	shortname (x560) #FIXED "x560"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationFeature (SpecificationFeatureType, SpecificationFeatureValue?, SpecificationFeatureDescription*)>
+<!ATTLIST SpecificationFeature
+	refname (SpecificationFeature) #FIXED "SpecificationFeature"
+	shortname (specificationfeature) #FIXED "specificationfeature"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationFeatureType (#PCDATA)>
+<!ATTLIST SpecificationFeatureType
+	refname (SpecificationFeatureType) #FIXED "SpecificationFeatureType"
+	shortname (x561) #FIXED "x561"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationFeatureValue (#PCDATA)>
+<!ATTLIST SpecificationFeatureValue
+	refname (SpecificationFeatureValue) #FIXED "SpecificationFeatureValue"
+	shortname (x562) #FIXED "x562"
+	%generalAttributes;>
+
+<!ELEMENT SpecificationFeatureDescription (#PCDATA)>
+<!ATTLIST SpecificationFeatureDescription
+	refname (SpecificationFeatureDescription) #FIXED "SpecificationFeatureDescription"
+	shortname (x563) #FIXED "x563"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SpecificationDescription (#PCDATA)>
+<!ATTLIST SpecificationDescription
+	refname (SpecificationDescription) #FIXED "SpecificationDescription"
+	shortname (x564) #FIXED "x564"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT CoverResource (SequenceNumber?, SalesOutlet*, ((%gp.resource_specification;) | NoResource))>
+<!ATTLIST CoverResource
+	refname (CoverResource) #FIXED "CoverResource"
+	shortname (coverresource) #FIXED "coverresource"
+	%generalAttributes;>
+
+<!ELEMENT BodyResource (SequenceNumber?, (%gp.resource_specification;))>
+<!ATTLIST BodyResource
+	refname (BodyResource) #FIXED "BodyResource"
+	shortname (bodyresource) #FIXED "bodyresource"
+	%generalAttributes;>
+
+<!ELEMENT InsertResource (SequenceNumber?, SalesOutlet*, ((%gp.resource_specification;) | NoResource))>
+<!ATTLIST InsertResource
+	refname (InsertResource) #FIXED "InsertResource"
+	shortname (insertresource) #FIXED "insertresource"
+	%generalAttributes;>
+
+<!ELEMENT ResourceIdentifier (ResourceIDType, IDTypeName?, IDValue)>
+<!ATTLIST ResourceIdentifier
+	refname (ResourceIdentifier) #FIXED "ResourceIdentifier"
+	shortname (resourceidentifier) #FIXED "resourceidentifier"
+	%generalAttributes;>
+
+<!ELEMENT ResourceIDType (#PCDATA)>
+<!ATTLIST ResourceIDType
+	refname (ResourceIDType) #FIXED "ResourceIDType"
+	shortname (x565) #FIXED "x565"
+	%generalAttributes;>
+
+<!ELEMENT ResourceRole (#PCDATA)>
+<!ATTLIST ResourceRole
+	refname (ResourceRole) #FIXED "ResourceRole"
+	shortname (x566) #FIXED "x566"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileDetail (#PCDATA)>
+<!ATTLIST ResourceFileDetail
+	refname (ResourceFileDetail) #FIXED "ResourceFileDetail"
+	shortname (x567) #FIXED "x567"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileFeature (ResourceFileFeatureType, ResourceFileFeatureValue?, ResourceFileFeatureDescription*)>
+<!ATTLIST ResourceFileFeature
+	refname (ResourceFileFeature) #FIXED "ResourceFileFeature"
+	shortname (resourcefilefeature) #FIXED "resourcefilefeature"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileFeatureType (#PCDATA)>
+<!ATTLIST ResourceFileFeatureType
+	refname (ResourceFileFeatureType) #FIXED "ResourceFileFeatureType"
+	shortname (x568) #FIXED "x568"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileFeatureValue (#PCDATA)>
+<!ATTLIST ResourceFileFeatureValue
+	refname (ResourceFileFeatureValue) #FIXED "ResourceFileFeatureValue"
+	shortname (x569) #FIXED "x569"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileFeatureDescription (#PCDATA)>
+<!ATTLIST ResourceFileFeatureDescription
+	refname (ResourceFileFeatureDescription) #FIXED "ResourceFileFeatureDescription"
+	shortname (x570) #FIXED "x570"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ResourceFileDescription (#PCDATA)>
+<!ATTLIST ResourceFileDescription
+	refname (ResourceFileDescription) #FIXED "ResourceFileDescription"
+	shortname (x571) #FIXED "x571"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ResourceFileContentDescription (#PCDATA)>
+<!ATTLIST ResourceFileContentDescription
+	refname (ResourceFileContentDescription) #FIXED "ResourceFileContentDescription"
+	shortname (x576) #FIXED "x576"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ResourceFileLink (#PCDATA)>
+<!ATTLIST ResourceFileLink
+	refname (ResourceFileLink) #FIXED "ResourceFileLink"
+	shortname (x572) #FIXED "x572"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileDate (ResourceFileDateRole, DateFormat?, Date)>
+<!ATTLIST ResourceFileDate
+	refname (ResourceFileDate) #FIXED "ResourceFileDate"
+	shortname (resourcefiledate) #FIXED "resourcefiledate"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFileDateRole (#PCDATA)>
+<!ATTLIST ResourceFileDateRole
+	refname (ResourceFileDateRole) #FIXED "ResourceFileDateRole"
+	shortname (x573) #FIXED "x573"
+	%generalAttributes;>
+
+<!ELEMENT InsertPoint (InsertPointType, InsertPointValue)>
+<!ATTLIST InsertPoint
+	refname (InsertPoint) #FIXED "InsertPoint"
+	shortname (insertpoint) #FIXED "insertpoint"
+	%generalAttributes;>
+
+<!ELEMENT InsertPointType (#PCDATA)>
+<!ATTLIST InsertPointType
+	refname (InsertPointType) #FIXED "InsertPointType"
+	shortname (x574) #FIXED "x574"
+	%generalAttributes;>
+
+<!ELEMENT InsertPointValue (#PCDATA)>
+<!ATTLIST InsertPointValue
+	refname (InsertPointValue) #FIXED "InsertPointValue"
+	shortname (x575) #FIXED "x575"
+	%generalAttributes;>
+
+<!ELEMENT NoResource (#PCDATA)>
+<!ATTLIST NoResource
+	refname (NoResource) #FIXED "NoResource"
+	shortname (x577) #FIXED "x577"
+	%generalAttributes;>
+
+<!ELEMENT AudienceHeadingText (#PCDATA)>
+<!ATTLIST AudienceHeadingText
+	refname (AudienceHeadingText) #FIXED "AudienceHeadingText"
+	shortname (x578) #FIXED "x578"
+	%generalAttributes;>
+
+<!ELEMENT NoSupplement (#PCDATA)>
+<!ATTLIST NoSupplement
+	refname (NoSupplement) #FIXED "NoSupplement"
+	shortname (x579) #FIXED "x579"
+	%generalAttributes;>
+
+<!ELEMENT PromotionDetail (PromotionalEvent*)>
+<!ATTLIST PromotionDetail
+	refname (PromotionDetail) #FIXED "PromotionDetail"
+	shortname (promotiondetail) #FIXED "promotiondetail"
+	%generalAttributes;>
+
+<!ELEMENT PromotionalEvent (EventIdentifier*, EventType+, EventStatus?, ContentAudience+, EventName+, ((((ContributorReference+, Contributor*) | Contributor+), ContributorStatement*) | NoContributor)?, EventDescription*, EventOccurrence+, SupportingResource*, EventSponsor*, Website*)>
+<!ATTLIST PromotionalEvent
+	refname (PromotionalEvent) #FIXED "PromotionalEvent"
+	shortname (promotionalevent) #FIXED "promotionalevent"
+	%generalAttributes;>
+
+<!ELEMENT EventIdentifier (EventIDType, IDTypeName?, IDValue)>
+<!ATTLIST EventIdentifier
+	refname (EventIdentifier) #FIXED "EventIdentifier"
+	shortname (eventidentifier) #FIXED "eventidentifier"
+	%generalAttributes;>
+
+<!ELEMENT EventIDType (#PCDATA)>
+<!ATTLIST EventIDType
+	refname (EventIDType) #FIXED "EventIDType"
+	shortname (x547) #FIXED "x547"
+	%generalAttributes;>
+
+<!ELEMENT EventType (#PCDATA)>
+<!ATTLIST EventType
+	refname (EventType) #FIXED "EventType"
+	shortname (x548) #FIXED "x548"
+	%generalAttributes;>
+
+<!ELEMENT EventStatus (#PCDATA)>
+<!ATTLIST EventStatus
+	refname (EventStatus) #FIXED "EventStatus"
+	shortname (x549) #FIXED "x549"
+	%generalAttributes;>
+
+<!ELEMENT ContributorReference (SequenceNumber?, ContributorRole+, NameIdentifier+)>
+<!ATTLIST ContributorReference
+	refname (ContributorReference) #FIXED "ContributorReference"
+	shortname (contributorreference) #FIXED "contributorreference"
+	%generalAttributes;>
+
+<!ELEMENT EventDescription %Flow;>
+<!ATTLIST EventDescription
+	refname (EventDescription) #FIXED "EventDescription"
+	shortname (x550) #FIXED "x550"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT EventOccurrence (EventIdentifier*, OccurrenceDate+, EventStatus, (((CountryCode, RegionCode?) | RegionCode), LocationName+, VenueName, StreetAddress?, VenueNote*)?, EventDescription*, SupportingResource*, EventSponsor*, Website*)>
+<!ATTLIST EventOccurrence
+	refname (EventOccurrence) #FIXED "EventOccurrence"
+	shortname (eventoccurrence) #FIXED "eventoccurrence"
+	%generalAttributes;>
+
+<!ELEMENT VenueName (#PCDATA)>
+<!ATTLIST VenueName
+	refname (VenueName) #FIXED "VenueName"
+	shortname (x551) #FIXED "x551"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT StreetAddress (#PCDATA)>
+<!ATTLIST StreetAddress
+	refname (StreetAddress) #FIXED "StreetAddress"
+	shortname (x552) #FIXED "x552"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT VenueNote %Flow;>
+<!ATTLIST VenueNote
+	refname (VenueNote) #FIXED "VenueNote"
+	shortname (x553) #FIXED "x553"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT OccurrenceDate (OccurrenceDateRole, DateFormat?, Date)>
+<!ATTLIST OccurrenceDate
+	refname (OccurrenceDate) #FIXED "OccurrenceDate"
+	shortname (occurrencedate) #FIXED "occurrencedate"
+	%generalAttributes;>
+
+<!ELEMENT OccurrenceDateRole (#PCDATA)>
+<!ATTLIST OccurrenceDateRole
+	refname (OccurrenceDateRole) #FIXED "OccurrenceDateRole"
+	shortname (x554) #FIXED "x554"
+	%generalAttributes;>
+
+<!ELEMENT ProductClassificationTypeName (#PCDATA)>
+<!ATTLIST ProductClassificationTypeName
+	refname (ProductClassificationTypeName) #FIXED "ProductClassificationTypeName"
+	shortname (x555) #FIXED "x555"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT PrizeRegion (#PCDATA)>
+<!ATTLIST PrizeRegion
+	refname (PrizeRegion) #FIXED "PrizeRegion"
+	shortname (x556) #FIXED "x556"
+	%generalAttributes;>
+
+<!ELEMENT TextSourceDescription %Flow;>
+<!ATTLIST TextSourceDescription
+	refname (TextSourceDescription) #FIXED "TextSourceDescription"
+	shortname (x557) #FIXED "x557"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Addressee (((AddresseeIdentifier+, AddresseeName?) | AddresseeName), ContactName?, TelephoneNumber?, EmailAddress?)>
+<!ATTLIST Addressee
+	refname (Addressee) #FIXED "Addressee"
+	shortname (addressee) #FIXED "addressee"
+	%generalAttributes;>
+
+<!ELEMENT AddresseeIdentifier (AddresseeIDType, IDTypeName?, IDValue)>
+<!ATTLIST AddresseeIdentifier
+	refname (AddresseeIdentifier) #FIXED "AddresseeIdentifier"
+	shortname (addresseeidentifier) #FIXED "addresseeidentifier"
+	%generalAttributes;>
+
+<!ELEMENT AddresseeIDType (#PCDATA)>
+<!ATTLIST AddresseeIDType
+	refname (AddresseeIDType) #FIXED "AddresseeIDType"
+	shortname (m380) #FIXED "m380"
+	%generalAttributes;>
+
+<!ELEMENT AddresseeName (#PCDATA)>
+<!ATTLIST AddresseeName
+	refname (AddresseeName) #FIXED "AddresseeName"
+	shortname (x300) #FIXED "x300"
+	%generalAttributes;>
+
+<!ELEMENT Affiliation (#PCDATA)>
+<!ATTLIST Affiliation
+	refname (Affiliation) #FIXED "Affiliation"
+	shortname (b046) #FIXED "b046"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT AgentIdentifier (AgentIDType, IDTypeName?, IDValue)>
+<!ATTLIST AgentIdentifier
+	refname (AgentIdentifier) #FIXED "AgentIdentifier"
+	shortname (agentidentifier) #FIXED "agentidentifier"
+	%generalAttributes;>
+
+<!ELEMENT AgentIDType (#PCDATA)>
+<!ATTLIST AgentIDType
+	refname (AgentIDType) #FIXED "AgentIDType"
+	shortname (j400) #FIXED "j400"
+	%generalAttributes;>
+
+<!ELEMENT AgentName (#PCDATA)>
+<!ATTLIST AgentName
+	refname (AgentName) #FIXED "AgentName"
+	shortname (j401) #FIXED "j401"
+	%generalAttributes;
+	%languageAttribute;
+	%collationkeyAttribute;>
+
+<!ELEMENT AgentRole (#PCDATA)>
+<!ATTLIST AgentRole
+	refname (AgentRole) #FIXED "AgentRole"
+	shortname (j402) #FIXED "j402"
+	%generalAttributes;>
+
+<!ENTITY % gp.corporate_name "(CorporateName, CorporateNameInverted?) | CorporateNameInverted">
+
+<!ENTITY % gp.structured_name "TitlesBeforeNames?, NamesBeforeKey?, PrefixToKey?, KeyNames, NamesAfterKey?, SuffixToKey?, LettersAfterNames?, TitlesAfterNames?">
+
+<!ENTITY % gp.unstructured_name "(PersonName, PersonNameInverted?) | PersonNameInverted">
+
+<!ELEMENT AlternativeName (NameType, ((NameIdentifier+, (((%gp.unstructured_name;), (%gp.structured_name;)?, Gender?) | ((%gp.structured_name;), Gender?) | (%gp.corporate_name;))?) | (((%gp.unstructured_name;), (%gp.structured_name;)?, Gender?) | ((%gp.structured_name;), Gender?) | (%gp.corporate_name;))))>
+<!ATTLIST AlternativeName
+	refname (AlternativeName) #FIXED "AlternativeName"
+	shortname (alternativename) #FIXED "alternativename"
+	%generalAttributes;>
+
+<!ELEMENT AncillaryContent (AncillaryContentType, AncillaryContentDescription*, Number?)>
+<!ATTLIST AncillaryContent
+	refname (AncillaryContent) #FIXED "AncillaryContent"
+	shortname (ancillarycontent) #FIXED "ancillarycontent"
+	%generalAttributes;>
+
+<!ELEMENT AncillaryContentType (#PCDATA)>
+<!ATTLIST AncillaryContentType
+	refname (AncillaryContentType) #FIXED "AncillaryContentType"
+	shortname (x423) #FIXED "x423"
+	%generalAttributes;>
+
+<!ELEMENT AncillaryContentDescription %Flow;>
+<!ATTLIST AncillaryContentDescription
+	refname (AncillaryContentDescription) #FIXED "AncillaryContentDescription"
+	shortname (x424) #FIXED "x424"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Audience (AudienceCodeType, AudienceCodeTypeName?, ((AudienceCodeValue, AudienceHeadingText*) | AudienceHeadingText+))>
+<!ATTLIST Audience
+	refname (Audience) #FIXED "Audience"
+	shortname (audience) #FIXED "audience"
+	%generalAttributes;>
+
+<!ELEMENT AudienceCode (#PCDATA)>
+<!ATTLIST AudienceCode
+	refname (AudienceCode) #FIXED "AudienceCode"
+	shortname (b073) #FIXED "b073"
+	%generalAttributes;>
+
+<!ELEMENT AudienceCodeType (#PCDATA)>
+<!ATTLIST AudienceCodeType
+	refname (AudienceCodeType) #FIXED "AudienceCodeType"
+	shortname (b204) #FIXED "b204"
+	%generalAttributes;>
+
+<!ELEMENT AudienceCodeTypeName (#PCDATA)>
+<!ATTLIST AudienceCodeTypeName
+	refname (AudienceCodeTypeName) #FIXED "AudienceCodeTypeName"
+	shortname (b205) #FIXED "b205"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT AudienceCodeValue (#PCDATA)>
+<!ATTLIST AudienceCodeValue
+	refname (AudienceCodeValue) #FIXED "AudienceCodeValue"
+	shortname (b206) #FIXED "b206"
+	%generalAttributes;>
+
+<!ELEMENT AudienceDescription %Flow;>
+<!ATTLIST AudienceDescription
+	refname (AudienceDescription) #FIXED "AudienceDescription"
+	shortname (b207) #FIXED "b207"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT AudienceRange (AudienceRangeQualifier, AudienceRangePrecision, AudienceRangeValue, (AudienceRangePrecision, AudienceRangeValue)?)>
+<!ATTLIST AudienceRange
+	refname (AudienceRange) #FIXED "AudienceRange"
+	shortname (audiencerange) #FIXED "audiencerange"
+	%generalAttributes;>
+
+<!ELEMENT AudienceRangePrecision (#PCDATA)>
+<!ATTLIST AudienceRangePrecision
+	refname (AudienceRangePrecision) #FIXED "AudienceRangePrecision"
+	shortname (b075) #FIXED "b075"
+	%generalAttributes;>
+
+<!ELEMENT AudienceRangeQualifier (#PCDATA)>
+<!ATTLIST AudienceRangeQualifier
+	refname (AudienceRangeQualifier) #FIXED "AudienceRangeQualifier"
+	shortname (b074) #FIXED "b074"
+	%generalAttributes;>
+
+<!ELEMENT AudienceRangeValue (#PCDATA)>
+<!ATTLIST AudienceRangeValue
+	refname (AudienceRangeValue) #FIXED "AudienceRangeValue"
+	shortname (b076) #FIXED "b076"
+	%generalAttributes;>
+
+<!ELEMENT AVDuration (#PCDATA)>
+<!ATTLIST AVDuration
+	refname (AVDuration) #FIXED "AVDuration"
+	shortname (x544) #FIXED "x544"
+	%generalAttributes;>
+
+<!ELEMENT AVItem (AVItemType, AVItemIdentifier*, TimeRun*, AVDuration?)>
+<!ATTLIST AVItem
+	refname (AVItem) #FIXED "AVItem"
+	shortname (avitem) #FIXED "avitem"
+	%generalAttributes;>
+
+<!ELEMENT AVItemIdentifier (AVItemIDType, IDTypeName?, IDValue)>
+<!ATTLIST AVItemIdentifier
+	refname (AVItemIdentifier) #FIXED "AVItemIdentifier"
+	shortname (avitemidentifier) #FIXED "avitemidentifier"
+	%generalAttributes;>
+
+<!ELEMENT AVItemIDType (#PCDATA)>
+<!ATTLIST AVItemIDType
+	refname (AVItemIDType) #FIXED "AVItemIDType"
+	shortname (x541) #FIXED "x541"
+	%generalAttributes;>
+
+<!ELEMENT AVItemType (#PCDATA)>
+<!ATTLIST AVItemType
+	refname (AVItemType) #FIXED "AVItemType"
+	shortname (x540) #FIXED "x540"
+	%generalAttributes;>
+
+<!ELEMENT Barcode (BarcodeType, PositionOnProduct?)>
+<!ATTLIST Barcode
+	refname (Barcode) #FIXED "Barcode"
+	shortname (barcode) #FIXED "barcode"
+	%generalAttributes;>
+
+<!ELEMENT BarcodeType (#PCDATA)>
+<!ATTLIST BarcodeType
+	refname (BarcodeType) #FIXED "BarcodeType"
+	shortname (x312) #FIXED "x312"
+	%generalAttributes;>
+
+<!ELEMENT BatchBonus (BatchQuantity, FreeQuantity)>
+<!ATTLIST BatchBonus
+	refname (BatchBonus) #FIXED "BatchBonus"
+	shortname (batchbonus) #FIXED "batchbonus"
+	%generalAttributes;>
+
+<!ELEMENT BatchQuantity (#PCDATA)>
+<!ATTLIST BatchQuantity
+	refname (BatchQuantity) #FIXED "BatchQuantity"
+	shortname (j264) #FIXED "j264"
+	%generalAttributes;>
+
+<!ELEMENT Bible (BibleContents+, BibleVersion+, StudyBibleType?, BiblePurpose*, BibleTextOrganization?, BibleReferenceLocation?, BibleTextFeature*)>
+<!ATTLIST Bible
+	refname (Bible) #FIXED "Bible"
+	shortname (bible) #FIXED "bible"
+	%generalAttributes;>
+
+<!ELEMENT BibleContents (#PCDATA)>
+<!ATTLIST BibleContents
+	refname (BibleContents) #FIXED "BibleContents"
+	shortname (b352) #FIXED "b352"
+	%generalAttributes;>
+
+<!ELEMENT BiblePurpose (#PCDATA)>
+<!ATTLIST BiblePurpose
+	refname (BiblePurpose) #FIXED "BiblePurpose"
+	shortname (b354) #FIXED "b354"
+	%generalAttributes;>
+
+<!ELEMENT BibleReferenceLocation (#PCDATA)>
+<!ATTLIST BibleReferenceLocation
+	refname (BibleReferenceLocation) #FIXED "BibleReferenceLocation"
+	shortname (b356) #FIXED "b356"
+	%generalAttributes;>
+
+<!ELEMENT BibleTextFeature (#PCDATA)>
+<!ATTLIST BibleTextFeature
+	refname (BibleTextFeature) #FIXED "BibleTextFeature"
+	shortname (b357) #FIXED "b357"
+	%generalAttributes;>
+
+<!ELEMENT BibleTextOrganization (#PCDATA)>
+<!ATTLIST BibleTextOrganization
+	refname (BibleTextOrganization) #FIXED "BibleTextOrganization"
+	shortname (b355) #FIXED "b355"
+	%generalAttributes;>
+
+<!ELEMENT BibleVersion (#PCDATA)>
+<!ATTLIST BibleVersion
+	refname (BibleVersion) #FIXED "BibleVersion"
+	shortname (b353) #FIXED "b353"
+	%generalAttributes;>
+
+<!ELEMENT BiographicalNote %Flow;>
+<!ATTLIST BiographicalNote
+	refname (BiographicalNote) #FIXED "BiographicalNote"
+	shortname (b044) #FIXED "b044"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT BookClubAdoption %Flow;>
+<!ATTLIST BookClubAdoption
+	refname (BookClubAdoption) #FIXED "BookClubAdoption"
+	shortname (k169) #FIXED "k169"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT CBO (#PCDATA)>
+<!ATTLIST CBO
+	refname (CBO) #FIXED "CBO"
+	shortname (j375) #FIXED "j375"
+	%generalAttributes;>
+
+<!ELEMENT CitationNote %Flow;>
+<!ATTLIST CitationNote
+	refname (CitationNote) #FIXED "CitationNote"
+	shortname (x434) #FIXED "x434"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT CitedContent (CitedContentType, ContentAudience*, Territory?, SourceType?, ((ReviewRating, SourceTitle+) | (SourceTitle+, (ListName+, PositionOnList?)?) | (ListName+, PositionOnList?)), CitationNote*, ResourceLink*, ContentDate*)>
+<!ATTLIST CitedContent
+	refname (CitedContent) #FIXED "CitedContent"
+	shortname (citedcontent) #FIXED "citedcontent"
+	%generalAttributes;>
+
+<!ELEMENT CitedContentType (#PCDATA)>
+<!ATTLIST CitedContentType
+	refname (CitedContentType) #FIXED "CitedContentType"
+	shortname (x430) #FIXED "x430"
+	%generalAttributes;>
+
+<!ELEMENT CityOfPublication (#PCDATA)>
+<!ATTLIST CityOfPublication
+	refname (CityOfPublication) #FIXED "CityOfPublication"
+	shortname (b209) #FIXED "b209"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ENTITY % gp.prizes "Prize*">
+
+<!ENTITY % gp.descriptions "TextContent*, CitedContent*, SupportingResource*">
+
+<!ELEMENT CollateralDetail ((%gp.descriptions;), (%gp.prizes;))>
+<!ATTLIST CollateralDetail
+	refname (CollateralDetail) #FIXED "CollateralDetail"
+	shortname (collateraldetail) #FIXED "collateraldetail"
+	%generalAttributes;>
+
+<!ENTITY % gp.authorship "(Contributor+, ContributorStatement*) | NoContributor?">
+
+<!ELEMENT Collection (CollectionType, SourceName?, CollectionIdentifier*, CollectionSequence*, TitleDetail*, (%gp.authorship;))>
+<!ATTLIST Collection
+	refname (Collection) #FIXED "Collection"
+	shortname (collection) #FIXED "collection"
+	%generalAttributes;>
+
+<!ELEMENT CollectionIdentifier (CollectionIDType, IDTypeName?, IDValue)>
+<!ATTLIST CollectionIdentifier
+	refname (CollectionIdentifier) #FIXED "CollectionIdentifier"
+	shortname (collectionidentifier) #FIXED "collectionidentifier"
+	%generalAttributes;>
+
+<!ELEMENT CollectionIDType (#PCDATA)>
+<!ATTLIST CollectionIDType
+	refname (CollectionIDType) #FIXED "CollectionIDType"
+	shortname (x344) #FIXED "x344"
+	%generalAttributes;>
+
+<!ELEMENT CollectionSequence (CollectionSequenceType, CollectionSequenceTypeName?, CollectionSequenceNumber)>
+<!ATTLIST CollectionSequence
+	refname (CollectionSequence) #FIXED "CollectionSequence"
+	shortname (collectionsequence) #FIXED "collectionsequence"
+	%generalAttributes;>
+
+<!ELEMENT CollectionSequenceNumber (#PCDATA)>
+<!ATTLIST CollectionSequenceNumber
+	refname (CollectionSequenceNumber) #FIXED "CollectionSequenceNumber"
+	shortname (x481) #FIXED "x481"
+	%generalAttributes;>
+
+<!ELEMENT CollectionSequenceType (#PCDATA)>
+<!ATTLIST CollectionSequenceType
+	refname (CollectionSequenceType) #FIXED "CollectionSequenceType"
+	shortname (x479) #FIXED "x479"
+	%generalAttributes;>
+
+<!ELEMENT CollectionSequenceTypeName (#PCDATA)>
+<!ATTLIST CollectionSequenceTypeName
+	refname (CollectionSequenceTypeName) #FIXED "CollectionSequenceTypeName"
+	shortname (x480) #FIXED "x480"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT CollectionType (#PCDATA)>
+<!ATTLIST CollectionType
+	refname (CollectionType) #FIXED "CollectionType"
+	shortname (x329) #FIXED "x329"
+	%generalAttributes;>
+
+<!ELEMENT ComparisonProductPrice (ProductIdentifier+, PriceType?, PriceAmount, CurrencyCode?)>
+<!ATTLIST ComparisonProductPrice
+	refname (ComparisonProductPrice) #FIXED "ComparisonProductPrice"
+	shortname (comparisonproductprice) #FIXED "comparisonproductprice"
+	%generalAttributes;>
+
+<!ELEMENT Complexity (ComplexitySchemeIdentifier, ComplexityCode)>
+<!ATTLIST Complexity
+	refname (Complexity) #FIXED "Complexity"
+	shortname (complexity) #FIXED "complexity"
+	%generalAttributes;>
+
+<!ELEMENT ComplexityCode (#PCDATA)>
+<!ATTLIST ComplexityCode
+	refname (ComplexityCode) #FIXED "ComplexityCode"
+	shortname (b078) #FIXED "b078"
+	%generalAttributes;>
+
+<!ELEMENT ComplexitySchemeIdentifier (#PCDATA)>
+<!ATTLIST ComplexitySchemeIdentifier
+	refname (ComplexitySchemeIdentifier) #FIXED "ComplexitySchemeIdentifier"
+	shortname (b077) #FIXED "b077"
+	%generalAttributes;>
+
+<!ELEMENT ComponentNumber (#PCDATA)>
+<!ATTLIST ComponentNumber
+	refname (ComponentNumber) #FIXED "ComponentNumber"
+	shortname (b289) #FIXED "b289"
+	%generalAttributes;>
+
+<!ELEMENT ComponentTypeName (#PCDATA)>
+<!ATTLIST ComponentTypeName
+	refname (ComponentTypeName) #FIXED "ComponentTypeName"
+	shortname (b288) #FIXED "b288"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT Conference (ConferenceRole?, ConferenceName, ConferenceAcronym?, ConferenceNumber?, ConferenceTheme?, ConferenceDate?, ConferencePlace?, ConferenceSponsor*, Website*)>
+<!ATTLIST Conference
+	refname (Conference) #FIXED "Conference"
+	shortname (conference) #FIXED "conference"
+	%generalAttributes;>
+
+<!ELEMENT ConferenceAcronym (#PCDATA)>
+<!ATTLIST ConferenceAcronym
+	refname (ConferenceAcronym) #FIXED "ConferenceAcronym"
+	shortname (b341) #FIXED "b341"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ConferenceDate (#PCDATA)>
+<!ATTLIST ConferenceDate
+	refname (ConferenceDate) #FIXED "ConferenceDate"
+	shortname (b054) #FIXED "b054"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT ConferenceName (#PCDATA)>
+<!ATTLIST ConferenceName
+	refname (ConferenceName) #FIXED "ConferenceName"
+	shortname (b052) #FIXED "b052"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ConferenceNumber (#PCDATA)>
+<!ATTLIST ConferenceNumber
+	refname (ConferenceNumber) #FIXED "ConferenceNumber"
+	shortname (b053) #FIXED "b053"
+	%generalAttributes;>
+
+<!ELEMENT ConferencePlace (#PCDATA)>
+<!ATTLIST ConferencePlace
+	refname (ConferencePlace) #FIXED "ConferencePlace"
+	shortname (b055) #FIXED "b055"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ConferenceRole (#PCDATA)>
+<!ATTLIST ConferenceRole
+	refname (ConferenceRole) #FIXED "ConferenceRole"
+	shortname (b051) #FIXED "b051"
+	%generalAttributes;>
+
+<!ELEMENT ConferenceSponsor ((ConferenceSponsorIdentifier, (PersonName | CorporateName)?) | PersonName | CorporateName)>
+<!ATTLIST ConferenceSponsor
+	refname (ConferenceSponsor) #FIXED "ConferenceSponsor"
+	shortname (conferencesponsor) #FIXED "conferencesponsor"
+	%generalAttributes;>
+
+<!ELEMENT ConferenceSponsorIDType (#PCDATA)>
+<!ATTLIST ConferenceSponsorIDType
+	refname (ConferenceSponsorIDType) #FIXED "ConferenceSponsorIDType"
+	shortname (b391) #FIXED "b391"
+	%generalAttributes;>
+
+<!ELEMENT ConferenceSponsorIdentifier (ConferenceSponsorIDType, IDTypeName?, IDValue)>
+<!ATTLIST ConferenceSponsorIdentifier
+	refname (ConferenceSponsorIdentifier) #FIXED "ConferenceSponsorIdentifier"
+	shortname (conferencesponsoridentifier) #FIXED "conferencesponsoridentifier"
+	%generalAttributes;>
+
+<!ELEMENT ConferenceTheme %Flow;>
+<!ATTLIST ConferenceTheme
+	refname (ConferenceTheme) #FIXED "ConferenceTheme"
+	shortname (b342) #FIXED "b342"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT ContactName (#PCDATA)>
+<!ATTLIST ContactName
+	refname (ContactName) #FIXED "ContactName"
+	shortname (x299) #FIXED "x299"
+	%generalAttributes;>
+
+<!ELEMENT ContentAudience (#PCDATA)>
+<!ATTLIST ContentAudience
+	refname (ContentAudience) #FIXED "ContentAudience"
+	shortname (x427) #FIXED "x427"
+	%generalAttributes;>
+
+<!ELEMENT ContentDate (ContentDateRole, DateFormat?, Date)>
+<!ATTLIST ContentDate
+	refname (ContentDate) #FIXED "ContentDate"
+	shortname (contentdate) #FIXED "contentdate"
+	%generalAttributes;>
+
+<!ELEMENT ContentDateRole (#PCDATA)>
+<!ATTLIST ContentDateRole
+	refname (ContentDateRole) #FIXED "ContentDateRole"
+	shortname (x429) #FIXED "x429"
+	%generalAttributes;>
+
+<!ELEMENT ContentDetail (ContentItem)*>
+<!ATTLIST ContentDetail
+	refname (ContentDetail) #FIXED "ContentDetail"
+	shortname (contentdetail) #FIXED "contentdetail"
+	%generalAttributes;>
+
+<!ENTITY % gp.languages "Language*">
+
+<!ENTITY % gp.related_materials "RelatedWork*, RelatedProduct*">
+
+<!ENTITY % gp.subjects "Subject*, NameAsSubject*">
+
+<!ELEMENT ContentItem (LevelSequenceNumber?, (TextItem | AVItem), ((ComponentTypeName, ComponentNumber?, TitleDetail*) | (ComponentNumber?, TitleDetail+)), (%gp.authorship;), (%gp.languages;), (%gp.subjects;), (%gp.descriptions;), (%gp.related_materials;))>
+<!ATTLIST ContentItem
+	refname (ContentItem) #FIXED "ContentItem"
+	shortname (contentitem) #FIXED "contentitem"
+	%generalAttributes;>
+
+<!ELEMENT Contributor (SequenceNumber?, ContributorRole+, FromLanguage*, ToLanguage*, NameType?, ((((NameIdentifier+, (((%gp.unstructured_name;), (%gp.structured_name;)?, Gender?) | ((%gp.structured_name;), Gender?) | (%gp.corporate_name;) | UnnamedPersons)?) | (((%gp.unstructured_name;), (%gp.structured_name;)?, Gender?) | ((%gp.structured_name;), Gender?) | (%gp.corporate_name;) | UnnamedPersons)), AlternativeName*, ContributorDate*, ProfessionalAffiliation*, Prize*, BiographicalNote*, Website*, ContributorDescription*, ContributorPlace*) | (((ContributorDate+, ProfessionalAffiliation*, Prize*, BiographicalNote*, Website*, ContributorDescription*, ContributorPlace*) | (ProfessionalAffiliation+, Prize*, BiographicalNote*, Website*, ContributorDescription*, ContributorPlace*) | (Prize+, BiographicalNote*, Website*, ContributorDescription*, ContributorPlace*) | (BiographicalNote+, Website*, ContributorDescription*, ContributorPlace*) | (Website+, ContributorDescription*, ContributorPlace*) | (ContributorDescription+, ContributorPlace*) | ContributorPlace+), UnnamedPersons, ContributorPlace*)))>
+<!ATTLIST Contributor
+	refname (Contributor) #FIXED "Contributor"
+	shortname (contributor) #FIXED "contributor"
+	%generalAttributes;>
+
+<!ELEMENT ContributorDate (ContributorDateRole, DateFormat?, Date)>
+<!ATTLIST ContributorDate
+	refname (ContributorDate) #FIXED "ContributorDate"
+	shortname (contributordate) #FIXED "contributordate"
+	%generalAttributes;>
+
+<!ELEMENT ContributorDateRole (#PCDATA)>
+<!ATTLIST ContributorDateRole
+	refname (ContributorDateRole) #FIXED "ContributorDateRole"
+	shortname (x417) #FIXED "x417"
+	%generalAttributes;>
+
+<!ELEMENT ContributorDescription %Flow;>
+<!ATTLIST ContributorDescription
+	refname (ContributorDescription) #FIXED "ContributorDescription"
+	shortname (b048) #FIXED "b048"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT ContributorPlace (ContributorPlaceRelator, ((CountryCode, RegionCode?) | RegionCode), LocationName*)>
+<!ATTLIST ContributorPlace
+	refname (ContributorPlace) #FIXED "ContributorPlace"
+	shortname (contributorplace) #FIXED "contributorplace"
+	%generalAttributes;>
+
+<!ELEMENT ContributorPlaceRelator (#PCDATA)>
+<!ATTLIST ContributorPlaceRelator
+	refname (ContributorPlaceRelator) #FIXED "ContributorPlaceRelator"
+	shortname (x418) #FIXED "x418"
+	%generalAttributes;>
+
+<!ELEMENT ContributorRole (#PCDATA)>
+<!ATTLIST ContributorRole
+	refname (ContributorRole) #FIXED "ContributorRole"
+	shortname (b035) #FIXED "b035"
+	%generalAttributes;>
+
+<!ELEMENT ContributorStatement %Flow;>
+<!ATTLIST ContributorStatement
+	refname (ContributorStatement) #FIXED "ContributorStatement"
+	shortname (b049) #FIXED "b049"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT CopiesSold %Flow;>
+<!ATTLIST CopiesSold
+	refname (CopiesSold) #FIXED "CopiesSold"
+	shortname (k168) #FIXED "k168"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT CopyrightOwner ((CopyrightOwnerIdentifier+, (PersonName | CorporateName)?) | PersonName | CorporateName)>
+<!ATTLIST CopyrightOwner
+	refname (CopyrightOwner) #FIXED "CopyrightOwner"
+	shortname (copyrightowner) #FIXED "copyrightowner"
+	%generalAttributes;>
+
+<!ELEMENT CopyrightOwnerIDType (#PCDATA)>
+<!ATTLIST CopyrightOwnerIDType
+	refname (CopyrightOwnerIDType) #FIXED "CopyrightOwnerIDType"
+	shortname (b392) #FIXED "b392"
+	%generalAttributes;>
+
+<!ELEMENT CopyrightOwnerIdentifier (CopyrightOwnerIDType, IDTypeName?, IDValue)>
+<!ATTLIST CopyrightOwnerIdentifier
+	refname (CopyrightOwnerIdentifier) #FIXED "CopyrightOwnerIdentifier"
+	shortname (copyrightowneridentifier) #FIXED "copyrightowneridentifier"
+	%generalAttributes;>
+
+<!ELEMENT CopyrightStatement (CopyrightType?, ((CopyrightYear+, CopyrightOwner*) | CopyrightOwner+))>
+<!ATTLIST CopyrightStatement
+	refname (CopyrightStatement) #FIXED "CopyrightStatement"
+	shortname (copyrightstatement) #FIXED "copyrightstatement"
+	%generalAttributes;>
+
+<!ELEMENT CopyrightType (#PCDATA)>
+<!ATTLIST CopyrightType
+	refname (CopyrightType) #FIXED "CopyrightType"
+	shortname (x512) #FIXED "x512"
+	%generalAttributes;>
+
+<!ELEMENT CopyrightYear (#PCDATA)>
+<!ATTLIST CopyrightYear
+	refname (CopyrightYear) #FIXED "CopyrightYear"
+	shortname (b087) #FIXED "b087"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT CorporateName (#PCDATA)>
+<!ATTLIST CorporateName
+	refname (CorporateName) #FIXED "CorporateName"
+	shortname (b047) #FIXED "b047"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT CorporateNameInverted (#PCDATA)>
+<!ATTLIST CorporateNameInverted
+	refname (CorporateNameInverted) #FIXED "CorporateNameInverted"
+	shortname (x443) #FIXED "x443"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT CountriesIncluded (#PCDATA)>
+<!ATTLIST CountriesIncluded
+	refname (CountriesIncluded) #FIXED "CountriesIncluded"
+	shortname (x449) #FIXED "x449"
+	%generalAttributes;>
+
+<!ELEMENT CountriesExcluded (#PCDATA)>
+<!ATTLIST CountriesExcluded
+	refname (CountriesExcluded) #FIXED "CountriesExcluded"
+	shortname (x451) #FIXED "x451"
+	%generalAttributes;>
+
+<!ELEMENT CountryCode (#PCDATA)>
+<!ATTLIST CountryCode
+	refname (CountryCode) #FIXED "CountryCode"
+	shortname (b251) #FIXED "b251"
+	%generalAttributes;>
+
+<!ENTITY % dt.CountryCodeList "CDATA">
+
+<!ELEMENT CountryOfManufacture (#PCDATA)>
+<!ATTLIST CountryOfManufacture
+	refname (CountryOfManufacture) #FIXED "CountryOfManufacture"
+	shortname (x316) #FIXED "x316"
+	%generalAttributes;>
+
+<!ELEMENT CountryOfPublication (#PCDATA)>
+<!ATTLIST CountryOfPublication
+	refname (CountryOfPublication) #FIXED "CountryOfPublication"
+	shortname (b083) #FIXED "b083"
+	%generalAttributes;>
+
+<!ELEMENT CurrencyCode (#PCDATA)>
+<!ATTLIST CurrencyCode
+	refname (CurrencyCode) #FIXED "CurrencyCode"
+	shortname (j152) #FIXED "j152"
+	%generalAttributes;>
+
+<!ELEMENT CurrencyZone (#PCDATA)>
+<!ATTLIST CurrencyZone
+	refname (CurrencyZone) #FIXED "CurrencyZone"
+	shortname (x475) #FIXED "x475"
+	%generalAttributes;>
+
+<!ELEMENT Date (#PCDATA)>
+<!ATTLIST Date
+	refname (Date) #FIXED "Date"
+	shortname (b306) #FIXED "b306"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT DateFormat (#PCDATA)>
+<!ATTLIST DateFormat
+	refname (DateFormat) #FIXED "DateFormat"
+	shortname (j260) #FIXED "j260"
+	%generalAttributes;>
+
+<!ELEMENT DefaultCurrencyCode (#PCDATA)>
+<!ATTLIST DefaultCurrencyCode
+	refname (DefaultCurrencyCode) #FIXED "DefaultCurrencyCode"
+	shortname (m186) #FIXED "m186"
+	%generalAttributes;>
+
+<!ELEMENT DefaultLanguageOfText (#PCDATA)>
+<!ATTLIST DefaultLanguageOfText
+	refname (DefaultLanguageOfText) #FIXED "DefaultLanguageOfText"
+	shortname (m184) #FIXED "m184"
+	%generalAttributes;>
+
+<!ELEMENT DefaultPriceType (#PCDATA)>
+<!ATTLIST DefaultPriceType
+	refname (DefaultPriceType) #FIXED "DefaultPriceType"
+	shortname (x310) #FIXED "x310"
+	%generalAttributes;>
+
+<!ELEMENT DeletionText (#PCDATA)>
+<!ATTLIST DeletionText
+	refname (DeletionText) #FIXED "DeletionText"
+	shortname (a199) #FIXED "a199"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ENTITY % gp.audiences "AudienceCode*, Audience*, AudienceRange*, AudienceDescription*, Complexity*">
+
+<!ENTITY % gp.extents "Extent*, Illustrated?, NumberOfIllustrations?, IllustrationsNote*, AncillaryContent*">
+
+<!ENTITY % gp.editions "((EditionType*, (EditionNumber, EditionVersionNumber?)?, EditionStatement*) | NoEdition?), ReligiousText?">
+
+<!ENTITY % gp.events "Event* | Conference*">
+
+<!ENTITY % gp.titles "TitleDetail+, (ThesisType, ThesisPresentedTo?, ThesisYear?)?">
+
+<!ENTITY % gp.collections "(Collection+ | NoCollection)?">
+
+<!ENTITY % gp.product_form_core "ProductForm, ProductFormDetail*, ProductFormFeature*, ProductPackaging?, ProductFormDescription*">
+
+<!ENTITY % gp.product_form "ProductComposition, (%gp.product_form_core;), TradeCategory?, PrimaryContentType?, ProductContentType*, Measure*, CountryOfManufacture?, EpubTechnicalProtection*, EpubUsageConstraint*, EpubLicense?, MapScale*, ProductClassification*, ProductPart*">
+
+<!ELEMENT DescriptiveDetail ((%gp.product_form;), (%gp.collections;), (%gp.titles;), (%gp.authorship;), (%gp.events;), (%gp.editions;), (%gp.languages;), (%gp.extents;), (%gp.subjects;), (%gp.audiences;))>
+<!ATTLIST DescriptiveDetail
+	refname (DescriptiveDetail) #FIXED "DescriptiveDetail"
+	shortname (descriptivedetail) #FIXED "descriptivedetail"
+	%generalAttributes;>
+
+<!ELEMENT Discount (DiscountType?, (Quantity, ToQuantity?)?, ((DiscountPercent, DiscountAmount?) | DiscountAmount))>
+<!ATTLIST Discount
+	refname (Discount) #FIXED "Discount"
+	shortname (discount) #FIXED "discount"
+	%generalAttributes;>
+
+<!ELEMENT DiscountAmount (#PCDATA)>
+<!ATTLIST DiscountAmount
+	refname (DiscountAmount) #FIXED "DiscountAmount"
+	shortname (x469) #FIXED "x469"
+	%generalAttributes;>
+
+<!ELEMENT DiscountCode (#PCDATA)>
+<!ATTLIST DiscountCode
+	refname (DiscountCode) #FIXED "DiscountCode"
+	shortname (j364) #FIXED "j364"
+	%generalAttributes;>
+
+<!ELEMENT DiscountCodeType (#PCDATA)>
+<!ATTLIST DiscountCodeType
+	refname (DiscountCodeType) #FIXED "DiscountCodeType"
+	shortname (j363) #FIXED "j363"
+	%generalAttributes;>
+
+<!ELEMENT DiscountCodeTypeName (#PCDATA)>
+<!ATTLIST DiscountCodeTypeName
+	refname (DiscountCodeTypeName) #FIXED "DiscountCodeTypeName"
+	shortname (j378) #FIXED "j378"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT DiscountCoded (DiscountCodeType, DiscountCodeTypeName?, DiscountCode)>
+<!ATTLIST DiscountCoded
+	refname (DiscountCoded) #FIXED "DiscountCoded"
+	shortname (discountcoded) #FIXED "discountcoded"
+	%generalAttributes;>
+
+<!ELEMENT DiscountType (#PCDATA)>
+<!ATTLIST DiscountType
+	refname (DiscountType) #FIXED "DiscountType"
+	shortname (x467) #FIXED "x467"
+	%generalAttributes;>
+
+<!ELEMENT EpubTechnicalProtection (#PCDATA)>
+<!ATTLIST EpubTechnicalProtection
+	refname (EpubTechnicalProtection) #FIXED "EpubTechnicalProtection"
+	shortname (x317) #FIXED "x317"
+	%generalAttributes;>
+
+<!ELEMENT EditionNumber (#PCDATA)>
+<!ATTLIST EditionNumber
+	refname (EditionNumber) #FIXED "EditionNumber"
+	shortname (b057) #FIXED "b057"
+	%generalAttributes;>
+
+<!ELEMENT EditionStatement %Flow;>
+<!ATTLIST EditionStatement
+	refname (EditionStatement) #FIXED "EditionStatement"
+	shortname (b058) #FIXED "b058"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT EditionType (#PCDATA)>
+<!ATTLIST EditionType
+	refname (EditionType) #FIXED "EditionType"
+	shortname (x419) #FIXED "x419"
+	%generalAttributes;>
+
+<!ELEMENT EditionVersionNumber (#PCDATA)>
+<!ATTLIST EditionVersionNumber
+	refname (EditionVersionNumber) #FIXED "EditionVersionNumber"
+	shortname (b217) #FIXED "b217"
+	%generalAttributes;>
+
+<!ELEMENT EmailAddress (#PCDATA)>
+<!ATTLIST EmailAddress
+	refname (EmailAddress) #FIXED "EmailAddress"
+	shortname (j272) #FIXED "j272"
+	%generalAttributes;>
+
+<!ELEMENT EndDate (#PCDATA)>
+<!ATTLIST EndDate
+	refname (EndDate) #FIXED "EndDate"
+	shortname (b325) #FIXED "b325"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT EndTime (#PCDATA)>
+<!ATTLIST EndTime
+	refname (EndTime) #FIXED "EndTime"
+	shortname (x543) #FIXED "x543"
+	%generalAttributes;>
+
+<!ELEMENT EpubLicense (EpubLicenseName+, EpubLicenseExpression*)>
+<!ATTLIST EpubLicense
+	refname (EpubLicense) #FIXED "EpubLicense"
+	shortname (epublicense) #FIXED "epublicense"
+	%generalAttributes;>
+
+<!ELEMENT EpubLicenseExpression (EpubLicenseExpressionType, EpubLicenseExpressionTypeName?, EpubLicenseExpressionLink)>
+<!ATTLIST EpubLicenseExpression
+	refname (EpubLicenseExpression) #FIXED "EpubLicenseExpression"
+	shortname (epublicenseexpression) #FIXED "epublicenseexpression"
+	%generalAttributes;>
+
+<!ELEMENT EpubLicenseExpressionLink (#PCDATA)>
+<!ATTLIST EpubLicenseExpressionLink
+	refname (EpubLicenseExpressionLink) #FIXED "EpubLicenseExpressionLink"
+	shortname (x510) #FIXED "x510"
+	%generalAttributes;>
+
+<!ELEMENT EpubLicenseExpressionType (#PCDATA)>
+<!ATTLIST EpubLicenseExpressionType
+	refname (EpubLicenseExpressionType) #FIXED "EpubLicenseExpressionType"
+	shortname (x508) #FIXED "x508"
+	%generalAttributes;>
+
+<!ELEMENT EpubLicenseExpressionTypeName (#PCDATA)>
+<!ATTLIST EpubLicenseExpressionTypeName
+	refname (EpubLicenseExpressionTypeName) #FIXED "EpubLicenseExpressionTypeName"
+	shortname (x509) #FIXED "x509"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT EpubLicenseName (#PCDATA)>
+<!ATTLIST EpubLicenseName
+	refname (EpubLicenseName) #FIXED "EpubLicenseName"
+	shortname (x511) #FIXED "x511"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT EpubUsageConstraint (EpubUsageType, EpubUsageStatus, EpubUsageLimit*)>
+<!ATTLIST EpubUsageConstraint
+	refname (EpubUsageConstraint) #FIXED "EpubUsageConstraint"
+	shortname (epubusageconstraint) #FIXED "epubusageconstraint"
+	%generalAttributes;>
+
+<!ELEMENT EpubUsageLimit (Quantity, EpubUsageUnit)>
+<!ATTLIST EpubUsageLimit
+	refname (EpubUsageLimit) #FIXED "EpubUsageLimit"
+	shortname (epubusagelimit) #FIXED "epubusagelimit"
+	%generalAttributes;>
+
+<!ELEMENT EpubUsageStatus (#PCDATA)>
+<!ATTLIST EpubUsageStatus
+	refname (EpubUsageStatus) #FIXED "EpubUsageStatus"
+	shortname (x319) #FIXED "x319"
+	%generalAttributes;>
+
+<!ELEMENT EpubUsageType (#PCDATA)>
+<!ATTLIST EpubUsageType
+	refname (EpubUsageType) #FIXED "EpubUsageType"
+	shortname (x318) #FIXED "x318"
+	%generalAttributes;>
+
+<!ELEMENT EpubUsageUnit (#PCDATA)>
+<!ATTLIST EpubUsageUnit
+	refname (EpubUsageUnit) #FIXED "EpubUsageUnit"
+	shortname (x321) #FIXED "x321"
+	%generalAttributes;>
+
+<!ELEMENT Event (EventRole, EventName+, EventAcronym*, EventNumber?, EventTheme*, EventDate?, EventPlace*, EventSponsor*, Website*)>
+<!ATTLIST Event
+	refname (Event) #FIXED "Event"
+	shortname (event) #FIXED "event"
+	%generalAttributes;>
+
+<!ELEMENT EventAcronym (#PCDATA)>
+<!ATTLIST EventAcronym
+	refname (EventAcronym) #FIXED "EventAcronym"
+	shortname (x517) #FIXED "x517"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT EventDate (#PCDATA)>
+<!ATTLIST EventDate
+	refname (EventDate) #FIXED "EventDate"
+	shortname (x520) #FIXED "x520"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT EventName (#PCDATA)>
+<!ATTLIST EventName
+	refname (EventName) #FIXED "EventName"
+	shortname (x516) #FIXED "x516"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT EventNumber (#PCDATA)>
+<!ATTLIST EventNumber
+	refname (EventNumber) #FIXED "EventNumber"
+	shortname (x518) #FIXED "x518"
+	%generalAttributes;>
+
+<!ELEMENT EventPlace (#PCDATA)>
+<!ATTLIST EventPlace
+	refname (EventPlace) #FIXED "EventPlace"
+	shortname (x521) #FIXED "x521"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT EventRole (#PCDATA)>
+<!ATTLIST EventRole
+	refname (EventRole) #FIXED "EventRole"
+	shortname (x515) #FIXED "x515"
+	%generalAttributes;>
+
+<!ELEMENT EventSponsor ((EventSponsorIdentifier+, (PersonName | CorporateName)?) | PersonName | CorporateName)>
+<!ATTLIST EventSponsor
+	refname (EventSponsor) #FIXED "EventSponsor"
+	shortname (eventsponsor) #FIXED "eventsponsor"
+	%generalAttributes;>
+
+<!ELEMENT EventSponsorIDType (#PCDATA)>
+<!ATTLIST EventSponsorIDType
+	refname (EventSponsorIDType) #FIXED "EventSponsorIDType"
+	shortname (x522) #FIXED "x522"
+	%generalAttributes;>
+
+<!ELEMENT EventSponsorIdentifier (EventSponsorIDType, IDTypeName?, IDValue)>
+<!ATTLIST EventSponsorIdentifier
+	refname (EventSponsorIdentifier) #FIXED "EventSponsorIdentifier"
+	shortname (eventsponsoridentifier) #FIXED "eventsponsoridentifier"
+	%generalAttributes;>
+
+<!ELEMENT EventTheme (#PCDATA)>
+<!ATTLIST EventTheme
+	refname (EventTheme) #FIXED "EventTheme"
+	shortname (x519) #FIXED "x519"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT ExpectedDate (#PCDATA)>
+<!ATTLIST ExpectedDate
+	refname (ExpectedDate) #FIXED "ExpectedDate"
+	shortname (j302) #FIXED "j302"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT Extent (ExtentType, ((ExtentValue, ExtentValueRoman?) | ExtentValueRoman), ExtentUnit)>
+<!ATTLIST Extent
+	refname (Extent) #FIXED "Extent"
+	shortname (extent) #FIXED "extent"
+	%generalAttributes;>
+
+<!ELEMENT ExtentType (#PCDATA)>
+<!ATTLIST ExtentType
+	refname (ExtentType) #FIXED "ExtentType"
+	shortname (b218) #FIXED "b218"
+	%generalAttributes;>
+
+<!ELEMENT ExtentUnit (#PCDATA)>
+<!ATTLIST ExtentUnit
+	refname (ExtentUnit) #FIXED "ExtentUnit"
+	shortname (b220) #FIXED "b220"
+	%generalAttributes;>
+
+<!ELEMENT ExtentValue (#PCDATA)>
+<!ATTLIST ExtentValue
+	refname (ExtentValue) #FIXED "ExtentValue"
+	shortname (b219) #FIXED "b219"
+	%generalAttributes;>
+
+<!ELEMENT ExtentValueRoman (#PCDATA)>
+<!ATTLIST ExtentValueRoman
+	refname (ExtentValueRoman) #FIXED "ExtentValueRoman"
+	shortname (x421) #FIXED "x421"
+	%generalAttributes;>
+
+<!ELEMENT FaxNumber (#PCDATA)>
+<!ATTLIST FaxNumber
+	refname (FaxNumber) #FIXED "FaxNumber"
+	shortname (j271) #FIXED "j271"
+	%generalAttributes;>
+
+<!ELEMENT FeatureNote %Flow;>
+<!ATTLIST FeatureNote
+	refname (FeatureNote) #FIXED "FeatureNote"
+	shortname (x440) #FIXED "x440"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT FeatureValue (#PCDATA)>
+<!ATTLIST FeatureValue
+	refname (FeatureValue) #FIXED "FeatureValue"
+	shortname (x439) #FIXED "x439"
+	%generalAttributes;>
+
+<!ELEMENT FirstPageNumber (#PCDATA)>
+<!ATTLIST FirstPageNumber
+	refname (FirstPageNumber) #FIXED "FirstPageNumber"
+	shortname (b286) #FIXED "b286"
+	%generalAttributes;>
+
+<!ELEMENT FreeQuantity (#PCDATA)>
+<!ATTLIST FreeQuantity
+	refname (FreeQuantity) #FIXED "FreeQuantity"
+	shortname (j265) #FIXED "j265"
+	%generalAttributes;>
+
+<!ELEMENT FromLanguage (#PCDATA)>
+<!ATTLIST FromLanguage
+	refname (FromLanguage) #FIXED "FromLanguage"
+	shortname (x412) #FIXED "x412"
+	%generalAttributes;>
+
+<!ELEMENT Funding (FundingIdentifier)+>
+<!ATTLIST Funding
+	refname (Funding) #FIXED "Funding"
+	shortname (funding) #FIXED "funding"
+	%generalAttributes;>
+
+<!ELEMENT FundingIdentifier (FundingIDType, IDTypeName?, IDValue)>
+<!ATTLIST FundingIdentifier
+	refname (FundingIdentifier) #FIXED "FundingIdentifier"
+	shortname (fundingidentifier) #FIXED "fundingidentifier"
+	%generalAttributes;>
+
+<!ELEMENT FundingIDType (#PCDATA)>
+<!ATTLIST FundingIDType
+	refname (FundingIDType) #FIXED "FundingIDType"
+	shortname (x523) #FIXED "x523"
+	%generalAttributes;>
+
+<!ELEMENT Gender (#PCDATA)>
+<!ATTLIST Gender
+	refname (Gender) #FIXED "Gender"
+	shortname (x524) #FIXED "x524"
+	%generalAttributes;>
+
+<!ELEMENT Header (Sender, Addressee*, MessageNumber?, MessageRepeat?, SentDateTime, MessageNote*, DefaultLanguageOfText?, DefaultPriceType?, DefaultCurrencyCode?)>
+<!ATTLIST Header
+	refname (Header) #FIXED "Header"
+	shortname (header) #FIXED "header"
+	%generalAttributes;>
+
+<!ELEMENT IDTypeName (#PCDATA)>
+<!ATTLIST IDTypeName
+	refname (IDTypeName) #FIXED "IDTypeName"
+	shortname (b233) #FIXED "b233"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT IDValue (#PCDATA)>
+<!ATTLIST IDValue
+	refname (IDValue) #FIXED "IDValue"
+	shortname (b244) #FIXED "b244"
+	%generalAttributes;>
+
+<!ELEMENT Illustrated (#PCDATA)>
+<!ATTLIST Illustrated
+	refname (Illustrated) #FIXED "Illustrated"
+	shortname (x422) #FIXED "x422"
+	%generalAttributes;>
+
+<!ELEMENT IllustrationsNote %Flow;>
+<!ATTLIST IllustrationsNote
+	refname (IllustrationsNote) #FIXED "IllustrationsNote"
+	shortname (b062) #FIXED "b062"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Imprint ((ImprintIdentifier+, ImprintName?) | ImprintName)>
+<!ATTLIST Imprint
+	refname (Imprint) #FIXED "Imprint"
+	shortname (imprint) #FIXED "imprint"
+	%generalAttributes;>
+
+<!ELEMENT ImprintIdentifier (ImprintIDType, IDTypeName?, IDValue)>
+<!ATTLIST ImprintIdentifier
+	refname (ImprintIdentifier) #FIXED "ImprintIdentifier"
+	shortname (imprintidentifier) #FIXED "imprintidentifier"
+	%generalAttributes;>
+
+<!ELEMENT ImprintIDType (#PCDATA)>
+<!ATTLIST ImprintIDType
+	refname (ImprintIDType) #FIXED "ImprintIDType"
+	shortname (x445) #FIXED "x445"
+	%generalAttributes;>
+
+<!ELEMENT ImprintName (#PCDATA)>
+<!ATTLIST ImprintName
+	refname (ImprintName) #FIXED "ImprintName"
+	shortname (b079) #FIXED "b079"
+	%generalAttributes;
+	%languageAttribute;
+	%collationkeyAttribute;>
+
+<!ELEMENT InitialPrintRun %Flow;>
+<!ATTLIST InitialPrintRun
+	refname (InitialPrintRun) #FIXED "InitialPrintRun"
+	shortname (k167) #FIXED "k167"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT KeyNames (#PCDATA)>
+<!ATTLIST KeyNames
+	refname (KeyNames) #FIXED "KeyNames"
+	shortname (b040) #FIXED "b040"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT Language (LanguageRole, LanguageCode, CountryCode?, RegionCode?, ScriptCode?)>
+<!ATTLIST Language
+	refname (Language) #FIXED "Language"
+	shortname (language) #FIXED "language"
+	%generalAttributes;>
+
+<!ELEMENT LanguageCode (#PCDATA)>
+<!ATTLIST LanguageCode
+	refname (LanguageCode) #FIXED "LanguageCode"
+	shortname (b252) #FIXED "b252"
+	%generalAttributes;>
+
+<!ELEMENT LanguageRole (#PCDATA)>
+<!ATTLIST LanguageRole
+	refname (LanguageRole) #FIXED "LanguageRole"
+	shortname (b253) #FIXED "b253"
+	%generalAttributes;>
+
+<!ELEMENT LastPageNumber (#PCDATA)>
+<!ATTLIST LastPageNumber
+	refname (LastPageNumber) #FIXED "LastPageNumber"
+	shortname (b287) #FIXED "b287"
+	%generalAttributes;>
+
+<!ELEMENT LatestReprintNumber (#PCDATA)>
+<!ATTLIST LatestReprintNumber
+	refname (LatestReprintNumber) #FIXED "LatestReprintNumber"
+	shortname (x446) #FIXED "x446"
+	%generalAttributes;>
+
+<!ELEMENT LettersAfterNames (#PCDATA)>
+<!ATTLIST LettersAfterNames
+	refname (LettersAfterNames) #FIXED "LettersAfterNames"
+	shortname (b042) #FIXED "b042"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT LevelSequenceNumber (#PCDATA)>
+<!ATTLIST LevelSequenceNumber
+	refname (LevelSequenceNumber) #FIXED "LevelSequenceNumber"
+	shortname (b284) #FIXED "b284"
+	%generalAttributes;>
+
+<!ELEMENT ListName (#PCDATA)>
+<!ATTLIST ListName
+	refname (ListName) #FIXED "ListName"
+	shortname (x432) #FIXED "x432"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT LocationIdentifier (LocationIDType, IDTypeName?, IDValue)>
+<!ATTLIST LocationIdentifier
+	refname (LocationIdentifier) #FIXED "LocationIdentifier"
+	shortname (locationidentifier) #FIXED "locationidentifier"
+	%generalAttributes;>
+
+<!ELEMENT LocationIDType (#PCDATA)>
+<!ATTLIST LocationIDType
+	refname (LocationIDType) #FIXED "LocationIDType"
+	shortname (j377) #FIXED "j377"
+	%generalAttributes;>
+
+<!ELEMENT LocationName (#PCDATA)>
+<!ATTLIST LocationName
+	refname (LocationName) #FIXED "LocationName"
+	shortname (j349) #FIXED "j349"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT MainSubject EMPTY>
+<!ATTLIST MainSubject
+	refname (MainSubject) #FIXED "MainSubject"
+	shortname (x425) #FIXED "x425"
+	%generalAttributes;>
+
+<!ELEMENT MapScale (#PCDATA)>
+<!ATTLIST MapScale
+	refname (MapScale) #FIXED "MapScale"
+	shortname (b063) #FIXED "b063"
+	%generalAttributes;>
+
+<!ELEMENT Market (Territory, SalesRestriction*)>
+<!ATTLIST Market
+	refname (Market) #FIXED "Market"
+	shortname (market) #FIXED "market"
+	%generalAttributes;>
+
+<!ELEMENT MarketDate (MarketDateRole, DateFormat?, Date)>
+<!ATTLIST MarketDate
+	refname (MarketDate) #FIXED "MarketDate"
+	shortname (marketdate) #FIXED "marketdate"
+	%generalAttributes;>
+
+<!ELEMENT MarketDateRole (#PCDATA)>
+<!ATTLIST MarketDateRole
+	refname (MarketDateRole) #FIXED "MarketDateRole"
+	shortname (j408) #FIXED "j408"
+	%generalAttributes;>
+
+<!ELEMENT MarketPublishingDetail (PublisherRepresentative*, ProductContact*, MarketPublishingStatus, MarketPublishingStatusNote*, MarketDate*, PromotionCampaign*, PromotionContact?, InitialPrintRun*, ReprintDetail*, CopiesSold*, BookClubAdoption*)>
+<!ATTLIST MarketPublishingDetail
+	refname (MarketPublishingDetail) #FIXED "MarketPublishingDetail"
+	shortname (marketpublishingdetail) #FIXED "marketpublishingdetail"
+	%generalAttributes;>
+
+<!ELEMENT MarketPublishingStatus (#PCDATA)>
+<!ATTLIST MarketPublishingStatus
+	refname (MarketPublishingStatus) #FIXED "MarketPublishingStatus"
+	shortname (j407) #FIXED "j407"
+	%generalAttributes;>
+
+<!ELEMENT MarketPublishingStatusNote %Flow;>
+<!ATTLIST MarketPublishingStatusNote
+	refname (MarketPublishingStatusNote) #FIXED "MarketPublishingStatusNote"
+	shortname (x406) #FIXED "x406"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Measure (MeasureType, Measurement, MeasureUnitCode)>
+<!ATTLIST Measure
+	refname (Measure) #FIXED "Measure"
+	shortname (measure) #FIXED "measure"
+	%generalAttributes;>
+
+<!ELEMENT Measurement (#PCDATA)>
+<!ATTLIST Measurement
+	refname (Measurement) #FIXED "Measurement"
+	shortname (c094) #FIXED "c094"
+	%generalAttributes;>
+
+<!ELEMENT MeasureType (#PCDATA)>
+<!ATTLIST MeasureType
+	refname (MeasureType) #FIXED "MeasureType"
+	shortname (x315) #FIXED "x315"
+	%generalAttributes;>
+
+<!ELEMENT MeasureUnitCode (#PCDATA)>
+<!ATTLIST MeasureUnitCode
+	refname (MeasureUnitCode) #FIXED "MeasureUnitCode"
+	shortname (c095) #FIXED "c095"
+	%generalAttributes;>
+
+<!ELEMENT MessageNote (#PCDATA)>
+<!ATTLIST MessageNote
+	refname (MessageNote) #FIXED "MessageNote"
+	shortname (m183) #FIXED "m183"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT MessageNumber (#PCDATA)>
+<!ATTLIST MessageNumber
+	refname (MessageNumber) #FIXED "MessageNumber"
+	shortname (m180) #FIXED "m180"
+	%generalAttributes;>
+
+<!ELEMENT MessageRepeat (#PCDATA)>
+<!ATTLIST MessageRepeat
+	refname (MessageRepeat) #FIXED "MessageRepeat"
+	shortname (m181) #FIXED "m181"
+	%generalAttributes;>
+
+<!ELEMENT MinimumOrderQuantity (#PCDATA)>
+<!ATTLIST MinimumOrderQuantity
+	refname (MinimumOrderQuantity) #FIXED "MinimumOrderQuantity"
+	shortname (j263) #FIXED "j263"
+	%generalAttributes;>
+
+<!ELEMENT NameAsSubject (NameType?, ((NameIdentifier+, (((%gp.unstructured_name;), (%gp.structured_name;)?, Gender?) | ((%gp.structured_name;), Gender?) | (%gp.corporate_name;))?) | (((%gp.unstructured_name;), (%gp.structured_name;)?, Gender?) | ((%gp.structured_name;), Gender?) | (%gp.corporate_name;))), AlternativeName*, SubjectDate*, ProfessionalAffiliation*)>
+<!ATTLIST NameAsSubject
+	refname (NameAsSubject) #FIXED "NameAsSubject"
+	shortname (nameassubject) #FIXED "nameassubject"
+	%generalAttributes;>
+
+<!ELEMENT NameIdentifier (NameIDType, IDTypeName?, IDValue)>
+<!ATTLIST NameIdentifier
+	refname (NameIdentifier) #FIXED "NameIdentifier"
+	shortname (nameidentifier) #FIXED "nameidentifier"
+	%generalAttributes;>
+
+<!ELEMENT NameIDType (#PCDATA)>
+<!ATTLIST NameIDType
+	refname (NameIDType) #FIXED "NameIDType"
+	shortname (x415) #FIXED "x415"
+	%generalAttributes;>
+
+<!ELEMENT NamesAfterKey (#PCDATA)>
+<!ATTLIST NamesAfterKey
+	refname (NamesAfterKey) #FIXED "NamesAfterKey"
+	shortname (b041) #FIXED "b041"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT NamesBeforeKey (#PCDATA)>
+<!ATTLIST NamesBeforeKey
+	refname (NamesBeforeKey) #FIXED "NamesBeforeKey"
+	shortname (b039) #FIXED "b039"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT NameType (#PCDATA)>
+<!ATTLIST NameType
+	refname (NameType) #FIXED "NameType"
+	shortname (x414) #FIXED "x414"
+	%generalAttributes;>
+
+<!ELEMENT NewSupplier (((SupplierIdentifier+, SupplierName?) | SupplierName), TelephoneNumber*, FaxNumber*, EmailAddress*)>
+<!ATTLIST NewSupplier
+	refname (NewSupplier) #FIXED "NewSupplier"
+	shortname (newsupplier) #FIXED "newsupplier"
+	%generalAttributes;>
+
+<!ELEMENT NoCollection EMPTY>
+<!ATTLIST NoCollection
+	refname (NoCollection) #FIXED "NoCollection"
+	shortname (x411) #FIXED "x411"
+	%generalAttributes;>
+
+<!ELEMENT NoContributor EMPTY>
+<!ATTLIST NoContributor
+	refname (NoContributor) #FIXED "NoContributor"
+	shortname (n339) #FIXED "n339"
+	%generalAttributes;>
+
+<!ELEMENT NoEdition EMPTY>
+<!ATTLIST NoEdition
+	refname (NoEdition) #FIXED "NoEdition"
+	shortname (n386) #FIXED "n386"
+	%generalAttributes;>
+
+<!ELEMENT NoPrefix EMPTY>
+<!ATTLIST NoPrefix
+	refname (NoPrefix) #FIXED "NoPrefix"
+	shortname (x501) #FIXED "x501"
+	%generalAttributes;>
+
+<!ELEMENT NoProduct EMPTY>
+<!ATTLIST NoProduct
+	refname (NoProduct) #FIXED "NoProduct"
+	shortname (x507) #FIXED "x507"
+	%generalAttributes;>
+
+<!ELEMENT NotificationType (#PCDATA)>
+<!ATTLIST NotificationType
+	refname (NotificationType) #FIXED "NotificationType"
+	shortname (a002) #FIXED "a002"
+	%generalAttributes;>
+
+<!ELEMENT Number (#PCDATA)>
+<!ATTLIST Number
+	refname (Number) #FIXED "Number"
+	shortname (b257) #FIXED "b257"
+	%generalAttributes;>
+
+<!ELEMENT NumberOfCopies (#PCDATA)>
+<!ATTLIST NumberOfCopies
+	refname (NumberOfCopies) #FIXED "NumberOfCopies"
+	shortname (x323) #FIXED "x323"
+	%generalAttributes;>
+
+<!ELEMENT NumberOfIllustrations (#PCDATA)>
+<!ATTLIST NumberOfIllustrations
+	refname (NumberOfIllustrations) #FIXED "NumberOfIllustrations"
+	shortname (b125) #FIXED "b125"
+	%generalAttributes;>
+
+<!ELEMENT NumberOfItemsOfThisForm (#PCDATA)>
+<!ATTLIST NumberOfItemsOfThisForm
+	refname (NumberOfItemsOfThisForm) #FIXED "NumberOfItemsOfThisForm"
+	shortname (x322) #FIXED "x322"
+	%generalAttributes;>
+
+<!ELEMENT NumberOfPages (#PCDATA)>
+<!ATTLIST NumberOfPages
+	refname (NumberOfPages) #FIXED "NumberOfPages"
+	shortname (b061) #FIXED "b061"
+	%generalAttributes;>
+
+<!ELEMENT ONIXMessage (Header, (NoProduct | Product+))>
+<!ATTLIST ONIXMessage
+	refname (ONIXMessage) #FIXED "ONIXMessage"
+	shortname (ONIXmessage) #FIXED "ONIXmessage"
+	xmlns CDATA #FIXED "http://ns.editeur.org/onix/3.0/reference"
+	%generalAttributes;
+	%releaseAttribute;>
+
+<!ELEMENT OnHand (#PCDATA)>
+<!ATTLIST OnHand
+	refname (OnHand) #FIXED "OnHand"
+	shortname (j350) #FIXED "j350"
+	%generalAttributes;>
+
+<!ELEMENT OnOrder (#PCDATA)>
+<!ATTLIST OnOrder
+	refname (OnOrder) #FIXED "OnOrder"
+	shortname (j351) #FIXED "j351"
+	%generalAttributes;>
+
+<!ELEMENT OnOrderDetail (OnOrder, ExpectedDate)>
+<!ATTLIST OnOrderDetail
+	refname (OnOrderDetail) #FIXED "OnOrderDetail"
+	shortname (onorderdetail) #FIXED "onorderdetail"
+	%generalAttributes;>
+
+<!ELEMENT OrderQuantityMinimum (#PCDATA)>
+<!ATTLIST OrderQuantityMinimum
+	refname (OrderQuantityMinimum) #FIXED "OrderQuantityMinimum"
+	shortname (x532) #FIXED "x532"
+	%generalAttributes;>
+
+<!ELEMENT OrderQuantityMultiple (#PCDATA)>
+<!ATTLIST OrderQuantityMultiple
+	refname (OrderQuantityMultiple) #FIXED "OrderQuantityMultiple"
+	shortname (x533) #FIXED "x533"
+	%generalAttributes;>
+
+<!ELEMENT OrderTime (#PCDATA)>
+<!ATTLIST OrderTime
+	refname (OrderTime) #FIXED "OrderTime"
+	shortname (j144) #FIXED "j144"
+	%generalAttributes;>
+
+<!ELEMENT PackQuantity (#PCDATA)>
+<!ATTLIST PackQuantity
+	refname (PackQuantity) #FIXED "PackQuantity"
+	shortname (j145) #FIXED "j145"
+	%generalAttributes;>
+
+<!ELEMENT PalletQuantity (#PCDATA)>
+<!ATTLIST PalletQuantity
+	refname (PalletQuantity) #FIXED "PalletQuantity"
+	shortname (x545) #FIXED "x545"
+	%generalAttributes;>
+
+<!ELEMENT PageRun (FirstPageNumber, LastPageNumber?)>
+<!ATTLIST PageRun
+	refname (PageRun) #FIXED "PageRun"
+	shortname (pagerun) #FIXED "pagerun"
+	%generalAttributes;>
+
+<!ELEMENT PartNumber (#PCDATA)>
+<!ATTLIST PartNumber
+	refname (PartNumber) #FIXED "PartNumber"
+	shortname (x410) #FIXED "x410"
+	%generalAttributes;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT Percent (#PCDATA)>
+<!ATTLIST Percent
+	refname (Percent) #FIXED "Percent"
+	shortname (b337) #FIXED "b337"
+	%generalAttributes;>
+
+<!ELEMENT DiscountPercent (#PCDATA)>
+<!ATTLIST DiscountPercent
+	refname (DiscountPercent) #FIXED "DiscountPercent"
+	shortname (j267) #FIXED "j267"
+	%generalAttributes;>
+
+<!ELEMENT PersonName (#PCDATA)>
+<!ATTLIST PersonName
+	refname (PersonName) #FIXED "PersonName"
+	shortname (b036) #FIXED "b036"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT PersonNameInverted (#PCDATA)>
+<!ATTLIST PersonNameInverted
+	refname (PersonNameInverted) #FIXED "PersonNameInverted"
+	shortname (b037) #FIXED "b037"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT PositionOnList (#PCDATA)>
+<!ATTLIST PositionOnList
+	refname (PositionOnList) #FIXED "PositionOnList"
+	shortname (x433) #FIXED "x433"
+	%generalAttributes;>
+
+<!ELEMENT PositionOnProduct (#PCDATA)>
+<!ATTLIST PositionOnProduct
+	refname (PositionOnProduct) #FIXED "PositionOnProduct"
+	shortname (x313) #FIXED "x313"
+	%generalAttributes;>
+
+<!ELEMENT PrefixToKey (#PCDATA)>
+<!ATTLIST PrefixToKey
+	refname (PrefixToKey) #FIXED "PrefixToKey"
+	shortname (b247) #FIXED "b247"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT Price (PriceIdentifier*, PriceType?, PriceQualifier?, EpubTechnicalProtection*, PriceConstraint*, EpubLicense?, PriceTypeDescription*, PricePer?, PriceCondition*, MinimumOrderQuantity?, BatchBonus*, DiscountCoded*, Discount*, PriceStatus?, (((PriceAmount | PriceCoded), (Tax+ | TaxExempt)?) | UnpricedItemType), CurrencyCode?, Territory?, CurrencyZone?, ComparisonProductPrice*, PriceDate*, PrintedOnProduct?, PositionOnProduct?)>
+<!ATTLIST Price
+	refname (Price) #FIXED "Price"
+	shortname (price) #FIXED "price"
+	%generalAttributes;>
+
+<!ELEMENT PriceAmount (#PCDATA)>
+<!ATTLIST PriceAmount
+	refname (PriceAmount) #FIXED "PriceAmount"
+	shortname (j151) #FIXED "j151"
+	%generalAttributes;>
+
+<!ELEMENT PriceCode (#PCDATA)>
+<!ATTLIST PriceCode
+	refname (PriceCode) #FIXED "PriceCode"
+	shortname (x468) #FIXED "x468"
+	%generalAttributes;>
+
+<!ELEMENT PriceCoded (PriceCodeType, PriceCodeTypeName?, PriceCode)>
+<!ATTLIST PriceCoded
+	refname (PriceCoded) #FIXED "PriceCoded"
+	shortname (pricecoded) #FIXED "pricecoded"
+	%generalAttributes;>
+
+<!ELEMENT PriceCodeType (#PCDATA)>
+<!ATTLIST PriceCodeType
+	refname (PriceCodeType) #FIXED "PriceCodeType"
+	shortname (x465) #FIXED "x465"
+	%generalAttributes;>
+
+<!ELEMENT PriceCodeTypeName (#PCDATA)>
+<!ATTLIST PriceCodeTypeName
+	refname (PriceCodeTypeName) #FIXED "PriceCodeTypeName"
+	shortname (x477) #FIXED "x477"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT PriceCondition (PriceConditionType, PriceConditionQuantity*, ProductIdentifier*)>
+<!ATTLIST PriceCondition
+	refname (PriceCondition) #FIXED "PriceCondition"
+	shortname (pricecondition) #FIXED "pricecondition"
+	%generalAttributes;>
+
+<!ELEMENT PriceConditionQuantity (PriceConditionQuantityType, Quantity, QuantityUnit)>
+<!ATTLIST PriceConditionQuantity
+	refname (PriceConditionQuantity) #FIXED "PriceConditionQuantity"
+	shortname (priceconditionquantity) #FIXED "priceconditionquantity"
+	%generalAttributes;>
+
+<!ELEMENT PriceConditionQuantityType (#PCDATA)>
+<!ATTLIST PriceConditionQuantityType
+	refname (PriceConditionQuantityType) #FIXED "PriceConditionQuantityType"
+	shortname (x464) #FIXED "x464"
+	%generalAttributes;>
+
+<!ELEMENT PriceConditionType (#PCDATA)>
+<!ATTLIST PriceConditionType
+	refname (PriceConditionType) #FIXED "PriceConditionType"
+	shortname (x463) #FIXED "x463"
+	%generalAttributes;>
+
+<!ELEMENT PriceDate (PriceDateRole, DateFormat?, Date)>
+<!ATTLIST PriceDate
+	refname (PriceDate) #FIXED "PriceDate"
+	shortname (pricedate) #FIXED "pricedate"
+	%generalAttributes;>
+
+<!ELEMENT PriceDateRole (#PCDATA)>
+<!ATTLIST PriceDateRole
+	refname (PriceDateRole) #FIXED "PriceDateRole"
+	shortname (x476) #FIXED "x476"
+	%generalAttributes;>
+
+<!ELEMENT PriceIdentifier (PriceIDType, IDTypeName?, IDValue)>
+<!ATTLIST PriceIdentifier
+	refname (PriceIdentifier) #FIXED "PriceIdentifier"
+	shortname (priceidentifier) #FIXED "priceidentifier"
+	%generalAttributes;>
+
+<!ELEMENT PriceIDType (#PCDATA)>
+<!ATTLIST PriceIDType
+	refname (PriceIDType) #FIXED "PriceIDType"
+	shortname (x506) #FIXED "x506"
+	%generalAttributes;>
+
+<!ELEMENT PricePer (#PCDATA)>
+<!ATTLIST PricePer
+	refname (PricePer) #FIXED "PricePer"
+	shortname (j239) #FIXED "j239"
+	%generalAttributes;>
+
+<!ELEMENT PriceQualifier (#PCDATA)>
+<!ATTLIST PriceQualifier
+	refname (PriceQualifier) #FIXED "PriceQualifier"
+	shortname (j261) #FIXED "j261"
+	%generalAttributes;>
+
+<!ELEMENT PriceStatus (#PCDATA)>
+<!ATTLIST PriceStatus
+	refname (PriceStatus) #FIXED "PriceStatus"
+	shortname (j266) #FIXED "j266"
+	%generalAttributes;>
+
+<!ELEMENT PriceType (#PCDATA)>
+<!ATTLIST PriceType
+	refname (PriceType) #FIXED "PriceType"
+	shortname (x462) #FIXED "x462"
+	%generalAttributes;>
+
+<!ELEMENT PriceTypeDescription (#PCDATA)>
+<!ATTLIST PriceTypeDescription
+	refname (PriceTypeDescription) #FIXED "PriceTypeDescription"
+	shortname (j262) #FIXED "j262"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT PriceConstraint (PriceConstraintType, PriceConstraintStatus, PriceConstraintLimit*)>
+<!ATTLIST PriceConstraint
+	refname (PriceConstraint) #FIXED "PriceConstraint"
+	shortname (priceconstraint) #FIXED "priceconstraint"
+	%generalAttributes;>
+
+<!ELEMENT PriceConstraintLimit (Quantity, PriceConstraintUnit)>
+<!ATTLIST PriceConstraintLimit
+	refname (PriceConstraintLimit) #FIXED "PriceConstraintLimit"
+	shortname (priceconstraintlimit) #FIXED "priceconstraintlimit"
+	%generalAttributes;>
+
+<!ELEMENT PriceConstraintStatus (#PCDATA)>
+<!ATTLIST PriceConstraintStatus
+	refname (PriceConstraintStatus) #FIXED "PriceConstraintStatus"
+	shortname (x530) #FIXED "x530"
+	%generalAttributes;>
+
+<!ELEMENT PriceConstraintType (#PCDATA)>
+<!ATTLIST PriceConstraintType
+	refname (PriceConstraintType) #FIXED "PriceConstraintType"
+	shortname (x529) #FIXED "x529"
+	%generalAttributes;>
+
+<!ELEMENT PriceConstraintUnit (#PCDATA)>
+<!ATTLIST PriceConstraintUnit
+	refname (PriceConstraintUnit) #FIXED "PriceConstraintUnit"
+	shortname (x531) #FIXED "x531"
+	%generalAttributes;>
+
+<!ELEMENT PricePartDescription (#PCDATA)>
+<!ATTLIST PricePartDescription
+	refname (PricePartDescription) #FIXED "PricePartDescription"
+	shortname (x535) #FIXED "x535"
+	%generalAttributes;>
+
+<!ELEMENT PrimaryContentType (#PCDATA)>
+<!ATTLIST PrimaryContentType
+	refname (PrimaryContentType) #FIXED "PrimaryContentType"
+	shortname (x416) #FIXED "x416"
+	%generalAttributes;>
+
+<!ELEMENT PrimaryPart EMPTY>
+<!ATTLIST PrimaryPart
+	refname (PrimaryPart) #FIXED "PrimaryPart"
+	shortname (x457) #FIXED "x457"
+	%generalAttributes;>
+
+<!ELEMENT PrintedOnProduct (#PCDATA)>
+<!ATTLIST PrintedOnProduct
+	refname (PrintedOnProduct) #FIXED "PrintedOnProduct"
+	shortname (x301) #FIXED "x301"
+	%generalAttributes;>
+
+<!ELEMENT Prize (PrizeName+, PrizeYear?, PrizeCountry?, PrizeRegion?, PrizeCode?, PrizeStatement*, PrizeJury*)>
+<!ATTLIST Prize
+	refname (Prize) #FIXED "Prize"
+	shortname (prize) #FIXED "prize"
+	%generalAttributes;>
+
+<!ELEMENT PrizeCode (#PCDATA)>
+<!ATTLIST PrizeCode
+	refname (PrizeCode) #FIXED "PrizeCode"
+	shortname (g129) #FIXED "g129"
+	%generalAttributes;>
+
+<!ELEMENT PrizeCountry (#PCDATA)>
+<!ATTLIST PrizeCountry
+	refname (PrizeCountry) #FIXED "PrizeCountry"
+	shortname (g128) #FIXED "g128"
+	%generalAttributes;>
+
+<!ELEMENT PrizeJury %Flow;>
+<!ATTLIST PrizeJury
+	refname (PrizeJury) #FIXED "PrizeJury"
+	shortname (g343) #FIXED "g343"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT PrizeName (#PCDATA)>
+<!ATTLIST PrizeName
+	refname (PrizeName) #FIXED "PrizeName"
+	shortname (g126) #FIXED "g126"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT PrizeStatement %Flow;>
+<!ATTLIST PrizeStatement
+	refname (PrizeStatement) #FIXED "PrizeStatement"
+	shortname (x503) #FIXED "x503"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT PrizeYear (#PCDATA)>
+<!ATTLIST PrizeYear
+	refname (PrizeYear) #FIXED "PrizeYear"
+	shortname (g127) #FIXED "g127"
+	%generalAttributes;>
+
+<!ENTITY % gp.product_numbers "ProductIdentifier+, Barcode*">
+
+<!ENTITY % gp.record_metadata "RecordReference, NotificationType, DeletionText*, RecordSourceType?, RecordSourceIdentifier*, RecordSourceName?">
+
+<!ELEMENT Product ((%gp.record_metadata;), (%gp.product_numbers;), DescriptiveDetail?, CollateralDetail?, PromotionDetail?, ContentDetail?, PublishingDetail?, RelatedMaterial?, ProductionDetail?, ProductSupply*)>
+<!ATTLIST Product
+	refname (Product) #FIXED "Product"
+	shortname (product) #FIXED "product"
+	%generalAttributes;>
+
+<!ELEMENT ProductAvailability (#PCDATA)>
+<!ATTLIST ProductAvailability
+	refname (ProductAvailability) #FIXED "ProductAvailability"
+	shortname (j396) #FIXED "j396"
+	%generalAttributes;>
+
+<!ELEMENT ProductClassification (ProductClassificationType, ProductClassificationTypeName?, ProductClassificationCode, Percent?)>
+<!ATTLIST ProductClassification
+	refname (ProductClassification) #FIXED "ProductClassification"
+	shortname (productclassification) #FIXED "productclassification"
+	%generalAttributes;>
+
+<!ELEMENT ProductClassificationCode (#PCDATA)>
+<!ATTLIST ProductClassificationCode
+	refname (ProductClassificationCode) #FIXED "ProductClassificationCode"
+	shortname (b275) #FIXED "b275"
+	%generalAttributes;>
+
+<!ELEMENT ProductClassificationType (#PCDATA)>
+<!ATTLIST ProductClassificationType
+	refname (ProductClassificationType) #FIXED "ProductClassificationType"
+	shortname (b274) #FIXED "b274"
+	%generalAttributes;>
+
+<!ELEMENT ProductComposition (#PCDATA)>
+<!ATTLIST ProductComposition
+	refname (ProductComposition) #FIXED "ProductComposition"
+	shortname (x314) #FIXED "x314"
+	%generalAttributes;>
+
+<!ELEMENT ProductContact (ProductContactRole, ((ProductContactIdentifier+, ProductContactName?) | ProductContactName), ContactName?, TelephoneNumber*, EmailAddress?)>
+<!ATTLIST ProductContact
+	refname (ProductContact) #FIXED "ProductContact"
+	shortname (productcontact) #FIXED "productcontact"
+	%generalAttributes;>
+
+<!ELEMENT ProductContactIdentifier (ProductContactIDType, IDTypeName?, IDValue)>
+<!ATTLIST ProductContactIdentifier
+	refname (ProductContactIdentifier) #FIXED "ProductContactIdentifier"
+	shortname (productcontactidentifier) #FIXED "productcontactidentifier"
+	%generalAttributes;>
+
+<!ELEMENT ProductContactIDType (#PCDATA)>
+<!ATTLIST ProductContactIDType
+	refname (ProductContactIDType) #FIXED "ProductContactIDType"
+	shortname (x483) #FIXED "x483"
+	%generalAttributes;>
+
+<!ELEMENT ProductContactName (#PCDATA)>
+<!ATTLIST ProductContactName
+	refname (ProductContactName) #FIXED "ProductContactName"
+	shortname (x484) #FIXED "x484"
+	%generalAttributes;>
+
+<!ELEMENT ProductContactRole (#PCDATA)>
+<!ATTLIST ProductContactRole
+	refname (ProductContactRole) #FIXED "ProductContactRole"
+	shortname (x482) #FIXED "x482"
+	%generalAttributes;>
+
+<!ELEMENT ProductContentType (#PCDATA)>
+<!ATTLIST ProductContentType
+	refname (ProductContentType) #FIXED "ProductContentType"
+	shortname (b385) #FIXED "b385"
+	%generalAttributes;>
+
+<!ELEMENT ProductForm (#PCDATA)>
+<!ATTLIST ProductForm
+	refname (ProductForm) #FIXED "ProductForm"
+	shortname (b012) #FIXED "b012"
+	%generalAttributes;>
+
+<!ELEMENT ProductFormDescription (#PCDATA)>
+<!ATTLIST ProductFormDescription
+	refname (ProductFormDescription) #FIXED "ProductFormDescription"
+	shortname (b014) #FIXED "b014"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ProductFormDetail (#PCDATA)>
+<!ATTLIST ProductFormDetail
+	refname (ProductFormDetail) #FIXED "ProductFormDetail"
+	shortname (b333) #FIXED "b333"
+	%generalAttributes;>
+
+<!ELEMENT ProductFormFeature (ProductFormFeatureType, ProductFormFeatureValue?, ProductFormFeatureDescription*)>
+<!ATTLIST ProductFormFeature
+	refname (ProductFormFeature) #FIXED "ProductFormFeature"
+	shortname (productformfeature) #FIXED "productformfeature"
+	%generalAttributes;>
+
+<!ELEMENT ProductFormFeatureDescription (#PCDATA)>
+<!ATTLIST ProductFormFeatureDescription
+	refname (ProductFormFeatureDescription) #FIXED "ProductFormFeatureDescription"
+	shortname (b336) #FIXED "b336"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ProductFormFeatureType (#PCDATA)>
+<!ATTLIST ProductFormFeatureType
+	refname (ProductFormFeatureType) #FIXED "ProductFormFeatureType"
+	shortname (b334) #FIXED "b334"
+	%generalAttributes;>
+
+<!ELEMENT ProductFormFeatureValue (#PCDATA)>
+<!ATTLIST ProductFormFeatureValue
+	refname (ProductFormFeatureValue) #FIXED "ProductFormFeatureValue"
+	shortname (b335) #FIXED "b335"
+	%generalAttributes;>
+
+<!ELEMENT ProductIDType (#PCDATA)>
+<!ATTLIST ProductIDType
+	refname (ProductIDType) #FIXED "ProductIDType"
+	shortname (b221) #FIXED "b221"
+	%generalAttributes;>
+
+<!ELEMENT ProductIdentifier (ProductIDType, IDTypeName?, IDValue)>
+<!ATTLIST ProductIdentifier
+	refname (ProductIdentifier) #FIXED "ProductIdentifier"
+	shortname (productidentifier) #FIXED "productidentifier"
+	%generalAttributes;>
+
+<!ELEMENT ProductPackaging (#PCDATA)>
+<!ATTLIST ProductPackaging
+	refname (ProductPackaging) #FIXED "ProductPackaging"
+	shortname (b225) #FIXED "b225"
+	%generalAttributes;>
+
+<!ELEMENT ProductPart (PrimaryPart?, ProductIdentifier*, (%gp.product_form_core;), ProductContentType*, Measure*, ((NumberOfItemsOfThisForm, NumberOfCopies?) | NumberOfCopies), CountryOfManufacture?)>
+<!ATTLIST ProductPart
+	refname (ProductPart) #FIXED "ProductPart"
+	shortname (productpart) #FIXED "productpart"
+	%generalAttributes;>
+
+<!ELEMENT ProductRelationCode (#PCDATA)>
+<!ATTLIST ProductRelationCode
+	refname (ProductRelationCode) #FIXED "ProductRelationCode"
+	shortname (x455) #FIXED "x455"
+	%generalAttributes;>
+
+<!ELEMENT ProductSupply (Market*, MarketPublishingDetail?, SupplyDetail+)>
+<!ATTLIST ProductSupply
+	refname (ProductSupply) #FIXED "ProductSupply"
+	shortname (productsupply) #FIXED "productsupply"
+	%generalAttributes;>
+
+<!ELEMENT ProfessionalAffiliation ((ProfessionalPosition+, Affiliation?) | Affiliation)>
+<!ATTLIST ProfessionalAffiliation
+	refname (ProfessionalAffiliation) #FIXED "ProfessionalAffiliation"
+	shortname (professionalaffiliation) #FIXED "professionalaffiliation"
+	%generalAttributes;>
+
+<!ELEMENT ProfessionalPosition (#PCDATA)>
+<!ATTLIST ProfessionalPosition
+	refname (ProfessionalPosition) #FIXED "ProfessionalPosition"
+	shortname (b045) #FIXED "b045"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT PromotionCampaign %Flow;>
+<!ATTLIST PromotionCampaign
+	refname (PromotionCampaign) #FIXED "PromotionCampaign"
+	shortname (k165) #FIXED "k165"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT PromotionContact %Flow;>
+<!ATTLIST PromotionContact
+	refname (PromotionContact) #FIXED "PromotionContact"
+	shortname (k166) #FIXED "k166"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Proximity (#PCDATA)>
+<!ATTLIST Proximity
+	refname (Proximity) #FIXED "Proximity"
+	shortname (x502) #FIXED "x502"
+	%generalAttributes;>
+
+<!ELEMENT Publisher (PublishingRole, ((PublisherIdentifier+, PublisherName?) | PublisherName), Funding*, Website*)>
+<!ATTLIST Publisher
+	refname (Publisher) #FIXED "Publisher"
+	shortname (publisher) #FIXED "publisher"
+	%generalAttributes;>
+
+<!ELEMENT PublisherIdentifier (PublisherIDType, IDTypeName?, IDValue)>
+<!ATTLIST PublisherIdentifier
+	refname (PublisherIdentifier) #FIXED "PublisherIdentifier"
+	shortname (publisheridentifier) #FIXED "publisheridentifier"
+	%generalAttributes;>
+
+<!ELEMENT PublisherIDType (#PCDATA)>
+<!ATTLIST PublisherIDType
+	refname (PublisherIDType) #FIXED "PublisherIDType"
+	shortname (x447) #FIXED "x447"
+	%generalAttributes;>
+
+<!ELEMENT PublisherName (#PCDATA)>
+<!ATTLIST PublisherName
+	refname (PublisherName) #FIXED "PublisherName"
+	shortname (b081) #FIXED "b081"
+	%generalAttributes;
+	%languageAttribute;
+	%collationkeyAttribute;>
+
+<!ELEMENT PublisherRepresentative (AgentRole, ((AgentIdentifier+, AgentName?) | AgentName), TelephoneNumber*, FaxNumber*, EmailAddress*, Website*)>
+<!ATTLIST PublisherRepresentative
+	refname (PublisherRepresentative) #FIXED "PublisherRepresentative"
+	shortname (publisherrepresentative) #FIXED "publisherrepresentative"
+	%generalAttributes;>
+
+<!ELEMENT PublishingDate (PublishingDateRole, DateFormat?, Date)>
+<!ATTLIST PublishingDate
+	refname (PublishingDate) #FIXED "PublishingDate"
+	shortname (publishingdate) #FIXED "publishingdate"
+	%generalAttributes;>
+
+<!ELEMENT PublishingDateRole (#PCDATA)>
+<!ATTLIST PublishingDateRole
+	refname (PublishingDateRole) #FIXED "PublishingDateRole"
+	shortname (x448) #FIXED "x448"
+	%generalAttributes;>
+
+<!ENTITY % gp.rights_restrictions "(SalesRights+, ROWSalesRightsType?)?, SalesRestriction*">
+
+<!ENTITY % gp.publishing_status "(PublishingStatus, PublishingStatusNote*)?, PublishingDate*, LatestReprintNumber?, CopyrightStatement*">
+
+<!ENTITY % gp.imprints_publishers "((Imprint+, Publisher*) | Publisher+), CityOfPublication*, CountryOfPublication?, ProductContact*">
+
+<!ELEMENT PublishingDetail ((%gp.imprints_publishers;), (%gp.publishing_status;), (%gp.rights_restrictions;))>
+<!ATTLIST PublishingDetail
+	refname (PublishingDetail) #FIXED "PublishingDetail"
+	shortname (publishingdetail) #FIXED "publishingdetail"
+	%generalAttributes;>
+
+<!ELEMENT PublishingRole (#PCDATA)>
+<!ATTLIST PublishingRole
+	refname (PublishingRole) #FIXED "PublishingRole"
+	shortname (b291) #FIXED "b291"
+	%generalAttributes;>
+
+<!ELEMENT PublishingStatus (#PCDATA)>
+<!ATTLIST PublishingStatus
+	refname (PublishingStatus) #FIXED "PublishingStatus"
+	shortname (b394) #FIXED "b394"
+	%generalAttributes;>
+
+<!ELEMENT PublishingStatusNote %Flow;>
+<!ATTLIST PublishingStatusNote
+	refname (PublishingStatusNote) #FIXED "PublishingStatusNote"
+	shortname (b395) #FIXED "b395"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Quantity (#PCDATA)>
+<!ATTLIST Quantity
+	refname (Quantity) #FIXED "Quantity"
+	shortname (x320) #FIXED "x320"
+	%generalAttributes;>
+
+<!ELEMENT QuantityUnit (#PCDATA)>
+<!ATTLIST QuantityUnit
+	refname (QuantityUnit) #FIXED "QuantityUnit"
+	shortname (x466) #FIXED "x466"
+	%generalAttributes;>
+
+<!ELEMENT Rate (#PCDATA)>
+<!ATTLIST Rate
+	refname (Rate) #FIXED "Rate"
+	shortname (x505) #FIXED "x505"
+	%generalAttributes;>
+
+<!ELEMENT ReviewRating (Rating, RatingLimit?, RatingUnits*)>
+<!ATTLIST ReviewRating
+	refname (ReviewRating) #FIXED "ReviewRating"
+	shortname (reviewrating) #FIXED "reviewrating"
+	%generalAttributes;>
+
+<!ELEMENT Rating (#PCDATA)>
+<!ATTLIST Rating
+	refname (Rating) #FIXED "Rating"
+	shortname (x525) #FIXED "x525"
+	%generalAttributes;>
+
+<!ELEMENT RatingLimit (#PCDATA)>
+<!ATTLIST RatingLimit
+	refname (RatingLimit) #FIXED "RatingLimit"
+	shortname (x526) #FIXED "x526"
+	%generalAttributes;>
+
+<!ELEMENT RatingUnits (#PCDATA)>
+<!ATTLIST RatingUnits
+	refname (RatingUnits) #FIXED "RatingUnits"
+	shortname (x527) #FIXED "x527"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT RecordReference (#PCDATA)>
+<!ATTLIST RecordReference
+	refname (RecordReference) #FIXED "RecordReference"
+	shortname (a001) #FIXED "a001"
+	%generalAttributes;>
+
+<!ELEMENT RecordSourceIdentifier (RecordSourceIDType, IDTypeName?, IDValue)>
+<!ATTLIST RecordSourceIdentifier
+	refname (RecordSourceIdentifier) #FIXED "RecordSourceIdentifier"
+	shortname (recordsourceidentifier) #FIXED "recordsourceidentifier"
+	%generalAttributes;>
+
+<!ELEMENT RecordSourceIDType (#PCDATA)>
+<!ATTLIST RecordSourceIDType
+	refname (RecordSourceIDType) #FIXED "RecordSourceIDType"
+	shortname (x311) #FIXED "x311"
+	%generalAttributes;>
+
+<!ELEMENT RecordSourceName (#PCDATA)>
+<!ATTLIST RecordSourceName
+	refname (RecordSourceName) #FIXED "RecordSourceName"
+	shortname (a197) #FIXED "a197"
+	%generalAttributes;>
+
+<!ELEMENT RecordSourceType (#PCDATA)>
+<!ATTLIST RecordSourceType
+	refname (RecordSourceType) #FIXED "RecordSourceType"
+	shortname (a194) #FIXED "a194"
+	%generalAttributes;>
+
+<!ELEMENT RegionCode (#PCDATA)>
+<!ATTLIST RegionCode
+	refname (RegionCode) #FIXED "RegionCode"
+	shortname (b398) #FIXED "b398"
+	%generalAttributes;>
+
+<!ENTITY % dt.RegionCodeList "CDATA">
+
+<!ELEMENT RegionsIncluded (#PCDATA)>
+<!ATTLIST RegionsIncluded
+	refname (RegionsIncluded) #FIXED "RegionsIncluded"
+	shortname (x450) #FIXED "x450"
+	%generalAttributes;>
+
+<!ELEMENT RegionsExcluded (#PCDATA)>
+<!ATTLIST RegionsExcluded
+	refname (RegionsExcluded) #FIXED "RegionsExcluded"
+	shortname (x452) #FIXED "x452"
+	%generalAttributes;>
+
+<!ELEMENT Reissue (ReissueDate, ReissueDescription?, Price*, SupportingResource*)>
+<!ATTLIST Reissue
+	refname (Reissue) #FIXED "Reissue"
+	shortname (reissue) #FIXED "reissue"
+	%generalAttributes;>
+
+<!ELEMENT ReissueDate (#PCDATA)>
+<!ATTLIST ReissueDate
+	refname (ReissueDate) #FIXED "ReissueDate"
+	shortname (j365) #FIXED "j365"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT ReissueDescription %Flow;>
+<!ATTLIST ReissueDescription
+	refname (ReissueDescription) #FIXED "ReissueDescription"
+	shortname (j366) #FIXED "j366"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT RelatedMaterial (%gp.related_materials;)>
+<!ATTLIST RelatedMaterial
+	refname (RelatedMaterial) #FIXED "RelatedMaterial"
+	shortname (relatedmaterial) #FIXED "relatedmaterial"
+	%generalAttributes;>
+
+<!ELEMENT RelatedProduct (ProductRelationCode+, ProductIdentifier+, (ProductForm, ProductFormDetail*)?)>
+<!ATTLIST RelatedProduct
+	refname (RelatedProduct) #FIXED "RelatedProduct"
+	shortname (relatedproduct) #FIXED "relatedproduct"
+	%generalAttributes;>
+
+<!ELEMENT RelatedWork (WorkRelationCode, WorkIdentifier+)>
+<!ATTLIST RelatedWork
+	refname (RelatedWork) #FIXED "RelatedWork"
+	shortname (relatedwork) #FIXED "relatedwork"
+	%generalAttributes;>
+
+<!ELEMENT ReligiousText (Bible | (ReligiousTextIdentifier, ReligiousTextFeature+))>
+<!ATTLIST ReligiousText
+	refname (ReligiousText) #FIXED "ReligiousText"
+	shortname (religioustext) #FIXED "religioustext"
+	%generalAttributes;>
+
+<!ELEMENT ReligiousTextFeature (ReligiousTextFeatureType, ReligiousTextFeatureCode, ReligiousTextFeatureDescription*)>
+<!ATTLIST ReligiousTextFeature
+	refname (ReligiousTextFeature) #FIXED "ReligiousTextFeature"
+	shortname (religioustextfeature) #FIXED "religioustextfeature"
+	%generalAttributes;>
+
+<!ELEMENT ReligiousTextFeatureCode (#PCDATA)>
+<!ATTLIST ReligiousTextFeatureCode
+	refname (ReligiousTextFeatureCode) #FIXED "ReligiousTextFeatureCode"
+	shortname (b359) #FIXED "b359"
+	%generalAttributes;>
+
+<!ELEMENT ReligiousTextFeatureDescription %Flow;>
+<!ATTLIST ReligiousTextFeatureDescription
+	refname (ReligiousTextFeatureDescription) #FIXED "ReligiousTextFeatureDescription"
+	shortname (b360) #FIXED "b360"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT ReligiousTextFeatureType (#PCDATA)>
+<!ATTLIST ReligiousTextFeatureType
+	refname (ReligiousTextFeatureType) #FIXED "ReligiousTextFeatureType"
+	shortname (b358) #FIXED "b358"
+	%generalAttributes;>
+
+<!ELEMENT ReligiousTextIdentifier (#PCDATA)>
+<!ATTLIST ReligiousTextIdentifier
+	refname (ReligiousTextIdentifier) #FIXED "ReligiousTextIdentifier"
+	shortname (b376) #FIXED "b376"
+	%generalAttributes;>
+
+<!ELEMENT ReprintDetail %Flow;>
+<!ATTLIST ReprintDetail
+	refname (ReprintDetail) #FIXED "ReprintDetail"
+	shortname (k309) #FIXED "k309"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT Reserved (#PCDATA)>
+<!ATTLIST Reserved
+	refname (Reserved) #FIXED "Reserved"
+	shortname (x536) #FIXED "x536"
+	%generalAttributes;>
+
+<!ELEMENT ResourceContentType (#PCDATA)>
+<!ATTLIST ResourceContentType
+	refname (ResourceContentType) #FIXED "ResourceContentType"
+	shortname (x436) #FIXED "x436"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFeature (ResourceFeatureType, FeatureValue?, FeatureNote*)>
+<!ATTLIST ResourceFeature
+	refname (ResourceFeature) #FIXED "ResourceFeature"
+	shortname (resourcefeature) #FIXED "resourcefeature"
+	%generalAttributes;>
+
+<!ELEMENT ResourceFeatureType (#PCDATA)>
+<!ATTLIST ResourceFeatureType
+	refname (ResourceFeatureType) #FIXED "ResourceFeatureType"
+	shortname (x438) #FIXED "x438"
+	%generalAttributes;>
+
+<!ELEMENT ResourceForm (#PCDATA)>
+<!ATTLIST ResourceForm
+	refname (ResourceForm) #FIXED "ResourceForm"
+	shortname (x441) #FIXED "x441"
+	%generalAttributes;>
+
+<!ELEMENT ResourceLink (#PCDATA)>
+<!ATTLIST ResourceLink
+	refname (ResourceLink) #FIXED "ResourceLink"
+	shortname (x435) #FIXED "x435"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ResourceMode (#PCDATA)>
+<!ATTLIST ResourceMode
+	refname (ResourceMode) #FIXED "ResourceMode"
+	shortname (x437) #FIXED "x437"
+	%generalAttributes;>
+
+<!ELEMENT ResourceVersion (ResourceForm, ResourceVersionFeature*, ResourceLink+, ContentDate*)>
+<!ATTLIST ResourceVersion
+	refname (ResourceVersion) #FIXED "ResourceVersion"
+	shortname (resourceversion) #FIXED "resourceversion"
+	%generalAttributes;>
+
+<!ELEMENT ResourceVersionFeature (ResourceVersionFeatureType, FeatureValue?, FeatureNote*)>
+<!ATTLIST ResourceVersionFeature
+	refname (ResourceVersionFeature) #FIXED "ResourceVersionFeature"
+	shortname (resourceversionfeature) #FIXED "resourceversionfeature"
+	%generalAttributes;>
+
+<!ELEMENT ResourceVersionFeatureType (#PCDATA)>
+<!ATTLIST ResourceVersionFeatureType
+	refname (ResourceVersionFeatureType) #FIXED "ResourceVersionFeatureType"
+	shortname (x442) #FIXED "x442"
+	%generalAttributes;>
+
+<!ELEMENT ROWSalesRightsType (#PCDATA)>
+<!ATTLIST ROWSalesRightsType
+	refname (ROWSalesRightsType) #FIXED "ROWSalesRightsType"
+	shortname (x456) #FIXED "x456"
+	%generalAttributes;>
+
+<!ELEMENT ReturnsCode (#PCDATA)>
+<!ATTLIST ReturnsCode
+	refname (ReturnsCode) #FIXED "ReturnsCode"
+	shortname (j269) #FIXED "j269"
+	%generalAttributes;>
+
+<!ELEMENT ReturnsCodeType (#PCDATA)>
+<!ATTLIST ReturnsCodeType
+	refname (ReturnsCodeType) #FIXED "ReturnsCodeType"
+	shortname (j268) #FIXED "j268"
+	%generalAttributes;>
+
+<!ELEMENT ReturnsCodeTypeName (#PCDATA)>
+<!ATTLIST ReturnsCodeTypeName
+	refname (ReturnsCodeTypeName) #FIXED "ReturnsCodeTypeName"
+	shortname (x460) #FIXED "x460"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ReturnsConditions (ReturnsCodeType, ReturnsCodeTypeName?, ReturnsCode, ReturnsNote*)>
+<!ATTLIST ReturnsConditions
+	refname (ReturnsConditions) #FIXED "ReturnsConditions"
+	shortname (returnsconditions) #FIXED "returnsconditions"
+	%generalAttributes;>
+
+<!ELEMENT ReturnsNote (#PCDATA)>
+<!ATTLIST ReturnsNote
+	refname (ReturnsNote) #FIXED "ReturnsNote"
+	shortname (x528) #FIXED "x528"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SalesRights (SalesRightsType, Territory, SalesRestriction*, ProductIdentifier*, PublisherName?)>
+<!ATTLIST SalesRights
+	refname (SalesRights) #FIXED "SalesRights"
+	shortname (salesrights) #FIXED "salesrights"
+	%generalAttributes;>
+
+<!ELEMENT SalesRightsType (#PCDATA)>
+<!ATTLIST SalesRightsType
+	refname (SalesRightsType) #FIXED "SalesRightsType"
+	shortname (b089) #FIXED "b089"
+	%generalAttributes;>
+
+<!ELEMENT SalesOutlet ((SalesOutletIdentifier+, SalesOutletName?) | SalesOutletName)>
+<!ATTLIST SalesOutlet
+	refname (SalesOutlet) #FIXED "SalesOutlet"
+	shortname (salesoutlet) #FIXED "salesoutlet"
+	%generalAttributes;>
+
+<!ELEMENT SalesOutletIdentifier (SalesOutletIDType, IDTypeName?, IDValue)>
+<!ATTLIST SalesOutletIdentifier
+	refname (SalesOutletIdentifier) #FIXED "SalesOutletIdentifier"
+	shortname (salesoutletidentifier) #FIXED "salesoutletidentifier"
+	%generalAttributes;>
+
+<!ELEMENT SalesOutletIDType (#PCDATA)>
+<!ATTLIST SalesOutletIDType
+	refname (SalesOutletIDType) #FIXED "SalesOutletIDType"
+	shortname (b393) #FIXED "b393"
+	%generalAttributes;>
+
+<!ELEMENT SalesOutletName (#PCDATA)>
+<!ATTLIST SalesOutletName
+	refname (SalesOutletName) #FIXED "SalesOutletName"
+	shortname (b382) #FIXED "b382"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SalesRestriction (SalesRestrictionType, SalesOutlet*, SalesRestrictionNote*, StartDate?, EndDate?)>
+<!ATTLIST SalesRestriction
+	refname (SalesRestriction) #FIXED "SalesRestriction"
+	shortname (salesrestriction) #FIXED "salesrestriction"
+	%generalAttributes;>
+
+<!ELEMENT SalesRestrictionNote %Flow;>
+<!ATTLIST SalesRestrictionNote
+	refname (SalesRestrictionNote) #FIXED "SalesRestrictionNote"
+	shortname (x453) #FIXED "x453"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT SalesRestrictionType (#PCDATA)>
+<!ATTLIST SalesRestrictionType
+	refname (SalesRestrictionType) #FIXED "SalesRestrictionType"
+	shortname (b381) #FIXED "b381"
+	%generalAttributes;>
+
+<!ELEMENT ScriptCode (#PCDATA)>
+<!ATTLIST ScriptCode
+	refname (ScriptCode) #FIXED "ScriptCode"
+	shortname (x420) #FIXED "x420"
+	%generalAttributes;>
+
+<!ELEMENT Sender (((SenderIdentifier+, SenderName?) | SenderName), ContactName?, TelephoneNumber?, EmailAddress?)>
+<!ATTLIST Sender
+	refname (Sender) #FIXED "Sender"
+	shortname (sender) #FIXED "sender"
+	%generalAttributes;>
+
+<!ELEMENT SenderIDType (#PCDATA)>
+<!ATTLIST SenderIDType
+	refname (SenderIDType) #FIXED "SenderIDType"
+	shortname (m379) #FIXED "m379"
+	%generalAttributes;>
+
+<!ELEMENT SenderIdentifier (SenderIDType, IDTypeName?, IDValue)>
+<!ATTLIST SenderIdentifier
+	refname (SenderIdentifier) #FIXED "SenderIdentifier"
+	shortname (senderidentifier) #FIXED "senderidentifier"
+	%generalAttributes;>
+
+<!ELEMENT SenderName (#PCDATA)>
+<!ATTLIST SenderName
+	refname (SenderName) #FIXED "SenderName"
+	shortname (x298) #FIXED "x298"
+	%generalAttributes;>
+
+<!ELEMENT SentDateTime (#PCDATA)>
+<!ATTLIST SentDateTime
+	refname (SentDateTime) #FIXED "SentDateTime"
+	shortname (x307) #FIXED "x307"
+	%generalAttributes;>
+
+<!ELEMENT SequenceNumber (#PCDATA)>
+<!ATTLIST SequenceNumber
+	refname (SequenceNumber) #FIXED "SequenceNumber"
+	shortname (b034) #FIXED "b034"
+	%generalAttributes;>
+
+<!ELEMENT SourceName (#PCDATA)>
+<!ATTLIST SourceName
+	refname (SourceName) #FIXED "SourceName"
+	shortname (x330) #FIXED "x330"
+	%generalAttributes;>
+
+<!ELEMENT SourceTitle (#PCDATA)>
+<!ATTLIST SourceTitle
+	refname (SourceTitle) #FIXED "SourceTitle"
+	shortname (x428) #FIXED "x428"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SourceType (#PCDATA)>
+<!ATTLIST SourceType
+	refname (SourceType) #FIXED "SourceType"
+	shortname (x431) #FIXED "x431"
+	%generalAttributes;>
+
+<!ELEMENT StartDate (#PCDATA)>
+<!ATTLIST StartDate
+	refname (StartDate) #FIXED "StartDate"
+	shortname (b324) #FIXED "b324"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT StartTime (#PCDATA)>
+<!ATTLIST StartTime
+	refname (StartTime) #FIXED "StartTime"
+	shortname (x542) #FIXED "x542"
+	%generalAttributes;>
+
+<!ELEMENT Stock (LocationIdentifier*, LocationName*, (StockQuantityCoded+ | (OnHand, Proximity?, (Reserved, Proximity?)?, (OnOrder, Proximity?)?, (CBO, Proximity?)?)), OnOrderDetail*, Velocity*)>
+<!ATTLIST Stock
+	refname (Stock) #FIXED "Stock"
+	shortname (stock) #FIXED "stock"
+	%generalAttributes;>
+
+<!ELEMENT StockQuantityCode (#PCDATA)>
+<!ATTLIST StockQuantityCode
+	refname (StockQuantityCode) #FIXED "StockQuantityCode"
+	shortname (j297) #FIXED "j297"
+	%generalAttributes;>
+
+<!ELEMENT StockQuantityCodeType (#PCDATA)>
+<!ATTLIST StockQuantityCodeType
+	refname (StockQuantityCodeType) #FIXED "StockQuantityCodeType"
+	shortname (j293) #FIXED "j293"
+	%generalAttributes;>
+
+<!ELEMENT StockQuantityCodeTypeName (#PCDATA)>
+<!ATTLIST StockQuantityCodeTypeName
+	refname (StockQuantityCodeTypeName) #FIXED "StockQuantityCodeTypeName"
+	shortname (j296) #FIXED "j296"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT StockQuantityCoded (StockQuantityCodeType, StockQuantityCodeTypeName?, StockQuantityCode)>
+<!ATTLIST StockQuantityCoded
+	refname (StockQuantityCoded) #FIXED "StockQuantityCoded"
+	shortname (stockquantitycoded) #FIXED "stockquantitycoded"
+	%generalAttributes;>
+
+<!ELEMENT StudyBibleType (#PCDATA)>
+<!ATTLIST StudyBibleType
+	refname (StudyBibleType) #FIXED "StudyBibleType"
+	shortname (b389) #FIXED "b389"
+	%generalAttributes;>
+
+<!ELEMENT Subject (MainSubject?, SubjectSchemeIdentifier, SubjectSchemeName?, SubjectSchemeVersion?, ((SubjectCode, SubjectHeadingText*) | SubjectHeadingText+))>
+<!ATTLIST Subject
+	refname (Subject) #FIXED "Subject"
+	shortname (subject) #FIXED "subject"
+	%generalAttributes;>
+
+<!ELEMENT SubjectCode (#PCDATA)>
+<!ATTLIST SubjectCode
+	refname (SubjectCode) #FIXED "SubjectCode"
+	shortname (b069) #FIXED "b069"
+	%generalAttributes;>
+
+<!ELEMENT SubjectDate (SubjectDateRole, DateFormat?, Date)>
+<!ATTLIST SubjectDate
+	refname (SubjectDate) #FIXED "SubjectDate"
+	shortname (subjectdate) #FIXED "subjectdate"
+	%generalAttributes;>
+
+<!ELEMENT SubjectDateRole (#PCDATA)>
+<!ATTLIST SubjectDateRole
+	refname (SubjectDateRole) #FIXED "SubjectDateRole"
+	shortname (x534) #FIXED "x534"
+	%generalAttributes;>
+
+<!ELEMENT SubjectHeadingText (#PCDATA)>
+<!ATTLIST SubjectHeadingText
+	refname (SubjectHeadingText) #FIXED "SubjectHeadingText"
+	shortname (b070) #FIXED "b070"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SubjectSchemeIdentifier (#PCDATA)>
+<!ATTLIST SubjectSchemeIdentifier
+	refname (SubjectSchemeIdentifier) #FIXED "SubjectSchemeIdentifier"
+	shortname (b067) #FIXED "b067"
+	%generalAttributes;>
+
+<!ELEMENT SubjectSchemeName (#PCDATA)>
+<!ATTLIST SubjectSchemeName
+	refname (SubjectSchemeName) #FIXED "SubjectSchemeName"
+	shortname (b171) #FIXED "b171"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SubjectSchemeVersion (#PCDATA)>
+<!ATTLIST SubjectSchemeVersion
+	refname (SubjectSchemeVersion) #FIXED "SubjectSchemeVersion"
+	shortname (b068) #FIXED "b068"
+	%generalAttributes;>
+
+<!ENTITY % textcaseAttribute "textcase (%TextCaseCode;) #IMPLIED">
+
+<!ELEMENT Subtitle (#PCDATA)>
+<!ATTLIST Subtitle
+	refname (Subtitle) #FIXED "Subtitle"
+	shortname (b029) #FIXED "b029"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;
+	%textcaseAttribute;>
+
+<!ELEMENT SuffixToKey (#PCDATA)>
+<!ATTLIST SuffixToKey
+	refname (SuffixToKey) #FIXED "SuffixToKey"
+	shortname (b248) #FIXED "b248"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT Supplier (SupplierRole, ((SupplierIdentifier+, SupplierName?) | SupplierName), TelephoneNumber*, FaxNumber*, EmailAddress*, Website*)>
+<!ATTLIST Supplier
+	refname (Supplier) #FIXED "Supplier"
+	shortname (supplier) #FIXED "supplier"
+	%generalAttributes;>
+
+<!ELEMENT SupplierCodeType (#PCDATA)>
+<!ATTLIST SupplierCodeType
+	refname (SupplierCodeType) #FIXED "SupplierCodeType"
+	shortname (x458) #FIXED "x458"
+	%generalAttributes;>
+
+<!ELEMENT SupplierCodeTypeName (#PCDATA)>
+<!ATTLIST SupplierCodeTypeName
+	refname (SupplierCodeTypeName) #FIXED "SupplierCodeTypeName"
+	shortname (x513) #FIXED "x513"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT SupplierCodeValue (#PCDATA)>
+<!ATTLIST SupplierCodeValue
+	refname (SupplierCodeValue) #FIXED "SupplierCodeValue"
+	shortname (x459) #FIXED "x459"
+	%generalAttributes;>
+
+<!ELEMENT SupplierIdentifier (SupplierIDType, IDTypeName?, IDValue)>
+<!ATTLIST SupplierIdentifier
+	refname (SupplierIdentifier) #FIXED "SupplierIdentifier"
+	shortname (supplieridentifier) #FIXED "supplieridentifier"
+	%generalAttributes;>
+
+<!ELEMENT SupplierIDType (#PCDATA)>
+<!ATTLIST SupplierIDType
+	refname (SupplierIDType) #FIXED "SupplierIDType"
+	shortname (j345) #FIXED "j345"
+	%generalAttributes;>
+
+<!ELEMENT SupplierName (#PCDATA)>
+<!ATTLIST SupplierName
+	refname (SupplierName) #FIXED "SupplierName"
+	shortname (j137) #FIXED "j137"
+	%generalAttributes;
+	%languageAttribute;
+	%collationkeyAttribute;>
+
+<!ELEMENT SupplierOwnCoding (SupplierCodeType, SupplierCodeTypeName?, SupplierCodeValue)>
+<!ATTLIST SupplierOwnCoding
+	refname (SupplierOwnCoding) #FIXED "SupplierOwnCoding"
+	shortname (supplierowncoding) #FIXED "supplierowncoding"
+	%generalAttributes;>
+
+<!ELEMENT SupplierRole (#PCDATA)>
+<!ATTLIST SupplierRole
+	refname (SupplierRole) #FIXED "SupplierRole"
+	shortname (j292) #FIXED "j292"
+	%generalAttributes;>
+
+<!ELEMENT SupplyContact (SupplyContactRole, ((SupplyContactIdentifier+, SupplyContactName?) | SupplyContactName), ContactName?, TelephoneNumber*, EmailAddress?)>
+<!ATTLIST SupplyContact
+	refname (SupplyContact) #FIXED "SupplyContact"
+	shortname (supplycontact) #FIXED "supplycontact"
+	%generalAttributes;>
+
+<!ELEMENT SupplyContactIdentifier (SupplyContactIDType, IDTypeName?, IDValue)>
+<!ATTLIST SupplyContactIdentifier
+	refname (SupplyContactIdentifier) #FIXED "SupplyContactIdentifier"
+	shortname (supplycontactidentifier) #FIXED "supplycontactidentifier"
+	%generalAttributes;>
+
+<!ELEMENT SupplyContactIDType (#PCDATA)>
+<!ATTLIST SupplyContactIDType
+	refname (SupplyContactIDType) #FIXED "SupplyContactIDType"
+	shortname (x538) #FIXED "x538"
+	%generalAttributes;>
+
+<!ELEMENT SupplyContactName (#PCDATA)>
+<!ATTLIST SupplyContactName
+	refname (SupplyContactName) #FIXED "SupplyContactName"
+	shortname (x539) #FIXED "x539"
+	%generalAttributes;>
+
+<!ELEMENT SupplyContactRole (#PCDATA)>
+<!ATTLIST SupplyContactRole
+	refname (SupplyContactRole) #FIXED "SupplyContactRole"
+	shortname (x537) #FIXED "x537"
+	%generalAttributes;>
+
+<!ELEMENT SupplyDate (SupplyDateRole, DateFormat?, Date)>
+<!ATTLIST SupplyDate
+	refname (SupplyDate) #FIXED "SupplyDate"
+	shortname (supplydate) #FIXED "supplydate"
+	%generalAttributes;>
+
+<!ELEMENT SupplyDateRole (#PCDATA)>
+<!ATTLIST SupplyDateRole
+	refname (SupplyDateRole) #FIXED "SupplyDateRole"
+	shortname (x461) #FIXED "x461"
+	%generalAttributes;>
+
+<!ELEMENT SupplyDetail (Supplier, SupplyContact*, SupplierOwnCoding*, ReturnsConditions*, ProductAvailability, SupplyDate*, OrderTime?, NewSupplier?, Stock*, PackQuantity?, PalletQuantity?, (OrderQuantityMinimum, OrderQuantityMinimum?, OrderQuantityMultiple?)?, (UnpricedItemType | Price+), Reissue?)>
+<!ATTLIST SupplyDetail
+	refname (SupplyDetail) #FIXED "SupplyDetail"
+	shortname (supplydetail) #FIXED "supplydetail"
+	%generalAttributes;>
+
+<!ELEMENT SupportingResource (ResourceContentType, ContentAudience+, Territory?, ResourceMode, ResourceFeature*, ResourceVersion+)>
+<!ATTLIST SupportingResource
+	refname (SupportingResource) #FIXED "SupportingResource"
+	shortname (supportingresource) #FIXED "supportingresource"
+	%generalAttributes;>
+
+<!ELEMENT Tax (ProductIdentifier*, PricePartDescription*, TaxType?, TaxRateCode?, ((TaxRatePercent, TaxableAmount?, TaxAmount?) | (TaxableAmount?, TaxAmount)))>
+<!ATTLIST Tax
+	refname (Tax) #FIXED "Tax"
+	shortname (tax) #FIXED "tax"
+	%generalAttributes;>
+
+<!ELEMENT TaxableAmount (#PCDATA)>
+<!ATTLIST TaxableAmount
+	refname (TaxableAmount) #FIXED "TaxableAmount"
+	shortname (x473) #FIXED "x473"
+	%generalAttributes;>
+
+<!ELEMENT TaxAmount (#PCDATA)>
+<!ATTLIST TaxAmount
+	refname (TaxAmount) #FIXED "TaxAmount"
+	shortname (x474) #FIXED "x474"
+	%generalAttributes;>
+
+<!ELEMENT TaxExempt EMPTY>
+<!ATTLIST TaxExempt
+	refname (TaxExempt) #FIXED "TaxExempt"
+	shortname (x546) #FIXED "x546"
+	%generalAttributes;>
+
+<!ELEMENT TaxRateCode (#PCDATA)>
+<!ATTLIST TaxRateCode
+	refname (TaxRateCode) #FIXED "TaxRateCode"
+	shortname (x471) #FIXED "x471"
+	%generalAttributes;>
+
+<!ELEMENT TaxRatePercent (#PCDATA)>
+<!ATTLIST TaxRatePercent
+	refname (TaxRatePercent) #FIXED "TaxRatePercent"
+	shortname (x472) #FIXED "x472"
+	%generalAttributes;>
+
+<!ELEMENT TaxType (#PCDATA)>
+<!ATTLIST TaxType
+	refname (TaxType) #FIXED "TaxType"
+	shortname (x470) #FIXED "x470"
+	%generalAttributes;>
+
+<!ELEMENT TelephoneNumber (#PCDATA)>
+<!ATTLIST TelephoneNumber
+	refname (TelephoneNumber) #FIXED "TelephoneNumber"
+	shortname (j270) #FIXED "j270"
+	%generalAttributes;>
+
+<!ELEMENT Territory ((CountriesIncluded, RegionsIncluded?, RegionsExcluded?) | (RegionsIncluded, CountriesExcluded?, RegionsExcluded?))>
+<!ATTLIST Territory
+	refname (Territory) #FIXED "Territory"
+	shortname (territory) #FIXED "territory"
+	%generalAttributes;>
+
+<!ELEMENT Text %Flow;>
+<!ATTLIST Text
+	refname (Text) #FIXED "Text"
+	shortname (d104) #FIXED "d104"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT TextAuthor (#PCDATA)>
+<!ATTLIST TextAuthor
+	refname (TextAuthor) #FIXED "TextAuthor"
+	shortname (d107) #FIXED "d107"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT TextContent (TextType, ContentAudience+, Territory?, Text+, ReviewRating?, TextAuthor*, TextSourceCorporate?, TextSourceDescription*, SourceTitle*, ContentDate*)>
+<!ATTLIST TextContent
+	refname (TextContent) #FIXED "TextContent"
+	shortname (textcontent) #FIXED "textcontent"
+	%generalAttributes;>
+
+<!ELEMENT TextItem (TextItemType, TextItemIdentifier*, PageRun*, NumberOfPages?)>
+<!ATTLIST TextItem
+	refname (TextItem) #FIXED "TextItem"
+	shortname (textitem) #FIXED "textitem"
+	%generalAttributes;>
+
+<!ELEMENT TextItemIDType (#PCDATA)>
+<!ATTLIST TextItemIDType
+	refname (TextItemIDType) #FIXED "TextItemIDType"
+	shortname (b285) #FIXED "b285"
+	%generalAttributes;>
+
+<!ELEMENT TextItemIdentifier (TextItemIDType, IDTypeName?, IDValue)>
+<!ATTLIST TextItemIdentifier
+	refname (TextItemIdentifier) #FIXED "TextItemIdentifier"
+	shortname (textitemidentifier) #FIXED "textitemidentifier"
+	%generalAttributes;>
+
+<!ELEMENT TextItemType (#PCDATA)>
+<!ATTLIST TextItemType
+	refname (TextItemType) #FIXED "TextItemType"
+	shortname (b290) #FIXED "b290"
+	%generalAttributes;>
+
+<!ELEMENT TextSourceCorporate (#PCDATA)>
+<!ATTLIST TextSourceCorporate
+	refname (TextSourceCorporate) #FIXED "TextSourceCorporate"
+	shortname (b374) #FIXED "b374"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT TextType (#PCDATA)>
+<!ATTLIST TextType
+	refname (TextType) #FIXED "TextType"
+	shortname (x426) #FIXED "x426"
+	%generalAttributes;>
+
+<!ELEMENT ThesisPresentedTo (#PCDATA)>
+<!ATTLIST ThesisPresentedTo
+	refname (ThesisPresentedTo) #FIXED "ThesisPresentedTo"
+	shortname (b369) #FIXED "b369"
+	%generalAttributes;
+	%languageAttribute;>
+
+<!ELEMENT ThesisType (#PCDATA)>
+<!ATTLIST ThesisType
+	refname (ThesisType) #FIXED "ThesisType"
+	shortname (b368) #FIXED "b368"
+	%generalAttributes;>
+
+<!ELEMENT ThesisYear (#PCDATA)>
+<!ATTLIST ThesisYear
+	refname (ThesisYear) #FIXED "ThesisYear"
+	shortname (b370) #FIXED "b370"
+	%generalAttributes;
+	%dateformatAttribute;>
+
+<!ELEMENT TimeRun (StartTime, EndTime?)>
+<!ATTLIST TimeRun
+	refname (TimeRun) #FIXED "TimeRun"
+	shortname (timerun) #FIXED "timerun"
+	%generalAttributes;>
+
+<!ELEMENT TitleDetail (TitleType, TitleElement+, TitleStatement?)>
+<!ATTLIST TitleDetail
+	refname (TitleDetail) #FIXED "TitleDetail"
+	shortname (titledetail) #FIXED "titledetail"
+	%generalAttributes;>
+
+<!ELEMENT TitleElement  (SequenceNumber?, TitleElementLevel, ((PartNumber, YearOfAnnual?, (TitleText | ((TitlePrefix | NoPrefix), TitleWithoutPrefix))?) | (YearOfAnnual, (TitleText | ((TitlePrefix | NoPrefix), TitleWithoutPrefix))?) | ((TitlePrefix | NoPrefix), TitleWithoutPrefix) | TitleText), Subtitle?)>
+<!ATTLIST TitleElement
+	refname (TitleElement) #FIXED "TitleElement"
+	shortname (titleelement) #FIXED "titleelement"
+	%generalAttributes;>
+
+<!ELEMENT TitleElementLevel (#PCDATA)>
+<!ATTLIST TitleElementLevel
+	refname (TitleElementLevel) #FIXED "TitleElementLevel"
+	shortname (x409) #FIXED "x409"
+	%generalAttributes;>
+
+<!ELEMENT TitlePrefix (#PCDATA)>
+<!ATTLIST TitlePrefix
+	refname (TitlePrefix) #FIXED "TitlePrefix"
+	shortname (b030) #FIXED "b030"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;
+	%textcaseAttribute;>
+
+<!ELEMENT TitlesAfterNames (#PCDATA)>
+<!ATTLIST TitlesAfterNames
+	refname (TitlesAfterNames) #FIXED "TitlesAfterNames"
+	shortname (b043) #FIXED "b043"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT TitlesBeforeNames (#PCDATA)>
+<!ATTLIST TitlesBeforeNames
+	refname (TitlesBeforeNames) #FIXED "TitlesBeforeNames"
+	shortname (b038) #FIXED "b038"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;>
+
+<!ELEMENT TitleStatement %Flow;>
+<!ATTLIST TitleStatement
+	refname (TitleStatement) #FIXED "TitleStatement"
+	shortname (x478) #FIXED "x478"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT TitleText (#PCDATA)>
+<!ATTLIST TitleText
+	refname (TitleText) #FIXED "TitleText"
+	shortname (b203) #FIXED "b203"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;
+	%textcaseAttribute;>
+
+<!ELEMENT TitleType (#PCDATA)>
+<!ATTLIST TitleType
+	refname (TitleType) #FIXED "TitleType"
+	shortname (b202) #FIXED "b202"
+	%generalAttributes;>
+
+<!ELEMENT TitleWithoutPrefix (#PCDATA)>
+<!ATTLIST TitleWithoutPrefix
+	refname (TitleWithoutPrefix) #FIXED "TitleWithoutPrefix"
+	shortname (b031) #FIXED "b031"
+	%generalAttributes;
+	%collationkeyAttribute;
+	%languageAttribute;
+	%textscriptAttribute;
+	%textcaseAttribute;>
+
+<!ELEMENT ToLanguage (#PCDATA)>
+<!ATTLIST ToLanguage
+	refname (ToLanguage) #FIXED "ToLanguage"
+	shortname (x413) #FIXED "x413"
+	%generalAttributes;>
+
+<!ELEMENT ToQuantity (#PCDATA)>
+<!ATTLIST ToQuantity
+	refname (ToQuantity) #FIXED "ToQuantity"
+	shortname (x514) #FIXED "x514"
+	%generalAttributes;>
+
+<!ELEMENT TradeCategory (#PCDATA)>
+<!ATTLIST TradeCategory
+	refname (TradeCategory) #FIXED "TradeCategory"
+	shortname (b384) #FIXED "b384"
+	%generalAttributes;>
+
+<!ELEMENT UnnamedPersons (#PCDATA)>
+<!ATTLIST UnnamedPersons
+	refname (UnnamedPersons) #FIXED "UnnamedPersons"
+	shortname (b249) #FIXED "b249"
+	%generalAttributes;>
+
+<!ELEMENT UnpricedItemType (#PCDATA)>
+<!ATTLIST UnpricedItemType
+	refname (UnpricedItemType) #FIXED "UnpricedItemType"
+	shortname (j192) #FIXED "j192"
+	%generalAttributes;>
+
+<!ELEMENT Velocity (VelocityMetric, Rate, Proximity?)>
+<!ATTLIST Velocity
+	refname (Velocity) #FIXED "Velocity"
+	shortname (velocity) #FIXED "velocity"
+	%generalAttributes;>
+
+<!ELEMENT VelocityMetric (#PCDATA)>
+<!ATTLIST VelocityMetric
+	refname (VelocityMetric) #FIXED "VelocityMetric"
+	shortname (x504) #FIXED "x504"
+	%generalAttributes;>
+
+<!ELEMENT Website (WebsiteRole?, WebsiteDescription*, WebsiteLink+)>
+<!ATTLIST Website
+	refname (Website) #FIXED "Website"
+	shortname (website) #FIXED "website"
+	%generalAttributes;>
+
+<!ELEMENT WebsiteDescription %Flow;>
+<!ATTLIST WebsiteDescription
+	refname (WebsiteDescription) #FIXED "WebsiteDescription"
+	shortname (b294) #FIXED "b294"
+	%generalAttributes;
+	%languageAttribute;
+	%textformatAttribute;>
+
+<!ELEMENT WebsiteLink (#PCDATA)>
+<!ATTLIST WebsiteLink
+	refname (WebsiteLink) #FIXED "WebsiteLink"
+	shortname (b295) #FIXED "b295"
+	%languageAttribute;
+	%generalAttributes;>
+
+<!ELEMENT WebsiteRole (#PCDATA)>
+<!ATTLIST WebsiteRole
+	refname (WebsiteRole) #FIXED "WebsiteRole"
+	shortname (b367) #FIXED "b367"
+	%generalAttributes;>
+
+<!ELEMENT WorkIdentifier (WorkIDType, IDTypeName?, IDValue)>
+<!ATTLIST WorkIdentifier
+	refname (WorkIdentifier) #FIXED "WorkIdentifier"
+	shortname (workidentifier) #FIXED "workidentifier"
+	%generalAttributes;>
+
+<!ELEMENT WorkIDType (#PCDATA)>
+<!ATTLIST WorkIDType
+	refname (WorkIDType) #FIXED "WorkIDType"
+	shortname (b201) #FIXED "b201"
+	%generalAttributes;>
+
+<!ELEMENT WorkRelationCode (#PCDATA)>
+<!ATTLIST WorkRelationCode
+	refname (WorkRelationCode) #FIXED "WorkRelationCode"
+	shortname (x454) #FIXED "x454"
+	%generalAttributes;>
+
+<!ELEMENT YearOfAnnual (#PCDATA)>
+<!ATTLIST YearOfAnnual
+	refname (YearOfAnnual) #FIXED "YearOfAnnual"
+	shortname (b020) #FIXED "b020"
+	%generalAttributes;>
+
+<!ENTITY % dt.Decimal "CDATA">
+
+<!ENTITY % dt.PositiveDecimal "CDATA">
+
+<!ENTITY % dt.StrictPositiveDecimal "CDATA">
+
+<!ENTITY % dt.PercentDecimal "CDATA">
+
+<!ENTITY % dt.Integer "CDATA">
+
+<!ENTITY % dt.PositiveInteger "CDATA">
+
+<!ENTITY % dt.StrictPositiveInteger "CDATA">
+
+<!ENTITY % dt.NonEmptyString "CDATA">
+
+<!ENTITY % dt.TimeOrDuration "CDATA">
+
+<!ENTITY % dt.EmailString "CDATA">
+
+<!ENTITY % dt.RomanNumeralString "CDATA">
+
+<!ENTITY % dt.NonEmptyURI "CDATA">
+
+<!ENTITY % dt.Year "CDATA">
+
+<!ENTITY % dt.YearOrYearRange "CDATA">
+
+<!ENTITY % dt.MultiLevelNumber "CDATA">
+
+<!ENTITY % dt.MultiLevelNumberOrHyphen "CDATA">
