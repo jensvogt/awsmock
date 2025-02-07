@@ -56,6 +56,7 @@ namespace AwsMock::Dto::Common {
         REDRIVE_MESSAGES,
         DELETE_ATTRIBUTE,
         UPDATE_DLQ,
+        RESEND_MESSAGE,
         UNKNOWN
     };
 
@@ -90,6 +91,7 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::UPDATE_MESSAGE, "update-message"},
             {SqsCommandType::UPDATE_DLQ, "update-dlq"},
             {SqsCommandType::REDRIVE_MESSAGES, "redrive-messages"},
+            {SqsCommandType::RESEND_MESSAGE, "resend-message"},
             {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
     };

@@ -32,16 +32,10 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "eventSourceARN", eventSourceArn);
 
             if (!messagesAttributes.empty()) {
-                array jsonMessageAttributeArray;
+                document jsonMessageAttributeObject;
                 for (const auto &[fst, snd]: messagesAttributes) {
-                    document jsonAttribute;
-                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
-                    jsonMessageAttributeArray.append(jsonAttribute);
+                    jsonMessageAttributeObject.append(kvp(fst, snd.ToDocument()));
                 }
-                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
-            } else {
-                document jsonAttributes;
-                rootDocument.append(kvp("messageAttributes", jsonAttributes));
             }
 
             if (!attributes.empty()) {

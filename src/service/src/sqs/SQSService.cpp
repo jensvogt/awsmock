@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/sqs/SQSService.h>
+#include <queue>
 
 namespace AwsMock::Service {
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
@@ -767,8 +768,7 @@ namespace AwsMock::Service {
 
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -811,15 +811,8 @@ namespace AwsMock::Service {
             log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
 
             // Find Lambdas with this as event source
-            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
-            const std::string queueArn = Core::AwsUtils::CreateSQSQueueArn(request.region, accountId, queue.name);
-            if (std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
-                log_info << "Found lambda notification events, count: " << lambdas.size();
-                for (const auto &lambda: lambdas) {
-                    SendLambdaInvocationRequest(lambda, message, queueArn);
-                }
-            }
-            log_info << "Send message, queueArn: " << queue.queueArn;
+            CheckLambdaNotifications(queue.queueArn, message);
+            log_info << "Send message, queueArn: " << queue.queueArn << " messageId: " << request.messageId;
 
             return Dto::SQS::Mapper::map(request, message);
         } catch (Core::DatabaseException &ex) {
@@ -1011,7 +1004,7 @@ namespace AwsMock::Service {
 
     void SQSService::UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "update_message");
-        log_trace << "Update message request, url: " << request.messageId;
+        log_trace << "Update message request, messageId: " << request.messageId;
 
         if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
             log_error << "Message does not exist, messageId: " << request.messageId;
@@ -1025,6 +1018,39 @@ namespace AwsMock::Service {
             // Delete from database
             message = _sqsDatabase.UpdateMessage(message);
             log_debug << "Message updated, messageId: " << request.messageId;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "resend_message");
+        log_trace << "Resend message request, queueArn: " << request.queueArn;
+
+        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+
+        try {
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
+
+            message.status = Database::Entity::SQS::MessageStatus::INITIAL;
+            message.retries = 0;
+            message.reset = system_clock::now() + std::chrono::seconds(std::stoi(message.attributes.at("VisibilityTimeout")));
+
+            // Update database
+            message = _sqsDatabase.UpdateMessage(message);
+            log_debug << "Message resend, messageId: " << request.messageId;
+
+            // Check lambda notification
+            CheckLambdaNotifications(request.queueArn, message);
+
+            // Adjust message counters
+            _sqsDatabase.AdjustMessageCounters(request.queueArn);
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1115,6 +1141,15 @@ namespace AwsMock::Service {
                                     [&value](const std::string &attribute) {
                                         return Core::StringUtils::EqualsIgnoreCase(attribute, value);
                                     }) != attributes.end();
+    }
+
+    void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
+        if (std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
+            log_info << "Found lambda notification events, count: " << lambdas.size();
+            for (const auto &lambda: lambdas) {
+                SendLambdaInvocationRequest(lambda, message, queueArn);
+            }
+        }
     }
 
     void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {

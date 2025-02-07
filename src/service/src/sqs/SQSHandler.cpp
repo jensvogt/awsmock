@@ -333,8 +333,7 @@ namespace AwsMock::Service {
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
                     log_info << "Send message, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE_BATCH: {
@@ -454,11 +453,23 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
+
                     Dto::SQS::UpdateMessageRequest sqsRequest;
                     sqsRequest.FromJson(clientCommand.payload);
 
                     _sqsService.UpdateMessage(sqsRequest);
                     log_info << "Update message, messageId: " << sqsRequest.messageId;
+
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::SqsCommandType::RESEND_MESSAGE: {
+
+                    Dto::SQS::ResendMessageRequest sqsRequest;
+                    sqsRequest.FromJson(clientCommand.payload);
+
+                    _sqsService.ResendMessage(sqsRequest);
+                    log_info << "Resend message, messageId: " << sqsRequest.messageId;
 
                     return SendOkResponse(request);
                 }
@@ -469,16 +480,9 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
-                        std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "ReceiptHandle");
-                        sqsRequest = {
-                                .region = clientCommand.region,
-                                .queueUrl = queueUrl,
-                                .receiptHandle = receiptHandle};
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
+                        std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "ReceiptHandle");
+                        sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl, .receiptHandle = receiptHandle};
                     }
 
                     _sqsService.DeleteMessage(sqsRequest);
@@ -493,24 +497,15 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
+                        sqsRequest.queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
 
                         // Get message count
-                        int count = Core::HttpUtils::CountQueryParametersByPrefix(
-                                            clientCommand.payload,
-                                            "DeleteMessageBatchRequestEntry") /
-                                    2;
+                        int count = Core::HttpUtils::CountQueryParametersByPrefix(clientCommand.payload, "DeleteMessageBatchRequestEntry") / 2;
                         log_trace << "Got entry count, count: " << count;
 
                         for (int i = 1; i <= count; i++) {
-                            std::string id = Core::HttpUtils::GetQueryParameterValueByName(
-                                    clientCommand.payload,
-                                    "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".Id");
-                            std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(
-                                    clientCommand.payload,
-                                    "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".ReceiptHandle");
+                            std::string id = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".Id");
+                            std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "DeleteMessageBatchRequestEntry." + std::to_string(i) + ".ReceiptHandle");
                             Dto::SQS::DeleteMessageBatchEntry entry = {.id = id, .receiptHandle = receiptHandle};
                             sqsRequest.deleteMessageBatchEntries.emplace_back(entry);
                         }
@@ -518,8 +513,7 @@ namespace AwsMock::Service {
                     Dto::SQS::DeleteMessageBatchResponse sqsResponse = _sqsService.DeleteMessageBatch(sqsRequest);
                     log_info << "Delete message batch, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_ATTRIBUTE: {

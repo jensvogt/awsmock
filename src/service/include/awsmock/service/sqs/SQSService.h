@@ -61,6 +61,7 @@
 #include <awsmock/dto/sqs/intern/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/intern/ListQueueTagCountersRequest.h>
 #include <awsmock/dto/sqs/intern/ListQueueTagCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ResendMessageRequest.h>
 #include <awsmock/dto/sqs/intern/UpdateDqlRequest.h>
 #include <awsmock/dto/sqs/intern/UpdateMessageRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
@@ -90,7 +91,7 @@ namespace AwsMock::Service {
        * @brief Constructor
        */
         explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()),
-                                _lambdaDatabase(Database::LambdaDatabase::instance()){};
+                                _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
        * @brief Creates a new queue.
@@ -113,31 +114,31 @@ namespace AwsMock::Service {
         Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request) const;
 
         /**
-       * @brief Returns a list of all available queues ARNs
-       *
-       * @return ListQueueArnsResponse
-       * @see ListQueueArnsResponse
-       */
+         * @brief Returns a list of all available queues ARNs
+         *
+         * @return ListQueueArnsResponse
+         * @see ListQueueArnsResponse
+         */
         Dto::SQS::ListQueueArnsResponse ListQueueArns() const;
 
         /**
-       * @brief Returns a list of all available queues counters
-       *
-       * @param request list queue counters request
-       * @return ListQueueCountersResponse
-       * @see ListQueueCountersRequest
-       * @see ListQueueCountersResponse
-       */
+         * @brief Returns a list of all available queues counters
+         *
+         * @param request list queue counters request
+         * @return ListQueueCountersResponse
+         * @see ListQueueCountersRequest
+         * @see ListQueueCountersResponse
+         */
         Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
 
         /**
-       * @brief Returns a list of all available queues tags
-       *
-       * @param request list queue tagss request
-       * @return ListQueueTagsResponse
-       * @see ListQueueTagsRequest
-       * @see ListQueueTagsResponse
-       */
+         * @brief Returns a list of all available queues tags
+         *
+         * @param request list queue tagss request
+         * @return ListQueueTagsResponse
+         * @see ListQueueTagsRequest
+         * @see ListQueueTagsResponse
+         */
         Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
 
         /**
@@ -293,46 +294,54 @@ namespace AwsMock::Service {
         Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request) const;
 
         /**
-       * @brief Returns a list SQS messages
-       *
-       * @param request list messages request
-       * @return ListMessagesResponse
-       * @throws ServiceException
-       * @see ListMessageCountersResponse
-       */
-        Dto::SQS::ListMessageCountersResponse ListMessageCounters(
-                const Dto::SQS::ListMessageCountersRequest &request) const;
+         * @brief Returns a list SQS messages
+         *
+         * @param request list messages request
+         * @return ListMessagesResponse
+         * @throws ServiceException
+         * @see ListMessageCountersResponse
+         */
+        Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
 
         /**
-       * @brief Updates a message
-       *
-       * @param request update message request DTO
-       * @throws ServiceException
-       */
+         * @brief Updates a message
+         *
+         * @param request update message request DTO
+         * @throws ServiceException
+         */
         void UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
 
         /**
-       * @brief Updates a DQL subscription
-       *
-       * @param request update DQL subscription request DTO
-       * @throws ServiceException
-       */
+         * @brief Resend a message
+         *
+         * @param request resend message request DTO
+         * @throws ServiceException
+         * @see ResendMessage
+         */
+        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+
+        /**
+         * @brief Updates a DQL subscription
+         *
+         * @param request update DQL subscription request DTO
+         * @throws ServiceException
+         */
         void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
 
         /**
-       * @brief Deletes a message
-       *
-       * @param request delete message request DTO
-       * @throws ServiceException
-       */
+         * @brief Deletes a message
+         *
+         * @param request delete message request DTO
+         * @throws ServiceException
+         */
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
 
         /**
-       * @brief Deletes a message attribute
-       *
-       * @param request delete message attribute request DTO
-       * @throws ServiceException
-       */
+         * @brief Deletes a message attribute
+         *
+         * @param request delete message attribute request DTO
+         * @throws ServiceException
+         */
         void DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const;
 
         /**
@@ -347,37 +356,43 @@ namespace AwsMock::Service {
       private:
 
         /**
-       * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
-       *
-       * @param lambda lambda to invoke.
-       * @param message SQS message.
-       * @param eventSourceArn event source ARN
-       */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda,
-                                         const Database::Entity::SQS::Message &message,
-                                         const std::string &eventSourceArn) const;
+         * @brief Send a lambda invocation request for a message.
+         *
+         * @param queueArn queue ARN
+         * @param message SQS message.
+         */
+        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
 
         /**
-       * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
-       *
-       * @param attributes vector of attributes.
-       * @param value value to check for.
-       */
+         * @brief Send a lambda invocation request for a message.
+         *
+         * @param lambda lambda to invoke.
+         * @param message SQS message.
+         * @param eventSourceArn event source ARN
+         */
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
+
+        /**
+         * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
+         *
+         * @param attributes vector of attributes.
+         * @param value value to check for.
+         */
         static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
         /**
-       * SQS database connection
-       */
+         * SQS database connection
+         */
         Database::SQSDatabase &_sqsDatabase;
 
         /**
-       * Lambda database connection
-       */
+         * Lambda database connection
+         */
         Database::LambdaDatabase &_lambdaDatabase;
 
         /**
-       * Lambda service
-       */
+         * Lambda service
+         */
         LambdaService _lambdaService;
     };
 }// namespace AwsMock::Service

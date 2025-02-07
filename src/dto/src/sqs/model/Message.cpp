@@ -29,26 +29,20 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "body", body);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "md5OfBody", md5Sum);
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
-            Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 
             if (!messageAttributes.empty()) {
-                array jsonMessageAttributeArray;
+                document jsonMessageAttributeObject;
                 for (const auto &[fst, snd]: messageAttributes) {
-                    document jsonAttribute;
-                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
-                    jsonMessageAttributeArray.append(jsonAttribute);
+                    jsonMessageAttributeObject.append(kvp(fst, snd.ToDocument()));
                 }
-                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
             }
 
             if (!attributes.empty()) {
-                array jsonAttributeArray;
+                document jsonAttributeObject;
                 for (const auto &[fst, snd]: attributes) {
-                    document jsonAttribute;
-                    jsonAttribute.append(kvp(fst, snd));
-                    jsonAttributeArray.append(jsonAttribute);
+                    jsonAttributeObject.append(kvp(fst, snd));
                 }
-                rootDocument.append(kvp("attributes", jsonAttributeArray));
             }
             return rootDocument.extract();
 
