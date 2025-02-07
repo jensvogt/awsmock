@@ -5,13 +5,9 @@
 #include <awsmock/dto/sqs/model/EventRecord.h>
 
 namespace AwsMock::Dto::SQS {
-
     std::string Record::ToJson() const {
-
         try {
-
             return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -19,9 +15,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     view_or_value<view, value> Record::ToDocument() const {
-
         try {
-
             document rootDocument;
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "awsRegion", region);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "messageId", messageId);
@@ -31,11 +25,12 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "eventSource", eventSource);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "eventSourceARN", eventSourceArn);
 
-            if (!messagesAttributes.empty()) {
+            if (!messageAttributes.empty()) {
                 document jsonMessageAttributeObject;
-                for (const auto &[fst, snd]: messagesAttributes) {
+                for (const auto &[fst, snd] : messageAttributes) {
                     jsonMessageAttributeObject.append(kvp(fst, snd.ToDocument()));
                 }
+                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeObject));
             }
 
             if (!attributes.empty()) {
@@ -47,7 +42,6 @@ namespace AwsMock::Dto::SQS {
                 rootDocument.append(kvp("attributes", jsonAttributeObject));
             }
             return rootDocument.extract();
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -55,9 +49,7 @@ namespace AwsMock::Dto::SQS {
     }
 
     void Record::FromDocument(const view_or_value<view, value> &document) {
-
         try {
-
             region = Core::Bson::BsonUtils::GetStringValue(document, "awsRegion");
             messageId = Core::Bson::BsonUtils::GetStringValue(document, "messageId");
             receiptHandle = Core::Bson::BsonUtils::GetStringValue(document, "receiptHandle");
@@ -65,7 +57,6 @@ namespace AwsMock::Dto::SQS {
             md5Sum = Core::Bson::BsonUtils::GetStringValue(document, "md5OfBody");
             eventSource = Core::Bson::BsonUtils::GetStringValue(document, "eventSource");
             eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "eventSourceArn");
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -82,4 +73,4 @@ namespace AwsMock::Dto::SQS {
         os << "Record=" + r.ToJson();
         return os;
     }
-};// namespace AwsMock::Dto::SQS
+}; // namespace AwsMock::Dto::SQS
