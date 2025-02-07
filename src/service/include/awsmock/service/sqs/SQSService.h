@@ -323,7 +323,7 @@ namespace AwsMock::Service {
          * @param request update DQL subscription request DTO
          * @throws ServiceException
          */
-          void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
+        void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
 
         /**
         * @brief Deletes a message

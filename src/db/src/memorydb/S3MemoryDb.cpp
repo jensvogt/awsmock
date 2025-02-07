@@ -214,11 +214,11 @@ namespace AwsMock::Database {
                                     }) != _objects.end();
     }
 
-    bool S3MemoryDb::ObjectExists(const std::string &region,const std::string &bucket, const std::string &key) const {
+    bool S3MemoryDb::ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
 
         return std::ranges::find_if(_objects,
                                     [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &o) {
-                                        return o.second.region == region &&o.second.bucket == bucket && o.second.key == key;
+                                        return o.second.region == region && o.second.bucket == bucket && o.second.key == key;
                                     }) != _objects.end();
     }
 
