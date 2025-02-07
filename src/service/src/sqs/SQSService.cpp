@@ -75,11 +75,11 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << queue.ToString();
             Dto::SQS::CreateQueueResponse response = {
-                    .region = queue.region,
-                    .name = queue.name,
-                    .owner = queue.owner,
-                    .queueUrl = queue.queueUrl,
-                    .queueArn = queue.queueArn
+                .region = queue.region,
+                .name = queue.name,
+                .owner = queue.owner,
+                .queueUrl = queue.queueUrl,
+                .queueArn = queue.queueArn
             };
             return response;
         } catch (Core::DatabaseException &exc) {
@@ -104,9 +104,9 @@ namespace AwsMock::Service {
                     request.region);
                 const std::string nextToken = queueList.size() > 0 ? queueList.back().oid : "";
                 Dto::SQS::ListQueuesResponse listQueueResponse = {
-                        .queueList = queueList,
-                        .nextToken = nextToken,
-                        .total = total
+                    .queueList = queueList,
+                    .nextToken = nextToken,
+                    .total = total
                 };
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
                 return listQueueResponse;
@@ -241,7 +241,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::ListQueueAttributeCountersResponse SQSService::ListQueueAttributeCounters(
-            const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
+        const Dto::SQS::ListQueueAttributeCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_queue_attribute_counters");
         log_trace << "List queue attribute counters request: " << request.ToString();
 
@@ -260,8 +260,8 @@ namespace AwsMock::Service {
             response.total = total;
             Dto::SQS::AttributeCounter attributeCounter;
             attributeCounter = {
-                    .attributeKey = "approximateNumberOfMessages",
-                    .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessages)
+                .attributeKey = "approximateNumberOfMessages",
+                .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessages)
             };
             response.attributeCounters.emplace_back(attributeCounter);
             attributeCounter = {
@@ -305,7 +305,8 @@ namespace AwsMock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
             attributeCounter = {
                 .attributeKey = "redriveAllowPolicy",
-                .attributeValue = queue.attributes.redriveAllowPolicy};
+                .attributeValue = queue.attributes.redriveAllowPolicy
+            };
             response.attributeCounters.emplace_back(attributeCounter);
             attributeCounter = {
                 .attributeKey = "visibilityTimeout",
@@ -571,7 +572,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(
-            Dto::SQS::SetQueueAttributesRequest &request) const {
+        Dto::SQS::SetQueueAttributesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
 
@@ -579,7 +580,7 @@ namespace AwsMock::Service {
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+                "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -636,9 +637,9 @@ namespace AwsMock::Service {
 
             // Reset all userAttributes
             const Database::Entity::SQS::MessageAttribute messageAttribute = {
-                    .attributeName = "VisibilityTimeout",
-                    .attributeValue = std::to_string(request.visibilityTimeout),
-                    .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER
+                .attributeName = "VisibilityTimeout",
+                .attributeValue = std::to_string(request.visibilityTimeout),
+                .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER
             };
             message.messageAttributes.push_back(messageAttribute);
             message.reset = system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
@@ -998,11 +999,11 @@ namespace AwsMock::Service {
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
             const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(
-                    request.queueArn,
-                    request.prefix,
-                    request.pageSize,
-                    request.pageIndex,
-                    request.sortColumns);
+                request.queueArn,
+                request.prefix,
+                request.pageSize,
+                request.pageIndex,
+                request.sortColumns);
 
             Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
@@ -1113,7 +1114,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SQS::DeleteMessageBatchResponse SQSService::DeleteMessageBatch(
-            const Dto::SQS::DeleteMessageBatchRequest &request) const {
+        const Dto::SQS::DeleteMessageBatchRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message_batch");
         log_trace << "Delete message batch request, size: " << request.deleteMessageBatchEntries.size();
 
@@ -1169,15 +1170,15 @@ namespace AwsMock::Service {
 
         // Create the event record
         Dto::SQS::Record record = {
-                .region = lambda.region,
-                .messageId = message.messageId,
-                .receiptHandle = message.receiptHandle,
-                .body = message.body,
-                .attributes = message.attributes,
-                .messageAttributes = Dto::SQS::Mapper::map(message.messageAttributes),
-                .md5Sum = message.md5Body,
-                .eventSource = "aws:sqs",
-                .eventSourceArn = eventSourceArn
+            .region = lambda.region,
+            .messageId = message.messageId,
+            .receiptHandle = message.receiptHandle,
+            .body = message.body,
+            .attributes = message.attributes,
+            .messageAttributes = Dto::SQS::Mapper::map(message.messageAttributes),
+            .md5Sum = message.md5Body,
+            .eventSource = "aws:sqs",
+            .eventSourceArn = eventSourceArn
         };
 
         Dto::SQS::EventNotification eventNotification;
@@ -1187,4 +1188,4 @@ namespace AwsMock::Service {
         _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), message.receiptHandle);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
