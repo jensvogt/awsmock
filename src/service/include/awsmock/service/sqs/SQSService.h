@@ -77,325 +77,323 @@
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
-    using std::chrono::system_clock;
+ using std::chrono::system_clock;
 
-    /**
-   * @brief SQS service
-   *
-   * @author jens.vogt\@opitz-consulting.com
-   */
-    class SQSService {
-      public:
+ /**
+* @brief SQS service
+*
+* @author jens.vogt\@opitz-consulting.com
+*/
+ class SQSService {
+  public:
+   /**
+  * @brief Constructor
+  */
+   explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()),
+                           _lambdaDatabase(Database::LambdaDatabase::instance()) {
+   };
 
-        /**
-       * @brief Constructor
-       */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()),
-                                _lambdaDatabase(Database::LambdaDatabase::instance()) {
-        };
+   /**
+  * @brief Creates a new queue.
+  *
+  * <p>In case the queue exists already, return the existing queue.</p>
+  *
+  * @param request create queue request
+  * @return CreateQueueResponse
+  */
+   Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request) const;
 
-        /**
-       * @brief Creates a new queue.
-       *
-       * <p>In case the queue exists already, return the existing queue.</p>
-       *
-       * @param request create queue request
-       * @return CreateQueueResponse
-       */
-        Dto::SQS::CreateQueueResponse CreateQueue(const Dto::SQS::CreateQueueRequest &request) const;
+   /**
+  * @brief Returns a list of all available queues
+  *
+  * @param request AWS list queue request
+  * @return ListQueuesResponse
+  * @see ListQueuesRequest
+  * @see ListQueuesResponse
+  */
+   Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request) const;
 
-        /**
-       * @brief Returns a list of all available queues
-       *
-       * @param request AWS list queue request
-       * @return ListQueuesResponse
-       * @see ListQueuesRequest
-       * @see ListQueuesResponse
-       */
-        Dto::SQS::ListQueuesResponse ListQueues(const Dto::SQS::ListQueuesRequest &request) const;
+   /**
+    * @brief Returns a list of all available queues ARNs
+    *
+    * @return ListQueueArnsResponse
+    * @see ListQueueArnsResponse
+    */
+   Dto::SQS::ListQueueArnsResponse ListQueueArns() const;
 
-        /**
-         * @brief Returns a list of all available queues ARNs
-         *
-         * @return ListQueueArnsResponse
-         * @see ListQueueArnsResponse
-         */
-        Dto::SQS::ListQueueArnsResponse ListQueueArns() const;
+   /**
+    * @brief Returns a list of all available queues counters
+    *
+    * @param request list queue counters request
+    * @return ListQueueCountersResponse
+    * @see ListQueueCountersRequest
+    * @see ListQueueCountersResponse
+    */
+   Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
 
-        /**
-         * @brief Returns a list of all available queues counters
-         *
-         * @param request list queue counters request
-         * @return ListQueueCountersResponse
-         * @see ListQueueCountersRequest
-         * @see ListQueueCountersResponse
-         */
-        Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
+   /**
+    * @brief Returns a list of all available queues tags
+    *
+    * @param request list queue tagss request
+    * @return ListQueueTagsResponse
+    * @see ListQueueTagsRequest
+    * @see ListQueueTagsResponse
+    */
+   Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
 
-        /**
-         * @brief Returns a list of all available queues tags
-         *
-         * @param request list queue tagss request
-         * @return ListQueueTagsResponse
-         * @see ListQueueTagsRequest
-         * @see ListQueueTagsResponse
-         */
-        Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
+   /**
+  * @brief Purge a queue.
+  *
+  * @param request purge queue request
+  * @retzurn total number of deleted queues
+  * @throws ServiceException
+  */
+   long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
 
-        /**
-       * @brief Purge a queue.
-       *
-       * @param request purge queue request
-       * @retzurn total number of deleted queues
-       * @throws ServiceException
-       */
-        long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
+   /**
+  * @brief Redrive messages in queue
+  *
+  * @param request redrive messages request
+  * @retzurn total number of redrive messages
+  * @throws ServiceException
+  */
+   long RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const;
 
-        /**
-       * @brief Redrive messages in queue
-       *
-       * @param request redrive messages request
-       * @retzurn total number of redrive messages
-       * @throws ServiceException
-       */
-        long RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const;
+   /**
+  * @brief Return the queue userAttributes
+  *
+  * @param request get queue sqs request
+  * @return GetQueueAttributesResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const;
 
-        /**
-       * @brief Return the queue userAttributes
-       *
-       * @param request get queue sqs request
-       * @return GetQueueAttributesResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::GetQueueUrlResponse GetQueueUrl(const Dto::SQS::GetQueueUrlRequest &request) const;
+   /**
+  * @brief Return the queue userAttributes
+  *
+  * @param request get queue sqs request
+  * @return GetQueueAttributesResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::GetQueueDetailsResponse GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const;
 
-        /**
-       * @brief Return the queue userAttributes
-       *
-       * @param request get queue sqs request
-       * @return GetQueueAttributesResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::GetQueueDetailsResponse GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const;
+   /**
+  * @brief Return the queue userAttributes
+  *
+  * @param request get queue sqs request
+  * @return GetQueueAttributesResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
 
-        /**
-       * @brief Return the queue userAttributes
-       *
-       * @param request get queue sqs request
-       * @return GetQueueAttributesResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
+   /**
+  * @brief Set queue userAttributes
+  *
+  * @param request put queue sqs request
+  * @return SetQueueAttributesResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
 
-        /**
-       * @brief Set queue userAttributes
-       *
-       * @param request put queue sqs request
-       * @return SetQueueAttributesResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::SetQueueAttributesResponse SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
+   /**
+  * @brief Sets the message visibility timeout.
+  *
+  * @param request set visibility timeout request
+  * @throws ServiceException
+  */
+   void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) const;
 
-        /**
-       * @brief Sets the message visibility timeout.
-       *
-       * @param request set visibility timeout request
-       * @throws ServiceException
-       */
-        void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) const;
+   /**
+  * @brief Sets tags for a queue.
+  *
+  * <p>
+  * Existing tags will be updates, and not existing tags will be created.
+  * </p>
+  *
+  * @param request tag resource request DTO
+  */
+   void TagQueue(const Dto::SQS::TagQueueRequest &request) const;
 
-        /**
-       * @brief Sets tags for a queue.
-       *
-       * <p>
-       * Existing tags will be updates, and not existing tags will be created.
-       * </p>
-       *
-       * @param request tag resource request DTO
-       */
-        void TagQueue(const Dto::SQS::TagQueueRequest &request) const;
+   /**
+  * @brief Removes a tags from a queue.
+  *
+  * @param request untag resource request DTO
+  */
+   void UntagQueue(const Dto::SQS::UntagQueueRequest &request) const;
 
-        /**
-       * @brief Removes a tags from a queue.
-       *
-       * @param request untag resource request DTO
-       */
-        void UntagQueue(const Dto::SQS::UntagQueueRequest &request) const;
+   /**
+  * @brief Returns a list of attribute counters for a queue
+  *
+  * @param request list attribute counters request DTO
+  * @return ListAttributeCountersResponse DTO
+  */
+   Dto::SQS::ListQueueAttributeCountersResponse ListQueueAttributeCounters(
+    const Dto::SQS::ListQueueAttributeCountersRequest &request) const;
 
-        /**
-       * @brief Returns a list of attribute counters for a queue
-       *
-       * @param request list attribute counters request DTO
-       * @return ListAttributeCountersResponse DTO
-       */
-        Dto::SQS::ListQueueAttributeCountersResponse ListQueueAttributeCounters(
-                const Dto::SQS::ListQueueAttributeCountersRequest &request) const;
+   /**
+  * @brief Returns a list of lambda trigger counters for a queue
+  *
+  * @param request list lambda trigger counters request DTO
+  * @return ListLambdaTriggerCountersResponse DTO
+  */
+   Dto::SQS::ListLambdaTriggerCountersResponse ListLambdaTriggerCounters(
+    const Dto::SQS::ListLambdaTriggerCountersRequest &request) const;
 
-        /**
-       * @brief Returns a list of lambda trigger counters for a queue
-       *
-       * @param request list lambda trigger counters request DTO
-       * @return ListLambdaTriggerCountersResponse DTO
-       */
-        Dto::SQS::ListLambdaTriggerCountersResponse ListLambdaTriggerCounters(
-                const Dto::SQS::ListLambdaTriggerCountersRequest &request) const;
+   /**
+  * @brief Returns a list of tags counters for a queue
+  *
+  * @param request list tag counters request DTO
+  * @return ListTagCountersResponse DTO
+  */
+   Dto::SQS::ListQueueTagCountersResponse ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
 
-        /**
-       * @brief Returns a list of tags counters for a queue
-       *
-       * @param request list tag counters request DTO
-       * @return ListTagCountersResponse DTO
-       */
-        Dto::SQS::ListQueueTagCountersResponse ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
+   /**
+  * @brief Delete a queue
+  *
+  * @param request delete request DTO
+  * @return SQSQueueResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) const;
 
-        /**
-       * @brief Delete a queue
-       *
-       * @param request delete request DTO
-       * @return SQSQueueResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::DeleteQueueResponse DeleteQueue(const Dto::SQS::DeleteQueueRequest &request) const;
+   /**
+  * @brief Send a message to the queue
+  *
+  * @param request send message request
+  * @return SendMessageResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
-        /**
-       * @brief Send a message to the queue
-       *
-       * @param request send message request
-       * @return SendMessageResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
+   /**
+  * @brief Creates a new queue
+  *
+  * @param request create message request
+  * @return SendMessageResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
 
-        /**
-       * @brief Creates a new queue
-       *
-       * @param request create message request
-       * @return SendMessageResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
+   /**
+  * @brief Receive a list of resources
+  *
+  * @param request receive message request
+  * @return ReceiveMessageResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const;
 
-        /**
-       * @brief Receive a list of resources
-       *
-       * @param request receive message request
-       * @return ReceiveMessageResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::ReceiveMessageResponse ReceiveMessages(const Dto::SQS::ReceiveMessageRequest &request) const;
+   /**
+  * @brief Returns a list SQS messages
+  *
+  * @param request list messages request
+  * @return ListMessagesResponse
+  * @throws ServiceException
+  * @see ListMessagesResponse
+  */
+   Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request) const;
 
-        /**
-       * @brief Returns a list SQS messages
-       *
-       * @param request list messages request
-       * @return ListMessagesResponse
-       * @throws ServiceException
-       * @see ListMessagesResponse
-       */
-        Dto::SQS::ListMessagesResponse ListMessages(const Dto::SQS::ListMessagesRequest &request) const;
+   /**
+    * @brief Returns a list SQS messages
+    *
+    * @param request list messages request
+    * @return ListMessagesResponse
+    * @throws ServiceException
+    * @see ListMessageCountersResponse
+    */
+   Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
 
-        /**
-         * @brief Returns a list SQS messages
-         *
-         * @param request list messages request
-         * @return ListMessagesResponse
-         * @throws ServiceException
-         * @see ListMessageCountersResponse
-         */
-        Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
+   /**
+    * @brief Updates a message
+    *
+    * @param request update message request DTO
+    * @throws ServiceException
+    */
+   void UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
 
-        /**
-         * @brief Updates a message
-         *
-         * @param request update message request DTO
-         * @throws ServiceException
-         */
-        void UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
+   /**
+    * @brief Resend a message
+    *
+    * @param request resend message request DTO
+    * @throws ServiceException
+    * @see ResendMessage
+    */
+   void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
 
-        /**
-         * @brief Resend a message
-         *
-         * @param request resend message request DTO
-         * @throws ServiceException
-         * @see ResendMessage
-         */
-        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+   /**
+    * @brief Updates a DQL subscription
+    *
+    * @param request update DQL subscription request DTO
+    * @throws ServiceException
+    */
+   void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
 
-        /**
-         * @brief Updates a DQL subscription
-         *
-         * @param request update DQL subscription request DTO
-         * @throws ServiceException
-         */
-        void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
+   /**
+    * @brief Deletes a message
+    *
+    * @param request delete message request DTO
+    * @throws ServiceException
+    */
+   void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
 
-        /**
-         * @brief Deletes a message
-         *
-         * @param request delete message request DTO
-         * @throws ServiceException
-         */
-        void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
+   /**
+    * @brief Deletes a message attribute
+    *
+    * @param request delete message attribute request DTO
+    * @throws ServiceException
+    */
+   void DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const;
 
-        /**
-         * @brief Deletes a message attribute
-         *
-         * @param request delete message attribute request DTO
-         * @throws ServiceException
-         */
-        void DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const;
+   /**
+  * @brief Deletes a message in a batch
+  *
+  * @param request delete message batch request DTO
+  * @return DeleteMessageBatchResponse
+  * @throws ServiceException
+  */
+   Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
 
-        /**
-       * @brief Deletes a message in a batch
-       *
-       * @param request delete message batch request DTO
-       * @return DeleteMessageBatchResponse
-       * @throws ServiceException
-       */
-        Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
+  private:
+   /**
+    * @brief Send a lambda invocation request for a message.
+    *
+    * @param queueArn queue ARN
+    * @param message SQS message.
+    */
+   void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
 
-      private:
+   /**
+    * @brief Send a lambda invocation request for a message.
+    *
+    * @param lambda lambda to invoke.
+    * @param message SQS message.
+    * @param eventSourceArn event source ARN
+    */
+   void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
 
-        /**
-         * @brief Send a lambda invocation request for a message.
-         *
-         * @param queueArn queue ARN
-         * @param message SQS message.
-         */
-        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
+   /**
+    * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
+    *
+    * @param attributes vector of attributes.
+    * @param value value to check for.
+    */
+   static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
 
-        /**
-         * @brief Send a lambda invocation request for a message.
-         *
-         * @param lambda lambda to invoke.
-         * @param message SQS message.
-         * @param eventSourceArn event source ARN
-         */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
+   /**
+    * SQS database connection
+    */
+   Database::SQSDatabase &_sqsDatabase;
 
-        /**
-         * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
-         *
-         * @param attributes vector of attributes.
-         * @param value value to check for.
-         */
-        static bool CheckAttribute(const std::vector<std::string> &attributes, const std::string &value);
+   /**
+    * Lambda database connection
+    */
+   Database::LambdaDatabase &_lambdaDatabase;
 
-        /**
-         * SQS database connection
-         */
-        Database::SQSDatabase &_sqsDatabase;
-
-        /**
-         * Lambda database connection
-         */
-        Database::LambdaDatabase &_lambdaDatabase;
-
-        /**
-         * Lambda service
-         */
-        LambdaService _lambdaService;
-    };
-}// namespace AwsMock::Service
+   /**
+    * Lambda service
+    */
+   LambdaService _lambdaService;
+ };
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H
