@@ -317,14 +317,9 @@ namespace AwsMock::Service {
                     if (clientCommand.contentType == "json") {
                         sqsRequest.FromJson(clientCommand.payload);
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
-                        std::string body = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "MessageBody");
-                        std::map<std::string, Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(
-                                clientCommand.payload);
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
+                        std::string body = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "MessageBody");
+                        std::map<std::string, Dto::SQS::MessageAttribute> attributes = GetMessageAttributes(clientCommand.payload);
 
                         sqsRequest = {
                                 .region = clientCommand.region,

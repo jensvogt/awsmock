@@ -157,8 +157,7 @@ namespace AwsMock::Service {
     void ContainerService::DeleteImage(const std::string &id) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "http://localhost/images/" + id + "?force=true");
-            statusCode != http::status::ok) {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "http://localhost/images/" + id + "?force=true"); statusCode != http::status::ok) {
             log_error << "Delete image failed, httpStatus: " << statusCode << ", id: " << id;
         }
         log_debug << "Image deleted, id: " << id;

@@ -715,14 +715,11 @@ namespace AwsMock::Service {
             ContainerService::instance().StopContainer(instance.containerId);
             ContainerService::instance().DeleteContainers(lambda.function, lambda.dockerTag);
         }
-        ContainerService::instance().DeleteImage(lambda.imageId);
-        log_debug << "Done cleanup instances, function: " << lambda.function;
-
         lambda.instances.clear();
         log_debug << "Done cleanup instances, function: " << lambda.function;
 
-        ContainerService::instance().DeleteImage(lambda.imageId);
-        log_debug << "Done cleanup image, function: " << lambda.function;
+        ContainerService::instance().DeleteImage(lambda.function + ":" + lambda.dockerTag);
+        log_debug << "Done cleanup instances, function: " << lambda.function;
 
         log_info << "Done cleanup docker, function: " << lambda.function;
     }
