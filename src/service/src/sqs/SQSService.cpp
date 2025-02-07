@@ -1052,37 +1052,6 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "resend_message");
-        log_trace << "Resend message request, queueArn: " << request.queueArn;
-
-        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
-            log_error << "Message does not exist, messageId: " << request.messageId;
-            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
-        }
-
-        try {
-            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
-
-            message.status = Database::Entity::SQS::MessageStatus::INITIAL;
-            message.retries = 0;
-            message.reset = system_clock::now() + std::chrono::seconds(std::stoi(message.attributes.at("VisibilityTimeout")));
-
-            // Update database
-            message = _sqsDatabase.UpdateMessage(message);
-            log_debug << "Message resend, messageId: " << request.messageId;
-
-            // Check lambda notification
-            CheckLambdaNotifications(request.queueArn, message);
-
-            // Adjust message counters
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
-        } catch (Core::DatabaseException &ex) {
-            log_error << ex.message();
-            throw Core::ServiceException(ex.message());
-        }
-    }
-
     void SQSService::DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "delete_message");
         log_trace << "Delete message request, url: " << request.receiptHandle;
