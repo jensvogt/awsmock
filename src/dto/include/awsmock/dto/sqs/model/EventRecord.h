@@ -96,6 +96,6 @@ namespace AwsMock::Dto::SQS {
          */
         friend std::ostream &operator<<(std::ostream &os, const Record &r);
     };
-} // namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_EVENT_RECORD_H
