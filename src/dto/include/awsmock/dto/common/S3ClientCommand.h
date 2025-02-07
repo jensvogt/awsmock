@@ -54,6 +54,7 @@ namespace AwsMock::Dto::Common {
         PUT_BUCKET_ENCRYPTION,
         PUT_BUCKET_VERSIONING,
         GET_OBJECT_COUNTER,
+        TOUCH_OBJECT,
         UNKNOWN
     };
 
@@ -85,6 +86,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::PUT_BUCKET_ENCRYPTION, "PUT_BUCKET_ENCRYPTION"},
             {S3CommandType::PUT_BUCKET_VERSIONING, "PUT_BUCKET_VERSIONING"},
             {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
+            {S3CommandType::TOUCH_OBJECT, "TouchObject"},
     };
 
     [[maybe_unused]] static std::string S3CommandTypeToString(S3CommandType commandType) {

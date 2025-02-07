@@ -240,6 +240,17 @@ namespace AwsMock::Database {
         bool ObjectExists(const std::string &oid) const;
 
         /**
+         * @brief Bucket exists
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @param key S3 key
+         * @return true if object exists
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const;
+
+        /**
          * @brief Check the existence of an object by internal name
          *
          * @param filename object internal name

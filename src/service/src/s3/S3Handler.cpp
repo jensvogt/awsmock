@@ -604,6 +604,20 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
+                case Dto::Common::S3CommandType::TOUCH_OBJECT: {
+                    log_debug << "S3 touch object";
+
+                    // Build request
+                    Dto::S3::TouchObjectRequest s3Request;
+                    s3Request.FromJson(clientCommand.payload);
+
+                    // Get object versions
+                    _s3Service.TouchObject(s3Request);
+
+                    log_info << "Touch object, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");

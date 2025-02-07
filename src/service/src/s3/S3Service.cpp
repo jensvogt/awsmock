@@ -509,6 +509,35 @@ namespace AwsMock::Service {
         }
     }
 
+    void S3Service::TouchObject(Dto::S3::TouchObjectRequest &request) const {
+        log_trace << "Touch object request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+            log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist");
+        }
+
+        // Check existence
+        if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
+            log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist");
+        }
+
+        try {
+            // Get the object
+            const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+
+            // Check notification
+            CheckNotifications(object.region, object.bucket, object.key, object.size, "ObjectCreated");
+            log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 touch object failed, message: " << ex.what() << " key: " << request.key;
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::S3::CopyObjectResponse S3Service::CopyObject(const Dto::S3::CopyObjectRequest &request) const {
         log_trace << "Copy object request: " << request.ToString();
 

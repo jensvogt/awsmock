@@ -59,6 +59,7 @@
 #include <awsmock/dto/s3/internal/ListBucketCounterResponse.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
+#include <awsmock/dto/s3/internal/TouchObjectRequest.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -105,7 +106,7 @@ namespace AwsMock::Service {
         bool BucketExists(const std::string &region, const std::string &bucket) const;
 
         /**
-         * @brief Returns the meta data of an S3 bucket
+         * @brief Returns the metadata of an S3 bucket
          *
          * @param request get metadata request
          * @return GetMetadataResponse
@@ -241,6 +242,17 @@ namespace AwsMock::Service {
          * @return PutObjectResponse
          */
         Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
+
+        /**
+         * @brief Touch object
+         *
+         * @par
+         * This method re-triggers the event notification, like lambda trigger etc.
+         *
+         * @param request touch object request
+         * @see TouchObjectRequest
+         */
+        void TouchObject(Dto::S3::TouchObjectRequest &request) const;
 
         /**
          * @brief Copy object
