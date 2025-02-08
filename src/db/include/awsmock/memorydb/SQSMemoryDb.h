@@ -102,6 +102,15 @@ namespace AwsMock::Database {
         Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
 
         /**
+         * @brief List available queues, using paging
+         *
+         * @param sortColumns vector of sort columns
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns);
+
+        /**
          * @brief Returns a queue by ARN
          *
          * @param queueArn queue ARN

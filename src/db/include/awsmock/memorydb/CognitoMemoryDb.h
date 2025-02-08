@@ -14,6 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
@@ -128,6 +129,14 @@ namespace AwsMock::Database {
         std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region);
 
         /**
+         * @brief Exports a list of cognito user pools.
+         *
+         * @param sortColumns sort columns
+         * @return list of cognito user pools
+         */
+        std::vector<Entity::Cognito::UserPool> ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const;
+
+        /**
          * @brief Updates an existing cognito user pool
          *
          * @param userPool cognito user pool entity
@@ -218,6 +227,14 @@ namespace AwsMock::Database {
         std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
+         * @brief Exports a list of cognito users.
+         *
+         * @param sortColumns sort columns
+         * @return list of cognito groups
+         */
+        std::vector<Entity::Cognito::User> ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const;
+
+        /**
          * @brief Returns a list of cognito users in given group.
          *
          * @param region AWS region name
@@ -287,6 +304,14 @@ namespace AwsMock::Database {
          * @return list of cognito groups
          */
         std::vector<Entity::Cognito::Group> ListGroups(const std::string &region = {}, const std::string &userPoolId = {});
+
+        /**
+         * @brief Exports a list of cognito groups.
+         *
+         * @param sortColumns sort columns
+         * @return list of cognito groups
+         */
+        std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns);
 
         /**
          * @brief Deletes an existing cognito user pool

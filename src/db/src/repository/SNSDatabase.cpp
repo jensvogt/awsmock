@@ -220,11 +220,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix,
-                                                   const int pageSize,
-                                                   const int pageIndex,
-                                                   const std::vector<Core::SortColumn> &sortColumns,
-                                                   const std::string &region) const {
+    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -271,6 +267,42 @@ namespace AwsMock::Database {
         }
         log_trace << "Got topic list, size:" << topicList.size();
         return topicList;
+    }
+
+    Entity::SNS::TopicList SNSDatabase::ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const {
+        if (HasDatabase()) {
+            try {
+                mongocxx::options::find opts;
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _queueCollection = (*client)[_databaseName][_topicCollectionName];
+
+                const bsoncxx::builder::basic::document query = {};
+
+                opts.sort(make_document(kvp("_id", 1)));
+                if (!sortColumns.empty()) {
+                    bsoncxx::builder::basic::document sort;
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                Entity::SNS::TopicList topicList;
+                for (auto queueCursor = _queueCollection.find(query.view(), opts); const auto queue: queueCursor) {
+                    Entity::SNS::Topic result;
+                    result.FromDocument(queue);
+                    topicList.push_back(result);
+                }
+                log_trace << "Got topic list, size:" << topicList.size();
+                return topicList;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "SNS Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.ExportTopics(sortColumns);
     }
 
     Entity::SNS::Topic SNSDatabase::UpdateTopic(Entity::SNS::Topic &topic) const {

@@ -124,6 +124,14 @@ namespace AwsMock::Database {
         Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
+         * @brief Export all buckets
+         *
+         * @param sortColumns sorting columns
+         * @return BucketList
+         */
+        Entity::S3::BucketList ExportBuckets(const std::vector<Core::SortColumn> &sortColumns = {}) const;
+
+        /**
          * @brief Check whether the bucket has still objects
          *
          * @param bucket bucket entity

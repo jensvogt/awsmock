@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
@@ -95,6 +96,14 @@ namespace AwsMock::Database {
          * @return BucketList
          */
         Entity::S3::BucketList ListBuckets();
+
+        /**
+         * @brief Export all buckets
+         *
+         * @param sortColumns sorting columns
+         * @return BucketList
+         */
+        Entity::S3::BucketList ExportBuckets(const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Check whether the bucket has still objects

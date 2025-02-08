@@ -83,7 +83,7 @@ namespace AwsMock::Service {
             if (module == "s3") {
 
                 Database::S3Database &_s3Database = Database::S3Database::instance();
-                infrastructure.s3Buckets = _s3Database.ListBuckets();
+                infrastructure.s3Buckets = _s3Database.ExportBuckets({{.column = "name", .sortDirection = 1}});
                 if (request.includeObjects) {
                     infrastructure.s3Objects = _s3Database.ListObjects();
                 }
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
             } else if (module == "sqs") {
 
                 Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-                infrastructure.sqsQueues = _sqsDatabase.ListQueues("", -1, 0, {});
+                infrastructure.sqsQueues = _sqsDatabase.ExportQueues({{.column = "name", .sortDirection = 1}});
                 if (request.includeObjects) {
                     infrastructure.sqsMessages = _sqsDatabase.ListMessages();
                 }
@@ -99,7 +99,7 @@ namespace AwsMock::Service {
             } else if (module == "sns") {
 
                 Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-                infrastructure.snsTopics = _snsDatabase.ListTopics();
+                infrastructure.snsTopics = _snsDatabase.ExportTopics({{.column = "name", .sortDirection = 1}});
                 if (request.includeObjects) {
                     infrastructure.snsMessages = _snsDatabase.ListMessages();
                 }
@@ -107,14 +107,14 @@ namespace AwsMock::Service {
             } else if (module == "lambda") {
 
                 Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-                infrastructure.lambdas = _lambdaDatabase.ExportLambdas();
+                infrastructure.lambdas = _lambdaDatabase.ExportLambdas({{.column = "name", .sortDirection = 1}});
 
             } else if (module == "cognito") {
 
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-                infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
-                infrastructure.cognitoUserGroups = _cognitoDatabase.ListGroups();
-                infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
+                infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({{.column = "name", .sortDirection = 1}});
+                infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({{.column = "name", .sortDirection = 1}});
+                infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({{.column = "name", .sortDirection = 1}});
 
             } else if (module == "dynamodb") {
 

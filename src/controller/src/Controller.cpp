@@ -384,7 +384,7 @@ namespace AwsMock::Controller {
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "import");
 
-        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", jsonString.str(), headers); response.statusCode != boost::beast::http::status::ok) {
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", jsonString.str(), headers); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not import objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
         }
     }

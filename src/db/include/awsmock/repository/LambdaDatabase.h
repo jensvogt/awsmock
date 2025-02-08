@@ -202,10 +202,10 @@ namespace AwsMock::Database {
         /**
          * @brief Export a list of lambdas
          *
-         * @param region Export the lambdas as list
-         * @return
+         * @param sortColumns sorting columns
+         * @return ölist of lambda entries
          */
-        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::string &region = {}) const;
+        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.

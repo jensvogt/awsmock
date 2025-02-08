@@ -147,6 +147,20 @@ namespace AwsMock::Database {
         return topicList;
     }
 
+    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        Entity::SNS::TopicList topicList;
+        for (const auto &topic: _topics) {
+            topicList.emplace_back(topic.second);
+        }
+
+        std::ranges::sort(topicList, [](const Entity::SNS::Topic &a, const Entity::SNS::Topic &b) {
+            return a.topicName < b.topicName;
+        });
+        log_trace << "Got topic list, size: " << topicList.size();
+        return topicList;
+    }
+
     long SNSMemoryDb::CountTopics(const std::string &region) const {
 
         long count = 0;

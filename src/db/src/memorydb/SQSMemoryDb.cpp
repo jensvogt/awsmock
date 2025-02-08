@@ -2,6 +2,7 @@
 // Created by vogje01 on 11/19/23.
 //
 
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
 namespace AwsMock::Database {
@@ -123,6 +124,21 @@ namespace AwsMock::Database {
         }
 
         log_trace << "Got queue list, size: " << queueList.size();
+        return queueList;
+    }
+
+    Entity::SQS::QueueList SQSMemoryDb::ExportQueues(const std::vector<Core::SortColumn> &sortColumns) {
+
+        Entity::SQS::QueueList queueList;
+        for (auto &val: _queues | std::views::values) {
+            val.size = 0;
+            queueList.emplace_back(val);
+        }
+
+        log_trace << "Got queue list, size: " << queueList.size();
+        std::ranges::sort(queueList, [](const Entity::SQS::Queue &a, const Entity::SQS::Queue &b) {
+            return a.name < b.name;
+        });
         return queueList;
     }
 
@@ -482,7 +498,7 @@ namespace AwsMock::Database {
                                        if (kv.second.queueArn == queue.queueArn) {
                                            return kv.second;
                                        }
-                                       return (Entity::SQS::Message){};
+                                       return (Entity::SQS::Message) {};
                                    });
 
             if (!filtered.empty()) {

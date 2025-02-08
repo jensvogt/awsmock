@@ -175,6 +175,15 @@ namespace AwsMock::Database {
         Entity::SNS::TopicList ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
 
         /**
+         * @brief Export all available topics
+         *
+         * @param sortColumns sort columns
+         * @return list of SNS topics
+         * @throws DatabaseException
+         */
+        Entity::SNS::TopicList ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const;
+
+        /**
          * @brief Counts the number of topics
          *
          * @param region AWS region

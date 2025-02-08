@@ -163,6 +163,15 @@ namespace AwsMock::Database {
         Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
 
         /**
+         * @brief List available queues, using paging
+         *
+         * @param sortColumns vector of sort columns
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns) const;
+
+        /**
          * @brief List all available queues
          *
          * @param region AWS region

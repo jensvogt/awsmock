@@ -70,6 +70,20 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
+    Entity::S3::BucketList S3MemoryDb::ExportBuckets(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        Entity::S3::BucketList bucketList;
+        for (const auto &bucket: std::views::values(_buckets)) {
+            bucketList.emplace_back(bucket);
+        }
+
+        log_trace << "Got bucket list, size: " << bucketList.size();
+        std::ranges::sort(bucketList, [](const Entity::S3::Bucket &a, const Entity::S3::Bucket &b) {
+            return a.name < b.name;
+        });
+        return bucketList;
+    }
+
     bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) const {
 
         long count = 0;
