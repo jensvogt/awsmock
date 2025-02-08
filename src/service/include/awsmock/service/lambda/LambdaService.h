@@ -47,6 +47,8 @@
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/StartFunctionRequest.h>
+#include <awsmock/dto/lambda/intern/StopFunctionRequest.h>
 #include <awsmock/dto/lambda/intern/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/intern/UpdateFunctionTagRequest.h>
 #include <awsmock/dto/lambda/intern/UploadFunctionCodeRequest.h>
@@ -275,7 +277,7 @@ namespace AwsMock::Service {
         Dto::Lambda::AccountSettingsResponse GetAccountSettings() const;
 
         /**
-         * @brief Creates a event source mapping.
+         * @brief Creates an event source mapping.
          *
          * @par
          * The event source mapping is created in the SQS/SNS entities and executes whenever a SQS/SNS message is created.
@@ -289,7 +291,7 @@ namespace AwsMock::Service {
         Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const;
 
         /**
-         * @brief List a event source mappings
+         * @brief List am event source mappings
          *
          * @param request list event source mappings request
          * @return list event source mappings response
@@ -298,6 +300,24 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::Lambda::ListEventSourceMappingsResponse
          */
         Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
+
+        /**
+         * @brief Starts the lambda function by starting a docker container
+         *
+         * @param request start lambda function request
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::StartFunctionRequest
+         */
+        void StartFunction(const Dto::Lambda::StartFunctionRequest &request) const;
+
+        /**
+         * @brief Stops the lambda function by stopping all running docker containers
+         *
+         * @param request stop lambda function request
+         * @throws ServiceException
+         * @see AwsMock::Dto::Lambda::StopFunctionRequest
+         */
+        void StopFunction(const Dto::Lambda::StopFunctionRequest &request) const;
 
         /**
          * @brief Delete lambda function

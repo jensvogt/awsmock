@@ -294,6 +294,28 @@ namespace AwsMock::Service {
                 return SendOkResponse(request);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
+
+                Dto::Lambda::StartFunctionRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.StartFunction(lambdaRequest);
+                log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_FUNCTION) {
+
+                Dto::Lambda::StopFunctionRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.StopFunction(lambdaRequest);
+                log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
+
+                return SendOkResponse(request);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA) {
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest;

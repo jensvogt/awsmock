@@ -590,6 +590,67 @@ namespace AwsMock::Service {
         return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
     }
 
+    void LambdaService::StartFunction(const Dto::Lambda::StartFunctionRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "start_function");
+        log_debug << "Start function, functionArn: " + request.functionArn;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
+        }
+
+        // Get lambda function
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+
+        // Load code
+        const std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
+        const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
+
+        // Create lambda function asynchronously
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        LambdaCreator lambdaCreator;
+        boost::thread t(boost::ref(lambdaCreator), functionCode, lambda.oid, instanceId);
+        t.detach();
+
+        // Update state
+        lambda.state = Database::Entity::Lambda::Pending;
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        log_debug << "Docker containers started, functionArn: " + lambda.arn;
+    }
+
+    void LambdaService::StopFunction(const Dto::Lambda::StopFunctionRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "stop_function");
+        log_debug << "Stop function, functionArn: " + request.functionArn;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
+        }
+
+        // Get lambda function
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+
+        // Delete the containers, if existing
+        const ContainerService &dockerService = ContainerService::instance();
+        for (const auto &instance: lambda.instances) {
+            if (dockerService.ContainerExists(instance.containerId)) {
+                Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
+                dockerService.StopContainer(container.id);
+                dockerService.DeleteContainer(container);
+                log_debug << "Docker container deleted, containerId: " + container.id;
+            }
+        }
+
+        // Update state
+        lambda.state = Database::Entity::Lambda::Inactive;
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        // Prune containers
+        dockerService.PruneContainers();
+        log_debug << "Docker containers deleted, functionArn: " + request.functionArn;
+    }
+
     void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();

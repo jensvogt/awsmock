@@ -152,7 +152,7 @@ namespace AwsMock::Core {
         return parameters[index - 1];
     }
 
-    int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
+    int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, const int min, const int max, const int def) {
         int value = def;
         if (const std::string parameterValue = GetQueryParameterValueByName(body, name); !parameterValue.empty()) {
             value = std::stoi(parameterValue);

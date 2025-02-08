@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_RESET_FUNCTION_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_RESET_FUNCTION_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_START_FUNCTION_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_START_FUNCTION_REQUEST_H
 
 // C++ Standard includes
 #include <string>
@@ -14,17 +14,12 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ResetFunctionCountersRequest {
+    struct StartFunctionRequest {
 
         /**
-         * Region
+         * Function ARN
          */
-        std::string region;
-
-        /**
-         * Function name
-         */
-        std::string functionName;
+        std::string functionArn;
 
         /**
          * @brief Parse values from a JSON stream
@@ -52,9 +47,9 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ResetFunctionCountersRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const StartFunctionRequest &r);
     };
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif//AWSMOCK_DTO_LAMBDA_RESET_FUNCTION_COUNTERS_REQUEST_H
+#endif//AWSMOCK_DTO_LAMBDA_START_FUNCTION_REQUEST_H

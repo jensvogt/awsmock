@@ -354,25 +354,10 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
-                        int maxMessages = Core::HttpUtils::GetIntParameter(clientCommand.payload,
-                                                                           "MaxNumberOfMessages",
-                                                                           1,
-                                                                           10,
-                                                                           3);
-                        int waitTimeSeconds = Core::HttpUtils::GetIntParameter(
-                                clientCommand.payload,
-                                "WaitTimeSeconds",
-                                1,
-                                900,
-                                5);
-                        int visibility = Core::HttpUtils::GetIntParameter(clientCommand.payload,
-                                                                          "VisibilityTimeout",
-                                                                          1,
-                                                                          900,
-                                                                          30);
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
+                        int maxMessages = Core::HttpUtils::GetIntParameter(clientCommand.payload, "MaxNumberOfMessages", 1, 10, 3);
+                        int waitTimeSeconds = Core::HttpUtils::GetIntParameter(clientCommand.payload, "WaitTimeSeconds", 1, 900, 5);
+                        int visibility = Core::HttpUtils::GetIntParameter(clientCommand.payload, "VisibilityTimeout", 1, 900, 30);
                         sqsRequest = {
                                 .region = clientCommand.region,
                                 .queueUrl = queueUrl,
@@ -385,8 +370,7 @@ namespace AwsMock::Service {
                     log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;
 
                     // Send response
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::CHANGE_MESSAGE_VISIBILITY: {
@@ -395,19 +379,10 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        int visibilityTimeout = Core::HttpUtils::GetIntParameter(
-                                clientCommand.payload,
-                                "VisibilityTimeout",
-                                30,
-                                12 * 3600,
-                                60);
-                        std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "ReceiptHandle");
+                        int visibilityTimeout = Core::HttpUtils::GetIntParameter(clientCommand.payload, "VisibilityTimeout", 0, 12 * 3600, 60);
+                        std::string receiptHandle = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "ReceiptHandle");
 
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
                         sqsRequest = {
                                 .region = clientCommand.region,
                                 .queueUrl = queueUrl,

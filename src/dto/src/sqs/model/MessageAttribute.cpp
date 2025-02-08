@@ -75,11 +75,40 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
+    void MessageAttribute::FromJson(const view_or_value<view, value> &jsonObject) {
+
+        try {
+            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
+            if (type == STRING || type == NUMBER) {
+                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+            }
+
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
+        }
+    }
+
     view_or_value<view, value> MessageAttribute::ToDocument() const {
 
         try {
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
+            Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
+            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
+            return document.extract();
+
+        } catch (bsoncxx::exception &e) {
+            log_error << e.what();
+            throw Core::JsonException(e.what());
+        }
+    }
+
+    view_or_value<view, value> MessageAttribute::ToJson() const {
+
+        try {
+            document document;
             Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
             Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
             Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
