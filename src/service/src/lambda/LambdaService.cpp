@@ -583,9 +583,7 @@ namespace AwsMock::Service {
         }
 
         // Get the existing entity
-        const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(
-                request.region,
-                request.functionName);
+        const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
         return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
     }
@@ -602,6 +600,12 @@ namespace AwsMock::Service {
         // Get lambda function
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
 
+        // Check state
+        if (lambda.state == Database::Entity::Lambda::Active) {
+            log_info << "Lambda function already running, functionArn: " << request.functionArn;
+            return;
+        }
+
         // Load code
         const std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
         const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
@@ -615,8 +619,7 @@ namespace AwsMock::Service {
         // Update state
         lambda.state = Database::Entity::Lambda::Pending;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
-
-        log_debug << "Docker containers started, functionArn: " + lambda.arn;
+        log_info << "Lambda function started, functionArn: " + lambda.arn;
     }
 
     void LambdaService::StopFunction(const Dto::Lambda::StopFunctionRequest &request) const {
@@ -631,6 +634,12 @@ namespace AwsMock::Service {
         // Get lambda function
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
 
+        // CHeck state
+        if (lambda.state == Database::Entity::Lambda::Inactive) {
+            log_info << "Lambda function already running, functionArn: " << request.functionArn;
+            return;
+        }
+
         // Delete the containers, if existing
         const ContainerService &dockerService = ContainerService::instance();
         for (const auto &instance: lambda.instances) {
@@ -638,7 +647,7 @@ namespace AwsMock::Service {
                 Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
                 dockerService.StopContainer(container.id);
                 dockerService.DeleteContainer(container);
-                log_debug << "Docker container deleted, containerId: " + container.id;
+                log_debug << "Docker container stopped and deleted, containerId: " + container.id;
             }
         }
 
@@ -648,7 +657,7 @@ namespace AwsMock::Service {
 
         // Prune containers
         dockerService.PruneContainers();
-        log_debug << "Docker containers deleted, functionArn: " + request.functionArn;
+        log_info << "Lambda function stopped, functionArn: " + lambda.arn;
     }
 
     void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const {
@@ -702,11 +711,10 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(request.arn);
         int count = 0;
         for (const auto &tag: request.tags) {
-            count += std::erase_if(lambdaEntity.tags,
-                                   [tag](const auto &item) {
-                                       auto const &[k, v] = item;
-                                       return k == tag;
-                                   });
+            count += std::erase_if(lambdaEntity.tags, [tag](const auto &item) {
+                auto const &[k, v] = item;
+                return k == tag;
+            });
         }
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Delete tag request succeeded, arn: " + lambdaEntity.arn << " deleted: " << count;
