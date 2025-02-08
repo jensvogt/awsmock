@@ -6,15 +6,15 @@
 
 namespace AwsMock::Database {
 
-    bool KMSDatabase::KeyExists(const std::string &keyId) {
+    bool KMSDatabase::KeyExists(const std::string &keyId) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
-                int64_t count = _keyCollection.count_documents(make_document(kvp("keyId", keyId)));
+                const int64_t count = _keyCollection.count_documents(make_document(kvp("keyId", keyId)));
                 log_trace << "Topic exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -29,13 +29,13 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::KMS::Key KMSDatabase::GetKeyById(bsoncxx::oid oid) {
+    Entity::KMS::Key KMSDatabase::GetKeyById(bsoncxx::oid oid) const {
 
         try {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_keyCollectionName];
-            std::optional<bsoncxx::document::value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
+            const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult->empty()) {
                 log_error << "KMS key not found, oid" << oid.to_string();
                 throw Core::DatabaseException("KMS key not found, oid" + oid.to_string());
@@ -52,23 +52,19 @@ namespace AwsMock::Database {
         }
     }
 
-    Entity::KMS::Key KMSDatabase::GetKeyById(const std::string &oid) {
+    Entity::KMS::Key KMSDatabase::GetKeyById(const std::string &oid) const {
 
         if (HasDatabase()) {
-
             return GetKeyById(bsoncxx::oid(oid));
-
-        } else {
-
-            return _memoryDb.GetKeyById(oid);
         }
+        return _memoryDb.GetKeyById(oid);
     }
 
-    Entity::KMS::Key KMSDatabase::GetKeyByKeyId(const std::string &keyId) {
+    Entity::KMS::Key KMSDatabase::GetKeyByKeyId(const std::string &keyId) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
 
             try {
@@ -88,10 +84,8 @@ namespace AwsMock::Database {
                 log_error << "KMS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else {
-
-            return _memoryDb.GetKeyByKeyId(keyId);
         }
+        return _memoryDb.GetKeyByKeyId(keyId);
     }
 
     Entity::KMS::KeyList KMSDatabase::ListKeys(const std::string &region) const {
@@ -99,21 +93,19 @@ namespace AwsMock::Database {
         Entity::KMS::KeyList keyList;
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
 
             if (region.empty()) {
 
-                auto keyCursor = _keyCollection.find({});
-                for (const auto &key: keyCursor) {
+                for (auto keyCursor = _keyCollection.find({}); const auto &key: keyCursor) {
                     Entity::KMS::Key result;
                     result.FromDocument(key);
                     keyList.push_back(result);
                 }
             } else {
 
-                auto keyCursor = _keyCollection.find(make_document(kvp("region", region)));
-                for (const auto &key: keyCursor) {
+                for (auto keyCursor = _keyCollection.find(make_document(kvp("region", region))); const auto &key: keyCursor) {
                     Entity::KMS::Key result;
                     result.FromDocument(key);
                     keyList.push_back(result);
@@ -129,15 +121,15 @@ namespace AwsMock::Database {
         return keyList;
     }
 
-    long KMSDatabase::CountKeys() {
+    long KMSDatabase::CountKeys() const {
 
         if (HasDatabase()) {
 
             try {
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
 
-                long count = _keyCollection.count_documents(make_document());
+                const long count = _keyCollection.count_documents(make_document());
                 log_trace << "Key count: " << count;
                 return count;
 
@@ -152,7 +144,7 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::KMS::Key KMSDatabase::CreateKey(const Entity::KMS::Key &key) {
+    Entity::KMS::Key KMSDatabase::CreateKey(const Entity::KMS::Key &key) const {
 
         if (HasDatabase()) {
 
@@ -163,7 +155,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _keyCollection.insert_one(key.ToDocument());
+                const auto result = _keyCollection.insert_one(key.ToDocument());
                 session.commit_transaction();
                 log_trace << "Key created, oid: " << result->inserted_id().get_oid().value.to_string();
 
@@ -178,11 +170,11 @@ namespace AwsMock::Database {
         return _memoryDb.CreateKey(key);
     }
 
-    Entity::KMS::Key KMSDatabase::UpdateKey(const Entity::KMS::Key &key) {
+    Entity::KMS::Key KMSDatabase::UpdateKey(const Entity::KMS::Key &key) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
             auto session = client->start_session();
 
@@ -203,7 +195,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateKey(key);
     }
 
-    Entity::KMS::Key KMSDatabase::UpsertKey(const Entity::KMS::Key &key) {
+    Entity::KMS::Key KMSDatabase::UpsertKey(const Entity::KMS::Key &key) const {
 
         if (KeyExists(key.keyId)) {
 
@@ -216,14 +208,14 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", key.keyId)));
+                const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", key.keyId)));
                 session.commit_transaction();
                 log_debug << "KMS key deleted, count: " << delete_many_result->deleted_count();
 
@@ -243,14 +235,14 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                auto delete_many_result = _bucketCollection.delete_many({});
+                const auto delete_many_result = _bucketCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All KMS keys deleted, count: " << delete_many_result->deleted_count();
 

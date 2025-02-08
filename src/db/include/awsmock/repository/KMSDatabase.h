@@ -58,7 +58,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool KeyExists(const std::string &keyId);
+        bool KeyExists(const std::string &keyId) const;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -67,7 +67,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(const std::string &oid);
+        Entity::KMS::Key GetKeyById(const std::string &oid) const;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -76,7 +76,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(bsoncxx::oid oid);
+        Entity::KMS::Key GetKeyById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a KMS key by key ID
@@ -85,7 +85,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
+        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId) const;
 
         /**
          * @brief List all keys
@@ -101,7 +101,7 @@ namespace AwsMock::Database {
          * @return total number of keys
          * @throws DatabaseException
          */
-        long CountKeys();
+        long CountKeys() const;
 
         /**
          * @brief Create a new key in the KMS key table
@@ -110,7 +110,7 @@ namespace AwsMock::Database {
          * @return created KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key);
+        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Create or update a key in the KMS key table
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
          * @return created or updated KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpsertKey(const Entity::KMS::Key &key);
+        Entity::KMS::Key UpsertKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Updates a key
@@ -128,7 +128,7 @@ namespace AwsMock::Database {
          * @return created key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
+        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Delete a key
