@@ -510,7 +510,7 @@ namespace AwsMock::Database {
                 session.commit_transaction();
                 if (result.has_value()) {
                     item = Entity::DynamoDb::Item().FromDocument(result->view());
-                    log_info << "DynamoDb item updated, oid: " << item.oid;
+                    log_debug << "DynamoDb item updated, oid: " << item.oid;
                     return item;
                 }
                 return {};

@@ -321,7 +321,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = PrepareHeaders("Scan");
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             scanResponse = {.body = body, .headers = outHeaders, .status = status};
-            log_info << "DynamoDb scan item, name: " << request.tableName;
+            log_debug << "DynamoDb scan item, name: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb scan failed, message: " << exc.message();
