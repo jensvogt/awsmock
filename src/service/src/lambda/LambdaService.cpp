@@ -388,6 +388,10 @@ namespace AwsMock::Service {
             response.user = lambda.user;
             response.role = lambda.role;
             response.size = lambda.codeSize;
+            response.zipFile = lambda.code.zipFile;
+            response.s3Bucket = lambda.code.s3Bucket;
+            response.s3Key = lambda.code.s3Key;
+            response.s3ObjectVersion = lambda.code.s3ObjectVersion;
             response.concurrency = lambda.concurrency;
             response.invocations = lambda.invocations;
             response.averageRuntime = lambda.averageRuntime;
@@ -660,6 +664,30 @@ namespace AwsMock::Service {
         log_info << "Lambda function stopped, functionArn: " + lambda.arn;
     }
 
+    void LambdaService::DeleteImage(const Dto::Lambda::DeleteImageRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_image");
+        log_debug << "Delete image, functionArn: " + request.functionArn;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
+        }
+
+        // Get lambda function
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+
+        // Cleanup docker
+        CleanupDocker(lambda);
+
+        // Update state
+        lambda.state = Database::Entity::Lambda::Inactive;
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        // Prune containers
+        ContainerService::instance().PruneContainers();
+        log_info << "Lambda function stopped, functionArn: " + lambda.arn;
+    }
+
     void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "method", "delete_function");
         log_debug << "Delete function: " + request.ToString();
@@ -787,8 +815,11 @@ namespace AwsMock::Service {
         lambda.instances.clear();
         log_debug << "Done cleanup instances, function: " << lambda.function;
 
-        ContainerService::instance().DeleteImage(lambda.function + ":" + lambda.dockerTag);
-        log_debug << "Done cleanup instances, function: " << lambda.function;
+        // Delete image
+        if (ContainerService::instance().ImageExists(lambda.function, lambda.dockerTag)) {
+            ContainerService::instance().DeleteImage(lambda.function + ":" + lambda.dockerTag);
+            log_debug << "Done cleanup instances, function: " << lambda.function;
+        }
 
         log_info << "Done cleanup docker, function: " << lambda.function;
     }

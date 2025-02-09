@@ -106,6 +106,7 @@ namespace AwsMock::Dto::Lambda {
             counter.invocations = lambdaEntity.invocations;
             counter.runtime = lambdaEntity.runtime;
             counter.handler = lambdaEntity.handler;
+            counter.zipFile = lambdaEntity.code.zipFile;
             counter.state = LambdaStateToString(lambdaEntity.state);
             counter.version = lambdaEntity.dockerTag;
             counter.averageRuntime = lambdaEntity.averageRuntime;

@@ -316,6 +316,17 @@ namespace AwsMock::Service {
                 return SendOkResponse(request);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_IMAGE) {
+
+                Dto::Lambda::DeleteImageRequest lambdaRequest;
+                lambdaRequest.FromJson(clientCommand.payload);
+
+                _lambdaService.DeleteImage(lambdaRequest);
+                log_trace << "Delete image, functionArn: " << lambdaRequest.functionArn;
+
+                return SendOkResponse(request);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA) {
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest;

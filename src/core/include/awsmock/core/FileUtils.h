@@ -105,7 +105,6 @@ namespace AwsMock::Core {
          *
          * @param filePath directory to create the file
          * @param skip number of bytes to skip
-         * @return first line
          */
         static void RemoveFirstBytes(const std::string &filePath, int skip);
 

@@ -19,6 +19,7 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetLongValue(document, "CodeSize", codeSize);
             Core::Bson::BsonUtils::SetStringValue(document, "CodeSha256", codeSha256);
             Core::Bson::BsonUtils::SetStringValue(document, "Version", version);
+            Core::Bson::BsonUtils::SetStringValue(document, "ZipFile", zipFile);
             Core::Bson::BsonUtils::SetIntValue(document, "Timeout", timeout);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
             Core::Bson::BsonUtils::SetStringValue(document, "StateReason", stateReason);

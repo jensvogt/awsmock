@@ -177,6 +177,26 @@ namespace AwsMock::Dto::Lambda {
         std::string version;
 
         /**
+         * Name of the base64 ZIP file
+         */
+        std::string zipFile;
+
+        /**
+         * Name of the S3 bucket
+         */
+        std::string s3Bucket;
+
+        /**
+         * Name of the S3 key
+         */
+        std::string s3Key;
+
+        /**
+         * Version of the S3 object
+         */
+        std::string s3ObjectVersion;
+
+        /**
          * Size
          */
         long size;

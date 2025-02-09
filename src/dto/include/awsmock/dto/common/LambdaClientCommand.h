@@ -45,6 +45,7 @@ namespace AwsMock::Dto::Common {
         UPDATE_ENVIRONMENT,
         START_FUNCTION,
         STOP_FUNCTION,
+        DELETE_IMAGE,
         UNKNOWN
     };
 
@@ -71,6 +72,7 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
             {LambdaCommandType::START_FUNCTION, "start-function"},
             {LambdaCommandType::STOP_FUNCTION, "stop-function"},
+            {LambdaCommandType::DELETE_IMAGE, "delete-image"},
     };
 
     [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {

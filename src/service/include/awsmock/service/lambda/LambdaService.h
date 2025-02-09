@@ -38,6 +38,7 @@
 #include <awsmock/dto/lambda/intern/AddFunctionTagRequest.h>
 #include <awsmock/dto/lambda/intern/DeleteFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/intern/DeleteFunctionTagRequest.h>
+#include <awsmock/dto/lambda/intern/DeleteImageRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
@@ -103,7 +104,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -117,29 +118,29 @@ namespace AwsMock::Service {
          * @brief List lambda functions
          *
          * @param region AWS region name
-         * @return CreateFunctionResponse
+         * @return Dto::Lambda::CreateFunctionResponse
          */
-        Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region) const;
+        [[nodiscard]] Dto::Lambda::ListFunctionResponse ListFunctions(const std::string &region) const;
 
         /**
          * @brief List lambda function counters
          *
          * @param request list lambda function counters request
          * @return ListFunctionCountersResponse
-         * @see ListFunctionCountersRequest
-         * @see ListFunctionCountersResponse
+         * @see Dto::Lambda::ListFunctionCountersRequest
+         * @see Dto::Lambda::ListFunctionCountersResponse
          */
-        Dto::Lambda::ListFunctionCountersResponse ListFunctionCounters(const Dto::Lambda::ListFunctionCountersRequest &request) const;
+        [[nodiscard]] Dto::Lambda::ListFunctionCountersResponse ListFunctionCounters(const Dto::Lambda::ListFunctionCountersRequest &request) const;
 
         /**
          * @brief List lambda tags counters
          *
          * @param request list lambda tags counters request
          * @return ListFunctionCountersResponse
-         * @see ListLambdaTagCountersRequest
-         * @see ListFunctionCountersResponse
+         * @see Dto::Lambda::ListLambdaTagCountersRequest
+         * @see Dto::Lambda::ListFunctionCountersResponse
          */
-        Dto::Lambda::ListLambdaTagCountersResponse ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const;
+        [[nodiscard]] Dto::Lambda::ListLambdaTagCountersResponse ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const;
 
         /**
          * @brief List lambda environment counters
@@ -149,13 +150,13 @@ namespace AwsMock::Service {
          * @see ListLambdaEnvironmentCountersRequest
          * @see ListLambdaEnvironmentCountersResponse
          */
-        Dto::Lambda::ListLambdaEnvironmentCountersResponse ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const;
+        [[nodiscard]] Dto::Lambda::ListLambdaEnvironmentCountersResponse ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const;
 
         /**
          * @brief Add a lambda environment variable
          *
          * @param request add lambda environment variable request
-         * @see AddFunctionTagRequest
+         * @see Dto::Lambda::AddFunctionTagRequest
          */
         void AddLambdaEnvironment(const Dto::Lambda::AddFunctionEnvironmentRequest &request) const;
 
@@ -163,7 +164,7 @@ namespace AwsMock::Service {
          * @brief Update a lambda environment variable
          *
          * @param request update lambda environment variablerequest
-         * @see UpdateFunctionEnvironmentRequest
+         * @see Dto::Lambda::UpdateFunctionEnvironmentRequest
          */
         void UpdateLambdaEnvironment(const Dto::Lambda::UpdateFunctionEnvironmentRequest &request) const;
 
@@ -171,7 +172,7 @@ namespace AwsMock::Service {
          * @brief Delete a lambda environment variable
          *
          * @param request delete lambda environment variable request
-         * @see DeleteFunctionEnvironmentRequest
+         * @see Dto::Lambda::DeleteFunctionEnvironmentRequest
          */
         void DeleteLambdaEnvironment(const Dto::Lambda::DeleteFunctionEnvironmentRequest &request) const;
 
@@ -179,7 +180,7 @@ namespace AwsMock::Service {
          * @brief Add a lambda tags
          *
          * @param request add lambda tags request
-         * @see AddFunctionTagRequest
+         * @see Dto::Lambda::AddFunctionTagRequest
          */
         void AddLambdaTag(const Dto::Lambda::AddFunctionTagRequest &request) const;
 
@@ -187,7 +188,7 @@ namespace AwsMock::Service {
          * @brief Update a lambda tags
          *
          * @param request update lambda tags request
-         * @see UpdateFunctionTagRequest
+         * @see Dto::Lambda::UpdateFunctionTagRequest
          */
         void UpdateLambdaTag(const Dto::Lambda::UpdateFunctionTagRequest &request) const;
 
@@ -195,7 +196,7 @@ namespace AwsMock::Service {
          * @brief Delete a lambda tags
          *
          * @param request delete lambda tags request
-         * @see DeleteFunctionTagRequest
+         * @see Dto::Lambda::DeleteFunctionTagRequest
          */
         void DeleteLambdaTag(const Dto::Lambda::DeleteFunctionTagRequest &request) const;
 
@@ -223,9 +224,9 @@ namespace AwsMock::Service {
          *
          * @param arn lambda function ARN
          * @return ListTagsResponse
-         * @see AwsMock::Dto::Lambda::ListTagsResponse
+         * @see Lambda::ListTagsResponse
          */
-        Dto::Lambda::ListTagsResponse ListTags(const std::string &arn) const;
+        [[nodiscard]] Dto::Lambda::ListTagsResponse ListTags(const std::string &arn) const;
 
         /**
          * @brief Gets a single lambda function
@@ -233,17 +234,17 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param name function name
          * @return GetFunctionResponse
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::GetFunctionResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::GetFunctionResponse
          */
-        Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name) const;
+        [[nodiscard]] Dto::Lambda::GetFunctionResponse GetFunction(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Upload new function code
          *
          * @param request upload function code request
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::UploadFunctionCodeRequest
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::UploadFunctionCodeRequest
          */
         void UploadFunctionCode(const Dto::Lambda::UploadFunctionCodeRequest &request) const;
 
@@ -252,9 +253,9 @@ namespace AwsMock::Service {
          *
          * @param request get function counters request
          * @return GetFunctionCountersResponse
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::GetFunctionCountersRequest
-         * @see AwsMock::Dto::Lambda::GetFunctionCountersResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::GetFunctionCountersRequest
+         * @see Dto::Lambda::GetFunctionCountersResponse
          */
         Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const;
 
@@ -262,8 +263,8 @@ namespace AwsMock::Service {
          * @brief Reset function counters
          *
          * @param request reset function counters request
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::ResetFunctionCountersRequest
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::ResetFunctionCountersRequest
          */
         void ResetFunctionCounters(const Dto::Lambda::ResetFunctionCountersRequest &request) const;
 
@@ -271,8 +272,8 @@ namespace AwsMock::Service {
          * @brief Returns the account settings
          *
          * @return AccountSettingsResponse
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::AccountSettingsResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::AccountSettingsResponse
          */
         Dto::Lambda::AccountSettingsResponse GetAccountSettings() const;
 
@@ -284,9 +285,9 @@ namespace AwsMock::Service {
          *
          * @param request create event source mappings request
          * @return create event source mappings response
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::CreateEventSourceMappingsRequest
-         * @see AwsMock::Dto::Lambda::CreateEventSourceMappingsResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::CreateEventSourceMappingsRequest
+         * @see Dto::Lambda::CreateEventSourceMappingsResponse
          */
         Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const;
 
@@ -295,9 +296,9 @@ namespace AwsMock::Service {
          *
          * @param request list event source mappings request
          * @return list event source mappings response
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::ListEventSourceMappingsRequest
-         * @see AwsMock::Dto::Lambda::ListEventSourceMappingsResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::ListEventSourceMappingsRequest
+         * @see Dto::Lambda::ListEventSourceMappingsResponse
          */
         Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
 
@@ -305,8 +306,8 @@ namespace AwsMock::Service {
          * @brief Starts the lambda function by starting a docker container
          *
          * @param request start lambda function request
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::StartFunctionRequest
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::StartFunctionRequest
          */
         void StartFunction(const Dto::Lambda::StartFunctionRequest &request) const;
 
@@ -314,8 +315,8 @@ namespace AwsMock::Service {
          * @brief Stops the lambda function by stopping all running docker containers
          *
          * @param request stop lambda function request
-         * @throws ServiceException
-         * @see AwsMock::Dto::Lambda::StopFunctionRequest
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::StopFunctionRequest
          */
         void StopFunction(const Dto::Lambda::StopFunctionRequest &request) const;
 
@@ -325,15 +326,27 @@ namespace AwsMock::Service {
          * This method will also delete the corresponding container and images.
          *
          * @param request delete lambda request
-         * @throws ServiceException
+         * @throws Core::ServiceException
          */
         void DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const;
+
+        /**
+         * @brief Delete lambda function docker image
+         *
+         * This method will also stop and remove all docker container
+         *
+         * @param request delete image request
+         * @see Dto::Lambda::DeleteImageRequest
+         * @throws Core::ServiceException
+         */
+        void DeleteImage(const Dto::Lambda::DeleteImageRequest &request) const;
 
         /**
          * @brief Delete lambda function tags
          *
          * @param request delete tags request
-         * @throws ServiceException
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::DeleteTagsRequest
          */
         void DeleteTags(Dto::Lambda::DeleteTagsRequest &request) const;
 
@@ -378,6 +391,7 @@ namespace AwsMock::Service {
          *
          * @param instance lambda instance to check
          * @return containerId of the idle instance
+         * @see Database::Entity::Lambda::Instance
          */
         static std::string GetHostname(Database::Entity::Lambda::Instance &instance);
 
@@ -391,6 +405,7 @@ namespace AwsMock::Service {
          *
          * @param instance lambda instance to check
          * @return containerId of the idle instance
+         * @see Database::Entity::Lambda::Instance
          */
         static int GetContainerPort(const Database::Entity::Lambda::Instance &instance);
 
@@ -402,6 +417,7 @@ namespace AwsMock::Service {
          * time is limited by the total timeout period of the lambda (i.e. 900sec.)
          *
          * @param lambda lambda entity to check
+         * @see Database::Entity::Lambda::Lambda
          */
         static void WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda);
 
@@ -409,6 +425,7 @@ namespace AwsMock::Service {
          * @brief Returns the full path to the base64 encoded lambda function code.
          * @param lambda lambda entity
          * @return full path to base64 function code
+         * @see Database::Entity::Lambda::Lambda
          */
         static std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
 

@@ -19,6 +19,10 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetStringValue(document, "handler", handler);
             Core::Bson::BsonUtils::SetStringValue(document, "runtime", runtime);
             Core::Bson::BsonUtils::SetStringValue(document, "user", user);
+            Core::Bson::BsonUtils::SetStringValue(document, "zipFile", zipFile);
+            Core::Bson::BsonUtils::SetStringValue(document, "s3Bucket", s3Bucket);
+            Core::Bson::BsonUtils::SetStringValue(document, "s3Key", s3Key);
+            Core::Bson::BsonUtils::SetStringValue(document, "s3ObjectVersion", s3ObjectVersion);
             Core::Bson::BsonUtils::SetStringValue(document, "role", role);
             Core::Bson::BsonUtils::SetLongValue(document, "size", size);
             Core::Bson::BsonUtils::SetStringValue(document, "version", version);
