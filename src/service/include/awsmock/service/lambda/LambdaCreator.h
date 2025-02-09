@@ -93,6 +93,7 @@ namespace AwsMock::Service {
          * @param lambdaEntity lambda entity.
          * @param instance lambda entity instance.
          * @param dockerTag docker tag.
+         * @see Database::Entity::Lambda::Lambda
          */
         static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag);
 
@@ -104,6 +105,7 @@ namespace AwsMock::Service {
          *
          * @param lambda lambda entity
          * @return vector of strings containing the runtime environment as key=value pairs
+         * @see Database::Entity::Lambda::Lambda
          */
         static std::vector<std::string> GetEnvironment(const Database::Entity::Lambda::Lambda &lambda);
 
@@ -140,6 +142,7 @@ namespace AwsMock::Service {
          *
          * @param lambda lambda database entity
          * @return random port between 32768 and 65536
+         * @see Database::Entity::Lambda::Lambda
          */
         static std::string GetDockerTag(const Database::Entity::Lambda::Lambda &lambda);
 
@@ -150,6 +153,7 @@ namespace AwsMock::Service {
          * @param lambda lambda entity
          * @param dockerTag docker tag to use
          * @return base64 string
+         * @see Database::Entity::Lambda::Lambda
          */
         static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag);
     };
