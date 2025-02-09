@@ -20,9 +20,10 @@ namespace AwsMock::Core {
       public:
 
         void SetUp() override {
-            _region = Configuration::instance().GetValueString("awsmock.region");
-            _accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
-            _port = Configuration::instance().GetValueInt("awsmock.gateway.http.port");
+            _configuration.SetFilename(TMP_PROPERTIES_FILE);
+            _region = _configuration.GetValueString("awsmock.region");
+            _accountId = _configuration.GetValueString("awsmock.access.account-id");
+            _port = _configuration.GetValueInt("awsmock.gateway.http.port");
             _endpoint = SystemUtils::GetHostName() + ":" + std::to_string(_port);
         }
 
@@ -30,6 +31,7 @@ namespace AwsMock::Core {
 
         int _port = 0;
         std::string _region, _accountId, _endpoint;
+        Configuration _configuration = Configuration::instance();
     };
 
     TEST_F(AwsUtilsTest, CreateS3ArnTest) {
