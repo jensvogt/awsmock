@@ -49,6 +49,7 @@ namespace AwsMock::Core {
                 break;
             }
         }
+
         // Note: necessary because *parentNode will later point to a different node due to lib behavior .
         YAML::Node lastExistingNode = *parentNode;
 
@@ -126,6 +127,18 @@ namespace AwsMock::Core {
         void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
         /**
+         * @brief Define a new string array property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue string default value
+         */
+        void DefineStringArrayProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+
+        /**
          * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
@@ -194,6 +207,14 @@ namespace AwsMock::Core {
          * @return configuration value
          */
         [[nodiscard]] std::string GetValueString(const std::string &key) const;
+
+        /**
+         * @brief Returns a string array configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] std::vector<std::string> GetValueStringArray(const std::string &key) const;
 
         /**
          * @brief Returns a integer configuration value

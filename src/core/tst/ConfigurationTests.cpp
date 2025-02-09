@@ -56,7 +56,7 @@ namespace AwsMock::Core {
         EXPECT_STREQ(configuration.GetValueString("awsmock.logging.level").c_str(), "debug");
     }
 
-    /*TEST_F(ConfigurationTest, YamlConfiggurationTest) {
+    TEST_F(ConfigurationTest, YamlConfigurationTest) {
         // arrange
         const std::string yamlString = "awsmock:\n"
                                        "  region: eu-central-1\n"
@@ -75,7 +75,32 @@ namespace AwsMock::Core {
         // assert
         EXPECT_TRUE(region == "eu-central-1");
         EXPECT_TRUE(keyId == "none");
-    }*/
+    }
+
+    TEST_F(ConfigurationTest, YamlConfigurationArrayTest) {
+        // arrange
+        const std::string yamlString = "awsmock:\n"
+                                       "  region: eu-central-1\n"
+                                       "  user: none\n"
+                                       "  access: \n"
+                                       "    key-id: none\n"
+                                       "    secret-access-key: none\n"
+                                       "    account-id: 000000000000\n"
+                                       "  modules: \n"
+                                       "    transfer: \n"
+                                       "      directories:\n"
+                                       "        - /incoming/mix\n"
+                                       "        - /feedback\n";
+        const std::string yamlFile = FileUtils::CreateTempFile("yaml", yamlString);
+        Configuration::instance().SetFilename(yamlFile);
+
+        // act
+        const std::vector<std::string> directories = Configuration::instance().GetValueStringArray("awsmock.modules.transfer.directories");
+
+        // assert
+        EXPECT_EQ(2, directories.size());
+    }
+
 }// namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_CONFIGURATION_TEST_H

@@ -15,7 +15,7 @@
 
 namespace AwsMock::Core {
 
-    class AwsUtilsTest : public ::testing::Test {
+    class AwsUtilsTest : public testing::Test {
 
       public:
 

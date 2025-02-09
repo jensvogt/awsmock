@@ -144,6 +144,9 @@ awsmock:
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
       data-dir: /home/awsmock/data/transfer                             # FTP data directory
+      directories:
+        - incoming/mix
+        - feedback
       monitoring: # Transfer server monitoring
         period: 300                                                     # Monitoring interval
       worker: # Background worker

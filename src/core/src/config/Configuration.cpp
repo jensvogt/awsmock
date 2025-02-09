@@ -169,6 +169,17 @@ namespace AwsMock::Core {
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
+    void Configuration::DefineStringArrayProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
+        std::string value = defaultValue;
+        if (getenv(envProperty.c_str()) != nullptr) {
+            value = getenv(envProperty.c_str());
+            AddToEnvList(key, getenv(envProperty.c_str()));
+        }
+        const std::vector<std::string> values = StringUtils::Split(value, ';');
+        SetValueByPath(_yamlConfig, key, values);
+        log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
+    }
+
     void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
         bool value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
@@ -269,6 +280,15 @@ namespace AwsMock::Core {
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
         return lookup(_yamlConfig, paths.begin(), paths.end()).as<std::string>();
+    }
+
+    std::vector<std::string> Configuration::GetValueStringArray(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<std::vector<std::string>>();
     }
 
     int Configuration::GetValueInt(const std::string &key) const {
