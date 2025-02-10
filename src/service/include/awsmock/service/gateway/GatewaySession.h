@@ -197,6 +197,97 @@ namespace AwsMock::Service {
     };
 
 
+    template<class SyncReadStream, class DynamicBuffer>
+    void PrintChunkedBody(std::ostream &os, SyncReadStream &stream, DynamicBuffer &buffer, boost::beast::error_code &ec) {
+
+        // Declare the parser with an empty body since
+        // we plan on capturing the chunks ourselves.
+        http::parser<true, http::empty_body> p;
+
+        // This container will hold the extensions for each chunk
+        http::chunk_extensions ce;
+
+        // This string will hold the body of each chunk
+        std::string chunk;
+
+        // Declare our chunk header callback  This is invoked
+        // after each chunk header and also after the last chunk.
+        auto header_cb = [&](const std::uint64_t size, const boost::string_view extensions, boost::beast::error_code &ev) {
+            // Parse the chunk extensions so we can access them easily
+            ce.parse(extensions, ev);
+            if (ev)
+                return;
+
+            // See if the chunk is too big
+            if (size > (std::numeric_limits<std::size_t>::max)()) {
+                ev = http::error::body_limit;
+                return;
+            }
+
+            // Make sure we have enough storage, and
+            // reset the container for the upcoming chunk
+            chunk.reserve(size);
+            chunk.clear();
+        };
+
+        // Set the callback. The function requires a non-const reference so we
+        // use a local variable, since temporaries can only bind to const refs.
+        p.on_chunk_header(header_cb);
+
+        // Declare the chunk body callback. This is called one or
+        // more times for each piece of a chunk body.
+        auto body_cb = [&](const std::uint64_t remain, const boost::string_view body, boost::beast::error_code &ec) {
+            // If this is the last piece of the chunk body, set the error so that the call to `read` returns,
+            // and we can process the chunk.
+            if (remain == body.size())
+                ec = http::error::end_of_chunk;
+
+            // Append this piece to our container
+            chunk.append(body.data(), body.size());
+
+            // The return value informs the parser of how much of the body we
+            // consumed. We will indicate that we consumed everything passed in.
+            return body.size();
+        };
+        p.on_chunk_body(body_cb);
+
+        while (!p.is_done()) {
+            // Read as much as we can. When we reach the end of the chunk, the chunk
+            // body callback will make the read return with the end_of_chunk error.
+            read(stream, buffer, p.get(), ec);
+            if (!ec)
+                continue;
+            if (ec != http::error::end_of_chunk)
+                return;
+            ec.assign(0, ec.category());
+
+            // We got a whole chunk, print the extensions:
+            for (const auto &[fst, snd]: ce) {
+                os << "Extension: " << fst;
+                if (!snd.empty())
+                    os << " = " << snd << std::endl;
+                else
+                    os << std::endl;
+            }
+
+            // Now print the chunk body
+            os << "Chunk Body: " << chunk << std::endl;
+        }
+
+        // Get a reference to the parsed message, this is for convenience
+        // Check each field promised in the "Trailer" header and output it
+        for (auto const &msg = p.get(); auto const &name: http::token_list{msg[http::field::trailer]}) {
+            // Find the trailer field
+            auto it = msg.find(name);
+            if (it == msg.end()) {
+                // Oops! They promised the field but failed to deliver it
+                os << "Missing Trailer: " << name << std::endl;
+                continue;
+            }
+            os << it->name() << ": " << it->value() << std::endl;
+        }
+    }
+
 }// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICES_GATEWAY_SESSION_H

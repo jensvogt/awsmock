@@ -60,8 +60,17 @@ namespace AwsMock::Service {
             HandleContinueRequest(_stream);
         }
 
+        //Core::HttpUtils::DumpHeaders(_parser.get().get());
+
         // Read the rest of the request.
+        // if (boost::beast::iequals(_parser->get()[http::field::transfer_encoding], "chunked")) {
+        //     boost::beast::error_code Ev;
+        //     PrintChunkedBody(std::cerr, _stream, _buffer, Ev);
+        // } else {
         read(_stream, _buffer, *_parser, ev);
+        //}
+        // Read the rest of the request.
+        //        read(_stream, _buffer, *_parser, ev);
 
         // Send the response
         QueueWrite(HandleRequest(_parser->release()));
