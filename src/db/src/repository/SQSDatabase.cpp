@@ -91,7 +91,7 @@ namespace AwsMock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
 
-        const std::optional<bsoncxx::document::value> mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
+        const auto mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
         if (mResult->empty()) {
             log_error << "Queue not found, oid: " << oid.to_string();
             throw Core::DatabaseException("Queue not found, oid: " + oid.to_string());
@@ -189,7 +189,7 @@ namespace AwsMock::Database {
                 query.append(kvp("queueName", queueName));
             }
 
-            if (const std::optional<value> mResult = _queueCollection.find_one(query.extract()); !mResult) {
+            if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
 
                 log_warning << "GetQueueByName failed, region: " << region << " name: " << queueName;
                 throw Core::DatabaseException("Queue not found, region: " + region + " name: " + queueName);
@@ -562,7 +562,7 @@ namespace AwsMock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-        const std::optional<value> mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
+        const auto mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
         result.FromDocument(mResult->view());
 
@@ -576,7 +576,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-            if (const std::optional<value> mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
+            if (const auto mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
                 Entity::SQS::Message result;
                 result.FromDocument(mResult->view());
                 return result;
@@ -593,7 +593,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
 
-            if (const std::optional<value> mResult = messageCollection.find_one(make_document(kvp("messageId", messageId)))) {
+            if (const auto mResult = messageCollection.find_one(make_document(kvp("messageId", messageId)))) {
                 Entity::SQS::Message result;
                 result.FromDocument(mResult->view());
                 return result;
@@ -1121,7 +1121,7 @@ namespace AwsMock::Database {
                     system_clock::time_point firstTimestamp = system_clock::now();
                     system_clock::time_point lastTimestamp = system_clock::now();
 
-                    if (const std::optional<value> first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts)) {
+                    if (const auto first = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts)) {
                         Entity::SQS::Message firstMessage;
                         firstMessage.FromDocument(first->view());
                         firstTimestamp = firstMessage.created;
@@ -1129,7 +1129,7 @@ namespace AwsMock::Database {
 
                     opts.sort(make_document(kvp("created", 1)));
 
-                    if (std::optional<value> last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts); last.has_value()) {
+                    if (auto last = messageCollection.find_one(make_document(kvp("queueArn", queue.queueArn)), opts); last.has_value()) {
                         Entity::SQS::Message lastMessage;
                         lastMessage.FromDocument(last->view());
                         lastTimestamp = lastMessage.created;

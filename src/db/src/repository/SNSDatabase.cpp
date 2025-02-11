@@ -74,7 +74,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-            if (const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("_id", oid)))) {
+            if (const auto mResult = _topicCollection.find_one(make_document(kvp("_id", oid)))) {
                 Entity::SNS::Topic result;
                 result.FromDocument(mResult->view());
                 return result;
@@ -103,7 +103,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-                if (const std::optional<value> mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn))); !mResult->empty()) {
+                if (const auto mResult = _topicCollection.find_one(make_document(kvp("topicArn", topicArn))); !mResult->empty()) {
                     Entity::SNS::Topic result;
                     result.FromDocument(mResult->view());
                     return result;
@@ -126,7 +126,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-                if (const std::optional<value> mResult = _topicCollection.find_one(
+                if (const auto mResult = _topicCollection.find_one(
                             make_document(kvp("targetArn", targetArn)));
                     !mResult->empty()) {
                     Entity::SNS::Topic result;
@@ -147,7 +147,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-                if (const std::optional<value> mResult = _topicCollection.find_one(
+                if (const auto mResult = _topicCollection.find_one(
                             make_document(kvp("region", region), kvp("topicName", topicName)));
                     !mResult->empty()) {
                     Entity::SNS::Topic result;
@@ -508,7 +508,7 @@ namespace AwsMock::Database {
         try {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-            const std::optional<value> mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
             Entity::SNS::Message result;
             result.FromDocument(mResult->view());
 

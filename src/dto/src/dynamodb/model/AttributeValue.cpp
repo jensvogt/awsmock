@@ -41,15 +41,15 @@ namespace AwsMock::Dto::DynamoDb {
     void AttributeValue::FromDocument(const view &jsonObject) {
 
         try {
-            for (bsoncxx::document::element ele: jsonObject) {
+            for (const bsoncxx::document::element& ele: jsonObject) {
                 if (ele.key() == "S") {
-                    stringValue = jsonObject["S"].get_string().value;
+                    stringValue = bsoncxx::string::to_string(jsonObject["S"].get_string().value);
                 } else if (ele.key() == "SS") {
                     for (bsoncxx::array::view jsonArray = jsonObject["SS"].get_array().value; const auto &value: jsonArray) {
                         stringSetValue.emplace_back(value.get_string().value);
                     }
                 } else if (ele.key() == "N") {
-                    numberValue = jsonObject["N"].get_string().value;
+                    numberValue = bsoncxx::string::to_string(jsonObject["N"].get_string().value);
                 } else if (ele.key() == "NS") {
                     for (bsoncxx::array::view jsonArray = jsonObject["NS"].get_array().value; const auto &value: jsonArray) {
                         numberSetValue.emplace_back(value.get_string().value);

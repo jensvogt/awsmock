@@ -7,7 +7,7 @@ set(MAIN_SOURCES main.cpp)
 
 # Includes
 include_directories(../include ../../core/include ../../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(../../core ../../db ../../dto)
+link_directories(../../core ../../db ../../dto /usr/local/lib)
 
 add_executable(${BINARY} ${SQS_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_thread boost_filesystem boost_url yaml-cpp gtest pthread

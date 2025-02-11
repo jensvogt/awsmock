@@ -101,7 +101,7 @@ namespace AwsMock::Database {
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
-        const std::optional<value> mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
+        const auto mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
         Entity::S3::Bucket result;
         result.FromDocument(mResult->view());
 
@@ -123,7 +123,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            if (const std::optional<value> mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)))) {
+            if (const auto mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)))) {
                 Entity::S3::Bucket result;
                 result.FromDocument(mResult->view());
                 log_trace << "Got bucket: " << result.ToString();
@@ -562,7 +562,7 @@ namespace AwsMock::Database {
         try {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-            const std::optional<value> mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _objectCollection.find_one(make_document(kvp("_id", oid)));
 
             if (mResult->empty()) {
                 return {};
@@ -665,7 +665,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
-                const std::optional<value>
+                const auto
                         mResult = _objectCollection.find_one(make_document(kvp("region", region),
                                                                            kvp("bucket", bucket),
                                                                            kvp("key", key),

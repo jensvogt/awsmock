@@ -58,7 +58,7 @@ namespace AwsMock::Database::Entity::Transfer {
         return transferDoc.extract();
     }
 
-    void Transfer::FromDocument(const std::optional<view> &mResult) {
+    void Transfer::FromDocument(const view_or_value<view,value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -73,15 +73,15 @@ namespace AwsMock::Database::Entity::Transfer {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Protocols
-        if (mResult.value().find("protocols") != mResult.value().end()) {
-            for (auto [value] = mResult.value()["protocols"].get_array(); auto &p: value) {
+        if (mResult.view().find("protocols") != mResult.view().end()) {
+            for (auto [value] = mResult.view()["protocols"].get_array(); auto &p: value) {
                 protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
             }
         }
 
         // Users
-        if (mResult.value().find("users") != mResult.value().end()) {
-            for (const bsoncxx::array::view usersView{mResult.value()["users"].get_array().value}; const bsoncxx::array::element &userElement: usersView) {
+        if (mResult.view().find("users") != mResult.view().end()) {
+            for (const bsoncxx::array::view usersView{mResult.view()["users"].get_array().value}; const bsoncxx::array::element &userElement: usersView) {
                 User user = {
                         .userName = bsoncxx::string::to_string(userElement["userName"].get_string().value),
                         .password = bsoncxx::string::to_string(userElement["password"].get_string().value),
