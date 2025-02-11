@@ -21,7 +21,6 @@
 #include <string>
 
 // Boost includes
-#include <boost/asio/detail/config.hpp>
 #include <boost/asio/ip/host_name.hpp>
 
 // AwsMock includes

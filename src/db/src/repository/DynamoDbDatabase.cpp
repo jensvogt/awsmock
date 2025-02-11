@@ -48,7 +48,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            const std::optional<value> mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Table not found ";
                 throw Core::DatabaseException("Database exception, Table not found ");
@@ -73,7 +73,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                const std::optional<value> mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                const auto mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Table not found ";
                     throw Core::DatabaseException("Database exception, Table not found ");
@@ -408,7 +408,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-            const std::optional<value> mResult = _itemCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _itemCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: item not found ";
                 throw Core::DatabaseException("Database exception, item not found ");

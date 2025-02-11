@@ -1,11 +1,8 @@
 set(BINARY awsmockctl)
-set(AWS_CRT_SDK aws-crt-cpp aws-c-event-stream aws-c-s3 aws-c-auth aws-c-mqtt aws-c-http aws-c-sdkutils aws-checksums
-        aws-c-io aws-c-cal aws-c-common aws-c-compression s2n)
-
 set(SOURCES src/Controller.cpp src/main.cpp)
 
 include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(../core)
+link_directories(../core /usr/local/lib)
 
 add_executable(${BINARY} ${SOURCES})
 

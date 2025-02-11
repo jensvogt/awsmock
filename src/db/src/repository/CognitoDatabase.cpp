@@ -78,7 +78,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-            const std::optional<value> mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                const std::optional<value> mResult = _userPoolCollection.find_one(make_document(kvp("userPoolId", userPoolId)));
+                const auto mResult = _userPoolCollection.find_one(make_document(kvp("userPoolId", userPoolId)));
                 if (!mResult) {
                     log_error << "Database exception: user pool not found ";
                     throw Core::DatabaseException("Database exception, user pool not found ");
@@ -128,10 +128,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                const std::optional<value> mResult = _userPoolCollection.find_one(make_document(
-                        kvp("userPoolClients",
-                            make_document(kvp("$elemMatch",
-                                              make_document(kvp("clientId", clientId)))))));
+                const auto mResult = _userPoolCollection.find_one(make_document(kvp("userPoolClients",make_document(kvp("$elemMatch",make_document(kvp("clientId", clientId)))))));
                 if (!mResult) {
                     log_error << "Database exception: user pool not found ";
                     throw Core::DatabaseException("Database exception, user pool not found ");
@@ -157,7 +154,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                const std::optional<value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                const auto mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Cognito not found ";
                     throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -445,7 +442,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
-            const std::optional<value> mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: user not found ";
                 throw Core::DatabaseException("Database exception, user not found ");
@@ -748,7 +745,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
-            const std::optional<value> mResult = _groupCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _groupCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
