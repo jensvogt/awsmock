@@ -74,8 +74,7 @@ namespace AwsMock::Database::Entity::Transfer {
 
         // Protocols
         if (mResult.view().find("protocols") != mResult.view().end()) {
-            auto [value] = mResult.view()["protocols"].get_array();
-            for (auto &p: value) {
+            for (auto [value] = mResult.view()["protocols"].get_array(); auto &p: value) {
                 protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
             }
         }
