@@ -40,27 +40,32 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing get the current port from the docker container
+        Database::Entity::Lambda::Instance instance;
         const std::string containerName = lambdaEntity.function + "-" + instanceId;
         if (!ContainerService::instance().ContainerExistsByName(containerName)) {
-            Database::Entity::Lambda::Instance instance;
-            instance.id = instanceId;
-            instance.hostPort = CreateRandomHostPort();
-            instance.containerName = containerName;
-            instance.status = Database::Entity::Lambda::InstanceIdle;
-            instance.created = system_clock::now();
-            CreateDockerContainer(lambdaEntity, instance, lambdaEntity.dockerTag);
-            lambdaEntity.instances.emplace_back(instance);
+            CreateDockerContainer(lambdaEntity, instanceId, CreateRandomHostPort(), lambdaEntity.dockerTag);
         }
 
         // Get docker container
-        const Dto::Docker::Container container = ContainerService::instance().GetContainerByName(containerName);
+        Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
+        Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
 
         // Start docker container, in case it is not already running.
-        if (container.state != "running") {
-            ContainerService::instance().StartDockerContainer(container.id);
-            ContainerService::instance().WaitForContainer(container.id);
-            log_debug << "Lambda docker container started, containerId: " << container.id;
+        if (!inspectContainerResponse.state.running) {
+            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id);
+            ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+            log_debug << "Lambda docker container started, containerId: " << inspectContainerResponse.id;
         }
+
+        // Get the public port
+        inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
+        instance.instanceId = instanceId;
+        instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(8080);
+        instance.status = Database::Entity::Lambda::InstanceIdle;
+        instance.containerId = inspectContainerResponse.id;
+        instance.containerName = containerName;
+        instance.created = system_clock::now();
+        lambdaEntity.instances.emplace_back(instance);
 
         // Save size in entity
         lambdaEntity.containerSize = container.sizeRootFs;
@@ -93,15 +98,14 @@ namespace AwsMock::Service {
         log_debug << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
     }
 
-    void LambdaCreator::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag) {
+    void LambdaCreator::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
 
         try {
 
-            const std::string containerName = lambdaEntity.function + "-" + instance.id;
+            const std::string containerName = lambdaEntity.function + "-" + instanceId;
             const std::vector<std::string> environment = GetEnvironment(lambdaEntity);
-            const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, instance.hostPort);
-            instance.containerId = containerCreateResponse.id;
-            log_debug << "Lambda container created, hostPort: " << instance.hostPort << " containerId: " << instance.containerId;
+            const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(lambdaEntity.function, containerName, dockerTag, environment, hostPort);
+            log_debug << "Lambda container created, hostPort: " << hostPort << " containerId: " << containerCreateResponse.id;
 
         } catch (std::exception &exc) {
             log_error << exc.what();

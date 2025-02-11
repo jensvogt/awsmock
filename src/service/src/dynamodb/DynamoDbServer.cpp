@@ -24,7 +24,7 @@ namespace AwsMock::Service {
             log_info << "DynamoDb module inactive";
             return;
         }
-        log_info << "DynamoDb server started";
+        log_info << "DynamoDb server starting";
 
         // Start DynamoDb docker image
         StartLocalDynamoDb();
@@ -52,12 +52,15 @@ namespace AwsMock::Service {
         // Check container image
         if (!_containerService.ContainerExistsByName(_containerName)) {
             const Dto::Docker::CreateContainerResponse response = _containerService.CreateContainer(_imageName, _imageTag, _containerName, _containerPort, _containerPort);
+            _containerService.StartDockerContainer(response.id);
+            _containerService.WaitForContainer(response.id);
             log_trace << "CreateContainer, containerName: " << _containerName << " id: " << response.id;
         }
 
         // Start docker container, in case it is not already running.
         if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); container.state != "running") {
             _containerService.StartDockerContainer(container.id);
+            _containerService.WaitForContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
         } else {
             log_info << "Docker containers for DynamoDB already running";

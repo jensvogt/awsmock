@@ -218,8 +218,7 @@ namespace AwsMock::Service {
         if (!infrastructure.lambdas.empty()) {
             Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
             for (auto &lambda: infrastructure.lambdas) {
-                lambda.modified = system_clock::now();
-                _lambdaDatabase.CreateOrUpdateLambda(lambda);
+                _lambdaDatabase.ImportLambda(lambda);
             }
             log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
         }

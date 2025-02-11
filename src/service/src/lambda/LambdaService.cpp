@@ -48,12 +48,16 @@ namespace AwsMock::Service {
         lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
-        // Create lambda function asynchronously
-        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        LambdaCreator lambdaCreator;
-        boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
-        t.detach();
-        log_debug << "Lambda create started, function: " << lambdaEntity.function;
+        // Find idle instance
+        if (std::string instanceId = FindIdleInstance(lambdaEntity); instanceId.empty()) {
+
+            // Create lambda function asynchronously
+            LambdaCreator lambdaCreator;
+            instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
+            t.detach();
+            log_debug << "Lambda create started, function: " << lambdaEntity.function;
+        }
 
         // Create response
         Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
@@ -780,8 +784,8 @@ namespace AwsMock::Service {
         }
         for (const auto &instance: lambda.instances) {
             if (instance.status == Database::Entity::Lambda::InstanceIdle) {
-                log_debug << "Found idle instance, id: " << instance.id;
-                return instance.id;
+                log_debug << "Found idle instance, id: " << instance.instanceId;
+                return instance.instanceId;
             }
         }
         return {};

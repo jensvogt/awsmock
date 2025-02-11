@@ -99,6 +99,7 @@ awsmock:
     lambda:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
+      privatePort: 8080                                              # lambda docker container internal port
       data-dir: /home/awsmock/data/lambda
       monitoring:
         period: 300

@@ -220,7 +220,7 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) {
+    Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const {
 
         if (LambdaExists(lambda)) {
             return UpdateLambda(lambda);
@@ -236,10 +236,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
-                auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region),
-                                                                          kvp("function", lambda.function),
-                                                                          kvp("runtime", lambda.runtime)),
-                                                            lambda.ToDocument());
+                auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
                 log_trace << "lambda updated: " << lambda.ToString();
                 return GetLambdaByArn(lambda.arn);
 
@@ -247,18 +244,26 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            return _memoryDb.UpdateLambda(lambda);
         }
+        return _memoryDb.UpdateLambda(lambda);
     }
+
+    Entity::Lambda::Lambda LambdaDatabase::ImportLambda(Entity::Lambda::Lambda &lambda) const {
+
+        if (LambdaExists(lambda)) {
+            const Entity::Lambda::Lambda existing = GetLambdaByArn(lambda.arn);
+            lambda.modified = system_clock::now();
+            lambda.instances = existing.instances;
+        }
+        return CreateOrUpdateLambda(lambda);
+    }
+
 
     void LambdaDatabase::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
 
         if (HasDatabase()) {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
@@ -266,8 +271,7 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
-                                             make_document(kvp("$set",
-                                                               make_document(kvp("instances.$.status", Entity::Lambda::LambdaInstanceStatusToString(status))))));
+                                             make_document(kvp("$set", make_document(kvp("instances.$.status", LambdaInstanceStatusToString(status))))));
                 session.commit_transaction();
 
             } catch (mongocxx::exception::system_error &e) {
@@ -293,8 +297,7 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(oid))),
-                                             make_document(kvp("$set",
-                                                               make_document(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation))))));
+                                             make_document(kvp("$set", make_document(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation))))));
                 session.commit_transaction();
 
             } catch (mongocxx::exception::system_error &e) {

@@ -120,7 +120,7 @@ namespace AwsMock::Service {
 
             // Remove instance
             const auto count = std::erase_if(lambda.instances, [expired](const Database::Entity::Lambda::Instance &instance) {
-                return instance.created < expired;
+                return instance.created > instance.created.min() && instance.created < expired;
             });
 
             // Update lambda

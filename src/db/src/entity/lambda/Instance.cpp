@@ -10,7 +10,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         try {
 
-            id = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
+            instanceId = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
             containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
             containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
             hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
@@ -28,7 +28,7 @@ namespace AwsMock::Database::Entity::Lambda {
         try {
 
             document instanceDoc{};
-            instanceDoc.append(kvp("id", id));
+            instanceDoc.append(kvp("id", instanceId));
             instanceDoc.append(kvp("containerId", containerId));
             instanceDoc.append(kvp("containerName", containerName));
             instanceDoc.append(kvp("hostPort", hostPort));
@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::Lambda {
         try {
 
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+            Core::Bson::BsonUtils::SetStringValue(document, "id", instanceId);
             Core::Bson::BsonUtils::SetStringValue(document, "status", LambdaInstanceStatusToString(status));
             return document.extract();
 

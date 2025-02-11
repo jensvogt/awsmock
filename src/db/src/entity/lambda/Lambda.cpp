@@ -36,7 +36,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     Instance Lambda::GetInstance(const std::string &instanceId) {
-        if (const auto it = std::ranges::find(instances, instanceId, &Instance::id); it != instances.end()) {
+        if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
             return *it;
         }
         log_error << "Lambda instance not found, id: " << instanceId;
@@ -44,8 +44,8 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     void Lambda::RemoveInstance(const Instance &instance) {
-        std::string id = instance.id;
-        instances.erase(std::ranges::remove_if(instances, [&id](const Instance &instance) { return id == instance.id; }).begin(), instances.end());
+        std::string id = instance.instanceId;
+        instances.erase(std::ranges::remove_if(instances, [&id](const Instance &instance) { return id == instance.instanceId; }).begin(), instances.end());
     }
 
     view_or_value<view, value> Lambda::ToDocument() const {

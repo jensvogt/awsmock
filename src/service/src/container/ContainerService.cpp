@@ -314,6 +314,21 @@ namespace AwsMock::Service {
         return response.containerList.front();
     }
 
+    Dto::Docker::InspectContainerResponse ContainerService::InspectContainer(const std::string &containerId) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/containers/" + containerId + "/json");
+        if (statusCode != http::status::ok) {
+            log_warning << "Get container by name failed, state: " << statusCode;
+            return {};
+        }
+
+        Dto::Docker::InspectContainerResponse inspectContainerResponse;
+        inspectContainerResponse.FromJson(body);
+        log_debug << "Container found, containerId: " << containerId;
+        return inspectContainerResponse;
+    }
+
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 

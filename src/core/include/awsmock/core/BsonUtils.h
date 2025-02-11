@@ -48,8 +48,7 @@ namespace AwsMock::Core::Bson {
     template<class Element>
     void FromBsonArray(const view &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -60,8 +59,7 @@ namespace AwsMock::Core::Bson {
     template<class Element>
     void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -71,8 +69,7 @@ namespace AwsMock::Core::Bson {
 
     inline void FromBsonStringArray(const value &value, const std::string &name, std::vector<std::string> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
@@ -80,8 +77,7 @@ namespace AwsMock::Core::Bson {
 
     inline void FromBsonArray(const view &value, const std::string &name, std::vector<std::string> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
@@ -95,8 +91,7 @@ namespace AwsMock::Core::Bson {
         return {};
     }
 
-    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument,
-                                                                const std::string &name) {
+    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument, const std::string &name) {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
             for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
