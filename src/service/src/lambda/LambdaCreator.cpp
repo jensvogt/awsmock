@@ -126,6 +126,7 @@ namespace AwsMock::Service {
             std::ofstream ofs(zipFile);
             ofs << decoded;
             ofs.close();
+            decoded.clear();
 
             // Save zip file
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
@@ -242,6 +243,7 @@ namespace AwsMock::Service {
                 log_debug << "New and original are equal: " << base64FullFile;
             }
         }
+        base64EncodedCodeString.clear();
 
         lambda.code.zipFile = base64File;
         return base64FullFile;
