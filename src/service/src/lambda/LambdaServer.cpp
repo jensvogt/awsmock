@@ -26,7 +26,7 @@ namespace AwsMock::Service {
         //CleanupContainers();
 
         // Cleanup instances
-        CleanupInstances();
+        //CleanupInstances();
 
         // Create a local network, if it is not existing yet
         CreateLocalNetwork();

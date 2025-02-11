@@ -55,7 +55,7 @@ namespace AwsMock::Service {
             LambdaCreator lambdaCreator;
             instanceId = Core::StringUtils::GenerateRandomHexString(8);
             boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
-            t.detach();
+            t.join();
             log_debug << "Lambda create started, function: " << lambdaEntity.function;
         }
 
