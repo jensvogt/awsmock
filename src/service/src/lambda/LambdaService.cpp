@@ -19,6 +19,7 @@ namespace AwsMock::Service {
         std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 
+            lambdaEntity = _lambdaDatabase.GetLambdaByArn(lambdaArn);
             const std::string fileName = GetLambdaCodePath(lambdaEntity);
             if (!Core::FileUtils::FileExists(fileName)) {
                 throw Core::ServiceException("Lambda base64 encoded code does not exists, fileName: " + fileName);

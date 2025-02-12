@@ -26,7 +26,7 @@ namespace AwsMock::Service {
         //CleanupContainers();
 
         // Cleanup instances
-        //CleanupInstances();
+        CleanupInstances();
 
         // Create a local network, if it is not existing yet
         CreateLocalNetwork();
@@ -61,7 +61,7 @@ namespace AwsMock::Service {
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_debug << "Lambda cleaned up, name: " << lambda.function;
         }
-        log_debug << "All lambda instances cleaned up";
+        log_info << "All lambda instances stopped";
     }
 
     void LambdaServer::CleanupContainers() const {
