@@ -13,7 +13,7 @@ namespace AwsMock::Service {
         const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
 
         // Create entity and set ARN
-        Database::Entity::Lambda::Lambda lambdaEntity;
+        Database::Entity::Lambda::Lambda lambdaEntity = {};
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
         // Create response, if inactive
@@ -26,8 +26,6 @@ namespace AwsMock::Service {
         std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 
-            // Get the existing entity
-            lambdaEntity = _lambdaDatabase.GetLambdaByArn(lambdaArn);
             const std::string fileName = GetLambdaCodePath(lambdaEntity);
             if (!Core::FileUtils::FileExists(fileName)) {
                 throw Core::ServiceException("Lambda base64 encoded code does not exists, fileName: " + fileName);
@@ -48,6 +46,13 @@ namespace AwsMock::Service {
             lambdaEntity.code.zipFile = GetLambdaCodePath(lambdaEntity);
         }
 
+        // Create response, if inactive
+        if (lambdaEntity.state == Database::Entity::Lambda::Inactive) {
+            Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
+            log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
+            return response;
+        }
+
         // Update database
         lambdaEntity.timeout = request.timeout;
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Pending;
@@ -62,7 +67,7 @@ namespace AwsMock::Service {
             LambdaCreator lambdaCreator;
             instanceId = Core::StringUtils::GenerateRandomHexString(8);
             boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
-            t.join();
+            t.detach();
             log_debug << "Lambda create started, function: " << lambdaEntity.function;
         }
 
