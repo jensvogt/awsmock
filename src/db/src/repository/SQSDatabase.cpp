@@ -374,7 +374,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::CreateOrUpdateQueue(Entity::SQS::Queue &queue) const {
 
-        if (QueueUrlExists(queue.region, queue.queueUrl)) {
+        if (QueueArnExists(queue.queueArn)) {
 
             return UpdateQueue(queue);
         }
