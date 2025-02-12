@@ -179,7 +179,6 @@ namespace AwsMock::Service {
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
                     queue.modified = system_clock::now();
-                    queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
                     _sqsDatabase.CreateOrUpdateQueue(queue);
                     log_debug << "SQS queues imported, url: " << queue.queueUrl;
                 }
