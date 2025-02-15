@@ -16,10 +16,15 @@ set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES})
 # Test directory
 add_subdirectory(tst)
 
-# Includes
 include_directories(./include /usr/local/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+link_directories(/usr/local/lib)
+
 add_library(${LIBRARY} SHARED ${SOURCES})
+set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
+target_link_libraries(${LIBRARY} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+        archive z prometheus-cpp-core prometheus-cpp-pull magic)
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-
+target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+        archive z prometheus-cpp-core prometheus-cpp-pull magic)
 install(TARGETS ${LIBRARY} DESTINATION lib)

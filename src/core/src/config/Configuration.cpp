@@ -183,7 +183,7 @@ namespace AwsMock::Core {
     void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
         bool value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            value = getenv(envProperty.c_str()) == "true";
+            value = StringUtils::Equals(getenv(envProperty.c_str()), "true");
             AddToEnvList(key, getenv(envProperty.c_str()));
         }
         SetValueByPath(_yamlConfig, key, value);

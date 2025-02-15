@@ -7,7 +7,6 @@
 
 // Standard C includes
 #include <magic.h>
-//#include <sys/sendfile.h>
 
 // Standard C++ includes
 #include <filesystem>
@@ -16,6 +15,7 @@
 #include <iostream>
 #include <pwd.h>
 #include <string>
+
 #ifdef __APPLE__
 #include <sys/socket.h>
 #include <sys/types.h>

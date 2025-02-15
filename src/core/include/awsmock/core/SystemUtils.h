@@ -20,6 +20,11 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef __APPLE__
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#endif
+
 // Boost includes
 #include <boost/asio/ip/host_name.hpp>
 

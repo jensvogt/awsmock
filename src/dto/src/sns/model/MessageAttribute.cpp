@@ -38,7 +38,7 @@ namespace AwsMock::Dto::SNS {
         std::string output;
         output.resize(md_len * 2);
         for (unsigned int i = 0; i < md_len; ++i) {
-            std::sprintf(&output[i * 2], "%02x", md_value[i]);
+            std::snprintf(&output[i * 2], md_len * 2, "%02x", md_value[i]);
         }
 
         return output;
