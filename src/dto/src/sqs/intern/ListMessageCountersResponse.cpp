@@ -13,11 +13,11 @@ namespace AwsMock::Dto::SQS {
             if (!messages.empty()) {
                 array messageArrayJson;
                 for (const auto &message: messages) {
-                    messageArrayJson.append(message.ToDocument());
+                    messageArrayJson.append(bsoncxx::types::b_document(message.ToDocument()));
                 }
-                document.append(kvp("Messages", messageArrayJson));
+                document.append(kvp("Messages", bsoncxx::types::b_array(messageArrayJson)));
             }
-            document.append(kvp("Total", total));
+            document.append(kvp("Total", bsoncxx::types::b_int64(total)));
 
             return Core::Bson::BsonUtils::ToJsonString(document);
 

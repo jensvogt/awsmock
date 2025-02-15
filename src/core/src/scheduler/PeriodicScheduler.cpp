@@ -3,7 +3,7 @@
 
 namespace AwsMock::Core {
 
-    PeriodicScheduler::PeriodicScheduler(boost::asio::io_service &io_service) : _io_service(io_service){};
+    PeriodicScheduler::PeriodicScheduler(boost::asio::io_context &io_service) : _io_service(io_service){};
 
     void PeriodicScheduler::Run() {
     }

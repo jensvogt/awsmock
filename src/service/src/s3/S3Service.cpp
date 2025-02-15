@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/s3/S3Service.h>
-#include <picojson/picojson.h>
 
 namespace AwsMock::Service {
 
@@ -386,11 +385,15 @@ namespace AwsMock::Service {
         log_trace << "Using uploadDir: " << uploadDir;
 
         long start = request.min;
-        const long length = request.max - request.min + 1;
+        long length = request.max - request.min + 1;
         const std::string destFile = uploadDir + Core::FileUtils::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
         const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
         const int source = open(sourceFile.c_str(), O_RDONLY, 0);
+#if __APPLE__
+        const long copied = sendfile(dest, source, start, reinterpret_cast<off_t *>(&length), nullptr, 0);
+#else
         const long copied = sendfile(dest, source, &start, length);
+#endif
         close(source);
         close(dest);
 

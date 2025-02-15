@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SQS {
                 document.append(kvp("Messages", messageArrayJson));
             }
 
-            document.append(kvp("Total", total));
+            document.append(kvp("Total", bsoncxx::types::b_int64(total)));
 
             return Core::Bson::BsonUtils::ToJsonString(document);
 

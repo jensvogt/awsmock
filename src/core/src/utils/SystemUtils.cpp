@@ -13,7 +13,11 @@ namespace AwsMock::Core {
         std::string cmd = command + " > " + redirection.string() + " 2>&1";
 
         // execute command
+#if __APPLE__
+        auto status = std::system(cmd.c_str());
+#else
         auto status = WEXITSTATUS(std::system(cmd.c_str()));
+#endif
         log_trace << "Exec status: " << status;
 
         // read redirection file and remove the file

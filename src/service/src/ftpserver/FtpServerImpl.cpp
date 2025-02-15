@@ -27,15 +27,15 @@ namespace AwsMock::FtpServer {
         auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
 
         // set up the acceptor to listen on the tcp port
-        asio::error_code make_address_ec;
-        const asio::ip::tcp::endpoint endpoint(asio::ip::make_address(_address, make_address_ec), _port);
+        boost::beast::error_code make_address_ec;
+        const boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::make_address(_address, make_address_ec), _port);
         if (make_address_ec) {
             log_error << "Error creating address from string \"" << _address << "\": " << make_address_ec.message();
             return false;
         }
 
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             ec = _acceptor.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening acceptor: " << ec.message();
@@ -44,8 +44,8 @@ namespace AwsMock::FtpServer {
         }
 
         {
-            asio::error_code ec;
-            ec = _acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true), ec);
+            boost::beast::error_code ec;
+            ec = _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), ec);
             if (ec) {
                 log_error << "Error setting reuse_address option: " << ec.message();
                 return false;
@@ -53,7 +53,7 @@ namespace AwsMock::FtpServer {
         }
 
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             ec = _acceptor.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding acceptor: " << ec.message();
@@ -62,8 +62,8 @@ namespace AwsMock::FtpServer {
         }
 
         {
-            asio::error_code ec;
-            ec = _acceptor.listen(asio::socket_base::max_listen_connections, ec);
+            boost::beast::error_code ec;
+            ec = _acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on acceptor: " << ec.message();
                 return false;
@@ -95,7 +95,7 @@ namespace AwsMock::FtpServer {
         _threadPool.clear();
     }
 
-    void FtpServerImpl::acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, asio::error_code const &error) {
+    void FtpServerImpl::acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, boost::beast::error_code const &error) {
         if (error) {
             log_error << "Error handling connection: " << error.message();
             return;

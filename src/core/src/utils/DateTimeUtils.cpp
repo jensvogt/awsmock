@@ -30,12 +30,20 @@ namespace AwsMock::Core {
         // T: ISO 8601 time format (HH:MM:SS), equivalent to %H:%M:%S
         // z: ISO 8601 offset from UTC in timezone (1 minute=1, 1 hour=100). If timezone cannot be determined, no characters
         strptime(dateString.c_str(), "%FT%TZ", &t);
-        return std::chrono::zoned_time{std::chrono::current_zone(), std::chrono::system_clock::from_time_t(mktime(&t))};
+#if __APPLE__
+        return std::chrono::system_clock::from_time_t(mktime(&t));
+#else
+        return std::chrono::zoned_time{std::chrono::current_zone(), system_clock::from_time_t(mktime(&t))};
+#endif
     }
 
     system_clock::time_point DateTimeUtils::FromUnixTimestamp(const long timestamp) {
         const system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
+#if __APPLE__
+        return std::chrono::system_clock::from_time_t(timestamp);
+#else
         return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::hours(2)};
+#endif
     }
 
     std::string DateTimeUtils::HttpFormatNow() {
@@ -59,7 +67,11 @@ namespace AwsMock::Core {
     }
 
     long DateTimeUtils::UnixTimestampLocal(const system_clock::time_point &timePoint) {
+#if __APPLE__
+        return std::chrono::duration_cast<std::chrono::seconds>(timePoint.time_since_epoch()).count();
+#else
         return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::zoned_time(std::chrono::current_zone(), timePoint).get_local_time().time_since_epoch()).count();
+#endif
     }
 
     long DateTimeUtils::UnixTimestampNow() {
@@ -67,11 +79,19 @@ namespace AwsMock::Core {
     }
 
     system_clock::time_point DateTimeUtils::LocalDateTimeNow() {
+#if __APPLE__
+        return std::chrono::system_clock::now();
+#else
         return system_clock::time_point(std::chrono::zoned_time(std::chrono::current_zone(), system_clock::now()).get_local_time().time_since_epoch());
+#endif
     }
 
     long DateTimeUtils::UtcOffset() {
+#if __APPLE__
+        return 0;
+#else
         return std::chrono::current_zone()->get_info(system_clock::now()).offset.count();
+#endif
     }
 
     int DateTimeUtils::GetSecondsUntilMidnight() {

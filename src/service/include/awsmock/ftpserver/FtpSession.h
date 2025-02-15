@@ -10,7 +10,7 @@
 #include <utility>
 
 // Asio includes
-#include <asio.hpp>
+#include <boost/asio.hpp>
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
@@ -65,7 +65,7 @@ namespace AwsMock::FtpServer {
         ////////////////////////////////////////////////////////
       public:
 
-        FtpSession(asio::io_service &io_service, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
+        FtpSession(boost::asio::io_context &io_service, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
         FtpSession(const FtpSession &) = delete;
@@ -81,7 +81,7 @@ namespace AwsMock::FtpServer {
 
         void start();
 
-        asio::ip::tcp::socket &getSocket();
+        boost::asio::ip::tcp::socket &getSocket();
 
         ////////////////////////////////////////////////////////
         // FTP command-socket
@@ -198,14 +198,14 @@ namespace AwsMock::FtpServer {
 
         void sendFile(const std::shared_ptr<IoFile> &file);
 
-        void readDataFromFileAndSend(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
+        void readDataFromFileAndSend(const std::shared_ptr<IoFile> &file, const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket);
 
         void addDataToBufferAndSend(
                 const std::shared_ptr<std::vector<char>> &data,
-                const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
+                const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                 const std::function<void(void)> &fetch_more = []() { return; });
 
-        void writeDataToSocket(const std::shared_ptr<asio::ip::tcp::socket> &data_socket, const std::function<void(void)> &fetch_more);
+        void writeDataToSocket(const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket, const std::function<void(void)> &fetch_more);
 
         ////////////////////////////////////////////////////////
         // FTP data-socket receive
@@ -214,7 +214,7 @@ namespace AwsMock::FtpServer {
 
         void receiveFile(const std::shared_ptr<IoFile> &file);
 
-        void receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<asio::ip::tcp::socket> &data_socket);
+        void receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket);
 
         void writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more = []() { return; });
 
@@ -301,14 +301,14 @@ namespace AwsMock::FtpServer {
         /**
          * Global IO module
          */
-        asio::io_service &_io_service;
+        boost::asio::io_context &_io_service;
 
         /**
          * Command Socket
          */
-        asio::ip::tcp::socket command_socket_;
-        asio::io_service::strand command_write_strand_;
-        asio::streambuf command_input_stream_;
+        boost::asio::ip::tcp::socket command_socket_;
+        boost::asio::io_context::strand command_write_strand_;
+        boost::asio::streambuf command_input_stream_;
         std::deque<std::string> command_output_queue_;
 
         std::string _lastCommand;
@@ -319,11 +319,11 @@ namespace AwsMock::FtpServer {
          * @brief Data Socket (=> passive mode)
          */
         bool data_type_binary_;
-        asio::ip::tcp::acceptor data_acceptor_;
-        std::weak_ptr<asio::ip::tcp::socket> data_socket_weakptr_;
+        boost::asio::ip::tcp::acceptor data_acceptor_;
+        std::weak_ptr<boost::asio::ip::tcp::socket> data_socket_weakptr_;
         std::deque<std::shared_ptr<std::vector<char>>> data_buffer_;
-        asio::io_service::strand data_buffer_strand_;
-        asio::io_service::strand file_rw_strand_;
+        boost::asio::io_context::strand data_buffer_strand_;
+        boost::asio::io_context::strand file_rw_strand_;
 
         /**
          * Current state

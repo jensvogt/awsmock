@@ -10,7 +10,7 @@
 #include <string>
 
 // Boost includes
-#include <asio/ip/tcp.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>

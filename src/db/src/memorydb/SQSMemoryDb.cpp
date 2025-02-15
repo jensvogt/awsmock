@@ -506,9 +506,9 @@ namespace AwsMock::Database {
                 // Sort by created timestamp
                 std::ranges::sort(filtered, [](auto x, auto y) { return x.created > y.created; });
 
-                const double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.front().created).count();
+                const double min = std::chrono::duration<double, std::milli>(system_clock::now() - filtered.front().created).count();
 
-                if (const double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count(); max + min > 5) {
+                if (const double max = std::chrono::duration<double, std::milli>(system_clock::now() - filtered.back().created).count(); max + min > 5) {
                     waitTime.waitTime[queue.name] = (max + min) / 2.0;
                 } else {
                     waitTime.waitTime[queue.name] = 0.0;

@@ -1,8 +1,4 @@
-#include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
 
@@ -172,7 +168,11 @@ namespace AwsMock::Core {
             const int source = open(it.c_str(), O_RDONLY, 0);
             struct stat stat_source{};
             fstat(source, &stat_source);
+#if __APPLE__
+            copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
+#else
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
+#endif
 
             close(source);
         }
