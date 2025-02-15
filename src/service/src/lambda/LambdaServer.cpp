@@ -22,11 +22,11 @@ namespace AwsMock::Service {
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
 
-        // Cleanup container
-        //CleanupContainers();
-
         // Cleanup instances
         CleanupInstances();
+
+        // Cleanup container
+        CleanupDocker();
 
         // Create a local network, if it is not existing yet
         CreateLocalNetwork();
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
         log_info << "All lambda instances stopped";
     }
 
-    void LambdaServer::CleanupContainers() const {
+    void LambdaServer::CleanupDocker() const {
         _dockerService.PruneContainers();
         log_debug << "Docker containers cleaned up";
     }

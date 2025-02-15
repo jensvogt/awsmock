@@ -16,12 +16,12 @@
 #include <iostream>
 #include <pwd.h>
 #include <string>
-#if __APPLE__
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <sys/uio.h>
-#elif
-    #include <sys/sendfile.h>
+#ifdef __APPLE__
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#else
+#include <sys/sendfile.h>
 #endif
 
 // Boost includes
@@ -31,12 +31,12 @@
 #include <boost/iostreams/copy.hpp>
 
 // AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
+#include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
-#include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/config/Configuration.h>
 
 #define BUFFER_LEN 8092
