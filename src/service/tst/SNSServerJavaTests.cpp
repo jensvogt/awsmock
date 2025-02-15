@@ -82,7 +82,7 @@ namespace AwsMock::Service {
 
         boost::thread _thread;
         std::string _snsBaseUrl, _sqsBaseUrl, _region;
-        boost::asio::io_service _ios{10};
+        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();

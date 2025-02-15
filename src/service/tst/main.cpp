@@ -14,7 +14,8 @@
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/utils/TestUtils.h>
-#include <boost/asio/io_service.hpp>
+
+#include <boost/asio/io_context.hpp>
 #include <boost/thread/detail/thread.hpp>
 
 #define TEST_IMAGE_NAME std::string("jensvogt/awsmock-test")

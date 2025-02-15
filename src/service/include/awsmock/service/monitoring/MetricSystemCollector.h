@@ -14,6 +14,11 @@
 #include <sstream>
 #include <string>
 
+#ifdef __APPLE__
+#include <mach/mach.h>
+#include <sys/resource.h>
+#endif
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
@@ -44,8 +49,24 @@ namespace AwsMock::Monitoring {
          */
         void CollectSystemCounter();
 
+#ifdef __APPLE__
+        /**
+         * @brief Thread counter
+         */
+        void GetCurrentThreadCount();
+
+        /**
+         * @brief CPU info
+         */
+        void GetCpuInfo();
+
+#endif
+
       private:
 
+#ifdef __APPLE__
+        system_clock::time_point _lastCPUTime;
+#endif
         /**
          * Number of processors
          */
@@ -65,6 +86,11 @@ namespace AwsMock::Monitoring {
          * Last user CPU
          */
         clock_t _lastUserCPU{};
+
+        /**
+         * Start time
+         */
+        system_clock::time_point _startTime;
 
         /**
          * Monitoring period

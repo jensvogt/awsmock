@@ -75,7 +75,7 @@ namespace AwsMock::Service {
 
         boost::thread _thread;
         std::string _endpoint, _baseUrl, _region;
-        boost::asio::io_service _ios{10};
+        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
         std::shared_ptr<GatewayServer> _gatewayServer;
