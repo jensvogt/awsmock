@@ -9,8 +9,8 @@ awsmock:
     secret-access-key: none                                           # AWS access secret
     account-id: 000000000000                                          # AWS account ID
     client-id: 00000000                                               # AWS client ID
-  temp-dir: /home/awsmock/data/tmp                                    # General temp directory
-  data-dir: /home/awsmock/data                                        # General data directory
+  temp-dir: ${HOME}/awsmock/data/tmp                                    # General temp directory
+  data-dir: ${HOME}/awsmock/data                                        # General data directory
   dockerized: false                                                   # Dockerized flag
   json: # JSON settings                                               # JSON settings
     pretty: true                                                      # JSON pretty print
@@ -23,11 +23,11 @@ awsmock:
     port: 4567                                                        # Port number
     workers: 20                                                       # Number of worker threads
     timeout: 900                                                      # HTTP timeout
-    doc-root: /home/awsmock/frontend                                  # Document root directory
+    doc-root: ${HOME}/awsmock/frontend                                  # Document root directory
   autoload: # BSON auto load on startup
     active: true                                                      # Autoload activation flag
-    dir: /home/awsmock/init                                           # Autoload directory, has priority over autoload file
-    file: /home/awsmock/init/init.json                                # Autoload file
+    dir: ${HOME}/awsmock/init                                           # Autoload directory, has priority over autoload file
+    file: ${HOME}/awsmock/init/init.json                                # Autoload file
   docker: # Docker settings
     active: true                                                      # Docker daemon activation flag
     network-mode: local                                               # Docker network mode, default: local
@@ -71,7 +71,7 @@ awsmock:
   modules:
     s3:
       active: true
-      data-dir: /home/awsmock/data/s3
+      data-dir: ${HOME}/awsmock/data/s3
       monitoring:
         period: 300
       sync:
@@ -100,7 +100,7 @@ awsmock:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
-      data-dir: /home/awsmock/data/lambda
+      data-dir: ${HOME}/awsmock/data/lambda
       monitoring:
         period: 300
       remove:
@@ -144,7 +144,7 @@ awsmock:
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: /home/awsmock/data/transfer                             # FTP data directory
+      data-dir: ${HOME}/awsmock/data/transfer                             # FTP data directory
       directories:
         - incoming/mix
         - feedback
