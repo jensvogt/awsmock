@@ -178,8 +178,8 @@ namespace AwsMock::Core {
             AddToEnvList(key, getenv(envProperty.c_str()));
         }
         std::vector<std::string> values = StringUtils::Split(value, ';');
-        for (auto &v:values) {
-                value = ReplaceEnvironmentVariables(v);
+        for (auto &v: values) {
+            value = ReplaceEnvironmentVariables(v);
         }
         SetValueByPath(_yamlConfig, key, values);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -394,12 +394,12 @@ namespace AwsMock::Core {
                 }
 
                 // Search for env var and replace if found
-                if (const char * s = getenv(envVarName.c_str());s != nullptr) {
+                if (const char *s = getenv(envVarName.c_str()); s != nullptr) {
                     std::string temp(s);
 
                     // Since we're manipulating the string, do a new find
                     // instead of using original match info
-                    if (const size_t pos = value.find(match, offset);pos != std::string::npos) {
+                    if (const size_t pos = value.find(match, offset); pos != std::string::npos) {
                         value.replace(pos, match.length(), temp);
                         offset = pos + value.length();
                     }
