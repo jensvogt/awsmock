@@ -82,7 +82,7 @@ namespace AwsMock::Database {
          * @param labelValue labelValue
          * @return list of counter values
          */
-        std::vector<Database::Entity::Monitoring::Counter> GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+        std::vector<Database::Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Deletes old monitoring data
@@ -103,6 +103,11 @@ namespace AwsMock::Database {
          * Performance collection name
          */
         std::string _monitoringCollectionName;
+
+        /**
+         * Use rolling mean
+         */
+        bool _rollingMean;
     };
 
 }// namespace AwsMock::Database

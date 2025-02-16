@@ -164,6 +164,7 @@ awsmock:
     prometheus: true                                                    # Use Prometheus as monitoring collector
     intern: true                                                        # Use internal monitoring
     retention: 3                                                        # Retention of monitoring data in days
+    smooth: false                                                       # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
     filename:                                                           # Log file name, if empty use stdout

@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/DateTimeUtils.h>
+#include <boost/system/detail/enable_if.hpp>
 
 namespace AwsMock::Core {
 
@@ -83,6 +84,14 @@ namespace AwsMock::Core {
         return std::chrono::system_clock::now();
 #else
         return system_clock::time_point(std::chrono::zoned_time(std::chrono::current_zone(), system_clock::now()).get_local_time().time_since_epoch());
+#endif
+    }
+
+    system_clock::time_point DateTimeUtils::UtcDateTimeNow() {
+#if __APPLE__
+        return system_clock::time_point{std::chrono::time_point_cast<std::chrono::milliseconds>(system_clock::now())};
+#else
+        return system_clock::time_point{std::chrono::time_point_cast<std::chrono::milliseconds>(system_clock::now())};
 #endif
     }
 

@@ -20,7 +20,8 @@ namespace AwsMock::Service {
                     log_debug << "Get counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
                     return SendOkResponse(request, response.ToJson());
                 }
-                case Dto::Common::MonitoringCommandType::UNKNOWN:
+
+                default:
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
             }
@@ -35,7 +36,6 @@ namespace AwsMock::Service {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         }
-        return SendBadRequestError(request, "Unknown method");
     }
 
 }// namespace AwsMock::Service

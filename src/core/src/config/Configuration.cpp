@@ -133,6 +133,7 @@ namespace AwsMock::Core {
         DefineBoolProperty("awsmock.monitoring.prometheus", "AWSMOCK_MONITORING_PROMETHEUS", true);
         DefineBoolProperty("awsmock.monitoring.intern", "AWSMOCK_MONITORING_INTERN", true);
         DefineIntProperty("awsmock.monitoring.retention", "AWSMOCK_MONITORING_RETENTION", 3);
+        DefineBoolProperty("awsmock.monitoring.smooth", "AWSMOCK_MONITORING_SMOOTH", false);
 
         // Database
         DefineBoolProperty("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);

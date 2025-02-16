@@ -5,24 +5,60 @@
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
 namespace AwsMock::Monitoring {
-    MetricSystemCollector::MetricSystemCollector() {
-        tms timeSample{};
 
-        _lastCPU = times(&timeSample);
-        _lastSysCPU = timeSample.tms_stime;
-        _lastUserCPU = timeSample.tms_utime;
-        _numProcessors = Core::SystemUtils::GetNumberOfCores() / 2;
+    MetricSystemCollector::MetricSystemCollector() {
         _startTime = system_clock::now();
-        log_debug << "Got number of processors, numProcs: " << _numProcessors;
     }
 
     void MetricSystemCollector::CollectSystemCounter() {
         log_trace << "System collector starting";
 
 #ifdef __APPLE__
-        GetCurrentThreadCount();
-        GetCpuInfo();
-#else
+
+        GetCurrentThreadCountMac();
+        GetCpuInfoMac();
+        GetMemoryInfoMac();
+
+#elif __linux__
+
+        GetCpuInfoLinux();
+        GetMemoryThreadsInfoLinux();
+
+#endif
+    }
+
+#ifdef __linux__
+
+    void MetricSystemCollector::GetCpuInfoLinux() {
+
+        // Get uptime
+        struct sysinfo s_info {};
+        if (sysinfo(&s_info) != 0) {
+            log_error << "Could not get sysinfo";
+            return;
+        }
+
+        // Get CPU utilization
+        tms timeSample{};
+        times(&timeSample);
+
+        if (s_info.uptime > 0) {
+            double percent = static_cast<double>(timeSample.tms_utime) / static_cast<double>(s_info.uptime) * 100;
+            MetricService::instance().SetGauge(USER_CPU, percent);
+            log_trace << "User CPU: " << percent;
+
+            percent = static_cast<double>(timeSample.tms_stime) / static_cast<double>(s_info.uptime) * 100;
+            MetricService::instance().SetGauge(SYSTEM_CPU, percent);
+            log_trace << "System CPU: " << percent;
+
+            percent = static_cast<double>(timeSample.tms_utime + timeSample.tms_stime) / static_cast<double>(s_info.uptime) * 100;
+            MetricService::instance().SetGauge(TOTAL_CPU, percent);
+            log_trace << "Total CPU: " << percent;
+        }
+        log_trace << "System collector finished";
+    }
+
+    void MetricSystemCollector::GetMemoryThreadsInfoLinux() {
 
         std::string line;
         std::ifstream ifs("/proc/self/status");
@@ -46,45 +82,11 @@ namespace AwsMock::Monitoring {
             }
         }
         ifs.close();
-
-        tms timeSample{};
-        const clock_t now = times(&timeSample);
-
-        log_trace << "Now: " << now << "/" << _lastCPU << "/" << _lastSysCPU << "/" << _lastUserCPU;
-        if (now <= _lastCPU || timeSample.tms_stime < _lastSysCPU || timeSample.tms_utime < _lastUserCPU) {
-            // Overflow detection. Just skip this value.
-            log_debug << "Invalid CPU values, skipping";
-        } else {
-            double totalPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU + (timeSample.tms_utime - _lastUserCPU));
-            totalPercent /= static_cast<double>(now - _lastCPU);
-            totalPercent /= _numProcessors;
-            totalPercent *= 100;
-            MetricService::instance().SetGauge(TOTAL_CPU, totalPercent);
-            log_trace << "Total CPU: " << totalPercent;
-
-            double userPercent = static_cast<double>(timeSample.tms_utime - _lastUserCPU);
-            userPercent /= static_cast<double>(now - _lastCPU);
-            userPercent /= _numProcessors;
-            userPercent *= 100;
-            MetricService::instance().SetGauge(USER_CPU, userPercent);
-            log_trace << "User CPU: " << userPercent;
-
-            double systemPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU);
-            systemPercent /= static_cast<double>(now - _lastCPU);
-            systemPercent /= _numProcessors;
-            systemPercent *= 100;
-            MetricService::instance().SetGauge(SYSTEM_CPU, systemPercent);
-            log_trace << "System CPU: " << systemPercent;
-        }
-        _lastCPU = now;
-        _lastSysCPU = timeSample.tms_stime;
-        _lastUserCPU = timeSample.tms_utime;
-        log_trace << "System collector finished";
-#endif
     }
+#endif
 
 #ifdef __APPLE__
-    void MetricSystemCollector::GetCurrentThreadCount() {
+    void MetricSystemCollector::GetCurrentThreadCountMac() {
         const auto me = mach_task_self();
         thread_array_t threads;
         mach_msg_type_number_t numberOfThreads;
@@ -102,12 +104,12 @@ namespace AwsMock::Monitoring {
         log_trace << "Total Threads: " << numberOfThreads;
     }
 
-    void MetricSystemCollector::GetCpuInfo() {
+    void MetricSystemCollector::GetCpuInfoMac() {
 
         rusage r_usage;
 
         if (getrusage(RUSAGE_SELF, &r_usage)) {
-            log_error << "GetCpuInfo failed";
+            log_error << "GetCpuInfoMac failed";
             return;
         }
 
@@ -132,6 +134,22 @@ namespace AwsMock::Monitoring {
             log_trace << "Total CPU: " << percent;
         }
     }
+
+    void MetricSystemCollector::GetMemoryInfoMac() {
+
+        struct task_basic_info t_info;
+        mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+
+        if (KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t) &t_info, &t_info_count)) {
+            log_error << "Could not get memory utilization";
+            return;
+        }
+
+        MetricService::instance().SetGauge(VIRTUAL_MEMORY, t_info.virtual_size);
+        MetricService::instance().SetGauge(REAL_MEMORY, t_info.resident_size);
+        log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
+    }
+
 #endif
 
 }// namespace AwsMock::Monitoring
