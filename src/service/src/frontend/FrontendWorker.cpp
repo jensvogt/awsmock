@@ -114,7 +114,7 @@ namespace AwsMock::Service::Frontend {
         } else {
             full_path = _docRoot + "/index.html";
             file.open(full_path.c_str(), beast::file_mode::read, ec);
-            log_trace << std::string(target) << " MIME: " << mime_type(target);
+            log_trace << full_path << " MIME: " << mime_type(target);
         }
         _fileResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _fileResponse->result(http::status::ok);
