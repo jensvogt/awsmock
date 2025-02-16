@@ -152,9 +152,15 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("created", 1)));
 
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
+#ifdef __APPLE__
+                const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::milliseconds>(start);
+                auto startUtc = system_clock::time_point(startTime.time_since_epoch());
+                const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::milliseconds>(start);
+                auto endUtc = system_clock::time_point(endTime.time_since_epoch());
+#else
                 auto startUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(start).time_since_epoch());
                 auto endUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(end).time_since_epoch());
-
+#endif
                 document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(startUtc)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(endUtc)))));
