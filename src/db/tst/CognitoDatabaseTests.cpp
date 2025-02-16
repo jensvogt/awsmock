@@ -371,10 +371,10 @@ namespace AwsMock::Database {
         // arrange
         Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user1 = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME + 1};
+        Entity::Cognito::User user1 = {.region = _region, .userPoolId = USER_POOL_ID, .userName = std::string(USER_NAME) + "1"};
         user1 = _cognitoDatabase.CreateUser(user1);
         ASSERT_FALSE(user1.oid.empty());
-        Entity::Cognito::User user2 = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME + 2};
+        Entity::Cognito::User user2 = {.region = _region, .userPoolId = USER_POOL_ID, .userName = std::string(USER_NAME) + "2"};
         user2 = _cognitoDatabase.CreateUser(user2);
         ASSERT_FALSE(user2.oid.empty());
 

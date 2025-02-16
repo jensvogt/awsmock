@@ -13,12 +13,11 @@ set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
 
 # Includes
 include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(${CMAKE_SOURCE_DIR}/db ${CMAKE_SOURCE_DIR}/core /usr/local/lib)
+link_directories(/usr/local/lib)
 
 add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_thread boost_filesystem boost_url yaml-cpp gtest pthread ssl
-        crypto archive z magic)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
