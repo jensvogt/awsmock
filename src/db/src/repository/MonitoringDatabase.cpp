@@ -9,7 +9,7 @@ namespace AwsMock::Database {
 
     typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean>> Accumulator;
 
-    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring") {}
+    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValueBool("awsmock.monitoring.smooth")) {}
 
     void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
         log_trace << "Set counter value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;
@@ -47,7 +47,9 @@ namespace AwsMock::Database {
                     document.append(kvp("labelValue", labelValue));
                 }
                 document.append(kvp("value", value));
-                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::LocalDateTimeNow())));
+
+                // As mongoDB uses UTC timestamps, we need to calculate everything in UTC
+                document.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::UtcDateTimeNow())));
 
                 auto insert_one_result = _monitoringCollection.insert_one(document.extract());
                 session.commit_transaction();
@@ -75,7 +77,8 @@ namespace AwsMock::Database {
 
             try {
 
-                const system_clock::time_point now = Core::DateTimeUtils::LocalDateTimeNow();
+                // As mongoDB uses UTC timestamps, we need to calculate everything in UTC
+                const system_clock::time_point now = Core::DateTimeUtils::UtcDateTimeNow();
                 const system_clock::time_point end = Core::ceilTimePoint(now, std::chrono::seconds(300));
                 const system_clock::time_point middle = end - std::chrono::seconds(150);
 
@@ -132,8 +135,8 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetRollingMean(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue) const {
-        log_trace << "Get rolling mean, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
+    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue) const {
+        log_trace << "Get monitoring values, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
 
         const long offset = Core::DateTimeUtils::UtcOffset();
 
@@ -148,9 +151,13 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 opts.sort(make_document(kvp("created", 1)));
 
+                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
+                auto startUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(start).time_since_epoch());
+                auto endUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(end).time_since_epoch());
+
                 document document;
                 document.append(kvp("name", name));
-                document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(start)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(end)))));
+                document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(startUtc)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(endUtc)))));
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
@@ -159,11 +166,18 @@ namespace AwsMock::Database {
                 }
 
                 // Find and accumulate
-                Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
-                for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
-                    acc(it["value"].get_double().value);
-                    Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value - std::chrono::seconds(offset))};
-                    result.emplace_back(counter);
+                if (_rollingMean) {
+                    Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
+                    for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
+                        acc(it["value"].get_double().value);
+                        Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                        result.emplace_back(counter);
+                    }
+                } else {
+                    for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
+                        Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                        result.emplace_back(counter);
+                    }
                 }
                 log_debug << "Counters, name: " << name << " count: " << result.size();
                 return result;
@@ -189,7 +203,7 @@ namespace AwsMock::Database {
             try {
                 // Find and delete counters
                 session.start_transaction();
-                const auto retention = system_clock::now() - std::chrono::hours(retentionPeriod * 24);
+                const auto retention = Core::DateTimeUtils::UtcDateTimeNow() - std::chrono::hours(retentionPeriod * 24);
                 const auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
                 log_debug << "Counters deleted, count: " << mResult.value().deleted_count();
                 session.commit_transaction();

@@ -13,7 +13,7 @@ namespace AwsMock::Service {
             Dto::Monitoring::GetCountersResponse response;
 
             // Get counters from database
-            response.counters = _database.GetRollingMean(request.name, request.start, request.end, request.step);
+            response.counters = _database.GetMonitoringValues(request.name, request.start, request.end, request.step);
 
             log_trace << "Monitoring get counter, count: " << response.counters.size();
 
