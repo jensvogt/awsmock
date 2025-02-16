@@ -4,6 +4,8 @@
 //
 
 #include <awsmock/repository/MonitoringDatabase.h>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace AwsMock::Database {
 
@@ -153,9 +155,9 @@ namespace AwsMock::Database {
 
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
 #ifdef __APPLE__
-                const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::milliseconds>(start);
+                const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
                 auto startUtc = system_clock::time_point(startTime.time_since_epoch());
-                const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::milliseconds>(start);
+                const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
                 auto endUtc = system_clock::time_point(endTime.time_since_epoch());
 #else
                 auto startUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(start).time_since_epoch());
@@ -185,7 +187,7 @@ namespace AwsMock::Database {
                         result.emplace_back(counter);
                     }
                 }
-                log_debug << "Counters, name: " << name << " count: " << result.size();
+                log_debug << "Counters, name: " << name << " count: " << result.size() << " start:" << startUtc << " end: " << endUtc;
                 return result;
 
             } catch (const mongocxx::exception &exc) {
