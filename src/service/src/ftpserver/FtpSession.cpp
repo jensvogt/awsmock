@@ -35,7 +35,8 @@ namespace AwsMock::FtpServer {
         command_socket_.set_option(boost::asio::ip::tcp::no_delay(true), ec);
         if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
-        }
+	}
+
         sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
         readFtpCommand();
     }
