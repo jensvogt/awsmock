@@ -41,7 +41,7 @@ namespace AwsMock::Core {
     system_clock::time_point DateTimeUtils::FromUnixTimestamp(const long timestamp) {
         const system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
 #if __APPLE__
-        return std::chrono::system_clock::from_time_t(timestamp);
+        return tp + std::chrono::hours(1);
 #else
         return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::hours(2)};
 #endif
