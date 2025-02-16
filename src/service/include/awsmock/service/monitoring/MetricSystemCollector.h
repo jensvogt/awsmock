@@ -83,7 +83,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get memory info on Linux systems
          */
-        void GetMemoryThreadsInfoLinux();
+        static void GetMemoryThreadsInfoLinux();
 #endif
 
       private:
