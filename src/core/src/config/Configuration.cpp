@@ -298,7 +298,7 @@ namespace AwsMock::Core {
         for (auto &v: values) {
             v = ReplaceEnvironmentVariables(v);
         }
-        return  values;
+        return values;
     }
 
     int Configuration::GetValueInt(const std::string &key) const {
