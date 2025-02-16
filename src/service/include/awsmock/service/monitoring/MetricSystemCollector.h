@@ -13,7 +13,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+
+#ifdef __linux__
 #include <sys/sysinfo.h>
+#endif
 
 #ifdef __APPLE__
 #include <mach/mach.h>
@@ -63,7 +66,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get memory utilization on MacOS
          */
-        void GetMmeoryInfoMac();
+        void GetMemoryInfoMac();
 
 #elif __linux__
 

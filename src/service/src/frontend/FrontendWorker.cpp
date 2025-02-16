@@ -109,14 +109,13 @@ namespace AwsMock::Service::Frontend {
 
         http::file_body::value_type file;
         beast::error_code ec;
-        file.open(full_path.c_str(), beast::file_mode::read, ec);
-        if (ec) {
-            target = boost::string_view(DEFAULT_PAGE.c_str(), DEFAULT_PAGE.length());
-            full_path = _docRoot + std::string(target);
+        if (boost::filesystem::exists(full_path)) {
+            file.open(full_path.c_str(), beast::file_mode::read, ec);
+        } else {
+            full_path = _docRoot + "/index.html";
             file.open(full_path.c_str(), beast::file_mode::read, ec);
             log_trace << std::string(target) << " MIME: " << mime_type(target);
         }
-
         _fileResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _fileResponse->result(http::status::ok);
         _fileResponse->keep_alive(false);
@@ -144,7 +143,7 @@ namespace AwsMock::Service::Frontend {
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {
