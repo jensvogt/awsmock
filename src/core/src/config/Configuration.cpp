@@ -284,7 +284,8 @@ namespace AwsMock::Core {
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<std::string>();
+        auto value = lookup(_yamlConfig, paths.begin(), paths.end()).as<std::string>();
+        return ReplaceEnvironmentVariables(value);
     }
 
     std::vector<std::string> Configuration::GetValueStringArray(const std::string &key) const {
@@ -293,7 +294,11 @@ namespace AwsMock::Core {
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<std::vector<std::string>>();
+        auto values = lookup(_yamlConfig, paths.begin(), paths.end()).as<std::vector<std::string>>();
+        for (auto &v: values) {
+            v = ReplaceEnvironmentVariables(v);
+        }
+        return  values;
     }
 
     int Configuration::GetValueInt(const std::string &key) const {

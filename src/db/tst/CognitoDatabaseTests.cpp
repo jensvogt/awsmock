@@ -224,10 +224,10 @@ namespace AwsMock::Database {
         Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
         Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
-        Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
+        const Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
-        bool result = _cognitoDatabase.UserExists(createdUser.region, createdUser.userPoolId, createdUser.userName);
+        const bool result = _cognitoDatabase.UserExists(createdUser.region, createdUser.userPoolId, createdUser.userName);
 
         // assert
         EXPECT_TRUE(result);
@@ -241,7 +241,7 @@ namespace AwsMock::Database {
         Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
 
         // act
-        Entity::Cognito::User result = _cognitoDatabase.CreateUser(user);
+        const Entity::Cognito::User result = _cognitoDatabase.CreateUser(user);
 
         // assert
         EXPECT_TRUE(result.userName == USER_NAME);
@@ -259,7 +259,7 @@ namespace AwsMock::Database {
         user = _cognitoDatabase.CreateUser(user);
 
         // act
-        Entity::Cognito::User result = _cognitoDatabase.GetUserById(bsoncxx::oid(user.oid));
+        const Entity::Cognito::User result = _cognitoDatabase.GetUserById(bsoncxx::oid(user.oid));
 
         // assert
         EXPECT_TRUE(result.userName == USER_NAME);
@@ -277,7 +277,7 @@ namespace AwsMock::Database {
         user = _cognitoDatabase.CreateUser(user);
 
         // act
-        Entity::Cognito::User result = _cognitoDatabase.GetUserByUserName(userPool.region, userPool.userPoolId, USER_NAME);
+        const Entity::Cognito::User result = _cognitoDatabase.GetUserByUserName(userPool.region, userPool.userPoolId, USER_NAME);
 
         // assert
         EXPECT_TRUE(result.userName == USER_NAME);
@@ -295,7 +295,7 @@ namespace AwsMock::Database {
         user = _cognitoDatabase.CreateUser(user);
 
         // act
-        Entity::Cognito::User result = _cognitoDatabase.GetUserById(user.oid);
+        const Entity::Cognito::User result = _cognitoDatabase.GetUserById(user.oid);
 
         // assert
         EXPECT_TRUE(result.userName == USER_NAME);
@@ -312,7 +312,7 @@ namespace AwsMock::Database {
         Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
-        long count = _cognitoDatabase.CountUsers();
+        const long count = _cognitoDatabase.CountUsers();
 
         // assert
         EXPECT_EQ(1, count);
@@ -327,7 +327,7 @@ namespace AwsMock::Database {
         Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
-        Entity::Cognito::UserList userList = _cognitoDatabase.ListUsers();
+        const Entity::Cognito::UserList userList = _cognitoDatabase.ListUsers();
 
         // assert
         EXPECT_EQ(1, userList.size());
@@ -360,7 +360,7 @@ namespace AwsMock::Database {
 
         // act
         _cognitoDatabase.DeleteUser(user);
-        bool result = _cognitoDatabase.UserExists(_region, createdUser.userPoolId, createdUser.userName);
+        const bool result = _cognitoDatabase.UserExists(_region, createdUser.userPoolId, createdUser.userName);
 
         // assert
         EXPECT_FALSE(result);
@@ -380,7 +380,7 @@ namespace AwsMock::Database {
 
         // act
         _cognitoDatabase.DeleteAllUsers();
-        long count = _cognitoDatabase.CountUsers();
+        const long count = _cognitoDatabase.CountUsers();
 
         // assert
         EXPECT_EQ(0, count);
@@ -414,7 +414,7 @@ namespace AwsMock::Database {
         ASSERT_FALSE(group.oid.empty());
 
         // act
-        Entity::Cognito::Group existingGroup = _cognitoDatabase.GetGroupById(bsoncxx::oid(group.oid));
+        const Entity::Cognito::Group existingGroup = _cognitoDatabase.GetGroupById(bsoncxx::oid(group.oid));
 
         // assert
         EXPECT_TRUE(group.oid == existingGroup.oid);
@@ -431,7 +431,7 @@ namespace AwsMock::Database {
         ASSERT_FALSE(group.oid.empty());
 
         // act
-        Entity::Cognito::Group existingGroup = _cognitoDatabase.GetGroupByGroupName(_region, userPool.userPoolId, GROUP_NAME);
+        const Entity::Cognito::Group existingGroup = _cognitoDatabase.GetGroupByGroupName(_region, userPool.userPoolId, GROUP_NAME);
 
         // assert
         EXPECT_TRUE(group.userPoolId == existingGroup.userPoolId);
