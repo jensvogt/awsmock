@@ -39,6 +39,6 @@ add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore awsmockdb
         awsmockdto boost_locale boost_filesystem boost_url boost_thread yaml-cpp gtest pthread ssl crypto archive z
-        prometheus-cpp-core prometheus-cpp-pull magic)
+        prometheus-cpp-pull prometheus-cpp-core magic)
 
 install(TARGETS ${LIBRARY} DESTINATION lib)
