@@ -35,7 +35,7 @@ namespace AwsMock::Service {
             _kmsDatabase.DeleteAllKeys();
         }
 
-        void WaitForKey(const Dto::KMS::Key &key)const {
+        void WaitForKey(const Dto::KMS::Key &key) const {
 
             Database::Entity::KMS::Key keyEntity;
             do {

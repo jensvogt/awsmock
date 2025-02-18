@@ -142,7 +142,7 @@ namespace AwsMock::Service {
         Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
         auto [subscriptionArn] = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
-        Dto::SNS::UpdateSubscriptionRequest updateRequest = {.topicArn=topicResponse.topicArn, .subscriptionArn = subscriptionArn, .protocol = "SQS", .endpoint = "foobar", .owner = "bar"};
+        Dto::SNS::UpdateSubscriptionRequest updateRequest = {.topicArn = topicResponse.topicArn, .subscriptionArn = subscriptionArn, .protocol = "SQS", .endpoint = "foobar", .owner = "bar"};
 
         // act
         auto [subscriptionArn1] = _snsService.UpdateSubscription(updateRequest);
