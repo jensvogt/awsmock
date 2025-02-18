@@ -35,7 +35,7 @@ namespace AwsMock::Monitoring {
         const clock_t now = times(&timeSample);
 
         log_trace << "Now: " << now << "/" << _lastTotalCPU << "/" << _lastSysCPU << "/" << _lastUserCPU;
-        if (now - _lastTime>0) {
+        if (now - _lastTime > 0) {
             const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU + (timeSample.tms_utime - _lastUserCPU)) / static_cast<double>(now - _lastTime) * 100;
             MetricService::instance().SetGauge(TOTAL_CPU, totalPercent);
             log_trace << "Total CPU: " << totalPercent;
