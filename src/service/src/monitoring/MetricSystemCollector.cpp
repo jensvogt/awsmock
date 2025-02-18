@@ -31,30 +31,27 @@ namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::GetCpuInfoLinux() {
 
-        // Get uptime
-        struct sysinfo s_info {};
-        if (sysinfo(&s_info) != 0) {
-            log_error << "Could not get sysinfo";
-            return;
-        }
-
-        // Get CPU utilization
         tms timeSample{};
-        times(&timeSample);
+        const clock_t now = times(&timeSample);
 
-        if (s_info.uptime > 0) {
-            double percent = static_cast<double>(timeSample.tms_utime) / static_cast<double>(s_info.uptime) * 100;
-            MetricService::instance().SetGauge(USER_CPU, percent);
-            log_trace << "User CPU: " << percent;
+        log_trace << "Now: " << now << "/" << _lastTotalCPU << "/" << _lastSysCPU << "/" << _lastUserCPU;
+        if (now - _lastTime>0) {
+            const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU + (timeSample.tms_utime - _lastUserCPU)) / static_cast<double>(now - _lastTime) * 100;
+            MetricService::instance().SetGauge(TOTAL_CPU, totalPercent);
+            log_trace << "Total CPU: " << totalPercent;
 
-            percent = static_cast<double>(timeSample.tms_stime) / static_cast<double>(s_info.uptime) * 100;
-            MetricService::instance().SetGauge(SYSTEM_CPU, percent);
-            log_trace << "System CPU: " << percent;
+            const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastUserCPU) / static_cast<double>(now - _lastTime) * 100;
+            MetricService::instance().SetGauge(USER_CPU, userPercent);
+            log_trace << "User CPU: " << userPercent;
 
-            percent = static_cast<double>(timeSample.tms_utime + timeSample.tms_stime) / static_cast<double>(s_info.uptime) * 100;
-            MetricService::instance().SetGauge(TOTAL_CPU, percent);
-            log_trace << "Total CPU: " << percent;
+            const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU) / static_cast<double>(now - _lastTime) * 100;
+            MetricService::instance().SetGauge(SYSTEM_CPU, systemPercent);
+            log_trace << "System CPU: " << systemPercent;
         }
+        _lastTime = now;
+        _lastTotalCPU = timeSample.tms_stime + timeSample.tms_utime;
+        _lastSysCPU = timeSample.tms_stime;
+        _lastUserCPU = timeSample.tms_utime;
         log_trace << "System collector finished";
     }
 

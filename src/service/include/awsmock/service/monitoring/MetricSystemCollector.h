@@ -88,6 +88,13 @@ namespace AwsMock::Monitoring {
 
       private:
 
+#ifdef __linux__
+        clock_t _lastTime;
+        clock_t _lastTotalCPU;
+        clock_t _lastSysCPU;
+        clock_t _lastUserCPU;
+#endif
+
         /**
          * Start time
          */

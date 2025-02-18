@@ -151,7 +151,7 @@ Building of the AwsMOck executables is CMake based.
 - Development releases of boost, libz, libssl, libcrypto, libarchive
 - 4GB of RAM.
 
-#### Building from Source:
+#### Building the manager from source:
 
 Building AwsMock from scratch is a rather time-consuming procedure. For a first glance at AwsMock, better use the
 provided docker image. Nevertheless, if you need to compile it by your own, here are the instructions.
@@ -179,6 +179,17 @@ To create an out-of-source build:
    ```
 
 As already said, this can be a time-consuming procedure, depending on your machine and the environment.
+
+#### Building the frontend from source:
+
+IN order to build the frontend you need NodeJS >16.0. The sourcecode is located at
+```http://github.com/jensvogt/awsmock-ui```. In order to build the frontend part use:
+
+```
+npm run build --prod
+```
+
+and copy the result to ```$HOME/awsmock/frontend```.
 
 ### Using the docker image
 
@@ -239,6 +250,29 @@ To connect a MongoDB instance use the provided docker-compose file:
 This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured
 separately. See for
 instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
+
+### Running the Manager on the host
+
+In order to run the manager on the host system (Docker ist still needed for the lambda functions and DynamoDB), you need
+tomake sure the manager application has access to the docker daemon REST API. For this put your user id into the docker
+group;
+
+```
+sudo usermod -a -G docker <userName>
+```
+
+this will add ```<userName>``` to the docker group and the manager can access the docker daemon REST APIs. After that
+you
+can start the manager as normal foreground process:
+
+```
+/usr/local/bin/awsmockmgr --loglevel debug
+```
+
+It will use the configuration file: ```/etc/awsmock.yml```. Logging output will be written to the console. To stop the
+process just type ```<CRTL>-C```. THe frontend will be served by default from the
+```$HOME/awsmock/frontend``` directory.
+To customize that change the corresponding attribute in the configuration file.
 
 ## Examples
 

@@ -33,12 +33,15 @@ add_subdirectory(tst)
 include_directories(./include ../core/include ../db/include ../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
 link_directories(/usr/local/lib)
 
+# Shared library
 add_library(${LIBRARY} SHARED ${SOURCES})
 target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb awsmockdto boost_thread)
+
+# Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore awsmockdb
-        awsmockdto boost_locale boost_filesystem boost_url boost_thread yaml-cpp gtest pthread ssl crypto archive z
+target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore awsmockdb awsmockdto mongocxx bsoncxx
+        boost_locale boost_filesystem boost_url boost_thread yaml-cpp gtest pthread ssl crypto archive z
         prometheus-cpp-pull prometheus-cpp-core magic)
 
 install(TARGETS ${LIBRARY} DESTINATION lib)
