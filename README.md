@@ -269,7 +269,7 @@ c:\Program Files\awsmock\bin\awsmockctl status
 ## MacOS support
 
 On MacOS the manager can be run as normal process. A MacOS can be installed using the normal development setup. Start
-the manager as ```awsmockmgr```. The frontend is available ```http://localhost:4567```
+the manager as ```awsmockmgr```. The frontend is available at ```http://localhost:4567```
 
 ### Compiling on MacOS
 
@@ -278,12 +278,15 @@ Prerequisites:
 ```
 brew install prometheus-cpp
 brew install yaml-cpp
+brew install jwt-cpp
 brew install mongo-c-driver
 brew install mongo-cxx-driver
-brew install doxygen pandoc      // Documentation
 brew install libarchive
+brew install libmagic
 brew install openssl@3
 brew install boost
+// Documentation
+brew install doxygen pandoc
 ```
 
 Download the backend source code
