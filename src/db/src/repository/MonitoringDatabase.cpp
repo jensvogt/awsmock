@@ -11,7 +11,7 @@ namespace AwsMock::Database {
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValueBool("awsmock.monitoring.smooth")) {}
 
-    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &labelName) const {
+    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName) const {
         log_trace << "Get distinct label values, labelName: " << labelName;
 
         if (HasDatabase()) {
@@ -25,6 +25,7 @@ namespace AwsMock::Database {
                 std::vector<std::string> labels;
 
                 document query;
+                query.append(kvp("name", name));
                 query.append(kvp("labelName", labelName));
 
                 for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {

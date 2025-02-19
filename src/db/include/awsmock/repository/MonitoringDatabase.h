@@ -88,10 +88,11 @@ namespace AwsMock::Database {
         /**
          * @brief Returns list of label values by label name
          *
+         * @param name monitoring feature name
          * @param labelName label name
          * @return list of label values
          */
-        std::vector<std::string> GetDistinctLabelValues(const std::string &labelName) const;
+        std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName) const;
 
         /**
          * @brief Deletes old monitoring data
