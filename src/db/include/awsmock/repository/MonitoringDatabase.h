@@ -81,9 +81,10 @@ namespace AwsMock::Database {
          * @param step steps
          * @param labelName label name
          * @param labelValue labelValue
+         * @param limit value limit
          * @return list of counter values
          */
-        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit) const;
 
         /**
          * @brief Returns list of label values by label name

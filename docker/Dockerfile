@@ -60,6 +60,10 @@ COPY --from=build /usr/local/lib/libbsoncxx.so.4.0.0 /usr/lib/
 RUN ln -s /usr/lib/libbsoncxx.so.4.0.0 /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
 
+# Install prometheus
+COPY --from=build /usr/local/lib/libprometheus-cpp-core.so /usr/lib/
+COPY --from=build /usr/local/lib/libprometheus-cpp-pull.so /usr/lib/
+
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/
 COPY --from=build /usr/local/bin/awsmockmgr /usr/bin/

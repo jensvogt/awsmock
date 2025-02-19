@@ -168,7 +168,7 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue) const {
+    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
 
         const long offset = Core::DateTimeUtils::UtcOffset();
@@ -183,14 +183,16 @@ namespace AwsMock::Database {
 
                 mongocxx::options::find opts;
                 opts.sort(make_document(kvp("created", 1)));
+                //opts.limit(limit);
 
-                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
 #ifdef __APPLE__
+                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
                 const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
                 auto startUtc = system_clock::time_point(startTime.time_since_epoch());
                 const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
                 auto endUtc = system_clock::time_point(endTime.time_since_epoch());
 #else
+                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
                 auto startUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(start).time_since_epoch());
                 auto endUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(end).time_since_epoch());
 #endif
