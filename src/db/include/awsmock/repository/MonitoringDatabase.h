@@ -5,7 +5,6 @@
 #ifndef AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 #define AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 
-
 // C++ standard includes
 #include <string>
 
@@ -14,6 +13,8 @@
 #include <boost/accumulators/statistics.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -82,7 +83,15 @@ namespace AwsMock::Database {
          * @param labelValue labelValue
          * @return list of counter values
          */
-        std::vector<Database::Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+
+        /**
+         * @brief Returns list of label values by label name
+         *
+         * @param labelName label name
+         * @return list of label values
+         */
+        std::vector<std::string> GetDistinctLabelValues(const std::string &labelName) const;
 
         /**
          * @brief Deletes old monitoring data

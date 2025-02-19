@@ -4,14 +4,45 @@
 //
 
 #include <awsmock/repository/MonitoringDatabase.h>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace AwsMock::Database {
 
     typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean>> Accumulator;
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValueBool("awsmock.monitoring.smooth")) {}
+
+    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &labelName) const {
+        log_trace << "Get distinct label values, labelName: " << labelName;
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                std::vector<std::string> labels;
+
+                document query;
+                query.append(kvp("labelName", labelName));
+
+                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc : cursor){
+                    for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) {
+                        labels.emplace_back(element.get_string().value);
+                    }
+                }
+                return labels;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+
+        }
+        log_trace << "Performance counter not available if you running the memory DB";
+        return {};
+    }
 
     void MonitoringDatabase::IncCounter(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
         log_trace << "Set counter value, name: " << name << " value: " << value << " labelName: " << labelName << " labelValue:" << labelValue;

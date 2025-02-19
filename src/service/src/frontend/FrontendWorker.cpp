@@ -107,9 +107,9 @@ namespace AwsMock::Service::Frontend {
         full_path.append(target.data(), target.size());
         log_debug << "Serving: " << full_path;
 
-        // If file does not exists, send defauslt page
+        // If file does not exist, send default page
         if (!boost::filesystem::exists(full_path)) {
-            full_path.append("/index.html");
+            full_path = _docRoot + "/index.html";
         }
         log_trace << full_path << " MIME: " << mime_type(target);
 

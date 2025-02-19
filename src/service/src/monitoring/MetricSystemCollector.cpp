@@ -22,7 +22,8 @@ namespace AwsMock::Monitoring {
 #elif __linux__
 
         GetCpuInfoLinux();
-        GetMemoryThreadsInfoLinux();
+        GetMemoryInfoLinux();
+        GetThreadInfoLinux();
 
 #endif
     }
@@ -37,15 +38,15 @@ namespace AwsMock::Monitoring {
         log_trace << "Now: " << now << "/" << _lastTotalCPU << "/" << _lastSysCPU << "/" << _lastUserCPU;
         if (now - _lastTime > 0) {
             const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU + (timeSample.tms_utime - _lastUserCPU)) / static_cast<double>(now - _lastTime) * 100;
-            MetricService::instance().SetGauge(TOTAL_CPU, totalPercent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", totalPercent);
             log_trace << "Total CPU: " << totalPercent;
 
             const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastUserCPU) / static_cast<double>(now - _lastTime) * 100;
-            MetricService::instance().SetGauge(USER_CPU, userPercent);
+            MetricService::instance().SetGauge(CPU_USAGE,"cpu_type", "user",  userPercent);
             log_trace << "User CPU: " << userPercent;
 
             const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU) / static_cast<double>(now - _lastTime) * 100;
-            MetricService::instance().SetGauge(SYSTEM_CPU, systemPercent);
+            MetricService::instance().SetGauge(CPU_USAGE,"cpu_type", "system",  systemPercent);
             log_trace << "System CPU: " << systemPercent;
         }
         _lastTime = now;
@@ -55,7 +56,7 @@ namespace AwsMock::Monitoring {
         log_trace << "System collector finished";
     }
 
-    void MetricSystemCollector::GetMemoryThreadsInfoLinux() {
+    void MetricSystemCollector::GetMemoryInfoLinux() {
 
         std::string line;
         std::ifstream ifs("/proc/self/status");
@@ -64,22 +65,32 @@ namespace AwsMock::Monitoring {
 
             if (Core::StringUtils::Contains(line, "VmSize:")) {
                 double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
-                MetricService::instance().SetGauge(VIRTUAL_MEMORY, value);
+                MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", value);
                 log_trace << "Virtual memory: " << value;
             }
             if (Core::StringUtils::Contains(line, "VmRSS:")) {
                 double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
-                MetricService::instance().SetGauge(REAL_MEMORY, value);
+                MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", value);
                 log_trace << "Real Memory: " << value;
             }
+        }
+        ifs.close();
+    }
+
+    void MetricSystemCollector::GetThreadInfoLinux() {
+        std::string line;
+        std::ifstream ifs("/proc/self/status");
+        while (ifs) {
+            std::getline(ifs, line);
             if (Core::StringUtils::Contains(line, "Threads:")) {
                 double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
                 MetricService::instance().SetGauge(TOTAL_THREADS, value);
                 log_trace << "Total Threads: " << value;
             }
+            ifs.close();
         }
-        ifs.close();
     }
+
 #endif
 
 #ifdef __APPLE__
@@ -115,19 +126,19 @@ namespace AwsMock::Monitoring {
             // User CPU
             long millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec;
             double percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(USER_CPU, percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
             millies = r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(SYSTEM_CPU, percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
             millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(TOTAL_CPU, percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }
     }
@@ -142,8 +153,8 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        MetricService::instance().SetGauge(VIRTUAL_MEMORY, t_info.virtual_size);
-        MetricService::instance().SetGauge(REAL_MEMORY, t_info.resident_size);
+        MetricService::instance().SetGauge(MEMORY_USAGE, "type", "virtual", t_info.virtual_size);
+        MetricService::instance().SetGauge(MEMORY_USAGE, "type", "real", t_info.resident_size);
         log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
     }
 

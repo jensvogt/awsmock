@@ -56,7 +56,7 @@ namespace AwsMock::Monitoring {
         /**
         * @brief Get number of threads on MacOS
         */
-        void GetCurrentThreadCountMac();
+        void GetThreadInfoMac();
 
         /**
          * @brief Get CPU utilization on MacOS
@@ -73,7 +73,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get number of threads on MacOS
          */
-        void GetCurrentThreadCountLinux();
+        void GetThreadInfoLinux();
 
         /**
          * @brief Get CPU utilization on MacOS
@@ -83,7 +83,8 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get memory info on Linux systems
          */
-        static void GetMemoryThreadsInfoLinux();
+        static void GetMemoryInfoLinux();
+
 #endif
 
       private:

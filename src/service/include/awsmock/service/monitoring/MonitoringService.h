@@ -21,6 +21,7 @@
 #include <awsmock/dto/monitoring/GetCountersRequest.h>
 #include <awsmock/dto/monitoring/GetCountersResponse.h>
 #include <awsmock/repository/MonitoringDatabase.h>
+#include <awsmock/dto/monitoring/GetMultiCountersResponse.h>
 
 namespace AwsMock::Service {
 
@@ -48,6 +49,14 @@ namespace AwsMock::Service {
          * @see GetCountersResponse
          */
         Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
+
+        /**
+         * @brief Returns deveral series of counters in a map
+         *
+         * @param request monitoring counter request
+         * @return map of counter objects
+         */
+        Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
       private:
 
