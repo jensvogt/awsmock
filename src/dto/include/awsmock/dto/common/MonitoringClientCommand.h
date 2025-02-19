@@ -35,8 +35,7 @@ namespace AwsMock::Dto::Common {
 
     static std::map<MonitoringCommandType, std::string> MonitoringCommandTypeNames{
             {MonitoringCommandType::GET_COUNTERS, "get-counters"},
-            {MonitoringCommandType::GET_MULTI_COUNTERS, "get-multi-counters"}
-    };
+            {MonitoringCommandType::GET_MULTI_COUNTERS, "get-multi-counters"}};
 
     [[maybe_unused]] static std::string MonitoringCommandTypeToString(MonitoringCommandType commandType) {
         return MonitoringCommandTypeNames[commandType];

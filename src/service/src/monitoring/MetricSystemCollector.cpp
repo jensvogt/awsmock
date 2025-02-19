@@ -42,11 +42,11 @@ namespace AwsMock::Monitoring {
             log_trace << "Total CPU: " << totalPercent;
 
             const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastUserCPU) / static_cast<double>(now - _lastTime) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE,"cpu_type", "user",  userPercent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", userPercent);
             log_trace << "User CPU: " << userPercent;
 
             const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU) / static_cast<double>(now - _lastTime) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE,"cpu_type", "system",  systemPercent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", systemPercent);
             log_trace << "System CPU: " << systemPercent;
         }
         _lastTime = now;

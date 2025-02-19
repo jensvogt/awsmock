@@ -12,7 +12,7 @@ namespace AwsMock::Dto::Monitoring {
 
             document rootDocument;
 
-            for (const auto &[fst, snd] : counters) {
+            for (const auto &[fst, snd]: counters) {
                 array jsonArray;
                 for (const auto &value: snd) {
                     array jsonElement;

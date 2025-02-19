@@ -20,8 +20,8 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/monitoring/GetCountersRequest.h>
 #include <awsmock/dto/monitoring/GetCountersResponse.h>
-#include <awsmock/repository/MonitoringDatabase.h>
 #include <awsmock/dto/monitoring/GetMultiCountersResponse.h>
+#include <awsmock/repository/MonitoringDatabase.h>
 
 namespace AwsMock::Service {
 

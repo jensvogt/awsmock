@@ -27,7 +27,7 @@ namespace AwsMock::Database {
                 document query;
                 query.append(kvp("labelName", labelName));
 
-                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc : cursor){
+                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
                     for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) {
                         labels.emplace_back(element.get_string().value);
                     }
@@ -38,7 +38,6 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
         }
         log_trace << "Performance counter not available if you running the memory DB";
         return {};
