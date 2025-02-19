@@ -61,8 +61,15 @@ RUN ln -s /usr/lib/libbsoncxx.so.4.0.0 /usr/lib/libbsoncxx.so._noabi
 RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
 
 # Install prometheus
-COPY --from=build /usr/local/lib/libprometheus-cpp-core.so /usr/lib/
-COPY --from=build /usr/local/lib/libprometheus-cpp-pull.so /usr/lib/
+COPY --from=build /usr/local/lib/libprometheus-cpp-core.so.1.3.0 /usr/lib/
+RUN ln -s /usr/lib/libprometheus-cpp-core.so.1.3.0 /usr/lib/libprometheus-cpp-core.so.1.3
+RUN ln -s /usr/lib/libprometheus-cpp-core.so /usr/lib/libprometheus-cpp-core.so.1.3
+COPY --from=build /usr/local/lib/libprometheus-cpp-pull.so.1.3.0 /usr/lib/
+RUN ln -s /usr/lib/libprometheus-cpp-pull.so.1.3.0 /usr/lib/libprometheus-cpp-pull.so.1.3
+RUN ln -s /usr/lib/libprometheus-cpp-pull.so /usr/lib/libprometheus-cpp-pull.so.1.3
+COPY --from=build /usr/local/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/
+RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-push.so.1.3
+RUN ln -s /usr/lib/libprometheus-cpp-push.so /usr/lib/libprometheus-cpp-push.so.1.3
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/
