@@ -6,9 +6,9 @@
 
 namespace AwsMock::Monitoring {
 
-    MetricSystemCollector::MetricSystemCollector() {
+    MetricSystemCollector::MetricSystemCollector():_lastTime(0),_lastTotalCPU(0),_lastSysCPU(0), _lastUserCPU(0) {
         _startTime = system_clock::now();
-    }
+    } 
 
     void MetricSystemCollector::CollectSystemCounter() {
         log_trace << "System collector starting";
@@ -87,8 +87,8 @@ namespace AwsMock::Monitoring {
                 MetricService::instance().SetGauge(TOTAL_THREADS, value);
                 log_trace << "Total Threads: " << value;
             }
-            ifs.close();
         }
+        ifs.close();
     }
 
 #endif
