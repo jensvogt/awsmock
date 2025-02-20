@@ -31,7 +31,8 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url plog yaml-cpp libarchive libmagic
+RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url boost-locale plog  \
+    yaml-cpp libarchive libmagic
 
 # Make directories
 RUN mkdir -p /home/awsmock/data/s3 && \
