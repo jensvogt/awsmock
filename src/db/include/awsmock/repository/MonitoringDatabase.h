@@ -93,7 +93,7 @@ namespace AwsMock::Database {
          * @param labelName label name
          * @return list of label values
          */
-        std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName) const;
+        [[nodiscard]] std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName) const;
 
         /**
          * @brief Deletes old monitoring data
@@ -101,7 +101,7 @@ namespace AwsMock::Database {
          * @param retentionPeriod retention period in days
          * @return number of deleted data rows
          */
-        long DeleteOldMonitoringData(int retentionPeriod) const;
+        [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
       private:
 

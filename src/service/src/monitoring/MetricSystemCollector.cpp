@@ -15,7 +15,7 @@ namespace AwsMock::Monitoring {
 
 #ifdef __APPLE__
 
-        GetCurrentThreadCountMac();
+        GetThreadInfoMac();
         GetCpuInfoMac();
         GetMemoryInfoMac();
 
@@ -94,7 +94,7 @@ namespace AwsMock::Monitoring {
 #endif
 
 #ifdef __APPLE__
-    void MetricSystemCollector::GetCurrentThreadCountMac() {
+    void MetricSystemCollector::GetThreadInfoMac() {
         const auto me = mach_task_self();
         thread_array_t threads;
         mach_msg_type_number_t numberOfThreads;
