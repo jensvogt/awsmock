@@ -544,7 +544,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::TouchObject(Dto::S3::TouchObjectRequest &request) const {
+    void S3Service::TouchObject(const Dto::S3::TouchObjectRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "touch_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "touch_object");
         log_trace << "Touch object request: " << request.ToString();
@@ -571,6 +571,38 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 touch object failed, message: " << ex.what() << " key: " << request.key;
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void S3Service::UpdateObject(const Dto::S3::UpdateObjectRequest &request) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "update_object");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "update_object");
+        log_trace << "Update object request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists({.region = request.region, .name = request.bucket})) {
+            log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist");
+        }
+
+        // Check existence
+        if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
+            log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
+            throw Core::NotFoundException("Bucket does not exist");
+        }
+
+        try {
+            // Get the object
+            Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+
+            // Change metadata
+            object.metadata = request.metadata;
+            object = _database.UpdateObject(object);
+            log_debug << "Metadata updated, bucket: " << object.bucket << " key: " << object.key;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 update object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
         }
     }
@@ -1079,6 +1111,7 @@ namespace AwsMock::Service {
                 objectCounter.contentType = object.contentType;
                 objectCounter.created = object.created;
                 objectCounter.modified = object.modified;
+                objectCounter.metadata = object.metadata;
                 listAllObjectResponse.objectCounters.emplace_back(objectCounter);
             }
             log_debug << "Count all objects, size: " << objectList.size();

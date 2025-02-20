@@ -66,6 +66,7 @@
 #include <awsmock/dto/s3/internal/ListObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
 #include <awsmock/dto/s3/internal/TouchObjectRequest.h>
+#include <awsmock/dto/s3/internal/UpdateObjectRequest.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -258,7 +259,18 @@ namespace AwsMock::Service {
          * @param request touch object request
          * @see TouchObjectRequest
          */
-        void TouchObject(Dto::S3::TouchObjectRequest &request) const;
+        void TouchObject(const Dto::S3::TouchObjectRequest &request) const;
+
+        /**
+         * @brief Touch object
+         *
+         * @par
+         * This method re-triggers the event notification, like lambda trigger etc.
+         *
+         * @param request touch object request
+         * @see TouchObjectRequest
+         */
+        void UpdateObject(const Dto::S3::UpdateObjectRequest &request) const;
 
         /**
          * @brief Copy object

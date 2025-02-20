@@ -19,12 +19,12 @@ namespace AwsMock::Database::Entity::S3 {
 
     view_or_value<view, value> LambdaNotification::ToDocument() const {
 
-        auto lambdaNotificationDoc = bsoncxx::builder::basic::document{};
+        auto lambdaNotificationDoc = document{};
         lambdaNotificationDoc.append(kvp("id", id));
         lambdaNotificationDoc.append(kvp("lambdaArn", lambdaArn));
 
         // Events
-        auto eventsDoc = bsoncxx::builder::basic::array{};
+        auto eventsDoc = array{};
         for (const auto &event: events) {
             eventsDoc.append(event);
         }
