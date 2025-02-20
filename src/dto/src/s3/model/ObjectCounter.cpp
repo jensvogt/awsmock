@@ -24,7 +24,7 @@ namespace AwsMock::Dto::S3 {
             // Metadata
             if (!metadata.empty()) {
                 array jsonMetadataArray;
-                for (const auto &[fst, snd]:metadata) {
+                for (const auto &[fst, snd]: metadata) {
                     document jsonMetadataObject;
                     jsonMetadataObject.append(kvp("key", fst));
                     jsonMetadataObject.append(kvp("value", snd));

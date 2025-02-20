@@ -13,12 +13,12 @@ namespace AwsMock::Dto::S3 {
             key = Core::Bson::BsonUtils::GetStringValue(rootDocument, "key");
 
             // Metadata
-            if (rootDocument.view().find("metadata")!=rootDocument.view().end()) {
-                for (const auto jsonMetadataArray= rootDocument.view()["metadata"].get_array().value ;const auto &element : jsonMetadataArray) {
+            if (rootDocument.view().find("metadata") != rootDocument.view().end()) {
+                for (const auto jsonMetadataArray = rootDocument.view()["metadata"].get_array().value; const auto &element: jsonMetadataArray) {
                     auto jsonObject = element.get_document().value;
                     std::string key = bsoncxx::string::to_string(jsonObject["key"].get_string().value);
                     const std::string value = bsoncxx::string::to_string(jsonObject["value"].get_string().value);
-                    metadata[key]= value;
+                    metadata[key] = value;
                 }
             }
         } catch (bsoncxx::exception &exc) {
