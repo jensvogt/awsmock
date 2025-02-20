@@ -299,6 +299,7 @@ namespace AwsMock::Service {
                 bucketCounter.bucketName = bucket.name;
                 bucketCounter.keys = bucket.keys;
                 bucketCounter.size = bucket.size;
+                bucketCounter.owner = bucket.owner;
                 bucketCounter.created = bucket.created;
                 bucketCounter.modified = bucket.modified;
                 listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
@@ -1488,10 +1489,7 @@ namespace AwsMock::Service {
 
             // General attributes
             const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
-            Database::Entity::S3::LambdaNotification lambdaNotification = {
-                    .id = attrId,
-                    .lambdaArn = lambdaArn,
-            };
+            Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaArn};
 
             // Get events
             for (const auto &event: events) {
