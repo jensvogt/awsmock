@@ -6,7 +6,7 @@
 
 namespace AwsMock::Monitoring {
 
-    MetricSystemCollector::MetricSystemCollector() : _lastTime(0), _lastTotalCPU(0), _lastSysCPU(0), _lastUserCPU(0) {
+    MetricSystemCollector::MetricSystemCollector() {
         _startTime = system_clock::now();
     }
 
