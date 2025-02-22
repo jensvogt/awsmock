@@ -26,7 +26,9 @@ namespace AwsMock::Database {
                 query.append(kvp("name", name));
                 query.append(kvp("labelName", labelName));
 
-                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) { for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) { labels.emplace_back(element.get_string().value); } }
+                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
+                    for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) { labels.emplace_back(element.get_string().value); }
+                }
                 return labels;
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -82,7 +84,9 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else { log_trace << "Performance counter not available if you running the memory DB"; }
+        } else {
+            log_trace << "Performance counter not available if you running the memory DB";
+        }
     }
 
     void MonitoringDatabase::SetGauge(const std::string &name, double value, const std::string &labelName, const std::string &labelValue) const {
@@ -131,7 +135,9 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else { log_trace << "Performance counter not available if you running the memory DB"; }
+        } else {
+            log_trace << "Performance counter not available if you running the memory DB";
+        }
     }
 
     std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
