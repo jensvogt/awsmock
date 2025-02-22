@@ -73,7 +73,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get number of threads on MacOS
          */
-        void GetThreadInfoLinux();
+        static void GetThreadInfoLinux();
 
         /**
          * @brief Get CPU utilization on MacOS

@@ -6,9 +6,7 @@
 
 namespace AwsMock::Core {
 
-    Configuration::Configuration() {
-        Initialize();
-    }
+    Configuration::Configuration() { Initialize(); }
 
     Configuration::Configuration(const std::string &basename) : _yamlConfig(YAML::Null) {
         Initialize();
@@ -130,7 +128,7 @@ namespace AwsMock::Core {
         // Monitoring
         DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_MONITORING_PORT", 9091);
         DefineIntProperty("awsmock.monitoring.period", "AWSMOCK_MONITORING_PERIOD", 60);
-        DefineBoolProperty("awsmock.monitoring.prometheus", "AWSMOCK_MONITORING_PROMETHEUS", true);
+        DefineBoolProperty("awsmock.monitoring.prometheus", "AWSMOCK_MONITORING_PROMETHEUS", false);
         DefineBoolProperty("awsmock.monitoring.intern", "AWSMOCK_MONITORING_INTERN", true);
         DefineIntProperty("awsmock.monitoring.retention", "AWSMOCK_MONITORING_RETENTION", 3);
         DefineBoolProperty("awsmock.monitoring.smooth", "AWSMOCK_MONITORING_SMOOTH", false);
@@ -178,9 +176,7 @@ namespace AwsMock::Core {
             AddToEnvList(key, getenv(envProperty.c_str()));
         }
         std::vector<std::string> values = StringUtils::Split(value, ';');
-        for (auto &v: values) {
-            value = ReplaceEnvironmentVariables(v);
-        }
+        for (auto &v: values) { value = ReplaceEnvironmentVariables(v); }
         SetValueByPath(_yamlConfig, key, values);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
@@ -226,19 +222,13 @@ namespace AwsMock::Core {
     }
 
     std::string Configuration::GetFilename() const {
-        if (_filename.empty()) {
-            throw CoreException("Filename not set");
-        }
+        if (_filename.empty()) { throw CoreException("Filename not set"); }
         return _filename;
     }
 
     void Configuration::SetFilename(const std::string &filename) {
-        if (filename.empty()) {
-            throw CoreException("Empty filename");
-        }
-        if (!FileUtils::FileExists(filename)) {
-            log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
-        }
+        if (filename.empty()) { throw CoreException("Empty filename"); }
+        if (!FileUtils::FileExists(filename)) { log_warning << "Configuration file '" << filename << "' does not exist. Will use default."; }
 
         // Save file name
         _filename = filename;
@@ -262,9 +252,7 @@ namespace AwsMock::Core {
     }
 
     void Configuration::SetValueBool(const std::string &key, const bool value) {
-        if (!HasProperty(key)) {
-            throw CoreException("Property not found, key: " + key);
-        }
+        if (!HasProperty(key)) { throw CoreException("Property not found, key: " + key); }
         SetValueByPath(_yamlConfig, key, value);
         log_trace << "Value set, key: " << key;
     }
@@ -295,9 +283,7 @@ namespace AwsMock::Core {
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
         auto values = lookup(_yamlConfig, paths.begin(), paths.end()).as<std::vector<std::string>>();
-        for (auto &v: values) {
-            v = ReplaceEnvironmentVariables(v);
-        }
+        for (auto &v: values) { v = ReplaceEnvironmentVariables(v); }
         return values;
     }
 
@@ -337,13 +323,9 @@ namespace AwsMock::Core {
         return lookup(_yamlConfig, paths.begin(), paths.end()).as<double>();
     }
 
-    std::string Configuration::GetAppName() {
-        return PROJECT_NAME;
-    }
+    std::string Configuration::GetAppName() { return PROJECT_NAME; }
 
-    std::string Configuration::GetVersion() {
-        return PROJECT_VERSION;
-    }
+    std::string Configuration::GetVersion() { return PROJECT_VERSION; }
 
     std::string Configuration::ToString() const {
         std::stringstream ss;
@@ -351,9 +333,7 @@ namespace AwsMock::Core {
         return ss.str();
     }
 
-    void Configuration::Dump() const {
-        std::cerr << _yamlConfig << std::endl;
-    }
+    void Configuration::Dump() const { std::cerr << _yamlConfig << std::endl; }
 
     void Configuration::WriteFile(const std::string &filename) const {
         std::ofstream ofs(filename);
@@ -361,29 +341,20 @@ namespace AwsMock::Core {
         ofs.close();
     }
 
-    void Configuration::AddToEnvList(const std::string &key, const std::string &value) {
-        _envList[key] = value;
-    }
+    void Configuration::AddToEnvList(const std::string &key, const std::string &value) { _envList[key] = value; }
 
-    void Configuration::ApplyEnvSettings() {
-        for (const auto &[fst, snd]: _envList) {
-            SetValueString(fst, snd);
-        }
-    }
+    void Configuration::ApplyEnvSettings() { for (const auto &[fst, snd]: _envList) { SetValueString(fst, snd); } }
 
     bool Configuration::HasProperty(const std::string &key) const {
         std::vector<std::string> paths = StringUtils::Split(key, '.');
         YAML::Node traverse = _yamlConfig;
-        for (std::string &path_element: paths) {
-            traverse.reset(traverse[path_element]);
-        }
+        for (std::string &path_element: paths) { traverse.reset(traverse[path_element]); }
         return traverse.IsDefined();
     }
 
     std::string Configuration::ReplaceEnvironmentVariables(std::string &value) {
 
         if (StringUtils::Contains(value, "$")) {
-
             size_t offset = 0;
             static std::regex envRegex(R"(\$(\w+|\{\w+\}))", std::regex::ECMAScript);
             const std::string matchText = value;
@@ -408,9 +379,7 @@ namespace AwsMock::Core {
                         value.replace(pos, match.length(), temp);
                         offset = pos + value.length();
                     }
-                } else {
-                    offset += match.length();
-                }
+                } else { offset += match.length(); }
             }
         }
         return value;
