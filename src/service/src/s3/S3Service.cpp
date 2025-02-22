@@ -34,7 +34,6 @@ namespace AwsMock::Service {
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
             log_info << "Bucket created, bucket: " << s3Request.name;
             return createBucketResponse;
-
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -860,10 +859,8 @@ namespace AwsMock::Service {
 
         Dto::S3::ListObjectVersionsResponse response;
         try {
-
             const std::vector<Database::Entity::S3::Object> objectList = _database.ListObjectVersions(request.region, request.bucket, request.prefix);
             return Dto::S3::Mapper::map(request, objectList);
-
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list object versions request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
