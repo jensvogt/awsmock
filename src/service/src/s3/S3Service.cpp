@@ -23,7 +23,6 @@ namespace AwsMock::Service {
         try {
 
             // Update database
-            Dto::S3::CreateBucketResponse createBucketResponse;
             const std::string arn = Core::AwsUtils::CreateS3BucketArn(region, accountId, s3Request.name);
             Database::Entity::S3::Bucket bucket = {.region = region, .name = s3Request.name, .owner = s3Request.owner, .arn = arn};
             bucket = _database.CreateBucket(bucket);
@@ -196,9 +195,7 @@ namespace AwsMock::Service {
                     log_error << "Object " << request.key << " does not exist";
                     throw Core::ServiceException("Object does not exist");
                 }
-            } else {
-                object = _database.GetObject(request.region, request.bucket, request.key);
-            }
+            } else { object = _database.GetObject(request.region, request.bucket, request.key); }
 
             std::string filename = s3DataDir + Core::FileUtils::separator() + object.internalName;
 
@@ -473,18 +470,10 @@ namespace AwsMock::Service {
         try {
 
             // Get bucket
-            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
-                return SaveVersionedObject(request, bucket, stream);
-            } else {
-                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
-            }
+            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) { return SaveVersionedObject(request, bucket, stream); } else { return SaveUnversionedObject(request, bucket, stream, request.contentLength); }
 
             // Get bucket
-            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
-                return SaveVersionedObject(request, bucket, stream);
-            } else {
-                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
-            }
+            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) { return SaveVersionedObject(request, bucket, stream); } else { return SaveUnversionedObject(request, bucket, stream, request.contentLength); }
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
@@ -1309,7 +1298,9 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
+            const std::string attrId = id.empty()
+                                           ? Core::StringUtils::CreateRandomUuid()
+                                           : id;
             Database::Entity::S3::QueueNotification queueNotification = {.id = attrId, .queueArn = queueArn};
 
             // Get events
@@ -1335,7 +1326,9 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
+            const std::string attrId = id.empty()
+                                           ? Core::StringUtils::CreateRandomUuid()
+                                           : id;
             Database::Entity::S3::TopicNotification topicNotification = {.id = attrId, .topicArn = topicArn};
 
             // Get events
@@ -1362,8 +1355,8 @@ namespace AwsMock::Service {
 
             // General attributes
             const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+                                           ? Core::StringUtils::CreateRandomUuid()
+                                           : id;
             Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaArn};
 
             // Get events
