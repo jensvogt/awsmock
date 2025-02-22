@@ -24,6 +24,22 @@ namespace AwsMock::Dto::S3 {
         return Core::XmlUtils::ToXmlString(root);
     }
 
+    std::string ListAllBucketResponse::ToJson() const {
+
+        document rootDocument;
+
+        // Get metadata
+        if (bucketList.empty()) {
+            array jsonBucketArray;
+            for (const auto &bucket: bucketList) {
+                jsonBucketArray.append(bucket.ToDocument());
+            }
+            rootDocument.append(kvp("buckets", jsonBucketArray));
+        }
+        rootDocument.append(kvp("total", total));
+        return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+    }
+
     std::string ListAllBucketResponse::ToString() const {
         std::stringstream ss;
         ss << *this;
@@ -31,11 +47,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     std::ostream &operator<<(std::ostream &os, const ListAllBucketResponse &r) {
-        os << "ListAllBucketResponse={bucketList='";
-        for (const auto &it: r.bucketList) {
-            os << it.ToString() + ", ";
-        }
-        os << "'}";
+        os << "ListAllBucketResponse=" << r.ToJson();
         return os;
     }
 

@@ -891,7 +891,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void S3Database::DeleteAllObjects() const {
+    long S3Database::DeleteAllObjects() const {
 
         if (HasDatabase()) {
 
@@ -905,17 +905,15 @@ namespace AwsMock::Database {
                 const auto result = _objectCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All objects deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteAllObjects();
         }
+        return _memoryDb.DeleteAllObjects();
     }
 
     Entity::S3::Bucket S3Database::CreateBucketNotification(const Entity::S3::Bucket &bucket, const Entity::S3::BucketNotification &bucketNotification) const {
