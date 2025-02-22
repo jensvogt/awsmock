@@ -411,7 +411,7 @@ namespace AwsMock::Service
          * @param lambdaNotification S3 lambda notification
          */
         void
-        SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const;
+        SendLambdaInvocationRequest(const Dto::S3::EventNotification& eventNotification, const Database::Entity::S3::LambdaNotification& lambdaNotification) const;
 
         /**
          * @brief Check for bucket notifications.
@@ -423,7 +423,7 @@ namespace AwsMock::Service
          * @param event S3 event type.
          */
         void
-        CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const;
+        CheckNotifications(const std::string& region, const std::string& bucket, const std::string& key, long size, const std::string& event) const;
 
         /**
          * @brief Checks the encryption status and encrypt the internal file using the KMS key supplied in the encryption object of the bucket.
@@ -432,7 +432,7 @@ namespace AwsMock::Service
          * @param object S3 object
          */
         static void
-        CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
+        CheckEncryption(const Database::Entity::S3::Bucket& bucket, const Database::Entity::S3::Object& object);
 
         /**
          * @brief Checks the existence of a bucket by region and name.
@@ -441,7 +441,7 @@ namespace AwsMock::Service
          * @param name S3 bucket name
          */
         static void
-        CheckBucket(const std::string &region, const std::string &name);
+        CheckBucket(const std::string& region, const std::string& name);
 
         /**
          * @brief Checks the decryption status and decrypts the internal file using the KMS key supplied in the encryption object of the bucket.
@@ -455,7 +455,7 @@ namespace AwsMock::Service
          * @param outFile name of the output file
          */
         static void
-        CheckDecryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object, std::string &outFile);
+        CheckDecryption(const Database::Entity::S3::Bucket& bucket, const Database::Entity::S3::Object& object, std::string& outFile);
 
         /**
          * @brief Get the temporary upload directory for a uploadId.
@@ -464,7 +464,7 @@ namespace AwsMock::Service
          * @return temporary directory path.
          */
         static std::string
-        GetMultipartUploadDirectory(const std::string &uploadId);
+        GetMultipartUploadDirectory(const std::string& uploadId);
 
         /**
          * @brief Deletes an object
@@ -474,7 +474,7 @@ namespace AwsMock::Service
          * @param internalName S3 internal name
          */
         void
-        DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName);
+        DeleteObject(const std::string& bucket, const std::string& key, const std::string& internalName);
 
         /**
          * @brief Deletes an bucket
@@ -484,7 +484,7 @@ namespace AwsMock::Service
          * @param bucket S3 bucket name
          */
         void
-        DeleteBucket(const std::string &bucket);
+        DeleteBucket(const std::string& bucket);
 
         /**
          * @brief Save a versioned S3 object.
@@ -495,7 +495,7 @@ namespace AwsMock::Service
          * @return file name
          */
         Dto::S3::PutObjectResponse
-        SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
+        SaveVersionedObject(Dto::S3::PutObjectRequest& request, const Database::Entity::S3::Bucket& bucket, std::istream& stream) const;
 
         /**
          * @brief Save a un-versioned S3 object.
@@ -507,7 +507,7 @@ namespace AwsMock::Service
          * @return file name
          */
         Dto::S3::PutObjectResponse
-        SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
+        SaveUnversionedObject(Dto::S3::PutObjectRequest& request, const Database::Entity::S3::Bucket& bucket, std::istream& stream, long size) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.
@@ -516,7 +516,7 @@ namespace AwsMock::Service
          * @param queueConfigurations queue notification configurations vector.
          */
         static void
-        PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations);
+        PutQueueNotificationConfigurations(Database::Entity::S3::Bucket& bucket, const std::vector<Dto::S3::QueueConfiguration>& queueConfigurations);
 
         /**
          * @brief Adds the topic notification configuration to the provided bucket.
@@ -525,7 +525,7 @@ namespace AwsMock::Service
          * @param topicConfigurations topic notification configurations vector.
          */
         static void
-        PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations);
+        PutTopicNotificationConfigurations(Database::Entity::S3::Bucket& bucket, const std::vector<Dto::S3::TopicConfiguration>& topicConfigurations);
 
         /**
          * @brief Adds the lambda notification configuration to the provided bucket.
@@ -534,7 +534,7 @@ namespace AwsMock::Service
          * @param lambdaConfigurations lambda notification configurations vector.
          */
         static void
-        PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
+        PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket& bucket, const std::vector<Dto::S3::LambdaConfiguration>& lambdaConfigurations);
 
         /**
          * @brief Adjusts the key counter in the bucket.
@@ -543,18 +543,18 @@ namespace AwsMock::Service
          * @param bucketName name of the bucket
          */
         void
-        AdjustBucketCounters(const std::string &region, const std::string &bucketName) const;
+        AdjustBucketCounters(const std::string& region, const std::string& bucketName) const;
 
         /**
          * Database connection
          */
-        Database::S3Database &_database;
+        Database::S3Database& _database;
 
         /**
          * Lambda service
          */
         LambdaService _lambdaService;
     };
-}// namespace AwsMock::Service
+} // namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H
