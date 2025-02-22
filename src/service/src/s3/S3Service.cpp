@@ -23,6 +23,7 @@ namespace AwsMock::Service {
         try {
 
             // Update database
+            Dto::S3::CreateBucketResponse createBucketResponse;
             const std::string arn = Core::AwsUtils::CreateS3BucketArn(region, accountId, s3Request.name);
             Database::Entity::S3::Bucket bucket = {.region = region, .name = s3Request.name, .owner = s3Request.owner, .arn = arn};
             bucket = _database.CreateBucket(bucket);
@@ -468,6 +469,13 @@ namespace AwsMock::Service {
         CheckBucket(request.region, request.bucket);
 
         try {
+
+            // Get bucket
+            if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
+                return SaveVersionedObject(request, bucket, stream);
+            } else {
+                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
+            }
 
             // Get bucket
             if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) { return SaveVersionedObject(request, bucket, stream); } else { return SaveUnversionedObject(request, bucket, stream, request.contentLength); }
@@ -1295,9 +1303,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                           ? Core::StringUtils::CreateRandomUuid()
-                                           : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::QueueNotification queueNotification = {.id = attrId, .queueArn = queueArn};
 
             // Get events
@@ -1323,9 +1329,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                           ? Core::StringUtils::CreateRandomUuid()
-                                           : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::TopicNotification topicNotification = {.id = attrId, .topicArn = topicArn};
 
             // Get events
