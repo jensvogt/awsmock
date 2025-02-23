@@ -19,7 +19,7 @@
 #define OWNER "test-owner"
 #define ACCOUNT_ID "000000000000"
 #define FUNCTION_NAME std::string("test-function")
-#define FUNCTION_FILE std::string("/tmp/java-basic-1.0-SNAPSHOT.jar")
+#define FUNCTION_FILE std::string("data/lambda/java-basic-1.0-SNAPSHOT.jar")
 #define ROLE std::string("arn:aws:iam::000000000000:role/lambda-role")
 #define CODE std::string("S3Bucket=lambdaBucket,S3Key=lambdaKey")
 #define RUNTIME std::string("java11")

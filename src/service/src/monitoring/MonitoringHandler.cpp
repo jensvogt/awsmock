@@ -21,6 +21,15 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, response.ToJson());
                 }
 
+                case Dto::Common::MonitoringCommandType::GET_MULTI_COUNTERS: {
+
+                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
+                    const Dto::Monitoring::GetMultiCountersResponse response = _monitoringService.GetMultiCounters(monitoringRequest);
+
+                    log_debug << "Get multiple counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
+                    return SendOkResponse(request, response.ToJson());
+                }
+
                 default:
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");

@@ -22,7 +22,7 @@
 #define ROLE "lambda-role"
 #define HANDLER "de.jensvogt.test-lambda.handler"
 #define QUALIFIER "latest"
-#define ZIP_FILE "/tmp/java-basic-1.0-SNAPSHOT.jar"
+#define ZIP_FILE "data/lambda/java-basic-1.0-SNAPSHOT.jar"
 
 namespace AwsMock::Service {
 

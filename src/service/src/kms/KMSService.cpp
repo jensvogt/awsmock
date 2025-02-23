@@ -82,7 +82,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void KMSService::WaitForRsaKey(const std::string &keyId, int maxSeconds) const {
+    void KMSService::WaitForRsaKey(const std::string &keyId, const int maxSeconds) const {
 
         int i = 0;
         while (true) {
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void KMSService::WaitForAesKey(const std::string &keyId, int maxSeconds) const {
+    void KMSService::WaitForAesKey(const std::string &keyId, const int maxSeconds) const {
 
         int i = 0;
         while (true) {

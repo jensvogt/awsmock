@@ -15,6 +15,7 @@ namespace AwsMock::Dto::S3 {
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "bucket", bucket);
             Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
+            Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
             Core::Bson::BsonUtils::SetLongValue(document, "size", size);
             Core::Bson::BsonUtils::SetLongValue(document, "keys", keys);
             Core::Bson::BsonUtils::SetStringValue(document, "versionStatus", versionStatus);

@@ -328,8 +328,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all objects
+         *
+         * @retrun number of objects deleted.
          */
-        void DeleteAllObjects();
+        long DeleteAllObjects();
 
       private:
 

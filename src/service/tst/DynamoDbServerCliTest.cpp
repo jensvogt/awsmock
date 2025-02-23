@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
    * AwsMock DynamoDB integration test.
    */
-    class DynamoDbServerCliTest : public ::testing::Test, public TestBase {
+    class DynamoDbServerCliTest : public testing::Test, public TestBase {
 
       protected:
 
@@ -39,6 +39,7 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
+            _database.DeleteAllItems();
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint http://localhost:8000");
         }

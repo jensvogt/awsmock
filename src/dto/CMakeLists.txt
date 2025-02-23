@@ -43,7 +43,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
         src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/internal/ListBucketCounterRequest.cpp src/s3/internal/ListBucketCounterResponse.cpp
         src/s3/model/ObjectCounter.cpp src/s3/internal/ListObjectCounterRequest.cpp src/s3/internal/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
-        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp)
+        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp
+        src/s3/internal/UpdateObjectRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -106,7 +107,7 @@ set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ss
         src/ssm/DescribeParametersResponse.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp src/module/ExportInfrastructureRequest.cpp
         src/module/ExportInfrastructureResponse.cpp src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp)
-set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp)
+set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp src/monitoring/GetMultiCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})

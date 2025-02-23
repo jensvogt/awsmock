@@ -161,7 +161,7 @@ awsmock:
     active: true                                                        # Activation flag
     port: 9091                                                          # Prometheus port
     period: 60                                                          # Monitoring interval
-    prometheus: true                                                    # Use Prometheus as monitoring collector
+    prometheus: false                                                   # Use Prometheus as monitoring collector
     intern: true                                                        # Use internal monitoring
     retention: 3                                                        # Retention of monitoring data in days
     smooth: false                                                       # Use rolling mean

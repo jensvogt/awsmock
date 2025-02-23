@@ -11,11 +11,11 @@ namespace AwsMock::Service {
         log_debug << "Start creating KMS key, keyId: " << keyId;
 
         // Get database connection
-        Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
+        const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
 
         // Make local copy
         Database::Entity::KMS::Key key = kmsDatabase.GetKeyByKeyId(keyId);
-        key.keyState = Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED);
+        key.keyState = KeyStateToString(Dto::KMS::KeyState::CREATING);
 
         switch (Dto::KMS::KeySpecFromString(key.keySpec)) {
 
@@ -65,6 +65,7 @@ namespace AwsMock::Service {
         }
 
         // Save to database
+        key.keyState = KeyStateToString(Dto::KMS::KeyState::ENABLED);
         key = kmsDatabase.UpdateKey(key);
 
         log_debug << "KMS key created, keyId: " << key.keyId;
@@ -77,8 +78,8 @@ namespace AwsMock::Service {
         Core::Crypto::CreateAes256Key(keyMaterial, iv);
 
         // Base64 hashing
-        std::string hexKey = Core::Crypto::HexEncode(keyMaterial, 32);
-        std::string hexIv = Core::Crypto::HexEncode(iv, 16);
+        const std::string hexKey = Core::Crypto::HexEncode(keyMaterial, 32);
+        const std::string hexIv = Core::Crypto::HexEncode(iv, 16);
         log_debug << "KMS keys created";
 
         key.aes256Key = hexKey;
@@ -94,7 +95,7 @@ namespace AwsMock::Service {
         Core::Crypto::CreateHmacKey(keyMaterial, length);
 
         // Base64 hashing
-        std::string hexKey = Core::Crypto::HexEncode(keyMaterial, length);
+        const std::string hexKey = Core::Crypto::HexEncode(keyMaterial, length);
         log_debug << "HMAC KMS keys created, length: " << length;
 
         if (length == 224) {
@@ -113,8 +114,8 @@ namespace AwsMock::Service {
         log_debug << "Start creating RSA KMS key pair, keyId: " << key.keyId << " length: " << length;
 
         EVP_PKEY *keyMaterial = Core::Crypto::GenerateRsaKeys(length);
-        std::string publicKey = Core::Crypto::GetRsaPublicKey(keyMaterial);
-        std::string privateKey = Core::Crypto::GetRsaPrivateKey(keyMaterial);
+        const std::string publicKey = Core::Crypto::GetRsaPublicKey(keyMaterial);
+        const std::string privateKey = Core::Crypto::GetRsaPrivateKey(keyMaterial);
 
         key.rsaPublicKey = publicKey;
         key.rsaPrivateKey = privateKey;

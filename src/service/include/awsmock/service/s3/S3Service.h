@@ -9,8 +9,8 @@
 #include <string>
 
 #if __APPLE__
-#include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/uio.h>
 #endif
 
@@ -66,6 +66,7 @@
 #include <awsmock/dto/s3/internal/ListObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
 #include <awsmock/dto/s3/internal/TouchObjectRequest.h>
+#include <awsmock/dto/s3/internal/UpdateObjectRequest.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
@@ -117,7 +118,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        Dto::S3::GetMetadataResponse GetBucketMetadata(Dto::S3::GetMetadataRequest &request) const;
+        Dto::S3::GetMetadataResponse GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const;
 
         /**
          * @brief Returns the S3 bucket.
@@ -132,7 +133,7 @@ namespace AwsMock::Service {
         Dto::S3::GetBucketResponse GetBucket(const Dto::S3::GetBucketRequest &request) const;
 
         /**
-         * @brief Returns the meta data of an S3 object
+         * @brief Returns the metadata of an S3 object
          *
          * @param request get metadata request
          * @return GetMetadataResponse
@@ -151,7 +152,8 @@ namespace AwsMock::Service {
          * @brief Purge a bucket
          *
          * @par
-         * This will delete all objects of the given bucket. The bucket itself is still existing, but empty.
+         * This will delete all objects of the given bucket. The bucket itself is
+         * still existing, but empty.
          *
          * @param request S3 purge request
          */
@@ -190,17 +192,17 @@ namespace AwsMock::Service {
         /**
          * @brief Put bucket versioning
          *
-         * @param s3Request S3 put versioning request
+         * @param request S3 put versioning request
          */
-        void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &s3Request) const;
+        void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) const;
 
         /**
          * @brief Creates a new bucket
          *
-         * @param s3Request S3 multi part upload request
+         * @param request S3 multi part upload request
          * @return Dto::S3::CreateMultipartUploadResult
          */
-        Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &s3Request) const;
+        Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const;
 
         /**
          * @brief Upload a partial file
@@ -216,7 +218,8 @@ namespace AwsMock::Service {
          * @brief Upload a partial file copy.
          *
          * @par
-         * This request does not have a body. The header contains the source bucket/key and the range to copy.
+         * This request does not have a body. The header contains the source
+         * bucket/key and the range to copy.
          *
          * @param request upload part copy request
          * @return UploadPartCopyResponse
@@ -258,7 +261,18 @@ namespace AwsMock::Service {
          * @param request touch object request
          * @see TouchObjectRequest
          */
-        void TouchObject(Dto::S3::TouchObjectRequest &request) const;
+        void TouchObject(const Dto::S3::TouchObjectRequest &request) const;
+
+        /**
+         * @brief Touch object
+         *
+         * @par
+         * This method re-triggers the event notification, like lambda trigger etc.
+         *
+         * @param request touch object request
+         * @see TouchObjectRequest
+         */
+        void UpdateObject(const Dto::S3::UpdateObjectRequest &request) const;
 
         /**
          * @brief Copy object
@@ -328,12 +342,12 @@ namespace AwsMock::Service {
         /**
          * @brief Returns a list object versions
          *
-         * @param s3Request list object versions request
+         * @param request list object versions request
          * @return ListObjectVersionsResponse
          * @see AwsMock::Dto::S3::ListObjectVersionsRequest
-         ** @see AwsMock::Dto::S3::ListObjectVersionsResponse
+         * @see AwsMock::Dto::S3::ListObjectVersionsResponse
          */
-        Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &s3Request) const;
+        Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const;
 
         /**
          * @brief Delete a bucket
@@ -363,8 +377,9 @@ namespace AwsMock::Service {
         /**
          * @brief Send lambda function invocation request to lambda module.
          *
-         * <p>This will send a lambda invocation request to the lambda module. The lambda module will StartServer the corresponding lambda function and will send the S3
-         * notification request to the lambda function.</p>
+         * <p>This will send a lambda invocation request to the lambda module. The
+         * lambda module will StartServer the corresponding lambda function and will
+         * send the S3 notification request to the lambda function.</p>
          *
          * @param eventNotification S3 event notification
          * @param lambdaNotification S3 lambda notification
@@ -383,7 +398,8 @@ namespace AwsMock::Service {
         void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const;
 
         /**
-         * @brief Checks the encryption status and encrypt the internal file using the KMS key supplied in the encryption object of the bucket.
+         * @brief Checks the encryption status and encrypt the internal file using the
+         * KMS key supplied in the encryption object of the bucket.
          *
          * @param bucket S3 bucket
          * @param object S3 object
@@ -391,10 +407,28 @@ namespace AwsMock::Service {
         static void CheckEncryption(const Database::Entity::S3::Bucket &bucket, const Database::Entity::S3::Object &object);
 
         /**
-         * @brief Checks the decryption status and decrypts the internal file using the KMS key supplied in the encryption object of the bucket.
+         * @brief Checks the existence of a bucket by region and name.
+         *
+         * @param region AWS region
+         * @param name S3 bucket name
+         */
+        static void CheckBucketExistence(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Checks whether the bucket exists already.
+         *
+         * @param region AWS region
+         * @param name S3 bucket name
+         */
+        static void CheckBucketNonExistence(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Checks the decryption status and decrypts the internal file using
+         * the KMS key supplied in the encryption object of the bucket.
          *
          * <p>
-         * The decrypted file will be written to outFile. This file needs to be deleted, after the file has been send back to the client.
+         * The decrypted file will be written to outFile. This file needs to be
+         * deleted, after the file has been send back to the client.
          * </p>
          *
          * @param bucket S3 bucket
@@ -421,9 +455,10 @@ namespace AwsMock::Service {
         void DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName);
 
         /**
-         * @brief Deletes an bucket
+         * @brief Deletes a bucket
          *
-         * <p>This method is recursive, if the bucket contains objects, also all object are removed </p>
+         * <p>This method is recursive, if the bucket contains objects, also all
+         * object are removed </p>
          *
          * @param bucket S3 bucket name
          */
@@ -437,10 +472,11 @@ namespace AwsMock::Service {
          * @param stream input stream
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
+        Dto::S3::PutObjectResponse
+        SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
 
         /**
-         * @brief Save a un-versioned S3 object.
+         * @brief Save an un-versioned S3 object.
          *
          * @param request put object request
          * @param bucket S3 bucket
@@ -448,7 +484,8 @@ namespace AwsMock::Service {
          * @param size input stream size
          * @return file name
          */
-        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
+        Dto::S3::PutObjectResponse
+        SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.
@@ -492,7 +529,6 @@ namespace AwsMock::Service {
          */
         LambdaService _lambdaService;
     };
-
 }// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_S3_SERVICE_H

@@ -405,10 +405,12 @@ namespace AwsMock::Database {
         log_debug << "Objects deleted, count: " << count;
     }
 
-    void S3MemoryDb::DeleteAllObjects() {
+    long S3MemoryDb::DeleteAllObjects() {
         boost::mutex::scoped_lock lock(_objectMutex);
 
+        long count = _objects.size();
         log_debug << "Deleting objects, size: " << _objects.size();
         _objects.clear();
+        return count;
     }
 }// namespace AwsMock::Database
