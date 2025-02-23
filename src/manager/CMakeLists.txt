@@ -9,7 +9,6 @@ link_directories(../core ../dto ../db ../service /usr/local/lib)
 add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
-target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_program_options boost_filesystem boost_thread boost_url
-        boost_locale yaml-cpp prometheus-cpp-pull prometheus-cpp-core pthread crypto ssl archive z magic)
+target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore boost_program_options)
 
 install(TARGETS ${BINARY} DESTINATION bin)

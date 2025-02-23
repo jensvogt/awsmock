@@ -23,8 +23,10 @@ namespace AwsMock::Core {
         archive *ext = archive_write_disk_new();
         archive_write_disk_set_options(ext, flags);
         archive_write_disk_set_standard_lookup(ext);
-        if ((r = archive_read_open_filename(a, zipFile.c_str(), 10240)))
-            exit(1);
+        if ((r = archive_read_open_filename(a, zipFile.c_str(), 10240)) != 0) {
+            log_error << "Could not open ZIP file, path: " << zipFile;
+            return;
+        }
         for (;;) {
             r = archive_read_next_header(a, &entry);
             if (r == ARCHIVE_EOF)
@@ -81,7 +83,7 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, const bool isDir, const bool isLink) {
 
-        struct stat st {};
+        struct stat st{};
         char buff[8192];
 
         std::string entryName = fileName;

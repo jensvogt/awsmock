@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::SNS {
                 kvp("archivePolicy", archivePolicy),
                 kvp("beginningArchiveTime", bsoncxx::types::b_date(beginningArchiveTime)),
                 kvp("contentBasedDeduplication", contentBasedDeduplication),
-                kvp("availableMessages", availableMessages));
+                kvp("availableMessages", bsoncxx::types::b_int64(availableMessages)));
 
         return topicAttributeDoc;
     }

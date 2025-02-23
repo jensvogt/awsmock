@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewayServer::GatewayServer(boost::asio::io_service &ios) : AbstractServer("gateway"), _ios(ios) {
+    GatewayServer::GatewayServer(boost::asio::io_context &ios) : AbstractServer("gateway"), _ios(ios) {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();

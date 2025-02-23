@@ -180,7 +180,7 @@ namespace AwsMock::Service {
                 for (auto &queue: infrastructure.sqsQueues) {
                     queue.modified = system_clock::now();
                     queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
-                    _sqsDatabase.CreateOrUpdateQueue(queue);
+                    queue = _sqsDatabase.CreateOrUpdateQueue(queue);
                     log_debug << "SQS queues imported, url: " << queue.queueUrl;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
@@ -188,7 +188,7 @@ namespace AwsMock::Service {
             if (!infrastructure.sqsMessages.empty()) {
                 for (auto &message: infrastructure.sqsMessages) {
                     message.modified = system_clock::now();
-                    _sqsDatabase.CreateOrUpdateMessage(message);
+                    message = _sqsDatabase.CreateOrUpdateMessage(message);
                     log_debug << "SQS queues imported, queueArn: " << message.queueArn;
                 }
                 log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();

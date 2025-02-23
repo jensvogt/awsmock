@@ -52,6 +52,11 @@ namespace AwsMock::Dto::S3 {
         std::string internalName;
 
         /**
+         * Metadata
+         */
+        std::map<std::string, std::string> metadata;
+
+        /**
          * Created timestamp
          */
         system_clock::time_point created;

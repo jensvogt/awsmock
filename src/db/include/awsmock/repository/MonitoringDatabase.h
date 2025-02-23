@@ -5,7 +5,6 @@
 #ifndef AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 #define AWSMOCK_REPOSITORY_PERFORMANCE_DATABASE_H
 
-
 // C++ standard includes
 #include <string>
 
@@ -14,6 +13,8 @@
 #include <boost/accumulators/statistics.hpp>
 #include <boost/accumulators/statistics/rolling_mean.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -80,9 +81,19 @@ namespace AwsMock::Database {
          * @param step steps
          * @param labelName label name
          * @param labelValue labelValue
+         * @param limit value limit
          * @return list of counter values
          */
-        std::vector<Database::Entity::Monitoring::Counter> GetRollingMean(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
+
+        /**
+         * @brief Returns list of label values by label name
+         *
+         * @param name monitoring feature name
+         * @param labelName label name
+         * @return list of label values
+         */
+        [[nodiscard]] std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName) const;
 
         /**
          * @brief Deletes old monitoring data
@@ -90,7 +101,7 @@ namespace AwsMock::Database {
          * @param retentionPeriod retention period in days
          * @return number of deleted data rows
          */
-        long DeleteOldMonitoringData(int retentionPeriod) const;
+        [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
 
       private:
 
@@ -103,6 +114,11 @@ namespace AwsMock::Database {
          * Performance collection name
          */
         std::string _monitoringCollectionName;
+
+        /**
+         * Use rolling mean
+         */
+        bool _rollingMean;
     };
 
 }// namespace AwsMock::Database

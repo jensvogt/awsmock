@@ -48,8 +48,8 @@ namespace AwsMock::Database::Entity::SQS {
         messageDoc.append(kvp("queueName", queueName));
         messageDoc.append(kvp("body", body));
         messageDoc.append(kvp("status", MessageStatusToString(status)));
-        messageDoc.append(kvp("retries", retries));
-        messageDoc.append(kvp("size", size));
+        messageDoc.append(kvp("retries", bsoncxx::types::b_int32(retries)));
+        messageDoc.append(kvp("size", bsoncxx::types::b_int64(size)));
         messageDoc.append(kvp("messageId", messageId));
         messageDoc.append(kvp("receiptHandle", receiptHandle));
         messageDoc.append(kvp("md5Body", md5Body));

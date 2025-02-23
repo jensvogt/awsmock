@@ -109,37 +109,8 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::DELETE_OBJECT;
                     }
                     break;
-
-                case http::verb::head:
-                case http::verb::unknown:
-                case http::verb::connect:
-                case http::verb::options:
-                case http::verb::trace:
-                case http::verb::copy:
-                case http::verb::lock:
-                case http::verb::mkcol:
-                case http::verb::move:
-                case http::verb::propfind:
-                case http::verb::proppatch:
-                case http::verb::search:
-                case http::verb::unlock:
-                case http::verb::bind:
-                case http::verb::rebind:
-                case http::verb::unbind:
-                case http::verb::acl:
-                case http::verb::report:
-                case http::verb::mkactivity:
-                case http::verb::checkout:
-                case http::verb::merge:
-                case http::verb::msearch:
-                case http::verb::notify:
-                case http::verb::subscribe:
-                case http::verb::unsubscribe:
-                case http::verb::patch:
-                case http::verb::purge:
-                case http::verb::mkcalendar:
-                case http::verb::link:
-                case http::verb::unlink:
+                default:
+                    log_error << "Unknown command";
                     break;
             }
         }

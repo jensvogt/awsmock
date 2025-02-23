@@ -107,15 +107,16 @@ namespace AwsMock::Service::Frontend {
         full_path.append(target.data(), target.size());
         log_debug << "Serving: " << full_path;
 
+        // If file does not exist, send default page
+        if (!boost::filesystem::exists(full_path)) {
+            full_path = _docRoot + "/index.html";
+        }
+        log_trace << full_path << " MIME: " << mime_type(target);
+
+        // Read file
         http::file_body::value_type file;
         beast::error_code ec;
         file.open(full_path.c_str(), beast::file_mode::read, ec);
-        if (ec) {
-            target = boost::string_view(DEFAULT_PAGE.c_str(), DEFAULT_PAGE.length());
-            full_path = _docRoot + std::string(target);
-            file.open(full_path.c_str(), beast::file_mode::read, ec);
-            log_trace << std::string(target) << " MIME: " << mime_type(target);
-        }
 
         _fileResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _fileResponse->result(http::status::ok);

@@ -818,8 +818,8 @@ namespace AwsMock::Database {
                 topicCollection.update_one(make_document(kvp("topicArn", topicArn)),
                                            make_document(kvp("$set",
                                                              make_document(
-                                                                     kvp("size", size),
-                                                                     kvp("attributes.availableMessages", total)))));
+                                                                     kvp("size", bsoncxx::types::b_int64(size)),
+                                                                     kvp("attributes.availableMessages", bsoncxx::types::b_int64(total))))));
                 log_debug << topicArn << " total: " << total;
                 session.commit_transaction();
             } catch (const mongocxx::exception &exc) {

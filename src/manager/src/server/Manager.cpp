@@ -130,7 +130,7 @@ namespace AwsMock::Manager {
         LoadModulesFromConfiguration();
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::io_service ios;
+        boost::asio::io_context ios;
         boost::asio::signal_set signals(ios, SIGINT, SIGTERM);
         signals.async_wait([&](boost::beast::error_code const &, int) {
             // Stop the `io_context`. This will cause `run()` to return immediately,

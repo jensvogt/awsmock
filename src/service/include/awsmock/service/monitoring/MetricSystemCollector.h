@@ -14,10 +14,17 @@
 #include <sstream>
 #include <string>
 
+#ifdef __linux__
+#include <sys/sysinfo.h>
+#endif
+
+#ifdef __APPLE__
+#include <mach/mach.h>
+#include <sys/resource.h>
+#endif
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/SystemUtils.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -44,27 +51,55 @@ namespace AwsMock::Monitoring {
          */
         void CollectSystemCounter();
 
+#ifdef __APPLE__
+
+        /**
+        * @brief Get number of threads on MacOS
+        */
+        void GetThreadInfoMac();
+
+        /**
+         * @brief Get CPU utilization on MacOS
+         */
+        void GetCpuInfoMac();
+
+        /**
+         * @brief Get memory utilization on MacOS
+         */
+        void GetMemoryInfoMac();
+
+#elif __linux__
+
+        /**
+         * @brief Get number of threads on MacOS
+         */
+        static void GetThreadInfoLinux();
+
+        /**
+         * @brief Get CPU utilization on MacOS
+        */
+        void GetCpuInfoLinux();
+
+        /**
+         * @brief Get memory info on Linux systems
+         */
+        static void GetMemoryInfoLinux();
+
+#endif
+
       private:
 
-        /**
-         * Number of processors
-         */
-        int _numProcessors{};
+#ifdef __linux__
+        clock_t _lastTime = 0;
+        clock_t _lastTotalCPU = 0;
+        clock_t _lastSysCPU = 0;
+        clock_t _lastUserCPU = 0;
+#endif
 
         /**
-         * Last CPU
+         * Start time
          */
-        clock_t _lastCPU{};
-
-        /**
-         * Last system CPU
-         */
-        clock_t _lastSysCPU{};
-
-        /**
-         * Last user CPU
-         */
-        clock_t _lastUserCPU{};
+        system_clock::time_point _startTime;
 
         /**
          * Monitoring period

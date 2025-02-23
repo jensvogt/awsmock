@@ -17,7 +17,7 @@
 
 namespace AwsMock::Core {
 
-    class TarUtilsTest : public ::testing::Test {
+    class TarUtilsTest : public testing::Test {
 
       protected:
 
@@ -36,7 +36,7 @@ namespace AwsMock::Core {
     TEST_F(TarUtilsTest, UncompressTest) {
 
         // arrange
-        const std::string zipFileName = "/tmp/java-basic-1.0-SNAPSHOT.jar";
+        const std::string zipFileName = "resources/lambda/java-basic-1.0-SNAPSHOT.jar";
 
         // act
         EXPECT_NO_THROW({ TarUtils::Unzip(zipFileName, tempDir); });

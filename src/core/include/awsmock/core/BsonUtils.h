@@ -39,9 +39,9 @@ namespace AwsMock::Core::Bson {
         if (!a.empty()) {
             array jsonArray;
             for (const auto &e: a) {
-                jsonArray.append(e.ToDocument());
+                jsonArray.append(bsoncxx::types::b_document(e.ToDocument()));
             }
-            d.append(kvp(name, jsonArray));
+            d.append(kvp(name, bsoncxx::types::b_array(jsonArray)));
         }
     }
 
@@ -112,16 +112,16 @@ namespace AwsMock::Core::Bson {
             }
         }
 
-        static void SetIntValue(document &document, const std::string &name, int value) {
-            document.append(kvp(name, value));
+        static void SetIntValue(document &document, const std::string &name, const int value) {
+            document.append(kvp(name, static_cast<bsoncxx::types::b_int32>(value)));
         }
 
-        static void SetLongValue(document &document, const std::string &name, long value) {
-            document.append(kvp(name, value));
+        static void SetLongValue(document &document, const std::string &name, const long value) {
+            document.append(kvp(name, static_cast<bsoncxx::types::b_int64>(value)));
         }
 
-        static void SetBoolValue(document &document, const std::string &name, bool value) {
-            document.append(kvp(name, value));
+        static void SetBoolValue(document &document, const std::string &name, const bool value) {
+            document.append(kvp(name, static_cast<bsoncxx::types::b_bool>(value)));
         }
 
         static void SetDateValue(document &document, const std::string &name, const system_clock::time_point &value) {

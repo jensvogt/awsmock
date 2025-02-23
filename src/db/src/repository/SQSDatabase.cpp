@@ -374,7 +374,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::CreateOrUpdateQueue(Entity::SQS::Queue &queue) const {
 
-        if (QueueUrlExists(queue.region, queue.queueUrl)) {
+        if (QueueArnExists(queue.queueArn)) {
 
             return UpdateQueue(queue);
         }
@@ -1135,8 +1135,8 @@ namespace AwsMock::Database {
                         lastTimestamp = lastMessage.created;
                     }
 
-                    const double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - firstTimestamp).count();
-                    if (const double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - lastTimestamp).count(); max + min > 5) {
+                    const double max = std::chrono::duration<double, std::milli>(system_clock::now() - firstTimestamp).count();
+                    if (const double min = std::chrono::duration<double, std::milli>(system_clock::now() - lastTimestamp).count(); max + min > 5) {
                         waitTime.waitTime[queue.name] = (max + min) / 2.0;
                     } else {
                         waitTime.waitTime[queue.name] = 0.0;
@@ -1303,18 +1303,18 @@ namespace AwsMock::Database {
                     long size = GetQueueSize(queueArn);
                     queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", size),
-                                                                                 kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
-                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
-                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
+                                                                                 kvp("size", bsoncxx::types::b_int64(size)),
+                                                                                 kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible")))))));
                     log_debug << queueArn << " size: " << size << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 } else {
                     queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", 0),
-                                                                                 kvp("attributes.approximateNumberOfMessages", 0),
-                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", 0),
-                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", 0)))));
+                                                                                 kvp("size", bsoncxx::types::b_int64()),
+                                                                                 kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64())))));
                 }
                 session.commit_transaction();
 

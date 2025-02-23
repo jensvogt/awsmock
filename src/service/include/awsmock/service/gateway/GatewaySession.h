@@ -10,6 +10,7 @@
 #include <queue>
 
 // Boost includes
+#include <boost/asio/buffers_iterator.hpp>
 #include <boost/asio/dispatch.hpp>
 #include <boost/beast.hpp>
 

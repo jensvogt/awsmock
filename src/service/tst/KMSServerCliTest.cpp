@@ -44,7 +44,7 @@ namespace AwsMock::Service {
 
         boost::thread _thread;
         std::string _endpoint, _region;
-        boost::asio::io_service _ios{10};
+        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::KMSDatabase &_database = Database::KMSDatabase::instance();
     };

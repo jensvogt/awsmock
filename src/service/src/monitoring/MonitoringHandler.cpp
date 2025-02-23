@@ -14,13 +14,23 @@ namespace AwsMock::Service {
 
                 case Dto::Common::MonitoringCommandType::GET_COUNTERS: {
 
-                    Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
-                    Dto::Monitoring::GetCountersResponse response = _monitoringService.GetCounters(monitoringRequest);
+                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
+                    const Dto::Monitoring::GetCountersResponse response = _monitoringService.GetCounters(monitoringRequest);
 
                     log_debug << "Get counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
                     return SendOkResponse(request, response.ToJson());
                 }
-                case Dto::Common::MonitoringCommandType::UNKNOWN:
+
+                case Dto::Common::MonitoringCommandType::GET_MULTI_COUNTERS: {
+
+                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
+                    const Dto::Monitoring::GetMultiCountersResponse response = _monitoringService.GetMultiCounters(monitoringRequest);
+
+                    log_debug << "Get multiple counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
+                    return SendOkResponse(request, response.ToJson());
+                }
+
+                default:
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
             }
@@ -35,7 +45,6 @@ namespace AwsMock::Service {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         }
-        return SendBadRequestError(request, "Unknown method");
     }
 
 }// namespace AwsMock::Service

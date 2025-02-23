@@ -72,15 +72,8 @@ namespace AwsMock::Core {
     /**
      * @brief Configuration handler.
      *
-     * Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
-     * are:
-     * <ul>
-     * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
-     * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
-     * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 9091)</li>
-     * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
-     * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
-     * </ul>
+     * Configuration are read from the given configuration file and can be overruled by environment variables. Environment variables
+     * are replaced by the system environment.
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
      * @code{.yaml}
@@ -329,7 +322,7 @@ namespace AwsMock::Core {
         void Initialize();
 
         /**
-         * Save the environment variables as key/value pair
+         * @brief Save the environment variables as key/value pair
          *
          * @param key environment variable key
          * @param value environment variable value
@@ -337,10 +330,18 @@ namespace AwsMock::Core {
         void AddToEnvList(const std::string &key, const std::string &value);
 
         /**
-         * Reapply the environment variables to the properties, as environment variables have precedence over
+         * @brief Reapply the environment variables to the properties, as environment variables have precedence over
          * file variables.
          */
         void ApplyEnvSettings();
+
+        /**
+         * @brief Replace environment variables with their value.
+         *
+         * @param value configuration value
+         * @return value with replaced environment variables
+         */
+        static std::string ReplaceEnvironmentVariables(std::string &value);
 
         /**
          * @brief Checks existence of a property key
