@@ -56,7 +56,12 @@ namespace AwsMock::Service::Frontend {
     }
 
     void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
+
         switch (req.method()) {
+
+            case http::verb::options:
+                return HandleOptionsRequest(req);
+                break;
 
             case http::verb::get:
                 SendFile(req.target());
@@ -150,6 +155,35 @@ namespace AwsMock::Service::Frontend {
 
         _requestDeadline.async_wait([this](beast::error_code) {
             CheckDeadline();
+        });
+    }
+
+    void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::ok);
+        response.set(http::field::server, "awsmockui");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::allow, "*/*");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::access_control_max_age, "86400");
+        response.set(http::field::vary, "Accept-Encoding, Origin");
+        response.set(http::field::keep_alive, "timeout=10, max=100");
+        response.set(http::field::connection, "Keep-Alive");
+        response.prepare_payload();
+
+        http::async_write(_socket, *_stringSerializer, [this](beast::error_code ec, std::size_t) {
+            ec = _socket.shutdown(tcp::socket::shutdown_send, ec);
+            if (ec) {
+                log_error << "Shutdown socket failed: " << ec.message();
+            }
+            _stringSerializer.reset();
+            _stringResponse.reset();
+            Accept();
         });
     }
 
