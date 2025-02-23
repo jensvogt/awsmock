@@ -60,7 +60,7 @@ namespace AwsMock::Service::Frontend {
         switch (req.method()) {
 
             case http::verb::options:
-                return HandleOptionsRequest(req);
+                HandleOptionsRequest(req);
                 break;
 
             case http::verb::get:
@@ -161,20 +161,21 @@ namespace AwsMock::Service::Frontend {
     void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
 
         // Prepare the response message
-        http::response<http::dynamic_body> response;
-        response.version(request.version());
-        response.result(http::status::ok);
-        response.set(http::field::server, "awsmockui");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
-        response.set(http::field::allow, "*/*");
-        response.set(http::field::access_control_allow_origin, "*");
-        response.set(http::field::access_control_allow_headers, "*");
-        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-        response.set(http::field::access_control_max_age, "86400");
-        response.set(http::field::vary, "Accept-Encoding, Origin");
-        response.set(http::field::keep_alive, "timeout=10, max=100");
-        response.set(http::field::connection, "Keep-Alive");
-        response.prepare_payload();
+        _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
+        _stringResponse->version(request.version());
+        _stringResponse->result(http::status::ok);
+        _stringResponse->set(http::field::server, "awsmockui");
+        _stringResponse->set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        _stringResponse->set(http::field::allow, "*/*");
+        _stringResponse->set(http::field::access_control_allow_origin, "*");
+        _stringResponse->set(http::field::access_control_allow_headers, "*");
+        _stringResponse->set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        _stringResponse->set(http::field::access_control_max_age, "86400");
+        _stringResponse->set(http::field::vary, "Accept-Encoding, Origin");
+        _stringResponse->set(http::field::keep_alive, "timeout=10, max=100");
+        _stringResponse->set(http::field::connection, "Keep-Alive");
+        _stringResponse->prepare_payload();
+        _stringSerializer.emplace(*_stringResponse);
 
         http::async_write(_socket, *_stringSerializer, [this](beast::error_code ec, std::size_t) {
             ec = _socket.shutdown(tcp::socket::shutdown_send, ec);
