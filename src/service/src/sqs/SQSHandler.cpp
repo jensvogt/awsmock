@@ -2,9 +2,7 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 
 namespace AwsMock::Service {
-    http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request,
-                                                                     const std::string &region,
-                                                                     const std::string &user) {
+    http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "SQS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::SQSClientCommand clientCommand;

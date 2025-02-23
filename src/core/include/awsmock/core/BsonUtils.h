@@ -39,17 +39,16 @@ namespace AwsMock::Core::Bson {
         if (!a.empty()) {
             array jsonArray;
             for (const auto &e: a) {
-                jsonArray.append(e.ToDocument());
+                jsonArray.append(bsoncxx::types::b_document(e.ToDocument()));
             }
-            d.append(kvp(name, jsonArray));
+            d.append(kvp(name, bsoncxx::types::b_array(jsonArray)));
         }
     }
 
     template<class Element>
     void FromBsonArray(const view &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -60,8 +59,7 @@ namespace AwsMock::Core::Bson {
     template<class Element>
     void FromBsonArray(const value &value, const std::string &name, std::vector<Element> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 Element element;
                 element.FromDocument(arrayElement.get_document().view());
                 a->emplace_back(element);
@@ -71,8 +69,7 @@ namespace AwsMock::Core::Bson {
 
     inline void FromBsonStringArray(const value &value, const std::string &name, std::vector<std::string> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
@@ -80,8 +77,7 @@ namespace AwsMock::Core::Bson {
 
     inline void FromBsonArray(const view &value, const std::string &name, std::vector<std::string> *a) {
         if (value.find(name) != value.end()) {
-            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &
-                                                                                              arrayElement: arrayView) {
+            for (const bsoncxx::array::view arrayView{value[name].get_array().value}; const bsoncxx::array::element &arrayElement: arrayView) {
                 a->emplace_back(arrayElement.get_string().value);
             }
         }
@@ -95,8 +91,7 @@ namespace AwsMock::Core::Bson {
         return {};
     }
 
-    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument,
-                                                                const std::string &name) {
+    inline std::map<std::string, std::string> MapFromBsonObject(const std::optional<view> &viewDocument, const std::string &name) {
         if (FindBsonObject(viewDocument.value(), name)) {
             std::map<std::string, std::string> valueMap;
             for (const view tagsView = viewDocument.value()[name].get_document().value; const bsoncxx::document::element
@@ -117,16 +112,16 @@ namespace AwsMock::Core::Bson {
             }
         }
 
-        static void SetIntValue(document &document, const std::string &name, int value) {
-            document.append(kvp(name, value));
+        static void SetIntValue(document &document, const std::string &name, const int value) {
+            document.append(kvp(name, static_cast<bsoncxx::types::b_int32>(value)));
         }
 
-        static void SetLongValue(document &document, const std::string &name, long value) {
-            document.append(kvp(name, value));
+        static void SetLongValue(document &document, const std::string &name, const long value) {
+            document.append(kvp(name, static_cast<bsoncxx::types::b_int64>(value)));
         }
 
-        static void SetBoolValue(document &document, const std::string &name, bool value) {
-            document.append(kvp(name, value));
+        static void SetBoolValue(document &document, const std::string &name, const bool value) {
+            document.append(kvp(name, static_cast<bsoncxx::types::b_bool>(value)));
         }
 
         static void SetDateValue(document &document, const std::string &name, const system_clock::time_point &value) {

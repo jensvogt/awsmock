@@ -113,7 +113,15 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created or updated lambda entity.
          */
-        Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda);
+        Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const;
+
+        /**
+         * @brief Import a lambda function
+         *
+         * @param lambda lambda entity
+         * @return imported lambda entity.
+         */
+        Entity::Lambda::Lambda ImportLambda(Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns a lambda entity by primary key

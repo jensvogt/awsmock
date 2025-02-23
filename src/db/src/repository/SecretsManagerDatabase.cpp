@@ -86,7 +86,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
             const auto mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-            if (mResult) {
+            if (!mResult) {
                 return {};
             }
 

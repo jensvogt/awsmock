@@ -51,6 +51,11 @@ namespace AwsMock::Dto::Monitoring {
         int step;
 
         /**
+         * Limit to top x counters
+         */
+        int limit = 10;
+
+        /**
          * Start time
          */
         system_clock::time_point start;

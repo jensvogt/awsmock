@@ -10,6 +10,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/entity/s3/Bucket.h>
 
@@ -33,6 +34,13 @@ namespace AwsMock::Dto::S3 {
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
+
+        /**
+         * @brief Convert to JSON representation
+         *
+         * @return JSON string
+         */
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

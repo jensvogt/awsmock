@@ -144,6 +144,13 @@ namespace AwsMock::Core {
         static system_clock::time_point LocalDateTimeNow();
 
         /**
+         * @brief Get the current UTC time
+         *
+         * @return UTC time.
+         */
+        static system_clock::time_point UtcDateTimeNow();
+
+        /**
          * @brief Gets the difference in seconds between now and the given time in '00:00:00'
          *
          * @return number of seconds between now and the given time

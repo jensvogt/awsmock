@@ -9,7 +9,7 @@
 #include <string>
 
 // Boost includes
-#include <boost/asio/io_service.hpp>
+#include <boost/asio/io_context.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayServer(boost::asio::io_service &ios);
+        explicit GatewayServer(boost::asio::io_context &ios);
 
         /**
          * @brief HTTP request worker

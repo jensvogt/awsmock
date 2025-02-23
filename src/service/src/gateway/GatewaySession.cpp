@@ -2,7 +2,6 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#include <asio/buffers_iterator.hpp>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {

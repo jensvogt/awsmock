@@ -22,11 +22,11 @@ namespace AwsMock::Service {
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
 
-        // Cleanup container
-        //CleanupContainers();
-
         // Cleanup instances
         CleanupInstances();
+
+        // Cleanup container
+        CleanupDocker();
 
         // Create a local network, if it is not existing yet
         CreateLocalNetwork();
@@ -61,10 +61,10 @@ namespace AwsMock::Service {
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_debug << "Lambda cleaned up, name: " << lambda.function;
         }
-        log_debug << "All lambda instances cleaned up";
+        log_info << "All lambda instances stopped";
     }
 
-    void LambdaServer::CleanupContainers() const {
+    void LambdaServer::CleanupDocker() const {
         _dockerService.PruneContainers();
         log_debug << "Docker containers cleaned up";
     }
@@ -120,7 +120,7 @@ namespace AwsMock::Service {
 
             // Remove instance
             const auto count = std::erase_if(lambda.instances, [expired](const Database::Entity::Lambda::Instance &instance) {
-                return instance.created < expired;
+                return instance.created > instance.created.min() && instance.created < expired;
             });
 
             // Update lambda
@@ -146,19 +146,19 @@ namespace AwsMock::Service {
         try {
 
             // Get lambda list
-            const Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
-            if (lambdaList.empty()) {
+            const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
+            if (lambdas.empty()) {
                 return;
             }
 
             // Loop over lambdas and create the containers
-            log_info << "Start creating lambda functions, count: " << lambdaList.size();
-            for (auto &lambda: lambdaList) {
+            log_info << "Start creating lambda functions, count: " << lambdas.size();
+            for (const auto &lambda: lambdas) {
                 Dto::Lambda::CreateFunctionRequest request = {{.region = _region}, lambda.function, lambda.runtime};
                 Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
                 log_debug << "Lambda containers created, function: " << lambda.function;
             }
-            log_debug << "Lambda containers created, count: " << lambdaList.size();
+            log_debug << "Lambda containers created, count: " << lambdas.size();
 
         } catch (Core::ServiceException &e) {
             log_error << e.message();

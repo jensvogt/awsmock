@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SNS {
                 }
                 document.append(kvp("SubscriptionCounters", queueCounterArrayJson));
             }
-            Core::Bson::BsonUtils::SetLongValue(document, "Total", total);
+            Core::Bson::BsonUtils::SetLongValue(document, "Total", bsoncxx::types::b_int64(total));
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

@@ -1,10 +1,11 @@
 
 #include <awsmock/ftpserver/FtpSession.h>
 
+#include <picojson/picojson.h>
 #include <utility>
 
 namespace AwsMock::FtpServer {
-    FtpSession::FtpSession(asio::io_service &io_service,
+    FtpSession::FtpSession(boost::asio::io_context &io_service,
                            const UserDatabase &user_database,
                            std::string serverName,
                            const std::function<void()> &completion_handler)
@@ -30,16 +31,17 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::start() {
-        asio::error_code ec;
-        command_socket_.set_option(asio::ip::tcp::no_delay(true), ec);
-        if (ec)
+        boost::beast::error_code ec;
+        command_socket_.set_option(boost::asio::ip::tcp::no_delay(true), ec);
+        if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
+	}
 
         sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
         readFtpCommand();
     }
 
-    asio::ip::tcp::socket &FtpSession::getSocket() {
+    boost::asio::ip::tcp::socket &FtpSession::getSocket() {
         return command_socket_;
     }
 
@@ -58,66 +60,67 @@ namespace AwsMock::FtpServer {
             if (!write_in_progress) {
                 me->startSendingMessages();
             }
-        });
+        },
+                                   nullptr);
     }
 
     void FtpSession::startSendingMessages() {
         log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
-        asio::async_write(command_socket_,
-                          asio::buffer(command_output_queue_.front()),
-                          command_write_strand_.wrap(
-                                  [me = shared_from_this()](const asio::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                                      if (!ec) {
-                                          me->command_output_queue_.pop_front();
+        boost::asio::async_write(command_socket_,
+                                 boost::asio::buffer(command_output_queue_.front()),
+                                 command_write_strand_.wrap(
+                                         [me = shared_from_this()](const boost::beast::error_code ec, std::size_t /*bytes_to_transfer*/) {
+                                             if (!ec) {
+                                                 me->command_output_queue_.pop_front();
 
-                                          if (!me->command_output_queue_.empty()) {
-                                              me->startSendingMessages();
-                                          }
-                                      } else {
-                                          log_error << "Command write error: " << ec.message();
-                                      }
-                                  }));
+                                                 if (!me->command_output_queue_.empty()) {
+                                                     me->startSendingMessages();
+                                                 }
+                                             } else {
+                                                 log_error << "Command write error: " << ec.message();
+                                             }
+                                         }));
     }
 
     void FtpSession::readFtpCommand() {
-        asio::async_read_until(command_socket_,
-                               command_input_stream_,
-                               "\r\n",
-                               [me = shared_from_this()](const asio::error_code ec, const std::size_t length) {
-                                   if (ec) {
-                                       if (ec != asio::error::eof) {
-                                           log_error << "Read_until error: " << ec.message();
-                                       } else {
-                                           log_debug << "Control connection closed by client.";
-                                       }
+        boost::asio::async_read_until(command_socket_,
+                                      command_input_stream_,
+                                      "\r\n",
+                                      [me = shared_from_this()](const boost::beast::error_code ec, const std::size_t length) {
+                                          if (ec) {
+                                              if (ec != boost::asio::error::eof) {
+                                                  log_error << "Read_until error: " << ec.message();
+                                              } else {
+                                                  log_debug << "Control connection closed by client.";
+                                              }
 
-                                       // Close the data connection, if it is open
-                                       {
-                                           asio::error_code ec_;
-                                           me->data_acceptor_.close(ec_);
-                                       }
-                                       {
-                                           if (const auto data_socket = me->data_socket_weakptr_.lock()) {
-                                               asio::error_code ec_;
-                                               data_socket->close(ec_);
-                                           }
-                                       }
+                                              // Close the data connection, if it is open
+                                              {
+                                                  boost::beast::error_code ec_;
+                                                  me->data_acceptor_.close(ec_);
+                                              }
+                                              {
+                                                  if (const auto data_socket = me->data_socket_weakptr_.lock()) {
+                                                      boost::beast::error_code ec_;
+                                                      data_socket->close(ec_);
+                                                  }
+                                              }
 
-                                       return;
-                                   }
+                                              return;
+                                          }
 
-                                   std::istream stream(&(me->command_input_stream_));
-                                   std::string packet_string(length - 2, ' ');
-                                   // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
-                                   // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
-                                   // in contiguous memory.
-                                   stream.read(&packet_string[0], length - 2);
+                                          std::istream stream(&(me->command_input_stream_));
+                                          std::string packet_string(length - 2, ' ');
+                                          // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
+                                          // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
+                                          // in contiguous memory.
+                                          stream.read(&packet_string[0], length - 2);
 
-                                   stream.ignore(2);// Remove the "\r\n"
-                                   log_debug << "FTP << " << packet_string;
+                                          stream.ignore(2);// Remove the "\r\n"
+                                          log_debug << "FTP << " << packet_string;
 
-                                   me->handleFtpCommand(packet_string);
-                               });
+                                          me->handleFtpCommand(packet_string);
+                                      });
     }
 
     void FtpSession::handleFtpCommand(const std::string &command) {
@@ -287,7 +290,7 @@ namespace AwsMock::FtpServer {
         }
 
         if (data_acceptor_.is_open()) {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             ec = data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
@@ -295,18 +298,18 @@ namespace AwsMock::FtpServer {
         }
 
         // In case of a dockerized FTP server we need to use some special ports
-        asio::ip::tcp::endpoint endpoint;
+        boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
             int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
             int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
             int port = Core::RandomUtils::NextInt(minPort, maxPort);
-            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port);
+            endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port);
         } else {
-            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
+            endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 0);
         }
         log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             ec = data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening data acceptor: " << ec.message();
@@ -315,7 +318,7 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             ec = data_acceptor_.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding data acceptor: " << ec.message() << " endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
@@ -324,8 +327,8 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
-            ec = data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            boost::beast::error_code ec;
+            ec = data_acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -362,16 +365,16 @@ namespace AwsMock::FtpServer {
         }
 
         if (data_acceptor_.is_open()) {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+        const boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v6(), 0);
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening data acceptor: " << ec.message();
@@ -380,7 +383,7 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding data acceptor: " << ec.message();
@@ -389,8 +392,8 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
-            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            boost::beast::error_code ec;
+            data_acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -420,16 +423,16 @@ namespace AwsMock::FtpServer {
         }
 
         if (data_acceptor_.is_open()) {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
             }
         }
 
-        const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v6(), 0);
+        const boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v6(), 0);
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening data acceptor: " << ec.message();
@@ -438,7 +441,7 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding data acceptor: " << ec.message();
@@ -447,8 +450,8 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
-            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            boost::beast::error_code ec;
+            data_acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -478,25 +481,25 @@ namespace AwsMock::FtpServer {
         }
 
         if (data_acceptor_.is_open()) {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
             }
         }
 
-        asio::ip::tcp::endpoint endpoint;
+        boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
             const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.min");
             const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
-            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
+            endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
-            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
+            endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), 0);
         }
         log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening data acceptor: " << ec.message();
@@ -505,7 +508,7 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding data acceptor: " << ec.message();
@@ -514,8 +517,8 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
-            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            boost::beast::error_code ec;
+            data_acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -545,25 +548,25 @@ namespace AwsMock::FtpServer {
         }
 
         if (data_acceptor_.is_open()) {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.close(ec);
             if (ec) {
                 log_error << "Error closing data acceptor: " << ec.message();
             }
         }
 
-        asio::ip::tcp::endpoint endpoint;
+        boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
             const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
             const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
-            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), port);
+            endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
-            endpoint = asio::ip::tcp::endpoint(asio::ip::tcp::v6(), 0);
+            endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), 0);
         }
         log_trace << "Passive mode endpoint: " << endpoint.address().to_string() << ":" << endpoint.port();
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Error opening data acceptor: " << ec.message();
@@ -572,7 +575,7 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
+            boost::beast::error_code ec;
             data_acceptor_.bind(endpoint, ec);
             if (ec) {
                 log_error << "Error binding data acceptor: " << ec.message();
@@ -581,8 +584,8 @@ namespace AwsMock::FtpServer {
             }
         }
         {
-            asio::error_code ec;
-            data_acceptor_.listen(asio::socket_base::max_connections, ec);
+            boost::beast::error_code ec;
+            data_acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Error listening on data acceptor: " << ec.message();
                 sendFtpMessage(FtpReplyCode::SERVICE_NOT_AVAILABLE, "Failed to enter passive mode.");
@@ -1111,7 +1114,7 @@ namespace AwsMock::FtpServer {
     ////////////////////////////////////////////////////////
 
     void FtpSession::sendDirectoryListing(const std::map<std::string, FileStatus> &directory_content) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
+        auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket,
@@ -1152,7 +1155,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::sendNameList(const std::map<std::string, FileStatus> &directory_content) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
+        auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket,
@@ -1185,7 +1188,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::sendFile(const std::shared_ptr<IoFile> &file) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
+        auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket,
@@ -1205,7 +1208,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
-                                             const std::shared_ptr<asio::ip::tcp::socket> &data_socket) {
+                                             const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
         file_rw_strand_.post([me = shared_from_this(), file, data_socket]() {
             if (file->file_stream_.eof())
                 return;
@@ -1225,11 +1228,12 @@ namespace AwsMock::FtpServer {
                 me->addDataToBufferAndSend(buffer, data_socket);
                 me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(nullptr), data_socket);
             }
-        });
+        },
+                             nullptr);
     }
 
     void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char>> &data,
-                                            const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
+                                            const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                                             const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post([me = shared_from_this(), data, data_socket, fetch_more]() {
             const bool write_in_progress = (!me->data_buffer_.empty());
@@ -1239,20 +1243,21 @@ namespace AwsMock::FtpServer {
             if (!write_in_progress) {
                 me->writeDataToSocket(data_socket, fetch_more);
             }
-        });
+        },
+                                 nullptr);
     }
 
-    void FtpSession::writeDataToSocket(const std::shared_ptr<asio::ip::tcp::socket> &data_socket,
+    void FtpSession::writeDataToSocket(const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                                        const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post(
                 [me = shared_from_this(), data_socket, fetch_more]() {
                     if (auto data = me->data_buffer_.front()) {
                         // Send out the buffer
                         async_write(*data_socket,
-                                    asio::buffer(*data),
+                                    boost::asio::buffer(*data),
                                     me->data_buffer_strand_.wrap(
                                             [me, data_socket, data, fetch_more](
-                                                    const asio::error_code ec,
+                                                    const boost::beast::error_code ec,
                                                     std::size_t /*bytes_to_transfer*/) {
                                                 me->data_buffer_.pop_front();
 
@@ -1272,7 +1277,8 @@ namespace AwsMock::FtpServer {
                         me->data_buffer_.pop_front();
                         me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
                     }
-                });
+                },
+                nullptr);
     }
 
     ////////////////////////////////////////////////////////
@@ -1280,7 +1286,7 @@ namespace AwsMock::FtpServer {
     ////////////////////////////////////////////////////////
 
     void FtpSession::receiveFile(const std::shared_ptr<IoFile> &file) {
-        auto data_socket = std::make_shared<asio::ip::tcp::socket>(_io_service);
+        auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
         data_acceptor_.async_accept(*data_socket,
@@ -1295,13 +1301,13 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file,
-                                                         const std::shared_ptr<asio::ip::tcp::socket> &data_socket) {
+                                                         const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
         const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
 
         async_read(*data_socket,
-                   asio::buffer(*buffer),
-                   asio::transfer_at_least(buffer->size()),
-                   [me = shared_from_this(), file, data_socket, buffer](const asio::error_code ec, const std::size_t length) {
+                   boost::asio::buffer(*buffer),
+                   boost::asio::transfer_at_least(buffer->size()),
+                   [me = shared_from_this(), file, data_socket, buffer](const boost::beast::error_code ec, const std::size_t length) {
                        buffer->resize(length);
                        if (ec) {
                            if (length > 0) {
@@ -1324,7 +1330,8 @@ namespace AwsMock::FtpServer {
         file_rw_strand_.post([me = shared_from_this(), data, file, fetch_more] {
             fetch_more();
             file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
-        });
+        },
+                             nullptr);
     }
 
     void FtpSession::endDataReceiving(const std::shared_ptr<IoFile> &file) {
@@ -1335,7 +1342,8 @@ namespace AwsMock::FtpServer {
 
             // Send to AWS S3
             me->SendCreateObjectRequest(file->_user, file->_fileName);
-        });
+        },
+                             nullptr);
     }
 
     ////////////////////////////////////////////////////////

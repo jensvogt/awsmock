@@ -26,7 +26,7 @@ namespace AwsMock::Service {
     /**
    * AwsMock DynamoDB integration test.
    */
-    class DynamoDbServerCliTest : public ::testing::Test, public TestBase {
+    class DynamoDbServerCliTest : public testing::Test, public TestBase {
 
       protected:
 
@@ -39,6 +39,7 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
+            _database.DeleteAllItems();
             _database.DeleteAllTables();
             Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint http://localhost:8000");
         }
@@ -53,7 +54,7 @@ namespace AwsMock::Service {
 
         boost::thread _thread;
         std::string _endpoint, _region;
-        boost::asio::io_service _ios{10};
+        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::DynamoDbDatabase &_database = Database::DynamoDbDatabase::instance();
         std::shared_ptr<GatewayServer> _gatewayServer;

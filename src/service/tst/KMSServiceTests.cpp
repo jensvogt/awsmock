@@ -35,6 +35,15 @@ namespace AwsMock::Service {
             _kmsDatabase.DeleteAllKeys();
         }
 
+        void WaitForKey(const Dto::KMS::Key &key) const {
+
+            Database::Entity::KMS::Key keyEntity;
+            do {
+                keyEntity = _kmsDatabase.GetKeyByKeyId(key.keyId);
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            } while (keyEntity.keyState != KeyStateToString(Dto::KMS::KeyState::ENABLED));
+        }
+
         std::string _region;
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
@@ -48,6 +57,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
+        WaitForKey(response.key);
         long keyCount = _kmsDatabase.CountKeys();
 
         // assert
@@ -64,6 +74,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
+        WaitForKey(response.key);
         long keyCount = _kmsDatabase.CountKeys();
 
         // assert
@@ -80,6 +91,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
+        WaitForKey(response.key);
         long keyCount = _kmsDatabase.CountKeys();
 
         // assert
@@ -96,6 +108,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
+        WaitForKey(response.key);
         long keyCount = _kmsDatabase.CountKeys();
 
         // assert
@@ -114,6 +127,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::KMS::ListKeysResponse listResponse = _kmsService.ListKeys(listRequest);
+        WaitForKey(response.key);
         long keyCount = _kmsDatabase.CountKeys();
 
         // assert

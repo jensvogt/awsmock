@@ -10,6 +10,10 @@
 #include <vector>
 
 // AwsMock includes
+#include "model/HostConfig.h"
+#include "model/PortBinding.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -48,6 +52,11 @@ namespace AwsMock::Dto::Docker {
          * State
          */
         State state;
+
+        /**
+         * Host config
+         */
+        HostConfig hostConfig;
 
         /**
          * @brief Convert to a JSON string

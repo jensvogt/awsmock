@@ -10,7 +10,7 @@
 #include <utility>
 
 // Boost includes
-#include <asio/buffer.hpp>
+#include <boost/asio/buffer.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes

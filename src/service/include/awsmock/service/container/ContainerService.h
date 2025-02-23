@@ -260,6 +260,15 @@ namespace AwsMock::Service {
         Dto::Docker::Container GetContainerById(const std::string &containerId) const;
 
         /**
+         * @brief Inspect a container
+         *
+         * @param containerId container ID
+         * @return Container
+         * @see Dto::Docker::InspectContainerResponse
+         */
+        Dto::Docker::InspectContainerResponse InspectContainer(const std::string &containerId) const;
+
+        /**
          * @brief Returns a container by name.
          *
          * @param name container name

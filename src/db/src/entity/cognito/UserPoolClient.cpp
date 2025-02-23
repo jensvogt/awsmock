@@ -14,9 +14,9 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("clientName", clientName),
                 kvp("clientSecret", clientSecret),
                 kvp("generateSecret", generateSecret),
-                kvp("accessTokenValidity", accessTokenValidity),
-                kvp("idTokenValidity", idTokenValidity),
-                kvp("refreshTokenValidity", refreshTokenValidity),
+                kvp("accessTokenValidity", bsoncxx::types::b_int64(accessTokenValidity)),
+                kvp("idTokenValidity", bsoncxx::types::b_int64(idTokenValidity)),
+                kvp("refreshTokenValidity", bsoncxx::types::b_int64(refreshTokenValidity)),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userPoolDocument;

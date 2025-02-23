@@ -10,7 +10,6 @@ include_directories(../include ../../core/include ../../db/include ${INC_BSON_CX
 link_directories(../../core ../../db ../../dto /usr/local/lib)
 
 add_executable(${BINARY} ${SQS_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_thread boost_filesystem boost_url yaml-cpp gtest pthread
-        ssl crypto archive z magic)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})

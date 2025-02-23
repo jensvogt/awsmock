@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/docker/model/Container.h>
+#include <awsmock/dto/docker/model/HostConfig.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -34,11 +35,9 @@ namespace AwsMock::Dto::Docker {
             }
 
             // Ports array
-            if (document.view().find("Ports") != document.view().end()) {
-                for (const bsoncxx::array::view namesArray = document.view()["Ports"].get_array().value; const auto &nt: namesArray) {
-                    Port port(nt.get_document().value);
-                    ports.emplace_back(port);
-                }
+            if (document.view().find("HostConfig") != document.view().end()) {
+                HostConfig hostConfig;
+                hostConfig.FromDocument(document.view()["HostConfig"].get_document().view());
             }
 
         } catch (bsoncxx::exception &exc) {

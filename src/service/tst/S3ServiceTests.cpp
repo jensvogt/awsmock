@@ -40,6 +40,7 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
+            _database.DeleteAllObjects();
             _database.DeleteAllBuckets();
             Core::FileUtils::DeleteFile(testFile);
         }
@@ -53,28 +54,60 @@ namespace AwsMock::Service {
     TEST_F(S3ServiceTest, BucketCreateTest) {
 
         // arrange
-        Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        const Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
 
         // act
-        Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
+        auto [location, arn] = _service.CreateBucket(request);
 
         // assert
-        EXPECT_TRUE(response.location == "eu-central-1");
+        EXPECT_TRUE(location == "eu-central-1");
+    }
+
+    TEST_F(S3ServiceTest, BucketListTest) {
+
+        // arrange
+        const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        auto [location, arn] = _service.CreateBucket(createRequest);
+        std::ifstream ifs(testFile);
+        Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
+        const Dto::S3::ListBucketRequest listRequest = {.region = REGION, .name = BUCKET};
+
+        // act
+        const Dto::S3::ListBucketResponse listResponse = _service.ListBucket(listRequest);
+
+        // assert
+        EXPECT_TRUE(listResponse.contents.size() > 0);
+        EXPECT_TRUE(listResponse.contents.front().key == KEY);
+    }
+
+    TEST_F(S3ServiceTest, BucketListAllTest) {
+
+        // arrange
+        const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        auto [location, arn] = _service.CreateBucket(createRequest);
+
+        // act
+        const auto [bucketList, total] = _service.ListAllBuckets();
+
+        // assert
+        EXPECT_TRUE(total > 0);
+        EXPECT_TRUE(bucketList.front().name == BUCKET);
     }
 
     TEST_F(S3ServiceTest, BucketDeleteTest) {
 
         // arrange
-        Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        const Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
         Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
 
         // act
-        Dto::S3::DeleteBucketRequest s3Request = {.region = REGION, .bucket = BUCKET};
+        const Dto::S3::DeleteBucketRequest s3Request = {.region = REGION, .bucket = BUCKET};
         _service.DeleteBucket(s3Request);
-        Dto::S3::ListAllBucketResponse result = _service.ListAllBuckets();
+        auto [bucketList, total] = _service.ListAllBuckets();
 
         // assert
-        EXPECT_EQ(0, result.bucketList.size());
+        EXPECT_EQ(0, bucketList.size());
     }
 
     TEST_F(S3ServiceTest, ObjectPutTest) {
@@ -91,6 +124,24 @@ namespace AwsMock::Service {
         // assert
         EXPECT_TRUE(putResponse.bucket == BUCKET);
         EXPECT_TRUE(putResponse.key == KEY);
+    }
+
+    TEST_F(S3ServiceTest, ObjectGetTest) {
+
+        // arrange
+        Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
+        std::ifstream ifs(testFile);
+        Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
+
+        // act
+        Dto::S3::GetObjectRequest getRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::GetObjectResponse getResponse = _service.GetObject(getRequest);
+
+        // assert
+        EXPECT_TRUE(getResponse.bucket == BUCKET);
+        EXPECT_TRUE(getResponse.key == KEY);
     }
 
     TEST_F(S3ServiceTest, ObjectDeleteTest) {

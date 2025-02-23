@@ -618,6 +618,20 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::S3CommandType::UPDATE_OBJECT: {
+                    log_debug << "S3 update object";
+
+                    // Build request
+                    Dto::S3::UpdateObjectRequest s3Request;
+                    s3Request.FromJson(clientCommand.payload);
+
+                    // Get object versions
+                    _s3Service.UpdateObject(s3Request);
+
+                    log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");

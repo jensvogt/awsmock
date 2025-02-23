@@ -91,11 +91,12 @@ namespace AwsMock::Service {
          * @brief Creates a new docker container, in case the container does not exists inside the docker daemon.
          *
          * @param lambdaEntity lambda entity.
-         * @param instance lambda entity instance.
+         * @param instanceId lambda instance ID.
+         * @param hostPort host port
          * @param dockerTag docker tag.
          * @see Database::Entity::Lambda::Lambda
          */
-        static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, Database::Entity::Lambda::Instance &instance, const std::string &dockerTag);
+        static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &instanceId, int hostPort, const std::string &dockerTag);
 
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API

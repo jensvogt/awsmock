@@ -358,7 +358,7 @@ namespace AwsMock::Database {
     void SNSMemoryDb::DeleteOldMessages(long timeout) {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
-        auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{timeout};
+        auto reset = system_clock::now() - std::chrono::seconds{timeout};
 
         long count = 0;
         for ([[maybe_unused]] auto &messageId: _messages) {

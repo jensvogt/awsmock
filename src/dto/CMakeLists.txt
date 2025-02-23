@@ -43,11 +43,12 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
         src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/internal/ListBucketCounterRequest.cpp src/s3/internal/ListBucketCounterResponse.cpp
         src/s3/model/ObjectCounter.cpp src/s3/internal/ListObjectCounterRequest.cpp src/s3/internal/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
-        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp)
+        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp
+        src/s3/internal/UpdateObjectRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
-        src/docker/model/Platform.cpp src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp)
+        src/docker/model/Platform.cpp src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp src/docker/model/HostConfig.cpp)
 set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp src/lambda/model/DeadLetterConfig.cpp
         src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
         src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp
@@ -106,7 +107,7 @@ set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ss
         src/ssm/DescribeParametersResponse.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp src/module/ExportInfrastructureRequest.cpp
         src/module/ExportInfrastructureResponse.cpp src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp)
-set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp)
+set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp src/monitoring/GetMultiCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
@@ -116,10 +117,13 @@ add_subdirectory(tst)
 
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
+link_directories(/usr/local/lib)
 
 add_library(${LIBRARY} SHARED ${SOURCES})
+target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
 
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-
+target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore awsmockdb bsoncxx mongocxx boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+        archive z prometheus-cpp-core prometheus-cpp-pull magic)
 install(TARGETS ${LIBRARY} DESTINATION lib)

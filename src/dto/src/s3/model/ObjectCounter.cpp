@@ -10,17 +10,29 @@ namespace AwsMock::Dto::S3 {
 
         try {
 
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "oid", oid);
-            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
-            Core::Bson::BsonUtils::SetStringValue(document, "key", key);
-            Core::Bson::BsonUtils::SetLongValue(document, "size", size);
-            Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
-            Core::Bson::BsonUtils::SetStringValue(document, "internalName", internalName);
-            Core::Bson::BsonUtils::SetDateValue(document, "created", created);
-            Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
-            return document.extract();
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "oid", oid);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "bucketName", bucketName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "key", key);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "internalName", internalName);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+            Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
+
+            // Metadata
+            if (!metadata.empty()) {
+                array jsonMetadataArray;
+                for (const auto &[fst, snd]: metadata) {
+                    document jsonMetadataObject;
+                    jsonMetadataObject.append(kvp("key", fst));
+                    jsonMetadataObject.append(kvp("value", snd));
+                    jsonMetadataArray.append(jsonMetadataObject);
+                }
+                rootDocument.append(kvp("metadata", jsonMetadataArray));
+            }
+            return rootDocument.extract();
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

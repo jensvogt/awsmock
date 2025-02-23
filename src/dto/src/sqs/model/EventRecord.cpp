@@ -36,9 +36,9 @@ namespace AwsMock::Dto::SQS {
             if (!attributes.empty()) {
                 document jsonAttributeObject;
                 jsonAttributeObject.append(kvp("ApproximateReceiveCount", "1"));
-                jsonAttributeObject.append(kvp("ApproximateFirstReceiveTimestamp", Core::DateTimeUtils::UnixTimestampMs(system_clock::now())));
+                jsonAttributeObject.append(kvp("ApproximateFirstReceiveTimestamp", bsoncxx::types::b_int64(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()))));
                 jsonAttributeObject.append(kvp("SenderId", Core::AwsUtils::CreateSQSSenderId()));
-                jsonAttributeObject.append(kvp("SentTimestamp", Core::DateTimeUtils::UnixTimestampMs(system_clock::now())));
+                jsonAttributeObject.append(kvp("SentTimestamp", bsoncxx::types::b_int64(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()))));
                 rootDocument.append(kvp("attributes", jsonAttributeObject));
             }
             return rootDocument.extract();
