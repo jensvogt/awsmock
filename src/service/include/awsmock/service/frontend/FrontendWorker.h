@@ -23,6 +23,7 @@
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/config/Configuration.h>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
@@ -80,6 +81,18 @@ namespace AwsMock::Service::Frontend {
 
         void SendBadResponse(http::status status, std::string const &error);
 
+        /**
+         * @brief Handle preflight requests
+         *
+         * @param request incoming HTTP request
+         */
+        void HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
+
+        /**
+         * @brief Handle file request
+         *
+         * @param target
+         */
         void SendFile(beast::string_view target);
 
         void CheckDeadline();
