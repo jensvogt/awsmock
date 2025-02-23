@@ -123,6 +123,7 @@ namespace AwsMock::Service::Frontend {
         beast::error_code ec;
         file.open(full_path.c_str(), beast::file_mode::read, ec);
 
+        // Prepare response
         _fileResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _fileResponse->result(http::status::ok);
         _fileResponse->keep_alive(false);
@@ -132,6 +133,7 @@ namespace AwsMock::Service::Frontend {
         _fileResponse->prepare_payload();
         _fileSerializer.emplace(*_fileResponse);
 
+        // Send response
         http::async_write(_socket, *_fileSerializer, [this](beast::error_code errorCode, std::size_t) {
             errorCode = _socket.shutdown(tcp::socket::shutdown_send, errorCode);
             if (errorCode) {
