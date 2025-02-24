@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>KeepAlive</key>
+        <false/>
+        <key>Label</key>
+        <string>de.jensvogt.awsmock</string>
+        <key>ProcessType</key>
+        <string>Background</string>
+        <key>Program</key>
+        <string>/usr/local/bin/awsmockmgr</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>--loglevel info</string>
+        </array>
+        <key>StandardOutPath</key>
+        <string>/usr/local/awsmock/logs/launchd-stdout.log</string>
+        <key>StandardErrorPath</key>
+        <string>/usr/local/awsmock/logs/launchd-stderr.log</string>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>Version</key>
+        <string>1.1.0</string>
+    </dict>
+</plist>

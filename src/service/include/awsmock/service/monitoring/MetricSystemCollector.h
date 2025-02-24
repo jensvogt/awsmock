@@ -66,7 +66,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get memory utilization on MacOS
          */
-        void GetMemoryInfoMac();
+        static void GetMemoryInfoMac();
 
 #elif __linux__
 
@@ -90,10 +90,10 @@ namespace AwsMock::Monitoring {
       private:
 
 #ifdef __linux__
-        clock_t _lastTime;
-        clock_t _lastTotalCPU;
-        clock_t _lastSysCPU;
-        clock_t _lastUserCPU;
+        clock_t _lastTime = 0;
+        clock_t _lastTotalCPU = 0;
+        clock_t _lastSysCPU = 0;
+        clock_t _lastUserCPU = 0;
 #endif
 
         /**

@@ -17,6 +17,13 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambdaEntity = {};
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
+        // Create response, if inactive
+        if(lambdaEntity.state == Database::Entity::Lambda::LambdaState::Inactive){
+            Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
+            log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
+            return response;
+        }
+
         std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 

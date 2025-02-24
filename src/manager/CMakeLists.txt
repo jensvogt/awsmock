@@ -10,5 +10,7 @@ add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore boost_program_options)
-
+if (APPLE)
+    set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "/usr/local/lib")
+endif ()
 install(TARGETS ${BINARY} DESTINATION bin)
