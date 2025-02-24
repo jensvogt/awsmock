@@ -35,15 +35,18 @@ RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-t
     yaml-cpp libarchive libmagic
 
 # Make directories
-RUN mkdir -p /home/awsmock/data/s3 && \
-    mkdir -p /home/awsmock/data/sqs && \
-    mkdir -p /home/awsmock/data/sns && \
-    mkdir -p /home/awsmock/data/lambda && \
-    mkdir -p /home/awsmock/data/transfer && \
-    mkdir -p /home/awsmock/data/dynamodb && \
-    mkdir -p /home/awsmock/data/tmp && \
-    mkdir -p /home/awsmock/init && \
-    mkdir -p /home/awsmock/frontend
+RUN mkdir -p /usr/local/awsmock/data/s3 && \
+    mkdir -p /usr/local/awsmock/data/sqs && \
+    mkdir -p /usr/local/awsmock/data/sns && \
+    mkdir -p /usr/local/awsmock/data/lambda && \
+    mkdir -p /usr/local/awsmock/data/transfer && \
+    mkdir -p /usr/local/awsmock/data/dynamodb && \
+    mkdir -p /usr/local/awsmock/data/tmp && \
+    mkdir -p /usr/local/awsmock/bin && \
+    mkdir -p /usr/local/awsmock/lib && \
+    mkdir -p /usr/local/awsmock/etc && \
+    mkdir -p /usr/local/awsmock/init && \
+    mkdir -p /usr/local/awsmock/frontend
 
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /home/awsmock/frontend/
@@ -74,11 +77,14 @@ RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push
 
 # Install aws-mock
 COPY --from=build /usr/bin/aws /usr/bin/
-COPY --from=build /usr/local/bin/awsmockmgr /usr/bin/
-COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
-COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
-COPY --from=build /etc/awsmock.yml /etc/
-COPY --from=build /usr/local/bin/awslocal /usr/bin/
+COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/lib/libawsmock* /usr/local/awsmock/lib
+COPY --from=build /usr/local/awsmock/etc/awsmock.yml /usr/local/awsmock/etc
+
+# Set library search path
+ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
 
 # Configure awslocal
 RUN aws configure set aws_access_key_id none && \
@@ -100,4 +106,4 @@ EXPOSE 6000-6010 6000-6010
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-CMD ["/usr/bin/awsmockmgr"]
+CMD ["/usr/local/awsmock/bin/awsmockmgr"]
