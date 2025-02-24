@@ -1,0 +1,170 @@
+#
+# Configuration file for the AWS cloud simulation
+#
+awsmock:
+  region: eu-central-1                                                # AWS region
+  user: none                                                          # AWS user
+  access: # AWS access definition
+    key-id: none                                                      # AWS access key ID
+    secret-access-key: none                                           # AWS access secret
+    account-id: 000000000000                                          # AWS account ID
+    client-id: 00000000                                               # AWS client ID
+  temp-dir: /usr/local/awsmock/data/tmp                                    # General temp directory
+  data-dir: /usr/local/awsmock/data                                        # General data directory
+  dockerized: false                                                   # Dockerized flag
+  json: # JSON settings                                               # JSON settings
+    pretty: true                                                      # JSON pretty print
+  aws: # AWS settings
+    signature: # AWS signature settings
+      verify: false                                                   # Verify AWS signature
+  frontend: # Frontend HTTP server
+    active: true                                                      # Frontend activation flag
+    address: 0.0.0.0                                                  # Listen address
+    port: 4567                                                        # Port number
+    workers: 20                                                       # Number of worker threads
+    timeout: 900                                                      # HTTP timeout
+    doc-root: /usr/local/awsmock/frontend                                  # Document root directory
+  autoload: # BSON auto load on startup
+    active: true                                                      # Autoload activation flag
+    dir: /usr/local/awsmock/init                                           # Autoload directory, has priority over autoload file
+    file: /usr/local/awsmock/init/init.json                                # Autoload file
+  docker: # Docker settings
+    active: true                                                      # Docker daemon activation flag
+    network-mode: local                                               # Docker network mode, default: local
+    network-name: local                                               # Docker network name
+    defaults: # Docker container default values
+      memory-size: 512                                                # Docker container memory size
+      temp-size: 10240                                                # Docker container tmp size
+    container: # Docker container defaults
+      port: 8080                                                      # Docker container default port
+      maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
+      checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
+    socket: /var/run/docker.sock                                      # Docker REST API domain socket
+  podman:
+    active: false
+    network-mode: podman
+    network-name: podman
+    defaults:
+      memory-size: 512
+      temp-size: 10240
+    container:
+      port: 8080
+    socket: /var/run/podman/podman.sock
+  mongodb:
+    active: true
+    name: awsmock
+    user: root
+    password: password
+    port: 27017
+    host: localhost
+    pool-size: 256
+  gateway:
+    active: true
+    http:
+      host: localhost
+      address: 0.0.0.0
+      port: 4566
+      max-queue: 10
+      max-threads: 200
+      max-body: 104857600
+      timeout: 900
+  modules:
+    s3:
+      active: true
+      data-dir: /usr/local/awsmock/data/s3
+      monitoring:
+        period: 300
+      sync:
+        object:
+          period: 300
+        bucket:
+          period: 300
+    sqs:
+      active: true
+      monitoring:
+        period: 300
+      reset:
+        period: 60
+      counter:
+        period: 30
+    sns:
+      active: true
+      timeout: 14
+      monitoring:
+        period: 300
+      delete:
+        period: 3600
+      counter:
+        period: 30
+    lambda:
+      active: true
+      lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
+      privatePort: 8080                                              # lambda docker container internal port
+      data-dir: /usr/local/awsmock/data/lambda
+      monitoring:
+        period: 300
+      remove:
+        period: 3600
+      counter:
+        period: 30
+    kms:
+      active: true
+      monitoring:
+        period: 300
+      remove:
+        period: 3600
+    dynamodb:
+      active: true
+      monitoring:
+        period: 300
+      worker:
+        period: 300
+      container:
+        host: localhost
+        port: 8000
+        name: dynamodb-local                                          # Container name, default: dynamodb-local
+        image-name: amazon/dynamodb-local                             # AWS dynamodb image name, default: docker.io/library/dynamodb-local
+        image-tag: latest                                             # AWS dynamodb image tag, default: latest
+    cognito:
+      active: true
+      monitoring:
+        period: 300
+    ssm:
+      active: true
+      monitoring:
+        period: 300
+      worker:
+        period: 3600
+    secretsmanager:
+      active: true
+      monitoring:
+        period: 300
+      worker:
+        period: 3600
+    transfer: # AWS transfer server
+      active: true                                                      # Activation flag
+      bucket: transfer-server                                           # Transfer server S3 bucket
+      data-dir: /usr/local/awsmock/data/transfer                             # FTP data directory
+      directories:
+        - incoming/mix
+        - feedback
+      monitoring: # Transfer server monitoring
+        period: 300                                                     # Monitoring interval
+      worker: # Background worker
+        period: 3600                                                    # Monitoring interval
+      ftp: # FTP server
+        port: 21                                                        # FTP port
+        address: 0.0.0.0                                                # FTP listening address
+        pasv-min: 6000                                                  # Passive mode minimum port
+        pasv-max: 6100                                                  # Passive mode maximal port
+  monitoring: # Monitoring
+    active: true                                                        # Activation flag
+    port: 9091                                                          # Prometheus port
+    period: 60                                                          # Monitoring interval
+    prometheus: false                                                   # Use Prometheus as monitoring collector
+    intern: true                                                        # Use internal monitoring
+    retention: 3                                                        # Retention of monitoring data in days
+    smooth: false                                                       # Use rolling mean
+  logging:
+    level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
+    filename:                                                           # Log file name, if empty use stdout

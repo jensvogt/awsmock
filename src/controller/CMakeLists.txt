@@ -5,6 +5,9 @@ include_directories(include ../core/include ../dto/include ../db/include ${INC_B
 link_directories(../core /usr/local/lib)
 
 add_executable(${BINARY} ${SOURCES})
+if (APPLE)
+    set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "/usr/local/lib")
+endif ()
 
 # Check systemd
 find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)
@@ -18,5 +21,4 @@ else ()
 endif ()
 
 add_library(${BINARY}_lib STATIC ${SOURCES})
-
 install(TARGETS ${BINARY} DESTINATION bin)
