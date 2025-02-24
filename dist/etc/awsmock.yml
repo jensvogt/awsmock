@@ -75,18 +75,18 @@ awsmock:
       monitoring: # S3 module monitoring
         period: 300                                                   # S3 module monitoring period in seconds, default: 300s
       sync: # S3 file system synchronization
-        object:
-          period: 300
+        object: # S3 object to DB synchronization
+          period: 300                                                 # S3 file to DB synchronization period in seconds, default:300s
         bucket:
-          period: 300
-    sqs:
-      active: true
-      monitoring:
-        period: 300
-      reset:
-        period: 60
-      counter:
-        period: 30
+          period: 300                                                 # S3 DB to file synchronization period in seconds, default:300s
+    sqs: # SQS module
+      active: true                                                    # SQS module activation flag
+      monitoring: # SQS module monitoring
+        period: 300                                                   # SQS module monitoring period in seconds, default: 300s
+      reset: # SQS queue reset
+        period: 60                                                    # SQS queue reset period in seconds, default: 60s
+      counter: # SQS message counters
+        period: 30                                                    # SQS message counting period in seconds, default: 30s
     sns:
       active: true
       timeout: 14
