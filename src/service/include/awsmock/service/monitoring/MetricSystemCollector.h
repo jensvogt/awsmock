@@ -66,7 +66,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get memory utilization on MacOS
          */
-        void GetMemoryInfoMac();
+        static void GetMemoryInfoMac();
 
 #elif __linux__
 
