@@ -18,7 +18,7 @@ namespace AwsMock::Service {
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
         // Create response, if inactive
-        if(lambdaEntity.state == Database::Entity::Lambda::LambdaState::Inactive){
+        if (lambdaEntity.state == Database::Entity::Lambda::LambdaState::Inactive) {
             Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
             log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
             return response;

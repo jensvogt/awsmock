@@ -282,6 +282,13 @@ namespace AwsMock::Core {
         void SetValue(const std::string &key, double value);
 
         /**
+         * @brief Checks whether the provided key exists
+         *
+         * @return true if key/value pair exists
+         */
+        bool HasValue(const std::string &key) const;
+
+        /**
          * @brief Returns the application name
          *
          * @return application name

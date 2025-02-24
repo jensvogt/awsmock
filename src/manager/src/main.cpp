@@ -35,7 +35,7 @@
 #include <awsmock/service/frontend/FrontendServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 
-#define DEFAULT_CONFIG_FILE "/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 
 /**
  * Main routine.
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
     // Set log file
     if (vm.contains("logfile")) {
         auto value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.filename", value);
+        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.file-name", value);
         AwsMock::Core::LogStream::SetFilename(value);
     }
 
