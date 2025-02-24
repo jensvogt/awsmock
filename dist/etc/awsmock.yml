@@ -9,8 +9,8 @@ awsmock:
     secret-access-key: none                                           # AWS access secret
     account-id: 000000000000                                          # AWS account ID
     client-id: 00000000                                               # AWS client ID
-  temp-dir: /usr/local/awsmock/data/tmp                                    # General temp directory
-  data-dir: /usr/local/awsmock/data                                        # General data directory
+  temp-dir: /usr/local/awsmock/data/tmp                               # General temp directory
+  data-dir: /usr/local/awsmock/data                                   # General data directory
   dockerized: false                                                   # Dockerized flag
   json: # JSON settings                                               # JSON settings
     pretty: true                                                      # JSON pretty print
@@ -23,11 +23,11 @@ awsmock:
     port: 4567                                                        # Port number
     workers: 20                                                       # Number of worker threads
     timeout: 900                                                      # HTTP timeout
-    doc-root: /usr/local/awsmock/frontend                                  # Document root directory
+    doc-root: /usr/local/awsmock/frontend                             # Document root directory
   autoload: # BSON auto load on startup
     active: true                                                      # Autoload activation flag
-    dir: /usr/local/awsmock/init                                           # Autoload directory, has priority over autoload file
-    file: /usr/local/awsmock/init/init.json                                # Autoload file
+    dir: /usr/local/awsmock/init                                      # Autoload directory, has priority over autoload file
+    file: /usr/local/awsmock/init/init.json                           # Autoload file
   docker: # Docker settings
     active: true                                                      # Docker daemon activation flag
     network-mode: local                                               # Docker network mode, default: local
@@ -40,41 +40,41 @@ awsmock:
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
     socket: /var/run/docker.sock                                      # Docker REST API domain socket
-  podman:
-    active: false
-    network-mode: podman
-    network-name: podman
-    defaults:
-      memory-size: 512
-      temp-size: 10240
-    container:
-      port: 8080
-    socket: /var/run/podman/podman.sock
-  mongodb:
-    active: true
-    name: awsmock
-    user: root
-    password: password
-    port: 27017
-    host: localhost
-    pool-size: 256
-  gateway:
-    active: true
-    http:
-      host: localhost
-      address: 0.0.0.0
-      port: 4566
-      max-queue: 10
-      max-threads: 200
-      max-body: 104857600
-      timeout: 900
-  modules:
-    s3:
-      active: true
-      data-dir: /usr/local/awsmock/data/s3
-      monitoring:
-        period: 300
-      sync:
+  podman: # Podman settings
+    active: false                                                     # Podman daemon activation flag
+    network-mode: podman                                              # Podman network mode, default: local
+    network-name: podman                                              # Podman network mode, default: local
+    defaults: # Podman defaults
+      memory-size: 512                                                # Podman container memory size
+      temp-size: 10240                                                # Docker container tmp size
+    container: # Podman container defaults
+      port: 8080                                                      # Docker container default port
+    socket: /var/run/podman/podman.sock                               # Docker REST API domain socket
+  mongodb: # Mongo DB settings
+    active: true                                                      # MongoDB activation flag
+    name: awsmock                                                     # MongoDB database name
+    user: root                                                        # MongoDB database user
+    password: password                                                # MongoDB database password
+    port: 27017                                                       # MongoDB database port, default: 27017
+    host: localhost                                                   # MongoDB database host name
+    pool-size: 256                                                    # MongoDB connection pool size
+  gateway: # AwsMock API gateway settings
+    active: true                                                      # Gateway activation flag
+    http: # Gateway HTTP settings
+      host: localhost                                                 # Gateway host name
+      address: 0.0.0.0                                                # Gateway listen address, default: 0.0.0.0 (all interfaces)
+      port: 4566                                                      # Gateway port
+      max-queue: 10                                                   # Gateway request queue length
+      max-threads: 200                                                # Gateway maximum number of threads
+      max-body: 104857600                                             # Gateway maximum request body size in bytes, default: 100MB
+      timeout: 900                                                    # Gateway maximum request time in seconds, default: 900s
+  modules: # AwsMock modules
+    s3: # S3 module
+      active: true                                                    # S3 module activation flag
+      data-dir: /usr/local/awsmock/data/s3                            # S3 module data dir
+      monitoring: # S3 module monitoring
+        period: 300                                                   # S3 module monitoring period in seconds, default: 300s
+      sync: # S3 file system synchronization
         object:
           period: 300
         bucket:
