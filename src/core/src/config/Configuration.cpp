@@ -152,7 +152,9 @@ namespace AwsMock::Core {
 
         // Logging
         DefineStringProperty("awsmock.logging.level", "AWSMOCK_LOG_LEVEL", "info");
-        DefineStringProperty("awsmock.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
+        DefineStringProperty("awsmock.logging.file-name", "AWSMOCK_LOG_FILE_NAME", "/usr/local/awsmock/logs/awsmock.log");
+        DefineLongProperty("awsmock.logging.file-size", "AWSMOCK_LOG_FILE_SIZE", 10485760);
+        DefineIntProperty("awsmock.logging.file-count", "AWSMOCK_LOG_FILE_COUNT", 5);
 
         // Debug
         log_debug << "Default configuration defined, config: " << _yamlConfig;
@@ -341,9 +343,15 @@ namespace AwsMock::Core {
         ofs.close();
     }
 
+    bool Configuration::HasValue(const std::string &key) const {
+        return HasProperty(key);
+    }
+
     void Configuration::AddToEnvList(const std::string &key, const std::string &value) { _envList[key] = value; }
 
-    void Configuration::ApplyEnvSettings() { for (const auto &[fst, snd]: _envList) { SetValueString(fst, snd); } }
+    void Configuration::ApplyEnvSettings() {
+        for (const auto &[fst, snd]: _envList) { SetValueString(fst, snd); }
+    }
 
     bool Configuration::HasProperty(const std::string &key) const {
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -379,7 +387,9 @@ namespace AwsMock::Core {
                         value.replace(pos, match.length(), temp);
                         offset = pos + value.length();
                     }
-                } else { offset += match.length(); }
+                } else {
+                    offset += match.length();
+                }
             }
         }
         return value;

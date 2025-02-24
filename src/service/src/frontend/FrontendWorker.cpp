@@ -152,7 +152,7 @@ namespace AwsMock::Service::Frontend {
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {

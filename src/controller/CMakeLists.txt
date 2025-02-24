@@ -21,4 +21,4 @@ else ()
 endif ()
 
 add_library(${BINARY}_lib STATIC ${SOURCES})
-install(TARGETS ${BINARY} DESTINATION bin)
+install(TARGETS ${BINARY} DESTINATION /usr/local/awsmock/bin)

@@ -13,4 +13,4 @@ target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockco
 if (APPLE)
     set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "/usr/local/lib")
 endif ()
-install(TARGETS ${BINARY} DESTINATION bin)
+install(TARGETS ${BINARY} DESTINATION /usr/local/awsmock/bin)
