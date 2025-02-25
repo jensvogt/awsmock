@@ -45,5 +45,4 @@ namespace AwsMock::Service {
             throw Core::ServiceException(exc.what());
         }
     }
-
 }// namespace AwsMock::Service

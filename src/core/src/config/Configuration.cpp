@@ -268,6 +268,15 @@ namespace AwsMock::Core {
         log_trace << "Value set, key: " << key;
     }
 
+    void Configuration::SetValueLong(const std::string &key, const long value) {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        SetValueByPath(_yamlConfig, key, value);
+        log_trace << "Value set, key: " << key;
+    }
+
     std::string Configuration::GetValueString(const std::string &key) const {
         if (!HasProperty(key)) {
             log_error << "Property not found, key: " + key;

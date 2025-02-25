@@ -271,7 +271,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, long value);
+        void SetValueLong(const std::string &key, long value);
 
         /**
          * @brief Sets an double configuration value

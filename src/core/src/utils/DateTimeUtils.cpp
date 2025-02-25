@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/DateTimeUtils.h>
+#include <boost/chrono/duration.hpp>
 #include <boost/system/detail/enable_if.hpp>
 
 namespace AwsMock::Core {
@@ -43,7 +44,7 @@ namespace AwsMock::Core {
 #if __APPLE__
         return tp + std::chrono::hours(1);
 #else
-        return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::hours(2)};
+        return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::seconds(UtcOffset())};
 #endif
     }
 
@@ -76,7 +77,7 @@ namespace AwsMock::Core {
     }
 
     long DateTimeUtils::UnixTimestampNow() {
-        return UnixTimestamp(system_clock::now());
+        return UnixTimestamp(std::chrono::zoned_time{"Europe/London", system_clock::now()});
     }
 
     system_clock::time_point DateTimeUtils::LocalDateTimeNow() {
@@ -97,10 +98,15 @@ namespace AwsMock::Core {
 
     long DateTimeUtils::UtcOffset() {
 #if __APPLE__
-        return 0;
+        return 3600;
 #else
         return std::chrono::current_zone()->get_info(system_clock::now()).offset.count();
 #endif
+    }
+
+    system_clock::time_point DateTimeUtils::ConvertToUtc(const system_clock::time_point &value) {
+        const long seconds = std::chrono::time_point_cast<std::chrono::seconds>(value).time_since_epoch().count();
+        return system_clock::from_time_t(seconds - UtcOffset());
     }
 
     int DateTimeUtils::GetSecondsUntilMidnight() {
