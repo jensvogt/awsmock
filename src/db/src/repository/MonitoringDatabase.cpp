@@ -48,9 +48,14 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
+                if (name.empty()) {
+                    log_error << "Missing name";
+                    return;
+                }
+
                 // As mongoDB uses UTC timestamps, we need to calculate everything in UTC
                 const system_clock::time_point now = Core::DateTimeUtils::UtcDateTimeNow();
-                const system_clock::time_point end = Core::ceilTimePoint(now, std::chrono::seconds(300));
+                const system_clock::time_point end = Core::CeilTimePoint(now, std::chrono::seconds(300));
                 const system_clock::time_point middle = end - std::chrono::seconds(150);
 
                 document document;
@@ -59,7 +64,6 @@ namespace AwsMock::Database {
                 if (!labelName.empty()) { document.append(kvp("labelName", labelName)); }
                 if (!labelValue.empty()) { document.append(kvp("labelValue", labelValue)); }
 
-                if (name.empty()) { log_error << "Missing name"; }
                 session.start_transaction();
                 if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
                     double currentValue = mResult.value()["value"].get_double().value;
@@ -68,7 +72,6 @@ namespace AwsMock::Database {
                     _monitoringCollection.update_one(make_document(kvp("_id", mResult.value()["_id"].get_oid())),
                                                      make_document(kvp("$set", make_document(kvp("value", currentValue), kvp("count", currentCount)))));
                 } else {
-                    if (name.empty()) { log_error << "Missing name"; }
                     bsoncxx::builder::basic::document newDocument;
                     newDocument.append(kvp("value", value));
                     newDocument.append(kvp("count", 1));
@@ -98,10 +101,14 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
+                if (name.empty()) {
+                    log_error << "Missing name";
+                    return;
+                }
 
                 // As mongoDB uses UTC timestamps, we need to calculate everything in UTC
                 const system_clock::time_point now = Core::DateTimeUtils::UtcDateTimeNow();
-                const system_clock::time_point end = Core::ceilTimePoint(now, std::chrono::seconds(300));
+                const system_clock::time_point end = Core::CeilTimePoint(now, std::chrono::seconds(300));
                 const system_clock::time_point middle = end - std::chrono::seconds(150);
 
                 document document;
@@ -110,7 +117,6 @@ namespace AwsMock::Database {
                 if (!labelName.empty()) { document.append(kvp("labelName", labelName)); }
                 if (!labelValue.empty()) { document.append(kvp("labelValue", labelValue)); }
 
-                if (name.empty()) { log_error << "Missing name"; }
                 session.start_transaction();
                 if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
                     double currentValue = mResult.value()["value"].get_double().value;
@@ -119,7 +125,6 @@ namespace AwsMock::Database {
                     _monitoringCollection.update_one(make_document(kvp("_id", mResult.value()["_id"].get_oid())),
                                                      make_document(kvp("$set", make_document(kvp("value", currentValue), kvp("count", currentCount)))));
                 } else {
-                    if (name.empty()) { log_error << "Missing name"; }
                     bsoncxx::builder::basic::document newDocument;
                     newDocument.append(kvp("value", value));
                     newDocument.append(kvp("count", 1));
@@ -143,18 +148,12 @@ namespace AwsMock::Database {
     std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
 
-        const long offset = Core::DateTimeUtils::UtcOffset();
-
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
 
             try {
                 std::vector<Entity::Monitoring::Counter> result;
-
-                mongocxx::options::find opts;
-                opts.sort(make_document(kvp("created", 1)));
-                //opts.limit(limit);
 
 #ifdef __APPLE__
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
@@ -164,17 +163,23 @@ namespace AwsMock::Database {
                 auto endUtc = system_clock::time_point(endTime.time_since_epoch());
 #else
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
-                auto startUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(start).time_since_epoch());
-                auto endUtc = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::utc_clock::from_sys(end).time_since_epoch());
+                auto startUtc = Core::DateTimeUtils::ConvertToUtc(start);
+                auto endUtc = Core::DateTimeUtils::ConvertToUtc(end);
 #endif
                 document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(startUtc)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(endUtc)))));
-                if (!labelName.empty()) { document.append(kvp("labelName", labelName)); }
-                if (!labelValue.empty()) { document.append(kvp("labelValue", labelValue)); }
+                if (!labelName.empty()) {
+                    document.append(kvp("labelName", labelName));
+                }
+                if (!labelValue.empty()) {
+                    document.append(kvp("labelValue", labelValue));
+                }
 
                 // Find and accumulate
                 if (_rollingMean) {
+                    mongocxx::options::find opts;
+                    opts.sort(make_document(kvp("created", 1)));
                     Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
                     for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
                         acc(it["value"].get_double().value);
@@ -182,7 +187,7 @@ namespace AwsMock::Database {
                         result.emplace_back(counter);
                     }
                 } else {
-                    for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
+                    for (auto cursor = _monitoringCollection.find(document.extract()); auto it: cursor) {
                         Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
                         result.emplace_back(counter);
                     }
@@ -223,4 +228,19 @@ namespace AwsMock::Database {
         log_trace << "Performance counter not available if you running the memory DB";
         return 0;
     }
+
+    void MonitoringDatabase::ConvertTimestamps(system_clock::time_point &start, system_clock::time_point &end) {
+#ifdef __APPLE__
+        // As mongoDB uses UTC timestamps, we need to convert everything to UTC
+        const std::chrono::time_point start = std::chrono::time_point_cast<std::chrono::microseconds>(start);
+        auto start = system_clock::time_point(start.time_since_epoch());
+        const std::chrono::time_point end = std::chrono::time_point_cast<std::chrono::microseconds>(end);
+        auto end = system_clock::time_point(end.time_since_epoch());
+#else
+        // As mongoDB uses UTC timestamps, we need to convert everything to UTC
+        start = Core::DateTimeUtils::ConvertToUtc(start);
+        end = Core::DateTimeUtils::ConvertToUtc(end);
+#endif
+    }
+
 }// namespace AwsMock::Database

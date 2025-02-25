@@ -81,7 +81,9 @@ namespace AwsMock::Core {
 
         // Logging
         Configuration::instance().SetValueString("awsmock.logging.level", "debug");
-        Configuration::instance().SetValueString("awsmock.logging.file", "/tmp/awsmock-test.log");
+        Configuration::instance().SetValueString("awsmock.logging.file-name", "/tmp/awsmock-test.log");
+        Configuration::instance().SetValueLong("awsmock.logging.file-size", 1024 * 1024);
+        Configuration::instance().SetValueInt("awsmock.logging.file-count", 5);
 
         // Monitoring
         Configuration::instance().SetValueInt("awsmock.monitoring.port", 19091);

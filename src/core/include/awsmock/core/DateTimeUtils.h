@@ -21,7 +21,7 @@ namespace AwsMock::Core {
     using std::chrono::system_clock;
 
     template<class Clock, class Duration1, class Duration2>
-    constexpr auto ceilTimePoint(std::chrono::time_point<Clock, Duration1> t, Duration2 m) noexcept {
+    constexpr auto CeilTimePoint(std::chrono::time_point<Clock, Duration1> t, Duration2 m) noexcept {
         using R = std::chrono::time_point<Clock, Duration2>;
         auto r = std::chrono::time_point_cast<Duration2>(R{} + (t - R{}) / m * m);
         if (r < t)
@@ -163,7 +163,22 @@ namespace AwsMock::Core {
          * @return offset in seconds to UTC.
          */
         static long UtcOffset();
-        std::string FromISO8601(system_clock::time_point now) const;
+
+        /**
+         * @brief Convert from ISO8601.
+         *
+         * @param now timestamp
+         * @return ISO8601 string
+         */
+        static std::string FromISO8601(system_clock::time_point now);
+
+        /**
+         * @brief Convert a local time to a UTC time
+         *
+         * @param value local time
+         * @return UTC time
+         */
+        static system_clock::time_point ConvertToUtc(const system_clock::time_point &value);
     };
 
 }// namespace AwsMock::Core
