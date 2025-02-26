@@ -305,7 +305,7 @@ namespace AwsMock::Controller {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "set-log-level");
-        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", level, headers); response.statusCode != boost::beast::http::status::ok) {
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", level, headers); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not set log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }

@@ -1213,8 +1213,24 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const Entity::SQS::Message message = GetMessageByReceiptHandle(receiptHandle);
-            return DeleteMessage(message);
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+                session.commit_transaction();
+
+                log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << result->deleted_count();
+                return result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
         }
         return _memoryDb.DeleteMessage(receiptHandle);
     }

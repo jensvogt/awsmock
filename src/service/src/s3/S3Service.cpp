@@ -29,7 +29,7 @@ namespace AwsMock::Service {
 
             auto createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::CreateArn("s3", region, accountId, s3Request.name));
             log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
-            log_info << "Bucket created, bucket: " << s3Request.name;
+            log_debug << "Bucket created, bucket: " << s3Request.name;
             return createBucketResponse;
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
@@ -52,7 +52,7 @@ namespace AwsMock::Service {
             const long deleted = _database.PurgeBucket(bucket);
             AdjustBucketCounters(bucket.region, bucket.name);
 
-            log_info << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
+            log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
         } catch (Core::JsonException &exc) {
             log_error << "S3 purge bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
 
             // Update database
             _database.UpdateBucket(bucket);
-            log_info << "Bucket updated, bucket: " << request.bucket.bucketName;
+            log_debug << "Bucket updated, bucket: " << request.bucket.bucketName;
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
@@ -103,7 +103,7 @@ namespace AwsMock::Service {
                     .modified = bucket.modified};
 
             log_trace << "S3 get bucket metadata response: " + response.ToString();
-            log_info << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
+            log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
 
             return response;
         } catch (bsoncxx::exception &ex) {
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
 
         try {
             Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
-            log_info << "Bucket returned, bucket: " << request.bucketName;
+            log_debug << "Bucket returned, bucket: " << request.bucketName;
 
             return Dto::S3::Mapper::map(request, bucket);
         } catch (bsoncxx::exception &ex) {
@@ -141,7 +141,7 @@ namespace AwsMock::Service {
 
         if (!request.key.empty()) {
             if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
-                log_info << "Object does not exists, bucket: " << request.bucket << ", key: " << request.key;
+                log_debug << "Object does not exists, bucket: " << request.bucket << ", key: " << request.key;
                 throw Core::NotFoundException("Object does not exists, bucket: " + request.bucket + ", key: " + request.key);
             }
         }
@@ -160,7 +160,7 @@ namespace AwsMock::Service {
                     .modified = object.modified};
 
             log_trace << "S3 get object metadata response: " + response.ToString();
-            log_info << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
+            log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
 
             return response;
         } catch (bsoncxx::exception &ex) {
@@ -215,7 +215,7 @@ namespace AwsMock::Service {
                     .created = object.created,
                     .modified = object.modified};
             log_trace << "S3 get object response: " << response.ToString();
-            log_info << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
+            log_debug << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -304,7 +304,7 @@ namespace AwsMock::Service {
         bucket.versionStatus = Database::Entity::S3::BucketVersionStatusFromString(Core::StringUtils::ToLower(request.status));
 
         _database.UpdateBucket(bucket);
-        log_info << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status;
+        log_debug << "Put bucket versioning, bucket: " << request.bucket << " state: " << request.status;
     }
 
     Dto::S3::CreateMultipartUploadResult S3Service::CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const {
@@ -329,7 +329,7 @@ namespace AwsMock::Service {
                                                .metadata = request.metadata};
         object = _database.CreateOrUpdateObject(object);
 
-        log_info << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
+        log_debug << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
         return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};
     }
 
@@ -349,7 +349,7 @@ namespace AwsMock::Service {
 
         // Get md5sum as ETag
         std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
-        log_info << "Upload part succeeded, part: " << part << " filename: " << fileName;
+        log_debug << "Upload part succeeded, part: " << part << " filename: " << fileName;
         return eTag;
     }
 
@@ -384,7 +384,7 @@ namespace AwsMock::Service {
         response.checksumSHA1 = Core::Crypto::GetSha1FromFile(destFile);
         response.checksumSHA256 = Core::Crypto::GetSha256FromFile(destFile);
         response.lastModified = system_clock::now();
-        log_info << "Upload part copy succeeded, part: " << request.partNumber << " filename: " << destFile << " copied: " << copied;
+        log_debug << "Upload part copy succeeded, part: " << request.partNumber << " filename: " << destFile << " copied: " << copied;
 
         return response;
     }
@@ -444,7 +444,7 @@ namespace AwsMock::Service {
 
             // Check notifications
             CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-            log_info << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
+            log_debug << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
 
             return {
                     .location = request.region,
@@ -611,7 +611,7 @@ namespace AwsMock::Service {
 
             // Check notification
             CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
-            log_info << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: " << request.targetBucket << " targetKey: " << request.targetKey;
+            log_debug << "Copy object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: " << request.targetBucket << " targetKey: " << request.targetKey;
 
             // Adjust bucket key counter on target bucket
             AdjustBucketCounters(request.region, request.targetBucket);
@@ -683,8 +683,8 @@ namespace AwsMock::Service {
 
             // Check notification
             CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
-            log_info << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
-                     << request.targetBucket << " targetKey: " << request.targetKey;
+            log_debug << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: "
+                      << request.targetBucket << " targetKey: " << request.targetKey;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 copy object request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -719,7 +719,7 @@ namespace AwsMock::Service {
                 // Check notifications
                 CheckNotifications(request.region, request.bucket, request.key, 0, "ObjectRemoved");
 
-                log_info << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
+                log_debug << "Object deleted, bucket: " << request.bucket << " key: " << request.key;
             } catch (Core::JsonException &exc) {
                 log_error << "S3 delete object failed, message: " + exc.message();
                 throw Core::ServiceException(exc.message());
@@ -762,12 +762,12 @@ namespace AwsMock::Service {
             // Adjust bucket counters
             AdjustBucketCounters(request.region, request.bucket);
 
-            log_info << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size();
+            log_debug << "Objects deleted, bucket: " << request.bucket << " count: " << request.keys.size();
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 delete objects failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
-        log_info << "DeleteObjects succeeded, bucket: " << request.bucket;
+        log_debug << "DeleteObjects succeeded, bucket: " << request.bucket;
         return response;
     }
 
@@ -789,7 +789,7 @@ namespace AwsMock::Service {
             } else if (!request.queueArn.empty()) {
                 CreateQueueConfiguration(bucket, request);
             }
-            log_info << "PutBucketNotification succeeded, bucket: " << request.bucket;
+            log_debug << "PutBucketNotification succeeded, bucket: " << request.bucket;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 put bucket notification request failed, message: " << ex.what();
@@ -811,7 +811,7 @@ namespace AwsMock::Service {
             const Database::Entity::S3::BucketEncryption bucketEncryption = {.sseAlgorithm = request.sseAlgorithm, .kmsKeyId = request.kmsKeyId};
             bucketEntity.bucketEncryption = bucketEncryption;
             bucketEntity = _database.UpdateBucket(bucketEntity);
-            log_info << "PutBucketEncryption succeeded, bucket: " << request.bucket;
+            log_debug << "PutBucketEncryption succeeded, bucket: " << request.bucket;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 put bucket encryption request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -862,7 +862,7 @@ namespace AwsMock::Service {
 
             // Delete bucket from database
             _database.DeleteBucket(bucket);
-            log_info << "Bucket deleted, bucket: " << bucket.name;
+            log_debug << "Bucket deleted, bucket: " << bucket.name;
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 Delete Bucket failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -1155,7 +1155,7 @@ namespace AwsMock::Service {
 
         // Check file encoding
         if (Core::FileUtils::IsBase64(filePath)) {
-            log_info << "File is base64 encoded, file: " << filePath;
+            log_debug << "File is base64 encoded, file: " << filePath;
             Core::FileUtils::Base64DecodeFile(filePath);
         }
 
@@ -1267,11 +1267,11 @@ namespace AwsMock::Service {
 
             // Check encryption
             CheckEncryption(bucket, object);
-            log_info << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+            log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
 
             // Check notification
             CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
-            log_info << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+            log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
         } else {
 
             // Delete local file
@@ -1280,7 +1280,7 @@ namespace AwsMock::Service {
 
         // Meta data
         object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
-        log_info << "Checksum, bucket: " << request.bucket << " key: " << request.key << "md5: " << object.md5sum;
+        log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << "md5: " << object.md5sum;
         if (request.checksumAlgorithm == "SHA1") {
             object.sha1sum = Core::Crypto::GetSha1FromFile(filePath);
             log_debug << "Checksum SHA1, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum;
@@ -1307,7 +1307,7 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!id.empty() && bucket.HasQueueNotificationId(id)) {
-                log_info << "Queue notification configuration exists already, id: " << id;
+                log_debug << "Queue notification configuration exists already, id: " << id;
                 break;
             }
 
@@ -1335,7 +1335,7 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!id.empty() && bucket.HasTopicNotificationId(id)) {
-                log_info << "Topic notification configuration exists already, id: " << id;
+                log_debug << "Topic notification configuration exists already, id: " << id;
                 break;
             }
 
@@ -1363,7 +1363,7 @@ namespace AwsMock::Service {
 
             // Check existence
             if (!id.empty() && bucket.HasLambdaNotificationId(id)) {
-                log_info << "Lambda notification configuration exists already, id: " << id;
+                log_debug << "Lambda notification configuration exists already, id: " << id;
                 break;
             }
 

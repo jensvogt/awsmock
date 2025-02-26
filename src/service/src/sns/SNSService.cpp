@@ -560,7 +560,7 @@ namespace AwsMock::Service {
             // Set tags and update database
             topic.tags = request.tags;
             topic = _snsDatabase.UpdateTopic(topic);
-            log_info << "SNS tags updated, count: " << topic.tags.size();
+            log_debug << "SNS tags updated, count: " << topic.tags.size();
 
             constexpr Dto::SNS::TagResourceResponse response;
             return response;
@@ -596,7 +596,7 @@ namespace AwsMock::Service {
                 });
             }
             topic = _snsDatabase.UpdateTopic(topic);
-            log_info << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
+            log_debug << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
 
             constexpr Dto::SNS::UntagResourceResponse response;
             return response;

@@ -285,7 +285,7 @@ namespace AwsMock::Service {
                     boost::beast::net::streambuf sb;
                     putObjectRequest.contentLength = PrepareBody(request, sb);
                     std::istream stream(&sb);
-                    log_info << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
+                    log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
                     Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream);
 
@@ -740,6 +740,7 @@ namespace AwsMock::Service {
             for (const auto &[fst, snd]: s3Response.metadata) {
                 headers["x-amz-meta-" + fst] = snd;
             }
+            log_info << "Get metadata, count: " << s3Response.metadata.size();
             return SendHeadResponse(request, s3Response.size, headers);
 
         } catch (std::exception &exc) {
@@ -780,7 +781,7 @@ namespace AwsMock::Service {
                 metadata[name] = meta.value();
             }
         }
-        log_info << "Get user metadata, size: " << metadata.size();
+        log_debug << "Get user metadata, size: " << metadata.size();
         return metadata;
     }
 
