@@ -61,8 +61,12 @@ namespace AwsMock::Database {
                 document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", bsoncxx::types::b_date(middle)));
-                if (!labelName.empty()) { document.append(kvp("labelName", labelName)); }
-                if (!labelValue.empty()) { document.append(kvp("labelValue", labelValue)); }
+                if (!labelName.empty()) {
+                    document.append(kvp("labelName", labelName));
+                }
+                if (!labelValue.empty()) {
+                    document.append(kvp("labelValue", labelValue));
+                }
 
                 session.start_transaction();
                 if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
@@ -114,8 +118,12 @@ namespace AwsMock::Database {
                 document document;
                 document.append(kvp("name", name));
                 document.append(kvp("created", bsoncxx::types::b_date(middle)));
-                if (!labelName.empty()) { document.append(kvp("labelName", labelName)); }
-                if (!labelValue.empty()) { document.append(kvp("labelValue", labelValue)); }
+                if (!labelName.empty()) {
+                    document.append(kvp("labelName", labelName));
+                }
+                if (!labelValue.empty()) {
+                    document.append(kvp("labelValue", labelValue));
+                }
 
                 session.start_transaction();
                 if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
@@ -130,8 +138,12 @@ namespace AwsMock::Database {
                     newDocument.append(kvp("count", 1));
                     newDocument.append(kvp("name", name));
                     newDocument.append(kvp("created", bsoncxx::types::b_date(middle)));
-                    if (!labelName.empty()) { newDocument.append(kvp("labelName", labelName)); }
-                    if (!labelValue.empty()) { newDocument.append(kvp("labelValue", labelValue)); }
+                    if (!labelName.empty()) {
+                        newDocument.append(kvp("labelName", labelName));
+                    }
+                    if (!labelValue.empty()) {
+                        newDocument.append(kvp("labelValue", labelValue));
+                    }
                     _monitoringCollection.insert_one(newDocument.extract());
                 }
                 session.commit_transaction();
@@ -153,8 +165,6 @@ namespace AwsMock::Database {
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
 
             try {
-                std::vector<Entity::Monitoring::Counter> result;
-
 #ifdef __APPLE__
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
                 const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
@@ -163,12 +173,12 @@ namespace AwsMock::Database {
                 auto endUtc = system_clock::time_point(endTime.time_since_epoch());
 #else
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
-                auto startUtc = Core::DateTimeUtils::ConvertToUtc(start);
-                auto endUtc = Core::DateTimeUtils::ConvertToUtc(end);
+                auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
+                auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));
 #endif
                 document document;
                 document.append(kvp("name", name));
-                document.append(kvp("created", make_document(kvp("$gte", bsoncxx::types::b_date(startUtc)))), kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(endUtc)))));
+                document.append(kvp("created", make_document(kvp("$gte", startUtc))), kvp("created", make_document(kvp("$lte", endUtc))));
                 if (!labelName.empty()) {
                     document.append(kvp("labelName", labelName));
                 }
@@ -177,6 +187,7 @@ namespace AwsMock::Database {
                 }
 
                 // Find and accumulate
+                std::vector<Entity::Monitoring::Counter> result;
                 if (_rollingMean) {
                     mongocxx::options::find opts;
                     opts.sort(make_document(kvp("created", 1)));
@@ -227,20 +238,6 @@ namespace AwsMock::Database {
         }
         log_trace << "Performance counter not available if you running the memory DB";
         return 0;
-    }
-
-    void MonitoringDatabase::ConvertTimestamps(system_clock::time_point &start, system_clock::time_point &end) {
-#ifdef __APPLE__
-        // As mongoDB uses UTC timestamps, we need to convert everything to UTC
-        const std::chrono::time_point start = std::chrono::time_point_cast<std::chrono::microseconds>(start);
-        auto start = system_clock::time_point(start.time_since_epoch());
-        const std::chrono::time_point end = std::chrono::time_point_cast<std::chrono::microseconds>(end);
-        auto end = system_clock::time_point(end.time_since_epoch());
-#else
-        // As mongoDB uses UTC timestamps, we need to convert everything to UTC
-        start = Core::DateTimeUtils::ConvertToUtc(start);
-        end = Core::DateTimeUtils::ConvertToUtc(end);
-#endif
     }
 
 }// namespace AwsMock::Database
