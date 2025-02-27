@@ -271,7 +271,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, long value);
+        void SetValueLong(const std::string &key, long value);
 
         /**
          * @brief Sets an double configuration value
@@ -280,6 +280,13 @@ namespace AwsMock::Core {
          * @param value configuration value
          */
         void SetValue(const std::string &key, double value);
+
+        /**
+         * @brief Checks whether the provided key exists
+         *
+         * @return true if key/value pair exists
+         */
+        bool HasValue(const std::string &key) const;
 
         /**
          * @brief Returns the application name

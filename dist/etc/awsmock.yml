@@ -9,8 +9,8 @@ awsmock:
     secret-access-key: none                                           # AWS access secret
     account-id: 000000000000                                          # AWS account ID
     client-id: 00000000                                               # AWS client ID
-  temp-dir: ${HOME}/awsmock/data/tmp                                    # General temp directory
-  data-dir: ${HOME}/awsmock/data                                        # General data directory
+  temp-dir: /usr/local/awsmock/data/tmp                               # General temp directory
+  data-dir: /usr/local/awsmock/data                                   # General data directory
   dockerized: false                                                   # Dockerized flag
   json: # JSON settings                                               # JSON settings
     pretty: true                                                      # JSON pretty print
@@ -23,11 +23,11 @@ awsmock:
     port: 4567                                                        # Port number
     workers: 20                                                       # Number of worker threads
     timeout: 900                                                      # HTTP timeout
-    doc-root: ${HOME}/awsmock/frontend                                  # Document root directory
+    doc-root: /usr/local/awsmock/frontend                             # Document root directory
   autoload: # BSON auto load on startup
     active: true                                                      # Autoload activation flag
-    dir: ${HOME}/awsmock/init                                           # Autoload directory, has priority over autoload file
-    file: ${HOME}/awsmock/init/init.json                                # Autoload file
+    dir: /usr/local/awsmock/init                                      # Autoload directory, has priority over autoload file
+    file: /usr/local/awsmock/init/init.json                           # Autoload file
   docker: # Docker settings
     active: true                                                      # Docker daemon activation flag
     network-mode: local                                               # Docker network mode, default: local
@@ -40,53 +40,53 @@ awsmock:
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
     socket: /var/run/docker.sock                                      # Docker REST API domain socket
-  podman:
-    active: false
-    network-mode: podman
-    network-name: podman
-    defaults:
-      memory-size: 512
-      temp-size: 10240
-    container:
-      port: 8080
-    socket: /var/run/podman/podman.sock
-  mongodb:
-    active: true
-    name: awsmock
-    user: root
-    password: password
-    port: 27017
-    host: localhost
-    pool-size: 256
-  gateway:
-    active: true
-    http:
-      host: localhost
-      address: 0.0.0.0
-      port: 4566
-      max-queue: 10
-      max-threads: 200
-      max-body: 104857600
-      timeout: 900
-  modules:
-    s3:
-      active: true
-      data-dir: ${HOME}/awsmock/data/s3
-      monitoring:
-        period: 300
-      sync:
-        object:
-          period: 300
+  podman: # Podman settings
+    active: false                                                     # Podman daemon activation flag
+    network-mode: podman                                              # Podman network mode, default: local
+    network-name: podman                                              # Podman network mode, default: local
+    defaults: # Podman defaults
+      memory-size: 512                                                # Podman container memory size
+      temp-size: 10240                                                # Docker container tmp size
+    container: # Podman container defaults
+      port: 8080                                                      # Docker container default port
+    socket: /var/run/podman/podman.sock                               # Docker REST API domain socket
+  mongodb: # Mongo DB settings
+    active: true                                                      # MongoDB activation flag
+    name: awsmock                                                     # MongoDB database name
+    user: root                                                        # MongoDB database user
+    password: password                                                # MongoDB database password
+    port: 27017                                                       # MongoDB database port, default: 27017
+    host: localhost                                                   # MongoDB database host name
+    pool-size: 256                                                    # MongoDB connection pool size
+  gateway: # AwsMock API gateway settings
+    active: true                                                      # Gateway activation flag
+    http: # Gateway HTTP settings
+      host: localhost                                                 # Gateway host name
+      address: 0.0.0.0                                                # Gateway listen address, default: 0.0.0.0 (all interfaces)
+      port: 4566                                                      # Gateway port
+      max-queue: 10                                                   # Gateway request queue length
+      max-threads: 200                                                # Gateway maximum number of threads
+      max-body: 104857600                                             # Gateway maximum request body size in bytes, default: 100MB
+      timeout: 900                                                    # Gateway maximum request time in seconds, default: 900s
+  modules: # AwsMock modules
+    s3: # S3 module
+      active: true                                                    # S3 module activation flag
+      data-dir: /usr/local/awsmock/data/s3                            # S3 module data dir
+      monitoring: # S3 module monitoring
+        period: 300                                                   # S3 module monitoring period in seconds, default: 300s
+      sync: # S3 file system synchronization
+        object: # S3 object to DB synchronization
+          period: 300                                                 # S3 file to DB synchronization period in seconds, default:300s
         bucket:
-          period: 300
-    sqs:
-      active: true
-      monitoring:
-        period: 300
-      reset:
-        period: 60
-      counter:
-        period: 30
+          period: 300                                                 # S3 DB to file synchronization period in seconds, default:300s
+    sqs: # SQS module
+      active: true                                                    # SQS module activation flag
+      monitoring: # SQS module monitoring
+        period: 300                                                   # SQS module monitoring period in seconds, default: 300s
+      reset: # SQS queue reset
+        period: 60                                                    # SQS queue reset period in seconds, default: 60s
+      counter: # SQS message counters
+        period: 30                                                    # SQS message counting period in seconds, default: 30s
     sns:
       active: true
       timeout: 14
@@ -100,7 +100,7 @@ awsmock:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
-      data-dir: ${HOME}/awsmock/data/lambda
+      data-dir: /usr/local/awsmock/data/lambda
       monitoring:
         period: 300
       remove:
@@ -144,7 +144,7 @@ awsmock:
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: ${HOME}/awsmock/data/transfer                             # FTP data directory
+      data-dir: /usr/local/awsmock/data/transfer                             # FTP data directory
       directories:
         - incoming/mix
         - feedback
@@ -167,4 +167,7 @@ awsmock:
     smooth: false                                                       # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
-    filename:                                                           # Log file name, if empty use stdout
+    file-name: /usr/local/awsmock/log/awsmock.log                       # Log file name, used additionally to stdout, mainly used on MacOS
+    file-size: 10485760                                                 # Log file size for the rolling file appender, default 10MB
+    file-count: 5                                                       # Log file count, default 5
+

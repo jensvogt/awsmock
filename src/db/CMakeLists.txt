@@ -47,4 +47,4 @@ set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
 target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
         archive z prometheus-cpp-core prometheus-cpp-pull magic)
 
-install(TARGETS ${LIBRARY} DESTINATION lib)
+install(TARGETS ${LIBRARY} DESTINATION /usr/local/awsmock/lib)

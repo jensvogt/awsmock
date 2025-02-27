@@ -6,9 +6,9 @@
 
 namespace AwsMock::Monitoring {
 
-    MetricSystemCollector::MetricSystemCollector(){
+    MetricSystemCollector::MetricSystemCollector() {
         _startTime = system_clock::now();
-    } 
+    }
 
     void MetricSystemCollector::CollectSystemCounter() {
         log_trace << "System collector starting";
@@ -114,7 +114,7 @@ namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::GetCpuInfoMac() {
 
-        rusage r_usage;
+        rusage r_usage{};
 
         if (getrusage(RUSAGE_SELF, &r_usage)) {
             log_error << "GetCpuInfoMac failed";
@@ -126,35 +126,35 @@ namespace AwsMock::Monitoring {
             // User CPU
             long millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec;
             double percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE, "type", "user", percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
             millies = r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE, "type", "system", percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
             millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE, "type", "total", percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }
     }
 
     void MetricSystemCollector::GetMemoryInfoMac() {
 
-        struct task_basic_info t_info;
+        task_basic_info t_info{};
         mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
-        if (KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t) &t_info, &t_info_count)) {
+        if (KERN_SUCCESS != task_info(mach_task_self(), TASK_BASIC_INFO, reinterpret_cast<task_info_t>(&t_info), &t_info_count)) {
             log_error << "Could not get memory utilization";
             return;
         }
 
-        MetricService::instance().SetGauge(MEMORY_USAGE, "type", "virtual", t_info.virtual_size);
-        MetricService::instance().SetGauge(MEMORY_USAGE, "type", "real", t_info.resident_size);
+        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
+        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", static_cast<double>(t_info.resident_size));
         log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
     }
 

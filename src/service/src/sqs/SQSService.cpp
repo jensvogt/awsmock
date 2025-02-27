@@ -461,7 +461,7 @@ namespace AwsMock::Service {
         try {
             // Get queue
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, queueUrl);
-            log_info << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
+            log_debug << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
             return {.queueUrl = queue.queueUrl};
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -669,7 +669,7 @@ namespace AwsMock::Service {
             }
 
             queue = _sqsDatabase.UpdateQueue(queue);
-            log_info << "SQS queue tags updated, count: " << request.tags.size() << " queue: " << queue.name;
+            log_debug << "SQS queue tags updated, count: " << request.tags.size() << " queue: " << queue.name;
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -708,7 +708,7 @@ namespace AwsMock::Service {
                 }
             }
             queue = _sqsDatabase.UpdateQueue(queue);
-            log_info << "SQS queue tags deleted, count: " << count << " queue: " << queue.name;
+            log_debug << "SQS queue tags deleted, count: " << count << " queue: " << queue.name;
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -828,7 +828,7 @@ namespace AwsMock::Service {
 
             // Find Lambdas with this as event source
             CheckLambdaNotifications(queue.queueArn, message);
-            log_info << "Send message, queueArn: " << queue.queueArn << " messageId: " << request.messageId;
+            log_debug << "Send message, queueArn: " << queue.queueArn << " messageId: " << request.messageId;
 
             return Dto::SQS::Mapper::map(request, message);
         } catch (Core::DatabaseException &ex) {
@@ -947,7 +947,7 @@ namespace AwsMock::Service {
                 queue = _sqsDatabase.UpdateQueue(queue);
                 response.messageList = messageList;
             }
-            log_info << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
+            log_debug << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
 
             return response;
         } catch (Core::DatabaseException &ex) {
@@ -1133,13 +1133,15 @@ namespace AwsMock::Service {
             Dto::SQS::DeleteMessageBatchResponse deleteMessageBatchResponse;
             for (const auto &[id, receiptHandle]: request.deleteMessageBatchEntries) {
                 if (!_sqsDatabase.MessageExists(receiptHandle)) {
+
                     log_warning << "Message does not exist, receiptHandle: " << receiptHandle.substr(0, 40);
                     Dto::SQS::BatchResultErrorEntry failure = {.id = id};
                     deleteMessageBatchResponse.failed.emplace_back(failure);
+
                 } else {
+
                     // Delete from database
-                    Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(receiptHandle);
-                    deleted += _sqsDatabase.DeleteMessage(message);
+                    deleted += _sqsDatabase.DeleteMessage(receiptHandle);
 
                     // Successful
                     Dto::SQS::DeleteMessageBatchResultEntry success = {.id = id};
@@ -1164,7 +1166,7 @@ namespace AwsMock::Service {
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
         if (std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
-            log_info << "Found lambda notification events, count: " << lambdas.size();
+            log_debug << "Found lambda notification events, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
                 SendLambdaInvocationRequest(lambda, message, queueArn);
             }

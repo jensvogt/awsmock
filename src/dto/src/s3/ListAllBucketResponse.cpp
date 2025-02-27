@@ -36,7 +36,7 @@ namespace AwsMock::Dto::S3 {
             }
             rootDocument.append(kvp("buckets", jsonBucketArray));
         }
-        Core::Bson::BsonUtils::SetLongValue(rootDocument, "total",total);
+        Core::Bson::BsonUtils::SetLongValue(rootDocument, "total", total);
         return Core::Bson::BsonUtils::ToJsonString(rootDocument);
     }
 
