@@ -1,11 +1,13 @@
 #include <awsmock/ftpserver/Filesystem.h>
 
-#include "awsmock/core/LogStream.h"
 #include <array>
+#include <awsmock/core/LogStream.h>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#ifndef WIN32
 #include <dirent.h>
+#endif
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -21,11 +23,15 @@
 namespace AwsMock::FtpServer {
 
     FileStatus::FileStatus(const std::string &path) : path_(path), file_status_{} {
+#ifdef WIN32
+        is_ok_ = true;
+#else
         const int error_code = stat(path.c_str(), &file_status_);
         if (error_code) {
             //log_error << "Cannot stat, file: " << path_ << " error: " << error_code;
         }
         is_ok_ = (error_code == 0);
+#endif
     }
 
     bool FileStatus::isOk() const {
@@ -36,6 +42,10 @@ namespace AwsMock::FtpServer {
         if (!is_ok_)
             return FileType::Unknown;
 
+#ifdef WIN32
+        // TODO: Fix win32 porting issues
+        return FileType::Unknown;
+#else
         switch (file_status_.st_mode & S_IFMT) {
             case S_IFREG:
                 return FileType::RegularFile;
@@ -54,6 +64,7 @@ namespace AwsMock::FtpServer {
             default:
                 return FileType::Unknown;
         }
+#endif
     }
 
     int64_t FileStatus::fileSize() const {
@@ -62,7 +73,18 @@ namespace AwsMock::FtpServer {
 
         return file_status_.st_size;
     }
-
+#ifdef WIN32
+    // TODO: Fix windows porting issues
+    bool FileStatus::permissionRootRead() const { return true; }
+    bool FileStatus::permissionRootWrite() const { return true; }
+    bool FileStatus::permissionRootExecute() const { return true; }
+    bool FileStatus::permissionGroupRead() const { return true; }
+    bool FileStatus::permissionGroupWrite() const { return true; }
+    bool FileStatus::permissionGroupExecute() const { return true; }
+    bool FileStatus::permissionOwnerRead() const { return true; }
+    bool FileStatus::permissionOwnerWrite() const { return true; }
+    bool FileStatus::permissionOwnerExecute() const { return true; }
+#else
     bool FileStatus::permissionRootRead() const { return 0 != (file_status_.st_mode & S_IRUSR); }
     bool FileStatus::permissionRootWrite() const { return 0 != (file_status_.st_mode & S_IWUSR); }
     bool FileStatus::permissionRootExecute() const { return 0 != (file_status_.st_mode & S_IXUSR); }
@@ -72,12 +94,16 @@ namespace AwsMock::FtpServer {
     bool FileStatus::permissionOwnerRead() const { return 0 != (file_status_.st_mode & S_IROTH); }
     bool FileStatus::permissionOwnerWrite() const { return 0 != (file_status_.st_mode & S_IWOTH); }
     bool FileStatus::permissionOwnerExecute() const { return 0 != (file_status_.st_mode & S_IXOTH); }
+#endif
 
     std::string FileStatus::permissionString() const {
         std::string permission_string(9, '-');
 
         if (!is_ok_)
             return permission_string;
+#ifdef WIN32
+        // TODO: Fix windows porting issues
+#else
         // Root
         permission_string[0] = ((file_status_.st_mode & S_IRUSR) != 0) ? 'r' : '-';
         permission_string[1] = ((file_status_.st_mode & S_IWUSR) != 0) ? 'w' : '-';
@@ -90,6 +116,7 @@ namespace AwsMock::FtpServer {
         permission_string[6] = ((file_status_.st_mode & S_IROTH) != 0) ? 'r' : '-';
         permission_string[7] = ((file_status_.st_mode & S_IWOTH) != 0) ? 'w' : '-';
         permission_string[8] = ((file_status_.st_mode & S_IXOTH) != 0) ? 'x' : '-';
+#endif
         return permission_string;
     }
 
@@ -190,19 +217,24 @@ namespace AwsMock::FtpServer {
             return false;
 
         bool can_open_dir(false);
-
+#ifdef WIN32
+        // TODO: Fix windows porting issues
+        return true;
+#else
         DIR *dp = opendir(path_.c_str());
         if (dp != nullptr) {
             can_open_dir = true;
             closedir(dp);
         }
         return can_open_dir;
+#endif
     }
 
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
         log_debug << "Get directory content, path: " << path;
-
+#ifdef WIN32
+#else
         DIR *dp = opendir(path.c_str());
         dirent *dirp = nullptr;
         if (dp == nullptr) {
@@ -216,6 +248,7 @@ namespace AwsMock::FtpServer {
         }
         closedir(dp);
         log_debug << "Found directory content, path: " << path << " count: " << content.size();
+#endif
         return content;
     }
 

@@ -14,12 +14,16 @@ set(TRANSFER_SOURCES TransferServerCliTest.cpp)
 set(MAIN_SOURCES main.cpp ModuleServiceTests.cpp TestBase.cpp)
 
 # Includes
-include_directories(../include ../../core/include ../../db/include ../../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(../../core ../../db ../../dto /usr/local/lib)
+if (WIN32)
+    include_directories(../include ../../core/include ../../db/include ../../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} D:/work/lib/include)
+    link_directories(../../core ../../db ../../dto D:/work/lib/lib)
+else ()
+    include_directories(../include ../../core/include ../../db/include ../../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
+    link_directories(../../core ../../db ../../dto /usr/local/lib)
+endif ()
 
 add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES}
         ${SSM_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
-#add_custom_command(TARGET ${BINARY} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/data/lambda/java-basic-1.0-SNAPSHOT.jar" "/tmp")

@@ -43,14 +43,10 @@ class TestEnvironment final : public ::testing::Environment {
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize));
 
-        auto instance = std::make_unique<mongocxx::instance>();
         AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::instance();
 
         // Options
-        mongocxx::options::client client_options;
-        const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
-        client_options.server_api_opts(api);
-        pool.configure(std::move(instance), std::make_unique<mongocxx::pool>(std::move(_uri), std::move(client_options)));
+        pool.Configure();
     }
 };
 

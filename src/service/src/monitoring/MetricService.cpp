@@ -9,15 +9,15 @@ namespace AwsMock::Monitoring {
     boost::mutex MetricService::_gaugeMutex;
     boost::mutex MetricService::_counterMutex;
 
-    MetricService::MetricService() : _port(Core::Configuration::instance().GetValueInt("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValueBool("awsmock.monitoring.prometheus")), _database(Database::MonitoringDatabase::instance()) {}
+    MetricService::MetricService() : _port(Core::Configuration::instance().GetValueInt("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValueBool("awsmock.monitoring.prometheus")), _intern(Core::Configuration::instance().GetValueBool("awsmock.monitoring.intern")), _database(Database::MonitoringDatabase::instance()) {}
 
     void MetricService::Initialize() {
+        log_debug << "Monitoring initialized, prometheus: " << std::boolalpha << _prometheus << " intern: " << _intern;
         if (_prometheus) {
             std::string bindAddress = "localhost:" + std::to_string(_port);
             _server = std::make_shared<prometheus::Exposer>(bindAddress);
             _registry = std::make_shared<prometheus::Registry>();
             _server->RegisterCollectable(_registry);
-            log_debug << "Monitoring initialized";
         }
     }
 
@@ -31,9 +31,9 @@ namespace AwsMock::Monitoring {
     void MetricService::DoAddCounter(const std::string &name) {
         try {
             auto &counter = prometheus::BuildCounter()
-                            .Name(name)
-                            .Help(name)
-                            .Register(*_registry);
+                                    .Name(name)
+                                    .Help(name)
+                                    .Register(*_registry);
             _counterMap[name] = &counter;
             log_trace << "Counter added, name: " << name;
         } catch (std::exception &e) { log_error << e.what(); }
@@ -121,9 +121,9 @@ namespace AwsMock::Monitoring {
     void MetricService::DoAddGauge(const std::string &name) {
         try {
             auto &gauge = prometheus::BuildGauge()
-                          .Name(name)
-                          .Help(name)
-                          .Register(*_registry);
+                                  .Name(name)
+                                  .Help(name)
+                                  .Register(*_registry);
             _gaugeMap[name] = &gauge;
             log_trace << "Gauge added, name: " << name;
         } catch (std::exception &e) { log_error << e.what(); }

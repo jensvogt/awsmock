@@ -6,8 +6,13 @@ set(TRANSFER_SOURCES transfer/CreateServerRequestTest.cpp transfer/CreateServerR
 set(MAIN_SOURCES main.cpp)
 
 # Includes
-include_directories(../include ../../core/include ../../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(../../core ../../db ../../dto /usr/local/lib)
+if (WIN32)
+    include_directories(../include ../../core/include ../../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} D:/work/lib/include)
+    link_directories(../../core ../../db ../../dto D:/work/lib/lib)
+else ()
+    include_directories(../include ../../core/include ../../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
+    link_directories(../../core ../../db ../../dto /usr/local/lib)
+endif ()
 
 add_executable(${BINARY} ${SQS_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb)

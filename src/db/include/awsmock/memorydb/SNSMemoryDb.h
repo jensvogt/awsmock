@@ -8,12 +8,14 @@
 // C++ includes
 #include <string>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
-#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 

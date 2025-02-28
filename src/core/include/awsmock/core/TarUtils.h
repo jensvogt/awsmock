@@ -5,6 +5,12 @@
 #ifndef AWSMOCK_CORE_TAR_UTILS_H
 #define AWSMOCK_CORE_TAR_UTILS_H
 
+#ifdef WIN32
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
+#endif
+
 // C++ standard includes
 #include <string>
 

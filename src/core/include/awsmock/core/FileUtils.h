@@ -6,21 +6,25 @@
 #define AWS_MOCK_CORE_FILE_UTILS_H
 
 // Standard C includes
+#ifndef WIN32
 #include <magic.h>
+#endif
 
 // Standard C++ includes
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <pwd.h>
 #include <string>
+#if !WIN32
+#include <pwd.h>
+#endif
 
 #ifdef __APPLE__
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#else
+#elif __linux__
 #include <sys/sendfile.h>
 #endif
 
