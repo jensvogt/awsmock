@@ -21,4 +21,6 @@ else ()
     endif ()
 endif ()
 add_library(${BINARY}_lib STATIC ${SOURCES})
-install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+install(TARGETS ${BINARY} DESTINATION ${BIN_INSTALL_DIR})
+

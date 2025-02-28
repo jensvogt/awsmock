@@ -5,6 +5,8 @@
 #ifndef AWSMOCK_MANAGER_H
 #define AWSMOCK_MANAGER_H
 
+// Boost includes
+#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/service/cognito/CognitoServer.h>

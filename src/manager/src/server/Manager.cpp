@@ -16,7 +16,7 @@ namespace AwsMock::Manager {
         InitializeDatabase();
         std::string boostVersion = BOOST_LIB_VERSION;
         Core::StringUtils::Replace(boostVersion, "_", ".");
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << _getpid()
+        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << Core::SystemUtils::GetPid()
                  << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level") << " boost version: " << boostVersion;
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
@@ -44,14 +44,14 @@ namespace AwsMock::Manager {
                 for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
                     if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
                         Service::ModuleService _moduleService;
-                        AwsMock::Service::ModuleService::ImportInfrastructure(jsonString);
+                        Service::ModuleService::ImportInfrastructure(jsonString);
                         log_info << "Loaded infrastructure from " << file;
                     }
                 }
             } else if (const std::string autoLoadFile = Core::Configuration::instance().GetValueString("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
                     Service::ModuleService _moduleService;
-                    AwsMock::Service::ModuleService::ImportInfrastructure(jsonString);
+                    Service::ModuleService::ImportInfrastructure(jsonString);
                     log_info << "Loaded infrastructure from " << autoLoadFile;
                 }
             }

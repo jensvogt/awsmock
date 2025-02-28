@@ -87,7 +87,11 @@ namespace AwsMock::Core {
     }
 
     int SystemUtils::GetPid() {
+#ifdef WIN32
+        return _getpid();
+#else
         return getpid();
+#endif
     }
 
     int SystemUtils::GetNumberOfCores() {
