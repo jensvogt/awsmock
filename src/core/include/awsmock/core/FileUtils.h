@@ -6,7 +6,9 @@
 #define AWS_MOCK_CORE_FILE_UTILS_H
 
 // Standard C includes
+#ifndef WIN32
 #include <magic.h>
+#endif
 
 // Standard C++ includes
 #include <filesystem>
