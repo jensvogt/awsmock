@@ -20,7 +20,7 @@ namespace AwsMock::Service {
 
         Dto::DynamoDb::CreateTableResponse createTableResponse = {.region = request.region, .tableName = request.tableName};
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
-            log_info << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
+            log_debug << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
             return createTableResponse;
         }
 
@@ -42,7 +42,7 @@ namespace AwsMock::Service {
                     .tags = request.tags,
                     .provisionedThroughput = provisionedThroughput};
             table = _dynamoDbDatabase.CreateTable(table);
-            log_info << "DynamoDb table created, name: " << table.name;
+            log_debug << "DynamoDb table created, name: " << table.name;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();
@@ -187,7 +187,7 @@ namespace AwsMock::Service {
 
             // Delete table in database
             _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
-            log_info << "DynamoDb table deleted, name: " << request.tableName;
+            log_debug << "DynamoDb table deleted, name: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete table failed, error: " << exc.message();
@@ -216,7 +216,7 @@ namespace AwsMock::Service {
 
             // Delete table in database
             const long count = _dynamoDbDatabase.DeleteAllTables();
-            log_info << "DynamoDb tables deleted, count: " << count;
+            log_debug << "DynamoDb tables deleted, count: " << count;
             return count;
 
         } catch (Core::JsonException &exc) {
@@ -243,7 +243,7 @@ namespace AwsMock::Service {
             if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers); status == http::status::ok) {
 
                 getItemResponse = {.body = body, .headers = outHeaders, .status = status};
-                log_info << "DynamoDb get item, name: " << request.tableName;
+                log_debug << "DynamoDb get item, name: " << request.tableName;
             }
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
@@ -278,7 +278,7 @@ namespace AwsMock::Service {
                 // Convert to entity and save to database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
                 Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
-                log_info << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
+                log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
             }
 
         } catch (Core::JsonException &exc) {
@@ -306,7 +306,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, headers);
             queryResponse = {.body = body, .headers = outHeaders, .status = status};
-            log_info << "DynamoDb query item, name: " << request.tableName;
+            log_debug << "DynamoDb query item, name: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb query failed, error: " << exc.message();
@@ -380,7 +380,7 @@ namespace AwsMock::Service {
                 }
                 _dynamoDbDatabase.DeleteItem(request.region, request.tableName, keys);
             }
-            log_info << "DynamoDb item deleted, table: " << request.tableName;
+            log_debug << "DynamoDb item deleted, table: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete item failed, message: " << exc.message();

@@ -60,4 +60,4 @@ else ()
 endif ()
 
 
-install(TARGETS ${LIBRARY} DESTINATION lib)
+install(TARGETS ${LIBRARY} DESTINATION /usr/local/awsmock/lib)

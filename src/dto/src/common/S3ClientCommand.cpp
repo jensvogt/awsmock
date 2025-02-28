@@ -109,8 +109,12 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::DELETE_OBJECT;
                     }
                     break;
+
+                case http::verb::head:
+                    break;
+
                 default:
-                    log_error << "Unknown command";
+                    log_error << "Unknown command, method: " << method << " multipartRequest: " << multipartRequest << " bucket: " << bucket << " key: " << key << uploads;
                     break;
             }
         }

@@ -35,18 +35,21 @@ RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-t
     yaml-cpp libarchive libmagic
 
 # Make directories
-RUN mkdir -p /home/awsmock/data/s3 && \
-    mkdir -p /home/awsmock/data/sqs && \
-    mkdir -p /home/awsmock/data/sns && \
-    mkdir -p /home/awsmock/data/lambda && \
-    mkdir -p /home/awsmock/data/transfer && \
-    mkdir -p /home/awsmock/data/dynamodb && \
-    mkdir -p /home/awsmock/data/tmp && \
-    mkdir -p /home/awsmock/init && \
-    mkdir -p /home/awsmock/frontend
+RUN mkdir -p /usr/local/awsmock/data/s3 && \
+    mkdir -p /usr/local/awsmock/data/sqs && \
+    mkdir -p /usr/local/awsmock/data/sns && \
+    mkdir -p /usr/local/awsmock/data/lambda && \
+    mkdir -p /usr/local/awsmock/data/transfer && \
+    mkdir -p /usr/local/awsmock/data/dynamodb && \
+    mkdir -p /usr/local/awsmock/data/tmp && \
+    mkdir -p /usr/local/awsmock/bin && \
+    mkdir -p /usr/local/awsmock/lib && \
+    mkdir -p /usr/local/awsmock/etc && \
+    mkdir -p /usr/local/awsmock/init && \
+    mkdir -p /usr/local/awsmock/frontend
 
 # Install frontend
-COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /home/awsmock/frontend/
+COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install Mongo C/C++ driver
 COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
@@ -73,31 +76,24 @@ RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-pu
 RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push.so
 
 # Install aws-mock
-COPY --from=build /usr/bin/aws /usr/bin/
-COPY --from=build /usr/local/bin/awsmockmgr /usr/bin/
-COPY --from=build /usr/local/bin/awsmockctl /usr/bin/
-COPY --from=build /usr/local/lib/libawsmock* /usr/lib/
-COPY --from=build /etc/awsmock.yml /etc/
-COPY --from=build /usr/local/bin/awslocal /usr/bin/
+COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
+COPY --from=build /usr/local/awsmock/lib/libawsmock* /usr/local/awsmock/lib
+COPY --from=build /usr/local/awsmock/etc/awsmock.yml /usr/local/awsmock/etc
 
-# Configure awslocal
-RUN aws configure set aws_access_key_id none && \
-    aws configure set aws_secret_access_key none && \
-    aws configure set default.region eu-central-1 && \
-    aws configure set profile.awsmock.region eu-central-1 && \
-    aws configure set profile.awsmock.aws_access_key_id none && \
-    aws configure set profile.awsmock.aws_secret_access_key none
+# Set library search path
+ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
 
-# Expose ports
-# Manager/Controller
+# Expose manager/controller ports
 EXPOSE 4566-4567 4566-4567
-# Prometheus
+# Prometheus ports
 EXPOSE 9091 9091
-# FTP server
+# FTP server ports
 EXPOSE 21 21
-# FTP passive mode
-EXPOSE 6000-6010 6000-6010
+# FTP passive mode ports
+EXPOSE 6000-6100 6000-6100
 
 VOLUME /var/run/docker.sock /var/run/docker.sock
 
-CMD ["/usr/bin/awsmockmgr"]
+CMD ["/usr/local/awsmock/bin/awsmockmgr"]

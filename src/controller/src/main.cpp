@@ -30,11 +30,11 @@
 // AwsMock includes
 #include <awsmock/controller/Controller.h>
 
-#define DEFAULT_CONFIG_FILE "/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 
 // Allowed actions
 static std::list<std::string> allowedActions() {
-    return {"list", "logLevel", "logs", "start", "stop", "restart", "export", "import", "clean", "clean-objects", "show-ftp-users", "config", "ping"};
+    return {"list", "logLevel", "logs", "start", "stop", "restart", "export", "import", "clean", "clean-objects", "show-ftp-users", "config", "ping", "loglevel"};
 }
 
 /**

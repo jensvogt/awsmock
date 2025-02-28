@@ -22,6 +22,9 @@
 // AwsMock includes
 #include <awsmock/core/LogFormatter.h>
 
+#define DEFAULT_LOG_SIZE (10 * 1024 * 1024)
+#define DEFAULT_LOG_COUNT 5
+
 namespace AwsMock::Core {
 
     /**
@@ -58,6 +61,18 @@ namespace AwsMock::Core {
          * @param filename name of the log file
          */
         static void SetFilename(const std::string &filename);
+
+      private:
+
+        /**
+         * Log size
+         */
+        static long logSize;
+
+        /**
+         * Log count
+         */
+        static int logCount;
     };
 
 }// namespace AwsMock::Core

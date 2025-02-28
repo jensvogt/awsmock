@@ -10,6 +10,9 @@ else ()
 endif ()
 
 add_executable(${BINARY} ${SOURCES})
+if (APPLE)
+    set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "/usr/local/lib")
+endif ()
 
 # Check systemd
 if (WIN32)
@@ -26,5 +29,4 @@ else ()
     endif ()
 endif ()
 add_library(${BINARY}_lib STATIC ${SOURCES})
-
-install(TARGETS ${BINARY} DESTINATION bin)
+install(TARGETS ${BINARY} DESTINATION /usr/local/awsmock/bin)
