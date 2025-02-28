@@ -152,10 +152,9 @@ namespace AwsMock::Core {
 
         // Logging
         DefineStringProperty("awsmock.logging.level", "AWSMOCK_LOG_LEVEL", "info");
-        DefineStringProperty("awsmock.logging.file", "AWSMOCK_LOG_FILE", "/var/run/awsmock.log");
-
-        // Debug
-        log_debug << "Default configuration defined, config: " << _yamlConfig;
+        DefineStringProperty("awsmock.logging.file-name", "AWSMOCK_LOG_FILE_NAME", "/usr/local/awsmock/logs/awsmock.log");
+        DefineLongProperty("awsmock.logging.file-size", "AWSMOCK_LOG_FILE_SIZE", 10485760);
+        DefineIntProperty("awsmock.logging.file-count", "AWSMOCK_LOG_FILE_COUNT", 5);
     }
 
     void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
@@ -266,6 +265,33 @@ namespace AwsMock::Core {
         log_trace << "Value set, key: " << key;
     }
 
+    void Configuration::SetValueLong(const std::string &key, const long value) {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        SetValueByPath(_yamlConfig, key, value);
+        log_trace << "Value set, key: " << key;
+    }
+
+    void Configuration::SetValueFloat(const std::string &key, const float value) {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        SetValueByPath(_yamlConfig, key, value);
+        log_trace << "Value set, key: " << key;
+    }
+
+    void Configuration::SetValueDouble(const std::string &key, const double value) {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        SetValueByPath(_yamlConfig, key, value);
+        log_trace << "Value set, key: " << key;
+    }
+
     std::string Configuration::GetValueString(const std::string &key) const {
         if (!HasProperty(key)) {
             log_error << "Property not found, key: " + key;
@@ -314,6 +340,15 @@ namespace AwsMock::Core {
         return lookup(_yamlConfig, paths.begin(), paths.end()).as<bool>();
     }
 
+    float Configuration::GetValueFloat(const std::string &key) const {
+        if (!HasProperty(key)) {
+            log_error << "Property not found, key: " + key;
+            throw CoreException("Property not found, key: " + key);
+        }
+        std::vector<std::string> paths = StringUtils::Split(key, '.');
+        return lookup(_yamlConfig, paths.begin(), paths.end()).as<float>();
+    }
+
     double Configuration::GetValueDouble(const std::string &key) const {
         if (!HasProperty(key)) {
             log_error << "Property not found, key: " + key;
@@ -341,9 +376,15 @@ namespace AwsMock::Core {
         ofs.close();
     }
 
+    bool Configuration::HasValue(const std::string &key) const {
+        return HasProperty(key);
+    }
+
     void Configuration::AddToEnvList(const std::string &key, const std::string &value) { _envList[key] = value; }
 
-    void Configuration::ApplyEnvSettings() { for (const auto &[fst, snd]: _envList) { SetValueString(fst, snd); } }
+    void Configuration::ApplyEnvSettings() {
+        for (const auto &[fst, snd]: _envList) { SetValueString(fst, snd); }
+    }
 
     bool Configuration::HasProperty(const std::string &key) const {
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -379,7 +420,9 @@ namespace AwsMock::Core {
                         value.replace(pos, match.length(), temp);
                         offset = pos + value.length();
                     }
-                } else { offset += match.length(); }
+                } else {
+                    offset += match.length();
+                }
             }
         }
         return value;

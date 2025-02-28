@@ -15,6 +15,9 @@ namespace AwsMock::Core {
         // execute command
 #if __APPLE__
         auto status = std::system(cmd.c_str());
+#elif WIN32
+        // TODO: Windows port
+        auto status = 1;
 #else
         auto status = WEXITSTATUS(std::system(cmd.c_str()));
 #endif
@@ -31,6 +34,10 @@ namespace AwsMock::Core {
     ExecResult SystemUtils::Exec2(const std::string &command) {
         std::array<char, 128> buffer{};
         std::string result;
+#ifdef WIN32
+        // TODO: Windows port
+        return ExecResult{0, result};
+#else
         const std::unique_ptr<FILE, void (*)(FILE *)> pipe(popen(command.c_str(), "r"),
                                                            [](FILE *f) -> void {
                                                                std::ignore = pclose(f);
@@ -42,22 +49,32 @@ namespace AwsMock::Core {
             result += buffer.data();
         }
         return ExecResult{0, result};
+#endif
     }
 
     std::string SystemUtils::GetCurrentWorkingDir() {
+#ifdef WIN32
+        // TODO: Windows port
+        return "";
+#else
         char result[PATH_MAX];
         const ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
         const std::string path = {std::string(result, (count > 0) ? count : 0)};
         return path.substr(0, path.find_last_of('/'));
+#endif
     }
 
     std::string SystemUtils::GetHomeDir() {
         std::string homeDir;
+#ifdef WIN32
+        // TODO: Windows port
+#else
         if (getenv("HOME") != nullptr) {
             homeDir = std::string(getenv("HOME"));
         } else {
             homeDir = std::string(getpwuid(getuid())->pw_dir);
         }
+#endif
         return homeDir;
     }
 

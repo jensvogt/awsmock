@@ -9,6 +9,9 @@
 #include <ranges>
 #include <string>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -16,7 +19,6 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
-#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 

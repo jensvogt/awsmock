@@ -568,7 +568,8 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
-        std::string dockerFilename = codeDir + boost::filesystem::path::preferred_separator + "Dockerfile";
+
+        std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
 
         std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
         log_debug << "Using supported runtime: " << supportedRuntime;

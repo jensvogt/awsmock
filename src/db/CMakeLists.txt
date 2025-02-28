@@ -36,15 +36,35 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
 add_subdirectory(tst)
 
 # Includes
-include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(${CMAKE_SOURCE_DIR}/src/core /usr/local/lib)
+if (WIN32)
+    include_directories(./include ../core/include D:/work/lib/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+    link_directories(${CMAKE_SOURCE_DIR}/src/core D:/work/lib/lib)
+else ()
+    include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
+    link_directories(${CMAKE_SOURCE_DIR}/src/core /usr/local/lib)
+endif ()
 
-add_library(${LIBRARY} SHARED ${SOURCES})
-set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY} PUBLIC awsmockcore)
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
-        archive z prometheus-cpp-core prometheus-cpp-pull magic)
+# Shared library
+if (WIN32)
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_link_libraries(${LIBRARY} PUBLIC ${IMPORTED} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} yaml-cpp gtest ${LIB_SSL} ${LIB_CRYPTO}
+            ${LIB_ARCHIVE} prometheus-cpp-core prometheus-cpp-pull)
+else ()
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
+    target_link_libraries(${LIBRARY} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} yaml-cpp gtest pthread ssl crypto
+            archive prometheus-cpp-core prometheus-cpp-pull magic)
+    install(TARGETS ${LIBRARY} DESTINATION /usr/local/awsmock/lib)
+endif ()
 
-install(TARGETS ${LIBRARY} DESTINATION lib)
+# Static library
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+            archive prometheus-cpp-core prometheus-cpp-pull magic)
+else ()
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+            archive prometheus-cpp-core prometheus-cpp-pull magic)
+endif ()

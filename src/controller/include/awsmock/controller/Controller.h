@@ -24,20 +24,14 @@
 #include <boost/program_options/variables_map.hpp>
 
 // AwsMock includes
-#include "awsmock/dto/module/model/GatewayConfig.h"
-#include "awsmock/dto/module/model/Module.h"
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
+#include <awsmock/dto/module/model/GatewayConfig.h>
+#include <awsmock/dto/module/model/Module.h>
 #include <awsmock/dto/transfer/model/Server.h>
 #include <awsmock/dto/transfer/model/User.h>
 #include <awsmock/repository/ModuleDatabase.h>
-
-#define AWSMOCKCTL_DEFAULT_HOST "localhost"
-#define AWSMOCKCTL_DEFAULT_PORT 4566
-#define AWSMOCKCTL_DEFAULT_USER "none"
-#define AWSMOCKCTL_DEFAULT_CLIENT "00000000"
-#define AWSMOCKCTL_DEFAULT_REGION "eu-central-1"
 
 namespace AwsMock::Controller {
 

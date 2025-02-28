@@ -98,7 +98,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetTempFile(const std::string &extension) {
         const boost::filesystem::path temp = boost::filesystem::temp_directory_path().append(boost::filesystem::unique_path());
-        return temp.native() + "." + extension;
+        return temp.string() + "." + extension;
     }
 
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
@@ -109,7 +109,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
         const std::filesystem::path path(fileName);
-        return path.parent_path();
+        return path.parent_path().string();
     }
 
     std::string FileUtils::GetFirstLine(const std::string &filePath) {
@@ -170,8 +170,10 @@ namespace AwsMock::Core {
             fstat(source, &stat_source);
 #if __APPLE__
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
-#else
+#elif __linux__
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
+#else
+            // TODO: Fix windows port
 #endif
 
             close(source);
@@ -240,11 +242,15 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
+#ifdef WIN32
+        // TODO: Fix windows port
+#else
         struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
         }
+#endif
         return {};
     }
 
@@ -258,6 +264,10 @@ namespace AwsMock::Core {
     }
 
     bool FileUtils::Touch(const std::string &fileName) {
+#ifdef WIN32
+        // TODO: Fix windows port
+        return true;
+#else
         const int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
         if (fd < 0) {
             log_error << "Could not open file: " << fileName;
@@ -269,6 +279,7 @@ namespace AwsMock::Core {
         }
         close(fd);
         return true;
+#endif
     }
 
     std::string FileUtils::GetContentType(const std::string &path) {
@@ -298,6 +309,10 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
 
+#ifdef WIN32
+        // TODO: Fix win32 port
+        return "application/octet-stream";
+#else
         if (!FileExists(path)) {
             return "application/octet-stream";
         }
@@ -325,12 +340,16 @@ namespace AwsMock::Core {
 
         // Free magic cookie and mime
         magic_close(magic);
-
         return result;
+#endif
     }
 
     std::string FileUtils::GetContentTypeMagicString(const std::string &content) {
 
+#ifdef WIN32
+        // TODO: Fix windows port
+        return "";
+#else
         // allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
@@ -361,6 +380,7 @@ namespace AwsMock::Core {
         magic_close(magic);
 
         return result;
+#endif
     }
 
     void FileUtils::StripChunkSignature(const std::string &path) {

@@ -29,7 +29,9 @@ namespace AwsMock::Service {
                         .host = host,
                         .address = address,
                         .port = port,
+#ifndef WIN32
                         .pid = getppid(),
+#endif
                         .user = configuration.GetValueString("awsmock.user"),
                         .accessId = configuration.GetValueString("awsmock.access.account-id"),
                         .clientId = configuration.GetValueString("awsmock.access.client-id"),

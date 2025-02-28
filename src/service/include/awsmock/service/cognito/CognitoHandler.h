@@ -42,19 +42,11 @@ namespace AwsMock::Service {
          * @param region AWS region name
          * @param user AWS user
          * @return HTTP response
-         * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
+         * @see AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
-
-        /**
-         * @brief Return the command from the header.
-         *
-         * @param request HTTP request
-         * @return Cognito action
-         */
-        static Dto::Common::CognitoCommandType GetActionFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
          * Cognito service

@@ -6,22 +6,21 @@
 #define AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
 
 // C includes
+#ifndef WIN32
 #include <sys/times.h>
+#endif
+#ifdef __linux__
+#include <sys/sysinfo.h>
+#elif __APPLE__
+#include <mach/mach.h>
+#include <sys/resource.h>
+#endif
 
 // C++ Standard includes
 #include <cassert>
 #include <fstream>
 #include <sstream>
 #include <string>
-
-#ifdef __linux__
-#include <sys/sysinfo.h>
-#endif
-
-#ifdef __APPLE__
-#include <mach/mach.h>
-#include <sys/resource.h>
-#endif
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>

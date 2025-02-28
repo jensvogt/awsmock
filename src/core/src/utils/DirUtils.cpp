@@ -71,13 +71,13 @@ namespace AwsMock::Core {
         if (recursive) {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::recursive_directory_iterator(dirName), {})) {
                 if (is_regular_file(entry)) {
-                    fileNames.emplace_back(entry.path().c_str());
+                    fileNames.emplace_back(entry.path().string().c_str());
                 }
             }
         } else {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
                 if (is_regular_file(entry)) {
-                    fileNames.emplace_back(entry.path().c_str());
+                    fileNames.emplace_back(entry.path().string().c_str());
                 }
             }
         }
@@ -118,14 +118,14 @@ namespace AwsMock::Core {
 
         if (recursive) {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::recursive_directory_iterator(dirName), {})) {
-                if (is_regular_file(entry) && std::regex_match(entry.path().c_str(), regex)) {
-                    fileNames.emplace_back(entry.path().c_str());
+                if (is_regular_file(entry) && std::regex_match(entry.path().string().c_str(), regex)) {
+                    fileNames.emplace_back(entry.path().string().c_str());
                 }
             }
         } else {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
-                if (is_regular_file(entry) && std::regex_match(entry.path().c_str(), regex)) {
-                    fileNames.emplace_back(entry.path().c_str());
+                if (is_regular_file(entry) && std::regex_match(entry.path().string().c_str(), regex)) {
+                    fileNames.emplace_back(entry.path().string().c_str());
                 }
             }
         }

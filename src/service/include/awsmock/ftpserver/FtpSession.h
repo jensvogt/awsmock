@@ -8,6 +8,9 @@
 #include <map>
 #include <sstream>
 #include <utility>
+#ifdef WIN32
+#include <direct.h>
+#endif
 
 // Asio includes
 #include <boost/asio.hpp>
@@ -23,9 +26,6 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/s3/S3Service.h>
 
-#define DEFAULT_TRANSFER_BASE_DIR "/home/awsmock/data/transfer"
-#define DEFAULT_TRANSFER_REGION "eu-central-1"
-
 namespace AwsMock::FtpServer {
 
     class FtpSession : public std::enable_shared_from_this<FtpSession> {
@@ -33,9 +33,7 @@ namespace AwsMock::FtpServer {
       private:
 
         struct IoFile {
-            IoFile(const std::string &filename, std::string user, const std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
-                                                                                                   _fileName(filename), _user(std::move(user)) {
-
+            IoFile(const std::string &filename, std::string user, const std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024), _fileName(filename), _user(std::move(user)) {
                 file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));
             }
 

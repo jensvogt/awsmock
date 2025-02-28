@@ -16,15 +16,35 @@ set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES})
 # Test directory
 add_subdirectory(tst)
 
-include_directories(./include /usr/local/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
-link_directories(/usr/local/lib)
+if (WIN32)
+    include_directories(./include D:/work/lib/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+    link_directories(D:/work/lib/lib)
+else ()
+    include_directories(./include /usr/local/include ${INC_BSON_CXX} ${INC_MONGO_CXX})
+    link_directories(/usr/local/lib)
+endif ()
 
-add_library(${LIBRARY} SHARED ${SOURCES})
-set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
-        archive z prometheus-cpp-core prometheus-cpp-pull magic)
+# Shared library
+if (WIN32)
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
+    target_link_libraries(${LIBRARY} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} yaml-cpp gtest ${LIB_SSL} ${LIB_CRYPTO}
+            ${LIB_ARCHIVE} prometheus-cpp-core prometheus-cpp-pull)
+else ()
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
+    target_link_libraries(${LIBRARY} PUBLIC ${LIB_BSON_CXX} ${LIB_MONGO_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} yaml-cpp gtest ${LIB_SSL} ${LIB_CRYPTO}
+            ${LIB_ARCHIVE} prometheus-cpp-core prometheus-cpp-pull magic)
+endif ()
+
+# Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
-        archive z prometheus-cpp-core prometheus-cpp-pull magic)
-install(TARGETS ${LIBRARY} DESTINATION lib)
+if (WIN32)
+    #    target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+    #        archive prometheus-cpp-core prometheus-cpp-pull magic)
+else ()
+    set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
+            archive prometheus-cpp-core prometheus-cpp-pull magic)
+    install(TARGETS ${LIBRARY} DESTINATION /usr/local/awsmock/lib)
+endif ()

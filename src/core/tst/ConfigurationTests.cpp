@@ -45,8 +45,13 @@ namespace AwsMock::Core {
     }
 
     TEST_F(ConfigurationTest, EnvironmentTest) {
+
         // arrange
+#ifdef WIN32
+        _putenv("AWSMOCK_LOG_LEVEL=error");
+#else
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
+#endif
         const Configuration configuration = Configuration::instance();
         Configuration::instance().SetFilename(TMP_PROPERTIES_FILE);
 

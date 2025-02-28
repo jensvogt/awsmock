@@ -74,7 +74,8 @@ namespace AwsMock::Database::Entity::Transfer {
 
         // Protocols
         if (mResult.view().find("protocols") != mResult.view().end()) {
-            for (auto [value] = mResult.view()["protocols"].get_array(); auto &p: value) {
+            auto [value] = mResult.view()["protocols"].get_array();
+            for (auto &p: value) {
                 protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
             }
         }
@@ -103,7 +104,7 @@ namespace AwsMock::Database::Entity::Transfer {
     }
 
     std::ostream &operator<<(std::ostream &os, const Transfer &t) {
-        os << "Transfer=" << to_json(t.ToDocument());
+        os << "Transfer=" << t.ToJson();
         return os;
     }
 }// namespace AwsMock::Database::Entity::Transfer

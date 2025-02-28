@@ -1,22 +1,30 @@
 set(BINARY awsmockctl)
 set(SOURCES src/Controller.cpp src/main.cpp)
 
-include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(../core /usr/local/lib)
+if (WIN32)
+    include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} D:/work/lib/include)
+    link_directories(../core d:/work/lib/lib)
+else ()
+    include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
+    link_directories(../core /usr/local/lib)
+endif ()
 
 add_executable(${BINARY} ${SOURCES})
 
 # Check systemd
-find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)
-if (SYSTEMD)
-    # systemd available
-    add_definitions(-DHAS_SYSTEMD)
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb boost_program_options systemd)
+if (WIN32)
+    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb)
 else ()
-    # systemd not available
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb boost_program_options)
+    find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)
+    if (SYSTEMD)
+        # systemd available
+        add_definitions(-DHAS_SYSTEMD)
+        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb boost_program_options systemd)
+    else ()
+        # systemd not available
+        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb boost_program_options)
+    endif ()
 endif ()
-
 add_library(${BINARY}_lib STATIC ${SOURCES})
 
 install(TARGETS ${BINARY} DESTINATION bin)

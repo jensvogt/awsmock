@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * Cognito sms sender
+     * @brief Cognito sms sender
      *
      * Example:
      * @code{.json}
@@ -41,28 +41,28 @@ namespace AwsMock::Dto::Cognito {
         std::string lambdaVersion;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

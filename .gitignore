@@ -52,7 +52,7 @@
 #**/Version.h
 
 # Tests
-Testing/*
+Testing
 **/*_tst
 core/tst/*.txt
 
@@ -79,3 +79,30 @@ src/manager/awsmockmgr
 # Tests
 **/cmake-build-debug-coverage
 **/test*
+
+# Visual studio
+ALL_BUILD*
+RUN_TESTS*
+ZERO_CHECK*
+INSTALL*
+awsmock.sln
+x86
+.suo
+.wsuo
+**/*vsidx
+**/*.log
+**/*.pdb
+**/*.recipe
+**/*.filters
+**/*.db
+**/*.def
+**/*.exp
+**/*.tlog
+**/*.json
+**/*.command
+**/*.vcxproj
+**/*.ipch
+**/*.txt
+**/*.bin
+**/*.sqlite
+**/CMake Overview

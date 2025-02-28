@@ -1,9 +1,6 @@
 
 #include <awsmock/ftpserver/FtpSession.h>
 
-#include <picojson/picojson.h>
-#include <utility>
-
 namespace AwsMock::FtpServer {
     FtpSession::FtpSession(boost::asio::io_context &io_service,
                            const UserDatabase &user_database,
@@ -35,7 +32,7 @@ namespace AwsMock::FtpServer {
         command_socket_.set_option(boost::asio::ip::tcp::no_delay(true), ec);
         if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
-	}
+        }
 
         sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
         readFtpCommand();
@@ -683,8 +680,10 @@ namespace AwsMock::FtpServer {
         const std::ios::openmode open_mode =
                 std::ios::ate | (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
 #if defined(WIN32) && !defined(__GNUG__)
-        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
-        std::ifstream file(wLocalPath, open_mode);
+        // TODO fix windows porting issues
+        std::ifstream file(local_path, open_mode);
+//        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
+//        std::ifstream file(wLocalPath, open_mode);
 #else
         std::ifstream file(local_path, open_mode);
 #endif
@@ -897,8 +896,9 @@ namespace AwsMock::FtpServer {
         }
 
         const std::string local_path = toLocalPath(param);
-#ifdef _WIN32
-        _rmdir(local_path.c_str());
+#ifdef WIN32
+        // TODO: Fix windows porting issues
+        //_rmdir(local_path.c_str());
 #else
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
@@ -923,10 +923,11 @@ namespace AwsMock::FtpServer {
 
         auto local_path = toLocalPath(param);
 #ifdef _WIN32
-        if (_mkdir(reinterpret_cast<const char *>(local_path.c_str() == 0))) {
-            sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
-            return;
-        }
+        // TODO: Fix windows porting issues
+//        if (_mkdir(reinterpret_cast<const char *>(local_path.c_str() == 0))) {
+//            sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
+//            return;
+//        }
 #else
         if (constexpr mode_t mode = 0755; mkdir(local_path.c_str(), mode) == 0) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED,

@@ -372,8 +372,11 @@ namespace AwsMock::Service {
         const int source = open(sourceFile.c_str(), O_RDONLY, 0);
 #if __APPLE__
         const long copied = sendfile(dest, source, start, reinterpret_cast<off_t *>(&length), nullptr, 0);
-#else
+#elif __linux__
         const long copied = sendfile(dest, source, &start, length);
+#else
+        // TODO: Fix windows porting
+        const long copied = 0;
 #endif
         close(source);
         close(dest);
