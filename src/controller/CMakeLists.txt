@@ -1,23 +1,15 @@
 set(BINARY awsmockctl)
 set(SOURCES src/Controller.cpp src/main.cpp)
 
-if (WIN32)
-    include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} D:/work/lib/include)
-    link_directories(../core d:/work/lib/lib)
-else ()
-    include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-    link_directories(../core /usr/local/lib)
-endif ()
+include_directories(include ../core/include ../dto/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} ${EXT_INCLUDE})
+link_directories(../core ${EXT_LIB})
 
 add_executable(${BINARY} ${SOURCES})
-if (APPLE)
-    set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "/usr/local/lib")
-endif ()
 
-# Check systemd
 if (WIN32)
     target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb)
 else ()
+    # Check systemd
     find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)
     if (SYSTEMD)
         # systemd available
@@ -29,4 +21,4 @@ else ()
     endif ()
 endif ()
 add_library(${BINARY}_lib STATIC ${SOURCES})
-install(TARGETS ${BINARY} DESTINATION /usr/local/awsmock/bin)
+install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

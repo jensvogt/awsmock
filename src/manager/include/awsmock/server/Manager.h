@@ -20,13 +20,6 @@
 #include <awsmock/service/ssm/SSMServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
 
-#define DEFAULT_MONGO_DBNAME "awsmock"
-#define DEFAULT_MONGO_DBUSER "root"
-#define DEFAULT_MONGO_DBPWD "password"
-#define DEFAULT_MONGO_DBHOST "localhost"
-#define DEFAULT_MONGO_DBPORT 27017
-#define DEFAULT_MONGO_POOL_SIZE 256
-
 namespace AwsMock::Manager {
 
     /**
@@ -55,7 +48,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialization
          */
-        static void Initialize();
+        void Initialize();
 
         /**
          * @brief Automatically loading init file
@@ -63,12 +56,12 @@ namespace AwsMock::Manager {
          * @par
          * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup.
          */
-        static void AutoLoad();
+        void AutoLoad();
 
         /**
          * @brief Stops all currently running modules.
          */
-        static void StopModules();
+        void StopModules();
 
         /**
          * @brief Main processing loop.
@@ -80,7 +73,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialize database
          */
-        static void InitializeDatabase();
+        void InitializeDatabase();
 
         /**
          * @brief Load the modules from the configuration file.
@@ -88,19 +81,24 @@ namespace AwsMock::Manager {
          * @par
          * Gateway and monitoring are a bit special, as they are not modules, but they still exists in the module database.
          */
-        static void LoadModulesFromConfiguration();
+        void LoadModulesFromConfiguration();
 
         /**
          * @brief Ensures that the modules exists
          *
          * @param key module key
          */
-        static void EnsureModuleExisting(const std::string &key);
+        void EnsureModuleExisting(const std::string &key);
 
         /**
          * Thread group
          */
         boost::thread_group _threadGroup;
+
+        /**
+         * MongoDB connection pool
+         */
+        Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
     };
 
 }// namespace AwsMock::Manager

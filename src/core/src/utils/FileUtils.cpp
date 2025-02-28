@@ -160,25 +160,46 @@ namespace AwsMock::Core {
 
     long FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
 
-        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
-
         size_t copied = 0;
-        for (auto &it: files) {
 
+#if __APPLE__
+        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
             struct stat stat_source{};
             fstat(source, &stat_source);
-#if __APPLE__
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
-#elif __linux__
-            copied += sendfile(dest, source, nullptr, stat_source.st_size);
-#else
-            // TODO: Fix windows port
-#endif
 
             close(source);
         }
         close(dest);
+#elif __linux__
+        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        for (auto &it: files) {
+            const int source = open(it.c_str(), O_RDONLY, 0);
+            struct stat stat_source{};
+            fstat(source, &stat_source);
+            copied += sendfile(dest, source, nullptr, stat_source.st_size);
+
+            close(source);
+        }
+        close(dest);
+#else
+        FILE *dest = fopen(outFile.c_str(), "wb");
+        for (auto &it: files) {
+            char buffer[BUFFER_LEN];
+            FILE *src = fopen(it.c_str(), "rb");
+
+            int n;
+            while ((n = fread(buffer, 1, BUFFER_LEN, src)) > 0) {
+                fwrite(buffer, 1, n, dest);
+                copied += n;
+            }
+
+            fclose(src);
+        }
+        fclose(dest);
+#endif
         return static_cast<long>(copied);
     }
 
@@ -309,10 +330,6 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
 
-#ifdef WIN32
-        // TODO: Fix win32 port
-        return "application/octet-stream";
-#else
         if (!FileExists(path)) {
             return "application/octet-stream";
         }
@@ -341,15 +358,10 @@ namespace AwsMock::Core {
         // Free magic cookie and mime
         magic_close(magic);
         return result;
-#endif
     }
 
     std::string FileUtils::GetContentTypeMagicString(const std::string &content) {
 
-#ifdef WIN32
-        // TODO: Fix windows port
-        return "";
-#else
         // allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
@@ -380,7 +392,6 @@ namespace AwsMock::Core {
         magic_close(magic);
 
         return result;
-#endif
     }
 
     void FileUtils::StripChunkSignature(const std::string &path) {

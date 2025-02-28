@@ -27,6 +27,11 @@
 // Boost includes
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
+//#ifdef WIN32
+//#include <boost/application.hpp>
+//#include <boost/application/initializers.hpp>
+//#include <boost/application/service_setup.hpp>
+//#endif
 
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
@@ -34,7 +39,13 @@
 #include <awsmock/service/frontend/FrontendServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 
+#ifdef WIN32
+#define DEFAULT_CONFIG_FILE "C:\\Program Files (x86)\\awsmock\\etc\\awsmock.yml"
+#define DEFAULT_LOG_FILE "C:\\Program Files (x86)\\awsmock\\log\\awsmock.log"
+#else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
+#endif
 
 /**
  * Main routine.
@@ -50,7 +61,20 @@ int main(int argc, char *argv[]) {
 
     // Declare the supported options.
     boost::program_options::options_description desc("Options");
-    desc.add_options()("help", "produce help message")("version", "application version")("config", boost::program_options::value<std::string>(), "set configuration file")("loglevel", boost::program_options::value<std::string>(), "set log level")("logfile", boost::program_options::value<std::string>(), "set log file");
+    desc.add_options()("help", "produce help message");
+    desc.add_options()("version", "application version");
+    desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "set configuration file");
+    desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value("info"), "set log level");
+    desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_FILE), "set log file");
+    //#ifdef WIN32
+    //    desc.add_options()("install", "install windows service");
+    //    desc.add_options()("check", "check windows service");
+    //    desc.add_options()("uninstall", "uninstall windows service");
+    //    desc.add_options()("name", boost::program_options::value<std::string>()->default_value("awsmock"), "windows service name");
+    //    desc.add_options()("description", boost::program_options::value<std::string>()->default_value("AWS Cloud Simulation"), "windows service description");
+    //    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AwsMock"), "windows service display name");
+    //    desc.add_options()("path", boost::program_options::value<std::string>()->default_value("c:/program files (x86)/awsmock/bin/awsmockmgr.exe"), "windows service path");
+    //#endif
 
     boost::program_options::variables_map vm;
     store(parse_command_line(argc, argv, desc), vm);
@@ -75,6 +99,36 @@ int main(int argc, char *argv[]) {
                   << std::endl;
         return 0;
     }
+
+    //#ifdef WIN32
+    //    if (vm.count("install")) {
+    //        boost::system::error_code ec;
+    //        boost::application::example::install_windows_service(
+    //                boost::application::setup_arg(vm["name"].as<std::string>()),
+    //                boost::application::setup_arg(vm["display"].as<std::string>()),
+    //                boost::application::setup_arg(vm["description"].as<std::string>()),
+    //                boost::application::setup_arg(vm["path"].as<std::string>()))
+    //                .install(ec);
+    //        log_info << "Windows service installed";
+    //        return 1;
+    //    }
+    //
+    //    if (vm.count("check")) {
+    //        boost::system::error_code ec;
+    //        bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
+    //
+    //        if (ec)
+    //            std::cout << ec.message() << std::endl;
+    //        else {
+    //            if (exist)
+    //                std::cout << "The service " << vm["name"].as<std::string>() << " is installed!" << std::endl;
+    //            else
+    //                std::cout << "The service " << vm["name"].as<std::string>() << " is NOT installed!" << std::endl;
+    //        }
+    //        return 0;
+    //    }
+    //
+    //#endif
 
     // Read configuration
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();

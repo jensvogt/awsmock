@@ -12,13 +12,8 @@ set(SSM_SOURCES SSMDatabaseTests.cpp)
 set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
 
 # Includes
-if (WIN32)
-    include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} D:/work/lib/include)
-    link_directories(../core D:/work/lib/lib)
-else ()
-    include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-    link_directories(/usr/local/lib)
-endif ()
+include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} ${EXT_INCLUDE})
+link_directories(../core ${EXT_LIB})
 
 add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)

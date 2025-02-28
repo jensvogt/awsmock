@@ -16,7 +16,7 @@ namespace AwsMock::Manager {
         InitializeDatabase();
         std::string boostVersion = BOOST_LIB_VERSION;
         Core::StringUtils::Replace(boostVersion, "_", ".");
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << getpid()
+        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << _getpid()
                  << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level") << " boost version: " << boostVersion;
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
@@ -26,25 +26,8 @@ namespace AwsMock::Manager {
 
         // Get database variables
         if (const Core::Configuration &configuration = Core::Configuration::instance(); configuration.GetValueBool("awsmock.mongodb.active")) {
-            const std::string name = configuration.GetValueString("awsmock.mongodb.name");
-            const std::string host = configuration.GetValueString("awsmock.mongodb.host");
-            const std::string user = configuration.GetValueString("awsmock.mongodb.user");
-            const std::string password = configuration.GetValueString("awsmock.mongodb.password");
-            const int _port = configuration.GetValueInt("awsmock.mongodb.port");
-            const int poolSize = configuration.GetValueInt("awsmock.mongodb.pool-size");
 
-            // MongoDB URL
-            const std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize);
-            mongocxx::uri _uri(url.c_str());
-            log_info << "Using MongoDB database url: " << url;
-
-            auto instance = std::make_unique<mongocxx::instance>();
-            Database::ConnectionPool &pool = Database::ConnectionPool::instance();
-
-            // Options
-            const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
-            pool.configure(std::move(instance), std::make_unique<mongocxx::pool>(std::move(_uri)));
-            log_info << "MongoDB database initialized, version: " << mongocxx::v_noabi::options::server_api::version_to_string(api.get_version());
+            _pool.Configure();
 
             // Create database indexes in a background thread
             boost::thread t{CreateIndexes};
@@ -61,14 +44,14 @@ namespace AwsMock::Manager {
                 for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
                     if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
                         Service::ModuleService _moduleService;
-                        _moduleService.ImportInfrastructure(jsonString);
+                        AwsMock::Service::ModuleService::ImportInfrastructure(jsonString);
                         log_info << "Loaded infrastructure from " << file;
                     }
                 }
             } else if (const std::string autoLoadFile = Core::Configuration::instance().GetValueString("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
                     Service::ModuleService _moduleService;
-                    _moduleService.ImportInfrastructure(jsonString);
+                    AwsMock::Service::ModuleService::ImportInfrastructure(jsonString);
                     log_info << "Loaded infrastructure from " << autoLoadFile;
                 }
             }
@@ -100,6 +83,7 @@ namespace AwsMock::Manager {
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
 
         for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
+            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << configuration.GetValueBool("awsmock.modules." + key + ".active");
             EnsureModuleExisting(key);
             configuration.GetValueBool("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
         }
@@ -128,6 +112,7 @@ namespace AwsMock::Manager {
 
         // Load available modules from configuration file
         LoadModulesFromConfiguration();
+        log_info << "Module configuration loaded";
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_context ios;
@@ -139,13 +124,16 @@ namespace AwsMock::Manager {
             StopModules();
             ios.stop();
         });
+        log_info << "Signal handler installed";
 
         Core::PeriodicScheduler scheduler(ios);
         auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        log_info << "Monitoring server started";
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+            log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
