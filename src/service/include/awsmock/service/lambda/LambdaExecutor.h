@@ -13,7 +13,6 @@
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
@@ -41,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API LambdaExecutor() = default;
+        explicit LambdaExecutor() = default;
 
         /**
          * @brief Executes a lambda function
@@ -54,7 +53,7 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param receiptHandle receipt handle of the message which triggered the invocation
          */
-        AWSMOCK_API void operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
+        void operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
 
       private:
 

@@ -18,7 +18,6 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
-#include <awsmock/core/Macros.h>
 #include <awsmock/repository/MonitoringDatabase.h>
 
 namespace AwsMock::Monitoring {
@@ -45,7 +44,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Default constructor
          */
-        AWSMOCK_API MetricService();
+        MetricService();
 
         /**
          * @brief Singleton instance
@@ -58,7 +57,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Initialization
          */
-        AWSMOCK_API void Initialize();
+        void Initialize();
 
         /**
          * @brief Increments a counter.
@@ -66,7 +65,7 @@ namespace AwsMock::Monitoring {
          * @param name of the counter
          * @param value value for the incrementation (default: 1), can be negative
          */
-        AWSMOCK_API void IncrementCounter(const std::string &name, int value = 1);
+        void IncrementCounter(const std::string &name, int value = 1);
 
         /**
          * @brief Increments a labeled counter.
@@ -76,14 +75,14 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the counter
          * @param value value for the incrementation (default: 1), can be negative
          */
-        AWSMOCK_API void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
+        void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
         /**
          * @brief Clears a counter.
          *
          * @param name of the counter
          */
-        AWSMOCK_API void ClearCounter(const std::string &name) const;
+        void ClearCounter(const std::string &name) const;
 
         /**
          * @brief Clears a counter.
@@ -92,7 +91,7 @@ namespace AwsMock::Monitoring {
          * @param labelName name of the label
          * @param labelValue label value of the counter
          */
-        AWSMOCK_API void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
+        void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
          * @brief Sets a double gauge value in the map.
@@ -100,7 +99,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the gauge
          * @param value value of the gauge
          */
-        [[maybe_unused]] AWSMOCK_API void SetGauge(const std::string &name, double value);
+        [[maybe_unused]] void SetGauge(const std::string &name, double value);
 
         /**
          * @brief Sets a double gauge value in the map.
@@ -110,7 +109,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        AWSMOCK_API void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
 
       private:
 

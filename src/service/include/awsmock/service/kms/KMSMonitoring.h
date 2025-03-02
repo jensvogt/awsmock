@@ -6,7 +6,6 @@
 #define AWSMOCK_SERVICE_KMS_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -28,12 +27,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API KMSMonitoring() = default;
+        explicit KMSMonitoring() = default;
 
         /**
          * @brief Update counters
          */
-        AWSMOCK_API void UpdateCounter();
+        void UpdateCounter();
 
       private:
 

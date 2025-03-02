@@ -15,7 +15,6 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
@@ -38,7 +37,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API MonitoringService() : _database(Database::MonitoringDatabase::instance()) {};
+        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {};
 
         /**
          * @brief Get counters request
@@ -47,7 +46,7 @@ namespace AwsMock::Service {
          * @return GetCountersResponse
          * @see GetCountersResponse
          */
-        AWSMOCK_API Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
+        Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
         /**
          * @brief Returns deveral series of counters in a map
@@ -55,7 +54,7 @@ namespace AwsMock::Service {
          * @param request monitoring counter request
          * @return map of counter objects
          */
-        AWSMOCK_API Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
+        Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
       private:
 

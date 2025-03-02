@@ -23,7 +23,6 @@
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -58,14 +57,14 @@ namespace AwsMock::Service {
          * @param acceptor request acceptor
          * @param docRoot document root directory
          */
-        AWSMOCK_API GatewayWorker(tcp::acceptor &acceptor, std::string docRoot);
+        GatewayWorker(tcp::acceptor &acceptor, std::string docRoot);
 
         /**
          * @brief Copy constructor
          *
          * @param worker worker to copy from
          */
-        AWSMOCK_API GatewayWorker(GatewayWorker const &worker) = delete;
+        GatewayWorker(GatewayWorker const &worker) = delete;
 
         /**
          * @brief Assignment constructor
@@ -73,12 +72,12 @@ namespace AwsMock::Service {
          * @param worker worker to assign from
          * @return assigned worker
          */
-        AWSMOCK_API GatewayWorker &operator=(GatewayWorker const &worker) = delete;
+        GatewayWorker &operator=(GatewayWorker const &worker) = delete;
 
         /**
          * @brief Start the server
          */
-        AWSMOCK_API void Start();
+        void Start();
 
       private:
 

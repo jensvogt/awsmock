@@ -13,7 +13,6 @@
 #include <boost/asio/thread_pool.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/service/common/AbstractServer.h>
 
 namespace AwsMock::Service {
@@ -25,7 +24,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        AWSMOCK_API ModuleMap();
+        ModuleMap();
 
         /**
          * @brief Singleton instance
@@ -41,7 +40,7 @@ namespace AwsMock::Service {
          * @param name name of the module
          * @param server server pointer
          */
-        AWSMOCK_API void AddModule(const std::string &name, const std::shared_ptr<AbstractServer> &server);
+        void AddModule(const std::string &name, const std::shared_ptr<AbstractServer> &server);
 
         /**
          * @brief Returns a pointer to the module server
@@ -49,7 +48,7 @@ namespace AwsMock::Service {
          * @param name name of the module
          * @return server pointer
          */
-        AWSMOCK_API std::shared_ptr<AbstractServer> GetModule(const std::string &name);
+        std::shared_ptr<AbstractServer> GetModule(const std::string &name);
 
         /**
          * @brief Checks the existence of a module server
@@ -57,14 +56,14 @@ namespace AwsMock::Service {
          * @param name name of the module
          * @return true if existing
          */
-        AWSMOCK_API bool HasModule(const std::string &name);
+        bool HasModule(const std::string &name);
 
         /**
          * @brief Returns the module mpa
          *
          * @return full module map
          */
-        AWSMOCK_API std::map<std::string, std::shared_ptr<AbstractServer>> GetModuleMap();
+        std::map<std::string, std::shared_ptr<AbstractServer>> GetModuleMap();
 
       private:
 

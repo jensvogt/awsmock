@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
@@ -36,12 +35,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API LambdaServer(Core::PeriodicScheduler &scheduler);
+        explicit LambdaServer(Core::PeriodicScheduler &scheduler);
 
         /**
          * @brief Shutdown server
          */
-        AWSMOCK_API void Shutdown() override;
+        void Shutdown() override;
 
       private:
 

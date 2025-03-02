@@ -9,7 +9,6 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -32,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API SNSHandler() : AbstractHandler("sns-handler") {}
+        explicit SNSHandler() : AbstractHandler("sns-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -43,7 +42,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

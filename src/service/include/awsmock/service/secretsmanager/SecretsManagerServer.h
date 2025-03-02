@@ -15,7 +15,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -37,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API SecretsManagerServer(Core::PeriodicScheduler &scheduler);
+        explicit SecretsManagerServer(Core::PeriodicScheduler &scheduler);
 
       private:
 

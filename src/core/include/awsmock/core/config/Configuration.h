@@ -13,7 +13,6 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
@@ -106,7 +105,7 @@ namespace AwsMock::Core {
          *
          * @param basename basename of the configuration file.
          */
-        AWSMOCK_API explicit Configuration(const std::string &basename);
+        explicit Configuration(const std::string &basename);
 
         /**
          * @brief Define a new configuration property.
@@ -118,7 +117,7 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue string default value
          */
-        AWSMOCK_API void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+        void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
         /**
          * @brief Define a new string array property.
@@ -130,7 +129,7 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue string default value
          */
-        AWSMOCK_API void DefineStringArrayProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+        void DefineStringArrayProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
         /**
          * @brief Define a new configuration property.
@@ -142,7 +141,7 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue boolean default value
          */
-        AWSMOCK_API void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
+        void DefineBoolProperty(const std::string &key, const std::string &envProperty, bool defaultValue);
 
         /**
          * @brief Define a new configuration property.
@@ -154,7 +153,7 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue integer default value
          */
-        AWSMOCK_API void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
+        void DefineIntProperty(const std::string &key, const std::string &envProperty, int defaultValue);
 
         /**
          * @brief Define a new configuration property.
@@ -166,7 +165,7 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue integer default value
          */
-        AWSMOCK_API void DefineLongProperty(const std::string &key, const std::string &envProperty, long defaultValue);
+        void DefineLongProperty(const std::string &key, const std::string &envProperty, long defaultValue);
 
         /**
          * @brief Define a new configuration property.
@@ -178,21 +177,21 @@ namespace AwsMock::Core {
          * @param envProperty environment variable name
          * @param defaultValue integer default value
          */
-        AWSMOCK_API void DefineDoubleProperty(const std::string &key, const std::string &envProperty, double defaultValue);
+        void DefineDoubleProperty(const std::string &key, const std::string &envProperty, double defaultValue);
 
         /**
          * @brief Returns the file name of the configuration file.
          *
          * @return file name of the configuration file.
          */
-        AWSMOCK_API [[nodiscard]] std::string GetFilename() const;
+        [[nodiscard]] std::string GetFilename() const;
 
         /**
          * @brief Sets the file name of the configuration file.
          *
          * @param filename file name of the configuration file.
          */
-        AWSMOCK_API void SetFilename(const std::string &filename);
+        void SetFilename(const std::string &filename);
 
         /**
          * @brief Returns a string configuration value
@@ -200,7 +199,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] std::string GetValueString(const std::string &key) const;
+        [[nodiscard]] std::string GetValueString(const std::string &key) const;
 
         /**
          * @brief Returns a string array configuration value
@@ -208,7 +207,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] std::vector<std::string> GetValueStringArray(const std::string &key) const;
+        [[nodiscard]] std::vector<std::string> GetValueStringArray(const std::string &key) const;
 
         /**
          * @brief Returns a integer configuration value
@@ -216,7 +215,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] int GetValueInt(const std::string &key) const;
+        [[nodiscard]] int GetValueInt(const std::string &key) const;
 
         /**
          * @brief Returns a long integer configuration value
@@ -224,7 +223,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] long GetValueLong(const std::string &key) const;
+        [[nodiscard]] long GetValueLong(const std::string &key) const;
 
         /**
          * @brief Returns a boolean configuration value
@@ -232,7 +231,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] bool GetValueBool(const std::string &key) const;
+        [[nodiscard]] bool GetValueBool(const std::string &key) const;
 
         /**
          * @brief Returns a float configuration value
@@ -240,7 +239,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] float GetValueFloat(const std::string &key) const;
+        [[nodiscard]] float GetValueFloat(const std::string &key) const;
 
         /**
          * @brief Returns a double configuration value
@@ -248,7 +247,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @return configuration value
          */
-        AWSMOCK_API [[nodiscard]] double GetValueDouble(const std::string &key) const;
+        [[nodiscard]] double GetValueDouble(const std::string &key) const;
 
         /**
          * @brief Sets a string configuration value
@@ -256,7 +255,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        AWSMOCK_API void SetValueString(const std::string &key, const std::string &value);
+        void SetValueString(const std::string &key, const std::string &value);
 
         /**
          * @brief Sets a bool configuration value
@@ -264,7 +263,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        AWSMOCK_API void SetValueBool(const std::string &key, bool value);
+        void SetValueBool(const std::string &key, bool value);
 
         /**
          * @brief Sets an integer configuration value
@@ -272,7 +271,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        AWSMOCK_API void SetValueInt(const std::string &key, int value);
+        void SetValueInt(const std::string &key, int value);
 
         /**
          * @brief Sets an long integer configuration value
@@ -280,7 +279,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        AWSMOCK_API void SetValueLong(const std::string &key, const long value);
+        void SetValueLong(const std::string &key, const long value);
 
         /**
          * @brief Sets an double configuration value
@@ -288,7 +287,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        AWSMOCK_API void SetValueFloat(const std::string &key, const float value);
+        void SetValueFloat(const std::string &key, const float value);
 
         /**
          * @brief Sets an double configuration value
@@ -296,7 +295,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        AWSMOCK_API void SetValueDouble(const std::string &key, const double value);
+        void SetValueDouble(const std::string &key, const double value);
 
         /**
          * @brief Checks whether a value exists
@@ -304,47 +303,47 @@ namespace AwsMock::Core {
          * @param key configuration key
          * @return true if value exists
          */
-        AWSMOCK_API bool HasValue(const std::string &key) const;
+        bool HasValue(const std::string &key) const;
 
         /**
          * @brief Returns the application name
          *
          * @return application name
          */
-        AWSMOCK_API static std::string GetAppName();
+        static std::string GetAppName();
 
         /**
          * @brief Returns the version of the library.
          *
          * @return library version
          */
-        AWSMOCK_API static std::string GetVersion();
+        static std::string GetVersion();
 
         /**
          * @brief Writes the current configuration the given file
          *
          * @param filename name of the configuration file
          */
-        AWSMOCK_API void WriteFile(const std::string &filename) const;
+        void WriteFile(const std::string &filename) const;
 
         /**
          * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
-        AWSMOCK_API [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * @brief Dumps the configuration to std:cerr
          */
-        AWSMOCK_API void Dump() const;
+        void Dump() const;
 
       private:
 
         /**
          * @brief Initialize the base properties
          */
-        AWSMOCK_API void Initialize();
+        void Initialize();
 
         /**
          * @brief Save the environment variables as key/value pair
@@ -352,13 +351,13 @@ namespace AwsMock::Core {
          * @param key environment variable key
          * @param value environment variable value
          */
-        AWSMOCK_API void AddToEnvList(const std::string &key, const std::string &value);
+        void AddToEnvList(const std::string &key, const std::string &value);
 
         /**
          * @brief Reapply the environment variables to the properties, as environment variables have precedence over
          * file variables.
          */
-        AWSMOCK_API void ApplyEnvSettings();
+        void ApplyEnvSettings();
 
         /**
          * @brief Replace environment variables with their value.
@@ -366,14 +365,14 @@ namespace AwsMock::Core {
          * @param value configuration value
          * @return value with replaced environment variables
          */
-        AWSMOCK_API static std::string ReplaceEnvironmentVariables(std::string &value);
+        static std::string ReplaceEnvironmentVariables(std::string &value);
 
         /**
          * @brief Checks existence of a property key
          *
          * @return true if property key exists
          */
-        AWSMOCK_API bool HasProperty(const std::string &key) const;
+        bool HasProperty(const std::string &key) const;
 
         /**
          * Name of the configuration file

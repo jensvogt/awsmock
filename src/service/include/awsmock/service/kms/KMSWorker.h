@@ -10,7 +10,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/repository/KMSDatabase.h>
 
@@ -34,12 +33,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API KMSWorker() = default;
+        explicit KMSWorker() = default;
 
         /**
          * @brief Delete keys which are pending for deletion
          */
-        void AWSMOCK_API DeleteKeys();
+        void DeleteKeys();
 
       private:
 

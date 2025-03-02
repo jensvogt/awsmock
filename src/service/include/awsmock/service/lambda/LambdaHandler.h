@@ -14,7 +14,6 @@
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/monitoring/MetricService.h>
-#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Service {
 
@@ -32,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API LambdaHandler() : AbstractHandler("lambda-handler") {}
+        explicit LambdaHandler() : AbstractHandler("lambda-handler") {}
 
         /**
          * @brief HTTP GET request.
@@ -43,7 +42,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP POST request.
@@ -54,7 +53,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP DELETE request.
@@ -65,7 +64,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

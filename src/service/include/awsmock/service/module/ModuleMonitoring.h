@@ -6,7 +6,6 @@
 #define AWSMOCK_SERVICE_MODULE_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -33,12 +32,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API ModuleMonitoring() = default;
+        explicit ModuleMonitoring() = default;
 
         /**
          * Update the counter
          */
-        AWSMOCK_API void UpdateCounter();
+        void UpdateCounter();
 
       private:
 

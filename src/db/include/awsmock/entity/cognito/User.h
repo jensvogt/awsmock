@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
@@ -92,35 +91,35 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param userPoolId user pool ID
          * @param groupName name of the group
          */
-        AWSMOCK_API bool HasGroup(const std::string &userPoolId, const std::string &groupName);
+        bool HasGroup(const std::string &userPoolId, const std::string &groupName);
 
         /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] AWSMOCK_API view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
-        AWSMOCK_API void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.
          *
          * @return DTO as JSON string
          */
-        [[nodiscard]] AWSMOCK_API std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the entity to a string representation.
          *
          * @return entity as string
          */
-        [[nodiscard]] AWSMOCK_API std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * @brief Stream provider.
@@ -129,7 +128,7 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param user user entity
          * @return output stream
          */
-        AWSMOCK_API friend std::ostream &operator<<(std::ostream &os, const User &user);
+        friend std::ostream &operator<<(std::ostream &os, const User &user);
     };
 
     typedef std::vector<User> UserList;

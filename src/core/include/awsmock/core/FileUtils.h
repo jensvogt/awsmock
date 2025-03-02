@@ -37,7 +37,6 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>

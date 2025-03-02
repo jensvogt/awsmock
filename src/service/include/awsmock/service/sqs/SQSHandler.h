@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
@@ -44,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API SQSHandler() : AbstractHandler("sqs-handler") {}
+        explicit SQSHandler() : AbstractHandler("sqs-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -55,7 +54,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 
