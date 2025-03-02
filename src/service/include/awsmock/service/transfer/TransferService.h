@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_TRANSFER_SERVICE_H
 
 // AwsMock includes
+#include <awsmock/core/Macros.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 #include <awsmock/dto/transfer/CreateServerResponse.h>
 #include <awsmock/dto/transfer/CreateUserRequest.h>
@@ -44,7 +45,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferService() = default;
+        explicit AWSMOCK_API TransferService() = default;
 
         /**
          * @brief Create transfer server request
@@ -53,7 +54,7 @@ namespace AwsMock::Service {
          * @return CreateServerResponse
          * @see Dto::Transfer::CreateServerResponse
          */
-        Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request) const;
+        AWSMOCK_API Dto::Transfer::CreateServerResponse CreateTransferServer(Dto::Transfer::CreateServerRequest &request) const;
 
         /**
          * @brief Create a user for the transfer manager.
@@ -62,7 +63,7 @@ namespace AwsMock::Service {
          * @return CreateUserResponse
          * @see Dto::Transfer::CreateUserResponse
          */
-        Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request) const;
+        AWSMOCK_API Dto::Transfer::CreateUserResponse CreateUser(Dto::Transfer::CreateUserRequest &request) const;
 
         /**
          * @brief Returns a list of available servers
@@ -71,7 +72,7 @@ namespace AwsMock::Service {
          * @return ListServerResponse
          * @see Dto::Transfer::ListServerResponse
          */
-        Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request) const;
+        AWSMOCK_API Dto::Transfer::ListServerResponse ListServers(const Dto::Transfer::ListServerRequest &request) const;
 
         /**
          * @brief Returns a list of available server counters
@@ -80,7 +81,7 @@ namespace AwsMock::Service {
          * @return ListServerCountersResponse
          * @see Dto::Transfer::ListServerCountersResponse
          */
-        Dto::Transfer::ListServerCountersResponse ListServerCounters(const Dto::Transfer::ListServerCountersRequest &request) const;
+        AWSMOCK_API Dto::Transfer::ListServerCountersResponse ListServerCounters(const Dto::Transfer::ListServerCountersRequest &request) const;
 
         /**
          * @brief Returns a list of available servers
@@ -89,7 +90,7 @@ namespace AwsMock::Service {
          * @return ListServerResponse
          * @see Dto::Transfer::ListServerResponse
          */
-        Dto::Transfer::ListUsersResponse ListUsers(const Dto::Transfer::ListUsersRequest &request) const;
+        AWSMOCK_API Dto::Transfer::ListUsersResponse ListUsers(const Dto::Transfer::ListUsersRequest &request) const;
 
         /**
          * @brief Returns a list of available user counters
@@ -98,21 +99,21 @@ namespace AwsMock::Service {
          * @return ListUserCountersResponse
          * @see Dto::Transfer::ListUserCountersResponse
          */
-        Dto::Transfer::ListUserCountersResponse ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const;
+        AWSMOCK_API Dto::Transfer::ListUserCountersResponse ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const;
 
         /**
          * @brief Starts a manager.
          *
          * @param request StartServer manager request
          */
-        void StartServer(const Dto::Transfer::StartServerRequest &request) const;
+        AWSMOCK_API void StartServer(const Dto::Transfer::StartServerRequest &request) const;
 
         /**
          * @brief Stops a manager.
          *
          * @param request stop manager request
          */
-        void StopServer(const Dto::Transfer::StopServerRequest &request) const;
+        AWSMOCK_API void StopServer(const Dto::Transfer::StopServerRequest &request) const;
 
         /**
          * @brief Returns the transfer server details.
@@ -121,21 +122,21 @@ namespace AwsMock::Service {
          * @return GetServerDetailsResponse DTO
          * @see GetServerDetailsResponse
          */
-        Dto::Transfer::GetServerDetailsResponse GetServerDetails(const Dto::Transfer::GetServerDetailsRequest &request) const;
+        AWSMOCK_API Dto::Transfer::GetServerDetailsResponse GetServerDetails(const Dto::Transfer::GetServerDetailsRequest &request) const;
 
         /**
          * @brief Deleted a manager.
          *
          * @param request delete manager request
          */
-        void DeleteServer(const Dto::Transfer::DeleteServerRequest &request) const;
+        AWSMOCK_API void DeleteServer(const Dto::Transfer::DeleteServerRequest &request) const;
 
         /**
          * @brief Deleted a user from a server.
          *
          * @param request delete user request
          */
-        void DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const;
+        AWSMOCK_API void DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const;
 
       private:
 

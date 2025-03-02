@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/repository/ModuleDatabase.h>
+#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Service {
 
@@ -30,17 +31,17 @@ namespace AwsMock::Service {
          *
          * @param name manager name
          */
-        explicit AbstractServer(std::string name);
+        explicit AWSMOCK_API AbstractServer(std::string name);
 
         /**
          * Destructor
          */
-        virtual ~AbstractServer() = default;
+        AWSMOCK_API virtual ~AbstractServer() = default;
 
         /**
          * @brief Shutdown server
          */
-        virtual void Shutdown();
+        AWSMOCK_API virtual void Shutdown();
 
       protected:
 

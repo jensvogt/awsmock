@@ -26,7 +26,7 @@ namespace AwsMock::Database {
         return _memoryDb.ParameterExists(name);
     }
 
-    /*Entity::SSM::Parameter SSMDatabase::GetParameterById(bsoncxx::oid oid) const {
+    Entity::SSM::Parameter SSMDatabase::GetParameterById(bsoncxx::oid oid) const {
 
         try {
 
@@ -261,6 +261,6 @@ namespace AwsMock::Database {
 
             _memoryDb.DeleteAllParameters();
         }
-    }*/
+    }
 
 }// namespace AwsMock::Database

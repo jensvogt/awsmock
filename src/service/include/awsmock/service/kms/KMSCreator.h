@@ -14,6 +14,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>
@@ -34,14 +35,14 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        [[maybe_unused]] explicit KMSCreator() = default;
+        [[maybe_unused]] explicit AWSMOCK_API KMSCreator() = default;
 
         /**
          * @brief Create new KMS key
          *
          * @param keyId ID of the key
          */
-        static void CreateKmsKey(const std::string &keyId);
+        static void AWSMOCK_API CreateKmsKey(const std::string &keyId);
 
       private:
 

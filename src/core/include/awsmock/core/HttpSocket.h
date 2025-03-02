@@ -17,6 +17,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 

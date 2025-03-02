@@ -16,6 +16,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Object.h>
@@ -41,7 +42,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit KMSDatabase() : _databaseName(GetDatabaseName()), _keyCollectionName("kms_key"), _memoryDb(KMSMemoryDb::instance()) {}
+        explicit AWSMOCK_API KMSDatabase() : _databaseName(GetDatabaseName()), _keyCollectionName("kms_key"), _memoryDb(KMSMemoryDb::instance()) {}
 
         /**
          * @brief Singleton instance
@@ -58,7 +59,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool KeyExists(const std::string &keyId) const;
+        AWSMOCK_API bool KeyExists(const std::string &keyId) const;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -67,7 +68,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(const std::string &oid) const;
+        AWSMOCK_API Entity::KMS::Key GetKeyById(const std::string &oid) const;
 
         /**
          * @brief Returns a KMS key by primary key
@@ -76,7 +77,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyById(bsoncxx::oid oid) const;
+        AWSMOCK_API Entity::KMS::Key GetKeyById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a KMS key by key ID
@@ -85,7 +86,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId) const;
+        AWSMOCK_API Entity::KMS::Key GetKeyByKeyId(const std::string &keyId) const;
 
         /**
          * @brief List all keys
@@ -93,7 +94,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return KeyList
          */
-        Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
+        AWSMOCK_API Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
 
         /**
          * @brief Returns the total number of keys
@@ -101,7 +102,7 @@ namespace AwsMock::Database {
          * @return total number of keys
          * @throws DatabaseException
          */
-        long CountKeys() const;
+        AWSMOCK_API long CountKeys() const;
 
         /**
          * @brief Create a new key in the KMS key table
@@ -110,7 +111,7 @@ namespace AwsMock::Database {
          * @return created KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key) const;
+        AWSMOCK_API Entity::KMS::Key CreateKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Create or update a key in the KMS key table
@@ -119,7 +120,7 @@ namespace AwsMock::Database {
          * @return created or updated KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpsertKey(const Entity::KMS::Key &key) const;
+        AWSMOCK_API Entity::KMS::Key UpsertKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Updates a key
@@ -128,7 +129,7 @@ namespace AwsMock::Database {
          * @return created key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key) const;
+        AWSMOCK_API Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Delete a key
@@ -136,14 +137,14 @@ namespace AwsMock::Database {
          * @param key key entity
          * @throws DatabaseException
          */
-        void DeleteKey(const Entity::KMS::Key &key) const;
+        AWSMOCK_API void DeleteKey(const Entity::KMS::Key &key) const;
 
         /**
          * @brief Delete a all keys
          *
          * @throws DatabaseException
          */
-        void DeleteAllKeys() const;
+        AWSMOCK_API void DeleteAllKeys() const;
 
       private:
 

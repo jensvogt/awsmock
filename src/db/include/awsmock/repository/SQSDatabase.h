@@ -16,6 +16,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sqs/Message.h>
@@ -44,7 +45,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit SQSDatabase();
+        explicit AWSMOCK_API SQSDatabase();
 
         /**
          * @brief Singleton instance
@@ -62,7 +63,7 @@ namespace AwsMock::Database {
          * @return true if queue already exists
          * @throws DatabaseException
          */
-        bool QueueExists(const std::string &region, const std::string &name) const;
+        AWSMOCK_API bool QueueExists(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Check existence of queue
@@ -72,7 +73,7 @@ namespace AwsMock::Database {
          * @return true if queue already exists
          * @throws DatabaseException
          */
-        bool QueueUrlExists(const std::string &region, const std::string &queueUrl) const;
+        AWSMOCK_API bool QueueUrlExists(const std::string &region, const std::string &queueUrl) const;
 
         /**
          * @brief Check existence of queue by ARN
@@ -81,7 +82,7 @@ namespace AwsMock::Database {
          * @return true in case queue exists
          * @throws DatabaseException
          */
-        bool QueueArnExists(const std::string &queueArn) const;
+        AWSMOCK_API bool QueueArnExists(const std::string &queueArn) const;
 
         /**
          * @brief Create a new queue in the SQS queue table
@@ -90,7 +91,7 @@ namespace AwsMock::Database {
          * @return created SQS queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue CreateQueue(Entity::SQS::Queue &queue) const;
+        AWSMOCK_API Entity::SQS::Queue CreateQueue(Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Returns a queue by primary key
@@ -99,7 +100,7 @@ namespace AwsMock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue GetQueueById(bsoncxx::oid oid) const;
+        AWSMOCK_API Entity::SQS::Queue GetQueueById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a queue by primary key
@@ -108,7 +109,7 @@ namespace AwsMock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue GetQueueById(const std::string &oid) const;
+        AWSMOCK_API Entity::SQS::Queue GetQueueById(const std::string &oid) const;
 
         /**
          * @brief Returns a queue by ARN
@@ -117,7 +118,7 @@ namespace AwsMock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue GetQueueByArn(const std::string &queueArn) const;
+        AWSMOCK_API Entity::SQS::Queue GetQueueByArn(const std::string &queueArn) const;
 
         /**
          * @brief Returns a queue by DQL ARN
@@ -126,7 +127,7 @@ namespace AwsMock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue GetQueueByDlq(const std::string &dlqQueueArn) const;
+        AWSMOCK_API Entity::SQS::Queue GetQueueByDlq(const std::string &dlqQueueArn) const;
 
         /**
          * @brief Returns a queue by name and region
@@ -136,7 +137,7 @@ namespace AwsMock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue GetQueueByName(const std::string &region, const std::string &queueName) const;
+        AWSMOCK_API Entity::SQS::Queue GetQueueByName(const std::string &region, const std::string &queueName) const;
 
         /**
          * @brief Returns a queue by URL
@@ -146,7 +147,7 @@ namespace AwsMock::Database {
          * @return queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue GetQueueByUrl(const std::string &region, const std::string &queueUrl) const;
+        AWSMOCK_API Entity::SQS::Queue GetQueueByUrl(const std::string &region, const std::string &queueUrl) const;
 
         /**
          * @brief List available queues, using paging
@@ -159,7 +160,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
+        AWSMOCK_API Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
 
         /**
          * @brief List available queues, using paging
@@ -168,7 +169,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns) const;
+        AWSMOCK_API Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief List all available queues
@@ -177,7 +178,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
+        AWSMOCK_API Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
 
         /**
          * @brief Purge a given queueUrl.
@@ -185,7 +186,7 @@ namespace AwsMock::Database {
          * @param queueArn queue ARN
          * @return total number of deleted messages
          */
-        long PurgeQueue(const std::string &queueArn) const;
+        AWSMOCK_API long PurgeQueue(const std::string &queueArn) const;
 
         /**
          * @brief Updates a given queue.
@@ -193,7 +194,7 @@ namespace AwsMock::Database {
          * @param queue AWS region
          * @return updated queue
          */
-        Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue) const;
+        AWSMOCK_API Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Create a new queue or updates an existing queue
@@ -202,7 +203,7 @@ namespace AwsMock::Database {
          * @return created SQS queue entity
          * @throws DatabaseException
          */
-        Entity::SQS::Queue CreateOrUpdateQueue(Entity::SQS::Queue &queue) const;
+        AWSMOCK_API Entity::SQS::Queue CreateOrUpdateQueue(Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Count the number of queues for a given region.
@@ -211,7 +212,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return number of queues in the given region.
          */
-        long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
+        AWSMOCK_API long CountQueues(const std::string &prefix = {}, const std::string &region = {}) const;
 
         /**
          * @brief Calculates the total size of all messages in the queue
@@ -219,7 +220,7 @@ namespace AwsMock::Database {
          * @param queueArn AWS queue ARN
          * @return total size of the queue
          */
-        long GetQueueSize(const std::string &queueArn) const;
+        AWSMOCK_API long GetQueueSize(const std::string &queueArn) const;
 
         /**
          * @brief Deletes a queue.
@@ -228,14 +229,14 @@ namespace AwsMock::Database {
          * @return number of deleted queues
          * @throws DatabaseException
          */
-        long DeleteQueue(const Entity::SQS::Queue &queue) const;
+        AWSMOCK_API long DeleteQueue(const Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Deletes all queues
          *
          * @return number of deleted queues
          */
-        long DeleteAllQueues() const;
+        AWSMOCK_API long DeleteAllQueues() const;
 
         /**
          * @brief Creates a new message in the SQS message table
@@ -244,7 +245,7 @@ namespace AwsMock::Database {
          * @return saved message entity
          * @throws Core::DatabaseException
          */
-        Entity::SQS::Message CreateMessage(Entity::SQS::Message &message) const;
+        AWSMOCK_API Entity::SQS::Message CreateMessage(Entity::SQS::Message &message) const;
 
         /**
          * @brief Checks whether the message exists by receipt handle.
@@ -253,7 +254,7 @@ namespace AwsMock::Database {
          * @return true if message exists, otherwise false
          * @throws Core::DatabaseException
          */
-        bool MessageExists(const std::string &receiptHandle) const;
+        AWSMOCK_API bool MessageExists(const std::string &receiptHandle) const;
 
         /**
          * @brief Checks whether the message exists by message ID
@@ -262,7 +263,7 @@ namespace AwsMock::Database {
          * @return true if message exists, otherwise false
          * @throws Core::DatabaseException
          */
-        bool MessageExistsByMessageId(const std::string &messageId) const;
+        AWSMOCK_API bool MessageExistsByMessageId(const std::string &messageId) const;
 
         /**
          * @brief Returns a message by ID.
@@ -271,7 +272,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        Entity::SQS::Message GetMessageById(bsoncxx::oid oid) const;
+        AWSMOCK_API Entity::SQS::Message GetMessageById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a message by ID.
@@ -280,7 +281,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        Entity::SQS::Message GetMessageById(const std::string &oid) const;
+        AWSMOCK_API Entity::SQS::Message GetMessageById(const std::string &oid) const;
 
         /**
          * @brief Returns a message by receipt handle.
@@ -289,7 +290,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle) const;
+        AWSMOCK_API Entity::SQS::Message GetMessageByReceiptHandle(const std::string &receiptHandle) const;
 
         /**
          * @brief Returns a message by message ID
@@ -298,7 +299,7 @@ namespace AwsMock::Database {
          * @return message entity
          * @throws Core::DatabaseException
          */
-        Entity::SQS::Message GetMessageByMessageId(const std::string &messageId) const;
+        AWSMOCK_API Entity::SQS::Message GetMessageByMessageId(const std::string &messageId) const;
 
         /**
          * @brief Updates a given message.
@@ -306,7 +307,7 @@ namespace AwsMock::Database {
          * @param message SQS message
          * @return updated message
          */
-        Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message) const;
+        AWSMOCK_API Entity::SQS::Message UpdateMessage(Entity::SQS::Message &message) const;
 
         /**
          * @brief Create a new queue or updates an existing message
@@ -315,7 +316,7 @@ namespace AwsMock::Database {
          * @return created or updated SQS message entity
          * @throws DatabaseException
          */
-        Entity::SQS::Message CreateOrUpdateMessage(Entity::SQS::Message &message) const;
+        AWSMOCK_API Entity::SQS::Message CreateOrUpdateMessage(Entity::SQS::Message &message) const;
 
         /**
          * @brief List all available resources
@@ -324,7 +325,7 @@ namespace AwsMock::Database {
          * @return list of SQS resources
          * @throws DatabaseException
          */
-        Entity::SQS::MessageList ListMessages(const std::string &region = {}) const;
+        AWSMOCK_API Entity::SQS::MessageList ListMessages(const std::string &region = {}) const;
 
         /**
          * @brief Paged list of messages
@@ -337,7 +338,7 @@ namespace AwsMock::Database {
          * @return list of SQS messages
          * @throws DatabaseException
          */
-        Entity::SQS::MessageList ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const;
+        AWSMOCK_API Entity::SQS::MessageList ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Receive messages from an queue.
@@ -349,7 +350,7 @@ namespace AwsMock::Database {
          * @param maxRetries maximal number of retries
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) const;
+        AWSMOCK_API void ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) const;
 
         /**
          * @brief Reset expired resources
@@ -358,7 +359,7 @@ namespace AwsMock::Database {
          * @param visibility visibilityTimeout period in seconds
          * @return number of message resets
          */
-        long ResetMessages(const std::string &queueArn, long visibility) const;
+        AWSMOCK_API long ResetMessages(const std::string &queueArn, long visibility) const;
 
         /**
          * @brief Redrive expired resources.
@@ -367,7 +368,7 @@ namespace AwsMock::Database {
          * @param redrivePolicy redrive policy
          * @return number of message sendto DLQ
          */
-        long RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const;
+        AWSMOCK_API long RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const;
 
         /**
          * @brief Any message, which has a message state is DELAYED is reset when the delay period is over.
@@ -376,7 +377,7 @@ namespace AwsMock::Database {
          * @param delay delay in seconds.
          * @return number of updated queues
          */
-        long ResetDelayedMessages(const std::string &queueArn, long delay) const;
+        AWSMOCK_API long ResetDelayedMessages(const std::string &queueArn, long delay) const;
 
         /**
          * @brief Redrive message
@@ -385,7 +386,7 @@ namespace AwsMock::Database {
          * @param dlqQueue DLQ queue
          * @return total number of redriven messages
          */
-        long RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const;
+        AWSMOCK_API long RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const;
 
         /**
          * @brief Any message, which has is older than the retention period is deleted.
@@ -394,7 +395,7 @@ namespace AwsMock::Database {
          * @param retentionPeriod retention period in seconds.
          * @return number of messages deleted.
          */
-        long MessageRetention(const std::string &queueArn, long retentionPeriod) const;
+        AWSMOCK_API long MessageRetention(const std::string &queueArn, long retentionPeriod) const;
 
         /**
          * @brief  Count the number of message by state
@@ -403,7 +404,7 @@ namespace AwsMock::Database {
          * @param prefix message ID prefix
          * @return total number of messages
          */
-        long CountMessages(const std::string &queueArn = {}, const std::string &prefix = {}) const;
+        AWSMOCK_API long CountMessages(const std::string &queueArn = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief  Count the number of message by state
@@ -411,7 +412,7 @@ namespace AwsMock::Database {
          * @param queueArn ARN of the queue
          * @return total message size
          */
-        long CountMessageSize(const std::string &queueArn = {}) const;
+        AWSMOCK_API long CountMessageSize(const std::string &queueArn = {}) const;
 
         /**
          * @brief Count the number of message by state
@@ -419,7 +420,7 @@ namespace AwsMock::Database {
          * @param queueArn ARN of the queue
          * @param status message state
          */
-        long CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) const;
+        AWSMOCK_API long CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) const;
 
         /**
          * @brief Returns the average waiting time for messages in the given queue
@@ -431,7 +432,7 @@ namespace AwsMock::Database {
          * @return map of average message waiting time per queue
          * @throws Core::DatabaseException
          */
-        Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime() const;
+        AWSMOCK_API Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime() const;
 
         /**
          * @brief Deletes all messages of a queue
@@ -440,7 +441,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteMessages(const std::string &queueArn) const;
+        [[nodiscard]] AWSMOCK_API long DeleteMessages(const std::string &queueArn) const;
 
         /**
          * @brief Deletes a message.
@@ -449,7 +450,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteMessage(const Entity::SQS::Message &message) const;
+        [[nodiscard]] AWSMOCK_API long DeleteMessage(const Entity::SQS::Message &message) const;
 
         /**
          * @brief Deletes a message by receipt handle.
@@ -458,7 +459,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteMessage(const std::string &receiptHandle) const;
+        [[nodiscard]] AWSMOCK_API long DeleteMessage(const std::string &receiptHandle) const;
 
         /**
          * @brief Deletes a resources.
@@ -466,19 +467,19 @@ namespace AwsMock::Database {
          * @return total number of message deleted
          * @throws Core::DatabaseException
          */
-        long DeleteAllMessages() const;
+        AWSMOCK_API long DeleteAllMessages() const;
 
         /**
          * @brief Adjust all message counters
          */
-        void AdjustAllMessageCounters() const;
+        AWSMOCK_API void AdjustAllMessageCounters() const;
 
         /**
          * @brief Adjust message counters for a single queue
          *
          * @param queueArn AWS queue ARN
          */
-        void AdjustMessageCounters(const std::string &queueArn) const;
+        AWSMOCK_API void AdjustMessageCounters(const std::string &queueArn) const;
 
       private:
 

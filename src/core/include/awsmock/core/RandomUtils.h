@@ -8,6 +8,7 @@
 // Standard C++ includes
 #include <algorithm>
 #include <array>
+#include <awsmock/core/Macros.h>
 #include <iterator>
 #include <random>
 #include <string>

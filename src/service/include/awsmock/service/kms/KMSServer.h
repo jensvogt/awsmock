@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -31,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit KMSServer(Core::PeriodicScheduler &scheduler);
+        explicit AWSMOCK_API KMSServer(Core::PeriodicScheduler &scheduler);
 
       private:
 

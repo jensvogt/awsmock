@@ -14,6 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 
@@ -26,12 +27,12 @@ namespace AwsMock::Service::Frontend {
         /**
          * Constructor
          */
-        FrontendServer() = default;
+        AWSMOCK_API FrontendServer() = default;
 
         /**
          * @brief HTTP request worker
          */
-        void operator()() const;
+        AWSMOCK_API void operator()() const;
     };
 
 }// namespace AwsMock::Service::Frontend

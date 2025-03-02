@@ -20,6 +20,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/utils/ConnectionPool.h>
 
@@ -66,21 +67,21 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit DatabaseBase();
+        explicit AWSMOCK_API DatabaseBase();
 
         /**
          * @brief Returns a MongoDB connection from the pool
          *
          * @return MongoDB database client
          */
-        [[nodiscard]] mongocxx::database GetConnection() const;
+        [[nodiscard]] AWSMOCK_API mongocxx::database GetConnection() const;
 
         /**
          * @brief Check all indexes.
          *
          * <p>Normally done during manager StartServer.</p>
          */
-        void CreateIndexes() const;
+        void AWSMOCK_API CreateIndexes() const;
 
         /**
          * @brief Check whether we are running without database
@@ -92,17 +93,17 @@ namespace AwsMock::Database {
          *
          * @return database name
          */
-        [[nodiscard]] std::string GetDatabaseName() const;
+        [[nodiscard]] std::string AWSMOCK_API GetDatabaseName() const;
 
         /**
          * @brief Start the database
          */
-        void StartDatabase();
+        AWSMOCK_API void StartDatabase();
 
         /**
          * @brief Stops the database
          */
-        void StopDatabase();
+        AWSMOCK_API void StopDatabase();
 
       private:
 

@@ -25,6 +25,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -50,12 +51,12 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector();
+        explicit AWSMOCK_API MetricSystemCollector();
 
         /**
          * @brief Updates the system counter
          */
-        void CollectSystemCounter();
+        AWSMOCK_API void CollectSystemCounter();
 
 #ifdef __APPLE__
 

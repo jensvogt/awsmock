@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_MONITORING_SERVER_H
 
 // AwsMock includes
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
@@ -25,7 +26,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringServer(Core::PeriodicScheduler &scheduler);
+        explicit AWSMOCK_API MonitoringServer(Core::PeriodicScheduler &scheduler);
 
         /**
        * @brief Delete monitoring data older than the retention period.
@@ -33,7 +34,7 @@ namespace AwsMock::Service {
        * @par
        * Delete al monitoring data oder than the retention period. Default is 3 days, which means monitoring data older than 3 days will be deleted.
        */
-        [[maybe_unused]] void DeleteMonitoringData() const;
+        [[maybe_unused]] AWSMOCK_API void DeleteMonitoringData() const;
 
       private:
 

@@ -19,6 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
@@ -42,7 +43,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit MonitoringDatabase();
+        explicit AWSMOCK_API MonitoringDatabase();
 
         /**
          * @brief Singleton instance
@@ -60,7 +61,7 @@ namespace AwsMock::Database {
          * @param labelValue metric label name
          * @param value metric value
          */
-        void IncCounter(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+        AWSMOCK_API void IncCounter(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Sets a metric gauge
@@ -70,7 +71,7 @@ namespace AwsMock::Database {
          * @param labelValue metric label name
          * @param value metric value
          */
-        void SetGauge(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
+        AWSMOCK_API void SetGauge(const std::string &name, double value, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Returns the rolling mean
@@ -84,7 +85,7 @@ namespace AwsMock::Database {
          * @param limit value limit
          * @return list of counter values
          */
-        [[nodiscard]] std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
+        [[nodiscard]] AWSMOCK_API std::vector<Entity::Monitoring::Counter> GetMonitoringValues(const std::string &name, system_clock::time_point start, system_clock::time_point end, int step, const std::string &labelName = {}, const std::string &labelValue = {}, long limit = 10) const;
 
         /**
          * @brief Returns list of label values by label name
@@ -93,7 +94,7 @@ namespace AwsMock::Database {
          * @param labelName label name
          * @return list of label values
          */
-        [[nodiscard]] std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName) const;
+        [[nodiscard]] AWSMOCK_API std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName) const;
 
         /**
          * @brief Deletes old monitoring data
@@ -101,7 +102,7 @@ namespace AwsMock::Database {
          * @param retentionPeriod retention period in days
          * @return number of deleted data rows
          */
-        [[nodiscard]] long DeleteOldMonitoringData(int retentionPeriod) const;
+        [[nodiscard]] AWSMOCK_API long DeleteOldMonitoringData(int retentionPeriod) const;
 
       private:
 

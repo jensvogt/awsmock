@@ -6,6 +6,7 @@
 #define AWSMOCK_CORE_JSON_EXCEPTION_H
 
 // Boost includes
+#include <awsmock/core/Macros.h>
 #include <boost/beast/http.hpp>
 
 namespace AwsMock::Core {
@@ -28,7 +29,7 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit JsonException(http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
+        AWSMOCK_API explicit JsonException(http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * @brief Constructor.
@@ -38,51 +39,51 @@ namespace AwsMock::Core {
          * @param resource exception resource
          * @param requestId exception resource ID
          */
-        explicit JsonException(const std::string &msg, http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
+        AWSMOCK_API explicit JsonException(const std::string &msg, http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
          * @brief Copy constructor.
          *
          * @param exc parent exception.
          */
-        JsonException(const JsonException &exc);
+        AWSMOCK_API JsonException(const JsonException &exc);
 
         /**
          * @brief Destructor
          */
-        ~JsonException() noexcept override;
+        AWSMOCK_API ~JsonException() noexcept override;
 
         /**
          * @brief Assigment operator.
          */
-        JsonException &operator=(const JsonException &exc);
+        AWSMOCK_API JsonException &operator=(const JsonException &exc);
 
         /**
          * @brief Returns the exception message.
          */
-        [[nodiscard]] std::string message() const noexcept;
+        AWSMOCK_API [[nodiscard]] std::string message() const noexcept;
 
         /**
          * @brief Returns the exception message.
          */
-        [[nodiscard]] http::status code() const noexcept;
+        AWSMOCK_API [[nodiscard]] http::status code() const noexcept;
 
         /**
          * @brief Returns the exception resource.
          */
-        [[nodiscard]] const char *resource() const noexcept;
+        AWSMOCK_API [[nodiscard]] const char *resource() const noexcept;
 
         /**
          * @brief Returns the exception request ID.
          */
-        [[nodiscard]] const char *requestId() const noexcept;
+        AWSMOCK_API [[nodiscard]] const char *requestId() const noexcept;
 
         /**
          * @brief Overrides the std::exception message
          *
          * @return std::exception what
          */
-        [[nodiscard]] const char *what() const noexcept override {
+        AWSMOCK_API [[nodiscard]] const char *what() const noexcept override {
             return _message.c_str();
         }
 

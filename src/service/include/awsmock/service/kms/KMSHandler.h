@@ -7,6 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/dto/common/KMSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/kms/KMSService.h>
@@ -29,7 +30,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit KMSHandler() : AbstractHandler("kms-handler") {}
+        explicit AWSMOCK_API KMSHandler() : AbstractHandler("kms-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -40,7 +41,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

@@ -9,6 +9,7 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/transfer/TransferService.h>
 
@@ -31,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferHandler() : AbstractHandler("transfer-handler") {}
+        explicit AWSMOCK_API TransferHandler() : AbstractHandler("transfer-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -42,7 +43,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

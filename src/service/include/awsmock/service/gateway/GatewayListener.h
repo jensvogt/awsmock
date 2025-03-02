@@ -16,6 +16,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
@@ -36,7 +37,7 @@ namespace AwsMock::Service {
          * @param ioc Boost IO context
          * @param endpoint HTTP endpoint
          */
-        GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint);
+        AWSMOCK_API GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint);
 
         /**
          * @brief Start accepting incoming connections
@@ -44,7 +45,7 @@ namespace AwsMock::Service {
          * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
          * for single-threaded contexts, this example code is written to be thread-safe by default.
          */
-        void Run();
+        AWSMOCK_API void Run();
 
       private:
 
