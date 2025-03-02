@@ -30,26 +30,31 @@ set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cp
 set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp)
 set(MONITORING_SOURCES src/entity/monitoring/Counter.cpp src/repository/MonitoringDatabase.cpp)
 
-set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
-        ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
+set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
+        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
+        ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 add_subdirectory(tst)
+
+if (WIN32)
+    add_compile_options(/D AWSMOCK_EXPORTS)
+endif ()
 
 # Includes
 include_directories(./include ../core/include ${EXT_INCLUDE} ${INC_BSON_CXX} ${INC_MONGO_CXX})
 link_directories(${EXT_LIB})
 
 # Shared library
-#add_library(${LIBRARY} SHARED ${SOURCES})
-#target_link_libraries(${LIBRARY} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_YAML}
-#        ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+add_library(${LIBRARY} SHARED ${SOURCES})
+target_link_libraries(${LIBRARY} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM}
+        ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} ${STATIC_LIB} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX}
-        ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
-        ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+target_link_libraries(${LIBRARY_STATIC} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE}
+        ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE}
+        ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
 # Installation
-#install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})

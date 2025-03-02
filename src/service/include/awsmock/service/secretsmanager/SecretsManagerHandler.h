@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/dto/common/SecretsManagerClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -32,7 +33,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SecretsManagerHandler() : AbstractHandler("secretsmanager-handler") {}
+        explicit AWSMOCK_API SecretsManagerHandler() : AbstractHandler("secretsmanager-handler") {}
 
         /**
          * HTTP POST request.
@@ -43,7 +44,7 @@ namespace AwsMock::Service {
          * @return response HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

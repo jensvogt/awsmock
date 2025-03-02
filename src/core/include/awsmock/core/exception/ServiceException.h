@@ -8,6 +8,9 @@
 // Boost includes
 #include <boost/beast/http.hpp>
 
+// AwsMock includes
+#include <awsmock/core/Macros.h>
+
 namespace AwsMock::Core {
 
     namespace http = boost::beast::http;
@@ -26,7 +29,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit ServiceException(http::status code = http::status::internal_server_error);
+        AWSMOCK_API explicit ServiceException(http::status code = http::status::internal_server_error);
 
         /**
          * @brief Constructor.
@@ -34,36 +37,36 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit ServiceException(const std::string &msg, http::status code = http::status::internal_server_error);
+        AWSMOCK_API explicit ServiceException(const std::string &msg, http::status code = http::status::internal_server_error);
 
         /**
          * @brief Copy constructor.
          *
          * @param exc parent exception.
          */
-        ServiceException(const ServiceException &exc);
+        AWSMOCK_API ServiceException(const ServiceException &exc);
 
         /**
          * @brief Destructor
          */
-        ~ServiceException() noexcept override;
+        AWSMOCK_API ~ServiceException() noexcept override;
 
         /**
          * @brief Returns the exception message.
          */
-        [[nodiscard]] std::string message() const noexcept;
+        AWSMOCK_API [[nodiscard]] std::string message() const noexcept;
 
         /**
          * @brief Returns the exception message.
          */
-        [[nodiscard]] http::status code() const noexcept;
+        AWSMOCK_API [[nodiscard]] http::status code() const noexcept;
 
         /**
          * @brief Overrides the std::exception message
          *
          * @return std::exception what
          */
-        [[nodiscard]] const char *what() const noexcept override {
+        AWSMOCK_API [[nodiscard]] const char *what() const noexcept override {
             return _message.c_str();
         }
 

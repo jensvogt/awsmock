@@ -18,6 +18,9 @@
 #include <openssl/sha.h>
 #include <openssl/srp.h>
 
+// AwsMock includes
+#include <awsmock/core/Macros.h>
+
 namespace AwsMock::Core {
 
     enum { M_FROM_K,
@@ -30,14 +33,14 @@ namespace AwsMock::Core {
 
       public:
 
-        explicit SrpUtils(int nMFrom = M_FROM_K);
+        AWSMOCK_API explicit SrpUtils(int nMFrom = M_FROM_K);
         ~SrpUtils();
 
-        const BIGNUM *CalcB();
-        bool CalcV(BIGNUM **ppSalt, const char *pszPassword);
-        void SetSaltAndV(BIGNUM *pSalt, BIGNUM *pV);
-        bool VerifyA(const BIGNUM *pA);
-        bool VerifyM1(const BIGNUM *pM1);
+        AWSMOCK_API const BIGNUM *CalcB();
+        AWSMOCK_API bool CalcV(BIGNUM **ppSalt, const char *pszPassword);
+        AWSMOCK_API void SetSaltAndV(BIGNUM *pSalt, BIGNUM *pV);
+        AWSMOCK_API bool VerifyA(const BIGNUM *pA);
+        AWSMOCK_API bool VerifyM1(const BIGNUM *pM1);
 
         /**
          * @brief Verify the initial SPR_A parameter of a InitialAuth flow.
@@ -45,7 +48,7 @@ namespace AwsMock::Core {
          * @param srpAStr SPA_A auth parameter
          * @return true if it is verified
          */
-        bool VerifyA(const std::string &srpAStr);
+        AWSMOCK_API bool VerifyA(const std::string &srpAStr);
 
       private:
 

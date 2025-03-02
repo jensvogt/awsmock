@@ -7,6 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/repository/S3Database.h>
 
@@ -37,7 +38,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3HashCreator() = default;
+        explicit AWSMOCK_API S3HashCreator() = default;
 
         /**
          * @brief Work method
@@ -47,7 +48,7 @@ namespace AwsMock::Service {
          * @param algorithms vector of algorithm names
          * @param object S3 object to hash
          */
-        void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const;
+        AWSMOCK_API void operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const;
     };
 
 }// namespace AwsMock::Service

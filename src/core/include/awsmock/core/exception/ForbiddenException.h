@@ -9,6 +9,9 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/status.hpp>
 
+// AwsMock includes
+#include <awsmock/core/Macros.h>
+
 namespace AwsMock::Core {
 
     namespace http = boost::beast::http;
@@ -27,7 +30,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit ForbiddenException(http::status code = http::status::forbidden);
+        AWSMOCK_API explicit ForbiddenException(http::status code = http::status::forbidden);
 
         /**
          * @brief Constructor.
@@ -35,36 +38,36 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit ForbiddenException(const std::string &msg, http::status code = http::status::forbidden);
+        AWSMOCK_API explicit ForbiddenException(const std::string &msg, http::status code = http::status::forbidden);
 
         /**
          * @brief Copy constructor.
          *
          * @param exc parent exception.
          */
-        ForbiddenException(const ForbiddenException &exc);
+        AWSMOCK_API ForbiddenException(const ForbiddenException &exc);
 
         /**
          * @brief Destructor
          */
-        ~ForbiddenException() noexcept override;
+        AWSMOCK_API ~ForbiddenException() noexcept override;
 
         /**
          * @brief Assigment operator.
          */
-        ForbiddenException &operator=(const ForbiddenException &exc);
+        AWSMOCK_API ForbiddenException &operator=(const ForbiddenException &exc);
 
         /**
          * @brief Rethrows the exception.
          */
-        void rethrow() const;
+        AWSMOCK_API void rethrow() const;
 
         /**
          * @brief Overrides the std::exception message
          *
          * @return std::exception what
          */
-        [[nodiscard]] const char *what() const noexcept override {
+        AWSMOCK_API [[nodiscard]] const char *what() const noexcept override {
             return _message.c_str();
         }
 

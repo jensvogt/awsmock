@@ -16,6 +16,9 @@
 #include <boost/beast/http/status.hpp>
 #include <utility>
 
+// AwsMock includes
+#include <awsmock/core/Macros.h>
+
 namespace AwsMock::Core {
 
     /**
@@ -32,7 +35,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        explicit BadRequestException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {}
+        AWSMOCK_API explicit BadRequestException(const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code) {}
 
         /**
          * Constructor.
@@ -40,36 +43,36 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        explicit BadRequestException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {}
+        AWSMOCK_API explicit BadRequestException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::bad_request) : _code(code), _message(std::move(msg)) {}
 
         /**
          * Copy constructor.
          *
          * @param exc parent exception.
          */
-        BadRequestException(const BadRequestException &exc);
+        AWSMOCK_API BadRequestException(const BadRequestException &exc);
 
         /**
          * Destructor
          */
-        ~BadRequestException() noexcept override;
+        AWSMOCK_API ~BadRequestException() noexcept override;
 
         /**
          * Assigment operator.
          */
-        BadRequestException &operator=(const BadRequestException &exc);
+        AWSMOCK_API BadRequestException &operator=(const BadRequestException &exc);
 
         /**
          * Rethrows the exception.
          */
-        void rethrow() const;
+        AWSMOCK_API void rethrow() const;
 
         /**
          * @brief Overrides the std::exception message
          *
          * @return std::exception what
          */
-        [[nodiscard]] const char *what() const noexcept override {
+        AWSMOCK_API [[nodiscard]] const char *what() const noexcept override {
             return _message.c_str();
         }
 

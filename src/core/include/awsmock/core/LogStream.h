@@ -21,6 +21,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogFormatter.h>
+#include <awsmock/core/Macros.h>
 
 #define DEFAULT_LOG_SIZE (10 * 1024 * 1024)
 #define DEFAULT_LOG_COUNT 5
@@ -41,7 +42,7 @@ namespace AwsMock::Core {
         /**
          * @brief Constructor
          */
-        LogStream() = default;
+        AWSMOCK_API LogStream() = default;
 
         /**
          * @brief Initialization

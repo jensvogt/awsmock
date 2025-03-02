@@ -15,6 +15,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
@@ -89,21 +90,21 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] AWSMOCK_API view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
-        void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
+        AWSMOCK_API void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
 
         /**
          * @brief Converts the entity to a string representation.
          *
          * @return entity as string
          */
-        [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] AWSMOCK_API std::string ToString() const;
 
         /**
          * @brief Stream provider.
@@ -112,7 +113,7 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param group group entity
          * @return output string
          */
-        friend std::ostream &operator<<(std::ostream &os, const Group &group);
+        AWSMOCK_API friend std::ostream &operator<<(std::ostream &os, const Group &group);
     };
 
     typedef std::vector<Group> GroupList;

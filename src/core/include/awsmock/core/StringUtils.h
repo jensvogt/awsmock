@@ -26,6 +26,9 @@
 // JWT includes
 #include <jwt-cpp/base.h>
 
+// AwsMock includes
+#include <awsmock/core/Macros.h>
+
 namespace AwsMock::Core {
 
     /**

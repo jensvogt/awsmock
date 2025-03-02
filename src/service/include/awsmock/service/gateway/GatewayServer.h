@@ -14,12 +14,10 @@
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewayListener.h>
 #include <awsmock/service/gateway/GatewayWorker.h>
-
-#define GATEWAY_DEFAULT_HOST "localhost"
-#define GATEWAY_DEFAULT_ADDRESS "0.0.0.0"
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;    // from <boost/beast/http.hpp>
@@ -47,12 +45,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayServer(boost::asio::io_context &ios);
+        explicit AWSMOCK_API GatewayServer(boost::asio::io_context &ios);
 
         /**
          * @brief HTTP request worker
          */
-        void operator()() const;
+        AWSMOCK_API void operator()() const;
 
       private:
 

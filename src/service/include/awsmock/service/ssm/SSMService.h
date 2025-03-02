@@ -12,6 +12,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/ssm/DeleteParameterRequest.h>
 #include <awsmock/dto/ssm/DescribeParametersRequest.h>
@@ -44,7 +45,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SSMService();
+        explicit AWSMOCK_API SSMService();
 
         /**
          * @brief Creates a new parameter
@@ -54,7 +55,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::PutParameterRequest
          * @see Dto::KMS::PutParameterResponse
          */
-        Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
+        AWSMOCK_API Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
 
         /**
          * @brief Returns a new parameter
@@ -64,7 +65,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::GetParameterRequest
          * @see Dto::KMS::GetParameterResponse
          */
-        Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
+        AWSMOCK_API Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
 
         /**
          * @brief Describe the parameters
@@ -74,7 +75,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DescribeParametersRequest
          * @see Dto::KMS::DescribeParametersResponse
          */
-        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
+        AWSMOCK_API Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
 
         /**
          * @brief Deletes a parameter
@@ -82,7 +83,7 @@ namespace AwsMock::Service {
          * @param request delete parameter request
          * @see Dto::KMS::DeleteParameterRequest
          */
-        void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const;
+        AWSMOCK_API void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const;
 
       private:
 

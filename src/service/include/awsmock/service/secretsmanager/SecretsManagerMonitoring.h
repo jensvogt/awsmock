@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_SECRETSMANAGER_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/Macros.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -24,12 +25,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerMonitoring() = default;
+        explicit AWSMOCK_API SecretsManagerMonitoring() = default;
 
         /**
          * @brief Update counters
          */
-        void UpdateCounter();
+        AWSMOCK_API void UpdateCounter();
 
       private:
 

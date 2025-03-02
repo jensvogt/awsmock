@@ -2,7 +2,7 @@
 // Created by vogje01 on 21/12/2022.
 // Copyright 2022 - 2024 Jens Vogt
 //
-// This file is part of aws-mock.
+// This file is part of awsmock (AWS Cloud Simulation).
 //
 // aws-mock is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,11 +22,9 @@
 #include <iostream>
 
 // Boost includes
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
 // AwsMock includes
 #include <awsmock/controller/Controller.h>
 
@@ -167,3 +165,9 @@ int main(const int argc, char *argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+#ifdef WIN32
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    return main(__argc, __argv);
+}
+#endif

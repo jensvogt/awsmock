@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
@@ -20,10 +21,6 @@
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/s3/S3Service.h>
-
-#define LAMBDA_DEFAULT_MONITORING_PERIOD 300
-#define LAMBDA_DEFAULT_WORKER_PERIOD 300
-#define LAMBDA_DEFAULT_LIFETIME 3600
 
 namespace AwsMock::Service {
 
@@ -39,12 +36,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaServer(Core::PeriodicScheduler &scheduler);
+        explicit AWSMOCK_API LambdaServer(Core::PeriodicScheduler &scheduler);
 
         /**
          * @brief Shutdown server
          */
-        void Shutdown() override;
+        AWSMOCK_API void Shutdown() override;
 
       private:
 

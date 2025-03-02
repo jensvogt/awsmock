@@ -12,6 +12,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/secretsmanager/CreateSecretRequest.h>
@@ -30,8 +31,6 @@
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
-#define DEFAULT_ACCOUNT_ID "000000000000"
-
 namespace AwsMock::Service {
 
     /**
@@ -46,7 +45,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SecretsManagerService();
+        explicit AWSMOCK_API SecretsManagerService();
 
         /**
          * Create a new secret
@@ -54,7 +53,7 @@ namespace AwsMock::Service {
          * @param request create secret request
          * @return CreateSecretResponse
          */
-        [[nodiscard]] Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const;
 
         /**
          * Describes an existing secret
@@ -62,7 +61,7 @@ namespace AwsMock::Service {
          * @param request describe secret request
          * @return DescribeSecretResponse
          */
-        [[nodiscard]] Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const;
 
         /**
          * Returns the secret value
@@ -70,7 +69,7 @@ namespace AwsMock::Service {
          * @param request get secret value request
          * @return GetSecretValueResponse
          */
-        [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
 
         /**
          * List existing secrets
@@ -78,7 +77,7 @@ namespace AwsMock::Service {
          * @param request list secrets request
          * @return ListSecretsResponse
          */
-        [[nodiscard]] Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
 
         /**
          * Updates an existing secret
@@ -86,7 +85,7 @@ namespace AwsMock::Service {
          * @param request update secret request
          * @return UpdateSecretResponse
          */
-        [[nodiscard]] Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const;
 
         /**
          * Rotates an existing secret
@@ -94,7 +93,7 @@ namespace AwsMock::Service {
          * @param request rotate secret request
          * @return RotateSecretResponse
          */
-        [[nodiscard]] Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const;
 
         /**
          * Deletes an existing secret
@@ -102,7 +101,7 @@ namespace AwsMock::Service {
          * @param request delete secret request
          * @return DeleteSecretResponse
          */
-        [[nodiscard]] Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::SecretsManager::DeleteSecretResponse DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const;
 
       private:
 

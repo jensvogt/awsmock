@@ -14,6 +14,7 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/memorydb/SecretsManagerMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -32,7 +33,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerDatabase();
+        explicit AWSMOCK_API SecretsManagerDatabase();
 
         /**
          * @brief Singleton instance
@@ -50,7 +51,7 @@ namespace AwsMock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        bool SecretExists(const std::string &region, const std::string &name) const;
+        AWSMOCK_API bool SecretExists(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Secret exists
@@ -59,7 +60,7 @@ namespace AwsMock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        bool SecretExists(const Entity::SecretsManager::Secret &secret) const;
+        AWSMOCK_API bool SecretExists(const Entity::SecretsManager::Secret &secret) const;
 
         /**
          * @brief Secret exists
@@ -68,7 +69,7 @@ namespace AwsMock::Database {
          * @return true if secret exists
          * @throws DatabaseException
          */
-        bool SecretExists(const std::string &secretId) const;
+        AWSMOCK_API bool SecretExists(const std::string &secretId) const;
 
         /**
          * @brief Returns the secret by oid
@@ -77,7 +78,7 @@ namespace AwsMock::Database {
          * @return secret, if existing
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid) const;
+        AWSMOCK_API Entity::SecretsManager::Secret GetSecretById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns the secret by userPoolId
@@ -86,7 +87,7 @@ namespace AwsMock::Database {
          * @return secret, if existing
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret GetSecretById(const std::string &oid) const;
+        AWSMOCK_API Entity::SecretsManager::Secret GetSecretById(const std::string &oid) const;
 
         /**
          * @brief Returns the secret by region and name.
@@ -95,7 +96,7 @@ namespace AwsMock::Database {
          * @param name secret name
          * @return secret entity
          */
-        Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name) const;
+        AWSMOCK_API Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Returns the secret by secret ID.
@@ -103,7 +104,7 @@ namespace AwsMock::Database {
          * @param secretId secret ID
          * @return secret entity
          */
-        Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId) const;
+        AWSMOCK_API Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId) const;
 
         /**
          * @brief Creates a new secret in the secrets collection
@@ -112,7 +113,7 @@ namespace AwsMock::Database {
          * @return created secret entity
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret) const;
+        AWSMOCK_API Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret) const;
 
         /**
          * @brief Updates an existing secret
@@ -121,7 +122,7 @@ namespace AwsMock::Database {
          * @return updated secret entity
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret) const;
+        AWSMOCK_API Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret) const;
 
         /**
          * @brief Creates or updates a secret in the secrets collection
@@ -130,7 +131,7 @@ namespace AwsMock::Database {
          * @return created secret entity
          * @throws DatabaseException
          */
-        Entity::SecretsManager::Secret CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) const;
+        AWSMOCK_API Entity::SecretsManager::Secret CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) const;
 
         /**
          * @brief Returns a list of secrets
@@ -138,7 +139,7 @@ namespace AwsMock::Database {
          * @return list of available secrets
          * @throws DatabaseException
          */
-        Entity::SecretsManager::SecretList ListSecrets() const;
+        AWSMOCK_API Entity::SecretsManager::SecretList ListSecrets() const;
 
         /**
          * @brief Returns the total number of secrets
@@ -147,7 +148,7 @@ namespace AwsMock::Database {
          * @return total number of secrets
          * @throws DatabaseException
          */
-        long CountSecrets(const std::string &region = {}) const;
+        AWSMOCK_API long CountSecrets(const std::string &region = {}) const;
 
         /**
          * @brief Delete a secret.
@@ -155,14 +156,14 @@ namespace AwsMock::Database {
          * @param secret secret entity
          * @throws DatabaseException
          */
-        void DeleteSecret(const Entity::SecretsManager::Secret &secret) const;
+        AWSMOCK_API void DeleteSecret(const Entity::SecretsManager::Secret &secret) const;
 
         /**
          * @brief Delete all secret.
          *
          * @throws DatabaseException
          */
-        void DeleteAllSecrets() const;
+        AWSMOCK_API void DeleteAllSecrets() const;
 
       private:
 

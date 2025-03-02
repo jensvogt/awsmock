@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -36,7 +37,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler() : AbstractHandler("dynamodb-handler") {}
+        explicit AWSMOCK_API DynamoDbHandler() : AbstractHandler("dynamodb-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -47,7 +48,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandlePostRequest
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

@@ -28,11 +28,11 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#ifdef WIN32
-#include <boost/application.hpp>
-#include <boost/application/initializers.hpp>
-#include <boost/application/service_setup.hpp>
-#endif
+//#ifdef WIN32
+//#include <boost/application.hpp>
+//#include <boost/application/initializers.hpp>
+//#include <boost/application/service_setup.hpp>
+//#endif
 
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
@@ -101,35 +101,35 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-#ifdef WIN32
-    if (vm.count("install")) {
-        boost::system::error_code ec;
-        boost::application::example::install_windows_service(
-                boost::application::setup_arg(vm["name"].as<std::string>()),
-                boost::application::setup_arg(vm["display"].as<std::string>()),
-                boost::application::setup_arg(vm["description"].as<std::string>()),
-                boost::application::setup_arg(vm["path"].as<std::string>()))
-                .install(ec);
-        log_info << "Windows service installed";
-        return 1;
-    }
-
-    if (vm.count("check")) {
-        boost::system::error_code ec;
-        bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
-
-        if (ec)
-            std::cout << ec.message() << std::endl;
-        else {
-            if (exist)
-                std::cout << "The service " << vm["name"].as<std::string>() << " is installed!" << std::endl;
-            else
-                std::cout << "The service " << vm["name"].as<std::string>() << " is NOT installed!" << std::endl;
-        }
-        return 0;
-    }
-
-#endif
+    //#ifdef WIN32
+    //    if (vm.count("install")) {
+    //        boost::system::error_code ec;
+    //        boost::application::example::install_windows_service(
+    //                boost::application::setup_arg(vm["name"].as<std::string>()),
+    //                boost::application::setup_arg(vm["display"].as<std::string>()),
+    //                boost::application::setup_arg(vm["description"].as<std::string>()),
+    //                boost::application::setup_arg(vm["path"].as<std::string>()))
+    //                .install(ec);
+    //        log_info << "Windows service installed";
+    //        return 1;
+    //    }
+    //
+    //    if (vm.count("check")) {
+    //        boost::system::error_code ec;
+    //        bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
+    //
+    //        if (ec)
+    //            std::cout << ec.message() << std::endl;
+    //        else {
+    //            if (exist)
+    //                std::cout << "The service " << vm["name"].as<std::string>() << " is installed!" << std::endl;
+    //            else
+    //                std::cout << "The service " << vm["name"].as<std::string>() << " is NOT installed!" << std::endl;
+    //        }
+    //        return 0;
+    //    }
+    //
+    //#endif
 
     // Read configuration
     std::string configFilename = vm["config"].as<std::string>();
@@ -164,3 +164,9 @@ int main(int argc, char *argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+#ifdef WIN32
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    return main(__argc, __argv);
+}
+#endif

@@ -20,6 +20,7 @@
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
@@ -36,11 +37,8 @@
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
 
-#define NETWORK_NAME ".dockerhost.net"
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
-#define CONTAINER_PORT "8080/tcp"
-#define NETWORK_DEFAULT_MODE "local"
 
 namespace AwsMock::Service {
 
@@ -90,7 +88,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ContainerService();
+        explicit AWSMOCK_API ContainerService();
 
         /**
          * @brief Singleton instance
@@ -107,7 +105,7 @@ namespace AwsMock::Service {
          * @param tag image tags
          * @param imageCode code of the image
          */
-        void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode) const;
+        AWSMOCK_API void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode) const;
 
         /**
          * @brief Checks whether an image exists.
@@ -116,7 +114,7 @@ namespace AwsMock::Service {
          * @param tag image tags
          * @return true if image exists, otherwise false
          */
-        bool ImageExists(const std::string &name, const std::string &tag) const;
+        AWSMOCK_API bool ImageExists(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Returns a image by name/tags.
@@ -126,7 +124,7 @@ namespace AwsMock::Service {
          * @param locked if true is already locked
          * @return Image
          */
-        [[nodiscard]] Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
+        [[nodiscard]] AWSMOCK_API Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
 
         /**
          * @brief Build a docker image for a lambda
@@ -139,7 +137,7 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+        [[nodiscard]] AWSMOCK_API std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Build a docker image from a docker file
@@ -149,14 +147,14 @@ namespace AwsMock::Service {
          * @param dockerFile docker file
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
+        [[nodiscard]] AWSMOCK_API std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
 
         /**
          * @brief Delete an image by name/tags.
          *
          * @param id image ID
          */
-        void DeleteImage(const std::string &id) const;
+        AWSMOCK_API void DeleteImage(const std::string &id) const;
 
         /**
          * @brief Checks whether a container exists.
@@ -165,7 +163,7 @@ namespace AwsMock::Service {
          * @param tag container tags
          * @return true if container exists, otherwise false
          */
-        [[nodiscard]] bool ContainerExists(const std::string &name, const std::string &tag) const;
+        [[nodiscard]] AWSMOCK_API bool ContainerExists(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Checks whether a container exists by ID.
@@ -173,7 +171,7 @@ namespace AwsMock::Service {
          * @param id container ID
          * @return true if container exists, otherwise false
          */
-        [[nodiscard]] bool ContainerExists(const std::string &id) const;
+        [[nodiscard]] AWSMOCK_API bool ContainerExists(const std::string &id) const;
 
         /**
          * @brief Checks whether a container exists by name.
@@ -181,7 +179,7 @@ namespace AwsMock::Service {
          * @param containerName container name
          * @return true if container exists, otherwise false
          */
-        [[nodiscard]] bool ContainerExistsByName(const std::string &containerName) const;
+        [[nodiscard]] AWSMOCK_API bool ContainerExistsByName(const std::string &containerName) const;
 
         /**
          * @brief Checks whether a container is in running state
@@ -192,7 +190,7 @@ namespace AwsMock::Service {
          * @param containerId container ID
          * @return true if container is running, otherwise false
          */
-        [[nodiscard]] bool IsContainerRunning(const std::string &containerId) const;
+        [[nodiscard]] AWSMOCK_API bool IsContainerRunning(const std::string &containerId) const;
 
         /**
          * @brief Waits until a container is in running state
@@ -202,7 +200,7 @@ namespace AwsMock::Service {
          *
          * @param containerId container ID
          */
-        void WaitForContainer(const std::string &containerId) const;
+        AWSMOCK_API void WaitForContainer(const std::string &containerId) const;
 
         /**
          * @brief List all docker images, with the given name and different tags.
@@ -210,7 +208,7 @@ namespace AwsMock::Service {
          * @param name name of the image
          * @return ListImageResponse
          */
-        [[nodiscard]] Dto::Docker::ListImageResponse ListImages(const std::string &name) const;
+        [[nodiscard]] AWSMOCK_API Dto::Docker::ListImageResponse ListImages(const std::string &name) const;
 
         /**
          * @brief Creates a container
@@ -225,7 +223,7 @@ namespace AwsMock::Service {
          * @param hostPort external port of the lambda
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) const;
+        AWSMOCK_API Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) const;
 
         /**
          * @brief Creates a container for a predefined image.
@@ -240,7 +238,7 @@ namespace AwsMock::Service {
          * @param containerPort internal port of the container
          * @return CreateContainerResponse
          */
-        Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const;
+        AWSMOCK_API Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const;
 
         /**
          * @brief Returns a container by name/tags.
@@ -249,7 +247,7 @@ namespace AwsMock::Service {
          * @param tag container tags
          * @return Container
          */
-        Dto::Docker::Container GetFirstContainerByImageName(const std::string &name, const std::string &tag) const;
+        AWSMOCK_API Dto::Docker::Container GetFirstContainerByImageName(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Returns a container by ID.
@@ -257,7 +255,7 @@ namespace AwsMock::Service {
          * @param containerId container ID
          * @return Container
          */
-        Dto::Docker::Container GetContainerById(const std::string &containerId) const;
+        AWSMOCK_API Dto::Docker::Container GetContainerById(const std::string &containerId) const;
 
         /**
          * @brief Inspect a container
@@ -266,7 +264,7 @@ namespace AwsMock::Service {
          * @return Container
          * @see Dto::Docker::InspectContainerResponse
          */
-        Dto::Docker::InspectContainerResponse InspectContainer(const std::string &containerId) const;
+        AWSMOCK_API Dto::Docker::InspectContainerResponse InspectContainer(const std::string &containerId) const;
 
         /**
          * @brief Returns a container by name.
@@ -274,7 +272,7 @@ namespace AwsMock::Service {
          * @param name container name
          * @return Container
          */
-        Dto::Docker::Container GetContainerByName(const std::string &name) const;
+        AWSMOCK_API Dto::Docker::Container GetContainerByName(const std::string &name) const;
 
         /**
          * @brief List all containers of an given image.
@@ -283,7 +281,7 @@ namespace AwsMock::Service {
          * @param tag image tag
          * @return list of containers
          */
-        std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag) const;
+        AWSMOCK_API std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Checks whether a network exists.
@@ -291,7 +289,7 @@ namespace AwsMock::Service {
          * @param name network name
          * @return true if network exists, otherwise false
          */
-        bool NetworkExists(const std::string &name) const;
+        AWSMOCK_API bool NetworkExists(const std::string &name) const;
 
         /**
          * @brief Creates a network with the given name
@@ -299,49 +297,49 @@ namespace AwsMock::Service {
          * @param request create network request
          * @return CreateNetworkResponse
          */
-        Dto::Docker::CreateNetworkResponse CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) const;
+        AWSMOCK_API Dto::Docker::CreateNetworkResponse CreateNetwork(const Dto::Docker::CreateNetworkRequest &request) const;
 
         /**
          * @brief Start the container
          *
          * @param id container ID
          */
-        void StartDockerContainer(const std::string &id) const;
+        AWSMOCK_API void StartDockerContainer(const std::string &id) const;
 
         /**
          * @brief Restart the container
          *
          * @param id container ID
          */
-        void RestartDockerContainer(const std::string &id) const;
+        AWSMOCK_API void RestartDockerContainer(const std::string &id) const;
 
         /**
          * @brief Restart the container
          *
          * @param container container
          */
-        void RestartContainer(const Dto::Docker::Container &container) const;
+        AWSMOCK_API void RestartContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Stops the container
          *
          * @param container container
          */
-        void StopContainer(const Dto::Docker::Container &container) const;
+        AWSMOCK_API void StopContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Stops the container by ID
          *
          * @param id container ID
          */
-        void StopContainer(const std::string &id) const;
+        AWSMOCK_API void StopContainer(const std::string &id) const;
 
         /**
          * @brief Deletes the container
          *
          * @param container container DTO
          */
-        void DeleteContainer(const Dto::Docker::Container &container) const;
+        AWSMOCK_API void DeleteContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Delete all container with the given image name as anchestor
@@ -349,19 +347,19 @@ namespace AwsMock::Service {
          * @param imageName image name
          * @param tag image tag
          */
-        void DeleteContainers(const std::string &imageName, const std::string &tag) const;
+        AWSMOCK_API void DeleteContainers(const std::string &imageName, const std::string &tag) const;
 
         /**
          * @brief Deletes the container by ID
          *
          * @param containerId container ID
          */
-        void DeleteContainer(const std::string &containerId) const;
+        AWSMOCK_API void DeleteContainer(const std::string &containerId) const;
 
         /**
          * @brief Deletes all stopped containers.
          */
-        void PruneContainers() const;
+        AWSMOCK_API void PruneContainers() const;
 
       private:
 

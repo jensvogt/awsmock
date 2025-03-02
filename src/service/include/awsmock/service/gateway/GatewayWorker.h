@@ -23,6 +23,7 @@
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -57,14 +58,14 @@ namespace AwsMock::Service {
          * @param acceptor request acceptor
          * @param docRoot document root directory
          */
-        GatewayWorker(tcp::acceptor &acceptor, std::string docRoot);
+        AWSMOCK_API GatewayWorker(tcp::acceptor &acceptor, std::string docRoot);
 
         /**
          * @brief Copy constructor
          *
          * @param worker worker to copy from
          */
-        GatewayWorker(GatewayWorker const &worker) = delete;
+        AWSMOCK_API GatewayWorker(GatewayWorker const &worker) = delete;
 
         /**
          * @brief Assignment constructor
@@ -72,12 +73,12 @@ namespace AwsMock::Service {
          * @param worker worker to assign from
          * @return assigned worker
          */
-        GatewayWorker &operator=(GatewayWorker const &worker) = delete;
+        AWSMOCK_API GatewayWorker &operator=(GatewayWorker const &worker) = delete;
 
         /**
          * @brief Start the server
          */
-        void Start();
+        AWSMOCK_API void Start();
 
       private:
 
@@ -130,7 +131,7 @@ namespace AwsMock::Service {
         boost::optional<http::request_parser<request_body_t, alloc_t>> _gatewayParser;
 
         // The timer putting a time limit on requests.
-        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max)()};
+        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max) ()};
 
         // The string-based response message.
         boost::optional<http::response<http::string_body, http::basic_fields<alloc_t>>> _stringResponse;

@@ -21,15 +21,21 @@ add_subdirectory(tst)
 include_directories(./include ${EXT_INCLUDE} ${INC_BSON_CXX} ${INC_MONGO_CXX})
 link_directories(${EXT_LIB})
 
+if (WIN32)
+    add_compile_options(/D AWSMOCK_EXPORTS)
+endif ()
+
 # Shared library
-#add_library(${LIBRARY} SHARED ${SOURCES})
-#target_link_libraries(${LIBRARY} ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_MONGO_C} ${LIB_BSON_C} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_YAML}
-#        ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+add_library(${LIBRARY} SHARED ${SOURCES})
+target_link_libraries(${LIBRARY} ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_MONGO_C} ${LIB_BSON_C} ${LIB_BOOST_LOCALE}
+        ${LIB_BOOST_FILESYSTEM} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS}
+        ${LIB_MAGIC})
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_MONGO_C} ${LIB_BSON_C} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_YAML}
-        ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+target_link_libraries(${LIBRARY_STATIC} ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_MONGO_C} ${LIB_BSON_C} ${LIB_BOOST_LOCALE}
+        ${LIB_BOOST_FILESYSTEM} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS}
+        ${LIB_MAGIC})
 
 # Installation
-#install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})

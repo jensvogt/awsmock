@@ -11,6 +11,9 @@
 // Boost includes
 #include <boost/lexical_cast.hpp>
 
+// AwsMock includes
+#include <awsmock/core/Macros.h>
+
 namespace AwsMock::Core {
 
     /**

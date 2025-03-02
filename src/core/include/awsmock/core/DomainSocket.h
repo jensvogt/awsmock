@@ -17,6 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 
@@ -31,7 +32,7 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit DomainSocket(const std::string &path) : _path(path){};
+        AWSMOCK_API explicit DomainSocket(const std::string &path) : _path(path){};
 
         /**
          * @brief Send JSON data
@@ -46,7 +47,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}) const;
+        AWSMOCK_API DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}) const;
 
         /**
          * @brief Send binary data
@@ -61,7 +62,7 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {}) const;
+        AWSMOCK_API DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {}) const;
 
       private:
 

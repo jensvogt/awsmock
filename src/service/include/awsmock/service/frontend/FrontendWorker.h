@@ -21,9 +21,10 @@
 #include <boost/numeric/ublas/fwd.hpp>
 
 // AwsMock includes
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
@@ -45,14 +46,14 @@ namespace AwsMock::Service::Frontend {
          * @param acceptor request acceptor
          * @param docRoot document root directory
          */
-        FrontendWorker(boost::asio::ip::tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {}
+        AWSMOCK_API FrontendWorker(boost::asio::ip::tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {}
 
         /**
          * @brief Copy constructor
          *
          * @param worker worker to copy from
          */
-        FrontendWorker(FrontendWorker const &worker) = delete;
+        AWSMOCK_API FrontendWorker(FrontendWorker const &worker) = delete;
 
         /**
          * @brief Assignment constructor
@@ -60,12 +61,12 @@ namespace AwsMock::Service::Frontend {
          * @param worker worker to assign from
          * @return assigned worker
          */
-        FrontendWorker &operator=(FrontendWorker const &worker) = delete;
+        AWSMOCK_API FrontendWorker &operator=(FrontendWorker const &worker) = delete;
 
         /**
          * @brief Start the server
          */
-        void Start();
+        AWSMOCK_API void Start();
 
       private:
 

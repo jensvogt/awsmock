@@ -18,6 +18,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
@@ -55,12 +56,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
-        explicit KMSService();
+        explicit AWSMOCK_API KMSService();
 
         /**
-         * List all keys
+         * @brief List all keys
          *
          * @param request list queue request
          * @return ListKeysResponse
@@ -68,17 +69,17 @@ namespace AwsMock::Service {
          * @see Dto::KMS::ListKeysRequest
          * @see Dto::KMS::ListKeysResponse
          */
-        Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
+        AWSMOCK_API Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
 
         /**
-         * Creates a new key
+         * @brief Creates a new key
          *
          * @param request create key request
          * @return CreateKeyResponse
          * @see Dto::KMS::CreateKeyRequest
          * @see Dto::KMS::CreateKeyResponse
          */
-        Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
+        AWSMOCK_API Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
 
         /**
          * @brief Wait for the asynchronous key creation
@@ -86,7 +87,7 @@ namespace AwsMock::Service {
          * @param keyId key ID
          * @param maxSeconds maximal seconds
          */
-        void WaitForRsaKey(const std::string &keyId, int maxSeconds) const;
+        AWSMOCK_API void WaitForRsaKey(const std::string &keyId, int maxSeconds) const;
 
         /**
          * @brief Wait for the asynchronous key creation
@@ -94,20 +95,20 @@ namespace AwsMock::Service {
          * @param keyId key ID
          * @param maxSeconds maximal seconds
          */
-        void WaitForAesKey(const std::string &keyId, int maxSeconds) const;
+        AWSMOCK_API void WaitForAesKey(const std::string &keyId, int maxSeconds) const;
 
         /**
-         * Schedules a key deletion
+         * @brief Schedules a key deletion
          *
          * @param request create queue request
          * @return ScheduleKeyDeletionRequest
          * @throws Core::DatabaseException
          * @see Dto::KMS::ScheduledKeyDeletionResponse
          */
-        Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
+        AWSMOCK_API Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
 
         /**
-         * Describe a key
+         * @brief Describe a key
          *
          * @param request describe key request
          * @return DescribeKeyResponse
@@ -115,10 +116,10 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DescribeKeyRequest
          * @see Dto::KMS::DescribeKeyResponse
          */
-        Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
 
         /**
-         * Encrypt a plain text using a given algorithm
+         * @brief Encrypt a plain text using a given algorithm
          *
          * @param request encrypt request
          * @return EncryptResponse
@@ -126,10 +127,10 @@ namespace AwsMock::Service {
          * @see Dto::KMS::EncryptRequest
          * @see Dto::KMS::EncryptResponse
          */
-        Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
+        [[nodiscard]] AWSMOCK_API Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
 
         /**
-         * Decrypts a cipher text using a given algorithm
+         * @brief Decrypts a cipher text using a given algorithm
          *
          * @param request decrypt request
          * @return DecryptResponse
@@ -137,12 +138,12 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DecryptRequest
          * @see Dto::KMS::DecryptResponse
          */
-        Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
+        AWSMOCK_API Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
 
       private:
 
         /**
-         * Encrypt a plaintext.
+         * @brief Encrypt a plaintext.
          *
          * @param key KMS key
          * @param plainText plain text
@@ -151,7 +152,7 @@ namespace AwsMock::Service {
         static std::string EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText);
 
         /**
-         * Decrypt a ciphertext.
+         * @brief Decrypt a ciphertext.
          *
          * @param key KMS key
          * @param ciphertext cipher text

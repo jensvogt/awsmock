@@ -17,6 +17,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 
 namespace AwsMock::Core {
@@ -27,12 +28,12 @@ namespace AwsMock::Core {
 
       public:
 
-        explicit PeriodicScheduler(boost::asio::io_context &io_service);
+        AWSMOCK_API explicit PeriodicScheduler(boost::asio::io_context &io_service);
 
         /**
          * @brief Main routine
          */
-        void Run();
+        AWSMOCK_API void Run();
 
         /**
          * @brief Add a task to the scheduler.
@@ -42,12 +43,12 @@ namespace AwsMock::Core {
          * @param interval interval in seconds
          * @param delay start delay in seconds
          */
-        void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval, int delay = 0);
+        AWSMOCK_API void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval, int delay = 0);
 
         /**
          * @brief Shutdown the scheduler
          */
-        void Shutdown() const;
+        AWSMOCK_API void Shutdown() const;
 
       private:
 

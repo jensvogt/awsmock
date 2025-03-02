@@ -6,6 +6,7 @@
 #define AWSMOCK_SERVICE_MODULE_HANDLER_H
 
 // AwsMock includes
+#include <awsmock/core/Macros.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
 #include <awsmock/dto/transfer/ListUsersRequest.h>
@@ -30,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Manager HTTP server
          */
-        explicit ModuleHandler() : AbstractHandler("module-handler") {}
+        explicit AWSMOCK_API ModuleHandler() : AbstractHandler("module-handler") {}
 
         /**
          * @brief Handler HTTP GET requests.
@@ -42,7 +43,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @return HTTP response structure
          */
-        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        AWSMOCK_API http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief Handler HTTP POST requests.
@@ -54,7 +55,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @return HTTP response structure
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

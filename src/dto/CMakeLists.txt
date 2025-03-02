@@ -126,19 +126,21 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCK
 # Test directory
 add_subdirectory(tst)
 
+if (WIN32)
+    add_compile_options(/D AWSMOCK_EXPORTS)
+endif ()
+
 # Includes
 include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} ${EXT_INCLUDE})
 link_directories(${EXT_LIB})
 
 # Shared library
-#add_library(${LIBRARY} SHARED ${SOURCES})
-#target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
+add_library(${LIBRARY} SHARED ${SOURCES})
+target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-#set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore_static awsmockdb_static ${LIB_BSON} ${LIB_MONGO}
-        ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
-        ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static ${mongocxx_LIBRARIES}
+        ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
-#install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})

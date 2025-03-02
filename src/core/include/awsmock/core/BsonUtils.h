@@ -18,13 +18,9 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/JsonException.h>
-
-#ifdef WIN32
-#define AWSMOCKAPI __declspec(dllexport)
-#else
-#define AWSMOCKAPI
-#endif
 
 using bsoncxx::view_or_value;
 using bsoncxx::builder::basic::array;

@@ -16,6 +16,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
@@ -30,11 +31,6 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 #include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
-
-// Maximal body size (10MB)
-#define DEFAULT_MAX_BODY_SIZE (100 * 1024 * 1024)
-#define DEFAULT_MAX_QUEUE_SIZE 250
-#define DEFAULT_TIMEOUT 300
 
 namespace AwsMock::Service {
 
@@ -60,7 +56,7 @@ namespace AwsMock::Service {
          *
          * @param socket
          */
-        explicit GatewaySession(ip::tcp::socket &&socket);
+        explicit AWSMOCK_API GatewaySession(ip::tcp::socket &&socket);
 
         /**
          * @brief Start the session
@@ -68,7 +64,7 @@ namespace AwsMock::Service {
          * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
          * for single-threaded contexts, this example code is written to be thread-safe by default.
          */
-        void Run();
+        void AWSMOCK_API Run();
 
       private:
 

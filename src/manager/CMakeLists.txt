@@ -7,10 +7,14 @@ include_directories(./include ../core/include ../db/include ../dto/include ../se
         ${INC_MONGO_CXX} ${EXT_INCLUDE})
 link_directories(../core ../dto ../db ../service ${EXT_LIB})
 
-add_executable(${BINARY} ${SOURCES})
+add_executable(${BINARY} WIN32 ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
+
 if (WIN32)
-    target_link_libraries(${BINARY} PUBLIC awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static)
+    set_target_properties(${BINARY} PROPERTIES WIN32_EXECUTABLE ON)
+    target_link_libraries(${BINARY} awsmocksrv awsmockdto awsmockdb awsmockcore ${LIB_BSON_CXX} ${LIB_MONGO_CXX}
+            ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
+            ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 else ()
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore)
 endif ()

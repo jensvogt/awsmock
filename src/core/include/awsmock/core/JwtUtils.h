@@ -14,6 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 
@@ -29,7 +30,7 @@ namespace AwsMock::Core {
         /**
          * @brief Constructor
          */
-        JwtUtils() = default;
+        AWSMOCK_API JwtUtils() = default;
 
         /**
          * @brief Create a new JWT token using Rs256 as signing algorithm

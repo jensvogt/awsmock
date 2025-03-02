@@ -20,7 +20,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS metadata
+     * @brief KMS metadata
      *
      * Example:
      * @code{.json}

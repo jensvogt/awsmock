@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 #include <awsmock/service/kms/KMSHandler.h>
@@ -38,7 +39,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayRouter();
+        explicit AWSMOCK_API GatewayRouter();
 
         /**
          * @brief Singleton instance
@@ -54,7 +55,7 @@ namespace AwsMock::Service {
          * @param routingKey module name
          * @return pointer to module handler
          */
-        std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
+        AWSMOCK_API std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
 
       private:
 
