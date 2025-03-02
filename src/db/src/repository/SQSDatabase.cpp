@@ -523,7 +523,7 @@ namespace AwsMock::Database {
             try {
 
                 document query;
-                query.append(kvp("receiptHandle", make_document(kvp("$exists", receiptHandle))));
+                query.append(kvp("receiptHandle", receiptHandle));
 
                 const auto result = messageCollection.find_one(query.extract());
                 log_trace << "Message exists: " << std::boolalpha << result->empty();
@@ -545,7 +545,7 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             try {
 
-                const auto result = messageCollection.find_one(make_document(kvp("messageId", make_document(kvp("$exists", messageId)))));
+                const auto result = messageCollection.find_one(make_document(kvp("messageId", messageId)));
                 log_trace << "Message exists: " << std::boolalpha << result.has_value();
                 return result.has_value();
 

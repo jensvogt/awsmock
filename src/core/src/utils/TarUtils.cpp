@@ -69,7 +69,7 @@ namespace AwsMock::Core {
         int count = 0;
         while (dir != end) {
             if (dir->path() != tarFile) {
-                WriteFile(a, dir->path().string().c_str(), directory, dir->is_directory(), dir->is_symlink());
+                WriteFile(a, dir->path().string(), directory, dir->is_directory(), dir->is_symlink());
                 count++;
             }
             ++dir;
