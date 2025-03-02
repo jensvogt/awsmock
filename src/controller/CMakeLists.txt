@@ -7,7 +7,7 @@ link_directories(../core ${EXT_LIB})
 add_executable(${BINARY} ${SOURCES})
 
 if (WIN32)
-    target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb)
+    target_link_libraries(${BINARY} PUBLIC awsmockcore_static awsmockdto_static awsmockdb_static)
 else ()
     # Check systemd
     find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)

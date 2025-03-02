@@ -131,14 +131,14 @@ include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_
 link_directories(${EXT_LIB})
 
 # Shared library
-add_library(${LIBRARY} SHARED ${SOURCES})
-target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
+#add_library(${LIBRARY} SHARED ${SOURCES})
+#target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore awsmockdb ${LIB_BSON} ${LIB_MONGO}
+#set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
+target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore_static awsmockdb_static ${LIB_BSON} ${LIB_MONGO}
         ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
         ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
-install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+#install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})

@@ -57,7 +57,7 @@ awsmock:
     password: password                                                # MongoDB database password
     port: 27017                                                       # MongoDB database port, default: 27017
     host: localhost                                                   # MongoDB database host name
-    pool-size: 256                                                    # MongoDB connection pool size
+    pool-size: 64                                                    # MongoDB connection pool size
   gateway: # AwsMock API gateway settings
     active: true                                                      # Gateway activation flag
     http: # Gateway HTTP settings

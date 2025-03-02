@@ -10,6 +10,11 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    /**
+     * @brief Cognito message actions
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum MessageAction {
         RESEND,
         SUPPRESS

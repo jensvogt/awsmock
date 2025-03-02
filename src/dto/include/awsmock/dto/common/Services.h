@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Common {
     struct Services {
 
         /**
-         * Service names
+         * @brief Service names
          */
         std::vector<std::string> serviceNames;
 

@@ -17,7 +17,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * Create KMS key response
+     * @brief Create KMS key response
      *
      * Example:
      * @code{.json}

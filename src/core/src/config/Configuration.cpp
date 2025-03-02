@@ -6,7 +6,9 @@
 
 namespace AwsMock::Core {
 
-    Configuration::Configuration() { Initialize(); }
+    Configuration::Configuration() : _yamlConfig(YAML::Null) {
+        Initialize();
+    }
 
     Configuration::Configuration(const std::string &basename) : _yamlConfig(YAML::Null) {
         Initialize();
@@ -221,13 +223,21 @@ namespace AwsMock::Core {
     }
 
     std::string Configuration::GetFilename() const {
-        if (_filename.empty()) { throw CoreException("Filename not set"); }
+        if (_filename.empty()) {
+            log_error << "Configuration filename not set";
+            throw CoreException("Configuration filename not set");
+        }
         return _filename;
     }
 
     void Configuration::SetFilename(const std::string &filename) {
-        if (filename.empty()) { throw CoreException("Empty filename"); }
-        if (!FileUtils::FileExists(filename)) { log_warning << "Configuration file '" << filename << "' does not exist. Will use default."; }
+        if (filename.empty()) {
+            log_error << "Empty configuration filename, name: " << filename;
+            throw CoreException("Empty configuration filename");
+        }
+        if (!FileUtils::FileExists(filename)) {
+            log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
+        }
 
         // Save file name
         _filename = filename;

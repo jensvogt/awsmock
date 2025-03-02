@@ -26,6 +26,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported SQS client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class SqsCommandType {
         CREATE_QUEUE,
         PURGE_QUEUE,

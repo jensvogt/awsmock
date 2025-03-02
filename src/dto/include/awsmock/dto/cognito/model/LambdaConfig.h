@@ -18,7 +18,7 @@
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * Cognito lambda configuration
+     * @brief Cognito lambda configuration
      *
      * Example:
      * @code{.json}

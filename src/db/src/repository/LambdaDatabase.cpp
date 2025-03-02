@@ -236,7 +236,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
-                auto result = _lambdaCollection.replace_one(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
+                auto result = _lambdaCollection.find_one_and_update(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
                 log_trace << "Lambda updated: " << lambda.ToString();
                 return GetLambdaByArn(lambda.arn);
 

@@ -26,6 +26,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported S3 client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class S3CommandType {
         CREATE_BUCKET,
         LIST_BUCKETS,

@@ -54,13 +54,6 @@ namespace AwsMock::Database {
         [[nodiscard]] mongocxx::pool::entry GetConnection() const;
 
         /**
-         * @brief Try to get a connection
-         *
-         * @return optional connection from the pool
-         */
-        [[nodiscard]] bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection() const;
-
-        /**
          * @brief Shutdown the connection pool
          */
         void Shutdown();
@@ -75,12 +68,12 @@ namespace AwsMock::Database {
         /**
          * MongoDB instance
          */
-        std::unique_ptr<mongocxx::instance> _instance = nullptr;
+        std::shared_ptr<mongocxx::instance> _instance = nullptr;
 
         /**
          * Connection pool
          */
-        std::unique_ptr<mongocxx::pool> _pool = nullptr;
+        std::shared_ptr<mongocxx::pool> _pool = nullptr;
     };
 
 }// namespace AwsMock::Database

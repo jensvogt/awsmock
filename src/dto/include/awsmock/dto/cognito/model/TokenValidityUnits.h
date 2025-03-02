@@ -17,6 +17,11 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
+    /**
+     * @brief Validation units
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum ValidityUnits {
         seconds,
         minutes,

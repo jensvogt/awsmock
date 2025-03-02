@@ -9,7 +9,10 @@ link_directories(../core ../dto ../db ../service ${EXT_LIB})
 
 add_executable(${BINARY} ${SOURCES})
 add_library(${BINARY}_lib STATIC ${SOURCES})
-target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore ${LIB_BOOST_PROGRAM_OPTIONS}
-        ${LIB_BOOST_THREAD})
+if (WIN32)
+    target_link_libraries(${BINARY} PUBLIC awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static)
+else ()
+    target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore)
+endif ()
 
 install(TARGETS ${BINARY} DESTINATION ${BIN_INSTALL_DIR})

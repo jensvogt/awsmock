@@ -12,15 +12,16 @@ set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src
         src/repository/S3Database.cpp src/memorydb/S3MemoryDb.cpp src/entity/s3/FilterRule.cpp
         src/entity/s3/QueueNotification.cpp src/entity/s3/TopicNotification.cpp src/entity/s3/LambdaNotification.cpp
         src/entity/s3/BucketEncryption.cpp)
-set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp src/entity/lambda/Code.cpp
-        src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp
-        src/entity/lambda/EventSourceMapping.cpp)
+set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp
+        src/entity/lambda/Code.cpp src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp
+        src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp src/entity/lambda/EventSourceMapping.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp
         src/memorydb/TransferMemoryDb.cpp)
-set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp src/entity/cognito/Group.cpp
-        src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
-set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp src/entity/dynamodb/ProvisionedThroughput.cpp
-        src/repository/DynamoDbDatabase.cpp src/memorydb/DynamoDbMemoryDb.cpp)
+set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp
+        src/entity/cognito/Group.cpp src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
+set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
+        src/entity/dynamodb/ProvisionedThroughput.cpp src/repository/DynamoDbDatabase.cpp
+        src/memorydb/DynamoDbMemoryDb.cpp)
 set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
         src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
@@ -40,16 +41,15 @@ include_directories(./include ../core/include ${EXT_INCLUDE} ${INC_BSON_CXX} ${I
 link_directories(${EXT_LIB})
 
 # Shared library
-add_library(${LIBRARY} SHARED ${SOURCES})
-set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY} PUBLIC ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
-        ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+#add_library(${LIBRARY} SHARED ${SOURCES})
+#target_link_libraries(${LIBRARY} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_YAML}
+#        ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
+target_link_libraries(${LIBRARY_STATIC} ${STATIC_LIB} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX}
+        ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
         ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
 # Installation
-install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+#install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})

@@ -16,27 +16,21 @@ namespace AwsMock::Database {
         const int poolSize = configuration.GetValueInt("awsmock.mongodb.pool-size");
 
         // MongoDB URL
-        const std::string url = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize);
-        mongocxx::uri _uri(url);
-        log_info << "Using MongoDB database url: " << url;
+        mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
+        log_info << "Using MongoDB database url: " << _uri.to_string();
 
         // Create connection pool
-        _instance = std::make_unique<mongocxx::instance>();
-        _pool = std::make_unique<mongocxx::pool>(std::move(_uri));
-        const auto api = mongocxx::options::server_api{mongocxx::options::server_api::version::k_version_1};
-        log_info << "MongoDB database initialized, version: " << mongocxx::v_noabi::options::server_api::version_to_string(api.get_version());
+        _instance = std::make_shared<mongocxx::instance>();
+        _pool = std::make_shared<mongocxx::pool>(_uri);
+        log_info << "MongoDB database initialized";
     }
 
     mongocxx::pool::entry ConnectionPool::GetConnection() const {
         return _pool->acquire();
     }
 
-    bsoncxx::stdx::optional<mongocxx::pool::entry> ConnectionPool::TryGetConnection() const {
-        return _pool->try_acquire();
-    }
-
     void ConnectionPool::Shutdown() {
-        _pool.release();
+        _pool.reset();
     }
 
 }// namespace AwsMock::Database

@@ -15,19 +15,19 @@ namespace AwsMock::Database::Entity::SSM {
             }
         }
 
-        view_or_value<view, value> userDocument = make_document(
-                kvp("region", region),
-                kvp("name", parameterName),
-                kvp("value", parameterValue),
-                kvp("type", type),
-                kvp("description", description),
-                kvp("tier", tier),
-                kvp("version", version),
-                kvp("arn", arn),
-                kvp("tags", tagsDoc),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
-        return userDocument;
+        document parameterDocument;
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "region", region);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "name", parameterName);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "value", parameterValue);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "type", type);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "description", description);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "tier", tier);
+        Core::Bson::BsonUtils::SetIntValue(parameterDocument, "version", version);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "arn", arn);
+        Core::Bson::BsonUtils::SetDocumentValue(parameterDocument, "tags", tagsDoc);
+        Core::Bson::BsonUtils::SetDateValue(parameterDocument, "created", created);
+        Core::Bson::BsonUtils::SetDateValue(parameterDocument, "modified", modified);
+        return parameterDocument.extract();
     }
 
     void Parameter::FromDocument(std::optional<bsoncxx::document::view> mResult) {
@@ -41,8 +41,8 @@ namespace AwsMock::Database::Entity::SSM {
         tier = Core::Bson::BsonUtils::GetStringValue(mResult, "tier");
         version = Core::Bson::BsonUtils::GetIntValue(mResult, "version");
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
-        created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-        modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
@@ -65,7 +65,7 @@ namespace AwsMock::Database::Entity::SSM {
     }
 
     std::ostream &operator<<(std::ostream &os, const Parameter &u) {
-        os << "Parameter=" << to_json(u.ToDocument());
+        os << "Parameter=" << u.ToJson();
         return os;
     }
 }// namespace AwsMock::Database::Entity::SSM
