@@ -25,11 +25,10 @@ namespace AwsMock::Service {
 
     ContainerService::ContainerService() {
         // Get network mode
-        const Core::Configuration &_configuration = Core::Configuration::instance();
-        _networkName = _configuration.GetValueString("awsmock.docker.network-name");
-        _containerPort = _configuration.GetValueString("awsmock.docker.container.port");
-        _isDocker = _configuration.GetValueBool("awsmock.docker.active");
-        _containerSocketPath = _isDocker ? _configuration.GetValueString("awsmock.docker.socket") : _containerSocketPath = _configuration.GetValueString("awsmock.podman.socket");
+        _networkName = Core::Configuration::instance().GetValueString("awsmock.docker.network-name");
+        _containerPort = Core::Configuration::instance().GetValueString("awsmock.docker.container.port");
+        _isDocker = Core::Configuration::instance().GetValueBool("awsmock.docker.active");
+        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.podman.socket");
         _domainSocket = std::make_shared<Core::DomainSocket>(_containerSocketPath);
     }
 

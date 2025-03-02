@@ -183,4 +183,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif//AWS_MOCK_CORE_DATETIME_UTILS_H
+#endif

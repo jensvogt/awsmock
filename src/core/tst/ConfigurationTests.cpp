@@ -34,7 +34,6 @@ namespace AwsMock::Core {
     TEST_F(ConfigurationTest, ConstructorTest) {
 
         // arrange
-        const Configuration configuration = Configuration::instance();
         Configuration::instance().SetFilename(TMP_PROPERTIES_FILE);
 
         // act
@@ -52,13 +51,12 @@ namespace AwsMock::Core {
 #else
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
 #endif
-        const Configuration configuration = Configuration::instance();
         Configuration::instance().SetFilename(TMP_PROPERTIES_FILE);
 
         // act
 
         // assert
-        EXPECT_STREQ(configuration.GetValueString("awsmock.logging.level").c_str(), "debug");
+        EXPECT_STREQ(Configuration::instance().GetValueString("awsmock.logging.level").c_str(), "debug");
     }
 
     TEST_F(ConfigurationTest, YamlConfigurationTest) {

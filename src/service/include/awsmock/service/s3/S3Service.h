@@ -21,7 +21,6 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
@@ -96,7 +95,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API S3Service() : _database(Database::S3Database::instance()) {};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -105,7 +104,7 @@ namespace AwsMock::Service {
          * @param bucket bucket name
          * @return true if bucket exists
          */
-        [[nodiscard]] AWSMOCK_API bool BucketExists(const std::string &region, const std::string &bucket) const;
+        [[nodiscard]] bool BucketExists(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief Returns the metadata of an S3 bucket
@@ -113,7 +112,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        [[nodiscard]] AWSMOCK_API Dto::S3::GetMetadataResponse GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const;
+        [[nodiscard]] Dto::S3::GetMetadataResponse GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const;
 
         /**
          * @brief Returns the S3 bucket.
@@ -125,7 +124,7 @@ namespace AwsMock::Service {
          * @return GetBucketResponse
          * @see GetBucketResponse
          */
-        [[nodiscard]] AWSMOCK_API Dto::S3::GetBucketResponse GetBucket(const Dto::S3::GetBucketRequest &request) const;
+        [[nodiscard]] Dto::S3::GetBucketResponse GetBucket(const Dto::S3::GetBucketRequest &request) const;
 
         /**
          * @brief Returns the metadata of an S3 object
@@ -133,7 +132,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        AWSMOCK_API Dto::S3::GetMetadataResponse GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const;
+        Dto::S3::GetMetadataResponse GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const;
 
         /**
          * @brief Creates a new bucket
@@ -141,7 +140,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 create request
          * @return CreateBucketResponse
          */
-        AWSMOCK_API Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) const;
+        Dto::S3::CreateBucketResponse CreateBucket(const Dto::S3::CreateBucketRequest &s3Request) const;
 
         /**
          * @brief Purge a bucket
@@ -152,21 +151,21 @@ namespace AwsMock::Service {
          *
          * @param request S3 purge request
          */
-        AWSMOCK_API void PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const;
+        void PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const;
 
         /**
          * @brief Updates a bucket
          *
          * @param request S3 update request
          */
-        AWSMOCK_API void UpdateBucket(const Dto::S3::UpdateBucketRequest &request) const;
+        void UpdateBucket(const Dto::S3::UpdateBucketRequest &request) const;
 
         /**
          * @brief Lists all buckets
          *
          * @return ListAllBucketResponse
          */
-        [[nodiscard]] AWSMOCK_API Dto::S3::ListAllBucketResponse ListAllBuckets() const;
+        [[nodiscard]] Dto::S3::ListAllBucketResponse ListAllBuckets() const;
 
         /**
          * @brief Lists contents of bucket
@@ -174,7 +173,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 create request
          * @return CreateBucketResponse
          */
-        [[nodiscard]] AWSMOCK_API Dto::S3::ListBucketResponse ListBucket(const Dto::S3::ListBucketRequest &s3Request) const;
+        [[nodiscard]] Dto::S3::ListBucketResponse ListBucket(const Dto::S3::ListBucketRequest &s3Request) const;
 
         /**
          * @brief Lists bucket counters
@@ -182,14 +181,14 @@ namespace AwsMock::Service {
          * @param s3Request S3 list bucket counters request
          * @return ListBucketCounterResponse
          */
-        AWSMOCK_API Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const;
+        Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const;
 
         /**
          * @brief Put bucket versioning
          *
          * @param request S3 put versioning request
          */
-        AWSMOCK_API void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) const;
+        void PutBucketVersioning(const Dto::S3::PutBucketVersioningRequest &request) const;
 
         /**
          * @brief Creates a new bucket
@@ -197,7 +196,7 @@ namespace AwsMock::Service {
          * @param request S3 multi part upload request
          * @return Dto::S3::CreateMultipartUploadResult
          */
-        AWSMOCK_API Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const;
+        Dto::S3::CreateMultipartUploadResult CreateMultipartUpload(const Dto::S3::CreateMultipartUploadRequest &request) const;
 
         /**
          * @brief Upload a partial file
@@ -207,7 +206,7 @@ namespace AwsMock::Service {
          * @param updateId upload ID
          * @return ETag
          */
-        AWSMOCK_API std::string UploadPart(std::istream &stream, int part, const std::string &updateId) const;
+        std::string UploadPart(std::istream &stream, int part, const std::string &updateId) const;
 
         /**
          * @brief Upload a partial file copy.
@@ -220,7 +219,7 @@ namespace AwsMock::Service {
          * @return UploadPartCopyResponse
          * @see Dto::S3::UploadPartCopyResponse
          */
-        AWSMOCK_API Dto::S3::UploadPartCopyResponse UploadPartCopy(const Dto::S3::UploadPartCopyRequest &request) const;
+        Dto::S3::UploadPartCopyResponse UploadPartCopy(const Dto::S3::UploadPartCopyRequest &request) const;
 
         /**
          * @brief Completes a multipart upload.
@@ -228,7 +227,7 @@ namespace AwsMock::Service {
          * @param request multipart upload request
          * @return Dto::S3::CreateMultipartUploadResult
          */
-        AWSMOCK_API Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const;
+        Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const;
 
         /**
          * @brief Get object
@@ -236,7 +235,7 @@ namespace AwsMock::Service {
          * @param request put object request
          * @return GetObjectResponse
          */
-        AWSMOCK_API Dto::S3::GetObjectResponse GetObject(const Dto::S3::GetObjectRequest &request) const;
+        Dto::S3::GetObjectResponse GetObject(const Dto::S3::GetObjectRequest &request) const;
 
         /**
          * @brief Put object
@@ -245,7 +244,7 @@ namespace AwsMock::Service {
          * @param stream input stream
          * @return PutObjectResponse
          */
-        AWSMOCK_API Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
+        Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
 
         /**
          * @brief Touch object
@@ -256,7 +255,7 @@ namespace AwsMock::Service {
          * @param request touch object request
          * @see TouchObjectRequest
          */
-        AWSMOCK_API void TouchObject(const Dto::S3::TouchObjectRequest &request) const;
+        void TouchObject(const Dto::S3::TouchObjectRequest &request) const;
 
         /**
          * @brief Touch object
@@ -267,7 +266,7 @@ namespace AwsMock::Service {
          * @param request touch object request
          * @see TouchObjectRequest
          */
-        AWSMOCK_API void UpdateObject(const Dto::S3::UpdateObjectRequest &request) const;
+        void UpdateObject(const Dto::S3::UpdateObjectRequest &request) const;
 
         /**
          * @brief Copy object
@@ -275,7 +274,7 @@ namespace AwsMock::Service {
          * @param request copy object request
          * @return PutObjectResponse
          */
-        AWSMOCK_API Dto::S3::CopyObjectResponse CopyObject(const Dto::S3::CopyObjectRequest &request) const;
+        Dto::S3::CopyObjectResponse CopyObject(const Dto::S3::CopyObjectRequest &request) const;
 
         /**
          * @brief Move object
@@ -283,7 +282,7 @@ namespace AwsMock::Service {
          * @param request move object request
          * @return PutObjectResponse
          */
-        AWSMOCK_API Dto::S3::MoveObjectResponse MoveObject(const Dto::S3::MoveObjectRequest &request) const;
+        Dto::S3::MoveObjectResponse MoveObject(const Dto::S3::MoveObjectRequest &request) const;
 
         /**
          * @brief Lists object counters
@@ -291,7 +290,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 list object counters request
          * @return ListObjectCounterResponse
          */
-        AWSMOCK_API Dto::S3::ListObjectCounterResponse ListObjectCounters(const Dto::S3::ListObjectCounterRequest &s3Request) const;
+        Dto::S3::ListObjectCounterResponse ListObjectCounters(const Dto::S3::ListObjectCounterRequest &s3Request) const;
 
         /**
          * @brief Returns an object counters
@@ -299,14 +298,14 @@ namespace AwsMock::Service {
          * @param request S3 get object counters request
          * @return GetObjectCounterResponse
          */
-        AWSMOCK_API Dto::S3::GetObjectCounterResponse GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const;
+        Dto::S3::GetObjectCounterResponse GetObjectCounters(const Dto::S3::GetObjectCounterRequest &request) const;
 
         /**
          * @brief Delete object
          *
          * @param request delete object request
          */
-        AWSMOCK_API void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
+        void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
 
         /**
          * @brief Delete objects
@@ -314,7 +313,7 @@ namespace AwsMock::Service {
          * @param request delete objects request
          * @return DeleteObjectsResponse
          */
-        AWSMOCK_API Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
+        Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
 
         /**
          * @brief Adds a bucket notification configuration
@@ -324,7 +323,7 @@ namespace AwsMock::Service {
          * @see PutBucketNotificationConfigurationRequest
          * @see PutBucketNotificationConfigurationResponse
          */
-        AWSMOCK_API Dto::S3::PutBucketNotificationConfigurationResponse PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) const;
+        Dto::S3::PutBucketNotificationConfigurationResponse PutBucketNotificationConfiguration(const Dto::S3::PutBucketNotificationConfigurationRequest &request) const;
 
         /**
          * @brief Adds a bucket encryption configuration
@@ -332,7 +331,7 @@ namespace AwsMock::Service {
          * @param request bucket encryption configuration request.
          * @see PutBucketEncryptionRequest
          */
-        AWSMOCK_API void PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const;
+        void PutBucketEncryption(const Dto::S3::PutBucketEncryptionRequest &request) const;
 
         /**
          * @brief Returns a list object versions
@@ -342,14 +341,14 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::S3::ListObjectVersionsRequest
          * @see AwsMock::Dto::S3::ListObjectVersionsResponse
          */
-        AWSMOCK_API Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const;
+        Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const;
 
         /**
          * @brief Delete a bucket
          *
          * @param request bucket delete request.
          */
-        AWSMOCK_API void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
+        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
 
       private:
 

@@ -11,7 +11,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
@@ -35,7 +34,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {};
 
         /**
          * @brief Singleton instance
@@ -53,7 +52,7 @@ namespace AwsMock::Database {
          * @return true if cognito user pool exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool UserPoolExists(const std::string &region, const std::string &name) const;
+        bool UserPoolExists(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Check existence of cognito user pool
@@ -62,7 +61,7 @@ namespace AwsMock::Database {
          * @return true if cognito user pool exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool UserPoolExists(const std::string &userPoolId) const;
+        bool UserPoolExists(const std::string &userPoolId) const;
 
         /**
          * @brief Create a new cognito user pool
@@ -70,7 +69,7 @@ namespace AwsMock::Database {
          * @param userPool cognito user pool entity to create
          * @return created cognito entity.
          */
-        AWSMOCK_API Entity::Cognito::UserPool CreateUserPool(Entity::Cognito::UserPool &userPool) const;
+        Entity::Cognito::UserPool CreateUserPool(Entity::Cognito::UserPool &userPool) const;
 
         /**
          * @brief Count all user pools
@@ -78,7 +77,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of user pools.
          */
-        AWSMOCK_API long CountUserPools(const std::string &region = {}) const;
+        long CountUserPools(const std::string &region = {}) const;
 
         /**
          * @brief Updates an existing cognito user pool
@@ -86,7 +85,7 @@ namespace AwsMock::Database {
          * @param userPool user pool entity
          * @return updated cognito user pool entity.
          */
-        AWSMOCK_API Entity::Cognito::UserPool UpdateUserPool(Entity::Cognito::UserPool &userPool) const;
+        Entity::Cognito::UserPool UpdateUserPool(Entity::Cognito::UserPool &userPool) const;
 
         /**
          * @brief Creates a new user pool or updates an existing user pool
@@ -95,7 +94,7 @@ namespace AwsMock::Database {
          * @return created or updated Cognito user pool entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::UserPool CreateOrUpdateUserPool(Entity::Cognito::UserPool &userPool) const;
+        Entity::Cognito::UserPool CreateOrUpdateUserPool(Entity::Cognito::UserPool &userPool) const;
 
         /**
          * @brief Returns a cognito user pool entity by primary key
@@ -104,7 +103,7 @@ namespace AwsMock::Database {
          * @return cognito user pool entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::UserPool GetUserPoolById(bsoncxx::oid oid) const;
+        Entity::Cognito::UserPool GetUserPoolById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a cognito user pool entity by primary key
@@ -113,7 +112,7 @@ namespace AwsMock::Database {
          * @return cognito user pool entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::UserPool GetUserPoolByUserPoolId(const std::string &userPoolId) const;
+        Entity::Cognito::UserPool GetUserPoolByUserPoolId(const std::string &userPoolId) const;
 
         /**
          * @brief Returns a cognito user pool entity by client Id
@@ -122,7 +121,7 @@ namespace AwsMock::Database {
          * @return cognito user pool entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::UserPool GetUserPoolByClientId(const std::string &clientId) const;
+        Entity::Cognito::UserPool GetUserPoolByClientId(const std::string &clientId) const;
 
         /**
          * @brief Returns a cognito user pool entity by region and name
@@ -132,7 +131,7 @@ namespace AwsMock::Database {
          * @return cognito entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::UserPool GetUserPoolByRegionName(const std::string &region, const std::string &name) const;
+        Entity::Cognito::UserPool GetUserPoolByRegionName(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Returns a list of cognito user pools.
@@ -140,7 +139,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of cognito user pools
          */
-        AWSMOCK_API std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {}) const;
+        std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {}) const;
 
         /**
          * @brief Exports a list of cognito user pools.
@@ -148,7 +147,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito user pools
          */
-        AWSMOCK_API std::vector<Entity::Cognito::UserPool> ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const;
+        std::vector<Entity::Cognito::UserPool> ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Deletes an existing cognito user pool
@@ -156,14 +155,14 @@ namespace AwsMock::Database {
          * @param id cognito user pool ID
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteUserPool(const std::string &id) const;
+        void DeleteUserPool(const std::string &id) const;
 
         /**
          * @brief Deletes all existing cognito user pools
          *
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteAllUserPools() const;
+        void DeleteAllUserPools() const;
 
         /**
          * @brief Check existence of cognito user
@@ -174,7 +173,7 @@ namespace AwsMock::Database {
          * @return true if cognito user exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) const;
+        bool UserExists(const std::string &region, const std::string &userPoolId, const std::string &userName) const;
 
         /**
          * Check existence of cognito user
@@ -184,7 +183,7 @@ namespace AwsMock::Database {
          * @return true if cognito user exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool UserExists(const std::string &region, const std::string &userName) const;
+        bool UserExists(const std::string &region, const std::string &userName) const;
 
         /**
          * @brief Create a new cognito user
@@ -192,7 +191,7 @@ namespace AwsMock::Database {
          * @param user cognito user entity to create
          * @return created cognito user entity.
          */
-        AWSMOCK_API Entity::Cognito::User CreateUser(Entity::Cognito::User &user) const;
+        Entity::Cognito::User CreateUser(Entity::Cognito::User &user) const;
 
         /**
          * @brief Returns a cognito user entity by primary key
@@ -201,7 +200,7 @@ namespace AwsMock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::User GetUserById(bsoncxx::oid oid) const;
+        Entity::Cognito::User GetUserById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a cognito user entity by primary key
@@ -210,7 +209,7 @@ namespace AwsMock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::User GetUserById(const std::string &oid) const;
+        Entity::Cognito::User GetUserById(const std::string &oid) const;
 
         /**
          * @brief Returns a cognito user entity by region, userId and name.
@@ -221,7 +220,7 @@ namespace AwsMock::Database {
          * @return cognito user entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) const;
+        Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) const;
 
         /**
          * @brief Count all user pools
@@ -230,7 +229,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return total number of users.
          */
-        AWSMOCK_API long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
+        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
          * @brief Returns a list of cognito users.
@@ -239,7 +238,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito users
          */
-        AWSMOCK_API std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
+        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
          * @brief Exports a list of cognito users.
@@ -247,7 +246,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
-        AWSMOCK_API std::vector<Entity::Cognito::User> ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const;
+        std::vector<Entity::Cognito::User> ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Returns a list of cognito users in given group.
@@ -257,7 +256,7 @@ namespace AwsMock::Database {
          * @param groupName name of the group
          * @return list of cognito users
          */
-        AWSMOCK_API std::vector<Entity::Cognito::User> ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
+        std::vector<Entity::Cognito::User> ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
 
         /**
          * @brief Updates an existing cognito user
@@ -265,7 +264,7 @@ namespace AwsMock::Database {
          * @param user user entity
          * @return updated cognito user entity.
          */
-        AWSMOCK_API Entity::Cognito::User UpdateUser(Entity::Cognito::User &user) const;
+        Entity::Cognito::User UpdateUser(Entity::Cognito::User &user) const;
 
         /**
          * @brief Creates a new user or updates an existing user
@@ -274,7 +273,7 @@ namespace AwsMock::Database {
          * @return created or updated Cognito user entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::User CreateOrUpdateUser(Entity::Cognito::User &user) const;
+        Entity::Cognito::User CreateOrUpdateUser(Entity::Cognito::User &user) const;
 
         /**
          * @brief Deletes an existing cognito users
@@ -282,14 +281,14 @@ namespace AwsMock::Database {
          * @param user cognito user to delete
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteUser(const Entity::Cognito::User &user) const;
+        void DeleteUser(const Entity::Cognito::User &user) const;
 
         /**
          * @brief Deletes all existing cognito users
          *
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteAllUsers() const;
+        void DeleteAllUsers() const;
 
         /**
          * @brief Check existence of cognito group
@@ -299,7 +298,7 @@ namespace AwsMock::Database {
          * @return true if cognito group exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool GroupExists(const std::string &region, const std::string &groupName) const;
+        bool GroupExists(const std::string &region, const std::string &groupName) const;
 
         /**
          * @brief Returns a cognito group entity by primary key
@@ -308,7 +307,7 @@ namespace AwsMock::Database {
          * @return cognito group entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::Group GetGroupById(bsoncxx::oid oid) const;
+        Entity::Cognito::Group GetGroupById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a cognito group entity by region, userPoolId and groupName.
@@ -319,7 +318,7 @@ namespace AwsMock::Database {
          * @return cognito group entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Cognito::Group GetGroupByGroupName(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
+        Entity::Cognito::Group GetGroupByGroupName(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
 
         /**
          * @brief Create a new cognito group
@@ -327,7 +326,7 @@ namespace AwsMock::Database {
          * @param group cognito group entity to create
          * @return created cognito group entity.
          */
-        AWSMOCK_API Entity::Cognito::Group CreateGroup(Entity::Cognito::Group &group) const;
+        Entity::Cognito::Group CreateGroup(Entity::Cognito::Group &group) const;
 
         /**
          * @brief Returns a list of cognito groups.
@@ -336,7 +335,7 @@ namespace AwsMock::Database {
          * @param userPoolId user pool ID
          * @return list of cognito groups
          */
-        AWSMOCK_API std::vector<Entity::Cognito::Group> ListGroups(const std::string &region = {}, const std::string &userPoolId = {}) const;
+        std::vector<Entity::Cognito::Group> ListGroups(const std::string &region = {}, const std::string &userPoolId = {}) const;
 
         /**
          * @brief Exports a list of cognito groups.
@@ -344,7 +343,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
-        AWSMOCK_API std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const;
+        [[nodiscard]] std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Deletes an existing cognito user group.
@@ -354,7 +353,7 @@ namespace AwsMock::Database {
          * @param groupName name of the group
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
+        void DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const;
 
         /**
          * @brief Deletes all existing cognito user groups.
@@ -362,7 +361,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteAllGroups(const std::string &region = {}) const;
+        void DeleteAllGroups(const std::string &region = {}) const;
 
         /**
          * @brief Check existence of a client ID
@@ -372,7 +371,7 @@ namespace AwsMock::Database {
          * @return true if cognito client ID exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool ClientIdExists(const std::string &region, const std::string &clientId) const;
+        [[nodiscard]] bool ClientIdExists(const std::string &region, const std::string &clientId) const;
 
       private:
 

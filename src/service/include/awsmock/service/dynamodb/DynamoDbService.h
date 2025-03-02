@@ -16,7 +16,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
@@ -71,7 +70,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API DynamoDbService();
+        explicit DynamoDbService();
 
         /**
          * @brief Creates a new table
@@ -79,7 +78,7 @@ namespace AwsMock::Service {
          * @param request create table request DTO
          * @return CreateTableResponse
          */
-        AWSMOCK_API Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
+        Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
 
         /**
          * @brief check existence of table in DynamoDB docker image.
@@ -88,7 +87,7 @@ namespace AwsMock::Service {
          * @param tableName table name
          * @return true if table exists in dynamoDb docker image
          */
-        AWSMOCK_API bool ExistTable(const std::string &region, const std::string &tableName) const;
+        bool ExistTable(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Lists all available tables
@@ -96,7 +95,7 @@ namespace AwsMock::Service {
          * @param request list table request DTO
          * @return ListTableResponse
          */
-        AWSMOCK_API Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request) const;
+        Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request) const;
 
         /**
          * @brief Lists all table counters
@@ -105,7 +104,7 @@ namespace AwsMock::Service {
          * @return ListTableCountersResponse
          * @see ListTableCountersResponse
          */
-        AWSMOCK_API Dto::DynamoDb::ListTableCountersResponse ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const;
+        Dto::DynamoDb::ListTableCountersResponse ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const;
 
         /**
          * @brief Lists all item counters
@@ -114,7 +113,7 @@ namespace AwsMock::Service {
          * @return ListItemCountersResponse
          * @see ListItemCountersResponse
          */
-        AWSMOCK_API Dto::DynamoDb::ListItemCountersResponse ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const;
+        Dto::DynamoDb::ListItemCountersResponse ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const;
 
         /**
          * @brief Describes a table
@@ -122,7 +121,7 @@ namespace AwsMock::Service {
          * @param request describe table request DTO
          * @return DescribeTableResponse
          */
-        AWSMOCK_API Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const;
+        Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const;
 
         /**
          * @brief Deletes a table
@@ -130,12 +129,12 @@ namespace AwsMock::Service {
          * @param request delete table request DTO
          * @return DeleteTableResponse
          */
-        AWSMOCK_API Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const;
+        Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const;
 
         /**
          * @brief Deletes all tables with all items
          */
-        AWSMOCK_API long DeleteAllTables() const;
+        long DeleteAllTables() const;
 
         /**
          * Gets an item
@@ -143,7 +142,7 @@ namespace AwsMock::Service {
          * @param request get item request DTO
          * @return GetItemResponse
          */
-        AWSMOCK_API Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request) const;
+        Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request) const;
 
         /**
          * @brief Puts an item
@@ -151,7 +150,7 @@ namespace AwsMock::Service {
          * @param request put item request DTO
          * @return GetItemResponse
          */
-        AWSMOCK_API Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request) const;
+        Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request) const;
 
         /**
          * @brief Query the database
@@ -159,7 +158,7 @@ namespace AwsMock::Service {
          * @param request query item request DTO
          * @return QueryResponse
          */
-        AWSMOCK_API Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request) const;
+        Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request) const;
 
         /**
          * @brief Scan the database
@@ -167,7 +166,7 @@ namespace AwsMock::Service {
          * @param request scan request DTO
          * @return ScanResponse
          */
-        AWSMOCK_API Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request) const;
+        Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request) const;
 
         /**
          * @brief Deletes a item
@@ -175,7 +174,7 @@ namespace AwsMock::Service {
          * @param request delete item request DTO
          * @return DeleteItemResponse
          */
-        AWSMOCK_API Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
+        Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
 
       private:
 

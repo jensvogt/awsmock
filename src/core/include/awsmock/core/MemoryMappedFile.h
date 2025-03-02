@@ -24,7 +24,6 @@
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 
@@ -40,7 +39,7 @@ namespace AwsMock::Core {
         /**
          * @brief Constructor
          */
-        AWSMOCK_API MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
+        MemoryMappedFile() : _start(nullptr), _membuffer(nullptr), _mapped(false) {}
 
         /**
          * @brief Singleton
@@ -58,12 +57,12 @@ namespace AwsMock::Core {
          * @param filename name of the file.
          * @return true on success
          */
-        AWSMOCK_API bool OpenFile(const std::string &filename);
+        bool OpenFile(const std::string &filename);
 
         /**
          * @brief Release all resources
          */
-        AWSMOCK_API void CloseFile();
+        void CloseFile();
 
         /**
          * @brief Copy a chunk of data from the memory mapped file the provided output buffer
@@ -73,14 +72,14 @@ namespace AwsMock::Core {
          * @param buffer char buffer
          * @return number of bytes actually read
          */
-        AWSMOCK_API long ReadChunk(long start, long end, char *buffer);
+        long ReadChunk(long start, long end, char *buffer);
 
         /**
          * @brief Returns true in case the file is mapped already.
          *
          * @return true, in case file is already mapped.
          */
-        AWSMOCK_API [[nodiscard]] bool IsMapped() const { return _mapped; }
+        [[nodiscard]] bool IsMapped() const { return _mapped; }
 
       private:
 

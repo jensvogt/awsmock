@@ -16,7 +16,6 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ForbiddenException.h>
@@ -41,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        explicit AWSMOCK_API AbstractHandler(std::string name) : _name(std::move(name)) {};
+        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -51,7 +50,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        AWSMOCK_API virtual http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Handles the HTTP method PUT.
@@ -61,7 +60,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        AWSMOCK_API virtual http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Handles the HTTP method POST.
@@ -71,7 +70,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        AWSMOCK_API virtual http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Handles the HTTP method DELETE.
@@ -81,7 +80,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        AWSMOCK_API virtual http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Handles the HTTP method HEAD.
@@ -91,7 +90,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        AWSMOCK_API virtual http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Send an OK response (HTTP state code 200).
@@ -179,7 +178,7 @@ namespace AwsMock::Service {
         /**
          * Get the name
          */
-        AWSMOCK_API std::string name() { return _name; }
+        std::string name() { return _name; }
 
       private:
 

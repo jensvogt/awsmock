@@ -7,7 +7,26 @@
 namespace AwsMock::Monitoring {
 
     MetricSystemCollector::MetricSystemCollector() {
+
         _startTime = system_clock::now();
+
+#ifdef _WIN32
+
+        SYSTEM_INFO sysInfo;
+        FILETIME ftime, fsys, fuser;
+
+        GetSystemInfo(&sysInfo);
+        numProcessors = static_cast<int>(sysInfo.dwNumberOfProcessors);
+
+        GetSystemTimeAsFileTime(&ftime);
+        memcpy(&lastCPU, &ftime, sizeof(FILETIME));
+
+        self = GetCurrentProcess();
+        GetProcessTimes(self, &ftime, &ftime, &fsys, &fuser);
+        memcpy(&lastSysCPU, &fsys, sizeof(FILETIME));
+        memcpy(&lastUserCPU, &fuser, sizeof(FILETIME));
+
+#endif
     }
 
     void MetricSystemCollector::CollectSystemCounter() {
@@ -24,6 +43,10 @@ namespace AwsMock::Monitoring {
         GetCpuInfoLinux();
         GetMemoryInfoLinux();
         GetThreadInfoLinux();
+
+#elif _WIN32
+
+        GetCpuInfoWin32();
 
 #endif
     }
@@ -156,6 +179,43 @@ namespace AwsMock::Monitoring {
         MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
         MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", static_cast<double>(t_info.resident_size));
         log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
+    }
+
+#elif _WIN32
+
+    void MetricSystemCollector::GetCpuInfoWin32() {
+        FILETIME ftime, fsys, fuser;
+        ULARGE_INTEGER now, sys, user;
+        double percent;
+
+        GetSystemTimeAsFileTime(&ftime);
+        memcpy(&now, &ftime, sizeof(FILETIME));
+
+        GetProcessTimes(self, &ftime, &ftime, &fsys, &fuser);
+        memcpy(&sys, &fsys, sizeof(FILETIME));
+        memcpy(&user, &fuser, sizeof(FILETIME));
+        percent = static_cast<double>((sys.QuadPart - lastSysCPU.QuadPart) + (user.QuadPart - lastUserCPU.QuadPart));
+        percent /= static_cast<double>(now.QuadPart - lastCPU.QuadPart);
+        percent /= numProcessors;
+        MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", percent);
+        percent = static_cast<double>((sys.QuadPart - lastSysCPU.QuadPart));
+        percent /= static_cast<double>(now.QuadPart - lastCPU.QuadPart);
+        percent /= numProcessors;
+        MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", percent);
+        percent = static_cast<double>((sys.QuadPart - lastUserCPU.QuadPart));
+        percent /= static_cast<double>(now.QuadPart - lastCPU.QuadPart);
+        percent /= numProcessors;
+        MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", percent);
+        lastCPU = now;
+        lastUserCPU = user;
+        lastSysCPU = sys;
+    }
+
+    void MetricSystemCollector::GetMemoryInfoWin32() {
+        //        PROCESS_MEMORY_COUNTERS_EX pmc;
+        //        GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *) &pmc, sizeof(pmc));
+        //        SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+        //        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", static_cast<double>(virtualMemUsedByMe));
     }
 
 #endif

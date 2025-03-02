@@ -8,7 +8,7 @@ add_executable(${BINARY} ${SOURCES})
 
 if (WIN32)
     set_target_properties(${BINARY} PROPERTIES WIN32_EXECUTABLE ON)
-    target_link_libraries(${BINARY} awsmockcore awsmockdto awsmockdb ${LIB_MONGO_CXX} ${LIB_BSON_CXX})
+    target_link_libraries(${BINARY} awsmockcore_static awsmockdto_static awsmockdb_static ${LIB_MONGO_CXX} ${LIB_BSON_CXX})
 else ()
     # Check systemd
     find_library(SYSTEMD NAMES systemd HINTS /usr/lib/x86_64-linux-gnu)

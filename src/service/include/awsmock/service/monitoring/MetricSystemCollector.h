@@ -15,6 +15,9 @@
 #include <mach/mach.h>
 #include <sys/resource.h>
 #endif
+#ifdef _WIN32
+//#include "psapi.h"
+#endif
 
 // C++ Standard includes
 #include <cassert>
@@ -24,7 +27,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -44,12 +46,12 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor.
          */
-        explicit AWSMOCK_API MetricSystemCollector();
+        explicit MetricSystemCollector();
 
         /**
          * @brief Updates the system counter
          */
-        AWSMOCK_API void CollectSystemCounter();
+        void CollectSystemCounter();
 
 #ifdef __APPLE__
 
@@ -85,6 +87,19 @@ namespace AwsMock::Monitoring {
          */
         static void GetMemoryInfoLinux();
 
+#elif _WIN32
+
+        /**
+         * @brief Get CPU utilization on Windows
+         */
+        void GetCpuInfoWin32();
+
+
+        /**
+         * @brief Get memory utilization on Win32
+         */
+        static void GetMemoryInfoWin32();
+
 #endif
 
       private:
@@ -94,6 +109,10 @@ namespace AwsMock::Monitoring {
         clock_t _lastTotalCPU = 0;
         clock_t _lastSysCPU = 0;
         clock_t _lastUserCPU = 0;
+#elif _WIN32
+        ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
+        int numProcessors;
+        HANDLE self;
 #endif
 
         /**

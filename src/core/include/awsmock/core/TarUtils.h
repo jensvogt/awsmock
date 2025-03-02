@@ -23,7 +23,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
@@ -40,7 +39,7 @@ namespace AwsMock::Core {
         /**
          * @brief Constructor
          */
-        AWSMOCK_API TarUtils() = default;
+        TarUtils() = default;
 
         /**
          * @brief Archive a whole directory tree to a tar file.

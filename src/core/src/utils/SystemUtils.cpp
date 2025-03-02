@@ -100,7 +100,7 @@ namespace AwsMock::Core {
         size_t countLen;
         sysctlbyname("hw.logicalcpu", &count, &countLen, nullptr, 0);
         return count;
-#else
+#elif __linux__
         char line[128];
 
         FILE *file = fopen("/proc/cpuinfo", "r");
@@ -112,6 +112,8 @@ namespace AwsMock::Core {
         fclose(file);
         log_debug << "Got number of processors, numProcs: " << numCores;
         return numCores;
+#elif _WIN32
+        return static_cast<int>(boost::thread::hardware_concurrency());
 #endif
     }
 

@@ -16,7 +16,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 
@@ -26,11 +25,11 @@ namespace AwsMock::Core {
 
         typedef std::function<void()> handler_fn;
 
-        AWSMOCK_API PeriodicTask(boost::asio::io_context &ioService, std::string const &name, int interval, handler_fn task, int delay);
+        PeriodicTask(boost::asio::io_context &ioService, std::string const &name, int interval, handler_fn task, int delay);
 
-        AWSMOCK_API [[maybe_unused]] void execute(boost::system::error_code const &e);
+        [[maybe_unused]] void execute(boost::system::error_code const &e);
 
-        AWSMOCK_API void start();
+        void start();
 
       private:
 

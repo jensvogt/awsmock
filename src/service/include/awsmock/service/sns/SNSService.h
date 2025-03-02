@@ -12,7 +12,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sns/CreateTopicRequest.h>
 #include <awsmock/dto/sns/CreateTopicResponse.h>
@@ -75,7 +74,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
          * @brief Creates a new topic
@@ -85,7 +84,7 @@ namespace AwsMock::Service {
          * @param request create topic request
          * @return CreateTopicResponse
          */
-        AWSMOCK_API Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request) const;
+        Dto::SNS::CreateTopicResponse CreateTopic(const Dto::SNS::CreateTopicRequest &request) const;
 
         /**
          * @brief Returns a list of all available topics
@@ -94,7 +93,7 @@ namespace AwsMock::Service {
          * @return ListTopicsResponse
          * @see ListTopicsResponse
          */
-        AWSMOCK_API Dto::SNS::ListTopicsResponse ListTopics(const std::string &region) const;
+        Dto::SNS::ListTopicsResponse ListTopics(const std::string &region) const;
 
         /**
          * @brief Returns a list of all topic counters
@@ -104,7 +103,7 @@ namespace AwsMock::Service {
          * @see ListTopicCountersResponse
          * @see ListTopicCountersResponse
          */
-        AWSMOCK_API Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const;
+        Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const;
 
         /**
          * @brief Publish a message to a SNS topic
@@ -112,7 +111,7 @@ namespace AwsMock::Service {
          * @param request AWS region
          * @return PublishResponse
          */
-        AWSMOCK_API Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request) const;
+        Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Subscribe to a topic
@@ -120,7 +119,7 @@ namespace AwsMock::Service {
          * @param request subscribe request DTO
          * @return SubscribeResponse DTO
          */
-        AWSMOCK_API Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request) const;
+        Dto::SNS::SubscribeResponse Subscribe(const Dto::SNS::SubscribeRequest &request) const;
 
         /**
          * @brief Unsubscribe from a topic
@@ -130,7 +129,7 @@ namespace AwsMock::Service {
          * @see UnsubscribeRequest
          * @see UnsubscribeResponse
          */
-        AWSMOCK_API Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const;
+        Dto::SNS::UnsubscribeResponse Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const;
 
         /**
          * @brief Update a topic subscription
@@ -140,7 +139,7 @@ namespace AwsMock::Service {
          * @see UpdateSubscriptionRequest
          * @see UpdateSubscriptionResponse
          */
-        AWSMOCK_API Dto::SNS::UpdateSubscriptionResponse UpdateSubscription(const Dto::SNS::UpdateSubscriptionRequest &request) const;
+        Dto::SNS::UpdateSubscriptionResponse UpdateSubscription(const Dto::SNS::UpdateSubscriptionRequest &request) const;
 
         /**
          * @brief Sets tags for a topic
@@ -150,7 +149,7 @@ namespace AwsMock::Service {
          * @see TagResourceRequest DTO
          * @see TagResourceResponse DTO
          */
-        AWSMOCK_API Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request) const;
+        Dto::SNS::TagResourceResponse TagResource(const Dto::SNS::TagResourceRequest &request) const;
 
         /**
          * @brief Removes tags from a topic
@@ -160,7 +159,7 @@ namespace AwsMock::Service {
          * @see UntagRequestResponse DTO
          * @see UntagResourceResponse DTO
          */
-        AWSMOCK_API Dto::SNS::UntagResourceResponse UntagResource(const Dto::SNS::UntagResourceRequest &request) const;
+        Dto::SNS::UntagResourceResponse UntagResource(const Dto::SNS::UntagResourceRequest &request) const;
 
         /**
          * @brief Returns the topic attributes
@@ -170,7 +169,7 @@ namespace AwsMock::Service {
          * @see GetTopicAttributesRequest
          * @see GetTopicAttributesResponse
          */
-        AWSMOCK_API Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) const;
+        Dto::SNS::GetTopicAttributesResponse GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) const;
 
         /**
          * @brief Returns the topic details.
@@ -180,7 +179,7 @@ namespace AwsMock::Service {
          * @see GetTopicDetailsRequest
          * @see GetTopicDetailsResponse
          */
-        AWSMOCK_API Dto::SNS::GetTopicDetailsResponse GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request) const;
+        Dto::SNS::GetTopicDetailsResponse GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request) const;
 
         /**
          * @brief Returns a list of subscriptions for a topic
@@ -188,7 +187,7 @@ namespace AwsMock::Service {
          * @param request list subscriptions request DTO
          * @return ListSubscriptionByTopicResponse DTO
          */
-        AWSMOCK_API Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request) const;
+        Dto::SNS::ListSubscriptionsByTopicResponse ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request) const;
 
         /**
          * @brief Returns a list of subscription counters for a topic
@@ -196,7 +195,7 @@ namespace AwsMock::Service {
          * @param request list subscription counters request DTO
          * @return ListSubscriptionCountersResponse DTO
          */
-        AWSMOCK_API Dto::SNS::ListSubscriptionCountersResponse ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request) const;
+        Dto::SNS::ListSubscriptionCountersResponse ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request) const;
 
         /**
          * @brief Returns a list of tags counters for a topic
@@ -204,7 +203,7 @@ namespace AwsMock::Service {
          * @param request list tag counters request DTO
          * @return ListTagCountersResponse DTO
          */
-        AWSMOCK_API Dto::SNS::ListTagCountersResponse ListTagCounters(const Dto::SNS::ListTagCountersRequest &request) const;
+        Dto::SNS::ListTagCountersResponse ListTagCounters(const Dto::SNS::ListTagCountersRequest &request) const;
 
         /**
          * @brief Returns a list of attribute counters for a topic
@@ -212,7 +211,7 @@ namespace AwsMock::Service {
          * @param request list attribute counters request DTO
          * @return ListAttributeCountersResponse DTO
          */
-        AWSMOCK_API Dto::SNS::ListAttributeCountersResponse ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const;
+        Dto::SNS::ListAttributeCountersResponse ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const;
 
         /**
          * @brief Purge a topic
@@ -221,7 +220,7 @@ namespace AwsMock::Service {
          * @return total number of deleted messages
          * @throws ServiceException
          */
-        AWSMOCK_API long PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
+        long PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
 
         /**
          * @brief Delete a topic
@@ -231,7 +230,7 @@ namespace AwsMock::Service {
          * @return DeleteTopicResponse
          * @throws ServiceException
          */
-        AWSMOCK_API Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn) const;
+        Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn) const;
 
         /**
          * @brief List messages
@@ -241,7 +240,7 @@ namespace AwsMock::Service {
          * @see ListmessagesResponse
          * @throws ServiceException
          */
-        AWSMOCK_API Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request) const;
+        Dto::SNS::ListMessagesResponse ListMessages(const Dto::SNS::ListMessagesRequest &request) const;
 
         /**
          * @brief List message counters
@@ -251,7 +250,7 @@ namespace AwsMock::Service {
          * @see ListmessageCountersResponse
          * @throws ServiceException
          */
-        AWSMOCK_API Dto::SNS::ListMessageCountersResponse ListMessageCounters(const Dto::SNS::ListMessageCountersRequest &request) const;
+        Dto::SNS::ListMessageCountersResponse ListMessageCounters(const Dto::SNS::ListMessageCountersRequest &request) const;
 
         /**
          * @brief Deletes a message
@@ -263,7 +262,7 @@ namespace AwsMock::Service {
          * @see DeleteMessageRequest
          * @throws ServiceException
          */
-        AWSMOCK_API void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
+        void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
       private:
 

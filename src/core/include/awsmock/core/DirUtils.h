@@ -13,7 +13,6 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {

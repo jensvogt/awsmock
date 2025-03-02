@@ -14,7 +14,6 @@
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewayListener.h>
 #include <awsmock/service/gateway/GatewayWorker.h>
@@ -45,12 +44,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API GatewayServer(boost::asio::io_context &ios);
+        explicit GatewayServer(boost::asio::io_context &ios);
 
         /**
          * @brief HTTP request worker
          */
-        AWSMOCK_API void operator()() const;
+        void operator()() const;
 
       private:
 

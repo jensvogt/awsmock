@@ -25,7 +25,7 @@ namespace AwsMock::Manager {
     void Manager::InitializeDatabase() {
 
         // Get database variables
-        if (const Core::Configuration &configuration = Core::Configuration::instance(); configuration.GetValueBool("awsmock.mongodb.active")) {
+        if (Core::Configuration::instance().GetValueBool("awsmock.mongodb.active")) {
 
             _pool.Configure();
 
@@ -79,22 +79,21 @@ namespace AwsMock::Manager {
 
         using Database::Entity::Module::ModuleStatus;
 
-        const Core::Configuration &configuration = Core::Configuration::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
 
         for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
-            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << configuration.GetValueBool("awsmock.modules." + key + ".active");
+            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.modules." + key + ".active");
             EnsureModuleExisting(key);
-            configuration.GetValueBool("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
+            Core::Configuration::instance().GetValueBool("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
         }
 
         // Gateway
         EnsureModuleExisting("gateway");
-        moduleDatabase.SetStatus("gateway", configuration.GetValueBool("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase.SetStatus("gateway", Core::Configuration::instance().GetValueBool("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
 
         // Monitoring
         EnsureModuleExisting("monitoring");
-        moduleDatabase.SetStatus("monitoring", configuration.GetValueBool("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase.SetStatus("monitoring", Core::Configuration::instance().GetValueBool("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
     }
 
     void Manager::EnsureModuleExisting(const std::string &key) {

@@ -35,10 +35,8 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
-
-if (WIN32)
-    add_compile_options(/D AWSMOCK_EXPORTS)
+if (NOT WIN32)
+    add_subdirectory(tst)
 endif ()
 
 # Includes
@@ -46,15 +44,19 @@ include_directories(./include ../core/include ${EXT_INCLUDE} ${INC_BSON_CXX} ${I
 link_directories(${EXT_LIB})
 
 # Shared library
-add_library(${LIBRARY} SHARED ${SOURCES})
-target_link_libraries(${LIBRARY} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM}
-        ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+if (NOT WIN32)
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_link_libraries(${LIBRARY} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM}
+            ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE}
+target_link_libraries(${LIBRARY_STATIC} awsmockcore_static ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE}
         ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE}
         ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
 # Installation
-install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+if (NOT WIN32)
+    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+endif ()

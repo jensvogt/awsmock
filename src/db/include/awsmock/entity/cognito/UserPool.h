@@ -19,7 +19,6 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/cognito/UserPoolClient.h>
 #include <awsmock/entity/cognito/UserPoolDomain.h>
@@ -104,35 +103,35 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param clientId user pool client ID
          * @return UserPoolClient
          */
-        AWSMOCK_API UserPoolClient GetClient(const std::string &clientId);
+        UserPoolClient GetClient(const std::string &clientId);
 
         /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] AWSMOCK_API view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
-        AWSMOCK_API void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.
          *
          * @return DTO as JSON string
          */
-        [[nodiscard]] AWSMOCK_API std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the entity to a string representation.
          *
          * @return entity as string
          */
-        [[nodiscard]] AWSMOCK_API std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * @brief Stream provider.
@@ -141,7 +140,7 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param userPool userPool entity
          * @return output stream
          */
-        AWSMOCK_API friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
+        friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
     };
 
     typedef std::vector<Entity::Cognito::UserPool> UserPoolList;

@@ -13,7 +13,6 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 #include <awsmock/service/common/AbstractHandler.h>
@@ -42,7 +41,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API S3Handler() : AbstractHandler("s3-handler") {};
+        explicit S3Handler() : AbstractHandler("s3-handler") {};
 
         /**
          * @brief HTTP GET request.
@@ -53,7 +52,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handleGet(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP PUT request.
@@ -64,7 +63,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePut(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP POST request.
@@ -75,7 +74,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief Delete DELETE request.
@@ -86,7 +85,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handleDelete(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief Head request.
@@ -97,7 +96,7 @@ namespace AwsMock::Service {
          * @return response HTTP response
          * @see AbstractResource::handleHead(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        AWSMOCK_API http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

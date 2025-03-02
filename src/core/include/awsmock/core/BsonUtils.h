@@ -19,7 +19,6 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/JsonException.h>
 
 using bsoncxx::view_or_value;

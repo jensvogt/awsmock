@@ -124,10 +124,8 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCK
         ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
-
-if (WIN32)
-    add_compile_options(/D AWSMOCK_EXPORTS)
+if (NOT WIN32)
+    add_subdirectory(tst)
 endif ()
 
 # Includes
@@ -135,12 +133,16 @@ include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_
 link_directories(${EXT_LIB})
 
 # Shared library
-add_library(${LIBRARY} SHARED ${SOURCES})
-target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
+if (NOT WIN32)
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
+endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static ${mongocxx_LIBRARIES}
         ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 
-install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+if (NOT WIN32)
+    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+endif ()

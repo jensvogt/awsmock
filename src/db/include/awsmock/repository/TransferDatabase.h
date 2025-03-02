@@ -11,7 +11,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/SortColumn.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -33,7 +32,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API TransferDatabase();
+        explicit TransferDatabase();
 
         /**
          * @brief Singleton instance
@@ -51,7 +50,7 @@ namespace AwsMock::Database {
          * @return true if transfer server already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool TransferExists(const std::string &region, const std::string &serverId) const;
+        bool TransferExists(const std::string &region, const std::string &serverId) const;
 
         /**
          * @brief Check existence of transfer server
@@ -60,7 +59,7 @@ namespace AwsMock::Database {
          * @return true if transfer server already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool TransferExists(const Entity::Transfer::Transfer &transfer) const;
+        bool TransferExists(const Entity::Transfer::Transfer &transfer) const;
 
         /**
          * @brief Check existence of transfer server
@@ -69,7 +68,7 @@ namespace AwsMock::Database {
          * @return true if transfer server already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool TransferExists(const std::string &serverId) const;
+        bool TransferExists(const std::string &serverId) const;
 
         /**
          * @brief Check existence of transfer server
@@ -79,7 +78,7 @@ namespace AwsMock::Database {
          * @return true if transfer server already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool TransferExists(const std::string &region, const std::vector<std::string> &protocols) const;
+        bool TransferExists(const std::string &region, const std::vector<std::string> &protocols) const;
 
         /**
          * @brief Create a new transfer server
@@ -87,7 +86,7 @@ namespace AwsMock::Database {
          * @param transfer transfer entity
          * @return created transfer entity.
          */
-        AWSMOCK_API Entity::Transfer::Transfer CreateTransfer(const Entity::Transfer::Transfer &transfer) const;
+        Entity::Transfer::Transfer CreateTransfer(const Entity::Transfer::Transfer &transfer) const;
 
         /**
          * @brief Updates an existing transfer manager
@@ -95,7 +94,7 @@ namespace AwsMock::Database {
          * @param transfer transfer entity
          * @return updated transfer entity.
          */
-        AWSMOCK_API Entity::Transfer::Transfer UpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
+        Entity::Transfer::Transfer UpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
 
         /**
          * @brief Created or updates an existing transfer manager
@@ -103,7 +102,7 @@ namespace AwsMock::Database {
          * @param transfer transfer entity
          * @return created or updated transfer entity.
          */
-        AWSMOCK_API Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
+        Entity::Transfer::Transfer CreateOrUpdateTransfer(const Entity::Transfer::Transfer &transfer) const;
 
         /**
          * @brief Returns a transfer manager entity by primary key
@@ -112,7 +111,7 @@ namespace AwsMock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Transfer::Transfer GetTransferById(bsoncxx::oid oid) const;
+        Entity::Transfer::Transfer GetTransferById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a transfer manager entity by primary key
@@ -121,7 +120,7 @@ namespace AwsMock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Transfer::Transfer GetTransferById(const std::string &oid) const;
+        Entity::Transfer::Transfer GetTransferById(const std::string &oid) const;
 
         /**
          * @brief Returns a transfer manager entity by manager ID
@@ -131,7 +130,7 @@ namespace AwsMock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Transfer::Transfer GetTransferByServerId(const std::string &region, const std::string &serverId) const;
+        Entity::Transfer::Transfer GetTransferByServerId(const std::string &region, const std::string &serverId) const;
 
         /**
          * @brief Returns a transfer manager entity by ARN
@@ -140,7 +139,7 @@ namespace AwsMock::Database {
          * @return transfer manager entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Transfer::Transfer GetTransferByArn(const std::string &arn) const;
+        Entity::Transfer::Transfer GetTransferByArn(const std::string &arn) const;
 
         /**
          * @brief Returns a list of transfer manager.
@@ -152,7 +151,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting
          * @return list of transfer manager
          */
-        AWSMOCK_API std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of transfer users.
@@ -165,7 +164,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting column names
          * @return list of transfer users
          */
-        AWSMOCK_API std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns the total number of servers.
@@ -173,7 +172,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return total number of transfer server
          */
-        AWSMOCK_API long CountServers(const std::string &region = {}) const;
+        long CountServers(const std::string &region = {}) const;
 
         /**
          * @brief Returns the total number of users for a server.
@@ -182,7 +181,7 @@ namespace AwsMock::Database {
          * @param serverId server ID
          * @return total number of transfer server users
          */
-        AWSMOCK_API long CountUsers(const std::string &region = {}, const std::string &serverId = {}) const;
+        long CountUsers(const std::string &region = {}, const std::string &serverId = {}) const;
 
         /**
          * @brief Deletes an existing transfer manager
@@ -190,7 +189,7 @@ namespace AwsMock::Database {
          * @param serverId transfer serverID
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteTransfer(const std::string &serverId) const;
+        void DeleteTransfer(const std::string &serverId) const;
 
         /**
          * @brief Deletes all existing transfer server
@@ -198,7 +197,7 @@ namespace AwsMock::Database {
          * @return total number of deleted objects
          * @throws DatabaseException
          */
-        AWSMOCK_API long DeleteAllTransfers() const;
+        long DeleteAllTransfers() const;
 
       private:
 

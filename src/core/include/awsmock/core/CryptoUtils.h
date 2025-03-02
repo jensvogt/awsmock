@@ -405,4 +405,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWS_MOCK_CORE_CRYPTO_UTILS_H
+#endif

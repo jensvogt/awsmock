@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/utils/MongoUtils.h>
 
@@ -88,21 +87,21 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] AWSMOCK_API view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * @brief Converts the MongoDB document to an entity
          *
          * @param mResult query result.
          */
-        AWSMOCK_API void FromDocument(std::optional<view> mResult);
+        void FromDocument(std::optional<view> mResult);
 
         /**
          * @brief Converts the entity to a string representation.
          *
          * @return entity as string
          */
-        [[nodiscard]] AWSMOCK_API std::string ToString() const;
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * @brief Stream provider.
@@ -111,7 +110,7 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param userPoolClient userPool client entity
          * @return output stream
          */
-        AWSMOCK_API friend std::ostream &operator<<(std::ostream &os, const UserPoolClient &userPoolClient);
+        friend std::ostream &operator<<(std::ostream &os, const UserPoolClient &userPoolClient);
     };
 
 }// namespace AwsMock::Database::Entity::Cognito

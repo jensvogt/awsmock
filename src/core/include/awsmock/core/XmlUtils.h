@@ -14,7 +14,6 @@
 
 // AwsMOck includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 

@@ -896,9 +896,8 @@ namespace AwsMock::FtpServer {
         }
 
         const std::string local_path = toLocalPath(param);
-#ifdef WIN32
-        // TODO: Fix windows porting issues
-        //_rmdir(local_path.c_str());
+#ifdef _WIN32
+        _wrmdir(reinterpret_cast<const wchar_t *>(local_path.c_str()));
 #else
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
@@ -923,11 +922,10 @@ namespace AwsMock::FtpServer {
 
         auto local_path = toLocalPath(param);
 #ifdef _WIN32
-        // TODO: Fix windows porting issues
-//        if (_mkdir(reinterpret_cast<const char *>(local_path.c_str() == 0))) {
-//            sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
-//            return;
-//        }
+        if (_wmkdir(reinterpret_cast<const wchar_t *>(reinterpret_cast<const char *>(local_path.c_str() == 0)))) {
+            sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
+            return;
+        }
 #else
         if (constexpr mode_t mode = 0755; mkdir(local_path.c_str(), mode) == 0) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED,
@@ -969,9 +967,9 @@ namespace AwsMock::FtpServer {
         // Some FTP clients send those commands, as if they would call ls on unix.
         //
         // We try to support those parameters (or rather ignore them), even though
-        // this techniqually breaks listing directories that actually use "-a" etc.
+        // this technically breaks listing directories that actually use "-a" etc.
         // as directory name. As most clients however first CWD into a directory and
-        // call LIST without parameter afterwards and starting a directory name with
+        // call LIST without parameter afterward and starting a directory name with
         // "-a " / "-l " / "-al " / "-la " is not that common, the compatibility
         // benefit should outperform te potential problems by a lot.
         //

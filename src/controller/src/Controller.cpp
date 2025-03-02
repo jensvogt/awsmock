@@ -11,15 +11,14 @@ namespace AwsMock::Controller {
     AwsMockCtl::AwsMockCtl() {
 
         // Initialize database
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _host = configuration.GetValueString("awsmock.gateway.http.host");
-        _port = configuration.GetValueInt("awsmock.gateway.http.port");
+        _host = Core::Configuration::instance().GetValueString("awsmock.gateway.http.host");
+        _port = Core::Configuration::instance().GetValueInt("awsmock.gateway.http.port");
         _baseUrl = "http://" + _host + ":" + std::to_string(_port);
 
         // Get user/clientId/region
-        _user = configuration.GetValueString("awsmock.user");
-        _clientId = configuration.GetValueString("awsmock.access.client-id");
-        _region = configuration.GetValueString("awsmock.region");
+        _user = Core::Configuration::instance().GetValueString("awsmock.user");
+        _clientId = Core::Configuration::instance().GetValueString("awsmock.access.client-id");
+        _region = Core::Configuration::instance().GetValueString("awsmock.region");
     }
 
     void AwsMockCtl::Initialize(const boost::program_options::variables_map &vm, const std::vector<std::string> &commands) {

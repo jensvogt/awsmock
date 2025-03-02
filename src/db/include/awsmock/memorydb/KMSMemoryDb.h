@@ -14,7 +14,6 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/entity/kms/Key.h>
 #include <awsmock/repository/Database.h>
 
@@ -32,7 +31,7 @@ namespace AwsMock::Database {
         /**
          * Constructor
          */
-        AWSMOCK_API KMSMemoryDb() = default;
+        KMSMemoryDb() = default;
 
         /**
          * Singleton instance
@@ -49,7 +48,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool KeyExists(const std::string &keyId);
+        bool KeyExists(const std::string &keyId);
 
         /**
          * @brief Returns a KMS key by primary key
@@ -58,7 +57,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::KMS::Key GetKeyById(const std::string &oid);
+        Entity::KMS::Key GetKeyById(const std::string &oid);
 
         /**
          * @brief Returns a KMS key by key ID
@@ -67,7 +66,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
+        Entity::KMS::Key GetKeyByKeyId(const std::string &keyId);
 
         /**
          * @brief List all keys
@@ -76,7 +75,7 @@ namespace AwsMock::Database {
          * @return KeyList
          * @see Database::Entity::KMS::Key
          */
-        AWSMOCK_API Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
+        Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
 
         /**
          * Returns the total number of keys
@@ -84,7 +83,7 @@ namespace AwsMock::Database {
          * @return total number of keys
          * @throws DatabaseException
          */
-        AWSMOCK_API long CountKeys() const;
+        long CountKeys() const;
 
         /**
          * @brief Create a new key in the KMS key table
@@ -93,7 +92,7 @@ namespace AwsMock::Database {
          * @return created KMS key entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::KMS::Key CreateKey(const Entity::KMS::Key &key);
+        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key);
 
         /**
          * @brief Updates a key
@@ -102,7 +101,7 @@ namespace AwsMock::Database {
          * @return created key entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
+        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key);
 
         /**
          * @brief Delete a key
@@ -110,14 +109,14 @@ namespace AwsMock::Database {
          * @param key key entity
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteKey(const Entity::KMS::Key &key);
+        void DeleteKey(const Entity::KMS::Key &key);
 
         /**
          * @brief Delete all keys
          *
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteAllKeys();
+        void DeleteAllKeys();
 
       private:
 

@@ -6,7 +6,6 @@
 #define AWSMOCK_MANAGER_MONITORING_H
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/repository/ModuleDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -17,6 +16,7 @@ namespace AwsMock::Manager {
     /**
      * @brief Manager monitoring
      *
+     * @par
      * Reports up/down status of modules using the following correlations:
      *
      *  - Active && running == 0
@@ -49,4 +49,4 @@ namespace AwsMock::Manager {
     };
 
 }// namespace AwsMock::Manager
-#endif// AWSMOCK_MANAGER_MONITORING_H
+#endif// AWSMOCK_MANAGER_M

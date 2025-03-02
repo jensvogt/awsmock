@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
 

@@ -10,7 +10,6 @@
 #include <streambuf>
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 
 namespace AwsMock::Core {
 

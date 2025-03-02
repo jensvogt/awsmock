@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
 
     // Read configuration
     std::string configFilename = vm["config"].as<std::string>();
-    AwsMock::Core::Configuration::instance().SetFilename(configFilename);
+    AwsMock::Core::Configuration::instance().SetFilename(configFilename.c_str());
 
     // Set log level
     if (vm.contains("loglevel")) {

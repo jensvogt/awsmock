@@ -7,8 +7,7 @@
 namespace AwsMock::Service {
     TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
         // REST manager configuration
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.transfer.monitoring.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.monitoring.period");
 
         // Check module active
         if (!IsActive("transfer")) {
@@ -44,9 +43,8 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::CreateDirectories(const std::string &userName) {
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        const std::string basePath = configuration.GetValueString("awsmock.modules.transfer.data-dir");
-        for (const auto &directory: configuration.GetValueStringArray("awsmock.modules.transfer.directories")) {
+        const std::string basePath = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        for (const auto &directory: Core::Configuration::instance().GetValueStringArray("awsmock.modules.transfer.directories")) {
             if (std::string dirPath = basePath + "/" + userName + "/" + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
                 Core::DirUtils::MakeDirectory(dirPath, true);
                 log_debug << "Created directory, path: " << dirPath;

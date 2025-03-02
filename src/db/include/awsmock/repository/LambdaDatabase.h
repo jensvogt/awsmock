@@ -11,7 +11,6 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/lambda/Lambda.h>
@@ -36,7 +35,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API LambdaDatabase();
+        explicit LambdaDatabase();
 
         /**
          * @brief Singleton instance
@@ -55,7 +54,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const;
+        bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const;
 
         /**
          * Check existence of lambda
@@ -64,7 +63,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool LambdaExists(const Entity::Lambda::Lambda &lambda) const;
+        bool LambdaExists(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Check existence of lambda
@@ -73,7 +72,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool LambdaExists(const std::string &functionName) const;
+        bool LambdaExists(const std::string &functionName) const;
 
         /**
          * @brief Check existence of lambda
@@ -82,7 +81,7 @@ namespace AwsMock::Database {
          * @return true if lambda exists
          * @throws DatabaseException
          */
-        AWSMOCK_API bool LambdaExistsByArn(const std::string &arn) const;
+        bool LambdaExistsByArn(const std::string &arn) const;
 
         /**
          * @brief Create a new lambda function
@@ -90,7 +89,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created lambda entity.
          */
-        AWSMOCK_API Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Count all lambdas
@@ -98,7 +97,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        AWSMOCK_API int LambdaCount(const std::string &region = {}) const;
+        int LambdaCount(const std::string &region = {}) const;
 
         /**
          * @brief Updates an existing lambda lambda function
@@ -106,7 +105,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return updated lambda entity.
          */
-        AWSMOCK_API Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Created or updates an existing lambda function
@@ -114,7 +113,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created or updated lambda entity.
          */
-        AWSMOCK_API Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Import a lambda function
@@ -122,7 +121,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return imported lambda entity.
          */
-        AWSMOCK_API Entity::Lambda::Lambda ImportLambda(Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda ImportLambda(Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -131,7 +130,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid) const;
+        Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -140,7 +139,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Lambda::Lambda GetLambdaById(const std::string &oid) const;
+        Entity::Lambda::Lambda GetLambdaById(const std::string &oid) const;
 
         /**
          * @brief Returns a lambda entity by ARN
@@ -149,7 +148,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn) const;
+        Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn) const;
 
         /**
          * @brief Returns a lambda entity by name
@@ -159,7 +158,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        AWSMOCK_API Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name) const;
+        Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Sets the status of an lambda instance
@@ -168,7 +167,7 @@ namespace AwsMock::Database {
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        AWSMOCK_API void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const;
+        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const;
 
         /**
          * @brief Sets the average runtime of a lambda instance
@@ -177,7 +176,7 @@ namespace AwsMock::Database {
          * @param timestamp last update timestamp
          * @throws DatabaseException
          */
-        AWSMOCK_API void SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp) const;
+        void SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp) const;
 
         /**
          * @brief Sets the average runtime of a lambda instance
@@ -186,7 +185,7 @@ namespace AwsMock::Database {
          * @param millis lambda invocation runtime
          * @throws DatabaseException
          */
-        AWSMOCK_API void SetAverageRuntime(const std::string &oid, long millis) const;
+        void SetAverageRuntime(const std::string &oid, long millis) const;
 
         /**
          * @brief Returns a list of lambda functions.
@@ -194,7 +193,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        AWSMOCK_API std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {}) const;
+        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {}) const;
 
         /**
          * @brief Returns a list of lambda functions.
@@ -206,7 +205,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        AWSMOCK_API std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export a list of lambdas
@@ -214,7 +213,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return ölist of lambda entries
          */
-        AWSMOCK_API std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.
@@ -222,7 +221,7 @@ namespace AwsMock::Database {
          * @param eventSourceArn event source ARN
          * @return list of lambda functions
          */
-        AWSMOCK_API std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn) const;
+        std::vector<Entity::Lambda::Lambda> ListLambdasWithEventSource(const std::string &eventSourceArn) const;
 
         /**
          * @brief Deletes an existing lambda function
@@ -230,14 +229,14 @@ namespace AwsMock::Database {
          * @param functionName lambda function name
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteLambda(const std::string &functionName) const;
+        void DeleteLambda(const std::string &functionName) const;
 
         /**
          * @brief Deletes all existing lambda functions
          *
          * @throws DatabaseException
          */
-        AWSMOCK_API void DeleteAllLambdas() const;
+        void DeleteAllLambdas() const;
 
       private:
 

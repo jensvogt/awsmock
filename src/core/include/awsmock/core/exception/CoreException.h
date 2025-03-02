@@ -14,7 +14,6 @@
 
 
 // AwsMock includes
-#include <awsmock/core/Macros.h>
 
 
 namespace AwsMock::Core {
@@ -35,7 +34,7 @@ namespace AwsMock::Core {
          *
          * @param code exception code, default: 0
          */
-        AWSMOCK_API explicit CoreException(const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code) {}
+        explicit CoreException(const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code) {}
 
         /**
          * Constructor.
@@ -43,36 +42,36 @@ namespace AwsMock::Core {
          * @param msg exception message
          * @param code exception code, default: 0
          */
-        AWSMOCK_API explicit CoreException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code), _message(std::move(msg)) {}
+        explicit CoreException(std::string msg, const boost::beast::http::status code = boost::beast::http::status::internal_server_error) : _code(code), _message(std::move(msg)) {}
 
         /**
          * Copy constructor.
          *
          * @param exc parent exception.
          */
-        AWSMOCK_API CoreException(const CoreException &exc);
+        CoreException(const CoreException &exc);
 
         /**
          * Destructor
          */
-        AWSMOCK_API ~CoreException() noexcept override;
+        ~CoreException() noexcept override;
 
         /**
          * Assigment operator.
          */
-        AWSMOCK_API CoreException &operator=(const CoreException &exc);
+        CoreException &operator=(const CoreException &exc);
 
         /**
          * Return message
          */
-        AWSMOCK_API [[nodiscard]] std::string message() const { return _message; }
+        [[nodiscard]] std::string message() const { return _message; }
 
         /**
          * @brief Overrides the std::exception message
          *
          * @return std::exception what
          */
-        AWSMOCK_API [[nodiscard]] const char *what() const noexcept override {
+        [[nodiscard]] const char *what() const noexcept override {
             return _message.c_str();
         }
 

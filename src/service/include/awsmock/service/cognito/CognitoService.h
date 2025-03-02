@@ -14,7 +14,6 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/SrpUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
@@ -95,7 +94,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit AWSMOCK_API CognitoService();
+        explicit CognitoService();
 
         /**
          * @brief Create a new cognito user pool
@@ -103,14 +102,14 @@ namespace AwsMock::Service {
          * @param request create user pool request
          * @return CreateUserPoolRequest DTO
          */
-        AWSMOCK_API Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) const;
+        Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) const;
 
         /**
          * @brief Updates an existing cognito user pool
          *
          * @param request update user pool request
          */
-        AWSMOCK_API void UpdateUserPool(const Dto::Cognito::UpdateUserPoolRequest &request) const;
+        void UpdateUserPool(const Dto::Cognito::UpdateUserPoolRequest &request) const;
 
         /**
          * @brief List cognito user pools
@@ -118,7 +117,7 @@ namespace AwsMock::Service {
          * @param request list user pool request
          * @return ListUserPoolResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) const;
+        Dto::Cognito::ListUserPoolResponse ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) const;
 
         /**
          * @brief List cognito user pool counters
@@ -127,7 +126,7 @@ namespace AwsMock::Service {
          * @return ListUserPoolCountersResponse DTO
          * @see ListUserPoolCountersResponse
          */
-        AWSMOCK_API Dto::Cognito::ListUserPoolCountersResponse ListUserPoolCounters(const Dto::Cognito::ListUserPoolCountersRequest &request) const;
+        Dto::Cognito::ListUserPoolCountersResponse ListUserPoolCounters(const Dto::Cognito::ListUserPoolCountersRequest &request) const;
 
         /**
          * @brief Describes a user pool
@@ -135,14 +134,14 @@ namespace AwsMock::Service {
          * @param request describe user pool request
          * @return DescribeUserPoolResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::DescribeUserPoolResponse DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request) const;
+        Dto::Cognito::DescribeUserPoolResponse DescribeUserPool(const Dto::Cognito::DescribeUserPoolRequest &request) const;
 
         /**
          * @brief Delete a cognito user pool
          *
          * @param request delete user pool request
          */
-        AWSMOCK_API void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) const;
+        void DeleteUserPool(const Dto::Cognito::DeleteUserPoolRequest &request) const;
 
         /**
          * @brief Create a new cognito user pool domain
@@ -150,7 +149,7 @@ namespace AwsMock::Service {
          * @param request create user pool domain request
          * @return CreateUserPoolDomainResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::CreateUserPoolDomainResponse CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request) const;
+        Dto::Cognito::CreateUserPoolDomainResponse CreateUserPoolDomain(const Dto::Cognito::CreateUserPoolDomainRequest &request) const;
 
         /**
          * @brief Updates an existing cognito user pool domain
@@ -159,7 +158,7 @@ namespace AwsMock::Service {
          * @return UpdateUserPoolDomainResponse
          * @see UpdateUserPoolDomainResponse
          */
-        AWSMOCK_API Dto::Cognito::UpdateUserPoolDomainResponse UpdateUserPoolDomain(const Dto::Cognito::UpdateUserPoolDomainRequest &request) const;
+        Dto::Cognito::UpdateUserPoolDomainResponse UpdateUserPoolDomain(const Dto::Cognito::UpdateUserPoolDomainRequest &request) const;
 
         /**
          * @brief Describes a user pool domain
@@ -168,7 +167,7 @@ namespace AwsMock::Service {
          * @return DescribeUserPoolDomainResponse DTO
          * @see DescribeUserPoolDomainResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
+        Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
 
         /**
          * @brief Create a new cognito user pool client
@@ -176,7 +175,7 @@ namespace AwsMock::Service {
          * @param request create user pool client request
          * @return CreateUserPoolClientResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::CreateUserPoolClientResponse CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request) const;
+        Dto::Cognito::CreateUserPoolClientResponse CreateUserPoolClient(const Dto::Cognito::CreateUserPoolClientRequest &request) const;
 
         /**
          * @brief List cognito user pool clients
@@ -184,7 +183,7 @@ namespace AwsMock::Service {
          * @param request list user pool clients request
          * @return ListUserPoolClientsResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::ListUserPoolClientsResponse ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request) const;
+        Dto::Cognito::ListUserPoolClientsResponse ListUserPoolClients(const Dto::Cognito::ListUserPoolClientsRequest &request) const;
 
         /**
          * @brief Describes a user pool client
@@ -192,21 +191,21 @@ namespace AwsMock::Service {
          * @param request describe user pool client request
          * @return DescribeUserPoolResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::DescribeUserPoolClientResponse DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request) const;
+        Dto::Cognito::DescribeUserPoolClientResponse DescribeUserPoolClient(const Dto::Cognito::DescribeUserPoolClientRequest &request) const;
 
         /**
          * @brief Updates an existing cognito user pool client
          *
          * @param request update user pool client request
          */
-        AWSMOCK_API void UpdateUserPoolClient(const Dto::Cognito::UpdateUserPoolClientRequest &request) const;
+        void UpdateUserPoolClient(const Dto::Cognito::UpdateUserPoolClientRequest &request) const;
 
         /**
          * @brief Deletes a cognito user pool client
          *
          * @param request delete user pool client request
          */
-        AWSMOCK_API void DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request) const;
+        void DeleteUserPoolClient(const Dto::Cognito::DeleteUserPoolClientRequest &request) const;
 
         /**
          * @brief List cognito users
@@ -214,7 +213,7 @@ namespace AwsMock::Service {
          * @param request list user request
          * @return ListUsersResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request) const;
+        Dto::Cognito::ListUsersResponse ListUsers(const Dto::Cognito::ListUsersRequest &request) const;
 
         /**
          * @brief List cognito user counters
@@ -223,7 +222,7 @@ namespace AwsMock::Service {
          * @return ListUserCountersResponse DTO
          * @see ListUserCountersResponse
          */
-        AWSMOCK_API Dto::Cognito::ListUserCountersResponse ListUserCounters(const Dto::Cognito::ListUserCountersRequest &request) const;
+        Dto::Cognito::ListUserCountersResponse ListUserCounters(const Dto::Cognito::ListUserCountersRequest &request) const;
 
         /**
          * @brief Create a new cognito user pool
@@ -231,7 +230,7 @@ namespace AwsMock::Service {
          * @param request create user pool request
          * @return CreateUserPoolResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::CreateGroupResponse CreateGroup(const Dto::Cognito::CreateGroupRequest &request) const;
+        Dto::Cognito::CreateGroupResponse CreateGroup(const Dto::Cognito::CreateGroupRequest &request) const;
 
         /**
          * @brief Lists all available groups
@@ -239,14 +238,14 @@ namespace AwsMock::Service {
          * @param request list groups request
          * @return ListGroupsResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::ListGroupsResponse ListGroups(const Dto::Cognito::ListGroupsRequest &request) const;
+        Dto::Cognito::ListGroupsResponse ListGroups(const Dto::Cognito::ListGroupsRequest &request) const;
 
         /**
          * @brief Delete a cognito group
          *
          * @param request delete group request
          */
-        AWSMOCK_API void DeleteGroup(const Dto::Cognito::DeleteGroupRequest &request) const;
+        void DeleteGroup(const Dto::Cognito::DeleteGroupRequest &request) const;
 
         /**
          * @brief Sign up a user
@@ -254,14 +253,14 @@ namespace AwsMock::Service {
          * @param request sign up request
          * @return SignUpResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::SignUpResponse SignUp(const Dto::Cognito::SignUpRequest &request) const;
+        Dto::Cognito::SignUpResponse SignUp(const Dto::Cognito::SignUpRequest &request) const;
 
         /**
          * @brief Confirm a user
          *
          * @param request confirm user request
          */
-        AWSMOCK_API void ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request) const;
+        void ConfirmUser(const Dto::Cognito::AdminConfirmUserRequest &request) const;
 
         /**
          * @brief Initiate authentication
@@ -276,7 +275,7 @@ namespace AwsMock::Service {
          * @see InitiateAuthRequest
          * @see InitiateAuthResponse
          */
-        AWSMOCK_API Dto::Cognito::InitiateAuthResponse InitiateAuth(Dto::Cognito::InitiateAuthRequest &request) const;
+        Dto::Cognito::InitiateAuthResponse InitiateAuth(Dto::Cognito::InitiateAuthRequest &request) const;
 
         /**
          * @brief Respond to auth challenge
@@ -291,7 +290,7 @@ namespace AwsMock::Service {
          * @see RespondToAuthChallengeRequest
          * @see RespondToAuthChallengeResponse
          */
-        AWSMOCK_API Dto::Cognito::RespondToAuthChallengeResponse RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) const;
+        Dto::Cognito::RespondToAuthChallengeResponse RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) const;
 
         /**
          * @brief Global sign out request
@@ -299,7 +298,7 @@ namespace AwsMock::Service {
          * @param request sign out request
          * @see GlobalSignOutRequest
          */
-        AWSMOCK_API void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request);
+        void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request);
 
         /**
          * @brief Create a new cognito user
@@ -307,7 +306,7 @@ namespace AwsMock::Service {
          * @param request create user request
          * @return AdminCreateUserResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) const;
+        Dto::Cognito::AdminCreateUserResponse AdminCreateUser(const Dto::Cognito::AdminCreateUserRequest &request) const;
 
         /**
          * @brief Get a local cognito user
@@ -315,49 +314,49 @@ namespace AwsMock::Service {
          * @param request get user request
          * @return AdminGetUserResponse DTO
          */
-        AWSMOCK_API Dto::Cognito::AdminGetUserResponse AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) const;
+        Dto::Cognito::AdminGetUserResponse AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) const;
 
         /**
          * @brief Adds a user to a group
          *
          * @param request add user to group request
          */
-        AWSMOCK_API void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request) const;
+        void AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request) const;
 
         /**
          * @brief Removes a user from a group
          *
          * @param request remove user from group request
          */
-        AWSMOCK_API void AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request) const;
+        void AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request) const;
 
         /**
          * @brief Lists the users in a group
          *
          * @param request list user in group request
          */
-        AWSMOCK_API Dto::Cognito::ListUsersInGroupResponse ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request) const;
+        Dto::Cognito::ListUsersInGroupResponse ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request) const;
 
         /**
          * @brief Enable a user
          *
          * @param request enable user request
          */
-        AWSMOCK_API void AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request) const;
+        void AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request) const;
 
         /**
          * @brief Disable a user
          *
          * @param request disable user request
          */
-        AWSMOCK_API void AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request) const;
+        void AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request) const;
 
         /**
          * @brief Deletes a cognito user
          *
          * @param request delete user request
          */
-        AWSMOCK_API void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
+        void AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const;
 
       private:
 

@@ -11,7 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/entity/lambda/Lambda.h>
@@ -57,7 +56,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor.
          */
-        explicit AWSMOCK_API LambdaCreator() = default;
+        explicit LambdaCreator() = default;
 
         /**
          * @brief Create new lambda function
@@ -66,7 +65,7 @@ namespace AwsMock::Service {
          * @param functionId lambda function OID
          * @param instanceId instanceId
          */
-        AWSMOCK_API void operator()(const std::string &functionCode, const std::string &functionId, const std::string &instanceId) const;
+        void operator()(const std::string &functionCode, const std::string &functionId, const std::string &instanceId) const;
 
       private:
 
