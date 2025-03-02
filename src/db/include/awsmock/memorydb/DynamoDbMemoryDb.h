@@ -14,6 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
@@ -33,7 +34,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        DynamoDbMemoryDb() = default;
+        AWSMOCK_API DynamoDbMemoryDb() = default;
 
         /**
          * @brief Singleton instance
@@ -53,7 +54,7 @@ namespace AwsMock::Database {
          * @return true if DynamoDb table already exists
          * @throws DatabaseException
          */
-        bool TableExists(const std::string &region, const std::string &tableName);
+        AWSMOCK_API bool TableExists(const std::string &region, const std::string &tableName);
 
         /**
          * @brief Create a new DynamoDb table
@@ -61,7 +62,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return created DynamoDb table.
          */
-        Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
+        AWSMOCK_API Entity::DynamoDb::Table CreateTable(const Entity::DynamoDb::Table &table);
 
         /**
          * @brief Updates a new DynamoDb table
@@ -69,7 +70,7 @@ namespace AwsMock::Database {
          * @param table DynamoDb table
          * @return updated DynamoDb table.
          */
-        Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
+        AWSMOCK_API Entity::DynamoDb::Table UpdateTable(const Entity::DynamoDb::Table &table);
 
         /**
          * @brief Returns a table entity by primary key
@@ -78,7 +79,7 @@ namespace AwsMock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Table GetTableById(const std::string &oid);
+        AWSMOCK_API Entity::DynamoDb::Table GetTableById(const std::string &oid);
 
         /**
          * @brief Returns a table entity by region and name
@@ -88,7 +89,7 @@ namespace AwsMock::Database {
          * @return table entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
+        AWSMOCK_API Entity::DynamoDb::Table GetTableByRegionName(const std::string &region, const std::string &name);
 
         /**
          * @brief Returns a list of DynamoDB tables
@@ -96,7 +97,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of DynamoDB tables
          */
-        std::vector<Entity::DynamoDb::Table> ListTables(const std::string &region = {});
+        AWSMOCK_API std::vector<Entity::DynamoDb::Table> ListTables(const std::string &region = {});
 
         /**
          * @brief Returns the number of DynamoDB tables
@@ -104,7 +105,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return number of DynamoDB tables
          */
-        long CountTables(const std::string &region = {}) const;
+        AWSMOCK_API long CountTables(const std::string &region = {}) const;
 
         /**
          * @brief Deletes an existing DynamoDB table
@@ -112,7 +113,7 @@ namespace AwsMock::Database {
          * @param tableName name of the table
          * @throws DatabaseException
          */
-        void DeleteTable(const std::string &tableName);
+        AWSMOCK_API void DeleteTable(const std::string &tableName);
 
         /**
          * @brief Deletes all existing DynamoDB tables
@@ -120,7 +121,7 @@ namespace AwsMock::Database {
          * @return total number of deleted objects
          * @throws DatabaseException
          */
-        long DeleteAllTables();
+        AWSMOCK_API long DeleteAllTables();
 
         /**
          * @brief Checks the existence of an item.
@@ -129,7 +130,7 @@ namespace AwsMock::Database {
          * @return true if database exists, otherwise false
          * @throws DatabaseException
          */
-        bool ItemExists(const Entity::DynamoDb::Item &item);
+        AWSMOCK_API bool ItemExists(const Entity::DynamoDb::Item &item);
 
         /**
          * @brief Returns a list of DynamoDB items
@@ -138,7 +139,7 @@ namespace AwsMock::Database {
          * @param tableName table name
          * @return list of DynamoDB tables
          */
-        Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
+        AWSMOCK_API Entity::DynamoDb::ItemList ListItems(const std::string &region = {}, const std::string &tableName = {}) const;
 
         /**
          * @brief Returns a item entity by primary key
@@ -147,7 +148,7 @@ namespace AwsMock::Database {
          * @return item entity
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item GetItemById(const std::string &oid);
+        AWSMOCK_API Entity::DynamoDb::Item GetItemById(const std::string &oid);
 
         /**
          * @brief Creates a new item
@@ -156,7 +157,7 @@ namespace AwsMock::Database {
          * @return created item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item);
+        AWSMOCK_API Entity::DynamoDb::Item CreateItem(const Entity::DynamoDb::Item &item);
 
         /**
          * @brief Updates an existing item
@@ -165,7 +166,7 @@ namespace AwsMock::Database {
          * @return updated item
          * @throws DatabaseException
          */
-        Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item);
+        AWSMOCK_API Entity::DynamoDb::Item UpdateItem(const Entity::DynamoDb::Item &item);
 
         /**
          * @brief Returns the number of DynamoDB items.
@@ -173,7 +174,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return number of DynamoDB items
          */
-        long CountItems(const std::string &region = {}) const;
+        AWSMOCK_API long CountItems(const std::string &region = {}) const;
 
         /**
          * @brief Deletes an item
@@ -182,7 +183,7 @@ namespace AwsMock::Database {
          * @param tableName name of the table
          * @param keys primary key of the item
          */
-        void DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys);
+        AWSMOCK_API void DeleteItem(const std::string &region, const std::string &tableName, const std::map<std::string, Entity::DynamoDb::AttributeValue> &keys);
 
         /**
          * @brief Deletes all item of a table
@@ -191,12 +192,12 @@ namespace AwsMock::Database {
          * @param tableName name of the table
          * @throws DatabaseException
          */
-        void DeleteItems(const std::string &region, const std::string &tableName);
+        AWSMOCK_API void DeleteItems(const std::string &region, const std::string &tableName);
 
         /**
          * @brief Deletes all items
          */
-        void DeleteAllItems();
+        AWSMOCK_API void DeleteAllItems();
 
       private:
 

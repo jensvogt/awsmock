@@ -19,6 +19,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/repository/Database.h>
 
@@ -41,7 +42,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        SSMMemoryDb() = default;
+        AWSMOCK_API SSMMemoryDb() = default;
 
         /**
          * @brief Singleton instance
@@ -58,7 +59,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool ParameterExists(const std::string &name);
+        AWSMOCK_API bool ParameterExists(const std::string &name);
 
         /**
          * @brief Returns an SMS parameter by primary key
@@ -67,7 +68,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterById(const std::string &oid);
+        AWSMOCK_API Entity::SSM::Parameter GetParameterById(const std::string &oid);
 
         /**
          * @brief Returns an SSM parameter by name
@@ -76,7 +77,7 @@ namespace AwsMock::Database {
          * @return key entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter GetParameterByName(const std::string &name);
+        AWSMOCK_API Entity::SSM::Parameter GetParameterByName(const std::string &name);
 
         /**
          * @brief List all parameters
@@ -84,7 +85,7 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return ParameterList
          */
-        Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
+        AWSMOCK_API Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
 
         /**
          * @brief Returns the total number of parameters
@@ -92,7 +93,7 @@ namespace AwsMock::Database {
          * @return total number of parameters
          * @throws DatabaseException
          */
-        long CountParameters() const;
+        AWSMOCK_API long CountParameters() const;
 
         /**
          * @brief Create a new parameter in the ssm parameter table
@@ -101,7 +102,7 @@ namespace AwsMock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter CreateParameter(const Entity::SSM::Parameter &parameter);
+        AWSMOCK_API Entity::SSM::Parameter CreateParameter(const Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Updates a parameter
@@ -110,7 +111,7 @@ namespace AwsMock::Database {
          * @return created parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter UpdateParameter(const Entity::SSM::Parameter &parameter);
+        AWSMOCK_API Entity::SSM::Parameter UpdateParameter(const Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Deletes a parameter
@@ -118,14 +119,14 @@ namespace AwsMock::Database {
          * @param parameter parameter entity
          * @throws DatabaseException
          */
-        void DeleteParameter(const Entity::SSM::Parameter &parameter);
+        AWSMOCK_API void DeleteParameter(const Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Deletes all parameters
          *
          * @throws DatabaseException
          */
-        void DeleteAllParameters();
+        AWSMOCK_API void DeleteAllParameters();
 
       private:
 
