@@ -14,7 +14,8 @@
 #else
 #define AWSMOCK_API __declspec(dllimport)
 #endif
-
+#else
+#define AWSMOCK_API
 #endif
 
 #endif//AWSMOCK_CORE_WINDOWS_H

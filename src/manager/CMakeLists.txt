@@ -16,7 +16,8 @@ if (WIN32)
             ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO}
             ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
 else ()
-    target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore)
+    target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore ${LIB_BOOST_THREAD}
+            ${LIB_BOOST_PROGRAM_OPTIONS})
 endif ()
 
 install(TARGETS ${BINARY} DESTINATION ${BIN_INSTALL_DIR})
