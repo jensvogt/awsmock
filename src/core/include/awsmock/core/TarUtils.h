@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_CORE_TAR_UTILS_H
 #define AWSMOCK_CORE_TAR_UTILS_H
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif

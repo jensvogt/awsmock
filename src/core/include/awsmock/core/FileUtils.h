@@ -14,7 +14,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#if !WIN32
+#ifndef _WIN32
 #include <pwd.h>
 #endif
 

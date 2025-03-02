@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_CORE_WINDOWS_H
 #define AWSMOCK_CORE_WINDOWS_H
 
-#ifdef WIN32
+#ifdef _WIN32
 /*
  * Microsoft Visual C
  */

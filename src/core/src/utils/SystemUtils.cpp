@@ -15,7 +15,7 @@ namespace AwsMock::Core {
         // execute command
 #if __APPLE__
         auto status = std::system(cmd.c_str());
-#elif WIN32
+#elif _WIN32
         // TODO: Windows port
         auto status = 1;
 #else

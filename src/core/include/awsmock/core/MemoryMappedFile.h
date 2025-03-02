@@ -9,7 +9,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/mman.h>
 #include <unistd.h>
 #endif

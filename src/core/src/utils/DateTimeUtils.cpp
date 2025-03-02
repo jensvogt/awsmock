@@ -8,8 +8,8 @@
 
 namespace AwsMock::Core {
 
-#ifdef WIN32
-    extern "C" char* strptime(const char* s, const char* f, struct tm* tm) {
+#ifdef _WIN32
+    extern "C" char *strptime(const char *s, const char *f, struct tm *tm) {
         // Isn't the C++ standard lib nice? std::get_time is defined such that its
         // format parameters are the exact same as strptime. Of course, we have to
         // create a string stream first, and imbue it with the current C locale, and
@@ -22,7 +22,7 @@ namespace AwsMock::Core {
         if (input.fail()) {
             return nullptr;
         }
-        return (char*)(s + input.tellg());
+        return (char *) (s + input.tellg());
     }
 #endif
 
