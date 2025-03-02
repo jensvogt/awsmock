@@ -81,7 +81,7 @@ namespace AwsMock::Database {
          *
          * <p>Normally done during manager StartServer.</p>
          */
-        void AWSMOCK_API CreateIndexes() const;
+        AWSMOCK_API void CreateIndexes() const;
 
         /**
          * @brief Check whether we are running without database
@@ -93,7 +93,7 @@ namespace AwsMock::Database {
          *
          * @return database name
          */
-        [[nodiscard]] std::string AWSMOCK_API GetDatabaseName() const;
+        [[nodiscard]] AWSMOCK_API std::string GetDatabaseName() const;
 
         /**
          * @brief Start the database

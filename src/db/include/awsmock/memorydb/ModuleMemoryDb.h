@@ -13,6 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/module/Module.h>
 #include <awsmock/repository/Database.h>
@@ -31,7 +32,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit ModuleMemoryDb() = default;
+        explicit AWSMOCK_API ModuleMemoryDb() = default;
 
         /**
          * @brief Singleton instance
@@ -49,7 +50,7 @@ namespace AwsMock::Database {
          * @param name module name
          * @return true if active
          */
-        bool IsActive(const std::string &name);
+        AWSMOCK_API bool IsActive(const std::string &name);
 
         /**
          * @brief Check existence of name
@@ -57,7 +58,7 @@ namespace AwsMock::Database {
          * @param name name name
          * @return created name
          */
-        bool ModuleExists(const std::string &name);
+        AWSMOCK_API bool ModuleExists(const std::string &name);
 
         /**
          * @brief Returns the module by userPoolId
@@ -66,7 +67,7 @@ namespace AwsMock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleById(const std::string &oid);
+        AWSMOCK_API Entity::Module::Module GetModuleById(const std::string &oid);
 
         /**
          * @brief Returns the module by userPoolId
@@ -75,7 +76,7 @@ namespace AwsMock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleByName(const std::string &name);
+        AWSMOCK_API Entity::Module::Module GetModuleByName(const std::string &name);
 
         /**
          * @brief Returns all module names
@@ -83,7 +84,7 @@ namespace AwsMock::Database {
          * @return list of module names
          * @throws DatabaseException
          */
-        std::vector<std::string> GetAllModuleNames();
+        AWSMOCK_API std::vector<std::string> GetAllModuleNames();
 
         /**
          * @brief Creates a module
@@ -91,7 +92,7 @@ namespace AwsMock::Database {
          * @param module module entity
          * @return created module
          */
-        Entity::Module::Module CreateModule(const Entity::Module::Module &module);
+        AWSMOCK_API Entity::Module::Module CreateModule(const Entity::Module::Module &module);
 
         /**
          * @brief Updates a module
@@ -99,7 +100,7 @@ namespace AwsMock::Database {
          * @param module module entity
          * @return updated module
          */
-        Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
+        AWSMOCK_API Entity::Module::Module UpdateModule(const Entity::Module::Module &module);
 
         /**
          * @brief Sets the state of module.
@@ -111,7 +112,7 @@ namespace AwsMock::Database {
          * @return updated module
          * @see AwsMock::Database::Entity::Module::ModuleState()
          */
-        Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
+        AWSMOCK_API Entity::Module::Module SetState(const std::string &name, const Entity::Module::ModuleState &state);
 
         /**
          * @brief Sets the status of module.
@@ -122,7 +123,7 @@ namespace AwsMock::Database {
          * @param status module status
          * @see AwsMock::Database::Entity::Module::ModuleStatus()
          */
-        void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
+        AWSMOCK_API void SetStatus(const std::string &name, const Entity::Module::ModuleStatus &status);
 
         /**
          * @brief Sets the port of module.
@@ -130,33 +131,33 @@ namespace AwsMock::Database {
          * @param name module name
          * @param port module port
          */
-        void SetPort(const std::string &name, int port);
+        AWSMOCK_API void SetPort(const std::string &name, int port);
 
         /**
          * @brief Counts the number of modules
          *
          * @return total number of modules
          */
-        int ModuleCount() const;
+        AWSMOCK_API int ModuleCount() const;
 
         /**
          * @brief Returns a list of all modules
          *
          * @return list of all modules
          */
-        Entity::Module::ModuleList ListModules() const;
+        AWSMOCK_API Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Deletes module
          *
          * @param module module entity
          */
-        void DeleteModule(const Entity::Module::Module &module);
+        AWSMOCK_API void DeleteModule(const Entity::Module::Module &module);
 
         /**
          * @brief Deletes all modules
          */
-        void DeleteAllModules();
+        AWSMOCK_API void DeleteAllModules();
 
       private:
 

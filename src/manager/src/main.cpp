@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "set configuration file");
     desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value("info"), "set log level");
     desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_FILE), "set log file");
-#ifdef WIN32
+#ifdef _WIN32
     desc.add_options()("install", "install windows service");
     desc.add_options()("check", "check windows service");
     desc.add_options()("uninstall", "uninstall windows service");
@@ -165,8 +165,8 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-#ifdef WIN32
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+#ifdef _WIN32
+int APIENTRY mainCRTStartup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     return main(__argc, __argv);
 }
 #endif

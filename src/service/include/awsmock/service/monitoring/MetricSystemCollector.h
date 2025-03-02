@@ -6,7 +6,7 @@
 #define AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
 
 // C includes
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/times.h>
 #endif
 #ifdef __linux__
