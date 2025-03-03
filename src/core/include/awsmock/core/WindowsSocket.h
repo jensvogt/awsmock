@@ -12,6 +12,8 @@
 
 // Boost includes
 #include <boost/beast.hpp>
+#include <boost/regex/v5/regex.hpp>
+#include <boost/regex/v5/regex_fwd.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DomainSocket.h>
