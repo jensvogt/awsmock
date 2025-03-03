@@ -63,21 +63,12 @@ class WindowsWorker {
     }
 
     /**
-     * Define the application operator
+     * @brief Define the application operator
      */
     int operator()() {
 
-        // Start HTTP frontend server
-        AwsMock::Service::Frontend::FrontendServer server;
-        boost::thread t{boost::ref(server)};
-        t.detach();
-
-        // Start manager
-        AwsMock::Manager::Manager awsMockManager;
-        awsMockManager.Initialize();
-        awsMockManager.RunForeground();
-
-        return EXIT_SUCCESS;
+        UnixWorker worker;
+        return worker.Run();
     }
 
   private:
@@ -87,8 +78,8 @@ class WindowsWorker {
      */
     boost::application::context &context_;
 };
+#endif
 
-#else
 /**
  * @brief Unix foreground application
  */
@@ -124,7 +115,6 @@ class UnixWorker {
         return EXIT_SUCCESS;
     }
 };
-#endif
 
 /**
  * Main routine.
@@ -257,8 +247,8 @@ int main(const int argc, char *argv[]) {
     // Run as foreground process
     if (vm.contains("foreground")) {
 
-        WindowsWorker worker(app_context);
-        return worker();
+        UnixWorker worker;
+        return worker.Run();
     }
 
     // Instantiate your application

@@ -143,34 +143,6 @@ namespace AwsMock::Manager {
         }
     }
 
-#ifdef _WIN32
-
-    void Manager::RunForeground() {
-
-        boost::asio::io_context ios;
-        Core::PeriodicScheduler scheduler(ios);
-        auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
-        log_info << "Monitoring server started";
-
-        // Initialize modules
-        InitializeModules(scheduler, ios);
-
-        // Auto load init file
-        AutoLoad();
-
-        // Start listener threads
-        const int numProcs = Core::SystemUtils::GetNumberOfCores();
-        for (auto i = 0; i < numProcs; i++) {
-            _threadGroup.create_thread([ObjectPtr = &ios] { return ObjectPtr->run(); });
-        }
-
-        // Start IO context
-        ios.run();
-        log_info << "So long, and thanks for all the fish!";
-    }
-
-#else
-
     void Manager::Run() {
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
@@ -188,9 +160,6 @@ namespace AwsMock::Manager {
         Core::PeriodicScheduler scheduler(ios);
         auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
-
-        // Initialize modules
-        //InitializeModules(scheduler, ios);
 
         // Load available modules from configuration file
         LoadModulesFromConfiguration();
@@ -239,5 +208,4 @@ namespace AwsMock::Manager {
         log_info << "So long, and thanks for all the fish!";
     }
 
-#endif
 }// namespace AwsMock::Manager
