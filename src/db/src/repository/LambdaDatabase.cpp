@@ -96,7 +96,6 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
         }
         return _memoryDb.LambdaCount(region);
     }
