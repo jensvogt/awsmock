@@ -5,9 +5,8 @@ namespace AwsMock::Core {
 
     void SortColumn::FromDocument(const std::optional<view> &document) {
 
-        // column = Bson::BsonUtils::GetStringValue(document, "column");
-        // TODO: Fix me
-        //sortDirection = Bson::BsonUtils::GetIntValue(document, "sortDirection");
+        column = Bson::BsonUtils::GetStringValue(document, "column");
+        sortDirection = Bson::BsonUtils::GetIntValue(document, "sortDirection");
     }
 
     view_or_value<view, value> SortColumn::ToDocument() const {

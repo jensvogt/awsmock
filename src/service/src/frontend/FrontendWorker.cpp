@@ -2,6 +2,7 @@
 // Created by vogje01 on 12/17/24.
 //
 
+#include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 
 namespace AwsMock::Service::Frontend {
@@ -106,15 +107,16 @@ namespace AwsMock::Service::Frontend {
         }
 
         std::string full_path = _docRoot;
-        if (target.size() == 1) {
-            target = boost::string_view(DEFAULT_PAGE.c_str(), DEFAULT_PAGE.length());
+        if (target.size() <= 1) {
+            full_path += DEFAULT_PAGE;
+        } else {
+            full_path += std::string_view(target.data(), target.size());
         }
-        full_path.append(target.data(), target.size());
         log_debug << "Serving: " << full_path;
 
         // If file does not exist, send default page
         if (!boost::filesystem::exists(full_path)) {
-            full_path = _docRoot + "/index.html";
+            full_path = _docRoot + DEFAULT_PAGE;
         }
         log_trace << full_path << " MIME: " << mime_type(target);
 
@@ -122,6 +124,11 @@ namespace AwsMock::Service::Frontend {
         http::file_body::value_type file;
         beast::error_code ec;
         file.open(full_path.c_str(), beast::file_mode::read, ec);
+        if (ec) {
+            log_error << "Could not read file, file: " << full_path << ", error: " << ec.message();
+            SendBadResponse(http::status::internal_server_error, "Could not read file, file: " + full_path);
+            return;
+        }
 
         // Prepare response
         _fileResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));

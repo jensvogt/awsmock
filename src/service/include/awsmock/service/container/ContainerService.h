@@ -16,7 +16,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
-#include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -24,6 +23,7 @@
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/UnixSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
@@ -35,6 +35,10 @@
 #include <awsmock/dto/docker/ListNetworkResponse.h>
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
+
+#ifdef _WIN32
+#include <awsmock/core/WindowsSocket.h>
+#endif
 
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536

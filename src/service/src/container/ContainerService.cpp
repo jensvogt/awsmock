@@ -28,8 +28,13 @@ namespace AwsMock::Service {
         _networkName = Core::Configuration::instance().GetValueString("awsmock.docker.network-name");
         _containerPort = Core::Configuration::instance().GetValueString("awsmock.docker.container.port");
         _isDocker = Core::Configuration::instance().GetValueBool("awsmock.docker.active");
+#ifdef WIN32
+        _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.docker.socket");
+        _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
+#else
         _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.podman.socket");
-        _domainSocket = std::make_shared<Core::DomainSocket>(_containerSocketPath);
+        _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
+#endif
     }
 
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
@@ -37,7 +42,7 @@ namespace AwsMock::Service {
 
         if (_isDocker) {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
+            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters, {}, {}); statusCode == http::status::ok) {
                 Dto::Docker::ListImageResponse response;
                 response.FromJson(body);
                 if (response.imageList.empty()) {

@@ -18,9 +18,7 @@ namespace AwsMock::Service {
                         sqsRequest.region = clientCommand.region;
                         sqsRequest.owner = clientCommand.user;
                     } else {
-                        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueName");
+                        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueName");
                         std::string queueUrl = Core::CreateSQSQueueUrl(queueName);
                         std::vector<Dto::SQS::QueueAttribute> attributes = GetQueueAttributes(clientCommand.payload);
                         std::map<std::string, std::string> tags = GetQueueTags(clientCommand.payload);
@@ -38,8 +36,7 @@ namespace AwsMock::Service {
                     Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                     log_info << "Create queue, queueName: " << sqsRequest.queueName;
 
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
@@ -48,9 +45,7 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
                         sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl};
                     }
                     long deleted = _sqsService.PurgeQueue(sqsRequest);
@@ -65,21 +60,15 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
                         std::vector<std::string> attributeNames = GetQueueAttributeNames(clientCommand.payload);
-                        sqsRequest = {
-                                .region = clientCommand.region,
-                                .queueUrl = queueUrl,
-                                .attributeNames = attributeNames};
+                        sqsRequest = {.region = clientCommand.region, .queueUrl = queueUrl, .attributeNames = attributeNames};
                     }
 
                     Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
                     log_info << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
@@ -89,21 +78,15 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
 
                         int count = Core::HttpUtils::CountQueryParametersByPrefix(clientCommand.payload, "Attribute") / 2;
                         log_trace << "Got attribute count, count: " << count;
 
                         std::map<std::string, std::string> attributes;
                         for (int i = 1; i <= count; i++) {
-                            std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(
-                                    clientCommand.payload,
-                                    "Attribute." + std::to_string(i) + ".Name");
-                            std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(
-                                    clientCommand.payload,
-                                    "Attribute." + std::to_string(i) + ".Value");
+                            std::string attributeName = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Attribute." + std::to_string(i) + ".Name");
+                            std::string attributeValue = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Attribute." + std::to_string(i) + ".Value");
                             attributes[attributeName] = attributeValue;
                         }
 
@@ -113,8 +96,7 @@ namespace AwsMock::Service {
                     Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
                     log_info << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
@@ -123,9 +105,7 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueName");
+                        std::string queueName = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueName");
                         sqsRequest = {.region = clientCommand.region, .queueName = queueName};
                     }
                     Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
@@ -149,8 +129,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::LIST_QUEUE_ARNS: {
                     Dto::SQS::ListQueueArnsResponse sqsResponse = _sqsService.ListQueueArns();
                     log_info << "List queue ARNs";
-                    return SendOkResponse(request,
-                                          clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
@@ -182,14 +161,9 @@ namespace AwsMock::Service {
                         sqsRequest.FromJson(clientCommand.payload);
                         sqsRequest.region = clientCommand.region;
                     } else {
-                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "QueueUrl");
-                        std::string tagKey =
-                                Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tag.Key");
-                        std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(
-                                clientCommand.payload,
-                                "Tag.Key");
+                        std::string queueUrl = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "QueueUrl");
+                        std::string tagKey = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tag.Key");
+                        std::string tagValue = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Tag.Key");
 
                         std::map<std::string, std::string> tags;
                         tags[tagKey] = tagValue;

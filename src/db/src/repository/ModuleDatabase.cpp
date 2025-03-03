@@ -76,7 +76,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
                 document query;
-                query.append(kvp(name, make_document(kvp("$exists", true))));
+                query.append(kvp("name", name));
 
                 const auto result = _moduleCollection.find_one(query.extract());
                 log_trace << "Module exists: " << std::boolalpha << result.has_value();

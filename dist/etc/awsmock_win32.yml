@@ -23,7 +23,7 @@ awsmock:
     port: 4567                                                        # Port number
     workers: 20                                                       # Number of worker threads
     timeout: 900                                                      # HTTP timeout
-    doc-root: C:/Program Files (x86)/awsmock/frontend                             # Document root directory
+    doc-root: C:/Program Files (x86)/awsmock/frontend                 # Document root directory
   autoload: # BSON auto load on startup
     active: true                                                      # Autoload activation flag
     dir: C:/Program Files (x86)/awsmock/init                          # Autoload directory, has priority over autoload file
@@ -39,7 +39,7 @@ awsmock:
       port: 8080                                                      # Docker container default port
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
-    socket: /var/run/docker.sock                                      # Docker REST API domain socket
+    socket: tcp://localhost:2375                                      # Docker REST API domain/HTTP socket, default: /var/run/docker.sock (Linux, MacOS), tcp://localhost:2375 (Windows)
   podman: # Podman settings
     active: false                                                     # Podman daemon activation flag
     network-mode: podman                                              # Podman network mode, default: local
