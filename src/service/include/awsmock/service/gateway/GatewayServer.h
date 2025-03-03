@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         /**
          * @brief HTTP request worker
          */
-        void operator()() const;
+        //void operator()() const;
 
       private:
 

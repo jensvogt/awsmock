@@ -133,7 +133,7 @@ class UnixWorker {
  * @param argv command line arguments.
  * @return system exit code.
  */
-int main(int argc, char *argv[]) {
+int main(const int argc, char *argv[]) {
 
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     // Read configuration
-    auto configFilename = vm["config"].as<std::string>();
+    const auto configFilename = vm["config"].as<std::string>();
     AwsMock::Core::Configuration::instance().SetFilename(configFilename);
 
     // Set log level
@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        std::string level = AwsMock::Core::Configuration::instance().GetValueString("awsmock.logging.level");
+        const std::string level = AwsMock::Core::Configuration::instance().GetValueString("awsmock.logging.level");
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 

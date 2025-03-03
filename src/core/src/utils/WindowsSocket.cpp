@@ -3,8 +3,6 @@
 //
 
 #include <awsmock/core/WindowsSocket.h>
-#include <boost/regex/v5/regex.hpp>
-#include <boost/regex/v5/regex_fwd.hpp>
 
 namespace AwsMock::Core {
     DomainSocketResult WindowsSocket::SendJson(const verb method, const std::string &path) {
@@ -81,7 +79,7 @@ namespace AwsMock::Core {
         ec = socket.connect(endpoint, ec);
         if (ec) {
             log_error << "Could not connect to docker UNIX domain socket";
-            return {.statusCode = http::status::internal_server_error,.body = "Could not connect to docker UNIX domain socket"};
+            return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
         }
 
         // Prepare message
