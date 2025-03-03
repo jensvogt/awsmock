@@ -11,7 +11,7 @@ namespace AwsMock::Manager {
         log_debug << "Database indexes created";
     }
 
-    void Manager::Initialize() {
+    void Manager::Initialize() const {
 
         InitializeDatabase();
         std::string boostVersion = BOOST_LIB_VERSION;
@@ -22,7 +22,7 @@ namespace AwsMock::Manager {
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
     }
 
-    void Manager::InitializeDatabase() {
+    void Manager::InitializeDatabase() const {
 
         // Get database variables
         if (Core::Configuration::instance().GetValueBool("awsmock.mongodb.active")) {
@@ -75,6 +75,42 @@ namespace AwsMock::Manager {
         }
     }
 
+    void Manager::InitializeModules(Core::PeriodicScheduler &scheduler, boost::asio::io_context &ios) {
+
+        // Load available modules from configuration file
+        LoadModulesFromConfiguration();
+        log_info << "Module configuration loaded";
+
+        Service::ModuleMap moduleMap = Service::ModuleMap::instance();
+        const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
+        for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+            log_debug << "Initializing module, name: " << module.name;
+            if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
+            } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
+            } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
+            } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
+            } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler));
+            } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler));
+            } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
+            } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>(scheduler));
+            } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
+            } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
+            } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
+            }
+        }
+    }
+
     void Manager::LoadModulesFromConfiguration() {
 
         using Database::Entity::Module::ModuleStatus;
@@ -107,11 +143,35 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::Run() {
+#ifdef _WIN32
 
-        // Load available modules from configuration file
-        LoadModulesFromConfiguration();
-        log_info << "Module configuration loaded";
+    void Manager::RunForeground() {
+
+        boost::asio::io_context ios;
+        Core::PeriodicScheduler scheduler(ios);
+        auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        log_info << "Monitoring server started";
+
+        // Initialize modules
+        InitializeModules(scheduler, ios);
+
+        // Auto load init file
+        AutoLoad();
+
+        // Start listener threads
+        const int numProcs = Core::SystemUtils::GetNumberOfCores();
+        for (auto i = 0; i < numProcs; i++) {
+            _threadGroup.create_thread([ObjectPtr = &ios] { return ObjectPtr->run(); });
+        }
+
+        // Start IO context
+        ios.run();
+        log_info << "So long, and thanks for all the fish!";
+    }
+
+#else
+
+    void Manager::Run() {
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_context ios;
@@ -129,34 +189,8 @@ namespace AwsMock::Manager {
         auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
 
-        Service::ModuleMap moduleMap = Service::ModuleMap::instance();
-        const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
-            log_debug << "Initializing module, name: " << module.name;
-            if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
-            } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
-            } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
-            } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
-            } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler));
-            } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler));
-            } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
-            } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::DynamoDbServer>(scheduler));
-            } else if (module.name == "kms" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::KMSServer>(scheduler));
-            } else if (module.name == "ssm" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
-            } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
-            }
-        }
+        // Initialize modules
+        InitializeModules(scheduler, ios);
 
         // Auto load init file
         AutoLoad();
@@ -171,4 +205,6 @@ namespace AwsMock::Manager {
         ios.run();
         log_info << "So long, and thanks for all the fish!";
     }
+
+#endif
 }// namespace AwsMock::Manager

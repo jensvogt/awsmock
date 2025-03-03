@@ -98,9 +98,9 @@ namespace AwsMock::Service {
 
             // Get the list of tables from DynamoDB
             Dto::DynamoDb::ListTableRequest request;
-            request.region = _region;
+            request.region = Core::Configuration::instance().GetValueString("awsmock.region");
             request.PrepareRequest();
-            if (Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
+            if (const Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 
                 for (const auto &tableName: listTableResponse.tableNames) {
 
@@ -119,7 +119,7 @@ namespace AwsMock::Service {
 
             } else {
 
-                long count = _dynamoDbDatabase.DeleteAllTables();
+                const long count = _dynamoDbDatabase.DeleteAllTables();
                 log_debug << "Tables deleted, count: " << count;
             }
             log_debug << "DynamoDB tables synchronized";
@@ -141,9 +141,9 @@ namespace AwsMock::Service {
 
             // Get the list of tables from DynamoDB
             Dto::DynamoDb::ListTableRequest request;
-            request.region = _region;
+            request.region = Core::Configuration::instance().GetValueString("awsmock.region");
             request.PrepareRequest();
-            if (Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
+            if (const Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 
                 for (const auto &tableName: listTableResponse.tableNames) {
 

@@ -115,8 +115,8 @@ namespace AwsMock::Service {
         log_debug << "Build image request, name: " << name << " tags: " << tag;
 
         // Write docker file
-        std::string codeDir = Core::DirUtils::CreateTempDir();
-        std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        const std::string codeDir = Core::DirUtils::CreateTempDir();
+        const std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::ofstream ofs(fileName);
         ofs << dockerFile;
         ofs.close();
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
         std::string tarFileName = name;
         Core::StringUtils::Replace(tarFileName, "/", "-");
         Core::StringUtils::Replace(tarFileName, ".", "-");
-        std::string imageFile = BuildImageFile(codeDir, tarFileName);
+        const std::string imageFile = BuildImageFile(codeDir, tarFileName);
 
         if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "http://localhost/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, httpStatus: " << statusCode << " body: " << body;

@@ -28,11 +28,11 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-//#ifdef WIN32
-//#include <boost/application.hpp>
-//#include <boost/application/initializers.hpp>
-//#include <boost/application/service_setup.hpp>
-//#endif
+#ifdef WIN32
+#include <boost/application.hpp>
+#include <boost/application/initializers.hpp>
+#include <boost/application/service_setup.hpp>
+#endif
 
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
@@ -42,10 +42,88 @@
 #ifdef WIN32
 #define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.yml")
 #define DEFAULT_LOG_FILE std::string("C:\\Program Files (x86)\\awsmock\\log\\awsmock.log")
-#define DEFAULT_SERVICE_PATH std::string("C:\\Program Files (x86)\\awsmock\\bin\\awsmock.exe")
+#define DEFAULT_SERVICE_PATH std::string("C:\\Program Files (x86)\\awsmock\\bin\\awsmockmgr.exe")
 #else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
+#endif
+
+#ifdef _WIN32
+
+class WindowsWorker {
+
+  public:
+
+    /**
+     * @brief Constructor that will receive a application context
+     *
+     * @param context Windows application context
+     */
+    explicit WindowsWorker(boost::application::context &context) : context_(context) {
+    }
+
+    /**
+     * Define the application operator
+     */
+    int operator()() {
+
+        // Start HTTP frontend server
+        AwsMock::Service::Frontend::FrontendServer server;
+        boost::thread t{boost::ref(server)};
+        t.detach();
+
+        // Start manager
+        AwsMock::Manager::Manager awsMockManager;
+        awsMockManager.Initialize();
+        awsMockManager.RunForeground();
+
+        return EXIT_SUCCESS;
+    }
+
+  private:
+
+    /**
+     * Application context to hold aspects
+     */
+    boost::application::context &context_;
+};
+
+#else
+/**
+ * @brief Unix foreground application
+ */
+class UnixWorker {
+
+  public:
+
+    /**
+     * @brief Constructor
+     */
+    UnixWorker() = default;
+
+    /**
+     * @brief Main routine.
+     *
+     * @par
+     * Will never return. except on SIGINT or SIGTERM signals.
+     *
+     * @return
+     */
+    int Run() {
+
+        // Start HTTP frontend server
+        AwsMock::Service::Frontend::FrontendServer server;
+        boost::thread t{boost::ref(server)};
+        t.detach();
+
+        // Start manager
+        AwsMock::Manager::Manager awsMockManager;
+        awsMockManager.Initialize();
+        awsMockManager.Run();
+
+        return EXIT_SUCCESS;
+    }
+};
 #endif
 
 /**
@@ -68,12 +146,13 @@ int main(int argc, char *argv[]) {
     desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value("info"), "set log level");
     desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_FILE), "set log file");
 #ifdef _WIN32
+    desc.add_options()("foreground", "run as foreground process");
     desc.add_options()("install", "install windows service");
     desc.add_options()("check", "check windows service");
     desc.add_options()("uninstall", "uninstall windows service");
     desc.add_options()("name", boost::program_options::value<std::string>()->default_value("awsmock"), "windows service name");
     desc.add_options()("description", boost::program_options::value<std::string>()->default_value("AWS Cloud Simulation"), "windows service description");
-    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AwsMock"), "windows service display name");
+    desc.add_options()("display", boost::program_options::value<std::string>()->default_value("AWS Mock"), "windows service display name");
     desc.add_options()("path", boost::program_options::value<std::string>()->default_value(DEFAULT_SERVICE_PATH), "windows service path");
 #endif
 
@@ -101,39 +180,57 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    //#ifdef WIN32
-    //    if (vm.count("install")) {
-    //        boost::system::error_code ec;
-    //        boost::application::example::install_windows_service(
-    //                boost::application::setup_arg(vm["name"].as<std::string>()),
-    //                boost::application::setup_arg(vm["display"].as<std::string>()),
-    //                boost::application::setup_arg(vm["description"].as<std::string>()),
-    //                boost::application::setup_arg(vm["path"].as<std::string>()))
-    //                .install(ec);
-    //        log_info << "Windows service installed";
-    //        return 1;
-    //    }
-    //
-    //    if (vm.count("check")) {
-    //        boost::system::error_code ec;
-    //        bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
-    //
-    //        if (ec)
-    //            std::cout << ec.message() << std::endl;
-    //        else {
-    //            if (exist)
-    //                std::cout << "The service " << vm["name"].as<std::string>() << " is installed!" << std::endl;
-    //            else
-    //                std::cout << "The service " << vm["name"].as<std::string>() << " is NOT installed!" << std::endl;
-    //        }
-    //        return 0;
-    //    }
-    //
-    //#endif
+#ifdef WIN32
+    if (vm.contains("install")) {
+        boost::system::error_code ec;
+        boost::application::example::install_windows_service(
+                boost::application::setup_arg(vm["name"].as<std::string>()),
+                boost::application::setup_arg(vm["display"].as<std::string>()),
+                boost::application::setup_arg(vm["description"].as<std::string>()),
+                boost::application::setup_arg(vm["path"].as<std::string>()))
+                .install(ec);
+        if (ec) {
+            std::cerr << "Could not install Windows service, error: " << ec.message() << std::endl;
+            return 1;
+        }
+        std::cout << "Windows service installed" << std::endl;
+        return 0;
+    }
+
+    if (vm.contains("check")) {
+        boost::system::error_code ec;
+        bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
+
+        if (ec) {
+            std::cerr << ec.message() << std::endl;
+            return 1;
+        }
+        if (exist)
+            std::cout << "The service " << vm["name"].as<std::string>() << " is installed!" << std::endl;
+        else
+            std::cout << "The service " << vm["name"].as<std::string>() << " is NOT installed!" << std::endl;
+        return 0;
+    }
+
+    if (vm.contains("uninstall")) {
+        boost::system::error_code ec;
+        boost::application::example::uninstall_windows_service(
+                boost::application::setup_arg(vm["name"].as<std::string>()),
+                boost::application::setup_arg(vm["path"].as<std::string>()))
+                .uninstall(ec);
+
+        if (ec) {
+            std::cerr << "Could not uninstall Windows service, error: " << ec.message() << std::endl;
+            return 1;
+        }
+        std::cout << "Windows service uninstalled" << std::endl;
+        return 0;
+    }
+#endif
 
     // Read configuration
-    std::string configFilename = vm["config"].as<std::string>();
-    AwsMock::Core::Configuration::instance().SetFilename(configFilename.c_str());
+    auto configFilename = vm["config"].as<std::string>();
+    AwsMock::Core::Configuration::instance().SetFilename(configFilename);
 
     // Set log level
     if (vm.contains("loglevel")) {
@@ -152,17 +249,30 @@ int main(int argc, char *argv[]) {
         AwsMock::Core::LogStream::SetFilename(value);
     }
 
-    // Start HTTP frontend server
-    AwsMock::Service::Frontend::FrontendServer server;
-    boost::thread t{boost::ref(server)};
-    t.detach();
+#ifdef WIN32
 
-    // Start manager
-    AwsMock::Manager::Manager awsMockManager;
-    awsMockManager.Initialize();
-    awsMockManager.Run();
+    // Create a context application aspect pool
+    boost::application::context app_context;
 
-    return EXIT_SUCCESS;
+    // Run as foreground process
+    if (vm.contains("foreground")) {
+
+        WindowsWorker worker(app_context);
+        return worker();
+    }
+
+    // Instantiate your application
+    WindowsWorker worker(app_context);
+
+    // Start the application on the desired mode (common, server)
+    return boost::application::launch<boost::application::common>(worker, app_context);
+
+#else
+
+    UnixWorker worker;
+    return worker.Run();
+
+#endif
 }
 
 #ifdef _WIN32

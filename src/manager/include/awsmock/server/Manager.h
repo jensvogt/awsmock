@@ -50,32 +50,58 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialization
          */
-        void Initialize();
+        void Initialize() const;
 
         /**
-         * @brief Automatically loading init file
+         * @brief Initialize the modules
          *
-         * @par
-         * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup.
+         * @param scheduler general scheduler
+         * @param ios application context
          */
-        void AutoLoad();
+        void InitializeModules(Core::PeriodicScheduler &scheduler, boost::asio::io_context &ios);
+
+#ifdef _WIN32
 
         /**
-         * @brief Stops all currently running modules.
+         * Run as Windows foreground service
          */
-        void StopModules();
+        void RunForeground();
+
+        /**
+         * Run as Windows service
+         */
+        void RunService();
+
+#else
 
         /**
          * @brief Main processing loop.
          */
         void Run();
 
+#endif
+
+        /**
+         * @brief Automatically loading init file
+         *
+         * @par
+         * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup. If a directory
+         * named /home/awsmock/init exists, all files from that directory will be imported. If both exists, the directory gets the
+         * precedence.
+         */
+        static void AutoLoad();
+
+        /**
+         * @brief Stops all currently running modules.
+         */
+        static void StopModules();
+
       private:
 
         /**
          * @brief Initialize database
          */
-        void InitializeDatabase();
+        void InitializeDatabase() const;
 
         /**
          * @brief Load the modules from the configuration file.
@@ -90,7 +116,7 @@ namespace AwsMock::Manager {
          *
          * @param key module key
          */
-        void EnsureModuleExisting(const std::string &key);
+        static void EnsureModuleExisting(const std::string &key);
 
         /**
          * Thread group
