@@ -24,6 +24,9 @@
 #include <cstdlib>
 #include <iostream>
 
+#define BOOST_APPLICATION_FEATURE_NS_SELECT_BOOST
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS 1
+
 // Boost includes
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -46,38 +49,6 @@
 #else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
-#endif
-
-#ifdef _WIN32
-
-class WindowsWorker {
-
-  public:
-
-    /**
-     * @brief Constructor that will receive a application context
-     *
-     * @param context Windows application context
-     */
-    explicit WindowsWorker(boost::application::context &context) : context_(context) {
-    }
-
-    /**
-     * @brief Define the application operator
-     */
-    int operator()() {
-
-        UnixWorker worker;
-        return worker.Run();
-    }
-
-  private:
-
-    /**
-     * Application context to hold aspects
-     */
-    boost::application::context &context_;
-};
 #endif
 
 /**
@@ -114,7 +85,48 @@ class UnixWorker {
 
         return EXIT_SUCCESS;
     }
+
+  private:
+
+    bool running;
 };
+
+#ifdef _WIN32
+
+class WindowsWorker {
+
+  public:
+
+    /**
+     * @brief Constructor that will receive a application context
+     *
+     * @param context Windows application context
+     */
+    WindowsWorker(boost::application::context &context) : context_(context) {
+    }
+
+    static bool Stop() {
+        std::cout << "stop!" << std::endl;
+        return true;
+    }
+
+    /**
+     * @brief Define the application operator
+     */
+    int operator()() {
+
+        UnixWorker worker;
+        return worker.Run();
+    }
+
+  private:
+
+    /**
+     * Application context to hold aspects
+     */
+    boost::application::context &context_;
+};
+#endif
 
 /**
  * Main routine.
@@ -244,18 +256,29 @@ int main(const int argc, char *argv[]) {
     // Create a context application aspect pool
     boost::application::context app_context;
 
-    // Run as foreground process
-    if (vm.contains("foreground")) {
-
-        UnixWorker worker;
-        return worker.Run();
-    }
-
-    // Instantiate your application
     WindowsWorker worker(app_context);
 
-    // Start the application on the desired mode (common, server)
-    return boost::application::launch<boost::application::common>(worker, app_context);
+    // add termination handler
+    boost::application::handler<>::callback termination_callback = boost::bind(&WindowsWorker::Stop);
+
+    app_context.insert<boost::application::termination_handler>(boost::make_shared<boost::application::termination_handler_default_behaviour>(termination_callback));
+
+    int result = 0;
+    boost::system::error_code ec;
+    if (vm.contains("foreground")) {
+        // Run as foreground process
+        result = boost::application::launch<boost::application::common>(worker, app_context, ec);
+        if (ec) {
+            log_error << "Windows foreground process failed, error: " << ec.message() << ", code: " << ec.value();
+        }
+    } else {
+        // Run as Windows service
+        result = boost::application::launch<boost::application::server>(worker, app_context, ec);
+        if (ec) {
+            log_error << "Windows service start failed, error: " << ec.message() << ", code: " << ec.value();
+        }
+    }
+    return result;
 
 #else
 

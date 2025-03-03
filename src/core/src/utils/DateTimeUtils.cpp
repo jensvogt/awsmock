@@ -67,6 +67,13 @@ namespace AwsMock::Core {
 #endif
     }
 
+    system_clock::time_point DateTimeUtils::FromUnixTimestamp(const long long timestamp) {
+#ifdef _WIN32
+        const system_clock::time_point tp{std::chrono::milliseconds{timestamp}};
+        return std::chrono::zoned_time{std::chrono::current_zone(), tp + std::chrono::seconds(UtcOffset())};
+#endif
+    }
+
     std::string DateTimeUtils::HttpFormatNow() {
         return HttpFormat(system_clock::now());
     }

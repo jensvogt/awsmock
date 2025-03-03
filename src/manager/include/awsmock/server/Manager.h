@@ -53,33 +53,14 @@ namespace AwsMock::Manager {
         void Initialize() const;
 
         /**
-         * @brief Initialize the modules
-         *
-         * @param scheduler general scheduler
-         * @param ios application context
-         */
-        void InitializeModules(Core::PeriodicScheduler &scheduler, boost::asio::io_context &ios);
-
-#ifdef _WIN32
-
-        /**
-         * Run as Windows foreground service
-         */
-        void RunForeground();
-
-        /**
-         * Run as Windows service
-         */
-        void RunService();
-
-#else
-
-        /**
          * @brief Main processing loop.
          */
         void Run();
 
-#endif
+        /**
+         * @brief Stop processing-
+         */
+        void Stop() { running = false; };
 
         /**
          * @brief Automatically loading init file
@@ -127,6 +108,11 @@ namespace AwsMock::Manager {
          * MongoDB connection pool
          */
         Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
+
+        /**
+         * Running flag
+         */
+        bool running = false;
     };
 
 }// namespace AwsMock::Manager

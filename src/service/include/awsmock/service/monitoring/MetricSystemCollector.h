@@ -9,14 +9,12 @@
 #ifndef _WIN32
 #include <sys/times.h>
 #endif
+
 #ifdef __linux__
 #include <sys/sysinfo.h>
 #elif __APPLE__
 #include <mach/mach.h>
 #include <sys/resource.h>
-#endif
-#ifdef _WIN32
-//#include "psapi.h"
 #endif
 
 // C++ Standard includes
@@ -29,6 +27,12 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
+
+#ifdef _WIN32
+#include "windows.h"
+#include <Wbemidl.h>
+#include <comdef.h>
+#endif
 
 namespace AwsMock::Monitoring {
 
@@ -98,7 +102,13 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get memory utilization on Win32
          */
-        static void GetMemoryInfoWin32();
+        void GetRealMemoryInfoWin32();
+        void GetVirtualMemoryInfoWin32();
+
+        /**
+         * @brief Get memory utilization on Win32
+         */
+        void GetThreadInfoWin32();
 
 #endif
 
@@ -113,6 +123,7 @@ namespace AwsMock::Monitoring {
         ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
         int numProcessors;
         HANDLE self;
+        IWbemServices *pSvc = nullptr;
 #endif
 
         /**

@@ -53,7 +53,7 @@ endif ()
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
         ${LIB_BSON_CXX} ${LIB_MONGO_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML}
-        ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+        ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC} wbemuuid.lib)
 
 if (NOT WIN32)
     install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
