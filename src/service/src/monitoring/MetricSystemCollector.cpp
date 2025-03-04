@@ -110,11 +110,11 @@ namespace AwsMock::Monitoring {
     void MetricSystemCollector::GetMemoryInfoLinux() {
 
         std::ifstream ifs("/proc/self/stat");
-        if (std::string line ;std::getline(ifs, line)) {
+        if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
             MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", std::stod(tokens[22]));
             log_trace << "Virtual memory: " << std::stol(tokens[22]);
-            MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", std::stod(tokens[23])*sysconf(_SC_PAGESIZE));
+            MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", std::stod(tokens[23]) * sysconf(_SC_PAGESIZE));
             log_trace << "Real Memory: " << std::stol(tokens[23]);
         }
         ifs.close();
@@ -123,7 +123,7 @@ namespace AwsMock::Monitoring {
     void MetricSystemCollector::GetThreadInfoLinux() {
 
         std::ifstream ifs("/proc/self/stat");
-        if (std::string line ;std::getline(ifs, line)) {
+        if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
             MetricService::instance().SetGauge(TOTAL_THREADS, std::stod(tokens[19]));
             log_trace << "Total threads: " << std::stol(tokens[22]);
