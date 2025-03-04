@@ -158,7 +158,7 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const view_or_value<view,value> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.

@@ -33,7 +33,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Constructor
          */
-        ManagerMonitoring() {};
+        ManagerMonitoring(){};
 
       private:
 

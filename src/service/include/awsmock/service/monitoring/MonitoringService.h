@@ -37,7 +37,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {};
+        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()){};
 
         /**
          * @brief Get counters request

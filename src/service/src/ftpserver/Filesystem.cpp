@@ -102,7 +102,7 @@ namespace AwsMock::FtpServer {
         if (!is_ok_)
             return permission_string;
 #ifdef WIN32
-        // TODO: Fix windows porting issues
+            // TODO: Fix windows porting issues
 #else
         // Root
         permission_string[0] = ((file_status_.st_mode & S_IRUSR) != 0) ? 'r' : '-';

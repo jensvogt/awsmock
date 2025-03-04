@@ -37,7 +37,6 @@
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/Macros.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/exception/CoreException.h>

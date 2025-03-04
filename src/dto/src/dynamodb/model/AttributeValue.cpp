@@ -41,7 +41,7 @@ namespace AwsMock::Dto::DynamoDb {
     void AttributeValue::FromDocument(const view &jsonObject) {
 
         try {
-            for (const bsoncxx::document::element& ele: jsonObject) {
+            for (const bsoncxx::document::element &ele: jsonObject) {
                 if (ele.key() == "S") {
                     stringValue = bsoncxx::string::to_string(jsonObject["S"].get_string().value);
                 } else if (ele.key() == "SS") {

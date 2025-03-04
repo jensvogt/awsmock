@@ -49,7 +49,7 @@ namespace AwsMock::Core {
     DomainSocketResult UnixSocket::SendBinary(verb method, const std::string &path, const std::string &fileName) {
         return SendBinary(method, fileName, {});
     }
-    
+
     DomainSocketResult UnixSocket::SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) {
 
         boost::system::error_code ec;
