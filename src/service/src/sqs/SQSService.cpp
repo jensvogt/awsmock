@@ -886,12 +886,14 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "receive_messages");
         log_trace << "Receive message request: " << request.ToString();
 
+        // Check input parameter
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
             throw Core::ServiceException(
                     "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
+        long pollPeriod = Core::Configuration::instance().GetValueLong("awsmock.modules.sqs.receive-poll");
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
@@ -933,7 +935,7 @@ namespace AwsMock::Service {
                     if (!messageList.empty()) {
                         break;
                     }
-                    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(pollPeriod));
                     elapsed = std::chrono::duration_cast<std::chrono::seconds>(system_clock::now() - begin).count();
                 }
             }

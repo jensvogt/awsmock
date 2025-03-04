@@ -29,7 +29,10 @@
 #include <awsmock/awslocal/AwsLocal.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+
+#ifdef _WIN32
 #include <minwindef.h>
+#endif
 
 #ifdef _WIN32
 #define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.yml"

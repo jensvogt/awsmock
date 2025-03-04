@@ -136,6 +136,7 @@ namespace AwsMock::Core {
          */
         static system_clock::time_point FromUnixTimestamp(long timestamp);
 
+#ifdef _WIN32
         /**
          * @brief Get the localtime from unix timestamp
          *
@@ -143,6 +144,7 @@ namespace AwsMock::Core {
          * @return system_clock::time_point
          */
         static system_clock::time_point FromUnixTimestamp(long long timestamp);
+#endif
 
         /**
          * @brief Get the current local time

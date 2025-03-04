@@ -116,7 +116,6 @@ if (WIN32)
     install(FILES dist/etc/awsmock_win32.yml DESTINATION ${INSTALL_DIR}/etc RENAME awsmock.yml)
 else ()
     install(FILES dist/etc/awsmock.yml DESTINATION ${INSTALL_DIR}/etc)
-    install(FILES dist/bin/awslocal DESTINATION ${INSTALL_DIR}/bin PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_READ WORLD_EXECUTE)
 endif ()
 
 # Service installation

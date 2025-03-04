@@ -30,6 +30,9 @@
 #include <boost/asio/read.hpp>
 #include <boost/process/v1.hpp>
 #include <boost/thread/thread.hpp>
+#ifdef _WIN32
+#include <boost/process/v1/windows.hpp>
+#endif
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
