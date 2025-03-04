@@ -12,8 +12,6 @@
 
 // Boost includes
 #include <boost/beast.hpp>
-#include <boost/regex/v5/regex.hpp>
-#include <boost/regex/v5/regex_fwd.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DomainSocket.h>
@@ -46,7 +44,8 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit WindowsSocket(const std::string &path) : DomainSocket(path){};
+        explicit WindowsSocket(const std::string &path) : DomainSocket(path) {
+                                                          };
 
         /**
          * @brief Send JSON data
