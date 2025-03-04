@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
-#include <boost/process/v1/windows.hpp>
 
 namespace AwsMock::Core {
 
