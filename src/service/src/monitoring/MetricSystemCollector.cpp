@@ -109,35 +109,24 @@ namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::GetMemoryInfoLinux() {
 
-        std::string line;
-        std::ifstream ifs("/proc/self/status");
-        while (ifs) {
-            std::getline(ifs, line);
-
-            if (Core::StringUtils::Contains(line, "VmSize:")) {
-                double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
-                MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", value);
-                log_trace << "Virtual memory: " << value;
-            }
-            if (Core::StringUtils::Contains(line, "VmRSS:")) {
-                double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
-                MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", value);
-                log_trace << "Real Memory: " << value;
-            }
+        std::ifstream ifs("/proc/self/stat");
+        if (std::string line ;std::getline(ifs, line)) {
+            const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
+            MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", std::stod(tokens[22]));
+            log_trace << "Virtual memory: " << std::stol(tokens[22]);
+            MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", std::stod(tokens[23])*sysconf(_SC_PAGESIZE));
+            log_trace << "Real Memory: " << std::stol(tokens[23]);
         }
         ifs.close();
     }
 
     void MetricSystemCollector::GetThreadInfoLinux() {
-        std::string line;
-        std::ifstream ifs("/proc/self/status");
-        while (ifs) {
-            std::getline(ifs, line);
-            if (Core::StringUtils::Contains(line, "Threads:")) {
-                double value = std::stod(Core::StringUtils::Split(line, ':')[1]);
-                MetricService::instance().SetGauge(TOTAL_THREADS, value);
-                log_trace << "Total Threads: " << value;
-            }
+
+        std::ifstream ifs("/proc/self/stat");
+        if (std::string line ;std::getline(ifs, line)) {
+            const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
+            MetricService::instance().SetGauge(TOTAL_THREADS, std::stod(tokens[19]));
+            log_trace << "Total threads: " << std::stol(tokens[22]);
         }
         ifs.close();
     }
