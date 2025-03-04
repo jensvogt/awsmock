@@ -28,7 +28,11 @@
 // AwsMock includes
 #include <awsmock/controller/Controller.h>
 
+#ifdef _WIN32
+#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.yml"
+#else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#endif
 
 // Allowed actions
 static std::list<std::string> allowedActions() {
@@ -41,7 +45,7 @@ static std::list<std::string> allowedActions() {
 void ShowHelp(const boost::program_options::options_description &desc) {
     constexpr int leftIndent = 40;
     std::cout << std::endl
-              << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+              << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awsmockctl [Options] Commands" << std::endl
@@ -95,14 +99,12 @@ int main(const int argc, char *argv[]) {
 
     // Get command line options.
     boost::program_options::variables_map vm;
-    store(parse_command_line(argc, argv, desc), vm);
+    const boost::program_options::parsed_options parsed = boost::program_options::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+    store(parsed, vm);
     notify(vm);
 
     // Get commands.
-    std::vector<std::string> commands;
-    for (size_t i = vm.size() + 1; i < argc; i++) {
-        commands.emplace_back(argv[i]);
-    }
+    const std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
 
     // Show usage.
     if (vm.contains("help")) {
@@ -113,7 +115,7 @@ int main(const int argc, char *argv[]) {
     // Show version
     if (vm.contains("version")) {
         std::cout << std::endl
-                  << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
@@ -167,7 +169,7 @@ int main(const int argc, char *argv[]) {
 }
 
 #ifdef WIN32
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int APIENTRY mainCRTStartup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     return main(__argc, __argv);
 }
 #endif

@@ -27,6 +27,8 @@
 
 // Boost includes
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/process/v1.hpp>
 #include <boost/thread/thread.hpp>
 
 // AwsMock includes
@@ -113,6 +115,15 @@ namespace AwsMock::Core {
          * @return number of CPU cores
          */
         static int GetNumberOfCores();
+
+        /**
+         * @brief Run command in a shell
+         * @param shellcmd command
+         * @param input input stream
+         * @param output output stream
+         * @param error error stream
+         */
+        static void RunShellCommand(const std::string &shellcmd, const std::string &input, std::string &output, std::string &error);
     };
 
 }// namespace AwsMock::Core

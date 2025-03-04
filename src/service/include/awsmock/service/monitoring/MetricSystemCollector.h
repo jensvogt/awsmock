@@ -98,12 +98,10 @@ namespace AwsMock::Monitoring {
          */
         void GetCpuInfoWin32();
 
-
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetRealMemoryInfoWin32();
-        void GetVirtualMemoryInfoWin32();
+        void GetMemoryInfoWin32();
 
         /**
          * @brief Get memory utilization on Win32
@@ -120,10 +118,20 @@ namespace AwsMock::Monitoring {
         clock_t _lastSysCPU = 0;
         clock_t _lastUserCPU = 0;
 #elif _WIN32
-        ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
-        int numProcessors;
-        HANDLE self;
+
+        /**
+         * Windows WMI service
+         */
         IWbemServices *pSvc = nullptr;
+
+        /**
+         * @brief Returns value from WMI
+         *
+         * @param counter name of the WMI counter
+         * @return value of the WMI counter
+         */
+        long long GetPerformanceValue(const std::string &counter);
+
 #endif
 
         /**

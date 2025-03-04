@@ -330,7 +330,7 @@ namespace AwsMock::Controller {
         AddStandardHeaders(headers, "get-config");
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
         if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Could not set configuration, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            std::cerr << "Could not get configuration, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
@@ -431,7 +431,7 @@ namespace AwsMock::Controller {
             return;
         }
 
-        for (std::vector<Dto::Transfer::User> users = Dto::Transfer::User::FromJsonList(response.body); const auto &user: users) {
+        for (const std::vector<Dto::Transfer::User> users = Dto::Transfer::User::FromJsonList(response.body); const auto &user: users) {
             std::cout << "FTP user: " << user.userName << " password: " << user.password << std::endl;
         }
     }

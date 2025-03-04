@@ -87,6 +87,7 @@ awsmock:
         period: 60                                                    # SQS queue reset period in seconds, default: 60s
       counter: # SQS message counters
         period: 30                                                    # SQS message counting period in seconds, default: 30s
+      receive-poll: 1000                                              # Number of ms for message polling
     sns:
       active: true
       timeout: 14

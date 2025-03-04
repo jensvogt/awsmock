@@ -85,7 +85,7 @@ COPY --from=build /usr/local/awsmock/etc/awsmock.yml /usr/local/awsmock/etc
 # Set library search path
 ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
 
-# Expose manager/controller ports
+# Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
 # Prometheus ports
 EXPOSE 9091 9091

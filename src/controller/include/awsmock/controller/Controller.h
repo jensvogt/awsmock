@@ -35,10 +35,10 @@
 namespace AwsMock::Controller {
 
     /**
-     * @brief AwsMock controller
+     * @brief AwsMock awslocal
      *
      * @par
-     * AwsMock controller, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
+     * AwsMock awslocal, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

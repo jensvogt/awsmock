@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#include <boost/process/v1/windows.hpp>
 
 namespace AwsMock::Core {
 
@@ -67,7 +68,13 @@ namespace AwsMock::Core {
     std::string SystemUtils::GetHomeDir() {
         std::string homeDir;
 #ifdef WIN32
-        // TODO: Windows port
+        size_t size = 1024;
+        auto buffer = static_cast<char *>(malloc(size));
+        _dupenv_s(&buffer, &size, "HOMEPATH");
+        if (buffer != nullptr) {
+            homeDir = std::string(buffer);
+        }
+        free(buffer);
 #else
         if (getenv("HOME") != nullptr) {
             homeDir = std::string(getenv("HOME"));
@@ -117,4 +124,22 @@ namespace AwsMock::Core {
 #endif
     }
 
+    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::string &input, std::string &output, std::string &error) {
+
+        boost::asio::io_context ios;
+
+        boost::process::async_pipe pipeIn(ios), pipeOut(ios), pipeErr(ios);
+#ifdef _WIN32
+        boost::process::child c(shellcmd, boost::process::windows::hide, boost::process::std_out > pipeOut, boost::process::std_err > pipeErr, boost::process::std_in < pipeIn, ios);
+#else
+        boost::process::child c("/bin/bash", "-c", shellcmd, boost::process::std_out > pipeOut, boost::process::std_err > pipeErr, boost::process::std_in < pipeIn, ios);
+#endif
+        auto closer = [](boost::process::async_pipe &p) { return [&p](boost::system::error_code, size_t) { p.async_close(); }; };
+
+        async_write(pipeIn, boost::process::buffer(input), closer(pipeIn));
+        async_read(pipeOut, boost::asio::dynamic_buffer(output), closer(pipeOut));
+        async_read(pipeErr, boost::asio::dynamic_buffer(error), closer(pipeErr));
+
+        ios.run();
+    }
 }// namespace AwsMock::Core
