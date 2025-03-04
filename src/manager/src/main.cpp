@@ -54,14 +54,23 @@
 /**
  * @brief Unix foreground application
  */
-class UnixWorker {
+class Daemon {
 
   public:
 
     /**
      * @brief Constructor
      */
-    UnixWorker() = default;
+    Daemon() = default;
+
+    /**
+     * Stop callback
+     */
+    void Stop() {
+        frontendThread.interrupt();
+        frontendThread.join();
+        awsMockManager.Stop();
+    }
 
     /**
      * @brief Main routine.
@@ -75,11 +84,10 @@ class UnixWorker {
 
         // Start HTTP frontend server
         AwsMock::Service::Frontend::FrontendServer server;
-        boost::thread t{boost::ref(server)};
-        t.detach();
+        frontendThread = boost::thread{boost::ref(server)};
+        frontendThread.detach();
 
         // Start manager
-        AwsMock::Manager::Manager awsMockManager;
         awsMockManager.Initialize();
         awsMockManager.Run();
 
@@ -88,7 +96,8 @@ class UnixWorker {
 
   private:
 
-    bool running;
+    boost::thread frontendThread;
+    AwsMock::Manager::Manager awsMockManager;
 };
 
 #ifdef _WIN32
@@ -102,30 +111,40 @@ class WindowsWorker {
      *
      * @param context Windows application context
      */
-    WindowsWorker(boost::application::context &context) : context_(context) {
-    }
+    explicit WindowsWorker(boost::application::context &context) : context_(context) {}
 
+    /**
+     * @brief Receives the Windows service stop signal.
+     *
+     * @return true when stopping
+     */
     static bool Stop() {
-        std::cout << "stop!" << std::endl;
+        log_info << "Got stop signal, shutting down";
+        worker.Stop();
         return true;
     }
 
     /**
      * @brief Define the application operator
      */
-    int operator()() {
-
-        UnixWorker worker;
+    int operator()() const {
         return worker.Run();
     }
 
   private:
 
     /**
+     * Static windows worker
+     */
+    static Daemon worker;
+
+    /**
      * Application context to hold aspects
      */
     boost::application::context &context_;
 };
+Daemon WindowsWorker::worker;
+
 #endif
 
 /**

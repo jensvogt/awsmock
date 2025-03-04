@@ -110,7 +110,7 @@ namespace AwsMock::Manager {
     void Manager::Run() {
 
         // Set running flag
-        running = true;
+        _running = true;
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_context ios;
@@ -171,7 +171,7 @@ namespace AwsMock::Manager {
         }
 
         // Start IO context
-        while (running) {
+        while (_running) {
             ios.poll();
         }
         log_info << "So long, and thanks for all the fish!";

@@ -203,7 +203,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueByName(region, queueName);
     }
 
-    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
 
         if (HasDatabase()) {
 

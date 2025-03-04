@@ -60,7 +60,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Stop processing-
          */
-        void Stop() { running = false; };
+        void Stop() { _running = false; };
 
         /**
          * @brief Automatically loading init file
@@ -112,7 +112,7 @@ namespace AwsMock::Manager {
         /**
          * Running flag
          */
-        bool running = false;
+        bool _running = false;
     };
 
 }// namespace AwsMock::Manager
