@@ -2,6 +2,7 @@
 // Created by vogje01 on 12/17/24.
 //
 
+#include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 
 namespace AwsMock::Service::Frontend {
@@ -56,7 +57,12 @@ namespace AwsMock::Service::Frontend {
     }
 
     void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
+
         switch (req.method()) {
+
+            case http::verb::options:
+                HandleOptionsRequest(req);
+                break;
 
             case http::verb::get:
                 SendFile(req.target());
@@ -101,22 +107,30 @@ namespace AwsMock::Service::Frontend {
         }
 
         std::string full_path = _docRoot;
-        if (target.size() == 1) {
-            target = boost::string_view(DEFAULT_PAGE.c_str(), DEFAULT_PAGE.length());
+        if (target.size() <= 1) {
+            full_path += DEFAULT_PAGE;
+        } else {
+            full_path += std::string_view(target.data(), target.size());
         }
-        full_path.append(target.data(), target.size());
         log_debug << "Serving: " << full_path;
 
+        // If file does not exist, send default page
+        if (!boost::filesystem::exists(full_path)) {
+            full_path = _docRoot + DEFAULT_PAGE;
+        }
+        log_trace << full_path << " MIME: " << mime_type(target);
+
+        // Read file
         http::file_body::value_type file;
         beast::error_code ec;
         file.open(full_path.c_str(), beast::file_mode::read, ec);
         if (ec) {
-            target = boost::string_view(DEFAULT_PAGE.c_str(), DEFAULT_PAGE.length());
-            full_path = _docRoot + std::string(target);
-            file.open(full_path.c_str(), beast::file_mode::read, ec);
-            log_trace << std::string(target) << " MIME: " << mime_type(target);
+            log_error << "Could not read file, file: " << full_path << ", error: " << ec.message();
+            SendBadResponse(http::status::internal_server_error, "Could not read file, file: " + full_path);
+            return;
         }
 
+        // Prepare response
         _fileResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _fileResponse->result(http::status::ok);
         _fileResponse->keep_alive(false);
@@ -126,6 +140,7 @@ namespace AwsMock::Service::Frontend {
         _fileResponse->prepare_payload();
         _fileSerializer.emplace(*_fileResponse);
 
+        // Send response
         http::async_write(_socket, *_fileSerializer, [this](beast::error_code errorCode, std::size_t) {
             errorCode = _socket.shutdown(tcp::socket::shutdown_send, errorCode);
             if (errorCode) {
@@ -144,11 +159,41 @@ namespace AwsMock::Service::Frontend {
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {
             CheckDeadline();
+        });
+    }
+
+    void FrontendWorker::HandleOptionsRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
+
+        // Prepare the response message
+        _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
+        _stringResponse->version(request.version());
+        _stringResponse->result(http::status::ok);
+        _stringResponse->set(http::field::server, "awsmockui");
+        _stringResponse->set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        _stringResponse->set(http::field::allow, "*/*");
+        _stringResponse->set(http::field::access_control_allow_origin, "*");
+        _stringResponse->set(http::field::access_control_allow_headers, "*");
+        _stringResponse->set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        _stringResponse->set(http::field::access_control_max_age, "86400");
+        _stringResponse->set(http::field::vary, "Accept-Encoding, Origin");
+        _stringResponse->set(http::field::keep_alive, "timeout=10, max=100");
+        _stringResponse->set(http::field::connection, "Keep-Alive");
+        _stringResponse->prepare_payload();
+        _stringSerializer.emplace(*_stringResponse);
+
+        http::async_write(_socket, *_stringSerializer, [this](beast::error_code ec, std::size_t) {
+            ec = _socket.shutdown(tcp::socket::shutdown_send, ec);
+            if (ec) {
+                log_error << "Shutdown socket failed: " << ec.message();
+            }
+            _stringSerializer.reset();
+            _stringResponse.reset();
+            Accept();
         });
     }
 

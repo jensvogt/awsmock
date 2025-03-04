@@ -15,7 +15,6 @@
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
-#include <boost/accumulators/statistics/stats.hpp>
 
 namespace AwsMock::Core {
 
@@ -49,6 +48,7 @@ namespace AwsMock::Core {
                 break;
             }
         }
+
         // Note: necessary because *parentNode will later point to a different node due to lib behavior .
         YAML::Node lastExistingNode = *parentNode;
 
@@ -71,15 +71,8 @@ namespace AwsMock::Core {
     /**
      * @brief Configuration handler.
      *
-     * Configuration are read from the given configuration file and can be overruled by environment variables. Supported environment variables
-     * are:
-     * <ul>
-     * <li>AWSMOCK_COM_BASENAME: the base name of the configuration file</li>
-     * <li>AWSMOCK_COM_PROFILE: the profile of the configuration file</li>
-     * <li>AWSMOCK_COM_METRIC_PORT: the port for the prometheus manager (default: 9091)</li>
-     * <li>AWSMOCK_COM_METRIC_TIMEOUT: the timeout for the prometheus system monitoring (default: 60000)</li>
-     * <li>AWSMOCK_COM_LOGLEVEL: the logging level (default: information, possible values: debug, information, warning, error, fatal)</li>
-     * </ul>
+     * Configuration are read from the given configuration file and can be overruled by environment variables. Environment variables
+     * are replaced by the system environment.
      *
      * Properties in a configuration file are key-vale pairs. The following list shows all supported keys with their default values:
      * @code{.yaml}
@@ -91,6 +84,7 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class Configuration {
+
       public:
 
         /**
@@ -124,6 +118,18 @@ namespace AwsMock::Core {
          * @param defaultValue string default value
          */
         void DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
+
+        /**
+         * @brief Define a new string array property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken. </p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue string default value
+         */
+        void DefineStringArrayProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue);
 
         /**
          * @brief Define a new configuration property.
@@ -196,6 +202,14 @@ namespace AwsMock::Core {
         [[nodiscard]] std::string GetValueString(const std::string &key) const;
 
         /**
+         * @brief Returns a string array configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] std::vector<std::string> GetValueStringArray(const std::string &key) const;
+
+        /**
          * @brief Returns a integer configuration value
          *
          * @param key property key
@@ -204,7 +218,7 @@ namespace AwsMock::Core {
         [[nodiscard]] int GetValueInt(const std::string &key) const;
 
         /**
-         * @brief Returns a integer configuration value
+         * @brief Returns a long integer configuration value
          *
          * @param key property key
          * @return configuration value
@@ -220,7 +234,15 @@ namespace AwsMock::Core {
         [[nodiscard]] bool GetValueBool(const std::string &key) const;
 
         /**
-         * @brief Returns a boolean configuration value
+         * @brief Returns a float configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] float GetValueFloat(const std::string &key) const;
+
+        /**
+         * @brief Returns a double configuration value
          *
          * @param key property key
          * @return configuration value
@@ -257,7 +279,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, long value);
+        void SetValueLong(const std::string &key, const long value);
 
         /**
          * @brief Sets an double configuration value
@@ -265,7 +287,23 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, double value);
+        void SetValueFloat(const std::string &key, const float value);
+
+        /**
+         * @brief Sets an double configuration value
+         *
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValueDouble(const std::string &key, const double value);
+
+        /**
+         * @brief Checks whether a value exists
+         *
+         * @param key configuration key
+         * @return true if value exists
+         */
+        bool HasValue(const std::string &key) const;
 
         /**
          * @brief Returns the application name
@@ -308,7 +346,7 @@ namespace AwsMock::Core {
         void Initialize();
 
         /**
-         * Save the environment variables as key/value pair
+         * @brief Save the environment variables as key/value pair
          *
          * @param key environment variable key
          * @param value environment variable value
@@ -316,10 +354,18 @@ namespace AwsMock::Core {
         void AddToEnvList(const std::string &key, const std::string &value);
 
         /**
-         * Reapply the environment variables to the properties, as environment variables have precedence over
+         * @brief Reapply the environment variables to the properties, as environment variables have precedence over
          * file variables.
          */
         void ApplyEnvSettings();
+
+        /**
+         * @brief Replace environment variables with their value.
+         *
+         * @param value configuration value
+         * @return value with replaced environment variables
+         */
+        static std::string ReplaceEnvironmentVariables(std::string &value);
 
         /**
          * @brief Checks existence of a property key

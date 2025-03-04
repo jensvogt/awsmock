@@ -20,7 +20,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS metadata
+     * @brief KMS metadata
      *
      * Example:
      * @code{.json}
@@ -108,7 +108,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate = system_clock::to_time_t(system_clock::now());
+        long creationDate = static_cast<long>(system_clock::to_time_t(system_clock::now()));
 
         /**
          * Deletion date
@@ -136,6 +136,13 @@ namespace AwsMock::Dto::KMS {
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @brief Convert to from a JSON object
+         *
+         * @param jsonObject JSON object
+         */
+        void FromDocument(const view_or_value<view, value> &jsonObject);
 
         /**
          * @brief Convert to a JSON string

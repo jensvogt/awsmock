@@ -56,6 +56,10 @@ namespace AwsMock::Core {
         return CreateArn("sqs", region, accountId, queueName);
     }
 
+    std::string AwsUtils::CreateSQSSenderId() {
+        return StringUtils::GenerateRandomString(21) + ":none@example.com";
+    }
+
     std::string AwsUtils::CreateSNSTopicArn(const std::string &region, const std::string &accountId, const std::string &topicName) {
         return CreateArn("sns", region, accountId, topicName);
     }

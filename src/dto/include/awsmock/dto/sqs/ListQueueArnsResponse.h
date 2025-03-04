@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief List SQS queue ARNs response.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListQueueArnsResponse {
 
         /**

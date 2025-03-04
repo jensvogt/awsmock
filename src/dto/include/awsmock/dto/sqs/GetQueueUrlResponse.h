@@ -18,7 +18,7 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-     * Create queue response.
+     * @brief Get SQS queue URL response.
      *
      * Example:
      * @code{.xml}
@@ -42,35 +42,35 @@ namespace AwsMock::Dto::SQS {
         std::string queueUrl;
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Convert from JSON representation
+         * @brief Convert from JSON representation
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

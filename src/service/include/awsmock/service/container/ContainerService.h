@@ -16,7 +16,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
-#include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -24,6 +23,7 @@
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/UnixSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
@@ -36,11 +36,12 @@
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
 
-#define NETWORK_NAME ".dockerhost.net"
+#ifdef _WIN32
+#include <awsmock/core/WindowsSocket.h>
+#endif
+
 #define HOST_PORT_MIN 32768
 #define HOST_PORT_MAX 65536
-#define CONTAINER_PORT "8080/tcp"
-#define NETWORK_DEFAULT_MODE "local"
 
 namespace AwsMock::Service {
 
@@ -260,6 +261,15 @@ namespace AwsMock::Service {
         Dto::Docker::Container GetContainerById(const std::string &containerId) const;
 
         /**
+         * @brief Inspect a container
+         *
+         * @param containerId container ID
+         * @return Container
+         * @see Dto::Docker::InspectContainerResponse
+         */
+        Dto::Docker::InspectContainerResponse InspectContainer(const std::string &containerId) const;
+
+        /**
          * @brief Returns a container by name.
          *
          * @param name container name
@@ -335,11 +345,19 @@ namespace AwsMock::Service {
         void DeleteContainer(const Dto::Docker::Container &container) const;
 
         /**
+         * @brief Delete all container with the given image name as anchestor
+         *
+         * @param imageName image name
+         * @param tag image tag
+         */
+        void DeleteContainers(const std::string &imageName, const std::string &tag) const;
+
+        /**
          * @brief Deletes the container by ID
          *
-         * @param id container ID
+         * @param containerId container ID
          */
-        void DeleteContainer(const std::string &id) const;
+        void DeleteContainer(const std::string &containerId) const;
 
         /**
          * @brief Deletes all stopped containers.

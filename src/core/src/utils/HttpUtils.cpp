@@ -32,7 +32,7 @@ namespace AwsMock::Core {
 
         const std::string basePath = GetBasePath(uri);
         const std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        return StringUtils::UrlDecode(StringUtils::Join(parameters, index));
+        return StringUtils::UrlDecode(StringUtils::Join(parameters, "/", index));
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
@@ -41,7 +41,7 @@ namespace AwsMock::Core {
         return StringUtils::Split(basePath, '/');
     }
 
-    bool HttpUtils::HasPathParameters(const std::string &uri, int index) {
+    bool HttpUtils::HasPathParameters(const std::string &uri, const int index) {
 
         const std::string basePath = GetBasePath(uri);
         const std::vector<std::string> pathVector = StringUtils::Split(basePath, '/');
@@ -83,10 +83,13 @@ namespace AwsMock::Core {
         if (const std::vector<std::string> parts = StringUtils::Split(parameter, '='); parts.size() > 1) {
             std::string value = parts[1];
             if (IsUrlEncoded(value)) {
+                log_trace << "Found query parameter value, name: " << parameter << ", value: " << value;
                 return StringUtils::UrlDecode(value);
             }
+            log_trace << "Found query parameter value, name: " << parameter << ", value: " << value;
             return value;
         }
+        log_debug << "Query parameter value not found, name: " << parameter;
         return {};
     }
 
@@ -125,7 +128,10 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetQueryParameterValueByName(const std::string &uri, const std::string &name) {
 
-        const std::string queryString = GetQueryString(uri);
+        std::string queryString = GetQueryString(uri);
+        if (queryString.at(0) == '&') {
+            queryString = queryString.substr(1);
+        }
 
         for (std::vector<std::string> parameters = StringUtils::Split(queryString, '&'); const auto &it: parameters) {
             if (GetQueryParameterName(it) == name) {
@@ -146,7 +152,7 @@ namespace AwsMock::Core {
         return parameters[index - 1];
     }
 
-    int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def) {
+    int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, const int min, const int max, const int def) {
         int value = def;
         if (const std::string parameterValue = GetQueryParameterValueByName(body, name); !parameterValue.empty()) {
             value = std::stoi(parameterValue);
@@ -202,6 +208,10 @@ namespace AwsMock::Core {
         return request.base().find(name) != request.end();
     }
 
+    bool HttpUtils::HasHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &value) {
+        return HasHeader(request, name) && GetHeaderValue(request, name) == value;
+    }
+
     std::string HttpUtils::GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &defaultValue) {
         if (request.base().find(name) == request.end()) {
             if (!defaultValue.empty()) {
@@ -242,6 +252,7 @@ namespace AwsMock::Core {
     void HttpUtils::DumpHeaders(const http::request<http::dynamic_body> &request) {
         log_info << SEPARATOR;
         log_info << "Method: " << request.method_string();
+        log_info << "Target: " << request.target();
         for (const auto &header: request.base()) {
             log_info << header.name_string() << ": " << header.value();
         }
@@ -266,7 +277,6 @@ namespace AwsMock::Core {
     }
 
     void HttpUtils::DumpRequest(const http::request<http::dynamic_body> &request, const int limit) {
-        log_info << SEPARATOR;
         DumpHeaders(request);
         if (limit > 0) {
             const std::string tmp = GetBodyAsString(request);
@@ -289,6 +299,20 @@ namespace AwsMock::Core {
         for (const auto &header: response.base()) {
             log_info << header.name_string() << ": " << header.value();
         }
+        log_info << SEPARATOR;
+    }
+
+    void HttpUtils::DumpResponse(const http::response<http::dynamic_body> &response) {
+        log_info << SEPARATOR;
+        DumpHeaders(response);
+        log_info << GetBodyAsString(response);
+        log_info << SEPARATOR;
+    }
+
+    void HttpUtils::DumpResponse(const http::response<http::string_body> &response) {
+        log_info << SEPARATOR;
+        DumpHeaders(response);
+        log_info << GetBodyAsString(response);
         log_info << SEPARATOR;
     }
 
@@ -336,6 +360,19 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request) {
 
         return request.body();
+    }
+
+    std::string HttpUtils::GetBodyAsString(const http::response<http::dynamic_body> &response) {
+
+        boost::beast::net::streambuf sb;
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(response.body().size()), response.body().cdata()));
+
+        return boost::beast::buffers_to_string(sb.data());
+    }
+
+    std::string HttpUtils::GetBodyAsString(const http::response<http::string_body> &response) {
+
+        return response.body();
     }
 
     http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {

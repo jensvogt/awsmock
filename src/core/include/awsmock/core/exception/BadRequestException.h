@@ -16,6 +16,8 @@
 #include <boost/beast/http/status.hpp>
 #include <utility>
 
+// AwsMock includes
+
 namespace AwsMock::Core {
 
     /**
@@ -63,6 +65,17 @@ namespace AwsMock::Core {
          * Rethrows the exception.
          */
         void rethrow() const;
+
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
+
+      private:
 
         /**
          * HTTP status code

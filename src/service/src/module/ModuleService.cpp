@@ -83,7 +83,7 @@ namespace AwsMock::Service {
             if (module == "s3") {
 
                 Database::S3Database &_s3Database = Database::S3Database::instance();
-                infrastructure.s3Buckets = _s3Database.ListBuckets();
+                infrastructure.s3Buckets = _s3Database.ExportBuckets({{.column = "name", .sortDirection = 1}});
                 if (request.includeObjects) {
                     infrastructure.s3Objects = _s3Database.ListObjects();
                 }
@@ -91,7 +91,7 @@ namespace AwsMock::Service {
             } else if (module == "sqs") {
 
                 Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-                infrastructure.sqsQueues = _sqsDatabase.ListQueues("", -1, 0, {});
+                infrastructure.sqsQueues = _sqsDatabase.ExportQueues({{.column = "name", .sortDirection = 1}});
                 if (request.includeObjects) {
                     infrastructure.sqsMessages = _sqsDatabase.ListMessages();
                 }
@@ -99,7 +99,7 @@ namespace AwsMock::Service {
             } else if (module == "sns") {
 
                 Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-                infrastructure.snsTopics = _snsDatabase.ListTopics();
+                infrastructure.snsTopics = _snsDatabase.ExportTopics({{.column = "name", .sortDirection = 1}});
                 if (request.includeObjects) {
                     infrastructure.snsMessages = _snsDatabase.ListMessages();
                 }
@@ -107,14 +107,14 @@ namespace AwsMock::Service {
             } else if (module == "lambda") {
 
                 Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-                infrastructure.lambdas = _lambdaDatabase.ListLambdas();
+                infrastructure.lambdas = _lambdaDatabase.ExportLambdas({{.column = "name", .sortDirection = 1}});
 
             } else if (module == "cognito") {
 
                 Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
-                infrastructure.cognitoUserPools = _cognitoDatabase.ListUserPools();
-                infrastructure.cognitoUserGroups = _cognitoDatabase.ListGroups();
-                infrastructure.cognitoUsers = _cognitoDatabase.ListUsers();
+                infrastructure.cognitoUserPools = _cognitoDatabase.ExportUserPools({{.column = "name", .sortDirection = 1}});
+                infrastructure.cognitoUserGroups = _cognitoDatabase.ExportGroups({{.column = "name", .sortDirection = 1}});
+                infrastructure.cognitoUsers = _cognitoDatabase.ExportUsers({{.column = "name", .sortDirection = 1}});
 
             } else if (module == "dynamodb") {
 
@@ -180,7 +180,7 @@ namespace AwsMock::Service {
                 for (auto &queue: infrastructure.sqsQueues) {
                     queue.modified = system_clock::now();
                     queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
-                    _sqsDatabase.CreateOrUpdateQueue(queue);
+                    queue = _sqsDatabase.CreateOrUpdateQueue(queue);
                     log_debug << "SQS queues imported, url: " << queue.queueUrl;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
@@ -188,7 +188,7 @@ namespace AwsMock::Service {
             if (!infrastructure.sqsMessages.empty()) {
                 for (auto &message: infrastructure.sqsMessages) {
                     message.modified = system_clock::now();
-                    _sqsDatabase.CreateOrUpdateMessage(message);
+                    message = _sqsDatabase.CreateOrUpdateMessage(message);
                     log_debug << "SQS queues imported, queueArn: " << message.queueArn;
                 }
                 log_info << "SQS resources imported, count: " << infrastructure.sqsMessages.size();
@@ -218,8 +218,7 @@ namespace AwsMock::Service {
         if (!infrastructure.lambdas.empty()) {
             Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
             for (auto &lambda: infrastructure.lambdas) {
-                lambda.modified = system_clock::now();
-                _lambdaDatabase.CreateOrUpdateLambda(lambda);
+                _lambdaDatabase.ImportLambda(lambda);
             }
             log_info << "Lambda functions imported, count: " << infrastructure.lambdas.size();
         }

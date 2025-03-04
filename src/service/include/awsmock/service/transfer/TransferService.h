@@ -28,7 +28,6 @@
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
-
 #define TRANSFER_DEFAULT_FTP_PORT 21
 
 namespace AwsMock::Service {

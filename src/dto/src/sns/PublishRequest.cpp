@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::SNS {
 
+    std::string PublishRequest::ToJson() const {
+
+        try {
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TopicArn", topicArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TargetArn", targetArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Message", message);
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string PublishRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
@@ -13,7 +29,7 @@ namespace AwsMock::Dto::SNS {
     }
 
     std::ostream &operator<<(std::ostream &os, const PublishRequest &r) {
-        os << "PublishRequest={region='" + r.region + "' topicArn='" + r.topicArn + "' targetArn: '" + r.targetArn + "' message='" + r.message + "'}";
+        os << "PublishRequest=" << r.ToJson();
         return os;
     }
 

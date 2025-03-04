@@ -51,7 +51,7 @@ namespace AwsMock::Core {
         const std::vector<std::string> values = {"transfer-manager", "ftpuser1", "incoming", "mix"};
 
         // act
-        const std::string result = StringUtils::Join(values, 1);
+        const std::string result = StringUtils::Join(values, "/", 1);
 
         // assert
         EXPECT_TRUE(result == "ftpuser1/incoming/mix");

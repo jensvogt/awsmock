@@ -9,7 +9,7 @@
 #include <string>
 
 // Boost includes
-#include <boost/asio/io_service.hpp>
+#include <boost/asio/io_context.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
@@ -17,9 +17,6 @@
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewayListener.h>
 #include <awsmock/service/gateway/GatewayWorker.h>
-
-#define GATEWAY_DEFAULT_HOST "localhost"
-#define GATEWAY_DEFAULT_ADDRESS "0.0.0.0"
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;    // from <boost/beast/http.hpp>
@@ -47,12 +44,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayServer(boost::asio::io_service &ios);
+        explicit GatewayServer(boost::asio::io_context &ios);
 
         /**
          * @brief HTTP request worker
          */
-        void operator()() const;
+        //void operator()() const;
 
       private:
 

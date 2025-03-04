@@ -17,7 +17,7 @@ namespace AwsMock::Dto::SNS {
             Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
             Core::Bson::BsonUtils::SetLongValue(document, "messageCount", messageCount);
             Core::Bson::BsonUtils::SetLongValue(document, "size", size);
-            Core::Bson::BsonUtils::SetStringValue(document, owner, owner);
+            Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
             Core::Bson::BsonUtils::SetDateValue(document, "created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
 

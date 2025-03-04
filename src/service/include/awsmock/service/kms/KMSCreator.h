@@ -32,7 +32,7 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         [[maybe_unused]] explicit KMSCreator() = default;
 
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
          * @param key key entity
          * @param length key length
          */
-        static void CreateHmacKey(Database::Entity::KMS::Key &key, int length);
+        static void CreateHmacKey(Database::Entity::KMS::Key &key, const int length);
 
         /**
          * @brief Generate a public/private key pair

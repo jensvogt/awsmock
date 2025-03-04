@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/dto/docker/InspectContainerResponse.h>
+#include <awsmock/dto/docker/model/HostConfig.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -19,8 +20,14 @@ namespace AwsMock::Dto::Docker {
             path = Core::Bson::BsonUtils::GetStringValue(document, "Path");
             image = Core::Bson::BsonUtils::GetStringValue(document, "Image");
 
+            // State
             if (document.view().find("State") != document.view().end()) {
                 state.FromDocument(document.view()["State"].get_document().value);
+            }
+
+            // Ports array
+            if (document.view().find("HostConfig") != document.view().end()) {
+                hostConfig.FromDocument(document.view()["HostConfig"].get_document().view());
             }
 
         } catch (bsoncxx::exception &exc) {

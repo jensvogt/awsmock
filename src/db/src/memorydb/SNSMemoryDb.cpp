@@ -56,10 +56,9 @@ namespace AwsMock::Database {
 
     Entity::SNS::Topic SNSMemoryDb::GetTopicByName(const std::string &region, const std::string &topicName) {
 
-        const auto it =
-                std::ranges::find_if(_topics, [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
-                    return topic.second.region == region && topic.second.topicName == topicName;
-                });
+        const auto it = std::ranges::find_if(_topics, [region, topicName](const std::pair<std::string, Entity::SNS::Topic> &topic) {
+            return topic.second.region == region && topic.second.topicName == topicName;
+        });
 
         if (it != _topics.end()) {
             it->second.oid = it->first;
@@ -70,7 +69,22 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) {
+    Entity::SNS::Topic SNSMemoryDb::GetTopicByTargetArn(const std::string &targetArn) {
+
+        const auto it =
+                std::ranges::find_if(_topics, [targetArn](const std::pair<std::string, Entity::SNS::Topic> &topic) {
+                    return topic.second.targetArn == targetArn;
+                });
+
+        if (it != _topics.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+        log_warning << "Topic not found, targetArn: " << targetArn;
+        return {};
+    }
+
+    Entity::SNS::TopicList SNSMemoryDb::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const {
 
         Entity::SNS::TopicList topics;
         for (const auto &topic: _topics) {
@@ -129,6 +143,20 @@ namespace AwsMock::Database {
             }
         }
 
+        log_trace << "Got topic list, size: " << topicList.size();
+        return topicList;
+    }
+
+    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        Entity::SNS::TopicList topicList;
+        for (const auto &topic: _topics) {
+            topicList.emplace_back(topic.second);
+        }
+
+        std::ranges::sort(topicList, [](const Entity::SNS::Topic &a, const Entity::SNS::Topic &b) {
+            return a.topicName < b.topicName;
+        });
         log_trace << "Got topic list, size: " << topicList.size();
         return topicList;
     }
@@ -251,7 +279,7 @@ namespace AwsMock::Database {
         return count;
     }
 
-    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) {
+    Entity::SNS::MessageList SNSMemoryDb::ListMessages(const std::string &region, const std::string &topicArn) const {
 
         Entity::SNS::MessageList messageList;
         if (region.empty() && topicArn.empty()) {
@@ -330,7 +358,7 @@ namespace AwsMock::Database {
     void SNSMemoryDb::DeleteOldMessages(long timeout) {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
 
-        auto reset = std::chrono::high_resolution_clock::now() - std::chrono::seconds{timeout};
+        auto reset = system_clock::now() - std::chrono::seconds{timeout};
 
         long count = 0;
         for ([[maybe_unused]] auto &messageId: _messages) {

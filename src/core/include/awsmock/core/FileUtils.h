@@ -7,27 +7,39 @@
 
 // Standard C includes
 #include <magic.h>
-#include <sys/sendfile.h>
 
 // Standard C++ includes
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <pwd.h>
 #include <string>
+#ifndef _WIN32
+#include <pwd.h>
+#endif
+
+#ifdef __APPLE__
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#elif __linux__
+#include <sys/sendfile.h>
+#endif
 
 // Boost includes
 #include <boost/asio/streambuf.hpp>
 #include <boost/beast/core/file.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/iostreams/copy.hpp>
 
 // AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
+#include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/config/Configuration.h>
 
 #define BUFFER_LEN 8092
 
@@ -91,6 +103,22 @@ namespace AwsMock::Core {
          * @return thread safe temp file name
          */
         static std::string GetTempFile(const std::string &dir, const std::string &extension);
+
+        /**
+         * @brief Returns the first line of a file
+         *
+         * @param filePath directory to create the file
+         * @return first line
+         */
+        static std::string GetFirstLine(const std::string &filePath);
+
+        /**
+         * @brief Removes the first line of a file
+         *
+         * @param filePath directory to create the file
+         * @param skip number of bytes to skip
+         */
+        static void RemoveFirstBytes(const std::string &filePath, int skip);
 
         /**
          * @brief Creates a temporary file containing a random string
@@ -268,6 +296,21 @@ namespace AwsMock::Core {
          * @return content type, as mime type
          */
         static std::string GetContentTypeMagicString(const std::string &content);
+
+        /**
+         * @brief Checks whether the file is base64 encoded.
+         *
+         * @param filePath file path
+         * @return true if file is base64 encoded
+         */
+        static bool IsBase64(const std::string &filePath);
+
+        /**
+         * @brief Decodes a Base64 encoded file
+         *
+         * @param filePath file path
+         */
+        static void Base64DecodeFile(const std::string &filePath);
 
         /**
          * @brief File path separator

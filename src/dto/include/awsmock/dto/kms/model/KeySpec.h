@@ -12,7 +12,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS master key specification
+     * @brief KMS master key specification
      *
      * @author jens.vogt\@opitz-consulting.com
      */

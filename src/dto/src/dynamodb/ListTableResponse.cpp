@@ -31,13 +31,13 @@ namespace AwsMock::Dto::DynamoDb {
 
     void ListTableResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        this->body = body;
-        this->headers = headers;
-
         if (body.empty()) {
             log_info << "Empty response from DynamoDB";
             return;
         }
+
+        this->body = body;
+        this->headers = headers;
 
         try {
 

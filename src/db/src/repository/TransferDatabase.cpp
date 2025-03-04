@@ -79,7 +79,7 @@ namespace AwsMock::Database {
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-        const std::optional<value> mResult = _transferCollection.find_one(make_document(kvp("_id", oid)));
+        const auto mResult = _transferCollection.find_one(make_document(kvp("_id", oid)));
         Entity::Transfer::Transfer result;
         result.FromDocument(mResult->view());
         return result;
@@ -109,9 +109,9 @@ namespace AwsMock::Database {
                 query.append(kvp("serverId", serverId));
             }
 
-            if (const std::optional<value> mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
+            if (const auto mResult = _transferCollection.find_one(query.extract()); mResult) {
                 Entity::Transfer::Transfer result;
-                result.FromDocument(mResult);
+                result.FromDocument(mResult->view());
                 return result;
             }
             return {};
@@ -146,7 +146,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-            const std::optional<value> mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
+            const auto mResult = _transferCollection.find_one(make_document(kvp("arn", arn)));
             Entity::Transfer::Transfer result;
             result.FromDocument(mResult->view());
             return result;
@@ -226,7 +226,7 @@ namespace AwsMock::Database {
                     query.append(kvp("serverId", serverId));
                 }
 
-                if (std::optional<value> mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
+                if (auto mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
                     Entity::Transfer::Transfer result;
                     result.FromDocument(mResult->view());
                     log_trace << "Got transfer server, serverId:" << serverId;

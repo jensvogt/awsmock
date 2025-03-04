@@ -56,6 +56,11 @@ namespace AwsMock::Database::Entity::SNS {
         std::string topicArn;
 
         /**
+         * Target ARN
+         */
+        std::string targetArn;
+
+        /**
          * Subscriptions
          */
         SubscriptionList subscriptions;
@@ -126,7 +131,7 @@ namespace AwsMock::Database::Entity::SNS {
          *
          * @param mResult MongoDB document view.
          */
-        void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.

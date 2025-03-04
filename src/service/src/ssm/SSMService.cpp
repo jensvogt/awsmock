@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "put_parameter");
+        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "put_parameter");
         log_trace << "Put parameter request: " << request.ToString();
 
         if (_ssmDatabase.ParameterExists(request.name)) {
@@ -48,7 +48,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "get_parameter");
+        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
         log_trace << "Get parameter request: " << request.ToString();
 
         if (!_ssmDatabase.ParameterExists(request.name)) {
@@ -70,7 +70,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "describe_parameters");
+        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "describe_parameters");
         log_trace << "Describe parameters request: " << request.ToString();
 
         try {
@@ -87,7 +87,7 @@ namespace AwsMock::Service {
     }
 
     void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "method", "delete_parameter");
+        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 
         if (!_ssmDatabase.ParameterExists(request.name)) {

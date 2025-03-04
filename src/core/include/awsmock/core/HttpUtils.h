@@ -232,10 +232,17 @@ namespace AwsMock::Core {
          * @return HTTP body as string
          */
         static std::string GetBodyAsString(const http::request<http::string_body> &request);
+
+        /**
+         * @brief Gets the version and action from an URI.
+         *
+         * @param request HTTP serer request
+         * @return HTTP body as string
+         */
         static std::string GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
 
         /**
-         * @brief Gets the body as string from a boost dynamic_body
+         * @brief Gets the body as string from a boost dynamic_body request
          *
          * @param request HTTP serer request
          * @return HTTP body as string
@@ -243,13 +250,37 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(const http::request<http::dynamic_body> &request);
 
         /**
+         * @brief Gets the body as string from a boost dynamic_body response
+         *
+         * @param response HTTP serer response
+         * @return HTTP body as string
+         */
+        static std::string GetBodyAsString(const http::response<http::dynamic_body> &response);
+
+        /**
+         * @brief Gets the body as string from a boost string_body response
+         *
+         * @param response HTTP serer response
+         * @return HTTP body as string
+         */
+        static std::string GetBodyAsString(const http::response<http::string_body> &response);
+
+        /**
          * @brief Checks whether a header exists.
          *
          * @param request HTTP request
-         * @param key header key
+         * @param name header key
          * @return header value of empty string.
          */
-        static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &key);
+        static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &name);
+
+        /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param name header key
+         * @return header value of empty string.
+         */
         static bool HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name);
 
         /**
@@ -260,6 +291,26 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static bool HasHeader(const http::request<http::string_body> &request, const std::string &key);
+
+        /**
+         * @brief Checks whether a header exists.
+         *
+         * @param request HTTP request
+         * @param name header key
+         * @param index index
+         * @return header value of empty string.
+         */
+        static bool HasHeader(const http::request<http::string_body> &request, const std::string &name, int index);
+
+        /**
+         * @brief Checks whether a header exists and has a given value.
+         *
+         * @param request HTTP request
+         * @param name header key
+         * @param value header value
+         * @return header value of empty string.
+         */
+        static bool HasHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &value);
 
         /**
          * @brief Returns a header value by key.
@@ -274,6 +325,19 @@ namespace AwsMock::Core {
          * @return header value of empty string.
          */
         static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
+
+        /**
+         * @brief Returns a header value by key.
+         *
+         * <p>
+         * Returns the default value, if existent, otherwise logs a warning message, in case the request has no value for the given key.
+         * </p>
+         *
+         * @param request HTTP request
+         * @param key header key
+         * @param defaultValue returned when the key was not found
+         * @return header value of empty string.
+         */
         static std::string GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &key, const std::string &defaultValue = {});
 
         /**
@@ -340,6 +404,20 @@ namespace AwsMock::Core {
          * @param request HTTP request
          */
         static void DumpRequest(const http::request<http::string_body> &request);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param response HTTP response
+         */
+        static void DumpResponse(const http::response<http::dynamic_body> &response);
+
+        /**
+         * @brief Dumps the headers to the logger as info messages
+         *
+         * @param response HTTP response
+         */
+        static void DumpResponse(const http::response<http::string_body> &response);
 
         /**
          * @brief Returns the content type
@@ -456,6 +534,105 @@ namespace AwsMock::Core {
         static std::string AddQueryDelimiter(std::string &url);
     };
 
+    template<bool isRequest, class SyncReadStream, class DynamicBuffer>
+    void DumpChunks(std::ostream &os, SyncReadStream &stream, DynamicBuffer &buffer, boost::beast::error_code &ec) {
+        // Declare the parser with an empty body since
+        // we plan on capturing the chunks ourselves.
+        http::parser<isRequest, http::empty_body> p;
+
+        // First read the complete header
+        read_header(stream, buffer, p, ec);
+        if (ec)
+            return;
+
+        // This container will hold the extensions for each chunk
+        http::chunk_extensions ce;
+
+        // This string will hold the body of each chunk
+        std::string chunk;
+
+        // Declare our chunk header callback  This is invoked
+        // after each chunk header and also after the last chunk.
+        auto header_cb = [&](const std::uint64_t size, const boost::string_view extensions, boost::beast::error_code &ev)// We can set this to indicate an error
+        {
+            // Parse the chunk extensions so we can access them easily
+            ce.parse(extensions, ev);
+            if (ev)
+                return;
+
+            // See if the chunk is too big
+            if (size > (std::numeric_limits<std::size_t>::max)()) {
+                ev = http::error::body_limit;
+                return;
+            }
+
+            // Make sure we have enough storage, and
+            // reset the container for the upcoming chunk
+            chunk.reserve(size);
+            chunk.clear();
+        };
+
+        // Set the callback. The function requires a non-const reference so we
+        // use a local variable, since temporaries can only bind to const refs.
+        p.on_chunk_header(header_cb);
+
+        // Declare the chunk body callback. This is called one or
+        // more times for each piece of a chunk body.
+        auto body_cb = [&](const std::uint64_t remain, const boost::string_view body, boost::beast::error_code &ev)// We can set this to indicate an error
+        {
+            // If this is the last piece of the chunk body,
+            // set the error so that the call to `read` returns,
+            // and we can process the chunk.
+            if (remain == body.size())
+                ev = http::error::end_of_chunk;
+
+            // Append this piece to our container
+            chunk.append(body.data(), body.size());
+
+            // The return value informs the parser of how much of the body we
+            // consumed. We will indicate that we consumed everything passed in.
+            return body.size();
+        };
+        p.on_chunk_body(body_cb);
+
+        while (!p.is_done()) {
+            // Read as much as we can. When we reach the end of the chunk, the chunk
+            // body callback will make the read return with the end_of_chunk error.
+            read(stream, buffer, p, ec);
+            if (!ec)
+                continue;
+            if (ec != http::error::end_of_chunk)
+                return;
+            ec = {};
+
+            // We got a whole chunk, print the extensions:
+            for (const auto &[fst, snd]: ce) {
+                os << "Extension: " << fst;
+                if (!snd.empty())
+                    os << " = " << snd << std::endl;
+                else
+                    os << std::endl;
+            }
+
+            // Now print the chunk body
+            os << "Chunk Body: " << chunk << std::endl;
+        }
+
+        // Get a reference to the parsed message, this is for convenience
+        auto const &msg = p.get();
+
+        // Check each field promised in the "Trailer" header and output it
+        for (auto const &name: http::token_list{msg[http::field::trailer]}) {
+            // Find the trailer field
+            auto it = msg.find(name);
+            if (it == msg.end()) {
+                // Oops! They promised the field but failed to deliver it
+                os << "Missing Trailer: " << name << std::endl;
+                continue;
+            }
+            os << it->name() << ": " << it->value() << std::endl;
+        }
+    }
 }// namespace AwsMock::Core
 
 #endif// AWS_MOCK_CORE_HTTP_UTILS_H

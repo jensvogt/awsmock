@@ -2,7 +2,6 @@
 // Created by vogje01 on 18/05/2023.
 //
 
-#include <archive_entry.h>
 #include <awsmock/core/TarUtils.h>
 
 namespace AwsMock::Core {
@@ -23,8 +22,10 @@ namespace AwsMock::Core {
         archive *ext = archive_write_disk_new();
         archive_write_disk_set_options(ext, flags);
         archive_write_disk_set_standard_lookup(ext);
-        if ((r = archive_read_open_filename(a, zipFile.c_str(), 10240)))
-            exit(1);
+        if ((r = archive_read_open_filename(a, zipFile.c_str(), 10240)) != 0) {
+            log_error << "Could not open ZIP file, path: " << zipFile;
+            return;
+        }
         for (;;) {
             r = archive_read_next_header(a, &entry);
             if (r == ARCHIVE_EOF)
@@ -58,19 +59,17 @@ namespace AwsMock::Core {
 
     void TarUtils::TarDirectory(const std::string &tarFile, const std::string &directory) {
 
-        using namespace boost::filesystem;
-
         archive *a = archive_write_new();
         archive_write_add_filter_gzip(a);
         archive_write_set_format_gnutar(a);
         archive_write_open_filename(a, tarFile.c_str());
 
-        recursive_directory_iterator dir(directory);
-        const recursive_directory_iterator end;
+        boost::filesystem::recursive_directory_iterator dir(directory);
+        const boost::filesystem::recursive_directory_iterator end;
         int count = 0;
         while (dir != end) {
             if (dir->path() != tarFile) {
-                WriteFile(a, dir->path().c_str(), directory, dir->is_directory(), dir->is_symlink());
+                WriteFile(a, dir->path().string(), directory, dir->is_directory(), dir->is_symlink());
                 count++;
             }
             ++dir;
@@ -81,7 +80,7 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, const bool isDir, const bool isLink) {
 
-        struct stat st {};
+        struct stat st{};
         char buff[8192];
 
         std::string entryName = fileName;
@@ -125,10 +124,14 @@ namespace AwsMock::Core {
 
     std::string TarUtils::Readsymlink(const std::string &path) {
         size_t len;
+#ifdef WIN32
+        // TODO: Fix windows porting issues
+#else
         if (char buf[1024]; (len = readlink(path.c_str(), buf, sizeof(buf) - 1)) != -1) {
             buf[len] = '\0';
             return {buf};
         }
+#endif
         return "";
     }
 

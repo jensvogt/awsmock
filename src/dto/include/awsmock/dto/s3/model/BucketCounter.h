@@ -32,6 +32,11 @@ namespace AwsMock::Dto::S3 {
         long size;
 
         /**
+         * Bucket owner
+         */
+        std::string owner;
+
+        /**
          * Create timestamp
          */
         system_clock::time_point created;

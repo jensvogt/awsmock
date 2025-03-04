@@ -8,10 +8,10 @@ namespace AwsMock::Database::Entity::Lambda {
 
     void Code::FromDocument(const std::optional<view> &mResult) {
 
-        if (mResult.value().find("zipFile") != mResult.value().end()) {
+        if (mResult->find("zipFile") != mResult->end()) {
             zipFile = Core::Bson::BsonUtils::GetStringValue(mResult, "zipFile");
         }
-        if (mResult.value().find("s3Bucket") != mResult.value().end()) {
+        if (mResult->find("s3Bucket") != mResult->end()) {
             s3Bucket = Core::Bson::BsonUtils::GetStringValue(mResult, "s3Bucket");
             s3Key = Core::Bson::BsonUtils::GetStringValue(mResult, "s3Key");
             s3ObjectVersion = Core::Bson::BsonUtils::GetStringValue(mResult, "s3ObjectVersion");

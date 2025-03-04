@@ -32,6 +32,7 @@ namespace AwsMock::Database {
             // Monitoring
             {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}}},
             {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}}},
+            {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}}},
     };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {
@@ -46,6 +47,7 @@ namespace AwsMock::Database {
     }
 
     bool DatabaseBase::HasDatabase() {
+        log_trace << "Active: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
         return Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
     }
 
@@ -77,17 +79,13 @@ namespace AwsMock::Database {
     }
 
     void DatabaseBase::CreateIndexes() const {
-
         if (_useDatabase) {
-
             const auto client = ConnectionPool::instance().GetConnection();
             const mongocxx::database database = (*client)[_name];
 
             log_info << "Start creating indexes";
 
-            for (const auto &indexName: std::views::keys(indexDefinitions)) {
-                CreateIndex(database, indexName);
-            }
+            for (const auto &indexName: std::views::keys(indexDefinitions)) { CreateIndex(database, indexName); }
             log_info << "Finished creating indexes, count: " << indexDefinitions.size();
         }
     }
@@ -97,9 +95,7 @@ namespace AwsMock::Database {
         log_trace << "Start creating index, name: " << indexName;
         auto [collectionName, indexColumns] = indexDefinitions.at(indexName);
         bsoncxx::builder::basic::document queryDoc;
-        for (const auto &[columns, direction]: indexColumns) {
-            queryDoc.append(kvp(columns, direction));
-        }
+        for (const auto &[columns, direction]: indexColumns) { queryDoc.append(kvp(columns, direction)); }
         bsoncxx::builder::basic::document nameDoc;
         nameDoc.append(kvp("name", indexName));
 

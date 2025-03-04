@@ -49,6 +49,7 @@ namespace AwsMock::Database::Entity::SNS {
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicName", topicName);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicUrl", topicUrl);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicArn", topicArn);
+        Core::Bson::BsonUtils::SetStringValue(topicDoc, "targetArn", targetArn);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "messages", messages);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "size", size);
         Core::Bson::BsonUtils::SetDateValue(topicDoc, "created", created);
@@ -60,7 +61,7 @@ namespace AwsMock::Database::Entity::SNS {
         return topicDoc.extract();
     }
 
-    void Topic::FromDocument(const std::optional<view> &mResult) {
+    void Topic::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 
@@ -70,17 +71,20 @@ namespace AwsMock::Database::Entity::SNS {
             owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
             topicUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "topicUrl");
             topicArn = Core::Bson::BsonUtils::GetStringValue(mResult, "topicArn");
+            targetArn = Core::Bson::BsonUtils::GetStringValue(mResult, "targetArn");
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             messages = Core::Bson::BsonUtils::GetLongValue(mResult, "messages");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Attributes
-            topicAttribute.FromDocument(mResult.value()["attributes"].get_document().view());
+            if (mResult.view().find("attributes") != mResult.view().end()) {
+                topicAttribute.FromDocument(mResult.view()["attributes"].get_document().view());
+            }
 
             // Subscriptions
-            if (mResult.value().find("subscriptions") != mResult.value().end()) {
-                for (const bsoncxx::array::view subscriptionsView{mResult.value()["subscriptions"].get_array().value}; const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
+            if (mResult.view().find("subscriptions") != mResult.view().end()) {
+                for (const bsoncxx::array::view subscriptionsView{mResult.view()["subscriptions"].get_array().value}; const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
                     Subscription subscription{
                             .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
                             .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
@@ -90,8 +94,8 @@ namespace AwsMock::Database::Entity::SNS {
             }
 
             // Get tags
-            if (mResult.value().find("tags") != mResult.value().end()) {
-                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            if (mResult.view().find("tags") != mResult.view().end()) {
+                for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);

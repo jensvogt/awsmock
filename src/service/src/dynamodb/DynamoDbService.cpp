@@ -14,12 +14,13 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "create_table");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "create_table");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "create_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         Dto::DynamoDb::CreateTableResponse createTableResponse = {.region = request.region, .tableName = request.tableName};
         if (_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
-            log_info << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
+            log_debug << "DynamoDb table exists already, region: " << request.region << " name: " << request.tableName;
             return createTableResponse;
         }
 
@@ -41,7 +42,7 @@ namespace AwsMock::Service {
                     .tags = request.tags,
                     .provisionedThroughput = provisionedThroughput};
             table = _dynamoDbDatabase.CreateTable(table);
-            log_info << "DynamoDb table created, name: " << table.name;
+            log_debug << "DynamoDb table created, name: " << table.name;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd create table failed, error: " << exc.message();
@@ -52,7 +53,8 @@ namespace AwsMock::Service {
     }
 
     bool DynamoDbService::ExistTable(const std::string &region, const std::string &tableName) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_tables");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_tables");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_tables");
         log_debug << "Starting exists table request, region: " << region << ", tableName: " << tableName;
 
         try {
@@ -79,7 +81,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListTableResponse DynamoDbService::ListTables(const Dto::DynamoDb::ListTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_tables");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_tables");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_tables");
         log_debug << "Starting list table request, region: " << request.region;
 
         try {
@@ -87,10 +90,12 @@ namespace AwsMock::Service {
             // Send request to docker container
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status};
-            listTableResponse.ScanResponse();
-            log_trace << "DynamoDb list tables, region: " << request.region << " body: " << body;
-            return listTableResponse;
+            if (Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status}; listTableResponse.status == http::status::ok) {
+                listTableResponse.ScanResponse();
+                log_trace << "DynamoDb list tables, region: " << request.region << " body: " << body;
+                return listTableResponse;
+            }
+            return {};
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd list tables failed, error: " << exc.message();
@@ -99,7 +104,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListTableCountersResponse DynamoDbService::ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_table_counters");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_counters");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_table_counters");
         log_debug << "Starting list table request, region: " << request.region;
 
         try {
@@ -124,7 +130,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListItemCountersResponse DynamoDbService::ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "list_item_counters");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_item_counters");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_item_counters");
         log_debug << "Starting list item request, region: " << request.region;
 
         try {
@@ -140,7 +147,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DescribeTableResponse DynamoDbService::DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "describe_table");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "describe_table");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "describe_table");
         log_debug << "Describe DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         Dto::DynamoDb::DescribeTableResponse describeTableResponse;
@@ -162,7 +170,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_table");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_table");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "delete_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -180,7 +189,7 @@ namespace AwsMock::Service {
 
             // Delete table in database
             _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
-            log_info << "DynamoDb table deleted, name: " << request.tableName;
+            log_debug << "DynamoDb table deleted, name: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete table failed, error: " << exc.message();
@@ -191,7 +200,8 @@ namespace AwsMock::Service {
     }
 
     long DynamoDbService::DeleteAllTables() const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_all_tables");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_all_tables");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "delete_all_tables");
         log_debug << "Deleting all tables";
 
         try {
@@ -208,7 +218,7 @@ namespace AwsMock::Service {
 
             // Delete table in database
             const long count = _dynamoDbDatabase.DeleteAllTables();
-            log_info << "DynamoDb tables deleted, count: " << count;
+            log_debug << "DynamoDb tables deleted, count: " << count;
             return count;
 
         } catch (Core::JsonException &exc) {
@@ -218,7 +228,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::GetItemResponse DynamoDbService::GetItem(const Dto::DynamoDb::GetItemRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "get_item");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_item");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "get_item");
         log_debug << "Start get item, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -234,7 +245,7 @@ namespace AwsMock::Service {
             if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers); status == http::status::ok) {
 
                 getItemResponse = {.body = body, .headers = outHeaders, .status = status};
-                log_info << "DynamoDb get item, name: " << request.tableName;
+                log_debug << "DynamoDb get item, name: " << request.tableName;
             }
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
@@ -245,7 +256,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "put_item");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "put_item");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "put_item");
         log_debug << "Start put item, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -268,7 +280,7 @@ namespace AwsMock::Service {
                 // Convert to entity and save to database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
                 Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
-                log_info << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
+                log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
             }
 
         } catch (Core::JsonException &exc) {
@@ -280,7 +292,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "query");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "query");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "query");
         log_debug << "Start query, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -295,7 +308,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, headers);
             queryResponse = {.body = body, .headers = outHeaders, .status = status};
-            log_info << "DynamoDb query item, name: " << request.tableName;
+            log_debug << "DynamoDb query item, name: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb query failed, error: " << exc.message();
@@ -306,7 +319,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ScanResponse DynamoDbService::Scan(const Dto::DynamoDb::ScanRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "scan");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "scan");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "scan");
         log_debug << "Start scan, region: " << request.region << " name: " << request.tableName;
 
         if (!_dynamoDbDatabase.TableExists(request.region, request.tableName)) {
@@ -321,7 +335,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers = PrepareHeaders("Scan");
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
             scanResponse = {.body = body, .headers = outHeaders, .status = status};
-            log_info << "DynamoDb scan item, name: " << request.tableName;
+            log_debug << "DynamoDb scan item, name: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb scan failed, message: " << exc.message();
@@ -332,7 +346,8 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "method", "delete_item");
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_item");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "delete_item");
         log_debug << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName;
 
         if (Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request); !_dynamoDbDatabase.ItemExists(item)) {
@@ -367,7 +382,7 @@ namespace AwsMock::Service {
                 }
                 _dynamoDbDatabase.DeleteItem(request.region, request.tableName, keys);
             }
-            log_info << "DynamoDb item deleted, table: " << request.tableName;
+            log_debug << "DynamoDb item deleted, table: " << request.tableName;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete item failed, message: " << exc.message();

@@ -68,6 +68,11 @@ namespace AwsMock::Dto::Lambda {
         std::string handler = {};
 
         /**
+         * Name of the base64 ZIP file
+         */
+        std::string zipFile = {};
+
+        /**
          * Function runtime
          */
         std::string runtime = {};

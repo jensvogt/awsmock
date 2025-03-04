@@ -17,6 +17,11 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
+    /**
+     * @brief Cognito user pool
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct UserPool {
 
         /**

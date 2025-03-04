@@ -98,7 +98,7 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetTempFile(const std::string &extension) {
         const boost::filesystem::path temp = boost::filesystem::temp_directory_path().append(boost::filesystem::unique_path());
-        return temp.native() + "." + extension;
+        return temp.string() + "." + extension;
     }
 
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
@@ -109,7 +109,27 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
         const std::filesystem::path path(fileName);
-        return path.parent_path();
+        return path.parent_path().string();
+    }
+
+    std::string FileUtils::GetFirstLine(const std::string &filePath) {
+        std::ifstream fileHandler(filePath);
+        std::string line;
+        getline(fileHandler, line);
+        fileHandler.close();
+        return line;
+    }
+
+    void FileUtils::RemoveFirstBytes(const std::string &filePath, const int skip) {
+        const std::string tmpFile = GetTempFile("tmp");
+        std::ofstream ofs(tmpFile);
+        std::ifstream ifs(filePath);
+        ifs.seekg(skip, std::ios::beg);
+        ofs << ifs.rdbuf();
+        ifs.close();
+        ofs.close();
+        DeleteFile(filePath);
+        MoveTo(tmpFile, filePath);
     }
 
     long FileUtils::FileSize(const std::string &fileName) {
@@ -140,19 +160,46 @@ namespace AwsMock::Core {
 
     long FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {
 
-        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
-
         size_t copied = 0;
-        for (auto &it: files) {
 
+#if __APPLE__
+        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
+            fstat(source, &stat_source);
+            copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
+
+            close(source);
+        }
+        close(dest);
+#elif __linux__
+        const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        for (auto &it: files) {
+            const int source = open(it.c_str(), O_RDONLY, 0);
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
             close(source);
         }
         close(dest);
+#else
+        FILE *dest = fopen(outFile.c_str(), "wb");
+        for (auto &it: files) {
+            char buffer[BUFFER_LEN];
+            FILE *src = fopen(it.c_str(), "rb");
+
+            int n;
+            while ((n = fread(buffer, 1, BUFFER_LEN, src)) > 0) {
+                fwrite(buffer, 1, n, dest);
+                copied += n;
+            }
+
+            fclose(src);
+        }
+        fclose(dest);
+#endif
         return static_cast<long>(copied);
     }
 
@@ -216,11 +263,15 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
-        struct stat info {};
+#ifdef WIN32
+        // TODO: Fix windows port
+#else
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
         }
+#endif
         return {};
     }
 
@@ -234,6 +285,10 @@ namespace AwsMock::Core {
     }
 
     bool FileUtils::Touch(const std::string &fileName) {
+#ifdef WIN32
+        // TODO: Fix windows port
+        return true;
+#else
         const int fd = open(fileName.c_str(), O_WRONLY | O_CREAT | O_NOCTTY | O_NONBLOCK, 0666);
         if (fd < 0) {
             log_error << "Could not open file: " << fileName;
@@ -245,10 +300,11 @@ namespace AwsMock::Core {
         }
         close(fd);
         return true;
+#endif
     }
 
     std::string FileUtils::GetContentType(const std::string &path) {
-        if (const std::string extension = boost::filesystem::path(path).extension().string(); MimeTypes.contains(extension)) {
+        if (const std::string extension = boost::filesystem::path(path).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
         return GetContentTypeMagicFile(path);
@@ -286,12 +342,7 @@ namespace AwsMock::Core {
 
         // load the default magic database (indicated by nullptr)
         if (magic_load(magic, nullptr) != 0) {
-            log_error << "Could not load libmagic";
-        }
-
-        // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, nullptr) != 0) {
-            log_error << "Could not compile libmagic";
+            log_error << "Could not load libmagic mime types, fileName: " << magic_getpath(nullptr, 0);
         }
 
         // get description of the filename argument
@@ -306,7 +357,6 @@ namespace AwsMock::Core {
 
         // Free magic cookie and mime
         magic_close(magic);
-
         return result;
     }
 
@@ -370,6 +420,28 @@ namespace AwsMock::Core {
         DeleteFile(path);
         CopyTo(tempFile, path);
         DeleteFile(tempFile);
+    }
+
+    bool FileUtils::IsBase64(const std::string &filePath) {
+        std::fstream s(filePath);
+        char buff[1000]{};
+        s.read(buff, 1000);
+        return Crypto::IsBase64({buff, 1000});
+    }
+
+    void FileUtils::Base64DecodeFile(const std::string &filePath) {
+        std::ifstream in(filePath);
+        std::string line;
+        in >> line;
+        DeleteFile(filePath);
+
+        std::string decoded = Crypto::Base64Decode({line});
+
+        std::string outFilepath = GetTempFile("b64");
+        std::ofstream out(outFilepath, std::ios::binary);
+        out << decoded;
+        out.close();
+        MoveTo(outFilepath, filePath);
     }
 
 }// namespace AwsMock::Core

@@ -14,7 +14,7 @@
 #include <boost/chrono/duration.hpp>
 #include <boost/noncopyable.hpp>
 
-// AwsMOck includes
+// AwsMock includes
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {
@@ -25,7 +25,7 @@ namespace AwsMock::Core {
 
         typedef std::function<void()> handler_fn;
 
-        PeriodicTask(boost::asio::io_service &ioService, std::string const &name, int interval, handler_fn task, int delay);
+        PeriodicTask(boost::asio::io_context &ioService, std::string const &name, int interval, handler_fn task, int delay);
 
         [[maybe_unused]] void execute(boost::system::error_code const &e);
 
@@ -35,7 +35,7 @@ namespace AwsMock::Core {
 
         [[maybe_unused]] void start_wait();
 
-        boost::asio::io_service &ioService;
+        boost::asio::io_context &ioService;
         boost::asio::deadline_timer timer;
         handler_fn task;
         std::string name;

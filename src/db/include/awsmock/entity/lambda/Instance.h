@@ -67,9 +67,9 @@ namespace AwsMock::Database::Entity::Lambda {
     struct Instance {
 
         /**
-         * ID
+         * Instance ID, will be appended to the container name, in case of multiple instances.
          */
-        std::string id;
+        std::string instanceId;
 
         /**
          * Container ID

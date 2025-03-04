@@ -10,7 +10,7 @@
 #include <utility>
 
 // Boost includes
-#include <asio/buffer.hpp>
+#include <boost/asio/buffer.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
@@ -40,7 +40,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        explicit AbstractHandler(std::string name) : _name(std::move(name)){};
+        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -60,7 +60,7 @@ namespace AwsMock::Service {
          * @param user current user
          * @return HTTP response
          */
-        virtual http::response<http::dynamic_body> HandlePutRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
          * @brief Handles the HTTP method POST.
@@ -166,6 +166,14 @@ namespace AwsMock::Service {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers = {});
+
+        /**
+         * @brief Send continue response
+         *
+         * @param request HTTP request
+         * @return HTTP response
+         */
+        static http::response<http::dynamic_body> SendContinueResponse(const http::request<http::dynamic_body> &request);
 
         /**
          * Get the name

@@ -19,7 +19,7 @@
 #define OWNER "test-owner"
 #define ACCOUNT_ID "000000000000"
 #define FUNCTION_NAME std::string("test-function")
-#define FUNCTION_FILE std::string("/tmp/java-basic-1.0-SNAPSHOT.jar")
+#define FUNCTION_FILE std::string("data/lambda/java-basic-1.0-SNAPSHOT.jar")
 #define ROLE std::string("arn:aws:iam::000000000000:role/lambda-role")
 #define CODE std::string("S3Bucket=lambdaBucket,S3Key=lambdaKey")
 #define RUNTIME std::string("java11")
@@ -51,7 +51,7 @@ namespace AwsMock::Service {
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager
-            _gatewayServer = std::make_shared<Service::GatewayServer>(_ios);
+            _gatewayServer = std::make_shared<GatewayServer>(_ios);
         }
 
         void TearDown() override {
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
         }
 
         std::string _endpoint, _accountId;
-        boost::asio::io_service _ios{10};
+        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         LambdaService _lambdaService;

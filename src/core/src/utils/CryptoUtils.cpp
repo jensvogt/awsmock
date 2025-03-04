@@ -491,6 +491,27 @@ namespace AwsMock::Core {
         return output;
     }
 
+    bool Crypto::IsBase64(const std::string &inputString) {
+        if (inputString.length() % 4 == 0 && std::ranges::all_of(inputString,
+                                                                 [](const char c) { return ((c >= 'a' && c <= 'z') ||
+                                                                                            (c >= 'A' && c <= 'Z') ||
+                                                                                            (c >= '0' && c <= '9') ||
+                                                                                            c == '/' ||
+                                                                                            c == '+' ||
+                                                                                            c == '='); })) {
+            // filter by the location of '=' sign.
+            if (const auto pos = inputString.find("==="); pos != std::string_view::npos) {
+                if (pos < inputString.length() - 3) return false;
+            } else if (const auto pos1 = inputString.find("=="); pos1 != std::string_view::npos) {
+                if (pos1 < inputString.length() - 2) return false;
+            } else if (const auto pos2 = inputString.find("="); pos2 != std::string_view::npos) {
+                if (pos2 < inputString.length() - 1) return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     std::string Crypto::HexEncode(const std::string &input) {
         return boost::algorithm::hex(input);
     }

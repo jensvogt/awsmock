@@ -16,6 +16,7 @@ namespace AwsMock::Manager {
     /**
      * @brief Manager monitoring
      *
+     * @par
      * Reports up/down status of modules using the following correlations:
      *
      *  - Active && running == 0
@@ -32,20 +33,20 @@ namespace AwsMock::Manager {
         /**
          * @brief Constructor
          */
-        ManagerMonitoring(){};
+        ManagerMonitoring() {};
 
       private:
 
         /**
-         * Update the counter
+         * @brief Update the counter
          */
         void UpdateCounter() const;
 
         /**
-         * Module database connection
+         * @brief Module database connection
          */
         Database::ModuleDatabase &_moduleDatabase = Database::ModuleDatabase::instance();
     };
 
 }// namespace AwsMock::Manager
-#endif// AWSMOCK_MANAGER_MONITORING_H
+#endif// AWSMOCK_MANAGER_M

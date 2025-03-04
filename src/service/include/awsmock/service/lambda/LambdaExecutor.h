@@ -14,6 +14,7 @@
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
@@ -50,8 +51,9 @@ namespace AwsMock::Service {
          * @param port lambda docker port
          * @param payload lambda payload
          * @param functionName lambda function name
+         * @param receiptHandle receipt handle of the message which triggered the invocation
          */
-        void operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName) const;
+        void operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
 
       private:
 

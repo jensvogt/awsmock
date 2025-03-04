@@ -68,7 +68,7 @@ namespace AwsMock::Dto::SQS {
         static void GetIntAsByteArray(size_t n, unsigned char *bytes);
 
         /**
-         * @brief Convert from JSON string
+         * @brief Convert from JSON document
          *
          * @param jsonObject attribute object
          */
@@ -80,6 +80,20 @@ namespace AwsMock::Dto::SQS {
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
+
+        /**
+         * @brief Convert from JSON document
+         *
+         * @param jsonObject attribute object
+         */
+        void FromJson(const view_or_value<view, value> &jsonObject);
+
+        /**
+         * @brief Convert from JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] view_or_value<view, value> ToJson() const;
 
         /**
          * @brief Name comparator

@@ -96,7 +96,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @param mResult query result.
          */
-        void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
 
         /**
          * @brief Converts the entity to a string representation.

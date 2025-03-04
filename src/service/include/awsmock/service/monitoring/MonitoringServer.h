@@ -11,9 +11,6 @@
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
 
-#define S3_DEFAULT_MONITORING_PERIOD 300
-#define S3_DEFAULT_WORKER_PERIOD 3600
-
 namespace AwsMock::Service {
 
     /**

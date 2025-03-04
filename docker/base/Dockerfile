@@ -17,7 +17,7 @@ RUN cd /usr/src && \
 RUN cd /usr/src && \
     git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
     cd prometheus-cpp && \
-    cmake . && \
+    cmake . -DBUILD_SHARED_LIBS=ON && \
     cmake --build . -j16 && \
     cmake --install .
 

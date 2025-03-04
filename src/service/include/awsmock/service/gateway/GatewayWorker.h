@@ -130,7 +130,7 @@ namespace AwsMock::Service {
         boost::optional<http::request_parser<request_body_t, alloc_t>> _gatewayParser;
 
         // The timer putting a time limit on requests.
-        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max)()};
+        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max) ()};
 
         // The string-based response message.
         boost::optional<http::response<http::string_body, http::basic_fields<alloc_t>>> _stringResponse;

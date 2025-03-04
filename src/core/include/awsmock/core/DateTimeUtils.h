@@ -21,7 +21,7 @@ namespace AwsMock::Core {
     using std::chrono::system_clock;
 
     template<class Clock, class Duration1, class Duration2>
-    constexpr auto ceilTimePoint(std::chrono::time_point<Clock, Duration1> t, Duration2 m) noexcept {
+    constexpr auto CeilTimePoint(std::chrono::time_point<Clock, Duration1> t, Duration2 m) noexcept {
         using R = std::chrono::time_point<Clock, Duration2>;
         auto r = std::chrono::time_point_cast<Duration2>(R{} + (t - R{}) / m * m);
         if (r < t)
@@ -103,6 +103,17 @@ namespace AwsMock::Core {
         static long UnixTimestamp(const system_clock::time_point &timePoint);
 
         /**
+         * @brief Returns the time_point in Java Unix epoch timestamp (UTC)
+         *
+         * @par
+         * This returns the number of milliseconds since 01.01.1970.
+         *
+         * @param timePoint point in time
+         * @return time_point as Unix epoch timestamp
+         */
+        static long UnixTimestampMs(const system_clock::time_point &timePoint);
+
+        /**
          * @brief Returns the current Unix epoch timestamp (UTC)
          *
          * @return now as Unix epoch timestamp
@@ -123,7 +134,20 @@ namespace AwsMock::Core {
          * @param timestamp UNIX timestamp
          * @return system_clock::time_point
          */
-        static system_clock::time_point FromUnixtimestamp(long timestamp);
+        static system_clock::time_point FromUnixTimestamp(long timestamp);
+
+#ifdef _WIN32
+        /**
+         * @brief Get the localtime from unix timestamp
+         *
+         * @par
+         * On Windows (using MSVC) the bson library converts a uint_64 in long long.
+         * 
+         * @param timestamp UNIX timestamp
+         * @return system_clock::time_point
+         */
+        static system_clock::time_point FromUnixTimestamp(long long timestamp);
+#endif
 
         /**
          * @brief Get the current local time
@@ -131,6 +155,13 @@ namespace AwsMock::Core {
          * @return local time.
          */
         static system_clock::time_point LocalDateTimeNow();
+
+        /**
+         * @brief Get the current UTC time
+         *
+         * @return UTC time.
+         */
+        static system_clock::time_point UtcDateTimeNow();
 
         /**
          * @brief Gets the difference in seconds between now and the given time in '00:00:00'
@@ -145,9 +176,24 @@ namespace AwsMock::Core {
          * @return offset in seconds to UTC.
          */
         static long UtcOffset();
-        std::string FromISO8601(system_clock::time_point now) const;
+
+        /**
+         * @brief Convert from ISO8601.
+         *
+         * @param now timestamp
+         * @return ISO8601 string
+         */
+        static std::string FromISO8601(system_clock::time_point now);
+
+        /**
+         * @brief Convert a local time to a UTC time
+         *
+         * @param value local time
+         * @return UTC time
+         */
+        static system_clock::time_point ConvertToUtc(const system_clock::time_point &value);
     };
 
 }// namespace AwsMock::Core
 
-#endif//AWS_MOCK_CORE_DATETIME_UTILS_H
+#endif

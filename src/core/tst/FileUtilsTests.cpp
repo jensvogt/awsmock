@@ -2,6 +2,7 @@
 // Created by vogje01 on 02/06/2023.
 //
 
+#include <awsmock/core/SystemUtils.h>
 #ifndef AWMOCK_CORE_FILE_UTILS_TEST_H
 #define AWMOCK_CORE_FILE_UTILS_TEST_H
 
@@ -222,6 +223,32 @@ namespace AwsMock::Core {
         // assert
         EXPECT_FALSE(contentType.empty());
         EXPECT_TRUE(contentType == "text/plain");
+    }
+
+    TEST_F(FileUtilsTest, GetContentTypeJpgTest) {
+
+        // arrange
+        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
+
+        // act
+        const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/9783911244381.jpg");
+
+        // assert
+        EXPECT_FALSE(contentType.empty());
+        EXPECT_TRUE(contentType == "image/jpeg");
+    }
+
+    TEST_F(FileUtilsTest, GetContentTypeTifTest) {
+
+        // arrange
+        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
+
+        // act
+        const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/7337529778404.tif");
+
+        // assert
+        EXPECT_FALSE(contentType.empty());
+        EXPECT_TRUE(contentType == "image/tiff");
     }
 
 }// namespace AwsMock::Core

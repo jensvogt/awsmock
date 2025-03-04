@@ -26,6 +26,8 @@
 // JWT includes
 #include <jwt-cpp/base.h>
 
+// AwsMock includes
+
 namespace AwsMock::Core {
 
     /**
@@ -94,6 +96,14 @@ namespace AwsMock::Core {
         static bool IsUuid(const std::string &value);
 
         /**
+         * @brief Check whether the provided string is a hexadecimal digit.
+         *
+         * @param value string value
+         * @return true in case the provided string is a hexadecimal digit, otherwise false.
+         */
+        static bool IsHexString(const std::string &value);
+
+        /**
          * @brief Creates a random UUID and return is as a string
          *
          * @return random UUID as string
@@ -113,10 +123,11 @@ namespace AwsMock::Core {
          * @brief Joins a string array to a string using the given delimiter.
          *
          * @param vec vector of strings
+         * @param delimiter delimiter
          * @param startIndex starting index default = 0
          * @return joined string
          */
-        static std::string Join(const std::vector<std::string> &vec, int startIndex = 0);
+        static std::string Join(const std::vector<std::string> &vec, const std::string &delimiter = " ", int startIndex = 0);
 
         /**
          * @brief Strip whitespaces

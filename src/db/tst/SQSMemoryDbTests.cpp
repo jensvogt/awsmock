@@ -2,6 +2,7 @@
 // Created by vogje01 on 02/06/2023.
 //
 
+#include <thread>
 #ifndef AWMOCK_CORE_SQSMEMORYDBTEST_H
 #define AWMOCK_CORE_SQSMEMORYDBTEST_H
 

@@ -10,7 +10,7 @@
 #include <vector>
 
 // Boost includes
-#include <boost/thread/pthread/mutex.hpp>
+#include <boost/thread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>

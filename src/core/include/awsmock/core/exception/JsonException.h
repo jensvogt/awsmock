@@ -22,7 +22,7 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * Constructor.
+         * @brief Constructor.
          *
          * @param code exception code, default: 0
          * @param resource exception resource
@@ -31,7 +31,7 @@ namespace AwsMock::Core {
         explicit JsonException(http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
-         * Constructor.
+         * @brief Constructor.
          *
          * @param msg exception message
          * @param code exception code, default: 0
@@ -41,41 +41,50 @@ namespace AwsMock::Core {
         explicit JsonException(const std::string &msg, http::status code = http::status::internal_server_error, const char *resource = nullptr, const char *requestId = nullptr);
 
         /**
-         * Copy constructor.
+         * @brief Copy constructor.
          *
          * @param exc parent exception.
          */
         JsonException(const JsonException &exc);
 
         /**
-         * Destructor
+         * @brief Destructor
          */
         ~JsonException() noexcept override;
 
         /**
-         * Assigment operator.
+         * @brief Assigment operator.
          */
         JsonException &operator=(const JsonException &exc);
 
         /**
-         * Returns the exception message.
+         * @brief Returns the exception message.
          */
         [[nodiscard]] std::string message() const noexcept;
 
         /**
-         * Returns the exception message.
+         * @brief Returns the exception message.
          */
         [[nodiscard]] http::status code() const noexcept;
 
         /**
-         * Returns the exception resource.
+         * @brief Returns the exception resource.
          */
         [[nodiscard]] const char *resource() const noexcept;
 
         /**
-         * Returns the exception request ID.
+         * @brief Returns the exception request ID.
          */
         [[nodiscard]] const char *requestId() const noexcept;
+
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *what() const noexcept override {
+            return _message.c_str();
+        }
 
       private:
 

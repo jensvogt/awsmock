@@ -25,7 +25,12 @@ namespace AwsMock::Dto::Docker {
         /**
          * @brief Constructor
          */
-        explicit Port(const view_or_value<view, value> &object);
+        //explicit Port(const view_or_value<view, value> &object);
+
+        /**
+         * Host IP address
+         */
+        std::string hostIp;
 
         /**
          * Private port, means port inside the container

@@ -20,6 +20,7 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->host = Core::HttpUtils::GetHost(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
+        this->payload = Core::HttpUtils::GetBodyAsString(request);
 
         // Core values
         bucket = Core::AwsUtils::GetS3BucketName(request);
@@ -110,35 +111,10 @@ namespace AwsMock::Dto::Common {
                     break;
 
                 case http::verb::head:
-                case http::verb::unknown:
-                case http::verb::connect:
-                case http::verb::options:
-                case http::verb::trace:
-                case http::verb::copy:
-                case http::verb::lock:
-                case http::verb::mkcol:
-                case http::verb::move:
-                case http::verb::propfind:
-                case http::verb::proppatch:
-                case http::verb::search:
-                case http::verb::unlock:
-                case http::verb::bind:
-                case http::verb::rebind:
-                case http::verb::unbind:
-                case http::verb::acl:
-                case http::verb::report:
-                case http::verb::mkactivity:
-                case http::verb::checkout:
-                case http::verb::merge:
-                case http::verb::msearch:
-                case http::verb::notify:
-                case http::verb::subscribe:
-                case http::verb::unsubscribe:
-                case http::verb::patch:
-                case http::verb::purge:
-                case http::verb::mkcalendar:
-                case http::verb::link:
-                case http::verb::unlink:
+                    break;
+
+                default:
+                    log_error << "Unknown command, method: " << method << " multipartRequest: " << multipartRequest << " bucket: " << bucket << " key: " << key << uploads;
                     break;
             }
         }

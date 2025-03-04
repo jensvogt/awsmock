@@ -7,7 +7,8 @@
 namespace AwsMock::Service {
 
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "create_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "create_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
 
         // Check existence
@@ -39,7 +40,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListTopicsResponse SNSService::ListTopics(const std::string &region) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_topics");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_topics");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topics");
         log_trace << "List all topics request, region: " << region;
 
         try {
@@ -57,7 +59,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "list_topic_counters");
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_topic_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topic_counters");
         log_trace << "List all topics counters request, request: " << request.ToString();
 
         try {
@@ -87,7 +90,8 @@ namespace AwsMock::Service {
     }
 
     long SNSService::PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "purge_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "purge_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "purge_topic");
         log_trace << "Purge topic request, topicArn: " << request.topicArn;
 
         // Check existence
@@ -116,7 +120,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "delete_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "delete_topic");
         log_trace << "Delete topic request, region: " << region << " topicArn: " << topicArn;
 
         // Check existence
@@ -139,27 +144,32 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "publish");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "publish");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "publish");
         log_trace << "Publish message request: " << request.ToString();
 
         // Check topic/target ARN
-        if (request.topicArn.empty()) {
-            log_error << "Either topicARN or targetArn must exist";
-            throw Core::ServiceException("Either topicARN or targetArn must exist");
+        if (request.topicArn.empty() && request.targetArn.empty()) {
+            log_error << "Either topicArn or targetArn must exist";
+            throw Core::ServiceException("Either topicArn or targetArn must exist");
         }
 
         // Check existence
-        if (!_snsDatabase.TopicExists(request.topicArn)) {
-            log_error << "Topic does not exist: " << request.topicArn;
-            throw Core::ServiceException("SNS topic does not exists");
+        if (!request.topicArn.empty() && !_snsDatabase.TopicExists(request.topicArn)) {
+            log_error << "SNS topic does not exists, topicArn: " << request.topicArn;
+            throw Core::ServiceException("SNS topic does not exists, topicArn: " + request.topicArn);
+        }
+        if (!request.targetArn.empty() && !_snsDatabase.TopicExists(request.targetArn)) {
+            log_error << "SNS targetArn does not exists, targetArn: " << request.targetArn;
+            throw Core::ServiceException("SNS targetArn does not exists, targetArn: " + request.targetArn);
         }
 
         try {
-            Database::Entity::SNS::Message message;
-
-            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
+            // Get the topic by topic ARN or target ARN
+            Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
 
             // Update database
+            Database::Entity::SNS::Message message;
             std::string messageId = Core::AwsUtils::CreateMessageId();
             message = {.region = request.region,
                        .topicArn = request.topicArn,
@@ -167,10 +177,14 @@ namespace AwsMock::Service {
                        .message = request.message,
                        .messageId = messageId,
                        .size = static_cast<long>(request.message.length())};
+
+            // Attributes
             for (const auto &[fst, snd]: request.messageAttributes) {
                 Database::Entity::SNS::MessageAttribute attribute = {.attributeName = fst, .attributeValue = snd.stringValue, .attributeType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))};
                 message.messageAttributes.emplace_back(attribute);
             }
+
+            // Save message
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions
@@ -188,7 +202,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::SubscribeResponse SNSService::Subscribe(const Dto::SNS::SubscribeRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "subscribe");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "subscribe");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "subscribe");
         log_trace << "Subscribe request: " << request.ToString();
 
         try {
@@ -213,9 +228,7 @@ namespace AwsMock::Service {
             if (const Database::Entity::SNS::Subscription subscription = {.protocol = request.protocol, .endpoint = request.endpoint}; !topic.HasSubscription(subscription)) {
 
                 // Add subscription
-                topic.subscriptions.push_back({.protocol = request.protocol,
-                                               .endpoint = request.endpoint,
-                                               .subscriptionArn = subscriptionArn});
+                topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
 
                 // Save to database
                 topic = _snsDatabase.UpdateTopic(topic);
@@ -231,7 +244,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::UpdateSubscriptionResponse SNSService::UpdateSubscription(const Dto::SNS::UpdateSubscriptionRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "update_subscription");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "update_subscription");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "update_subscription");
         log_trace << "Update subscription request: " << request.ToString();
 
         // Check topic/target ARN
@@ -274,7 +288,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::UnsubscribeResponse SNSService::Unsubscribe(const Dto::SNS::UnsubscribeRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "unsubscribe");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "unsubscribe");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "unsubscribe");
         log_trace << "Unsubscribe request: " << request.ToString();
 
         try {
@@ -309,7 +324,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListSubscriptionsByTopicResponse SNSService::ListSubscriptionsByTopic(const Dto::SNS::ListSubscriptionsByTopicRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_subscriptions");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_subscriptions");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_subscriptions");
         log_trace << "List subscriptions request: " << request.ToString();
 
         // Check existence
@@ -337,7 +353,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListSubscriptionCountersResponse SNSService::ListSubscriptionCounters(const Dto::SNS::ListSubscriptionCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_subscription_counters");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_subscription_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_subscription_counters");
         log_trace << "List subscription counters request: " << request.ToString();
 
         // Check existence
@@ -366,7 +383,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListAttributeCountersResponse SNSService::ListAttributeCounters(const Dto::SNS::ListAttributeCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_attribute_counters");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_attribute_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_attribute_counters");
         log_trace << "List attribute counters request: " << request.ToString();
 
         // Check existence
@@ -419,7 +437,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListTagCountersResponse SNSService::ListTagCounters(const Dto::SNS::ListTagCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_tag_counters");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_tag_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_tag_counters");
         log_trace << "List tag counters request: " << request.ToString();
 
         // Check existence
@@ -447,7 +466,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::GetTopicAttributesResponse SNSService::GetTopicAttributes(const Dto::SNS::GetTopicAttributesRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_attributes");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "get_topic_attributes");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "get_topic_attributes");
         log_trace << "Get topic attributes request: " << request.ToString();
 
         try {
@@ -470,7 +490,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::GetTopicDetailsResponse SNSService::GetTopicDetails(const Dto::SNS::GetTopicDetailsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "get_topic_details");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "get_topic_details");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "get_topic_details");
         log_trace << "Get topic details request: " << request.ToString();
 
         try {
@@ -503,7 +524,8 @@ namespace AwsMock::Service {
     }
 
     void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "check_subscriptions");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();
 
         if (const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn); !topic.subscriptions.empty()) {
@@ -520,7 +542,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::TagResourceResponse SNSService::TagResource(const Dto::SNS::TagResourceRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "tag_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "tag_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "tag_topic");
         log_trace << "Tag topic request: " << request.ToString();
 
         try {
@@ -537,7 +560,7 @@ namespace AwsMock::Service {
             // Set tags and update database
             topic.tags = request.tags;
             topic = _snsDatabase.UpdateTopic(topic);
-            log_info << "SNS tags updated, count: " << topic.tags.size();
+            log_debug << "SNS tags updated, count: " << topic.tags.size();
 
             constexpr Dto::SNS::TagResourceResponse response;
             return response;
@@ -549,7 +572,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::UntagResourceResponse SNSService::UntagResource(const Dto::SNS::UntagResourceRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "untag_topic");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "untag_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "untag_topic");
         log_trace << "Untag topic request: " << request.ToString();
 
         try {
@@ -572,7 +596,7 @@ namespace AwsMock::Service {
                 });
             }
             topic = _snsDatabase.UpdateTopic(topic);
-            log_info << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
+            log_debug << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
 
             constexpr Dto::SNS::UntagResourceResponse response;
             return response;
@@ -618,7 +642,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_messages");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_messages");
         log_trace << "List all messages request, region: " << request.region << " topicArn: " << request.topicArn;
 
         try {
@@ -640,7 +664,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SNS::ListMessageCountersResponse SNSService::ListMessageCounters(const Dto::SNS::ListMessageCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "list_message_counters");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_message_counters");
         log_trace << "List message counters request, region: " << request.region << " topicArn: " << request.topicArn;
 
         try {
@@ -662,7 +686,7 @@ namespace AwsMock::Service {
     }
 
     void SNSService::DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "method", "delete_message");
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "delete_message");
         log_trace << "Delete a message request, messageId: " << request.messageId;
 
         if (!_snsDatabase.MessageExists(request.messageId)) {

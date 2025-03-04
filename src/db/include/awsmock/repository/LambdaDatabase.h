@@ -18,10 +18,10 @@
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
+
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-
 
     /**
      * Lambda MongoDB database.
@@ -68,11 +68,11 @@ namespace AwsMock::Database {
         /**
          * @brief Check existence of lambda
          *
-         * @param function AWS function
+         * @param functionName AWS function
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const std::string &function) const;
+        bool LambdaExists(const std::string &functionName) const;
 
         /**
          * @brief Check existence of lambda
@@ -89,7 +89,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created lambda entity.
          */
-        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda);
+        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Count all lambdas
@@ -113,7 +113,15 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created or updated lambda entity.
          */
-        Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda);
+        Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const;
+
+        /**
+         * @brief Import a lambda function
+         *
+         * @param lambda lambda entity
+         * @return imported lambda entity.
+         */
+        Entity::Lambda::Lambda ImportLambda(Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -198,6 +206,14 @@ namespace AwsMock::Database {
          * @return list of lambda function counters
          */
         std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+
+        /**
+         * @brief Export a list of lambdas
+         *
+         * @param sortColumns sorting columns
+         * @return ölist of lambda entries
+         */
+        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.

@@ -25,6 +25,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported SNS client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class SNSCommandType {
         CREATE_TOPIC,
         LIST_TOPICS,
@@ -105,7 +110,7 @@ namespace AwsMock::Dto::Common {
          * @param request HTTP request
          * @return command string
          */
-        std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
+        [[nodiscard]] std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request) const;
 
         /**
          * @brief Getś the value from the user-agent string

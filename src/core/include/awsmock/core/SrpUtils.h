@@ -18,6 +18,8 @@
 #include <openssl/sha.h>
 #include <openssl/srp.h>
 
+// AwsMock includes
+
 namespace AwsMock::Core {
 
     enum { M_FROM_K,

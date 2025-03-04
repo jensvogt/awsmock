@@ -8,25 +8,25 @@ namespace AwsMock::Database::Entity::Transfer {
 
     view_or_value<view, value> User::ToDocument() const {
 
-        view_or_value<view, value> userDoc = make_document(
-                kvp("arn", arn),
-                kvp("role", role),
-                kvp("userName", userName),
-                kvp("password", password),
-                kvp("homeDirectory", homeDirectory));
+        document userDoc;
+        userDoc.append(kvp("arn", arn));
+        userDoc.append(kvp("role", role));
+        userDoc.append(kvp("userName", userName));
+        userDoc.append(kvp("password", password));
+        userDoc.append(kvp("homeDirectory", homeDirectory));
 
-        return userDoc;
+        return userDoc.extract();
     }
 
     void User::FromDocument(const view mResult) {
-
-        for (auto &v: mResult) {
-            arn = bsoncxx::string::to_string(v["arn"].get_string().value);
-            role = bsoncxx::string::to_string(v["role"].get_string().value);
-            userName = bsoncxx::string::to_string(v["userName"].get_string().value);
-            password = bsoncxx::string::to_string(v["password"].get_string().value);
-            homeDirectory = bsoncxx::string::to_string(v["homeDirectory"].get_string().value);
-        }
+        //
+        //        for (auto &v: mResult) {
+        //            arn = bsoncxx::string::to_string(v["arn"].get_string().value);
+        //            role = bsoncxx::string::to_string(v["role"].get_string().value);
+        //            userName = bsoncxx::string::to_string(v["userName"].get_string().value);
+        //            password = bsoncxx::string::to_string(v["password"].get_string().value);
+        //            homeDirectory = bsoncxx::string::to_string(v["homeDirectory"].get_string().value);
+        //        }
     }
 
     std::string User::ToString() const {

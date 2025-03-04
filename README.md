@@ -151,7 +151,7 @@ Building of the AwsMOck executables is CMake based.
 - Development releases of boost, libz, libssl, libcrypto, libarchive
 - 4GB of RAM.
 
-#### Building from Source:
+#### Building the manager from source:
 
 Building AwsMock from scratch is a rather time-consuming procedure. For a first glance at AwsMock, better use the
 provided docker image. Nevertheless, if you need to compile it by your own, here are the instructions.
@@ -180,6 +180,17 @@ To create an out-of-source build:
 
 As already said, this can be a time-consuming procedure, depending on your machine and the environment.
 
+#### Building the frontend from source:
+
+IN order to build the frontend you need NodeJS >16.0. The sourcecode is located at
+```http://github.com/jensvogt/awsmock-ui```. In order to build the frontend part use:
+
+```
+npm run build --prod
+```
+
+and copy the result to ```$HOME/awsmock/frontend```.
+
 ### Using the docker image
 
 Using the provided docker image is much simpler (assuming Docker is already installed).
@@ -195,14 +206,15 @@ To start the docker image:
 2. Start the container
 
   ```  
-  docker run -p 4566-4567:4566-4567 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
+  docker run -p 4566-4567:4566-4567 -p 21:21 -p 6000-6100:6000:6100 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
   ```
 
 This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance. Port
-```4566``` (gateway) and ```4567``` (manager)
+```4566``` (gateway) and ```4567``` (frontend)
 should be reachable. ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and
-```-v /var/run/docker.sock:/var/run/docker.sock``` for
-the communication with the host's docker daemon (lambdas, dynamodb).
+```-v /var/run/docker.sock:/var/run/docker.sock``` for the communication with the host's docker daemon (lambdas,
+dynamodb).
+Ports ```6000-6100``` are use for the passive mode of the FTP server.
 
 If you have problems with the docker daemon connection and you see errors like:
 
@@ -239,6 +251,29 @@ This will start a mongo DB instance an awsmock docker image. Remote access to th
 separately. See for
 instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
 
+### Running the Manager on the host
+
+In order to run the manager on the host system (Docker ist still needed for the lambda functions and DynamoDB), you need
+tomake sure the manager application has access to the docker daemon REST API. For this put your user id into the docker
+group;
+
+```
+sudo usermod -a -G docker <userName>
+```
+
+this will add ```<userName>``` to the docker group and the manager can access the docker daemon REST APIs. After that
+you
+can start the manager as normal foreground process:
+
+```
+/usr/local/bin/awsmockmgr --loglevel debug
+```
+
+It will use the configuration file: ```/etc/awsmock.yml```. Logging output will be written to the console. To stop the
+process just type ```<CRTL>-C```. THe frontend will be served by default from the
+```$HOME/awsmock/frontend``` directory.
+To customize that change the corresponding attribute in the configuration file.
+
 ## Examples
 
 There are a couple of examples shell script available. Depending on your installation directory, there in
@@ -263,6 +298,52 @@ machine.
 
 ```
 c:\Program Files\awsmock\bin\awsmockctl status
+```
+
+## MacOS support
+
+On MacOS the manager can be run as normal process. A MacOS can be installed using the normal development setup. Start
+the manager as ```awsmockmgr```. The frontend is available at ```http://localhost:4567```
+
+### Compiling on MacOS
+
+Prerequisites:
+
+```
+brew install prometheus-cpp
+brew install yaml-cpp
+brew install jwt-cpp
+brew install mongo-c-driver
+brew install mongo-cxx-driver
+brew install libarchive
+brew install libmagic
+brew install openssl@3
+brew install boost
+// Documentation
+brew install doxygen pandoc
+```
+
+Download the backend source code
+
+```
+git clone https://github.com/jensvogt/awsmock
+cd awsmock
+cmake .
+cmake --build . -j 16
+sudo make install
+```
+
+This will compile and install the backend executables into ```/usr/local/bin``` and the libraries in
+```/usr/local/lib```. The configuration file should be installed as ```/etc/awsmock.yml```:
+```cp dist/etc/awsmock.yml /etc```
+
+Download the frontend code
+
+```
+git clone https://github.com/jensvogt/awsmock-ui
+cd awsmock-ui
+npm install
+npm run build --prod
 ```
 
 ## Configuration

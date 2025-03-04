@@ -23,6 +23,11 @@ namespace AwsMock::Dto::Common {
 
     namespace http = boost::beast::http;
 
+    /**
+     * @brief Supported Cognito client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class CognitoCommandType {
         CREATE_USER_POOL,
         CREATE_USER_POOL_CLIENT,

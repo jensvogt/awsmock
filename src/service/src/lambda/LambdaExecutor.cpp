@@ -6,12 +6,12 @@
 
 namespace AwsMock::Service {
 
-    void LambdaExecutor::operator()(const std::string &oid, const std::string &containerId, const std::string &host, const int port, const std::string &payload, const std::string &functionName) const {
+    void LambdaExecutor::operator()(const std::string &oid, const std::string &containerId, const std::string &host, const int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle) const {
 
-        Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER);
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT);
+        Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", functionName);
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", functionName);
         log_debug << "Sending lambda invocation request, function: " << functionName << " endpoint: " << host << ":" << port;
-        log_debug << "Sending lambda invocation request, payload: " << payload;
+        log_trace << "Sending lambda invocation request, payload: " << payload;
 
         // Set status
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceRunning);
@@ -29,6 +29,11 @@ namespace AwsMock::Service {
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
         Database::LambdaDatabase::instance().SetAverageRuntime(oid, std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count());
         log_debug << "Lambda invocation finished, function: " << functionName << " httpStatus: " << response.statusCode;
+
+        if (Core::StringUtils::Contains(response.body, "success")) {
+            const long deleted = Database::SQSDatabase::instance().DeleteMessage(receiptHandle);
+            log_info << "SQS messages deleted, count: " << deleted;
+        }
         log_info << "Lambda invocation finished, lambda: " << functionName << " output: " << response.body;
     }
 

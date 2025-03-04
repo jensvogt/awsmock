@@ -108,11 +108,11 @@ namespace AwsMock::Database::Entity::SQS {
          * Fixed system attributes:
          *
          * - ApproximateReceiveCount
-         * - ApproximateFirstReceiveTimestamp
+         * - ApproximateFirstReceiveTimestamp Java UNIX timestamp (milliseconds since 01.01.1970)
          * - MessageDeduplicationId
          * - MessageGroupId
          * - SenderId
-         * - SentTimestamp
+         * - SentTimestamp Java UNIX timestamp (milliseconds since 01.01.1970)
          * - SequenceNumber
          * - SequenceNumber
          */

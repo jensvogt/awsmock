@@ -28,27 +28,15 @@
 #include <awsmock/dto/sqs/DeleteQueueResponse.h>
 #include <awsmock/dto/sqs/GetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
-#include <awsmock/dto/sqs/GetQueueDetailsRequest.h>
-#include <awsmock/dto/sqs/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
-#include <awsmock/dto/sqs/ListLambdaTriggerCountersRequest.h>
-#include <awsmock/dto/sqs/ListLambdaTriggerCountersResponse.h>
-#include <awsmock/dto/sqs/ListMessageCountersRequest.h>
-#include <awsmock/dto/sqs/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/ListMessagesRequest.h>
 #include <awsmock/dto/sqs/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/ListQueueArnsResponse.h>
-#include <awsmock/dto/sqs/ListQueueAttributeCountersRequest.h>
-#include <awsmock/dto/sqs/ListQueueAttributeCountersResponse.h>
-#include <awsmock/dto/sqs/ListQueueCountersRequest.h>
-#include <awsmock/dto/sqs/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
 #include <awsmock/dto/sqs/ListQueueTagsRequest.h>
 #include <awsmock/dto/sqs/ListQueueTagsResponse.h>
-#include <awsmock/dto/sqs/ListTagCountersRequest.h>
-#include <awsmock/dto/sqs/ListTagCountersResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
@@ -61,7 +49,21 @@
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
-#include <awsmock/dto/sqs/UpdateMessageRequest.h>
+#include <awsmock/dto/sqs/intern/GetQueueDetailsRequest.h>
+#include <awsmock/dto/sqs/intern/GetQueueDetailsResponse.h>
+#include <awsmock/dto/sqs/intern/ListLambdaTriggerCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListLambdaTriggerCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListMessageCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListQueueAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListQueueAttributeCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListQueueCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListQueueCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ListQueueTagCountersRequest.h>
+#include <awsmock/dto/sqs/intern/ListQueueTagCountersResponse.h>
+#include <awsmock/dto/sqs/intern/ResendMessageRequest.h>
+#include <awsmock/dto/sqs/intern/UpdateDqlRequest.h>
+#include <awsmock/dto/sqs/intern/UpdateMessageRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
@@ -75,7 +77,6 @@
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
-
     using std::chrono::system_clock;
 
     /**
@@ -84,13 +85,12 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.
@@ -144,7 +144,7 @@ namespace AwsMock::Service {
          * @brief Purge a queue.
          *
          * @param request purge queue request
-         * @retzurn total number of deleted queues
+         * @return total number of deleted queues
          * @throws ServiceException
          */
         long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
@@ -153,7 +153,7 @@ namespace AwsMock::Service {
          * @brief Redrive messages in queue
          *
          * @param request redrive messages request
-         * @retzurn total number of redrive messages
+         * @return total number of redrive messages
          * @throws ServiceException
          */
         long RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const;
@@ -200,7 +200,7 @@ namespace AwsMock::Service {
          * @param request set visibility timeout request
          * @throws ServiceException
          */
-        void SetVisibilityTimeout(Dto::SQS::ChangeMessageVisibilityRequest &request) const;
+        void SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const;
 
         /**
          * @brief Sets tags for a queue.
@@ -242,7 +242,7 @@ namespace AwsMock::Service {
          * @param request list tag counters request DTO
          * @return ListTagCountersResponse DTO
          */
-        Dto::SQS::ListTagCountersResponse ListTagCounters(const Dto::SQS::ListTagCountersRequest &request) const;
+        Dto::SQS::ListQueueTagCountersResponse ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
 
         /**
          * @brief Delete a queue
@@ -309,11 +309,28 @@ namespace AwsMock::Service {
         void UpdateMessage(const Dto::SQS::UpdateMessageRequest &request) const;
 
         /**
-         * @brief Deletes a message
+         * @brief Resend a message
          *
-         * @param request delete message request DTO
+         * @param request resend message request DTO
+         * @throws ServiceException
+         * @see ResendMessage
+         */
+        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+
+        /**
+         * @brief Updates a DQL subscription
+         *
+         * @param request update DQL subscription request DTO
          * @throws ServiceException
          */
+        void UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const;
+
+        /**
+        * @brief Deletes a message
+        *
+        * @param request delete message request DTO
+        * @throws ServiceException
+        */
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
 
         /**
@@ -336,7 +353,15 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Checks the attributes for a entry with 'all'. The search is case-insensitive.
+         * @brief Send a lambda invocation request for a message.
+         *
+         * @param queueArn queue ARN
+         * @param message SQS message.
+         */
+        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
+
+        /**
+         * @brief Send a lambda invocation request for a message.
          *
          * @param lambda lambda to invoke.
          * @param message SQS message.
@@ -367,7 +392,6 @@ namespace AwsMock::Service {
          */
         LambdaService _lambdaService;
     };
-
 }// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_SQS_SERVICE_H

@@ -39,7 +39,8 @@ within the container that you post data to it in order to invoke your function f
 Orchestration is done through different docker images. A maximal concurrency of 1000 is supported. Each invocation will
 be sent to an idle instance of the lambda function. If no idle function docker container can be found, a new docker
 container will be created, up to an upper limit of 1000 lambda function. Each instance of the lambda function docker
-container will be cached for 60 min. The lifetime can be set in the awsmock configuration file (```awsmock.service.lambda.lifetime```)
+container will be cached for 60 min. The lifetime can be set in the awsmock configuration file (
+```awsmock.service.lambda.lifetime```)
 Default is 3600 seconds.
 
 The lambda functions are executed inside the RIE (Runtime Interface Emulator). Lambdas run as docker container using
@@ -220,6 +221,13 @@ awslocal lambda delete-function --function-name test-function
 
 This will stop the docker container and remove the image from the docker environment.
 
+## FRONTEND
+
+The frontend has some more functionalities, which are not included in the AWS CLI. Using the frontend on
+```http://localhost:4567```, you can start/stop the lambda function as well as monitor the number of invocation and the
+average runtime in milliseconds. To update a lambda function (replacement of the lambda function code), use the update
+function in the lambda function list.
+
 ## SAMPLES
 
 More example can be found in the AwsMock sample directory (```/usr/local/share/awsmock```).
@@ -238,6 +246,8 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```,
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```,
+```awsmocksns(1)```,
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
+```awsmocksqs(1)```,
 ```awsmockssm(1)```

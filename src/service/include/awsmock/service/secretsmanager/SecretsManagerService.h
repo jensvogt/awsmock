@@ -30,8 +30,6 @@
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
-#define DEFAULT_ACCOUNT_ID "000000000000"
-
 namespace AwsMock::Service {
 
     /**

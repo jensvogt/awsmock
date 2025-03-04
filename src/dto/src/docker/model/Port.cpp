@@ -6,9 +6,9 @@
 
 namespace AwsMock::Dto::Docker {
 
-    Port::Port(const view_or_value<view, value> &object) {
-        FromDocument(object);
-    }
+    // Port::Port(const view_or_value<view, value> &object) {
+    //     FromDocument(object);
+    // }
 
     void Port::FromDocument(const view_or_value<view, value> &object) {
 

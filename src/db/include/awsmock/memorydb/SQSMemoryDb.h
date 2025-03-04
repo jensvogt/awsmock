@@ -9,7 +9,7 @@
 #include <string>
 
 // Boost includes
-#include <boost/thread/pthread/mutex.hpp>
+#include <boost/thread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -100,6 +100,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
+
+        /**
+         * @brief List available queues, using paging
+         *
+         * @param sortColumns vector of sort columns
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns);
 
         /**
          * @brief Returns a queue by ARN
@@ -372,9 +381,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes a resources.
          *
+         * @return total number of message deleted
          * @throws Core::DatabaseException
          */
-        void DeleteAllMessages();
+        long DeleteAllMessages();
 
       private:
 

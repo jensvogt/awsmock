@@ -2,7 +2,6 @@
 // Created by vogje01 on 5/27/24.
 //
 
-#include <awsmock/service/gateway/GatewayRouter.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
@@ -24,6 +23,7 @@ namespace AwsMock::Service {
 
         // Construct a new parser for each message
         _parser.emplace();
+        _buffer.clear();
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
@@ -47,6 +47,29 @@ namespace AwsMock::Service {
         if (ec) {
             return;
         }
+
+        // Read the header
+        boost::beast::error_code ev;
+        read_header(_stream, _buffer, *_parser, ev);
+        if (ec)
+            return;
+
+        // Handle 100-continue requests
+        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
+            HandleContinueRequest(_stream);
+        }
+
+        //Core::HttpUtils::DumpHeaders(_parser.get().get());
+
+        // Read the rest of the request.
+        // if (boost::beast::iequals(_parser->get()[http::field::transfer_encoding], "chunked")) {
+        //     boost::beast::error_code Ev;
+        //     PrintChunkedBody(std::cerr, _stream, _buffer, Ev);
+        // } else {
+        read(_stream, _buffer, *_parser, ev);
+        //}
+        // Read the rest of the request.
+        //        read(_stream, _buffer, *_parser, ev);
 
         // Send the response
         QueueWrite(HandleRequest(_parser->release()));
@@ -97,7 +120,7 @@ namespace AwsMock::Service {
             return Core::HttpUtils::BadRequest(request, "Invalid target path");
         }
 
-        // Process OPTIONS requests
+        // Handle OPTIONS requests
         if (request.method() == http::verb::options) {
             return HandleOptionsRequest(request);
         }
@@ -247,6 +270,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> GatewaySession::HandleOptionsRequest(const http::request<http::dynamic_body> &request) {
+
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
@@ -266,4 +290,21 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
+
+    void GatewaySession::HandleContinueRequest(boost::beast::tcp_stream &_stream) {
+        http::response<http::empty_body> response;
+        response.version(11);
+        response.result(http::status::continue_);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::allow, "*/*");
+        response.set(http::field::content_length, "0");
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "*");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::access_control_max_age, "86400");
+        boost::beast::error_code ec;
+        write(_stream, response, ec);
+    }
+
 }// namespace AwsMock::Service

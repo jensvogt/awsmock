@@ -70,6 +70,20 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
+    Entity::S3::BucketList S3MemoryDb::ExportBuckets(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        Entity::S3::BucketList bucketList;
+        for (const auto &bucket: std::views::values(_buckets)) {
+            bucketList.emplace_back(bucket);
+        }
+
+        log_trace << "Got bucket list, size: " << bucketList.size();
+        std::ranges::sort(bucketList, [](const Entity::S3::Bucket &a, const Entity::S3::Bucket &b) {
+            return a.name < b.name;
+        });
+        return bucketList;
+    }
+
     bool S3MemoryDb::HasObjects(const Entity::S3::Bucket &bucket) const {
 
         long count = 0;
@@ -206,7 +220,23 @@ namespace AwsMock::Database {
                                     }) != _objects.end();
     }
 
-    bool S3MemoryDb::ObjectExists(const std::string &filename) {
+    bool S3MemoryDb::ObjectExists(const std::string &oid) const {
+
+        return std::ranges::find_if(_objects,
+                                    [oid](const std::pair<std::string, Entity::S3::Object> &o) {
+                                        return o.second.oid == oid;
+                                    }) != _objects.end();
+    }
+
+    bool S3MemoryDb::ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
+
+        return std::ranges::find_if(_objects,
+                                    [region, bucket, key](const std::pair<std::string, Entity::S3::Object> &o) {
+                                        return o.second.region == region && o.second.bucket == bucket && o.second.key == key;
+                                    }) != _objects.end();
+    }
+
+    bool S3MemoryDb::ObjectExistsInternalName(const std::string &filename) {
 
         return std::ranges::find_if(_objects,
                                     [filename](const std::pair<std::string, Entity::S3::Object> &object) {
@@ -375,10 +405,12 @@ namespace AwsMock::Database {
         log_debug << "Objects deleted, count: " << count;
     }
 
-    void S3MemoryDb::DeleteAllObjects() {
+    long S3MemoryDb::DeleteAllObjects() {
         boost::mutex::scoped_lock lock(_objectMutex);
 
+        long count = _objects.size();
         log_debug << "Deleting objects, size: " << _objects.size();
         _objects.clear();
+        return count;
     }
 }// namespace AwsMock::Database

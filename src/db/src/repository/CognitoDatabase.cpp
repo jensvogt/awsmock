@@ -78,7 +78,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-            const std::optional<value> mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _userPoolCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -102,7 +102,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                const std::optional<value> mResult = _userPoolCollection.find_one(make_document(kvp("userPoolId", userPoolId)));
+                const auto mResult = _userPoolCollection.find_one(make_document(kvp("userPoolId", userPoolId)));
                 if (!mResult) {
                     log_error << "Database exception: user pool not found ";
                     throw Core::DatabaseException("Database exception, user pool not found ");
@@ -128,10 +128,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                const std::optional<value> mResult = _userPoolCollection.find_one(make_document(
-                        kvp("userPoolClients",
-                            make_document(kvp("$elemMatch",
-                                              make_document(kvp("clientId", clientId)))))));
+                const auto mResult = _userPoolCollection.find_one(make_document(kvp("userPoolClients",make_document(kvp("$elemMatch",make_document(kvp("clientId", clientId)))))));
                 if (!mResult) {
                     log_error << "Database exception: user pool not found ";
                     throw Core::DatabaseException("Database exception, user pool not found ");
@@ -157,7 +154,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                const std::optional<value> mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                const auto mResult = _userPoolCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Cognito not found ";
                     throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -254,6 +251,41 @@ namespace AwsMock::Database {
 
         log_trace << "Got user pool list, size:" << userPools.size();
         return userPools;
+    }
+
+    std::vector<Entity::Cognito::UserPool> CognitoDatabase::ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
+
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                std::vector<Entity::Cognito::UserPool> userPools;
+                for (auto userPoolCursor = _userPoolCollection.find({}, opts); auto userPool: userPoolCursor) {
+                    Entity::Cognito::UserPool result;
+                    result.FromDocument(userPool);
+                    userPools.push_back(result);
+                }
+                log_trace << "Got user pool list, size:" << userPools.size();
+                return userPools;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.ExportUserPools(sortColumns);
     }
 
     long CognitoDatabase::CountUserPools(const std::string &region) const {
@@ -410,7 +442,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
-            const std::optional<value> mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _userCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: user not found ";
                 throw Core::DatabaseException("Database exception, user not found ");
@@ -491,52 +523,71 @@ namespace AwsMock::Database {
         return _memoryDb.CountUsers(region);
     }
 
-    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) {
+    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) const {
 
-        std::vector<Entity::Cognito::User> users;
         if (HasDatabase()) {
 
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
-                if (!region.empty() && !userPoolId.empty()) {
 
-                    for (auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId))); auto user: userCursor) {
-                        Entity::Cognito::User result;
-                        result.FromDocument(user);
-                        users.push_back(result);
-                    }
-
-                } else if (!region.empty()) {
-
-                    for (auto userCursor = _userCollection.find(make_document(kvp("region", region))); auto user: userCursor) {
-                        Entity::Cognito::User result;
-                        result.FromDocument(user);
-                        users.push_back(result);
-                    }
-
-                } else {
-
-                    for (auto userCursor = _userCollection.find(make_document()); auto user: userCursor) {
-                        Entity::Cognito::User result;
-                        result.FromDocument(user);
-                        users.push_back(result);
-                    }
+                document query{};
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
                 }
+                if (!userPoolId.empty()) {
+                    query.append(kvp("userPoolId", userPoolId));
+                }
+
+                std::vector<Entity::Cognito::User> users;
+                for (auto userCursor = _userCollection.find(query.extract()); auto user: userCursor) {
+                    Entity::Cognito::User result;
+                    result.FromDocument(user);
+                    users.push_back(result);
+                }
+                return users;
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.ListUsers(region, userPoolId);
+    }
+
+    std::vector<Entity::Cognito::User> CognitoDatabase::ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
+                std::vector<Entity::Cognito::User> users;
+
+                document query;
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                for (auto userCursor = _userCollection.find(query.extract(), opts); auto user: userCursor) {
+                    Entity::Cognito::User result;
+                    result.FromDocument(user);
+                    users.push_back(result);
+                }
+                return users;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            users = _memoryDb.ListUsers(region, userPoolId);
         }
-
-        log_trace << "Got user list, size:" << users.size();
-        return users;
+        return _memoryDb.ExportUsers(sortColumns);
     }
 
     std::vector<Entity::Cognito::User> CognitoDatabase::ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
@@ -605,7 +656,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateUser(user);
     }
 
-    Entity::Cognito::User CognitoDatabase::CreateOrUpdateUser(Entity::Cognito::User &user) {
+    Entity::Cognito::User CognitoDatabase::CreateOrUpdateUser(Entity::Cognito::User &user) const {
 
         if (UserExists(user.region, user.userPoolId, user.userName)) {
 
@@ -694,7 +745,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
-            const std::optional<value> mResult = _groupCollection.find_one(make_document(kvp("_id", oid)));
+            const auto mResult = _groupCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Cognito not found ";
                 throw Core::DatabaseException("Database exception, Cognito not found ");
@@ -717,8 +768,8 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _userCollection = (*client)[_databaseName][_groupCollectionName];
-                const auto mResult = _userCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
+                mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+                const auto mResult = _groupCollection.find_one(make_document(kvp("region", region), kvp("userPoolId", userPoolId), kvp("groupName", groupName)));
                 if (!mResult) {
                     log_error << "Database exception: group not found ";
                     throw Core::DatabaseException("Database exception, group not found ");
@@ -736,6 +787,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetGroupByGroupName(region, userPoolId, groupName);
     }
 
+    // TODO: write tests
     Entity::Cognito::Group CognitoDatabase::CreateGroup(Entity::Cognito::Group &group) const {
 
         if (HasDatabase()) {
@@ -798,6 +850,42 @@ namespace AwsMock::Database {
 
         log_trace << "Got group list, size:" << groups.size();
         return groups;
+    }
+
+    std::vector<Entity::Cognito::Group> CognitoDatabase::ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _groupCollection = (*client)[_databaseName][_groupCollectionName];
+
+                document query;
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                std::vector<Entity::Cognito::Group> groups;
+                for (auto groupCursor = _groupCollection.find(query.extract(), opts); auto group: groupCursor) {
+                    Entity::Cognito::Group result;
+                    result.FromDocument(group);
+                    groups.push_back(result);
+                }
+                log_trace << "Got group list, size:" << groups.size();
+                return groups;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.ExportGroups(sortColumns);
     }
 
     void CognitoDatabase::DeleteGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {

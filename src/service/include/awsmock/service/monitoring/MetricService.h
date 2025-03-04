@@ -242,6 +242,16 @@ namespace AwsMock::Monitoring {
         long _port;
 
         /**
+         * Prometheus flag
+         */
+        bool _prometheus;
+
+        /**
+         * Intern flag
+         */
+        bool _intern;
+
+        /**
          * Mutex
          */
         static boost::mutex _gaugeMutex;

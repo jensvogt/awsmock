@@ -20,6 +20,7 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
@@ -168,6 +169,13 @@ namespace AwsMock::Core {
          * @return URL of the queue
          */
         static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl);
+
+        /**
+         * @brief Creates a queue ARN
+         *
+         * @return SQS sender ID
+         */
+        static std::string CreateSQSSenderId();
 
         /**
          * @brief  Create SNS topic ARN

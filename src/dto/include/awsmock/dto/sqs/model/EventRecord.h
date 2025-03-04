@@ -10,13 +10,12 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
-
     struct Record {
-
         /**
          * Region
          */
@@ -45,7 +44,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attributes
          */
-        MessageAttributeList messagesAttributes;
+        MessageAttributeList messageAttributes;
 
         /**
          * MD5 sum
@@ -97,7 +96,6 @@ namespace AwsMock::Dto::SQS {
          */
         friend std::ostream &operator<<(std::ostream &os, const Record &r);
     };
-
 }// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_EVENT_RECORD_H

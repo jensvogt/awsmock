@@ -39,6 +39,7 @@ namespace AwsMock::Service {
 
             // General configuration
             StartGateway();
+
             _region = GetRegion();
             _endpoint = GetEndpoint();
         }

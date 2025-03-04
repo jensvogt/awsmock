@@ -6,25 +6,24 @@
 
 namespace AwsMock::Dto::KMS {
 
-    void Key::FromJson(const std::string &jsonString) {
+    void Key::FromDocument(const view_or_value<view, value> &jsonObject) {
 
         try {
 
-            const value document = bsoncxx::from_json(jsonString);
-            keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
-            keySpec = KeySpecFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeySpec"));
-            keyUsage = KeyUsageFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeyUsage"));
-            keyState = KeyStateFromString(Core::Bson::BsonUtils::GetStringValue(document, "KeyState"));
-            description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
-            arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
-            creationDate = Core::Bson::BsonUtils::GetLongValue(document, "CreationDate");
-            multiRegion = Core::Bson::BsonUtils::GetBoolValue(document, "MultiRegion");
-            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "Enabled");
-            origin = OriginFromString(Core::Bson::BsonUtils::GetStringValue(document, "Origin"));
+            keyId = Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyId");
+            keySpec = KeySpecFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeySpec"));
+            keyUsage = KeyUsageFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyUsage"));
+            keyState = KeyStateFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyState"));
+            description = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Description");
+            arn = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Arn");
+            creationDate = Core::Bson::BsonUtils::GetLongValue(jsonObject, "CreationDate");
+            multiRegion = Core::Bson::BsonUtils::GetBoolValue(jsonObject, "MultiRegion");
+            enabled = Core::Bson::BsonUtils::GetBoolValue(jsonObject, "Enabled");
+            origin = OriginFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "Origin"));
 
             // Grant tokens
-            if (document.view().find("EncryptionAlgorithms") != document.view().end()) {
-                for (const bsoncxx::array::view jsonArray = document.view()["EncryptionAlgorithms"].get_array().value; const auto &element: jsonArray) {
+            if (jsonObject.view().find("EncryptionAlgorithms") != jsonObject.view().end()) {
+                for (const bsoncxx::array::view jsonArray = jsonObject.view()["EncryptionAlgorithms"].get_array().value; const auto &element: jsonArray) {
                     encryptionAlgorithms.emplace_back(EncryptionAlgorithmsFromString(std::string(element.get_string().value)));
                 }
             }
@@ -33,6 +32,12 @@ namespace AwsMock::Dto::KMS {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
+    }
+
+    void Key::FromJson(const std::string &jsonString) {
+
+        const value document = bsoncxx::from_json(jsonString);
+        FromDocument(document.view());
     }
 
     view_or_value<view, value> Key::ToDocument() const {

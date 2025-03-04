@@ -7,7 +7,7 @@
 #include <vector>
 
 // Asio includes
-#include <asio.hpp>
+#include <boost/asio.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -127,7 +127,7 @@ namespace AwsMock::FtpServer {
          * @param ftp_session FTP session
          * @param error error handler
          */
-        void acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, asio::error_code const &error);
+        void acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, boost::beast::error_code const &error);
 
         /**
          * User database
@@ -152,12 +152,12 @@ namespace AwsMock::FtpServer {
         /**
          * Asio IO module
          */
-        asio::io_service _ioService;
+        boost::asio::io_context _ioService;
 
         /**
          * Asio session acceptor
          */
-        asio::ip::tcp::acceptor _acceptor;
+        boost::asio::ip::tcp::acceptor _acceptor;
 
         /**
          * Number of open connections

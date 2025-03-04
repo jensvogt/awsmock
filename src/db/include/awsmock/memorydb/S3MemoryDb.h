@@ -9,13 +9,16 @@
 #include <ranges>
 #include <string>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
-#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 
@@ -97,6 +100,14 @@ namespace AwsMock::Database {
         Entity::S3::BucketList ListBuckets();
 
         /**
+         * @brief Export all buckets
+         *
+         * @param sortColumns sorting columns
+         * @return BucketList
+         */
+        Entity::S3::BucketList ExportBuckets(const std::vector<Core::SortColumn> &sortColumns = {}) const;
+
+        /**
          * @brief Check whether the bucket has still objects
          *
          * @param bucket bucket entity
@@ -149,7 +160,6 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         long BucketCount() const;
-
 
         /**
          * @brief Purges a bucket
@@ -219,7 +229,27 @@ namespace AwsMock::Database {
          * @return true if existing otherwise false
          * @throws DatabaseException
          */
-        bool ObjectExists(const std::string &filename);
+        bool ObjectExistsInternalName(const std::string &filename);
+
+        /**
+         * @brief Check the existence of an object by OID
+         *
+         * @param oid object ID
+         * @return true if existing otherwise false
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &oid) const;
+
+        /**
+         * @brief Bucket exists
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @param key S3 key
+         * @return true if object exists
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const;
 
         /**
          * @brief Create a new S3 object in the S3 object table
@@ -300,8 +330,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all objects
+         *
+         * @retrun number of objects deleted.
          */
-        void DeleteAllObjects();
+        long DeleteAllObjects();
 
       private:
 

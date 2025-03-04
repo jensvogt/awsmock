@@ -19,7 +19,7 @@ namespace AwsMock::Dto::SNS {
                 }
                 rootDocument.append(kvp("TagCounters", tagArray));
             }
-            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Total", total);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "Total", bsoncxx::types::b_int64(total));
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {

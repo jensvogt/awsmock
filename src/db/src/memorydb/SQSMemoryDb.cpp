@@ -2,6 +2,7 @@
 // Created by vogje01 on 11/19/23.
 //
 
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
 namespace AwsMock::Database {
@@ -123,6 +124,21 @@ namespace AwsMock::Database {
         }
 
         log_trace << "Got queue list, size: " << queueList.size();
+        return queueList;
+    }
+
+    Entity::SQS::QueueList SQSMemoryDb::ExportQueues(const std::vector<Core::SortColumn> &sortColumns) {
+
+        Entity::SQS::QueueList queueList;
+        for (auto &val: _queues | std::views::values) {
+            val.size = 0;
+            queueList.emplace_back(val);
+        }
+
+        log_trace << "Got queue list, size: " << queueList.size();
+        std::ranges::sort(queueList, [](const Entity::SQS::Queue &a, const Entity::SQS::Queue &b) {
+            return a.name < b.name;
+        });
         return queueList;
     }
 
@@ -482,7 +498,7 @@ namespace AwsMock::Database {
                                        if (kv.second.queueArn == queue.queueArn) {
                                            return kv.second;
                                        }
-                                       return (Entity::SQS::Message){};
+                                       return Entity::SQS::Message();
                                    });
 
             if (!filtered.empty()) {
@@ -490,9 +506,9 @@ namespace AwsMock::Database {
                 // Sort by created timestamp
                 std::ranges::sort(filtered, [](auto x, auto y) { return x.created > y.created; });
 
-                const double min = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.front().created).count();
+                const double min = std::chrono::duration<double, std::milli>(system_clock::now() - filtered.front().created).count();
 
-                if (double max = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - filtered.back().created).count(); max + min > 5) {
+                if (const double max = std::chrono::duration<double, std::milli>(system_clock::now() - filtered.back().created).count(); max + min > 5) {
                     waitTime.waitTime[queue.name] = (max + min) / 2.0;
                 } else {
                     waitTime.waitTime[queue.name] = 0.0;
@@ -539,10 +555,12 @@ namespace AwsMock::Database {
         return count;
     }
 
-    void SQSMemoryDb::DeleteAllMessages() {
+    long SQSMemoryDb::DeleteAllMessages() {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
-        log_debug << "All resources deleted, count: " << _messages.size();
+        const long count = _messages.size();
         _messages.clear();
+        log_debug << "All resources deleted, count: " << count;
+        return count;
     }
 }// namespace AwsMock::Database

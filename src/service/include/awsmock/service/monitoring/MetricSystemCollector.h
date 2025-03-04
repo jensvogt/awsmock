@@ -6,7 +6,16 @@
 #define AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
 
 // C includes
+#ifndef _WIN32
 #include <sys/times.h>
+#endif
+
+#ifdef __linux__
+#include <sys/sysinfo.h>
+#elif __APPLE__
+#include <mach/mach.h>
+#include <sys/resource.h>
+#endif
 
 // C++ Standard includes
 #include <cassert>
@@ -16,10 +25,15 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
+
+#ifdef _WIN32
+#include "windows.h"
+#include <Wbemidl.h>
+#include <comdef.h>
+#endif
 
 namespace AwsMock::Monitoring {
 
@@ -37,34 +51,94 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor.
          */
-        explicit MetricSystemCollector();
+        explicit AWSMOCK_API MetricSystemCollector();
 
         /**
          * @brief Updates the system counter
          */
-        void CollectSystemCounter();
+        AWSMOCK_API void CollectSystemCounter();
+
+#ifdef __APPLE__
+
+        /**
+        * @brief Get number of threads on MacOS
+        */
+        void GetThreadInfoMac();
+
+        /**
+         * @brief Get CPU utilization on MacOS
+         */
+        void GetCpuInfoMac();
+
+        /**
+         * @brief Get memory utilization on MacOS
+         */
+        static void GetMemoryInfoMac();
+
+#elif __linux__
+
+        /**
+         * @brief Get number of threads on MacOS
+         */
+        static void GetThreadInfoLinux();
+
+        /**
+         * @brief Get CPU utilization on MacOS
+        */
+        void GetCpuInfoLinux();
+
+        /**
+         * @brief Get memory info on Linux systems
+         */
+        static void GetMemoryInfoLinux();
+
+#elif _WIN32
+
+        /**
+         * @brief Get CPU utilization on Windows
+         */
+        void GetCpuInfoWin32() const;
+
+        /**
+         * @brief Get memory utilization on Win32
+         */
+        void GetMemoryInfoWin32() const;
+
+        /**
+         * @brief Get memory utilization on Win32
+         */
+        void GetThreadInfoWin32() const;
+
+#endif
 
       private:
 
-        /**
-         * Number of processors
-         */
-        int _numProcessors{};
+#ifdef __linux__
+        clock_t _lastTime = 0;
+        clock_t _lastTotalCPU = 0;
+        clock_t _lastSysCPU = 0;
+        clock_t _lastUserCPU = 0;
+#elif _WIN32
 
         /**
-         * Last CPU
+         * Windows WMI service
          */
-        clock_t _lastCPU{};
+        IWbemServices *pSvc = nullptr;
 
         /**
-         * Last system CPU
+         * @brief Returns value from WMI
+         *
+         * @param counter name of the WMI counter
+         * @return value of the WMI counter
          */
-        clock_t _lastSysCPU{};
+        long long GetPerformanceValue(const std::string &counter) const;
+
+#endif
 
         /**
-         * Last user CPU
+         * Start time
          */
-        clock_t _lastUserCPU{};
+        system_clock::time_point _startTime;
 
         /**
          * Monitoring period

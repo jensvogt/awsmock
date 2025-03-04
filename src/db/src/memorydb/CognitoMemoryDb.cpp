@@ -45,6 +45,20 @@ namespace AwsMock::Database {
         return userPoolList;
     }
 
+    Entity::Cognito::UserPoolList CognitoMemoryDb::ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        Entity::Cognito::UserPoolList userPoolList;
+        for (const auto &val: _userPools | std::views::values) {
+            userPoolList.emplace_back(val);
+        }
+
+        log_trace << "Got user pool list, size: " << userPoolList.size();
+        std::ranges::sort(userPoolList, [](const Entity::Cognito::UserPool &a, const Entity::Cognito::UserPool &b) {
+            return a.name < b.name;
+        });
+        return userPoolList;
+    }
+
     Entity::Cognito::UserPool CognitoMemoryDb::CreateUserPool(const Entity::Cognito::UserPool &userPool) {
         boost::mutex::scoped_lock lock(_userPoolMutex);
 
@@ -261,6 +275,7 @@ namespace AwsMock::Database {
     std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsers(const std::string &region, const std::string &userPoolId) const {
 
         Entity::Cognito::UserList userList;
+
         if (!region.empty() && !userPoolId.empty()) {
 
             for (const auto &val: _users | std::views::values) {
@@ -288,12 +303,26 @@ namespace AwsMock::Database {
         return userList;
     }
 
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const {
+
+        Entity::Cognito::UserList userList;
+        for (const auto &val: _users | std::views::values) {
+            userList.emplace_back(val);
+        }
+
+        log_trace << "Got user list, size: " << userList.size();
+        std::ranges::sort(userList, [](const Entity::Cognito::User &a, const Entity::Cognito::User &b) {
+            return a.userName < b.userName;
+        });
+        return userList;
+    }
+
     std::vector<Entity::Cognito::User> CognitoMemoryDb::ListUsersInGroup(const std::string &region, const std::string &userPoolId, const std::string &groupName) {
 
         Entity::Cognito::UserList userList;
 
         for (const auto &val: _users | std::views::values) {
-            if (val.region == region && val.userPoolId == userPoolId && std::find_if(val.groups.begin(), val.groups.end(), [&groupName](const Entity::Cognito::Group &g) {
+            if (val.region == region && val.userPoolId == userPoolId && std::ranges::find_if(val.groups, [&groupName](const Entity::Cognito::Group &g) {
                                                                             return g.groupName == groupName;
                                                                         }) != val.groups.end()) {
                 userList.emplace_back(val);
@@ -399,6 +428,20 @@ namespace AwsMock::Database {
             }
         }
 
+        log_trace << "Got group list, size: " << groupList.size();
+        return groupList;
+    }
+
+    std::vector<Entity::Cognito::Group> CognitoMemoryDb::ExportGroups(const std::vector<Core::SortColumn> &sortColumns) {
+
+        Entity::Cognito::GroupList groupList;
+        for (const auto &val: _groups | std::views::values) {
+            groupList.emplace_back(val);
+        }
+
+        std::ranges::sort(groupList, [](const Entity::Cognito::Group &g1, const Entity::Cognito::Group &g2) {
+            return g1.groupName < g2.groupName;
+        });
         log_trace << "Got group list, size: " << groupList.size();
         return groupList;
     }

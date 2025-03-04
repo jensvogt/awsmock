@@ -10,8 +10,8 @@
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
-#include <awsmock/dto/lambda/ListFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
 #include <awsmock/entity/lambda/Lambda.h>
 

@@ -124,6 +124,14 @@ namespace AwsMock::Database {
         Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
 
         /**
+         * @brief Export all buckets
+         *
+         * @param sortColumns sorting columns
+         * @return BucketList
+         */
+        Entity::S3::BucketList ExportBuckets(const std::vector<Core::SortColumn> &sortColumns = {}) const;
+
+        /**
          * @brief Check whether the bucket has still objects
          *
          * @param bucket bucket entity
@@ -179,6 +187,13 @@ namespace AwsMock::Database {
         long GetBucketSize(const std::string &region, const std::string &bucket) const;
 
         /**
+         * @brief Adjust the bucket counters
+         * @param region AWS region
+         * @param bucketName bucket name
+         */
+        void AdjustBucketCounters(const std::string &region, const std::string &bucketName) const;
+
+        /**
          * @brief Create a new bucket or updated a existing bucket
          *
          * @param bucket bucket entity
@@ -222,6 +237,26 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         bool ObjectExists(const Entity::S3::Object &object) const;
+
+        /**
+         * @brief Check the existence of an object by OID
+         *
+         * @param oid object ID
+         * @return true if existing otherwise false
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &oid) const;
+
+        /**
+         * @brief Bucket exists
+         *
+         * @param region AWS region
+         * @param bucket bucket name
+         * @param key S3 key
+         * @return true if object exists
+         * @throws DatabaseException
+         */
+        bool ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const;
 
         /**
          * @brief Check the existence of an object by internal name
@@ -391,8 +426,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all objects
+         *
+         * @retrun number of objects deleted.
          */
-        void DeleteAllObjects() const;
+        long DeleteAllObjects() const;
 
       private:
 

@@ -12,7 +12,6 @@
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/client.hpp>
-#include <mongocxx/options/find_one_and_update.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -161,6 +160,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
+
+        /**
+         * @brief List available queues, using paging
+         *
+         * @param sortColumns vector of sort columns
+         * @return List of SQS queues
+         * @throws DatabaseException
+         */
+        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief List all available queues
@@ -455,9 +463,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes a resources.
          *
+         * @return total number of message deleted
          * @throws Core::DatabaseException
          */
-        void DeleteAllMessages() const;
+        long DeleteAllMessages() const;
 
         /**
          * @brief Adjust all message counters

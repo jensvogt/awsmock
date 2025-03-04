@@ -28,7 +28,11 @@ namespace AwsMock::Dto::SQS {
                     document messageAttributesDocument;
                     MessageAttributeList messageAttributeListDto = Mapper::map(message.messageAttributes);
                     for (const auto &[fst, snd]: messageAttributeListDto) {
-                        messageAttributesDocument.append(kvp(fst, snd.ToDocument()));
+                        document messageAttributeDocument;
+                        Core::Bson::BsonUtils::SetStringValue(messageAttributeDocument, "StringValue", snd.stringValue);
+                        Core::Bson::BsonUtils::SetLongValue(messageAttributeDocument, "NumberValue", snd.numberValue);
+                        Core::Bson::BsonUtils::SetStringValue(messageAttributeDocument, "DataType", MessageAttributeDataTypeToString(snd.type));
+                        messageAttributesDocument.append(kvp(fst, messageAttributeDocument));
                     }
                     messageDocument.append(kvp("MessageAttributes", messageAttributesDocument.extract()));
 

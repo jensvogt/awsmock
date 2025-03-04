@@ -75,14 +75,6 @@ namespace AwsMock::Dto::S3 {
         RestoreStatus restoreStatus;
 
         /**
-         * Convert to a XML element
-         *
-         * @param pDoc XML document
-         * @return XML element
-         */
-        //[[nodiscard]] Poco::XML::AutoPtr<Poco::XML::Element> ToXmlElement(Poco::XML::AutoPtr<Poco::XML::Document> pDoc) const;
-
-        /**
          * Convert to a JSON object
          *
          * @return JSON object

@@ -20,13 +20,24 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#include <sys/types.h>
+#endif
+
 // Boost includes
-#include <boost/asio/detail/config.hpp>
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/process/v1.hpp>
+#include <boost/thread/thread.hpp>
+#ifdef _WIN32
+#include <boost/process/v1/windows.hpp>
+#endif
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/Macros.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/exception/CoreException.h>
@@ -108,6 +119,15 @@ namespace AwsMock::Core {
          * @return number of CPU cores
          */
         static int GetNumberOfCores();
+
+        /**
+         * @brief Run command in a shell
+         * @param shellcmd command
+         * @param input input stream
+         * @param output output stream
+         * @param error error stream
+         */
+        static void RunShellCommand(const std::string &shellcmd, const std::string &input, std::string &output, std::string &error);
     };
 
 }// namespace AwsMock::Core

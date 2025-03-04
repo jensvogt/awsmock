@@ -25,8 +25,8 @@ namespace AwsMock::Dto::S3 {
                 Poco::XML::Node *sseEncryptionConfiguration = ruleNode->firstChild();
 
                 if (sseEncryptionConfiguration) {
-                    for (int i = 0; i < sseEncryptionConfiguration->childNodes()->length(); i++) {
-                        Poco::XML::Node *childNode = sseEncryptionConfiguration->childNodes()->item(i);
+                    for (int i = 0; i < sseEncryptionconfiguration.childNodes()->length(); i++) {
+                        Poco::XML::Node *childNode = sseEncryptionconfiguration.childNodes()->item(i);
                         if (childNode->nodeName() == "SSEAlgorithm") {
                             sseAlgorithm = childNode->lastChild()->innerText();
                         } else if (childNode->nodeName() == "KMSKeyID" || childNode->nodeName() == "KMSMasterKeyID") {

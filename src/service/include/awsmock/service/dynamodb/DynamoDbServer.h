@@ -21,10 +21,6 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
-#define DYNAMODB_DEFAULT_MONITORING_PERIOD 300
-#define DYNAMODB_DEFAULT_WORKER_PERIOD 300
-#define DYNAMODB_DOCKER_PORT 8000
-#define DYNAMODB_DOCKER_HOST "localhost"
 #define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
                              "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
                              "WORKDIR /home/dynamodblocal\n"                                 \

@@ -8,9 +8,11 @@
 // C includes
 #include <cerrno>
 #include <fcntl.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
+#ifndef _WIN32
+#include <sys/mman.h>
 #include <unistd.h>
+#endif
 
 // C++ includes
 #include <string>

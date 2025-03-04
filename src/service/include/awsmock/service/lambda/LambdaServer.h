@@ -21,10 +21,6 @@
 #include <awsmock/service/lambda/LambdaExecutor.h>
 #include <awsmock/service/s3/S3Service.h>
 
-#define LAMBDA_DEFAULT_MONITORING_PERIOD 300
-#define LAMBDA_DEFAULT_WORKER_PERIOD 300
-#define LAMBDA_DEFAULT_LIFETIME 3600
-
 namespace AwsMock::Service {
 
     /**
@@ -51,7 +47,7 @@ namespace AwsMock::Service {
         /**
          * @brief Delete dangling, stopped containers
          */
-        void CleanupContainers() const;
+        void CleanupDocker() const;
 
         /**
          * @brief Delete instances from database, which are not running

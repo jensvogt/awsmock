@@ -15,8 +15,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
                     kvp("region", region),
                     kvp("name", name),
                     kvp("status", status),
-                    kvp("size", size),
-                    kvp("itemCount", itemCount),
+                    kvp("size", bsoncxx::types::b_int64(size)),
+                    kvp("itemCount", bsoncxx::types::b_int64(itemCount)),
                     kvp("created", bsoncxx::types::b_date(created)),
                     kvp("modified", bsoncxx::types::b_date(modified)));
 

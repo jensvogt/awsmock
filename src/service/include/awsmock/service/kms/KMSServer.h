@@ -51,7 +51,7 @@ namespace AwsMock::Service {
         KMSWorker _kmsWorker;
 
         /**
-         * KMS server period
+         * @brief KMS server period
          *
          * <p>
          * Used for the background threads (cleanup, reset, retention, etc.)

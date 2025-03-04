@@ -73,7 +73,9 @@ namespace AwsMock::Service {
                     std::string message = Core::HttpUtils::GetQueryParameterValueByName(clientCommand.payload, "Message");
                     std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes = GetMessageAttributes(clientCommand.payload);
 
-                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish({.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .messageAttributes = messageAttributes, .requestId = clientCommand.requestId});
+                    Dto::SNS::PublishRequest snsRequest = {.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .messageAttributes = messageAttributes, .requestId = clientCommand.requestId};
+                    Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
+                    log_trace << "SNS PUBLISH, request: " << snsRequest.ToString();
 
                     std::map<std::string, std::string> headers;
                     headers["Content-Type"] = "application/xml";
@@ -274,18 +276,11 @@ namespace AwsMock::Service {
                 }
             }
 
-        } catch (Core::DatabaseException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
-        } catch (Core::JsonException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
-        } catch (Core::ServiceException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
-        } catch (Core::NotFoundException &e) {
-            log_error << e.message();
-            return SendInternalServerError(request, e.message());
+        } catch (std::exception &e) {
+            return SendInternalServerError(request, e.what());
+        } catch (...) {
+            log_error << "Unknown exception";
+            return SendInternalServerError(request, "Unknown exception");
         }
     }
 

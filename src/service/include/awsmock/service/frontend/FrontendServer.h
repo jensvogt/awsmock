@@ -10,7 +10,7 @@
 #include <string>
 
 // Boost includes
-#include <asio/ip/tcp.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -29,9 +29,21 @@ namespace AwsMock::Service::Frontend {
         FrontendServer() = default;
 
         /**
+         * @brief Stop signal handler
+         */
+        void Stop() { _running = false; }
+
+        /**
          * @brief HTTP request worker
          */
-        void operator()() const;
+        void operator()();
+
+      private:
+
+        /**
+         * Running flag
+         */
+        bool _running = false;
     };
 
 }// namespace AwsMock::Service::Frontend

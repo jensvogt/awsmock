@@ -20,7 +20,7 @@ namespace AwsMock::Database::Entity::SNS {
                           kvp("targetArn", targetArn),
                           kvp("message", message),
                           kvp("messageId", messageId),
-                          kvp("size", size),
+                          kvp("size", bsoncxx::types::b_int64(size)),
                           kvp("status", MessageStatusToString(status)),
                           kvp("messageAttribute", messageAttributesDoc));
         MongoUtils::SetDatetime(messageDoc, "lastSend", lastSend);

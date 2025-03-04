@@ -187,7 +187,7 @@ namespace AwsMock::Database {
          *
          * @return list of all modules
          */
-        Entity::Module::ModuleList ListModules() const;
+        [[nodiscard]] Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Deletes module

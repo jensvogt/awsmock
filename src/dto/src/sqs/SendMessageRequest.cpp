@@ -52,13 +52,11 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetIntValue(rootDocument, "DelaySeconds", delaySeconds);
 
             if (!messageAttributes.empty()) {
-                array jsonMessageAttributeArray;
+                document jsonMessageAttribute;
                 for (const auto &[fst, snd]: messageAttributes) {
-                    document jsonAttribute;
-                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
-                    jsonMessageAttributeArray.append(jsonAttribute);
+                    jsonMessageAttribute.append(kvp(fst, snd.ToDocument()));
                 }
-                rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
+                rootDocument.append(kvp("messageAttributes", jsonMessageAttribute));
             }
 
             if (!attributes.empty()) {

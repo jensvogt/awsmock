@@ -17,7 +17,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * Create KMS key response
+     * @brief Create KMS key response
      *
      * Example:
      * @code{.json}
@@ -73,6 +73,13 @@ namespace AwsMock::Dto::KMS {
          * Key metadata
          */
         Key key;
+
+        /**
+         * @brief Convert to from a JSON string
+         *
+         * @param jsonString JSON string
+         */
+        void FromJson(const std::string &jsonString);
 
         /**
          * @brief Convert to a JSON string

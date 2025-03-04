@@ -18,6 +18,11 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
+    /**
+     * @brief Cognito user group
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct Group {
 
         /**

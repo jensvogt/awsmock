@@ -8,11 +8,14 @@
 // C++ includes
 #include <string>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/SortColumn.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
-#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 
@@ -97,12 +100,20 @@ namespace AwsMock::Database {
         Entity::SNS::Topic GetTopicByName(const std::string &region, const std::string &topicName);
 
         /**
+         * @brief Return a topic by target ARN
+         *
+         * @param targetArn target ARN
+         * @return topic with given target ARN
+         */
+        Entity::SNS::Topic GetTopicByTargetArn(const std::string &targetArn);
+
+        /**
          * @brief Return a list of topics with the given subscription ARN
          *
          * @param subscriptionArn subscription ARN
          * @return topic with given topic ARN
          */
-        Entity::SNS::TopicList GetTopicsBySubscriptionArn(const std::string &subscriptionArn);
+        Entity::SNS::TopicList GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const;
 
         /**
          * @brief Updates an existing topic in the SNS topic table
@@ -121,6 +132,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SNS::TopicList ListTopics(const std::string &region = {}) const;
+
+        /**
+         * @brief Export all available topics
+         *
+         * @param sortColumns sort columns
+         * @return list of SNS topics
+         * @throws DatabaseException
+         */
+        Entity::SNS::TopicList ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Counts the number of topics
@@ -205,7 +225,7 @@ namespace AwsMock::Database {
          * @return list of SNS resources
          * @throws DatabaseException
          */
-        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {});
+        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}) const;
 
         /**
          * @brief Updates a given message.

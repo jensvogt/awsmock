@@ -10,13 +10,10 @@
 
 // Boost includes
 #include <boost/beast/http/message.hpp>
-#include <boost/beast/http/string_body.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -25,6 +22,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported Lambda client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class LambdaCommandType {
         CREATE_LAMBDA,
         DELETE_LAMBDA,
@@ -37,6 +39,18 @@ namespace AwsMock::Dto::Common {
         TAG_LAMBDA,
         GET_FUNCTION_COUNTERS,
         RESET_FUNCTION_COUNTERS,
+        UPLOAD_FUNCTION_CODE,
+        LIST_TAG_COUNTERS,
+        ADD_TAG,
+        DELETE_TAG,
+        UPDATE_TAG,
+        LIST_ENVIRONMENT_COUNTERS,
+        ADD_ENVIRONMENT,
+        DELETE_ENVIRONMENT,
+        UPDATE_ENVIRONMENT,
+        START_FUNCTION,
+        STOP_FUNCTION,
+        DELETE_IMAGE,
         UNKNOWN
     };
 
@@ -51,9 +65,22 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS, "list-event-source-mappings"},
             {LambdaCommandType::TAG_LAMBDA, "function-tag"},
             {LambdaCommandType::GET_FUNCTION_COUNTERS, "get-function-counters"},
-            {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"}};
+            {LambdaCommandType::RESET_FUNCTION_COUNTERS, "reset-function-counters"},
+            {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
+            {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
+            {LambdaCommandType::ADD_TAG, "add-function-tag"},
+            {LambdaCommandType::DELETE_TAG, "delete-function-tag"},
+            {LambdaCommandType::UPDATE_TAG, "update-function-tag"},
+            {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
+            {LambdaCommandType::ADD_ENVIRONMENT, "add-function-environment"},
+            {LambdaCommandType::DELETE_ENVIRONMENT, "delete-function-environment"},
+            {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
+            {LambdaCommandType::START_FUNCTION, "start-function"},
+            {LambdaCommandType::STOP_FUNCTION, "stop-function"},
+            {LambdaCommandType::DELETE_IMAGE, "delete-image"},
+    };
 
-    [[maybe_unused]] static std::string LambdaCommandTypeToString(LambdaCommandType commandType) {
+    [[maybe_unused]] static std::string LambdaCommandTypeToString(const LambdaCommandType &commandType) {
         return LambdaCommandTypeNames[commandType];
     }
 

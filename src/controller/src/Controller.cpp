@@ -11,15 +11,14 @@ namespace AwsMock::Controller {
     AwsMockCtl::AwsMockCtl() {
 
         // Initialize database
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _host = configuration.GetValueString("awsmock.gateway.http.host");
-        _port = configuration.GetValueInt("awsmock.gateway.http.port");
+        _host = Core::Configuration::instance().GetValueString("awsmock.gateway.http.host");
+        _port = Core::Configuration::instance().GetValueInt("awsmock.gateway.http.port");
         _baseUrl = "http://" + _host + ":" + std::to_string(_port);
 
         // Get user/clientId/region
-        _user = configuration.GetValueString("awsmock.user");
-        _clientId = configuration.GetValueString("awsmock.access.client-id");
-        _region = configuration.GetValueString("awsmock.region");
+        _user = Core::Configuration::instance().GetValueString("awsmock.user");
+        _clientId = Core::Configuration::instance().GetValueString("awsmock.access.client-id");
+        _region = Core::Configuration::instance().GetValueString("awsmock.region");
     }
 
     void AwsMockCtl::Initialize(const boost::program_options::variables_map &vm, const std::vector<std::string> &commands) {
@@ -305,7 +304,7 @@ namespace AwsMock::Controller {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "set-log-level");
-        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", level, headers); response.statusCode != boost::beast::http::status::ok) {
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", level, headers); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not set log level, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
@@ -331,7 +330,7 @@ namespace AwsMock::Controller {
         AddStandardHeaders(headers, "get-config");
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
         if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Could not set configuration, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            std::cerr << "Could not get configuration, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return;
         }
 
@@ -384,7 +383,7 @@ namespace AwsMock::Controller {
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "import");
 
-        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", jsonString.str(), headers); response.statusCode != boost::beast::http::status::ok) {
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", jsonString.str(), headers); response.statusCode != boost::beast::http::status::ok) {
             std::cerr << "Could not import objects, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
         }
     }
@@ -432,7 +431,7 @@ namespace AwsMock::Controller {
             return;
         }
 
-        for (std::vector<Dto::Transfer::User> users = Dto::Transfer::User::FromJsonList(response.body); const auto &user: users) {
+        for (const std::vector<Dto::Transfer::User> users = Dto::Transfer::User::FromJsonList(response.body); const auto &user: users) {
             std::cout << "FTP user: " << user.userName << " password: " << user.password << std::endl;
         }
     }
