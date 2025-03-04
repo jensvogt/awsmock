@@ -7,7 +7,7 @@
 
 namespace AwsMock::Service::Frontend {
 
-    void FrontendServer::operator()() const {
+    void FrontendServer::operator()() {
 
         if (!Core::Configuration::instance().GetValueBool("awsmock.frontend.active")) {
             log_info << "Frontend server inactive";
@@ -15,6 +15,8 @@ namespace AwsMock::Service::Frontend {
         }
 
         try {
+            _running = true;
+
             auto const address = net::ip::make_address(Core::Configuration::instance().GetValueString("awsmock.frontend.address"));
             unsigned short port = Core::Configuration::instance().GetValueInt("awsmock.frontend.port");
             std::string doc_root = Core::Configuration::instance().GetValueString("awsmock.frontend.doc-root");
@@ -28,8 +30,11 @@ namespace AwsMock::Service::Frontend {
                 workers.emplace_back(acceptor, doc_root);
                 workers.back().Start();
             }
+
             log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
-            ioc.run();
+            while (_running) {
+                ioc.poll();
+            }
 
         } catch (const std::exception &e) {
             log_error << "Error: " << e.what() << std::endl;

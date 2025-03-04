@@ -200,48 +200,48 @@ namespace AwsMock::Monitoring {
 
 #elif _WIN32
 
-    void MetricSystemCollector::GetCpuInfoWin32() {
+    void MetricSystemCollector::GetCpuInfoWin32() const {
 
         if (const long long elapsed = GetPerformanceValue("ElapsedTime"); elapsed > 0) {
             long long value = GetPerformanceValue("PercentProcessorTime");
             double percent = static_cast<double>(value) / static_cast<double>(elapsed) * 100.0;
-            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", percent <= 100.0 ? percent : 0.0);
             value = GetPerformanceValue("PercentPrivilegedTime");
             percent = static_cast<double>(value) / static_cast<double>(elapsed) * 100.0;
-            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", percent <= 100.0 ? percent : 0.0);
             value = GetPerformanceValue("PercentUserTime");
             percent = static_cast<double>(value) / static_cast<double>(elapsed) * 100.0;
-            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", percent);
+            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", percent <= 100.0 ? percent : 0.0);
         }
     }
 
-    void MetricSystemCollector::GetMemoryInfoWin32() {
+    void MetricSystemCollector::GetMemoryInfoWin32() const {
         MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", GetPerformanceValue("VirtualBytes"));
         MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", GetPerformanceValue("WorkingSetPrivate"));
     }
 
-    void MetricSystemCollector::GetThreadInfoWin32() {
+    void MetricSystemCollector::GetThreadInfoWin32() const {
         MetricService::instance().SetGauge(TOTAL_THREADS, GetPerformanceValue("ThreadCount"));
     }
 
-    long long MetricSystemCollector::GetPerformanceValue(const std::string &counter) {
+    long long MetricSystemCollector::GetPerformanceValue(const std::string &counter) const {
 
         long long value = 0;
 
         IEnumWbemClassObject *pEnumerator = nullptr;
         const std::string query = "SELECT " + counter + " FROM Win32_PerfFormattedData_PerfProc_Process WHERE Name = 'awsmockmgr'";
-        HRESULT hres = pSvc->ExecQuery(bstr_t("WQL"), bstr_t(query.c_str()), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator);
-        if (FAILED(hres)) {
-            log_error << "Query for operating system name failed. Error code = 0x" << std::hex << hres;
-            pSvc->Release();
-            CoUninitialize();
+        if (const HRESULT hResult = pSvc->ExecQuery(bstr_t("WQL"), bstr_t(query.c_str()), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator); FAILED(hResult)) {
+            log_error << "Query for operating system name failed. Error code = 0x" << std::hex << hResult;
             return value;
         }
 
         IWbemClassObject *pclsObj = nullptr;
         ULONG uReturn = 0;
         while (pEnumerator) {
-            pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+            if (const HRESULT hResult = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn); FAILED(hResult)) {
+                log_error << "Could not get performance data, counter: " << counter;
+                break;
+            }
             if (0 == uReturn) {
                 break;
             }
@@ -259,6 +259,8 @@ namespace AwsMock::Monitoring {
                 value = std::stoll(vtProp.bstrVal);
             } else if (vtProp.vt == VT_I8) {
                 value = vtProp.llVal;
+            } else if (vtProp.vt == VT_I4) {
+                value = vtProp.iVal;
             }
             log_trace << "counter: " << counter << ": " << value;
 
