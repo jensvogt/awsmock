@@ -147,6 +147,14 @@ namespace AwsMock::Core {
 #endif
 
         /**
+         * @brief Get the localtime from unix timestamp
+         *
+         * @param timestamp UNIX timestamp
+         * @return system_clock::time_point
+         */
+        static system_clock::time_point FromUnixTimestamp(long long timestamp);
+
+        /**
          * @brief Get the current local time
          *
          * @return local time.
