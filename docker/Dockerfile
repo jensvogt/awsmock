@@ -4,8 +4,6 @@ FROM jensvogt/awsmock-base:latest AS build
 RUN mkdir -p /usr/src
 RUN git config --global http.postBuffer 157286400
 RUN git config --global http.version HTTP/1.1
-RUN git push
-RUN git config --unset http.version
 
 # Install aws-mock
 WORKDIR /usr/src
