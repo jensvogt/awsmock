@@ -117,7 +117,11 @@ namespace AwsMock::Core {
         boost::asio::io_context ios;
         std::future<std::string> outData, errData;
         boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
+
+        // Blocks until command has finished
         ios.run();
+
+        // Get stdout/stderr
         output = outData.get();
         error = errData.get();
     }
