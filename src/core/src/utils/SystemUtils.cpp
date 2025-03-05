@@ -9,7 +9,7 @@ namespace AwsMock::Core {
     ExecResult SystemUtils::Exec(const std::string &command) {
 
         // set up file redirection
-        std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
+        const std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
         std::string cmd = command + " > " + redirection.string() + " 2>&1";
 
         // execute command
@@ -54,8 +54,8 @@ namespace AwsMock::Core {
 
     std::string SystemUtils::GetCurrentWorkingDir() {
 #ifdef WIN32
-        // TODO: Windows port
-        return "";
+        // TODO: Check Linux/maxOS
+        return boost::filesystem::current_path().string();
 #else
         char result[PATH_MAX];
         const ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
@@ -123,22 +123,18 @@ namespace AwsMock::Core {
 #endif
     }
 
-    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::string &input, std::string &output, std::string &error) {
+    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
+        // TODO: Check Linux/macOS
         boost::asio::io_context ios;
-
-        boost::process::async_pipe pipeIn(ios), pipeOut(ios), pipeErr(ios);
+        std::future<std::string> outData, errData;
 #ifdef _WIN32
-        boost::process::child c(shellcmd, boost::process::windows::hide, boost::process::std_out > pipeOut, boost::process::std_err > pipeErr, boost::process::std_in < pipeIn, ios);
+        boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
+        ios.run();
+        output = outData.get();
+        error = errData.get();
 #else
         boost::process::child c("/bin/bash", "-c", shellcmd, boost::process::std_out > pipeOut, boost::process::std_err > pipeErr, boost::process::std_in < pipeIn, ios);
 #endif
-        auto closer = [](boost::process::async_pipe &p) { return [&p](boost::system::error_code, size_t) { p.async_close(); }; };
-
-        async_write(pipeIn, boost::process::buffer(input), closer(pipeIn));
-        async_read(pipeOut, boost::asio::dynamic_buffer(output), closer(pipeOut));
-        async_read(pipeErr, boost::asio::dynamic_buffer(error), closer(pipeErr));
-
-        ios.run();
     }
 }// namespace AwsMock::Core

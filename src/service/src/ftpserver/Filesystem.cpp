@@ -8,6 +8,9 @@
 #ifndef WIN32
 #include <dirent.h>
 #endif
+#include <boost/filesystem/directory.hpp>
+#include <boost/filesystem/file_status.hpp>
+#include <boost/range/iterator_range_core.hpp>
 #include <iomanip>
 #include <iostream>
 #include <list>
@@ -23,15 +26,11 @@
 namespace AwsMock::FtpServer {
 
     FileStatus::FileStatus(const std::string &path) : path_(path), file_status_{} {
-#ifdef WIN32
-        is_ok_ = true;
-#else
         const int error_code = stat(path.c_str(), &file_status_);
         if (error_code) {
             //log_error << "Cannot stat, file: " << path_ << " error: " << error_code;
         }
         is_ok_ = (error_code == 0);
-#endif
     }
 
     bool FileStatus::isOk() const {
@@ -42,10 +41,6 @@ namespace AwsMock::FtpServer {
         if (!is_ok_)
             return FileType::Unknown;
 
-#ifdef WIN32
-        // TODO: Fix win32 porting issues
-        return FileType::Unknown;
-#else
         switch (file_status_.st_mode & S_IFMT) {
             case S_IFREG:
                 return FileType::RegularFile;
@@ -53,6 +48,7 @@ namespace AwsMock::FtpServer {
                 return FileType::Dir;
             case S_IFCHR:
                 return FileType::CharacterDevice;
+#ifndef _WIN32
             case S_IFBLK:
                 return FileType::BlockDevice;
             case S_IFIFO:
@@ -61,10 +57,10 @@ namespace AwsMock::FtpServer {
                 return FileType::SymbolicLink;
             case S_IFSOCK:
                 return FileType::Socket;
+#endif
             default:
                 return FileType::Unknown;
         }
-#endif
     }
 
     int64_t FileStatus::fileSize() const {
@@ -73,28 +69,15 @@ namespace AwsMock::FtpServer {
 
         return file_status_.st_size;
     }
-#ifdef WIN32
-    // TODO: Fix windows porting issues
-    bool FileStatus::permissionRootRead() const { return true; }
-    bool FileStatus::permissionRootWrite() const { return true; }
-    bool FileStatus::permissionRootExecute() const { return true; }
-    bool FileStatus::permissionGroupRead() const { return true; }
-    bool FileStatus::permissionGroupWrite() const { return true; }
-    bool FileStatus::permissionGroupExecute() const { return true; }
-    bool FileStatus::permissionOwnerRead() const { return true; }
-    bool FileStatus::permissionOwnerWrite() const { return true; }
-    bool FileStatus::permissionOwnerExecute() const { return true; }
-#else
-    bool FileStatus::permissionRootRead() const { return 0 != (file_status_.st_mode & S_IRUSR); }
-    bool FileStatus::permissionRootWrite() const { return 0 != (file_status_.st_mode & S_IWUSR); }
-    bool FileStatus::permissionRootExecute() const { return 0 != (file_status_.st_mode & S_IXUSR); }
-    bool FileStatus::permissionGroupRead() const { return 0 != (file_status_.st_mode & S_IRGRP); }
-    bool FileStatus::permissionGroupWrite() const { return 0 != (file_status_.st_mode & S_IWGRP); }
-    bool FileStatus::permissionGroupExecute() const { return 0 != (file_status_.st_mode & S_IXGRP); }
-    bool FileStatus::permissionOwnerRead() const { return 0 != (file_status_.st_mode & S_IROTH); }
-    bool FileStatus::permissionOwnerWrite() const { return 0 != (file_status_.st_mode & S_IWOTH); }
-    bool FileStatus::permissionOwnerExecute() const { return 0 != (file_status_.st_mode & S_IXOTH); }
-#endif
+    bool FileStatus::permissionRootRead() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_read); }
+    bool FileStatus::permissionRootWrite() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_write); }
+    bool FileStatus::permissionRootExecute() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_exe); }
+    bool FileStatus::permissionGroupRead() const { return 0 != (file_status_.st_mode & boost::filesystem::group_read); }
+    bool FileStatus::permissionGroupWrite() const { return 0 != (file_status_.st_mode & boost::filesystem::group_write); }
+    bool FileStatus::permissionGroupExecute() const { return 0 != (file_status_.st_mode & boost::filesystem::group_exe); }
+    bool FileStatus::permissionOwnerRead() const { return 0 != (file_status_.st_mode & boost::filesystem::owner_read); }
+    bool FileStatus::permissionOwnerWrite() const { return 0 != (file_status_.st_mode & boost::filesystem::others_write); }
+    bool FileStatus::permissionOwnerExecute() const { return 0 != (file_status_.st_mode & boost::filesystem::others_exe); }
 
     std::string FileStatus::permissionString() const {
         std::string permission_string(9, '-');
@@ -102,20 +85,32 @@ namespace AwsMock::FtpServer {
         if (!is_ok_)
             return permission_string;
 #ifdef WIN32
-            // TODO: Fix windows porting issues
+        // TODO: Check  Linux/macOS
+        // Root
+        permission_string[0] = ((file_status_.st_mode & boost::filesystem::owner_read) != 0) ? 'r' : '-';
+        permission_string[1] = ((file_status_.st_mode & boost::filesystem::owner_write) != 0) ? 'w' : '-';
+        permission_string[2] = ((file_status_.st_mode & boost::filesystem::owner_exe) != 0) ? 'x' : '-';
+        // Group
+        permission_string[3] = ((file_status_.st_mode & boost::filesystem::group_read) != 0) ? 'r' : '-';
+        permission_string[4] = ((file_status_.st_mode & boost::filesystem::group_write) != 0) ? 'w' : '-';
+        permission_string[5] = ((file_status_.st_mode & boost::filesystem::group_exe) != 0) ? 'x' : '-';
+        // Owner
+        permission_string[6] = ((file_status_.st_mode & boost::filesystem::owner_read) != 0) ? 'r' : '-';
+        permission_string[7] = ((file_status_.st_mode & boost::filesystem::others_write) != 0) ? 'w' : '-';
+        permission_string[8] = ((file_status_.st_mode & boost::filesystem::others_exe) != 0) ? 'x' : '-';
 #else
         // Root
-        permission_string[0] = ((file_status_.st_mode & S_IRUSR) != 0) ? 'r' : '-';
-        permission_string[1] = ((file_status_.st_mode & S_IWUSR) != 0) ? 'w' : '-';
-        permission_string[2] = ((file_status_.st_mode & S_IXUSR) != 0) ? 'x' : '-';
+        permission_string[0] = ((file_status_.st_mode & boost::filesystem::owner_read) != 0) ? 'r' : '-';
+        permission_string[1] = ((file_status_.st_mode & boost::filesystem::owner_write) != 0) ? 'w' : '-';
+        permission_string[2] = ((file_status_.st_mode & boost::filesystem::owner_exe) != 0) ? 'x' : '-';
         // Group
-        permission_string[3] = ((file_status_.st_mode & S_IRGRP) != 0) ? 'r' : '-';
-        permission_string[4] = ((file_status_.st_mode & S_IWGRP) != 0) ? 'w' : '-';
-        permission_string[5] = ((file_status_.st_mode & S_IXGRP) != 0) ? 'x' : '-';
+        permission_string[3] = ((file_status_.st_mode & boost::filesystem::group_read) != 0) ? 'r' : '-';
+        permission_string[4] = ((file_status_.st_mode & boost::filesystem::group_write) != 0) ? 'w' : '-';
+        permission_string[5] = ((file_status_.st_mode & boost::filesystem::group_exe) != 0) ? 'x' : '-';
         // Owner
-        permission_string[6] = ((file_status_.st_mode & S_IROTH) != 0) ? 'r' : '-';
-        permission_string[7] = ((file_status_.st_mode & S_IWOTH) != 0) ? 'w' : '-';
-        permission_string[8] = ((file_status_.st_mode & S_IXOTH) != 0) ? 'x' : '-';
+        permission_string[6] = ((file_status_.st_mode & boost::filesystem::owner_read) != 0) ? 'r' : '-';
+        permission_string[7] = ((file_status_.st_mode & boost::filesystem::others_write) != 0) ? 'w' : '-';
+        permission_string[8] = ((file_status_.st_mode & boost::filesystem::others_exe) != 0) ? 'x' : '-';
 #endif
         return permission_string;
     }
@@ -147,7 +142,7 @@ namespace AwsMock::FtpServer {
         //
         // https://files.stairways.com/other/ftp-list-specs-info.txt
 
-        auto now = std::chrono::system_clock::now();
+        const auto now = std::chrono::system_clock::now();
         const time_t now_time_t = std::chrono::system_clock::to_time_t(now);
         //struct tm* now_timeinfo = localtime(&now_time_t);
         //int current_year = now_timeinfo->tm_year;
@@ -165,7 +160,7 @@ namespace AwsMock::FtpServer {
 #else
         static std::mutex mtx;
         {
-            std::lock_guard<std::mutex> lock(mtx);
+            std::lock_guard lock(mtx);
 
             now_timeinfo = *std::localtime(&now_time_t);
             file_timeinfo = *std::localtime(&file_status_.st_ctime);
@@ -218,8 +213,8 @@ namespace AwsMock::FtpServer {
 
         bool can_open_dir(false);
 #ifdef WIN32
-        // TODO: Fix windows porting issues
-        return true;
+        const boost::filesystem::path p(path_);
+        return is_directory(boost::filesystem::directory_entry(p));
 #else
         DIR *dp = opendir(path_.c_str());
         if (dp != nullptr) {
@@ -234,6 +229,13 @@ namespace AwsMock::FtpServer {
         std::map<std::string, FileStatus> content;
         log_debug << "Get directory content, path: " << path;
 #ifdef WIN32
+        // TODO: Check Linux/macOS
+        if (const boost::filesystem::path p(path); is_directory(boost::filesystem::directory_entry(p))) {
+            for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(p), {})) {
+                std::string tmp = entry.path().filename().string();
+                content.emplace(std::string(entry.path().filename().string()), FileStatus(entry.path().string()));
+            }
+        }
 #else
         DIR *dp = opendir(path.c_str());
         dirent *dirp = nullptr;
@@ -258,7 +260,6 @@ namespace AwsMock::FtpServer {
         }
 
         // Find the root for absolute paths
-
         std::string absolute_root;
 
         if (windows_path) {

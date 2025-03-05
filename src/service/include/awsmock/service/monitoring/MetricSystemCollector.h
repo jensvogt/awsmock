@@ -60,29 +60,29 @@ namespace AwsMock::Monitoring {
 #ifdef __APPLE__
 
         /**
-        * @brief Get number of threads on MacOS
+        * @brief Get number of threads on macOS
         */
         void GetThreadInfoMac();
 
         /**
-         * @brief Get CPU utilization on MacOS
+         * @brief Get CPU utilization on macOS
          */
         void GetCpuInfoMac();
 
         /**
-         * @brief Get memory utilization on MacOS
+         * @brief Get memory utilization on macOS
          */
         static void GetMemoryInfoMac();
 
 #elif __linux__
 
         /**
-         * @brief Get number of threads on MacOS
+         * @brief Get number of threads on macOS
          */
         static void GetThreadInfoLinux();
 
         /**
-         * @brief Get CPU utilization on MacOS
+         * @brief Get CPU utilization on macOS
         */
         void GetCpuInfoLinux();
 
@@ -113,10 +113,26 @@ namespace AwsMock::Monitoring {
       private:
 
 #ifdef __linux__
+
+        /**
+         * Last collection timestamp
+         */
         clock_t _lastTime = 0;
+
+        /**
+         * Last collection timestamp for total CPU utilization
+         */
         clock_t _lastTotalCPU = 0;
+        /**
+         * Last collection timestamp for system CPU utilization
+         */
         clock_t _lastSysCPU = 0;
+
+        /**
+         * Last collection timestamp for user CPU utilization
+         */
         clock_t _lastUserCPU = 0;
+
 #elif _WIN32
 
         /**

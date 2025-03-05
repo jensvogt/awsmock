@@ -26,6 +26,7 @@ namespace AwsMock::FtpServer {
 
     class FileStatus {
       public:
+
         FileStatus(const std::string &path);
 
         bool isOk() const;
@@ -54,13 +55,10 @@ namespace AwsMock::FtpServer {
         bool canOpenDir() const;
 
       private:
+
         std::string path_;
         bool is_ok_;
-#ifdef WIN32
-        struct __stat64 file_status_;
-#else// WIN32
         struct stat file_status_;
-#endif
     };
 
     std::map<std::string, FileStatus> dirContent(const std::string &path);

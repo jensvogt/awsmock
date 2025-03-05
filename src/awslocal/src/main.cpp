@@ -108,7 +108,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Get commands.
-    const std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
+    std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
 
     // Start manager
     AwsMock::AwsLocal::AwsLocal awsLocal;

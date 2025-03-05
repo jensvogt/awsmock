@@ -30,9 +30,6 @@
 #include <boost/asio/read.hpp>
 #include <boost/process.hpp>
 #include <boost/thread/thread.hpp>
-#ifdef _WIN32
-#include <boost/process/windows.hpp>
-#endif
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
@@ -58,7 +55,6 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SystemUtils {
-
       public:
 
         /**
@@ -121,12 +117,14 @@ namespace AwsMock::Core {
 
         /**
          * @brief Run command in a shell
+         *
          * @param shellcmd command
+         * @param args vector of string arguments
          * @param input input stream
          * @param output output stream
          * @param error error stream
          */
-        static void RunShellCommand(const std::string &shellcmd, const std::string &input, std::string &output, std::string &error);
+        static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error);
     };
 
 }// namespace AwsMock::Core

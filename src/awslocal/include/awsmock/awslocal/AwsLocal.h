@@ -18,7 +18,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #ifdef _WIN32
-#include <boost/process/windows.hpp>
+//#include <boost/process/v1/windows.hpp>
 #endif
 
 // AwsMock includes
@@ -60,7 +60,7 @@ namespace AwsMock::AwsLocal {
          *
          * @param command AWS command line command
          */
-        void Run(const std::vector<std::string> &command) const;
+        void Run(std::vector<std::string> &command) const;
 
       private:
 
