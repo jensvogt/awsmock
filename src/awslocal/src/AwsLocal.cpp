@@ -22,10 +22,11 @@ namespace AwsMock::AwsLocal {
     }
 
 
-    void AwsLocal::Run(const std::vector<std::string> &command) const {
+    void AwsLocal::Run(std::vector<std::string> &command) const {
         std::string out, err;
-        const std::string cmds = Core::StringUtils::Join(command, std::string(" "));
-        Core::SystemUtils::RunShellCommand("aws " + cmds + " --endpoint " + _baseUrl, "", out, err);
+        command.push_back("--endpoint");
+        command.push_back(_baseUrl);
+        Core::SystemUtils::RunShellCommand("C:/Program Files/Amazon/AWSCLIV2/aws.exe", command, "", out, err);
         if (!out.empty()) {
             std::cout << out;
         }

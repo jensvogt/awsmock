@@ -932,11 +932,11 @@ namespace AwsMock::FtpServer {
                            createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
             return;
         }
+#endif
         // If would be a good idea to return a 4xx error code here (-> temp error)
         // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
         // errors are permanent.
         sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
-#endif
     }
 
     void FtpSession::handleFtpCommandPWD(const std::string & /*param*/) {
