@@ -34,7 +34,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()){};
 
         /**
          * @brief Singleton instance

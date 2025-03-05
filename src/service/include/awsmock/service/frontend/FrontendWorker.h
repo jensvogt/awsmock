@@ -147,7 +147,7 @@ namespace AwsMock::Service::Frontend {
         /**
          * The timer putting a time limit on requests.
          */
-        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max) ()};
+        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max)()};
 
         /**
          * The string-based response message.

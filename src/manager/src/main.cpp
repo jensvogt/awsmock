@@ -301,7 +301,7 @@ int main(const int argc, char *argv[]) {
 
 #else
 
-    UnixWorker worker;
+    Daemon worker;
     return worker.Run();
 
 #endif

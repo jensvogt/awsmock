@@ -49,12 +49,13 @@
 
 # Doxygen
 **/CMakeDoxyfile.in
-#**/Version.h
 
 # Tests
 Testing
 **/*_tst
 core/tst/*.txt
+**/cmake-build-debug-coverage
+**/test*
 
 # Docs
 docs/html
@@ -72,13 +73,12 @@ dist/samples/database-data
 # executables
 src/controller/awsmockctl
 src/manager/awsmockmgr
+src/awslocal/awslocal
 
 # Examples
 **/out.json
 
 # Tests
-**/cmake-build-debug-coverage
-**/test*
 
 # Visual studio
 ALL_BUILD*

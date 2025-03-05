@@ -78,7 +78,7 @@ namespace AwsMock::Service {
 
         // Write base64 encoded zip file
         const std::string encodedFile = WriteBase64File(functionCode, lambdaEntity, dockerTag);
-        log_debug << "Create Base64 string, length: " << functionCode.size();
+        log_debug << "Created Base64 string, length: " << functionCode.size();
 
         // Unzip provided zip-file into a temporary directory
         codeDir = UnpackZipFile(codeDir, functionCode, lambdaEntity.runtime);
