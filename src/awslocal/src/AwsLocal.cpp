@@ -26,7 +26,7 @@ namespace AwsMock::AwsLocal {
         std::string out, err;
         command.push_back("--endpoint");
         command.push_back(_baseUrl);
-        Core::SystemUtils::RunShellCommand("C:/Program Files/Amazon/AWSCLIV2/aws.exe", command, "", out, err);
+        Core::SystemUtils::RunShellCommand(AWS_CMD, command, "", out, err);
         if (!out.empty()) {
             std::cout << out;
         }

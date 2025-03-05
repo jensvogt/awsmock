@@ -29,6 +29,11 @@
 #define DEFAULT_PROFILE "default"
 #define DEFAULT_BASE_URL "http://localhost:4566";
 
+#ifdef _WIN32
+#define AWS_CMD "C:/Program Files/Amazon/AWSCLIV2/aws.exe"
+#else
+#define AWS_CMD "/snap/bin/aws"
+#endif
 namespace AwsMock::AwsLocal {
 
     /**

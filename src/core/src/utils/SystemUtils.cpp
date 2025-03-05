@@ -130,11 +130,11 @@ namespace AwsMock::Core {
         std::future<std::string> outData, errData;
 #ifdef _WIN32
         boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
+#else
+        boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
+#endif
         ios.run();
         output = outData.get();
         error = errData.get();
-#else
-        boost::process::child c("/bin/bash", "-c", shellcmd, boost::process::std_out > pipeOut, boost::process::std_err > pipeErr, boost::process::std_in < pipeIn, ios);
-#endif
     }
 }// namespace AwsMock::Core
