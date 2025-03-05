@@ -102,37 +102,21 @@ namespace AwsMock::Core {
 
     int SystemUtils::GetNumberOfCores() {
 #ifdef __APPLE__
+        // TODO: Check macOS
         int count;
         size_t countLen;
         sysctlbyname("hw.logicalcpu", &count, &countLen, nullptr, 0);
         return count;
-#elif __linux__
-        char line[128];
-
-        FILE *file = fopen("/proc/cpuinfo", "r");
-        int numCores = 0;
-        while (fgets(line, 128, file) != nullptr) {
-            if (strncmp(line, "processor", 9) == 0)
-                numCores++;
-        }
-        fclose(file);
-        log_debug << "Got number of processors, numProcs: " << numCores;
-        return numCores;
-#elif _WIN32
+#else
         return static_cast<int>(boost::thread::hardware_concurrency());
 #endif
     }
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
-        // TODO: Check Linux/macOS
         boost::asio::io_context ios;
         std::future<std::string> outData, errData;
-#ifdef _WIN32
         boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
-#else
-        boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
-#endif
         ios.run();
         output = outData.get();
         error = errData.get();

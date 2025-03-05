@@ -15,9 +15,9 @@ set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
 include_directories(../include ../../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} ${EXT_INCLUDE})
 link_directories(../core ${EXT_LIB})
 
-add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
+add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SOURCES} ${MODULE_SOURCES}
+        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore)
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore ${LIB_BOOST_THREAD})
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
