@@ -18,7 +18,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #ifdef _WIN32
-#include <boost/process/v1/windows.hpp>
+#include <boost/process/windows.hpp>
 #endif
 
 // AwsMock includes
@@ -80,7 +80,7 @@ namespace AwsMock::AwsLocal {
         /**
          * Port
          */
-        int _port;
+        int _port = DEFAULT_PORT;
 
         /**
          * Base URL

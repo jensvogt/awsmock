@@ -28,10 +28,10 @@
 // Boost includes
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/read.hpp>
-#include <boost/process/v1.hpp>
+#include <boost/process.hpp>
 #include <boost/thread/thread.hpp>
 #ifdef _WIN32
-#include <boost/process/v1/windows.hpp>
+#include <boost/process/windows.hpp>
 #endif
 
 // AwsMock includes
