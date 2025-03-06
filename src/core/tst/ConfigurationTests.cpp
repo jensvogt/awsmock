@@ -22,10 +22,10 @@ namespace AwsMock::Core {
         // act
         EXPECT_THROW({
                      try {
-                     auto configuration = Configuration("");
+                        auto configuration = Configuration("");
                      } catch (const CoreException &e) {
-                     EXPECT_STREQ("Empty filename", e.message().c_str());
-                     throw;
+                         EXPECT_STREQ("Empty configuration filename", e.message().c_str());
+                         throw;
                      } }, CoreException);
 
         // assert

@@ -99,7 +99,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
@@ -110,10 +110,10 @@ namespace AwsMock::Service {
     TEST_F(SNSServerCliTest, TopicListTest) {
 
         // arrange
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
@@ -123,15 +123,15 @@ namespace AwsMock::Service {
     TEST_F(SNSServerCliTest, TopicSubscribeTest) {
 
         // arrange
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
         const std::string queueUrl = GetQueueUrl(output3);
 
         // act
-        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--endpoint-url", queueUrl, "--endpoint", _endpoint});
+        const std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--endpoint-url", queueUrl, "--endpoint", _endpoint});
         const std::string subscriptionArn = GetSubscriptionArn(output4);
 
         // assert
@@ -144,20 +144,20 @@ namespace AwsMock::Service {
 
         // arrange
         // create topic
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint" + _endpoint});
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
         // create queue
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
         const std::string queueUrl = GetQueueUrl(output3);
 
         // subscribe
-        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--endpoint-url", queueUrl, "--endpoint", _endpoint});
+        const std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--endpoint-url", queueUrl, "--endpoint", _endpoint});
         const std::string subscriptionArn = GetSubscriptionArn(output4);
 
         // act
-        const std::string output5 = Core::TestUtils::SendCliCommand("aws", {"sns", "unsubscribe", "--subscription-arn", subscriptionArn, "--endpoint", _endpoint});
+        const std::string output5 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "unsubscribe", "--subscription-arn", subscriptionArn, "--endpoint", _endpoint});
 
         // assert
         EXPECT_TRUE(output5.empty());
@@ -166,12 +166,12 @@ namespace AwsMock::Service {
     TEST_F(SNSServerCliTest, TopicDeleteTest) {
 
         // arrange
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sns", "delete-topic", "--topic-arn", topicArn, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "delete-topic", "--topic-arn", topicArn, "--endpoint", _endpoint});
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
@@ -181,12 +181,12 @@ namespace AwsMock::Service {
     TEST_F(SNSServerCliTest, MessagePublishTest) {
 
         // arrange
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sns", "publish", "--topic-arn", topicArn, "--message", "TEST-BODY", "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "publish", "--topic-arn", topicArn, "--message", "TEST-BODY", "--endpoint", _endpoint});
         const long messageCount = _snsDatabase.CountMessages();
         const std::string messageId = GetMessageId(output3);
 

@@ -75,7 +75,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
         // assert
@@ -86,10 +86,10 @@ namespace AwsMock::Service {
     TEST_F(SQSServerCliTest, QueueListTest) {
 
         // arrange
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
 
         // act
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {" sqs list-queues --endpoint " + _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "list-queues", "--endpoint", _endpoint});
 
         // assert
         EXPECT_TRUE(Core::StringUtils::Contains(output1, TEST_QUEUE));
@@ -98,10 +98,10 @@ namespace AwsMock::Service {
     TEST_F(SQSServerCliTest, QueueGetUrlTest) {
 
         // arrange
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
 
         // act
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws ", {"sqs", "get-queue-url", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "get-queue-url", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
 
         // assert
         EXPECT_TRUE(Core::StringUtils::Contains(output1, TEST_QUEUE));
@@ -110,13 +110,13 @@ namespace AwsMock::Service {
     TEST_F(SQSServerCliTest, QueuePurgeTest) {
 
         // arrange
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
 
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sqs", "send", "queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "purge", "--queue-url", queueUrl, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "purge-queue", "--queue-url", queueUrl, "--endpoint", _endpoint});
         const long messageCount = _sqsDatabase.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, queueUrl));
 
         // assert
@@ -126,12 +126,12 @@ namespace AwsMock::Service {
     TEST_F(SQSServerCliTest, QueueDeleteTest) {
 
         // arrange
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sqs", "get-queue-url", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "get-queue-url", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sqs", "delete-queue", "--queue-url", queueUrl, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "delete-queue", "--queue-url", queueUrl, "--endpoint", _endpoint});
         const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
 
         // assert
@@ -140,11 +140,11 @@ namespace AwsMock::Service {
 
     TEST_F(SQSServerCliTest, MessageSendTest) {
         // arrange
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
 
         // act
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "-- endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
         const long messageCount = _sqsDatabase.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, queueUrl));
 
         // assert
@@ -153,13 +153,13 @@ namespace AwsMock::Service {
 
     TEST_F(SQSServerCliTest, MessageReceiveTest) {
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
 
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "receive-message", "--queue-url", queueUrl, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "receive-message", "--queue-url", queueUrl, "--endpoint", _endpoint});
 
         // assert
         EXPECT_FALSE(output3.empty());
@@ -168,16 +168,16 @@ namespace AwsMock::Service {
 
     TEST_F(SQSServerCliTest, MessageDeleteTest) {
         // arrange
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
 
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
 
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sqs", "receive-message", "--queue-url", queueUrl, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "receive-message", "--queue-url", queueUrl, "--endpoint", _endpoint});
         const std::string receiptHandle = GetReceiptHandle(output2);
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "delete-message", "--queue-url", queueUrl, "--receipt-handle", receiptHandle, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "delete-message", "--queue-url", queueUrl, "--receipt-handle", receiptHandle, "--endpoint", _endpoint});
         const long messageCount = _sqsDatabase.CountMessages(Core::AwsUtils::ConvertSQSQueueUrlToArn(REGION, queueUrl));
 
         // assert

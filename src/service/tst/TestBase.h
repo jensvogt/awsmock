@@ -8,6 +8,12 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 
+#ifdef __linux__
+#define AWS_CMD "/snap/bin/aws"
+#elif __APPLE__
+#define AWS_CMD "/usr/local/bin/aws"
+#endif
+
 namespace AwsMock::Service {
 
     class TestBase {

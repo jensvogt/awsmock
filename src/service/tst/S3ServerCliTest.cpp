@@ -58,7 +58,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
         const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
         // assert
@@ -69,10 +69,10 @@ namespace AwsMock::Service {
 
         // arrange
         std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
 
         // act
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "ls", "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "ls", "--endpoint", _endpoint});
 
         // assert
         EXPECT_FALSE(output2.empty());
@@ -82,10 +82,10 @@ namespace AwsMock::Service {
     TEST_F(S3ServerCliTest, BucketDeleteTest) {
 
         // arrange
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
 
         // act
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "rb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "rb", TEST_BUCKET, "--endpoint", _endpoint});
         const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
         // assert
@@ -96,10 +96,10 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
 
         // act
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
         // assert
@@ -110,11 +110,11 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
 
         // act
-        std::string output3 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", TEST_BUCKET + "/" + filename + " " + filename, "--endpoint", _endpoint});
+        std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", TEST_BUCKET + "/" + filename, filename, "--endpoint", _endpoint});
 
         // assert
         EXPECT_EQ(10, Core::FileUtils::FileSize(filename));
@@ -125,11 +125,11 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", filename + " " + TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
 
         // act
-        std::string output3 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", TEST_BUCKET + "/" + filename, TEST_BUCKET + "/test/" + filename, "--endpoint", _endpoint});
+        std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", TEST_BUCKET + "/" + filename, TEST_BUCKET + "/test/" + filename, "--endpoint", _endpoint});
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
@@ -143,11 +143,11 @@ namespace AwsMock::Service {
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
         const std::string objectName = Core::StringUtils::Split(filename, '/')[2];
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", filename, TEST_BUCKET + "/" + objectName, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + objectName, "--endpoint", _endpoint});
 
         // act
-        std::string output3 = Core::TestUtils::SendCliCommand("aws", {"s3", "mv", TEST_BUCKET + "/" + objectName, TEST_BUCKET + "/test/" + objectName, "--endpoint", _endpoint});
+        std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mv", TEST_BUCKET + "/" + objectName, TEST_BUCKET + "/test/" + objectName, "--endpoint", _endpoint});
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
@@ -158,8 +158,8 @@ namespace AwsMock::Service {
     TEST_F(S3ServerCliTest, ObjectMultipartUploadTest) {
 
         // arrange: Create bucket
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3api", "create-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--endpoint " + _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "create-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--endpoint", _endpoint});
 
         // arrange: CreateMultipartUpload
         Dto::S3::CreateMultipartUploadResult s3Result;
@@ -167,10 +167,10 @@ namespace AwsMock::Service {
 
         // act
         std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);
-        std::string output3 = Core::TestUtils::SendCliCommand("aws", {"s3api", "upload-part", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--part-number", "1", "--body", filename, "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
+        std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "upload-part", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--part-number", "1", "--body", filename, "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
 
         //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
-        std::string output4 = Core::TestUtils::SendCliCommand("aws", {"s3api", "complete-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
+        std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "complete-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
         Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
@@ -182,11 +182,11 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
-        std::string output2 = Core::TestUtils::SendCliCommand("aws", {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
 
         // act
-        std::string output3 = Core::TestUtils::SendCliCommand("aws", {"s3", "rm", TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
+        std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "rm", TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
         // assert

@@ -55,6 +55,7 @@ namespace AwsMock::Core {
 
         // SQS configuration
         Configuration::instance().SetValueBool("awsmock.modules.sqs.active", true);
+        Configuration::instance().SetValueInt("awsmock.modules.sqs.receive-poll", 1000);
 
         // SNS configuration
         Configuration::instance().SetValueBool("awsmock.modules.sns.active", true);
