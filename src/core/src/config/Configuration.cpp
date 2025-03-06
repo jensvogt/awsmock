@@ -56,6 +56,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.modules.sqs.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
         DefineIntProperty("awsmock.modules.sqs.reset.period", "AWSMOCK_WORKER_SQS_RESET_PERIOD", 30);
         DefineIntProperty("awsmock.modules.sqs.counter.period", "AWSMOCK_WORKER_SQS_COUNTER_PERIOD", 30);
+        DefineIntProperty("awsmock.modules.sqs.receive-poll", "AWSMOCK_WORKER_SQS_RECEIVE_POLL", 1000);
 
         // SNS
         DefineBoolProperty("awsmock.modules.sns.active", "AWSMOCK_MODULES_SNS_ACTIVE", true);
