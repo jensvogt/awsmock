@@ -24,8 +24,8 @@ namespace AwsMock::Core {
                      try {
                         auto configuration = Configuration("");
                      } catch (const CoreException &e) {
-                     EXPECT_STREQ("Empty configuration filename", e.message().c_str());
-                     throw;
+                         EXPECT_STREQ("Empty configuration filename", e.message().c_str());
+                         throw;
                      } }, CoreException);
 
         // assert
