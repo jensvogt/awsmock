@@ -103,7 +103,11 @@ namespace AwsMock::Core {
     }
 
     long DateTimeUtils::UnixTimestampNow() {
+#ifdef __APPLE__
+        return timelocal(nullptr);
+#else
         return UnixTimestamp(std::chrono::zoned_time{"Europe/London", system_clock::now()});
+#endif
     }
 
     system_clock::time_point DateTimeUtils::LocalDateTimeNow() {
@@ -124,7 +128,9 @@ namespace AwsMock::Core {
 
     long DateTimeUtils::UtcOffset() {
 #if __APPLE__
-        return 3600;
+        time_t clock;
+        const tm *localTime = localtime(&clock);
+        return localTime->tm_gmtoff;
 #else
         return std::chrono::current_zone()->get_info(system_clock::now()).offset.count();
 #endif
