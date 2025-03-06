@@ -169,9 +169,9 @@ namespace AwsMock::Database {
 #ifdef __APPLE__
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
                 const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
-                auto startUtc = system_clock::time_point(startTime.time_since_epoch());
+                auto startUtc = bsoncxx::types::b_date(system_clock::time_point(startTime.time_since_epoch()));
                 const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
-                auto endUtc = system_clock::time_point(endTime.time_since_epoch());
+                auto endUtc = bsoncxx::types::b_date(system_clock::time_point(endTime.time_since_epoch()));
 #elif __linux__
                 auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
                 auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));

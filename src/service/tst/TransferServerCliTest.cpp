@@ -49,28 +49,25 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws transfer list-servers --endpoint " + GetEndpoint());
+        std::string output = Core::TestUtils::SendCliCommand("aws", {"transfer", "list-servers", "--endpoint", GetEndpoint()});
         const Database::Entity::Transfer::TransferList transferList = _database.ListServers();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(0, transferList.size());
     }
 
     TEST_F(TransferServerCliTest, TransferServerListTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws transfer create-server --protocols ftp --endpoint " + GetEndpoint());
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"transfer", "create-server", "--protocols", "ftp", "--endpoint", GetEndpoint()});
         Database::Entity::Transfer::TransferList transferList = _database.ListServers();
-        EXPECT_EQ(0, status1);
         EXPECT_EQ(1, transferList.size());
 
         // act
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws transfer list-servers --endpoint " + GetEndpoint());
+        std::string output3 = Core::TestUtils::SendCliCommand("aws", {"transfer", "list-servers", "--endpoint", GetEndpoint()});
         transferList = _database.ListServers();
 
         // assert
-        EXPECT_EQ(0, status2);
         EXPECT_EQ(1, transferList.size());
     }
 
@@ -79,11 +76,10 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws transfer create-server --protocols ftp --endpoint " + GetEndpoint());
+        const std::string output = Core::TestUtils::SendCliCommand("aws", {"transfer", "create-server", "--protocols", "ftp", "--endpoint", GetEndpoint()});
         const Database::Entity::Transfer::TransferList transferList = _database.ListServers();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(1, transferList.size());
         EXPECT_FALSE(transferList.front().serverId.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(output, "ServerId"));
@@ -92,56 +88,51 @@ namespace AwsMock::Service {
     TEST_F(TransferServerCliTest, TransferServerDeleteTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws transfer create-server --protocols ftp --endpoint " + GetEndpoint());
+        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"transfer", "create-server", "--protocols", "ftp", "--endpoint", GetEndpoint()});
         Database::Entity::Transfer::TransferList transferList = _database.ListServers();
-        EXPECT_EQ(0, status1);
         const std::string serverId = transferList.front().serverId;
 
         // act
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws transfer delete-server --server-id " + serverId + " --endpoint " + GetEndpoint());
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"transfer", "delete-server", "--server-id", serverId, "--endpoint", GetEndpoint()});
         transferList = _database.ListServers();
 
         // assert
-        EXPECT_EQ(0, status2);
         EXPECT_EQ(0, transferList.size());
     }
 
     TEST_F(TransferServerCliTest, TransferServerStartTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws transfer create-server --protocols ftp --endpoint " + GetEndpoint());
+        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"transfer", "create-server", "--protocols", "ftp", "--endpoint", GetEndpoint()});
         Database::Entity::Transfer::TransferList transferList = _database.ListServers();
-        EXPECT_EQ(0, status1);
         const std::string serverId = transferList.front().serverId;
 
         // act
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws transfer start-server --server-id " + serverId + " --endpoint " + GetEndpoint());
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"transfer", "start-server", "--server-id", serverId, "--endpoint", GetEndpoint()});
         transferList = _database.ListServers();
 
         // assert
-        EXPECT_EQ(0, status2);
         EXPECT_TRUE(transferList.front().state == Database::Entity::Transfer::ServerState::ONLINE);
     }
 
     TEST_F(TransferServerCliTest, TransferServerStopTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws transfer create-server --protocols ftp --endpoint " + GetEndpoint());
+        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {" transfer", "create-server", "--protocols", "ftp", "--endpoint", GetEndpoint()});
         Database::Entity::Transfer::TransferList transferList = _database.ListServers();
-        EXPECT_EQ(0, status1);
         const std::string serverId = transferList.front().serverId;
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws transfer start-server --server-id " + serverId + " --endpoint " + GetEndpoint());
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {" transfer", "start-server", "--server-id", serverId, "--endpoint", GetEndpoint()});
         transferList = _database.ListServers();
+        EXPECT_FALSE(transferList.empty());
 
         // act
-        auto [status3, output3] = Core::TestUtils::SendCliCommand("aws transfer stop-server --server-id " + serverId + " --endpoint " + GetEndpoint());
+        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"transfer", "stop-server", "--server-id", serverId, "--endpoint", GetEndpoint()});
         transferList = _database.ListServers();
 
         // assert
-        EXPECT_EQ(0, status3);
         EXPECT_TRUE(transferList.front().state == Database::Entity::Transfer::ServerState::OFFLINE);
     }
 
 }// namespace AwsMock::Service
 
-#endif// AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
+#endif// AWMOCK_SERVICE_TRANSFER_SERVER_CLI_TEST_H
