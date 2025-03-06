@@ -47,15 +47,7 @@ namespace AwsMock::Core {
     }
 
     int SystemUtils::GetNumberOfCores() {
-#ifdef __APPLE__
-        // TODO: Check macOS
-        int count;
-        size_t countLen;
-        sysctlbyname("hw.logicalcpu", &count, &countLen, nullptr, 0);
-        return count;
-#else
         return static_cast<int>(boost::thread::hardware_concurrency());
-#endif
     }
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
