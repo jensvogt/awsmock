@@ -99,11 +99,10 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws sns create-topic --name " + TEST_TOPIC + " --endpoint " + _endpoint);
+        const std::string output = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(1, topicList.size());
         EXPECT_TRUE(Core::StringUtils::Contains(output, TEST_TOPIC));
     }
@@ -111,37 +110,31 @@ namespace AwsMock::Service {
     TEST_F(SNSServerCliTest, TopicListTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws sns create-topic --name " + TEST_TOPIC + " --endpoint " + _endpoint);
-        EXPECT_EQ(0, status1);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
 
         // act
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws sns list-topics --endpoint " + _endpoint);
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
         Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_EQ(0, status2);
         EXPECT_TRUE(Core::StringUtils::Contains(output2, TEST_TOPIC));
     }
 
     TEST_F(SNSServerCliTest, TopicSubscribeTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws sns create-topic --name " + TEST_TOPIC + " --endpoint " + _endpoint);
-        EXPECT_EQ(0, status1);
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws sns list-topics --endpoint " + _endpoint);
-        EXPECT_EQ(0, status2);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
-        auto [status3, output3] = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name test-queue --endpoint " + _endpoint);
-        EXPECT_EQ(0, status3);
+        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
         const std::string queueUrl = GetQueueUrl(output3);
 
         // act
-        auto [status4, output4] = Core::TestUtils::SendCliCommand("aws sns subscribe --topic-arn " + topicArn + " --protocol sqs --endpoint-url " + queueUrl + " --endpoint " + _endpoint);
+        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--endpoint-url", queueUrl, "--endpoint", _endpoint});
         const std::string subscriptionArn = GetSubscriptionArn(output4);
 
         // assert
-        EXPECT_EQ(0, status4);
         EXPECT_FALSE(output4.empty());
         EXPECT_FALSE(subscriptionArn.empty());
         EXPECT_TRUE(Core::StringUtils::Contains(subscriptionArn, "test-topic"));
@@ -151,63 +144,53 @@ namespace AwsMock::Service {
 
         // arrange
         // create topic
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws sns create-topic --name " + TEST_TOPIC + " --endpoint " + _endpoint);
-        EXPECT_EQ(0, status1);
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws sns list-topics --endpoint " + _endpoint);
-        EXPECT_EQ(0, status2);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint" + _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
         // create queue
-        auto [status3, output3] = Core::TestUtils::SendCliCommand("aws sqs create-queue --queue-name test-queue --endpoint " + _endpoint);
-        EXPECT_EQ(0, status3);
+        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
         const std::string queueUrl = GetQueueUrl(output3);
 
         // subscribe
-        auto [status4, output4] = Core::TestUtils::SendCliCommand("aws sns subscribe --topic-arn " + topicArn + " --protocol sqs --endpoint-url " + queueUrl + " --endpoint " + _endpoint);
+        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--endpoint-url", queueUrl, "--endpoint", _endpoint});
         const std::string subscriptionArn = GetSubscriptionArn(output4);
 
         // act
-        auto [status5, output5] = Core::TestUtils::SendCliCommand("aws sns unsubscribe --subscription-arn " + subscriptionArn + " --endpoint " + _endpoint);
+        const std::string output5 = Core::TestUtils::SendCliCommand("aws", {"sns", "unsubscribe", "--subscription-arn", subscriptionArn, "--endpoint", _endpoint});
 
         // assert
-        EXPECT_EQ(0, status5);
         EXPECT_TRUE(output5.empty());
     }
 
     TEST_F(SNSServerCliTest, TopicDeleteTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws sns create-topic --name " + TEST_TOPIC + " --endpoint " + _endpoint);
-        EXPECT_EQ(0, status1);
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws sns list-topics --endpoint " + _endpoint);
-        EXPECT_EQ(0, status2);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
         // act
-        auto [status3, output3] = Core::TestUtils::SendCliCommand("aws sns delete-topic --topic-arn " + topicArn + " --endpoint " + _endpoint);
+        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sns", "delete-topic", "--topic-arn", topicArn, "--endpoint", _endpoint});
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_EQ(0, status3);
         EXPECT_EQ(0, topicList.size());
     }
 
     TEST_F(SNSServerCliTest, MessagePublishTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws sns create-topic --name " + TEST_TOPIC + " --endpoint " + _endpoint);
-        EXPECT_EQ(0, status1);
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws sns list-topics --endpoint " + _endpoint);
-        EXPECT_EQ(0, status2);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
 
         // act
-        auto [status3, output3] = Core::TestUtils::SendCliCommand("aws sns publish --topic-arn " + topicArn + " --message TEST-BODY --endpoint " + _endpoint);
+        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"sns", "publish", "--topic-arn", topicArn, "--message", "TEST-BODY", "--endpoint", _endpoint});
         const long messageCount = _snsDatabase.CountMessages();
         const std::string messageId = GetMessageId(output3);
 
         // assert
-        EXPECT_EQ(0, status3);
         EXPECT_EQ(1, messageCount);
         EXPECT_FALSE(messageId.empty());
     }

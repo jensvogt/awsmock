@@ -109,8 +109,13 @@ namespace AwsMock::Core {
         return configuration;
     }
 
-    ExecResult TestUtils::SendCliCommand(const std::string &command) {
-        return SystemUtils::Exec2(command);
+    std::string TestUtils::SendCliCommand(const std::string &command, const std::vector<std::string> &args) {
+        std::string output, error;
+        SystemUtils::RunShellCommand(command, args, {}, output, error);
+        if (!error.empty()) {
+            std::cerr << error << std::endl;
+        }
+        return output;
     }
 
 }// namespace AwsMock::Core

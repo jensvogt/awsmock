@@ -41,7 +41,8 @@ namespace AwsMock::Service {
         void TearDown() override {
             _database.DeleteAllItems();
             _database.DeleteAllTables();
-            Core::ExecResult deleteResult1 = Core::SystemUtils::Exec("aws dynamodb delete-table --table-name test-table1 --endpoint http://localhost:8000");
+            std::string error, output;
+            Core::SystemUtils::RunShellCommand("aws", {"delete-table", "--table-name", "test-table1", "--endpoint", "http://localhost:8000"}, {}, output, error);
         }
 
         static std::string WriteItemFile() {
