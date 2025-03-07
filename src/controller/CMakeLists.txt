@@ -15,10 +15,12 @@ else ()
     if (SYSTEMD)
         # systemd available
         add_definitions(-DHAS_SYSTEMD)
-        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb boost_program_options systemd)
+        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb ${LIB_BOOST_PROGRAM_OPTIONS}
+                ${LIB_BOOST_PROCESS} ${LIB_BOOST_THREAD} systemd)
     else ()
         # systemd not available
-        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb boost_program_options)
+        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb ${LIB_BOOST_PROGRAM_OPTIONS}
+                ${LIB_BOOST_PROCESS} ${LIB_BOOST_THREAD})
     endif ()
 endif ()
 

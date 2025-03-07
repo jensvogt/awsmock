@@ -18,8 +18,8 @@ include_directories(../include ../../core/include ../../db/include ../../dto/inc
         ${EXT_INCLUDE})
 link_directories(../../core ../../db ../../dto ${EXT_LIB})
 
-add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES}
-        ${SSM_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
+add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
+        ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb ${LIB_BOOST_THREAD})
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
