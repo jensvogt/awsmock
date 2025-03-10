@@ -19,6 +19,10 @@ else ()
     add_executable(${BINARY} ${SOURCES})
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore ${LIB_BOOST_THREAD}
             ${LIB_BOOST_PROGRAM_OPTIONS})
+    if (APPLE)
+        set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH
+                "${CMAKE_INSTALL_RPATH};${LIB_INSTALL_DIR};${EXT_LIB}")
+    endif ()
 endif ()
 
 install(TARGETS ${BINARY} DESTINATION ${BIN_INSTALL_DIR})
