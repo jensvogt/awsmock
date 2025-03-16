@@ -143,11 +143,11 @@ namespace AwsMock::Core {
     }
 
     std::string AwsUtils::GetS3HostStyleObjectKey(const http::request<http::dynamic_body> &request) {
-        return HttpUtils::GetPathParametersFromIndex(request.target(), 0);
+        return HttpUtils::GetPathParameter(request.target(), 0);
     }
 
     std::string AwsUtils::GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request) {
-        return HttpUtils::GetPathParametersFromIndex(request.target(), 1);
+        return HttpUtils::GetPathParameter(request.target(), 1);
     }
 
     void AwsUtils::AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {

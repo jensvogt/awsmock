@@ -133,6 +133,11 @@ namespace AwsMock::Monitoring {
          */
         clock_t _lastUserCPU = 0;
 
+        /**
+         * Number of cores
+         */
+        int _numProcessors;
+
 #elif _WIN32
 
         /**

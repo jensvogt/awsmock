@@ -10,6 +10,7 @@ namespace AwsMock::Monitoring {
     MetricSystemCollector::MetricSystemCollector() {
 
         _startTime = system_clock::now();
+        _numProcessors = Core::SystemUtils::GetNumberOfCores();
 
 #ifdef _WIN32
 
@@ -88,20 +89,19 @@ namespace AwsMock::Monitoring {
 
         log_trace << "Now: " << now << "/" << _lastTotalCPU << "/" << _lastSysCPU << "/" << _lastUserCPU;
         if (now - _lastTime > 0) {
-            const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU + (timeSample.tms_utime - _lastUserCPU)) / static_cast<double>(now - _lastTime) * 100;
+            const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU + (timeSample.tms_utime - _lastUserCPU)) / static_cast<double>(now - _lastTime) / _numProcessors * 100;
             MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", totalPercent);
             log_trace << "Total CPU: " << totalPercent;
 
-            const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastUserCPU) / static_cast<double>(now - _lastTime) * 100;
+            const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastUserCPU) / static_cast<double>(now - _lastTime) / _numProcessors * 100;
             MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", userPercent);
             log_trace << "User CPU: " << userPercent;
 
-            const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU) / static_cast<double>(now - _lastTime) * 100;
+            const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastSysCPU) / static_cast<double>(now - _lastTime) / _numProcessors * 100;
             MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", systemPercent);
             log_trace << "System CPU: " << systemPercent;
         }
         _lastTime = now;
-        _lastTotalCPU = timeSample.tms_stime + timeSample.tms_utime;
         _lastSysCPU = timeSample.tms_stime;
         _lastUserCPU = timeSample.tms_utime;
         log_trace << "System collector finished";

@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Common {
 
         // Multipart uploads/downloads
         uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
-        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+        uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
         uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
         rangeRequest = Core::HttpUtils::HasHeader(request, "Range");
@@ -56,7 +56,7 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::LIST_BUCKETS;
                     } else if (!bucket.empty() && key.empty()) {
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
-                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "prefix");
+                            prefix = Core::HttpUtils::GetStringParameter(request.target(), "prefix");
                             command = S3CommandType::LIST_OBJECT_VERSIONS;
                         } else {
                             command = S3CommandType::LIST_OBJECTS;

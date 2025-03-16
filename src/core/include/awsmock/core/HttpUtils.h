@@ -12,6 +12,7 @@
 
 // Boost includes
 #include <boost/beast.hpp>
+#include <boost/url.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
@@ -40,16 +41,6 @@ namespace AwsMock::Core {
       public:
 
         /**
-         * @brief Returns the base path of the URI.
-         *
-         * @brief <p>Removes leading '/'.</p>
-         *
-         * @param uri HTTP request URI
-         * @return base path of the HTTP request URI
-         */
-        static std::string GetBasePath(const std::string &uri);
-
-        /**
          * @brief Returns a given path parameter by index.
          *
          * @param uri HTTP request URI
@@ -57,15 +48,6 @@ namespace AwsMock::Core {
          * @return path parameter with given index.
          */
         static std::string GetPathParameter(const std::string &uri, int index);
-
-        /**
-         * @brief Get the rest of the path after index.
-         *
-         * @param uri HTTP request URI
-         * @param index path parameter index
-         * @return rest of the path after index
-         */
-        static std::string GetPathParametersFromIndex(const std::string &uri, int index);
 
         /**
          * @brief Returns all path parameters.
@@ -127,7 +109,7 @@ namespace AwsMock::Core {
          * @param value parameter value
          * @return
          */
-        static std::string AddQueryParameter(std::string &url, const std::string &name, bool value);
+        static std::string AddQueryParameter(const std::string &url, const std::string &name, bool value);
 
         /**
          * @brief Adds a string query parameter to the given URL.
@@ -137,7 +119,7 @@ namespace AwsMock::Core {
          * @param value parameter value
          * @return
          */
-        static std::string AddQueryParameter(std::string &url, const std::string &name, const std::string &value);
+        static std::string AddQueryParameter(const std::string &url, const std::string &name, const std::string &value);
 
         /**
          * @brief Adds a integer query parameter to the given URL.
@@ -147,37 +129,51 @@ namespace AwsMock::Core {
          * @param value parameter value
          * @return
          */
-        static std::string AddQueryParameter(std::string &url, const std::string &name, int value);
+        static std::string AddQueryParameter(const std::string &url, const std::string &name, int value);
 
         /**
          * @brief Returns an integer parameter
          *
-         * @param body HTTP body
+         * @param uri HTTP uri
          * @param name parameter name
          * @param min minimum value
          * @param max maximum value
          * @param def default value
          * @return integer parameter
          */
-        static int GetIntParameter(const std::string &body, const std::string &name, int min, int max, int def);
+        static int GetIntParameter(const std::string &uri, const std::string &name, int min, int max, int def);
 
         /**
-         * @brief Returns the name of a query parameter.
+         * @brief Returns an long integer parameter
          *
-         * @param parameter parameter in the form name=value
-         * @return name of the parameter
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param min minimum value
+         * @param max maximum value
+         * @param def default value
+         * @return integer parameter
          */
-        static std::string GetQueryParameterName(const std::string &parameter);
+        static long GetLongParameter(const std::string &uri, const std::string &name, long min, long max, long def);
 
         /**
-         * @brief Returns the value of a query parameter.
+         * @brief Returns a string parameter
          *
-         * <p> if the value is URL encoded, the value will be decoded.</p>
-         *
-         * @param parameter parameter in the form name=value
-         * @return value of the parameter
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param def default value
+         * @return integer parameter
          */
-        static std::string GetQueryParameterValue(const std::string &parameter);
+        static std::string GetStringParameter(const std::string &uri, const std::string &name, const std::string &def = ";");
+
+        /**
+         * @brief Returns a boolean parameter
+         *
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param def default value
+         * @return integer parameter
+         */
+        static bool GetBoolParameter(const std::string &uri, const std::string &name, const bool &def = false);
 
         /**
          * @brief Returns a map of all query parameters.
@@ -197,15 +193,6 @@ namespace AwsMock::Core {
          * @return vector of parameters
          */
         static std::vector<std::string> GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix = {});
-
-        /**
-         * @brief Returns the parameter value by prefix with the given index
-         *
-         * @param uri HTTP request URI
-         * @param name HTTP parameter name
-         * @return number of query parameters
-         */
-        static std::string GetQueryParameterValueByName(const std::string &uri, const std::string &name);
 
         /**
          * @brief Checks for existence of parameter with the given name.
@@ -524,14 +511,6 @@ namespace AwsMock::Core {
          * @return true if value is URL encoded
          */
         static bool IsUrlEncoded(const std::string &value);
-
-        /**
-         * @brief Add query delimiter
-         *
-         * @param url HTTP request URL
-         * @return URL with delimiter
-         */
-        static std::string AddQueryDelimiter(std::string &url);
     };
 
     template<bool isRequest, class SyncReadStream, class DynamicBuffer>

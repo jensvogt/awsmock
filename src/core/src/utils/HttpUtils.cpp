@@ -6,104 +6,60 @@
 
 namespace AwsMock::Core {
 
-    std::string HttpUtils::GetBasePath(const std::string &uri) {
-        std::string basePath = StringUtils::SubStringUntil(uri, "?");
-        if (basePath[0] == '/') {
-            basePath = basePath.substr(1);
-        }
-        return basePath;
-    }
-
     std::string HttpUtils::GetPathParameter(const std::string &uri, int index) {
 
-        const std::string basePath = GetBasePath(uri);
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
-        std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        if (index >= static_cast<int>(parameters.size())) {
-            return {};
-        }
-        if (IsUrlEncoded(parameters[index])) {
-            return StringUtils::UrlDecode(parameters[index]);
-        }
-        return parameters[index];
-    }
-
-    std::string HttpUtils::GetPathParametersFromIndex(const std::string &uri, int index) {
-
-        const std::string basePath = GetBasePath(uri);
-        const std::vector<std::string> parameters = StringUtils::Split(basePath, '/');
-        return StringUtils::UrlDecode(StringUtils::Join(parameters, "/", index));
+        std::vector<std::string> seq;
+        for (auto seg: r->encoded_segments())
+            seq.push_back(seg.decode());
+        return seq[index];
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
-
-        const std::string basePath = GetBasePath(uri);
-        return StringUtils::Split(basePath, '/');
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        std::vector<std::string> seq;
+        for (auto seg: r->encoded_segments())
+            seq.push_back(seg.decode());
+        return seq;
     }
 
     bool HttpUtils::HasPathParameters(const std::string &uri, const int index) {
-
-        const std::string basePath = GetBasePath(uri);
-        const std::vector<std::string> pathVector = StringUtils::Split(basePath, '/');
-        return index < pathVector.size();
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        return r->encoded_segments().size() > index;
     }
 
     std::string HttpUtils::GetQueryString(const std::string &uri) {
-        if (StringUtils::Contains(uri, "?")) {
-            return StringUtils::SubStringAfter(uri, "?");
-        }
-        return uri;
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        return r->path();
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
-        const std::string queryString = GetQueryString(uri);
-        const std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
-        return static_cast<int>(parameters.size());
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        return static_cast<int>(r->params().size());
     }
 
     int HttpUtils::CountQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
 
-        const std::string queryString = GetQueryString(uri);
-        const std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
         int count = 0;
-        for (auto &it: parameters) {
-            if (it.starts_with(prefix)) {
+        for (const auto &param: r->params()) {
+            if (std::string parameterValue = param.key; !prefix.empty() && parameterValue.starts_with(prefix)) {
                 count++;
             }
         }
         return count;
     }
 
-    std::string HttpUtils::GetQueryParameterName(const std::string &parameter) {
-        return StringUtils::Split(parameter, '=')[0];
-    }
-
-    std::string HttpUtils::GetQueryParameterValue(const std::string &parameter) {
-        if (const std::vector<std::string> parts = StringUtils::Split(parameter, '='); parts.size() > 1) {
-            std::string value = parts[1];
-            if (IsUrlEncoded(value)) {
-                log_trace << "Found query parameter value, name: " << parameter << ", value: " << value;
-                return StringUtils::UrlDecode(value);
-            }
-            log_trace << "Found query parameter value, name: " << parameter << ", value: " << value;
-            return value;
-        }
-        log_debug << "Query parameter value not found, name: " << parameter;
-        return {};
-    }
-
     std::vector<std::string> HttpUtils::GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
 
-        const std::string queryString = GetQueryString(uri);
-        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
         std::vector<std::string> namedParameters;
-        for (const auto &it: parameters) {
-            if (!prefix.empty() && it.starts_with(prefix)) {
-                namedParameters.emplace_back(GetQueryParameterValue(it));
-            } else {
-                namedParameters.emplace_back(GetQueryParameterValue(it));
+        for (const auto &param: r->params()) {
+            if (std::string parameterValue = param.key; !prefix.empty() && parameterValue.starts_with(prefix)) {
+                namedParameters.emplace_back(param.value);
             }
         }
         return namedParameters;
@@ -111,37 +67,16 @@ namespace AwsMock::Core {
 
     std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
 
-        if (!StringUtils::Contains(uri, "?")) {
-            return {};
-        }
-
-        const std::string queryString = GetQueryString(uri);
-        std::vector<std::string> parameters = StringUtils::Split(queryString, '&');
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
         std::map<std::string, std::string> queryParameters;
-        for (const auto &it: parameters) {
-            std::vector<std::string> namedValues = StringUtils::Split(it, '=');
-            queryParameters[namedValues[0]] = namedValues[1];
+        for (const auto &param: r->params()) {
+            queryParameters[param.key] = param.value;
         }
         return queryParameters;
     }
 
-    std::string HttpUtils::GetQueryParameterValueByName(const std::string &uri, const std::string &name) {
-
-        std::string queryString = GetQueryString(uri);
-        if (queryString.at(0) == '&') {
-            queryString = queryString.substr(1);
-        }
-
-        for (std::vector<std::string> parameters = StringUtils::Split(queryString, '&'); const auto &it: parameters) {
-            if (GetQueryParameterName(it) == name) {
-                return GetQueryParameterValue(it);
-            }
-        }
-        return {};
-    }
-
-    std::string HttpUtils::GetQueryParameterByPrefix(const std::string &uri, const std::string &prefix, int index) {
+    std::string HttpUtils::GetQueryParameterByPrefix(const std::string &uri, const std::string &prefix, const int index) {
 
         std::vector<std::string> parameters = GetQueryParametersByPrefix(uri, prefix);
 
@@ -152,47 +87,71 @@ namespace AwsMock::Core {
         return parameters[index - 1];
     }
 
-    int HttpUtils::GetIntParameter(const std::string &body, const std::string &name, const int min, const int max, const int def) {
+    int HttpUtils::GetIntParameter(const std::string &uri, const std::string &name, const int min, const int max, const int def) {
         int value = def;
-        if (const std::string parameterValue = GetQueryParameterValueByName(body, name); !parameterValue.empty()) {
-            value = std::stoi(parameterValue);
-            value = value > min && value < max ? value : def;
+        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
+            const boost::urls::params_view p = r->params(name.data());
+            if (const auto parameterValue = std::string(p.buffer()); !parameterValue.empty()) {
+                value = std::stoi(parameterValue);
+                value = value > min && value < max ? value : def;
+            }
+        }
+        return value;
+    }
+
+    long HttpUtils::GetLongParameter(const std::string &uri, const std::string &name, const long min, const long max, const long def) {
+        long value = def;
+        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
+            const boost::urls::params_view p = r->params(name.data());
+            if (const auto parameterValue = std::string(p.buffer()); !parameterValue.empty()) {
+                value = std::stol(parameterValue);
+                value = value > min && value < max ? value : def;
+            }
+        }
+        return value;
+    }
+
+    std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name, const std::string &def) {
+        std::string value = def;
+        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
+            const boost::urls::params_view p = r->params(name.data());
+            if (const auto parameterValue = std::string(p.buffer()); !parameterValue.empty()) {
+                value = parameterValue;
+            }
+        }
+        log_trace << "Query parameter found, name: " << name << " value: " << value;
+        return value;
+    }
+
+    bool HttpUtils::GetBoolParameter(const std::string &uri, const std::string &name, const bool &def) {
+        bool value = def;
+        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().contains(name)) {
+            value = true;
         }
         log_trace << "Query parameter found, name: " << name << " value: " << value;
         return value;
     }
 
     bool HttpUtils::HasQueryParameter(const std::string &uri, const std::string &name) {
-        const std::string queryString = GetQueryString(uri);
-        for (std::vector<std::string> parameters = StringUtils::Split(queryString, '&'); const auto &it: parameters) {
-            if (GetQueryParameterName(it) == name) {
-                return true;
-            }
-        }
-        log_trace << "Query parameter not found, name: " << name;
-        return false;
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        return r->params().contains(name);
     }
 
-    std::string HttpUtils::AddQueryParameter(std::string &url, const std::string &name, bool value) {
-        url = AddQueryDelimiter(url);
-        url += name + "=" + (value ? "true" : "false");
+    std::string HttpUtils::AddQueryParameter(const std::string &url, const std::string &name, bool value) {
+        boost::url u(url);
+        u.params().append({name, value ? "true" : "false"});
         return url;
     }
 
-    std::string HttpUtils::AddQueryParameter(std::string &url, const std::string &name, const std::string &value) {
-        url = AddQueryDelimiter(url);
-        url += name + "=" + value;
+    std::string HttpUtils::AddQueryParameter(const std::string &url, const std::string &name, const std::string &value) {
+        boost::url u(url);
+        u.params().append({name, value});
         return url;
     }
 
-    std::string HttpUtils::AddQueryParameter(std::string &url, const std::string &name, int value) {
-        url = AddQueryDelimiter(url);
-        url += name + "=" + std::to_string(value);
-        return url;
-    }
-
-    std::string HttpUtils::AddQueryDelimiter(std::string &url) {
-        url += Core::StringUtils::Contains(url, "?") ? "&" : "?";
+    std::string HttpUtils::AddQueryParameter(const std::string &url, const std::string &name, int value) {
+        boost::url u(url);
+        u.params().append({name, std::to_string(value)});
         return url;
     }
 

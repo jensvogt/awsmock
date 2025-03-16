@@ -29,21 +29,21 @@ namespace AwsMock::Service {
 
                     if (Core::HttpUtils::HasQueryParameter(request.target(), "list-type")) {
 
-                        int listType = std::stoi(Core::HttpUtils::GetQueryParameterValueByName(request.target(), "list-type"));
+                        int listType = Core::HttpUtils::GetIntParameter(request.target(), "list-type", 0, 1000, 0);
 
                         std::string delimiter;
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "delimiter")) {
-                            delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "delimiter");
+                            delimiter = Core::HttpUtils::GetStringParameter(request.target(), "delimiter");
                         }
 
                         std::string prefix;
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "prefix")) {
-                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "prefix");
+                            prefix = Core::HttpUtils::GetStringParameter(request.target(), "prefix");
                         }
 
                         std::string encodingType = "url";
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "encoding_type")) {
-                            encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "encoding_type");
+                            encodingType = Core::HttpUtils::GetStringParameter(request.target(), "encoding_type");
                         }
 
                         // Return object list
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
                     Dto::S3::GetObjectRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
 
                     // Get version ID
-                    if (std::string versionId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "versionId"); !versionId.empty()) {
+                    if (std::string versionId = Core::HttpUtils::GetStringParameter(request.target(), "versionId"); !versionId.empty()) {
                         s3Request.versionId = versionId;
                     }
 
@@ -139,11 +139,11 @@ namespace AwsMock::Service {
                     // Get object request
                     log_debug << "S3 list object versions request, bucket: " << clientCommand.bucket << " prefix: " << clientCommand.prefix;
 
-                    std::string delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "delimiter");
-                    std::string encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "encoding-type");
-                    std::string keyMarker = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "key-marker");
-                    std::string versionIdMarker = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "version-id-marker");
-                    std::string sPageSize = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "max-keys");
+                    std::string delimiter = Core::HttpUtils::GetStringParameter(request.target(), "delimiter");
+                    std::string encodingType = Core::HttpUtils::GetStringParameter(request.target(), "encoding-type");
+                    std::string keyMarker = Core::HttpUtils::GetStringParameter(request.target(), "key-marker");
+                    std::string versionIdMarker = Core::HttpUtils::GetStringParameter(request.target(), "version-id-marker");
+                    std::string sPageSize = Core::HttpUtils::GetStringParameter(request.target(), "max-keys");
 
                     // Convert maxKeys
                     int pageSize = 1000;
@@ -175,21 +175,21 @@ namespace AwsMock::Service {
 
                     if (Core::HttpUtils::HasQueryParameter(request.target(), "list-type")) {
 
-                        int listType = std::stoi(Core::HttpUtils::GetQueryParameterValueByName(request.target(), "list-type"));
+                        int listType = std::stoi(Core::HttpUtils::GetStringParameter(request.target(), "list-type"));
 
                         std::string delimiter;
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "delimiter")) {
-                            delimiter = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "delimiter");
+                            delimiter = Core::HttpUtils::GetStringParameter(request.target(), "delimiter");
                         }
 
                         std::string prefix;
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "prefix")) {
-                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "prefix");
+                            prefix = Core::HttpUtils::GetStringParameter(request.target(), "prefix");
                         }
 
                         std::string encodingType = "url";
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "encoding_type")) {
-                            encodingType = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "encoding_type");
+                            encodingType = Core::HttpUtils::GetStringParameter(request.target(), "encoding_type");
                         }
 
                         // Return object list
@@ -251,7 +251,7 @@ namespace AwsMock::Service {
                         // Get S3 source bucket/key
                         std::string sourceHeader = request["x-amz-copy-source"];
                         std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                        std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
+                        std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
 
                         Dto::S3::CopyObjectRequest s3Request = {
                                 .region = clientCommand.region,
@@ -299,7 +299,7 @@ namespace AwsMock::Service {
                     // Get S3 source bucket/key
                     std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
                     std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                    std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
+                    std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
 
                     // Get the user metadata
                     std::map<std::string, std::string> metadata = GetMetadata(request);
@@ -321,8 +321,8 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
 
-                    std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "partNumber");
-                    std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
+                    std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     std::string contentLength = request.base()[http::field::content_length];
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
@@ -341,8 +341,8 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::UPLOAD_PART_COPY: {
 
-                    std::string partNumber = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "partNumber");
-                    std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
+                    std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
 
                     // Get range
                     Dto::S3::UploadPartCopyRequest s3Request;
@@ -355,7 +355,7 @@ namespace AwsMock::Service {
                     // Get S3 source bucket/key
                     std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
                     std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                    std::string sourceKey = Core::HttpUtils::GetPathParametersFromIndex(sourceHeader, 1);
+                    std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
                     s3Request.sourceBucket = sourceBucket;
                     s3Request.sourceKey = sourceKey;
 
@@ -459,7 +459,7 @@ namespace AwsMock::Service {
                         log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                         return SendOkResponse(request, result.ToXml());
                     }
-                    std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     log_debug << "Finish multipart upload request, uploadId: " << uploadId;
 
                     Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId};
@@ -508,7 +508,7 @@ namespace AwsMock::Service {
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     std::string contentType = Core::HttpUtils::HasHeader(request, "Content-Type") ? std::string(request["Content-Type"]) : Core::FileUtils::GetContentType(clientCommand.key);
 
-                    std::string uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
+                    std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId, .contentType = contentType};
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
