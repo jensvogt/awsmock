@@ -11,24 +11,27 @@ namespace AwsMock::Core {
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
         std::vector<std::string> seq;
-        for (auto seg: r->encoded_segments())
+        for (auto seg: r->encoded_segments()) {
             seq.push_back(seg.decode());
+        }
         if (index < seq.size()) {
             return seq[index];
         }
+        log_error << "Invalid index, index: " << index << ", size: " << seq.size();
         return {};
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        if (const auto count = std::ranges::count(std::string(r->path().data()), '/'); count < 2) {
+        if (!r->segments().size()) {
             return {};
         }
 
         std::vector<std::string> seq;
-        for (auto seg: r->encoded_segments())
+        for (auto seg: r->encoded_segments()) {
             seq.push_back(seg.decode());
+        }
         return seq;
     }
 
@@ -49,11 +52,20 @@ namespace AwsMock::Core {
 
     int HttpUtils::CountQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
 
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        if (prefix.empty()) {
+            log_error << "Prefix missing";
+            return -1;
+        }
 
+        if (!CountQueryParameters(uri)) {
+            log_trace << "No query parameters";
+            return 0;
+        }
+
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
         int count = 0;
         for (const auto &param: r->params()) {
-            if (std::string parameterValue = param.key; !prefix.empty() && parameterValue.starts_with(prefix)) {
+            if (param.key.starts_with(prefix)) {
                 count++;
             }
         }
