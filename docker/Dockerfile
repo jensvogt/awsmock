@@ -84,7 +84,7 @@ COPY --from=build /usr/local/lib/libboost_locale.so.1.87.0 /usr/lib/libboost_loc
 COPY --from=build /usr/local/lib/libboost_url.so.1.87.0 /usr/lib/libboost_url.so.1.87.0
 COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
 COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
-COPY --from=build /usr/local/lib/libgtest_main.so.1.15.2 /usr/lib/libgtest_main.so.1.15.2
+COPY --from=build /usr/lib/libgtest_main.so.1.15.2 /usr/lib/libgtest_main.so.1.15.2
 COPY --from=build /usr/lib/libgtest.so.1.15.2 /usr/lib/libgtest.so.1.15.2
 
 # Install aws-mock
