@@ -107,6 +107,7 @@ namespace AwsMock::Service {
         if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "http://localhost/build?t=" + name + ":" + tag, imageFile); statusCode != http::status::ok) {
             log_error << "Build image failed, httpStatus: " << statusCode << " body: " << body;
         }
+        log_debug << "Build image request finished, name: " << name << " tags: " << tag << " runtime: " << runtime;
         return imageFile;
     }
 
