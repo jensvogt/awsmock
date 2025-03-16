@@ -11,30 +11,11 @@ namespace AwsMock::Dto::S3 {
         try {
 
             boost::property_tree::ptree pt;
-            read_xml(xmlString, pt);
+            Core::XmlUtils::ReadXml(xmlString, &pt);
 
-            for (const auto &configuratioun: pt.get_child("ServerSideEncryptionConfiguration")) {
-            }
-            /*            Poco::XML::DOMParser parser;
-            Poco::AutoPtr<Poco::XML::Document> pDoc = parser.parseString(xmlString);
+            sseAlgorithm = pt.get<std::string>("ServerSideEncryptionConfiguration.Rule.ApplyServerSideEncryptionByDefault.SSEAlgorithm");
+            kmsKeyId = pt.get<std::string>("ServerSideEncryptionConfiguration.Rule.ApplyServerSideEncryptionByDefault.KMSMasterKeyID");
 
-            Poco::XML::Node *rootNode = pDoc->getNodeByPath("/ServerSideEncryptionConfiguration");
-            if (rootNode) {
-
-                Poco::XML::Node *ruleNode = rootNode->firstChild();
-                Poco::XML::Node *sseEncryptionConfiguration = ruleNode->firstChild();
-
-                if (sseEncryptionConfiguration) {
-                    for (int i = 0; i < sseEncryptionconfiguration.childNodes()->length(); i++) {
-                        Poco::XML::Node *childNode = sseEncryptionconfiguration.childNodes()->item(i);
-                        if (childNode->nodeName() == "SSEAlgorithm") {
-                            sseAlgorithm = childNode->lastChild()->innerText();
-                        } else if (childNode->nodeName() == "KMSKeyID" || childNode->nodeName() == "KMSMasterKeyID") {
-                            kmsKeyId = childNode->lastChild()->innerText();
-                        }
-                    }
-                }
-            }*/
         } catch (std::exception &e) {
             log_error << e.what();
             throw Core::JsonException(e.what());

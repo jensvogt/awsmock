@@ -163,7 +163,7 @@ namespace AwsMock::Core {
          * @param def default value
          * @return integer parameter
          */
-        static std::string GetStringParameter(const std::string &uri, const std::string &name, const std::string &def = ";");
+        static std::string GetStringParameter(const std::string &uri, const std::string &name, const std::string &def = {});
 
         /**
          * @brief Returns a boolean parameter

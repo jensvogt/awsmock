@@ -249,9 +249,9 @@ namespace AwsMock::Service {
                     if (clientCommand.copyRequest) {
 
                         // Get S3 source bucket/key
-                        std::string sourceHeader = request["x-amz-copy-source"];
-                        std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                        std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
+                        std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
+                        std::string sourceBucket = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 0);
+                        std::string sourceKey = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 1);
 
                         Dto::S3::CopyObjectRequest s3Request = {
                                 .region = clientCommand.region,
@@ -298,8 +298,8 @@ namespace AwsMock::Service {
 
                     // Get S3 source bucket/key
                     std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
-                    std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                    std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
+                    std::string sourceBucket = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 0);
+                    std::string sourceKey = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 1);
 
                     // Get the user metadata
                     std::map<std::string, std::string> metadata = GetMetadata(request);
@@ -395,10 +395,10 @@ namespace AwsMock::Service {
 
                     log_debug << "Put bucket encryption configuration request, bucket: " << clientCommand.bucket;
 
-                    // S3 notification setup
-                    //std::string body = Core::HttpUtils::GetBodyAsString(request);
+                    // S3 bucket encryption
+                    std::string body = Core::HttpUtils::GetBodyAsString(request);
                     Dto::S3::PutBucketEncryptionRequest s3Request;
-                    //s3Request.FromXml(body);
+                    s3Request.FromXml(body);
                     s3Request.region = clientCommand.region;
                     s3Request.bucket = clientCommand.bucket;
 

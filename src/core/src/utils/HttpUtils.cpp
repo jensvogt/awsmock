@@ -13,7 +13,10 @@ namespace AwsMock::Core {
         std::vector<std::string> seq;
         for (auto seg: r->encoded_segments())
             seq.push_back(seg.decode());
-        return seq[index];
+        if (index < seq.size()) {
+            return seq[index];
+        }
+        return {};
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
@@ -89,11 +92,9 @@ namespace AwsMock::Core {
 
     int HttpUtils::GetIntParameter(const std::string &uri, const std::string &name, const int min, const int max, const int def) {
         int value = def;
-        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
-            const boost::urls::params_view p = r->params(name.data());
-            if (const auto parameterValue = std::string(p.buffer()); !parameterValue.empty()) {
-                value = std::stoi(parameterValue);
-                value = value > min && value < max ? value : def;
+        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().contains(name)) {
+            if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
+                value = std::stoi(p->value.decode());
             }
         }
         return value;
@@ -102,9 +103,8 @@ namespace AwsMock::Core {
     long HttpUtils::GetLongParameter(const std::string &uri, const std::string &name, const long min, const long max, const long def) {
         long value = def;
         if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
-            const boost::urls::params_view p = r->params(name.data());
-            if (const auto parameterValue = std::string(p.buffer()); !parameterValue.empty()) {
-                value = std::stol(parameterValue);
+            if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
+                value = std::stol(p->value.decode());
                 value = value > min && value < max ? value : def;
             }
         }
@@ -114,9 +114,8 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name, const std::string &def) {
         std::string value = def;
         if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
-            const boost::urls::params_view p = r->params(name.data());
-            if (const auto parameterValue = std::string(p.buffer()); !parameterValue.empty()) {
-                value = parameterValue;
+            if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
+                value = p->value.decode();
             }
         }
         log_trace << "Query parameter found, name: " << name << " value: " << value;
