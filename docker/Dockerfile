@@ -31,8 +31,9 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url boost-locale plog  \
-    yaml-cpp libarchive libmagic
+RUN apk update && apk add plog yaml-cpp libarchive libmagic
+
+#aws-cli boost-program_options boost-filesystem boost-thread boost-url boost-json boost-locale
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -74,6 +75,14 @@ RUN ln -s /usr/lib/libprometheus-cpp-pull.so.1.3 /usr/lib/libprometheus-cpp-pull
 COPY --from=build /usr/local/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/
 RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-push.so.1.3
 RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push.so
+
+# Install Boost libraries
+COPY --from=build /usr/local/lib/libboost_json.so.1.87.0 /usr/local/lib/libboost_json.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_thread.so.1.87.0 /usr/local/lib/libboost_thread.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_program_options.so.1.87.0 /usr/local/lib/libboost_program_options.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_locale.so.1.87.0 /usr/local/lib/libboost_locale.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_url.so.1.87.0 /usr/local/lib/libboost_url.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/local/lib/libboost_filesystem.so.1.87.0
 
 # Install aws-mock
 COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
