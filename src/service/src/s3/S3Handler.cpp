@@ -175,7 +175,7 @@ namespace AwsMock::Service {
 
                     if (Core::HttpUtils::HasQueryParameter(request.target(), "list-type")) {
 
-                        int listType = std::stoi(Core::HttpUtils::GetStringParameter(request.target(), "list-type"));
+                        int listType = Core::HttpUtils::GetIntParameter(request.target(), "list-type", 0, 1000, 0);
 
                         std::string delimiter;
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "delimiter")) {
@@ -226,8 +226,6 @@ namespace AwsMock::Service {
         Dto::Common::S3ClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        log_debug << "S3 PUT request, URI: " << request.target() << " region: " << clientCommand.region << " user: " << clientCommand.user;
-
         try {
 
             switch (clientCommand.command) {
@@ -248,19 +246,15 @@ namespace AwsMock::Service {
 
                     if (clientCommand.copyRequest) {
 
-                        // Get S3 source bucket/key
-                        std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
-                        std::string sourceBucket = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 0);
-                        std::string sourceKey = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 1);
-
                         Dto::S3::CopyObjectRequest s3Request = {
                                 .region = clientCommand.region,
                                 .user = clientCommand.user,
-                                .sourceBucket = sourceBucket,
-                                .sourceKey = sourceKey,
                                 .targetBucket = clientCommand.bucket,
                                 .targetKey = clientCommand.key,
                                 .metadata = metadata};
+
+                        // Get S3 source bucket/key
+                        GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
 
                         Dto::S3::CopyObjectResponse s3Response = _s3Service.CopyObject(s3Request);
 
@@ -296,22 +290,18 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::MOVE_OBJECT: {
                     log_debug << "Object move request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
-                    // Get S3 source bucket/key
-                    std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
-                    std::string sourceBucket = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 0);
-                    std::string sourceKey = Core::HttpUtils::GetPathParameter("/" + sourceHeader, 1);
-
-                    // Get the user metadata
-                    std::map<std::string, std::string> metadata = GetMetadata(request);
 
                     Dto::S3::MoveObjectRequest s3Request = {
                             .region = clientCommand.region,
                             .user = clientCommand.user,
-                            .sourceBucket = sourceBucket,
-                            .sourceKey = sourceKey,
                             .targetBucket = clientCommand.bucket,
-                            .targetKey = clientCommand.key,
-                            .metadata = metadata};
+                            .targetKey = clientCommand.key};
+
+                    // Get S3 source bucket/key
+                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
+
+                    // Get the user metadata
+                    s3Request.metadata = GetMetadata(request);
 
                     Dto::S3::MoveObjectResponse s3Response = _s3Service.MoveObject(s3Request);
 
@@ -353,11 +343,7 @@ namespace AwsMock::Service {
                     s3Request.targetKey = clientCommand.key;
 
                     // Get S3 source bucket/key
-                    std::string sourceHeader = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source");
-                    std::string sourceBucket = Core::HttpUtils::GetPathParameter(sourceHeader, 0);
-                    std::string sourceKey = Core::HttpUtils::GetPathParameter(sourceHeader, 1);
-                    s3Request.sourceBucket = sourceBucket;
-                    s3Request.sourceKey = sourceKey;
+                    GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
 
                     if (Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range")) {
                         std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source-range");
@@ -813,4 +799,10 @@ namespace AwsMock::Service {
         return request.body().size();
     }
 
+    void S3Handler::GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key) {
+
+        bucket = Core::StringUtils::SubStringUntil(path, "/");
+        key = Core::StringUtils::SubStringAfter(path, "/");
+        log_debug << "GetBucketKeyFromHeader: " << bucket << " " << key;
+    }
 }// namespace AwsMock::Service

@@ -11,6 +11,8 @@ namespace AwsMock::Dto::Common {
         UserAgent userAgent;
         userAgent.FromRequest(request);
 
+        // Core::HttpUtils::DumpHeaders(request);
+
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
@@ -29,8 +31,8 @@ namespace AwsMock::Dto::Common {
         // Multipart uploads/downloads
         uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
         uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         rangeRequest = Core::HttpUtils::HasHeader(request, "Range");
         multipartRequest = uploads || !uploadId.empty() || partNumber;
 
@@ -182,7 +184,7 @@ namespace AwsMock::Dto::Common {
             Core::Bson::BsonUtils::SetStringValue(document, "key", key);
             Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
-            Core::Bson::BsonUtils::SetIntValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetLongValue(document, "contentLength", contentLength);
             Core::Bson::BsonUtils::SetBoolValue(document, "versionRequest", versionRequest);
             Core::Bson::BsonUtils::SetBoolValue(document, "notificationRequest", notificationRequest);
             Core::Bson::BsonUtils::SetBoolValue(document, "multipartRequest", multipartRequest);

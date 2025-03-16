@@ -8,7 +8,7 @@ namespace AwsMock::Service {
     std::map<std::string, std::string> ContainerService::_supportedRuntimes = {
             {"java11", "public.ecr.aws/lambda/java:11"},
             {"java17", "public.ecr.aws/lambda/java:17"},
-            {"java21", "public.ecr.aws/lambda/java:21"},
+            {"java21", "public.ecr.aws/lambda/java:21.2024.11.22.15"},
             {"python3.8", "public.ecr.aws/lambda/python:3.8"},
             {"python3.9", "public.ecr.aws/lambda/python:3.9"},
             {"python3.10", "public.ecr.aws/lambda/python:3.10"},
@@ -139,8 +139,7 @@ namespace AwsMock::Service {
 
         Dto::Docker::ListImageResponse response{};
         const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
-            statusCode == http::status::ok) {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
             response.FromJson(body);
             if (response.imageList.empty()) {
                 log_warning << "Docker image not found, name: " << name;
@@ -575,9 +574,10 @@ namespace AwsMock::Service {
     std::string ContainerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
 
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        std::string supportedRuntime = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.runtime." + boost::algorithm::to_lower_copy(runtime));
 
-        std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
-        log_debug << "Using supported runtime: " << supportedRuntime;
+        //std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
+        log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {

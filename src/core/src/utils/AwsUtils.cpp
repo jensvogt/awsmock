@@ -119,7 +119,7 @@ namespace AwsMock::Core {
         if (IsS3HostStyle(request)) {
             return GetS3HostStyleObjectKey(request);
         }
-        return GetS3PathStyleObjectKey(request);
+        return GetS3PathStyleObjectKey(request.target());
     }
 
     bool AwsUtils::IsS3HostStyle(const http::request<http::dynamic_body> &request) {
@@ -146,8 +146,14 @@ namespace AwsMock::Core {
         return HttpUtils::GetPathParameter(request.target(), 0);
     }
 
-    std::string AwsUtils::GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request) {
-        return HttpUtils::GetPathParameter(request.target(), 1);
+    std::string AwsUtils::GetS3PathStyleObjectKey(const std::string &url) {
+        std::vector<std::string> segments = HttpUtils::GetPathParameters(url);
+        if (segments.empty()) {
+            return {};
+        }
+        segments.erase(segments.begin());
+        std::string key = StringUtils::Join(segments, "/");
+        return key;
     }
 
     void AwsUtils::AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {

@@ -20,7 +20,12 @@ namespace AwsMock::Core {
     }
 
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
+
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        if (const auto count = std::ranges::count(std::string(r->path().data()), '/'); count < 2) {
+            return {};
+        }
+
         std::vector<std::string> seq;
         for (auto seg: r->encoded_segments())
             seq.push_back(seg.decode());
@@ -116,9 +121,9 @@ namespace AwsMock::Core {
         if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
             if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
                 value = p->value.decode();
+                log_debug << "Query parameter found, name: " << name << " value: " << value;
             }
         }
-        log_trace << "Query parameter found, name: " << name << " value: " << value;
         return value;
     }
 

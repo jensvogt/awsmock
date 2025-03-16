@@ -107,7 +107,7 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::Run() {
+    [[noreturn]] void Manager::Run() {
 
         // Set running flag
         _running = true;
@@ -172,7 +172,7 @@ namespace AwsMock::Manager {
 
         // Start IO context
         while (_running) {
-            ios.poll();
+            ios.poll_one();
         }
         log_info << "So long, and thanks for all the fish!";
     }

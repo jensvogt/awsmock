@@ -144,7 +144,19 @@ namespace AwsMock::Core {
         static int GetIntParameter(const std::string &uri, const std::string &name, int min, int max, int def);
 
         /**
-         * @brief Returns an long integer parameter
+         * @brief Returns an integer parameter from the payload
+         *
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param min minimum value
+         * @param max maximum value
+         * @param def default value
+         * @return integer parameter
+         */
+        static int GetIntParameterFromPayload(const std::string &uri, const std::string &name, const int min, const int max, const int def) { return GetIntParameter("/?" + uri, name, min, max, def); }
+
+        /**
+         * @brief Returns a long integer parameter
          *
          * @param uri HTTP uri
          * @param name parameter name
@@ -154,6 +166,18 @@ namespace AwsMock::Core {
          * @return integer parameter
          */
         static long GetLongParameter(const std::string &uri, const std::string &name, long min, long max, long def);
+
+        /**
+         * @brief Returns a long integer parameter from the payload
+         *
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param min minimum value
+         * @param max maximum value
+         * @param def default value
+         * @return integer parameter
+         */
+        static long GetLongParameterFromPayload(const std::string &uri, const std::string &name, const long min, const long max, const long def) { return GetLongParameter("/?" + uri, name, min, max, def); }
 
         /**
          * @brief Returns a string parameter
@@ -166,6 +190,16 @@ namespace AwsMock::Core {
         static std::string GetStringParameter(const std::string &uri, const std::string &name, const std::string &def = {});
 
         /**
+         * @brief Returns a string parameter from the payload
+         *
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param def default value
+         * @return integer parameter
+         */
+        static std::string GetStringParameterFromPayload(const std::string &uri, const std::string &name, const std::string &def = {}) { return GetStringParameter("/?" + uri, name, def); }
+
+        /**
          * @brief Returns a boolean parameter
          *
          * @param uri HTTP uri
@@ -174,6 +208,16 @@ namespace AwsMock::Core {
          * @return integer parameter
          */
         static bool GetBoolParameter(const std::string &uri, const std::string &name, const bool &def = false);
+
+        /**
+         * @brief Returns a boolean parameter from the payload
+         *
+         * @param uri HTTP uri
+         * @param name parameter name
+         * @param def default value
+         * @return integer parameter
+         */
+        static bool GetBoolParameterFromPayload(const std::string &uri, const std::string &name, const bool &def = false) { return GetBoolParameter("/?" + uri, name, def); }
 
         /**
          * @brief Returns a map of all query parameters.

@@ -225,7 +225,7 @@ namespace AwsMock::Service {
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
                     log_info << "Send message, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE_BATCH: {

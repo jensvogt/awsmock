@@ -124,7 +124,21 @@ awsmock:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
-      data-dir: /usr/local/awsmock/data/lambda
+      data-dir: /usr/local/awsmock/data/lambda                       # Lambda data directory
+      # Lambda runtimes
+      runtime:
+        java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
+        java17: public.ecr.aws/lambda/java:17                        # Lambda Java 17 runtime
+        java21: public.ecr.aws/lambda/java:21.2024.11.22.15          # Lambda Java 17 runtime (16.03.2025: latest has problem with classloader)
+        python3.8: public.ecr.aws/lambda/python:3.8                  # Lambda Python 3.8
+        python3.9: public.ecr.aws/lambda/python:3.9                  # Lambda Python 3.9
+        python3.10: public.ecr.aws/lambda/python:3.10                # Lambda Python 3.10
+        python3.11: public.ecr.aws/lambda/python:3.11                # Lambda Python 3.11
+        nodejs20.x: public.ecr.aws/lambda/nodejs:20                  # Lambda NodeJS 20
+        provided.al2: public.ecr.aws/lambda/provided:al2             # Lambda Amazon Linux runtime
+        provided.al2023: public.ecr.aws/lambda/provided:al2023       # Lambda Amazon Linux runtime
+        provided.latest: public.ecr.aws/lambda/provided:latest       # Lambda Amazon Linux runtime
+        go: public.ecr.aws/lambda/provided:al2023                    # Amazon Linux runtime
       monitoring:
         period: 300
       remove:
