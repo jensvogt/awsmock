@@ -107,7 +107,7 @@ namespace AwsMock::Manager {
         }
     }
 
-    void Manager::Run() {
+    [[noreturn]] void Manager::Run() {
 
         // Set running flag
         _running = true;
