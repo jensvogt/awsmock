@@ -14,7 +14,7 @@
 #include <boost/chrono/duration.hpp>
 #include <boost/noncopyable.hpp>
 
-// AwsMOck includes
+// AwsMock includes
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {

@@ -1,7 +1,8 @@
 FROM alpine:latest
 
-RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli libarchive libarchive-dev github-cli asio-dev gtest-dev pandoc icu-libs doxygen  \
-    boost-program_options boost-filesystem boost-thread boost-url curl curl-dev plog plog-dev yaml-cpp yaml-cpp-dev libmagic file-dev nodejs npm
+RUN apk update && apk add groff g++ make cmake ccache openssl-dev git python3 aws-cli libarchive libarchive-dev  \
+    github-cli gtest-dev pandoc icu-libs doxygen curl curl-dev plog plog-dev yaml-cpp yaml-cpp-dev libmagic file-dev  \
+    nodejs npm linux-headers
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -28,6 +29,14 @@ RUN cd /usr/src && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --prefix /usr/local
+
+# Install Boost 1.87
+RUN cd /usr/src && \
+    wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz && \
+    tar -xzf boost_1_87_0.tar.gz && \
+    cd boost_1_87_0 && \
+    ./bootstrap.sh && \
+    ./b2 install
 
 # Cleanup
 RUN rm -rf /usr/src

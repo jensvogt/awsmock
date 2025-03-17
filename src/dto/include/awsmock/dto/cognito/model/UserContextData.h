@@ -16,6 +16,11 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
+    /**
+     * @brief Cognito user context data
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct UserContextData {
 
         /**

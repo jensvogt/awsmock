@@ -6,21 +6,31 @@
 
 namespace AwsMock::Database {
 
-    void ConnectionPool::configure(std::unique_ptr<mongocxx::instance> instance, std::unique_ptr<mongocxx::pool> pool) {
-        _instance = std::move(instance);
-        _pool = std::move(pool);
+    void ConnectionPool::Configure() {
+        Core::Configuration &configuration = Core::Configuration::instance();
+        const std::string name = configuration.GetValueString("awsmock.mongodb.name");
+        const std::string host = configuration.GetValueString("awsmock.mongodb.host");
+        const std::string user = configuration.GetValueString("awsmock.mongodb.user");
+        const std::string password = configuration.GetValueString("awsmock.mongodb.password");
+        const int port = configuration.GetValueInt("awsmock.mongodb.port");
+        const int poolSize = configuration.GetValueInt("awsmock.mongodb.pool-size");
+
+        // MongoDB URL
+        mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
+        log_info << "Using MongoDB database url: " << _uri.to_string();
+
+        // Create connection pool
+        _instance = std::make_shared<mongocxx::instance>();
+        _pool = std::make_shared<mongocxx::pool>(_uri);
+        log_info << "MongoDB database initialized";
     }
 
     mongocxx::pool::entry ConnectionPool::GetConnection() const {
         return _pool->acquire();
     }
 
-    bsoncxx::stdx::optional<mongocxx::pool::entry> ConnectionPool::TryGetConnection() const {
-        return _pool->try_acquire();
-    }
-
     void ConnectionPool::Shutdown() {
-        _pool.release();
+        _pool.reset();
     }
 
 }// namespace AwsMock::Database

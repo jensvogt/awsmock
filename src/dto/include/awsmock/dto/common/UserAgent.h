@@ -20,6 +20,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported AWS SDK clients
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class UserAgentType {
         AWS_SDK_JAVA1,
         AWS_SDK_JAVA2,
@@ -102,28 +107,28 @@ namespace AwsMock::Dto::Common {
         UserAgentType type;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Gets the value from the user-agent string
+         * @brief Gets the value from the user-agent string
          *
          * @param request HTTP server request
          */
         void FromRequest(const http::request<http::dynamic_body> &request);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

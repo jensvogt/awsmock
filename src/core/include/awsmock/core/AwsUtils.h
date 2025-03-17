@@ -20,6 +20,7 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
@@ -409,8 +410,6 @@ namespace AwsMock::Core {
          */
         static std::string GetS3ObjectKey(const http::request<http::dynamic_body> &request);
 
-      private:
-
         /**
          * @brief Checks whether this is a host-style or path-style S3 request
          *
@@ -445,10 +444,12 @@ namespace AwsMock::Core {
         /**
           * @brief Returns the bucket name for a S3 path-style request
           *
-          * @param request HTTP request
+          * @param url HTTP url
           * @return object key
           */
-        static std::string GetS3PathStyleObjectKey(const http::request<http::dynamic_body> &request);
+        static std::string GetS3PathStyleObjectKey(const std::string &url);
+
+      private:
 
         /**
          * @brief Returns the canonical request.

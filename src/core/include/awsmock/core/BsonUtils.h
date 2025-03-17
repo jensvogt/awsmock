@@ -18,6 +18,7 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 
 using bsoncxx::view_or_value;
@@ -30,6 +31,7 @@ using bsoncxx::document::view;
 using std::chrono::system_clock;
 
 namespace AwsMock::Core::Bson {
+
     inline bool FindBsonObject(const view &value, const std::string &name) {
         return value.find(name) != value.end();
     }
@@ -132,9 +134,7 @@ namespace AwsMock::Core::Bson {
             rootDocument.append(kvp(name, value));
         }
 
-        static void SetDocumentValue(document &rootDocument,
-                                     const std::string &name,
-                                     const view_or_value<view, value> &value) {
+        static void SetDocumentValue(document &rootDocument, const std::string &name, const view_or_value<view, value> &value) {
             rootDocument.append(kvp(name, value));
         }
 
@@ -143,7 +143,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static std::string GetOidValue(const std::optional<view> &view, const std::string &name) {
-            if (view.value().find(name) != view.value().end()) {
+            if (view->find(name) != view->end()) {
                 return GetOidValue(view.value()[name]);
             }
             return {};
@@ -162,7 +162,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static long GetLongValue(const std::optional<view> &view, const std::string &name) {
-            if (view.value().find(name) != view.value().end()) {
+            if (view->find(name) != view->end()) {
                 return GetLongValue(view.value()[name]);
             }
             return {};
@@ -183,6 +183,39 @@ namespace AwsMock::Core::Bson {
                 case bsoncxx::type::k_int32:
                     return element.get_int32().value;
                 case bsoncxx::type::k_int64:
+                    return static_cast<long>(element.get_int64().value);
+                case bsoncxx::type::k_string:
+                    return std::stol(bsoncxx::string::to_string(element.get_string().value));
+                case bsoncxx::type::k_null:
+                    return 0;
+                default:
+                    break;
+            }
+            return 0;
+        }
+
+        static long long GetLongLongValue(const std::optional<view> &view, const std::string &name) {
+            if (view->find(name) != view->end()) {
+                return GetLongLongValue(view.value()[name]);
+            }
+            return {};
+        }
+
+        static long long GetLongLongValue(const value &value, const std::string &name) {
+            if (value.find(name) != value.end()) {
+                return GetLongLongValue(value[name]);
+            }
+            return {};
+        }
+
+        static long long GetLongLongValue(const bsoncxx::document::element &element) {
+            if (!element) {
+                return 0;
+            }
+            switch (element.type()) {
+                case bsoncxx::type::k_int32:
+                    return element.get_int32().value;
+                case bsoncxx::type::k_int64:
                     return element.get_int64().value;
                 case bsoncxx::type::k_string:
                     return std::stol(bsoncxx::string::to_string(element.get_string().value));
@@ -195,7 +228,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static int GetIntValue(const std::optional<view> &view, const std::string &name) {
-            if (view.value().find(name) != view.value().end()) {
+            if (view->find(name) != view->end()) {
                 return GetIntValue(view.value()[name]);
             }
             return {};
@@ -250,7 +283,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static std::string GetStringValue(const std::optional<view> &view, const std::string &name) {
-            if (view.value().find(name) != view.value().end()) {
+            if (view->find(name) != view->end()) {
                 return GetStringValue(view.value()[name]);
             }
             return {};
@@ -284,7 +317,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static bool GetBoolValue(const std::optional<view> &view, const std::string &name) {
-            if (view.value().find(name) != view.value().end()) {
+            if (view->find(name) != view->end()) {
                 return GetBoolValue(view.value()[name]);
             }
             return {};
@@ -307,7 +340,7 @@ namespace AwsMock::Core::Bson {
         }
 
         static system_clock::time_point GetDateValue(const std::optional<view> &view, const std::string &name) {
-            if (view.value().find(name) != view.value().end()) {
+            if (view->find(name) != view->end()) {
                 return GetDateValue(view.value()[name]);
             }
             return {};

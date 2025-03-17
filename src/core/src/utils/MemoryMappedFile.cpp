@@ -9,7 +9,10 @@ namespace AwsMock::Core {
     boost::mutex MemoryMappedFile::_mutex;
 
     bool MemoryMappedFile::OpenFile(const std::string &filename) {
-
+#ifdef WIN32
+        // TODO: Fix windows port
+        return true;
+#else
         _fileSize = FileUtils::FileSize(filename);
 
         int fd = open(filename.c_str(), O_RDONLY);
@@ -30,13 +33,17 @@ namespace AwsMock::Core {
 
         _mapped = true;
         return _mapped;
+#endif
     }
 
     void MemoryMappedFile::CloseFile() {
         boost::mutex::scoped_lock lock(_mutex);
+#ifdef WIN32
+#else
         if (munmap(_start, _fileSize) < 0) {
             log_error << "Could not unmap file";
         }
+#endif
         log_debug << "Memory mapped file closed";
         _mapped = false;
     }

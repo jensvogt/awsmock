@@ -34,10 +34,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS: {
 
-                    std::string functionName = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "FunctionName");
-                    std::string eventSourceArn = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "EventSourceArn");
-                    std::string marker = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "Marker");
-                    int maxItems = Core::NumberUtils::ToInt(Core::HttpUtils::GetQueryParameterValueByName(request.target(), "MaxItems"));
+                    std::string functionName = Core::HttpUtils::GetStringParameter(request.target(), "FunctionName");
+                    std::string eventSourceArn = Core::HttpUtils::GetStringParameter(request.target(), "EventSourceArn");
+                    std::string marker = Core::HttpUtils::GetStringParameter(request.target(), "Marker");
+                    int maxItems = Core::HttpUtils::GetIntParameter(request.target(), "MaxItems", 0, 1000, 1000);
 
                     Dto::Lambda::ListEventSourceMappingsRequest lambdaRequest = {.functionName = functionName, .eventSourceArn = eventSourceArn, .marker = marker, .maxItems = maxItems};
                     lambdaRequest.region = clientCommand.region;

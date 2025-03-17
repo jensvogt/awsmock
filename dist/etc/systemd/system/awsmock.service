@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-ExecStart=/usr/local/bin/awsmockmgr --loglevel info --config /etc/awsmock.yml
+ExecStart=/usr/local/awsmock/bin/awsmockmgr --loglevel info --config /usr/local/awsmock/etc/awsmock.yml
 KillSignal=SIGTERM
 
 [Install]

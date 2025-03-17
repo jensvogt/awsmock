@@ -11,6 +11,8 @@ namespace AwsMock::Dto::Common {
         UserAgent userAgent;
         userAgent.FromRequest(request);
 
+        // Core::HttpUtils::DumpHeaders(request);
+
         // Basic values
         this->region = awsRegion;
         this->user = awsUser;
@@ -28,9 +30,9 @@ namespace AwsMock::Dto::Common {
 
         // Multipart uploads/downloads
         uploads = Core::HttpUtils::HasQueryParameter(request.target(), "uploads");
-        uploadId = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "uploadId");
-        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
+        uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
         partNumber = Core::HttpUtils::HasQueryParameter(request.target(), "partNumber");
+        uploadPartCopy = Core::HttpUtils::HasHeader(request, "x-amz-copy-source") && Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range");
         rangeRequest = Core::HttpUtils::HasHeader(request, "Range");
         multipartRequest = uploads || !uploadId.empty() || partNumber;
 
@@ -56,7 +58,7 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::LIST_BUCKETS;
                     } else if (!bucket.empty() && key.empty()) {
                         if (Core::HttpUtils::HasQueryParameter(request.target(), "versions")) {
-                            prefix = Core::HttpUtils::GetQueryParameterValueByName(request.target(), "prefix");
+                            prefix = Core::HttpUtils::GetStringParameter(request.target(), "prefix");
                             command = S3CommandType::LIST_OBJECT_VERSIONS;
                         } else {
                             command = S3CommandType::LIST_OBJECTS;
@@ -109,8 +111,12 @@ namespace AwsMock::Dto::Common {
                         command = S3CommandType::DELETE_OBJECT;
                     }
                     break;
+
+                case http::verb::head:
+                    break;
+
                 default:
-                    log_error << "Unknown command";
+                    log_error << "Unknown command, method: " << method << " multipartRequest: " << multipartRequest << " bucket: " << bucket << " key: " << key << uploads;
                     break;
             }
         }
@@ -178,7 +184,7 @@ namespace AwsMock::Dto::Common {
             Core::Bson::BsonUtils::SetStringValue(document, "key", key);
             Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
-            Core::Bson::BsonUtils::SetIntValue(document, "contentLength", contentLength);
+            Core::Bson::BsonUtils::SetLongValue(document, "contentLength", contentLength);
             Core::Bson::BsonUtils::SetBoolValue(document, "versionRequest", versionRequest);
             Core::Bson::BsonUtils::SetBoolValue(document, "notificationRequest", notificationRequest);
             Core::Bson::BsonUtils::SetBoolValue(document, "multipartRequest", multipartRequest);

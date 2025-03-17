@@ -25,6 +25,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported SNS client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class SNSCommandType {
         CREATE_TOPIC,
         LIST_TOPICS,

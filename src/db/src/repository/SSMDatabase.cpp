@@ -15,7 +15,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
                 const int64_t count = _parameterCollection.count_documents(make_document(kvp("name", name)));
-                log_trace << "Parameter exists: " << std::boolalpha << count;
+                log_trace << "Parameter exists: " << std::boolalpha << (count > 0);
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -122,7 +122,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
 
-                const long count = _parameterCollection.count_documents(make_document());
+                const long count = static_cast<long>(_parameterCollection.count_documents(make_document()));
                 log_trace << "Parameter count: " << count;
                 return count;
 

@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-     * Receive message response.
+     * @brief Receive message response.
      *
      * Example:
      * @code{.json}
@@ -44,6 +44,8 @@ namespace AwsMock::Dto::SQS {
      *   ]
      * }
      * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ReceiveMessageResponse {
 
@@ -73,28 +75,28 @@ namespace AwsMock::Dto::SQS {
         std::map<std::string, MessageAttribute> messageAttributes;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson();
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString();
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

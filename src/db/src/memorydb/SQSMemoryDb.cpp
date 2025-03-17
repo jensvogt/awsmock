@@ -498,7 +498,7 @@ namespace AwsMock::Database {
                                        if (kv.second.queueArn == queue.queueArn) {
                                            return kv.second;
                                        }
-                                       return (Entity::SQS::Message){};
+                                       return Entity::SQS::Message();
                                    });
 
             if (!filtered.empty()) {

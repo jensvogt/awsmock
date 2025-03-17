@@ -491,19 +491,4 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Common::CognitoCommandType CognitoHandler::GetActionFromHeader(const http::request<http::dynamic_body> &request) {
-
-        if (Core::HttpUtils::HasHeader(request, "x-awsmock-action")) {
-            return Dto::Common::CognitoCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
-        }
-
-        if (!Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
-            log_error << "Could not extract action";
-            throw Core::BadRequestException("Could not extract action");
-        }
-
-        const std::string headerValue = request["X-Amz-Target"];
-        return Dto::Common::CognitoCommandTypeFromString(Core::StringUtils::Split(headerValue, '.')[1]);
-    }
-
 }// namespace AwsMock::Service

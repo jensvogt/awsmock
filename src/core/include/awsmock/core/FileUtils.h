@@ -13,14 +13,16 @@
 #include <format>
 #include <fstream>
 #include <iostream>
-#include <pwd.h>
 #include <string>
+#ifndef _WIN32
+#include <pwd.h>
+#endif
 
 #ifdef __APPLE__
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
-#else
+#elif __linux__
 #include <sys/sendfile.h>
 #endif
 

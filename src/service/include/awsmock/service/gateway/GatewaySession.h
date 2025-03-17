@@ -31,11 +31,6 @@
 #include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
 
-// Maximal body size (10MB)
-#define DEFAULT_MAX_BODY_SIZE (100 * 1024 * 1024)
-#define DEFAULT_MAX_QUEUE_SIZE 250
-#define DEFAULT_TIMEOUT 300
-
 namespace AwsMock::Service {
 
     namespace http = boost::beast::http;

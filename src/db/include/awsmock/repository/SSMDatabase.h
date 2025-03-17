@@ -9,12 +9,8 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/ssm/Parameter.h>
@@ -22,11 +18,6 @@
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
-
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::builder::stream::document;
 
     /**
      * @brief ssm MongoDB database.
@@ -57,7 +48,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool ParameterExists(const std::string &name) const;
+        [[nodiscard]] bool ParameterExists(const std::string &name) const;
 
         /**
          * @brief Returns an SSM parameter by primary key

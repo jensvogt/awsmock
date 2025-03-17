@@ -12,7 +12,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS key expiration model
+     * @brief KMS key expiration model
      *
      * @author jens.vogt\@opitz-consulting.com
      */

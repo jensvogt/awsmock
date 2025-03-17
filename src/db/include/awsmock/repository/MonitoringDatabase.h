@@ -106,11 +106,6 @@ namespace AwsMock::Database {
       private:
 
         /**
-         * Convert timestamps
-         */
-        void ConvertTimestamps(system_clock::time_point &start, system_clock::time_point &end);
-
-        /**
          * Database name
          */
         std::string _databaseName;

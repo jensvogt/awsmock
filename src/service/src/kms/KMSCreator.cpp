@@ -88,10 +88,10 @@ namespace AwsMock::Service {
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;
     }
 
-    void KMSCreator::CreateHmacKey(Database::Entity::KMS::Key &key, int length) {
+    void KMSCreator::CreateHmacKey(Database::Entity::KMS::Key &key, const int length) {
         log_debug << "Start creating HMAC KMS key, keyId: " << key.keyId << " length: " << length;
 
-        unsigned char keyMaterial[length];
+        unsigned char keyMaterial[512];
         Core::Crypto::CreateHmacKey(keyMaterial, length);
 
         // Base64 hashing

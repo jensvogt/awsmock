@@ -136,6 +136,19 @@ namespace AwsMock::Core {
          */
         static system_clock::time_point FromUnixTimestamp(long timestamp);
 
+#ifdef _WIN32
+        /**
+         * @brief Get the localtime from unix timestamp
+         *
+         * @par
+         * On Windows (using MSVC) the bson library converts a uint_64 in long long.
+         * 
+         * @param timestamp UNIX timestamp
+         * @return system_clock::time_point
+         */
+        static system_clock::time_point FromUnixTimestamp(long long timestamp);
+#endif
+
         /**
          * @brief Get the current local time
          *
@@ -183,4 +196,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif//AWS_MOCK_CORE_DATETIME_UTILS_H
+#endif

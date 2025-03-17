@@ -17,7 +17,7 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-     * @brief List queue tags request
+     * @brief List SQS queue tags request
      *
      * @author jens.vogt\@opitz-consulting.com
      */

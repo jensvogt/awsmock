@@ -15,7 +15,7 @@
 #include <boost/noncopyable.hpp>
 #include <boost/system/error_code.hpp>
 
-// AwsMOck includes
+// AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 
@@ -30,7 +30,7 @@ namespace AwsMock::Core {
         explicit PeriodicScheduler(boost::asio::io_context &io_service);
 
         /**
-         * Main routine
+         * @brief Main routine
          */
         void Run();
 

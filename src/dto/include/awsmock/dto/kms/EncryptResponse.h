@@ -17,7 +17,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * Encryption of supplied blob response
+     * @brief Encryption of supplied blob response
      *
      * Example:
      * @code{.json}

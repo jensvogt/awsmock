@@ -63,7 +63,7 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        constexpr std::vector<std::string> environment;
+        const std::vector<std::string> environment;
         _service.CreateImage(HELLO_WORLD_IMAGE, HELLO_WORLD_TAG, HELLO_WORLD_IMAGE);
         const Dto::Docker::CreateContainerResponse response = _service.CreateContainer(HELLO_WORLD_IMAGE, instanceId, HELLO_WORLD_TAG, environment, 1025);
         EXPECT_FALSE(response.id.empty());
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        constexpr std::vector<std::string> environment;
+        const std::vector<std::string> environment;
         _service.CreateImage(HELLO_WORLD_IMAGE, HELLO_WORLD_TAG, HELLO_WORLD_IMAGE);
         const Dto::Docker::CreateContainerResponse response = _service.CreateContainer(HELLO_WORLD_IMAGE, instanceId, HELLO_WORLD_TAG, environment, 1025);
         EXPECT_FALSE(response.id.empty());
@@ -97,7 +97,7 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        constexpr std::vector<std::string> environment;
+        const std::vector<std::string> environment;
         _service.CreateImage(HELLO_WORLD_IMAGE, HELLO_WORLD_TAG, HELLO_WORLD_IMAGE);
         const Dto::Docker::CreateContainerResponse response = _service.CreateContainer(HELLO_WORLD_IMAGE, instanceId, HELLO_WORLD_TAG, environment, 1025);
         EXPECT_FALSE(response.id.empty());
@@ -115,7 +115,7 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        constexpr std::vector<std::string> environment;
+        const std::vector<std::string> environment;
         _service.CreateImage(K8S_PAUSE_IMAGE, K8S_PAUSE_TAG, K8S_PAUSE_IMAGE);
         const Dto::Docker::CreateContainerResponse response = _service.CreateContainer(K8S_PAUSE_IMAGE, instanceId, K8S_PAUSE_TAG, environment, 1025);
         EXPECT_FALSE(response.id.empty());

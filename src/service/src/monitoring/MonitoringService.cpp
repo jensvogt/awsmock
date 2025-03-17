@@ -32,7 +32,7 @@ namespace AwsMock::Service {
             Dto::Monitoring::GetMultiCountersResponse response;
 
             // Get counters from database
-            for (std::vector<std::string> series = _database.GetDistinctLabelValues(request.name, request.labelName); const auto &labelValue: series) {
+            for (const std::vector<std::string> series = _database.GetDistinctLabelValues(request.name, request.labelName); const auto &labelValue: series) {
                 response.counters[labelValue] = _database.GetMonitoringValues(request.name, request.start, request.end, request.step, request.labelName, labelValue);
             }
 

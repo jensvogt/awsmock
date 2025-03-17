@@ -221,9 +221,9 @@ namespace AwsMock::Database {
     TEST_F(CognitoDatabaseDbTest, UserExistsTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool = {.region = _region, .name = USER_POOL_NAME};
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user = {.region = _region, .userPoolId = createUserPoolResult.userPoolId, .userName = USER_NAME};
         const Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act

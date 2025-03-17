@@ -12,14 +12,14 @@
 namespace AwsMock::Dto {
 
     /**
-     * Common DTO
+     * @brief Common DTO
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct CommonDto {
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param resource AWS resource
          * @param requestId AWS request ID

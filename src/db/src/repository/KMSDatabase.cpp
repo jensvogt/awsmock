@@ -181,7 +181,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _keyCollection.replace_one(make_document(kvp("keyId", key.keyId)), key.ToDocument());
+                auto result = _keyCollection.find_one_and_update(make_document(kvp("keyId", key.keyId)), key.ToDocument());
                 log_trace << "Key updated: " << key.ToString();
                 session.commit_transaction();
                 return GetKeyByKeyId(key.keyId);

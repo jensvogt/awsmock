@@ -15,6 +15,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief List SQS queues tags response.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListQueueTagsResponse {
 
         /**

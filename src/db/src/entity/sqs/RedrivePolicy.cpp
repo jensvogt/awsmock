@@ -34,17 +34,17 @@ namespace AwsMock::Database::Entity::SQS {
 
     view_or_value<view, value> RedrivePolicy::ToDocument() const {
 
-        view_or_value<view, value> redrivePolicyDoc = make_document(
-                kvp("deadLetterTargetArn", deadLetterTargetArn),
-                kvp("maxReceiveCount", maxReceiveCount));
+        document redrivePolicyDoc;
+        Core::Bson::BsonUtils::SetStringValue(redrivePolicyDoc, "deadLetterTargetArn", deadLetterTargetArn);
+        Core::Bson::BsonUtils::SetIntValue(redrivePolicyDoc, "maxReceiveCount", maxReceiveCount);
 
-        return redrivePolicyDoc;
+        return redrivePolicyDoc.extract();
     }
 
     void RedrivePolicy::FromDocument(const std::optional<view> &mResult) {
 
-        deadLetterTargetArn = bsoncxx::string::to_string(mResult.value()["deadLetterTargetArn"].get_string().value);
-        maxReceiveCount = mResult.value()["maxReceiveCount"].get_int32().value;
+        deadLetterTargetArn = Core::Bson::BsonUtils::GetStringValue(mResult, "deadLetterTargetArn");
+        maxReceiveCount = Core::Bson::BsonUtils::GetIntValue(mResult, "maxReceiveCount");
     }
 
     std::string RedrivePolicy::ToString() const {
@@ -54,7 +54,7 @@ namespace AwsMock::Database::Entity::SQS {
     }
 
     std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r) {
-        os << "RedrivePolicy=" << to_json(r.ToDocument());
+        os << "RedrivePolicy=" << r.ToJson();
         return os;
     }
 

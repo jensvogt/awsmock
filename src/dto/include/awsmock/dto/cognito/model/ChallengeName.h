@@ -11,7 +11,6 @@
 
 namespace AwsMock::Dto::Cognito {
 
-
     /**
      * @brief Cognito auth flow enum
      *

@@ -3,7 +3,7 @@ FROM jensvogt/awsmock-base:latest AS build
 # Create build environment
 RUN mkdir -p /usr/src
 RUN git config --global http.postBuffer 524288000
-RUN git config --global http.version HTTP/2
+RUN git config --global http.version HTTP/1.1
 
 # Install aws-mock
 WORKDIR /usr/src
@@ -31,8 +31,9 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url boost-locale plog  \
-    yaml-cpp libarchive libmagic
+RUN apk update && apk add plog yaml-cpp libarchive libmagic
+
+#aws-cli boost-program_options boost-filesystem boost-thread boost-url boost-json boost-locale
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -75,6 +76,17 @@ COPY --from=build /usr/local/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/
 RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-push.so.1.3
 RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push.so
 
+# Install Boost libraries
+COPY --from=build /usr/local/lib/libboost_json.so.1.87.0 /usr/lib/libboost_json.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_thread.so.1.87.0 /usr/lib/libboost_thread.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_program_options.so.1.87.0 /usr/lib/libboost_program_options.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_locale.so.1.87.0 /usr/lib/libboost_locale.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_url.so.1.87.0 /usr/lib/libboost_url.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
+COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
+COPY --from=build /usr/lib/libgtest_main.so.1.15.2 /usr/lib/libgtest_main.so.1.15.2
+COPY --from=build /usr/lib/libgtest.so.1.15.2 /usr/lib/libgtest.so.1.15.2
+
 # Install aws-mock
 COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
@@ -85,7 +97,7 @@ COPY --from=build /usr/local/awsmock/etc/awsmock.yml /usr/local/awsmock/etc
 # Set library search path
 ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
 
-# Expose manager/controller ports
+# Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
 # Prometheus ports
 EXPOSE 9091 9091

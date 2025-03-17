@@ -5,6 +5,8 @@
 #ifndef AWSMOCK_MANAGER_H
 #define AWSMOCK_MANAGER_H
 
+// Boost includes
+#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/service/cognito/CognitoServer.h>
@@ -19,13 +21,6 @@
 #include <awsmock/service/sqs/SQSServer.h>
 #include <awsmock/service/ssm/SSMServer.h>
 #include <awsmock/service/transfer/TransferServer.h>
-
-#define DEFAULT_MONGO_DBNAME "awsmock"
-#define DEFAULT_MONGO_DBUSER "root"
-#define DEFAULT_MONGO_DBPWD "password"
-#define DEFAULT_MONGO_DBHOST "localhost"
-#define DEFAULT_MONGO_DBPORT 27017
-#define DEFAULT_MONGO_POOL_SIZE 256
 
 namespace AwsMock::Manager {
 
@@ -55,13 +50,25 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialization
          */
-        static void Initialize();
+        void Initialize() const;
+
+        /**
+         * @brief Main processing loop.
+         */
+        void Run();
+
+        /**
+         * @brief Stop processing-
+         */
+        void Stop() { _running = false; };
 
         /**
          * @brief Automatically loading init file
          *
          * @par
-         * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup.
+         * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup. If a directory
+         * named /home/awsmock/init exists, all files from that directory will be imported. If both exists, the directory gets the
+         * precedence.
          */
         static void AutoLoad();
 
@@ -70,17 +77,12 @@ namespace AwsMock::Manager {
          */
         static void StopModules();
 
-        /**
-         * @brief Main processing loop.
-         */
-        void Run();
-
       private:
 
         /**
          * @brief Initialize database
          */
-        static void InitializeDatabase();
+        void InitializeDatabase() const;
 
         /**
          * @brief Load the modules from the configuration file.
@@ -88,7 +90,7 @@ namespace AwsMock::Manager {
          * @par
          * Gateway and monitoring are a bit special, as they are not modules, but they still exists in the module database.
          */
-        static void LoadModulesFromConfiguration();
+        void LoadModulesFromConfiguration();
 
         /**
          * @brief Ensures that the modules exists
@@ -101,6 +103,16 @@ namespace AwsMock::Manager {
          * Thread group
          */
         boost::thread_group _threadGroup;
+
+        /**
+         * MongoDB connection pool
+         */
+        Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
+
+        /**
+         * Running flag
+         */
+        bool _running = false;
     };
 
 }// namespace AwsMock::Manager

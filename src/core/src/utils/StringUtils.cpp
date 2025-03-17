@@ -97,12 +97,12 @@ namespace AwsMock::Core {
         return tokens;
     }
 
-    std::string StringUtils::Join(const std::vector<std::string> &vec, const int startIndex) {
+    std::string StringUtils::Join(const std::vector<std::string> &vec, const std::string &delimiter, const int startIndex) {
         std::string result;
         for (int i = startIndex; i < vec.size(); i++) {
             result += vec[i];
             if (i != vec.size() - 1) {
-                result += "/";
+                result += delimiter;
             }
         }
         return result;

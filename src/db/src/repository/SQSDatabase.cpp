@@ -203,7 +203,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueByName(region, queueName);
     }
 
-    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
 
         if (HasDatabase()) {
 
@@ -523,7 +523,7 @@ namespace AwsMock::Database {
             try {
 
                 document query;
-                query.append(kvp("receiptHandle", make_document(kvp("$exists", receiptHandle))));
+                query.append(kvp("receiptHandle", receiptHandle));
 
                 const auto result = messageCollection.find_one(query.extract());
                 log_trace << "Message exists: " << std::boolalpha << result->empty();
@@ -545,7 +545,7 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             try {
 
-                const auto result = messageCollection.find_one(make_document(kvp("messageId", make_document(kvp("$exists", messageId)))));
+                const auto result = messageCollection.find_one(make_document(kvp("messageId", messageId)));
                 log_trace << "Message exists: " << std::boolalpha << result.has_value();
                 return result.has_value();
 
@@ -1213,8 +1213,24 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const Entity::SQS::Message message = GetMessageByReceiptHandle(receiptHandle);
-            return DeleteMessage(message);
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+                session.commit_transaction();
+
+                log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << result->deleted_count();
+                return result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
         }
         return _memoryDb.DeleteMessage(receiptHandle);
     }

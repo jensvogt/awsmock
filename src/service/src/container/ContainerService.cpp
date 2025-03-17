@@ -8,7 +8,7 @@ namespace AwsMock::Service {
     std::map<std::string, std::string> ContainerService::_supportedRuntimes = {
             {"java11", "public.ecr.aws/lambda/java:11"},
             {"java17", "public.ecr.aws/lambda/java:17"},
-            {"java21", "public.ecr.aws/lambda/java:21"},
+            {"java21", "public.ecr.aws/lambda/java:21.2024.11.22.15"},
             {"python3.8", "public.ecr.aws/lambda/python:3.8"},
             {"python3.9", "public.ecr.aws/lambda/python:3.9"},
             {"python3.10", "public.ecr.aws/lambda/python:3.10"},
@@ -25,12 +25,16 @@ namespace AwsMock::Service {
 
     ContainerService::ContainerService() {
         // Get network mode
-        const Core::Configuration &_configuration = Core::Configuration::instance();
-        _networkName = _configuration.GetValueString("awsmock.docker.network-name");
-        _containerPort = _configuration.GetValueString("awsmock.docker.container.port");
-        _isDocker = _configuration.GetValueBool("awsmock.docker.active");
-        _containerSocketPath = _isDocker ? _configuration.GetValueString("awsmock.docker.socket") : _containerSocketPath = _configuration.GetValueString("awsmock.podman.socket");
-        _domainSocket = std::make_shared<Core::DomainSocket>(_containerSocketPath);
+        _networkName = Core::Configuration::instance().GetValueString("awsmock.docker.network-name");
+        _containerPort = Core::Configuration::instance().GetValueString("awsmock.docker.container.port");
+        _isDocker = Core::Configuration::instance().GetValueBool("awsmock.docker.active");
+#ifdef WIN32
+        _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.docker.socket");
+        _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
+#else
+        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.podman.socket");
+        _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
+#endif
     }
 
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
@@ -38,7 +42,7 @@ namespace AwsMock::Service {
 
         if (_isDocker) {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
+            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters, {}, {}); statusCode == http::status::ok) {
                 Dto::Docker::ListImageResponse response;
                 response.FromJson(body);
                 if (response.imageList.empty()) {
@@ -103,6 +107,7 @@ namespace AwsMock::Service {
         if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "http://localhost/build?t=" + name + ":" + tag, imageFile); statusCode != http::status::ok) {
             log_error << "Build image failed, httpStatus: " << statusCode << " body: " << body;
         }
+        log_debug << "Build image request finished, name: " << name << " tags: " << tag << " runtime: " << runtime;
         return imageFile;
     }
 
@@ -111,8 +116,8 @@ namespace AwsMock::Service {
         log_debug << "Build image request, name: " << name << " tags: " << tag;
 
         // Write docker file
-        std::string codeDir = Core::DirUtils::CreateTempDir();
-        std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        const std::string codeDir = Core::DirUtils::CreateTempDir();
+        const std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::ofstream ofs(fileName);
         ofs << dockerFile;
         ofs.close();
@@ -121,7 +126,7 @@ namespace AwsMock::Service {
         std::string tarFileName = name;
         Core::StringUtils::Replace(tarFileName, "/", "-");
         Core::StringUtils::Replace(tarFileName, ".", "-");
-        std::string imageFile = BuildImageFile(codeDir, tarFileName);
+        const std::string imageFile = BuildImageFile(codeDir, tarFileName);
 
         if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "http://localhost/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, httpStatus: " << statusCode << " body: " << body;
@@ -134,8 +139,7 @@ namespace AwsMock::Service {
 
         Dto::Docker::ListImageResponse response{};
         const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters);
-            statusCode == http::status::ok) {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "http://localhost/images/json?all=true&filters=" + filters); statusCode == http::status::ok) {
             response.FromJson(body);
             if (response.imageList.empty()) {
                 log_warning << "Docker image not found, name: " << name;
@@ -568,10 +572,12 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
-        std::string dockerFilename = codeDir + boost::filesystem::path::preferred_separator + "Dockerfile";
 
-        std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
-        log_debug << "Using supported runtime: " << supportedRuntime;
+        std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
+        std::string supportedRuntime = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.runtime." + boost::algorithm::to_lower_copy(runtime));
+
+        //std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
+        log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {

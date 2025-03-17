@@ -12,9 +12,11 @@ namespace AwsMock::Service {
 
         // Start monitoring system collector
         scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.CollectSystemCounter(); }, 60);
+        log_debug << "System collector started";
 
         // Start the database cleanup worker thread every day
         scheduler.AddTask("monitoring-cleanup-database", [this] { this->DeleteMonitoringData(); }, 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
+        log_debug << "Cleanup started";
 
         // Set running
         SetRunning();

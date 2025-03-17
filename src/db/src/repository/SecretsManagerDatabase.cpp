@@ -155,7 +155,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto result = _secretCollection.replace_one(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
+                auto result = _secretCollection.find_one_and_update(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
                 session.commit_transaction();
                 log_trace << "Bucket updated: " << secret.ToString();
 

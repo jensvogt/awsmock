@@ -1,9 +1,6 @@
 
 #include <awsmock/ftpserver/FtpSession.h>
 
-#include <picojson/picojson.h>
-#include <utility>
-
 namespace AwsMock::FtpServer {
     FtpSession::FtpSession(boost::asio::io_context &io_service,
                            const UserDatabase &user_database,
@@ -35,7 +32,7 @@ namespace AwsMock::FtpServer {
         command_socket_.set_option(boost::asio::ip::tcp::no_delay(true), ec);
         if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
-	}
+        }
 
         sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
         readFtpCommand();
@@ -683,8 +680,10 @@ namespace AwsMock::FtpServer {
         const std::ios::openmode open_mode =
                 std::ios::ate | (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
 #if defined(WIN32) && !defined(__GNUG__)
-        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
-        std::ifstream file(wLocalPath, open_mode);
+        // TODO fix windows porting issues
+        std::ifstream file(local_path, open_mode);
+//        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
+//        std::ifstream file(wLocalPath, open_mode);
 #else
         std::ifstream file(local_path, open_mode);
 #endif
@@ -898,7 +897,7 @@ namespace AwsMock::FtpServer {
 
         const std::string local_path = toLocalPath(param);
 #ifdef _WIN32
-        _rmdir(local_path.c_str());
+        _wrmdir(reinterpret_cast<const wchar_t *>(local_path.c_str()));
 #else
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
@@ -923,7 +922,7 @@ namespace AwsMock::FtpServer {
 
         auto local_path = toLocalPath(param);
 #ifdef _WIN32
-        if (_mkdir(reinterpret_cast<const char *>(local_path.c_str() == 0))) {
+        if (_wmkdir(reinterpret_cast<const wchar_t *>(reinterpret_cast<const char *>(local_path.c_str() == 0)))) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
             return;
         }
@@ -933,11 +932,11 @@ namespace AwsMock::FtpServer {
                            createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
             return;
         }
+#endif
         // If would be a good idea to return a 4xx error code here (-> temp error)
         // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
         // errors are permanent.
         sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
-#endif
     }
 
     void FtpSession::handleFtpCommandPWD(const std::string & /*param*/) {
@@ -968,9 +967,9 @@ namespace AwsMock::FtpServer {
         // Some FTP clients send those commands, as if they would call ls on unix.
         //
         // We try to support those parameters (or rather ignore them), even though
-        // this techniqually breaks listing directories that actually use "-a" etc.
+        // this technically breaks listing directories that actually use "-a" etc.
         // as directory name. As most clients however first CWD into a directory and
-        // call LIST without parameter afterwards and starting a directory name with
+        // call LIST without parameter afterward and starting a directory name with
         // "-a " / "-l " / "-al " / "-la " is not that common, the compatibility
         // benefit should outperform te potential problems by a lot.
         //

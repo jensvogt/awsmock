@@ -343,7 +343,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
-        std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const;
+        [[nodiscard]] std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const;
 
         /**
          * @brief Deletes an existing cognito user group.
@@ -371,7 +371,7 @@ namespace AwsMock::Database {
          * @return true if cognito client ID exists
          * @throws DatabaseException
          */
-        bool ClientIdExists(const std::string &region, const std::string &clientId) const;
+        [[nodiscard]] bool ClientIdExists(const std::string &region, const std::string &clientId) const;
 
       private:
 

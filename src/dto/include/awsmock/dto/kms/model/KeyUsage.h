@@ -11,7 +11,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS key usage
+     * @brief KMS key usage
      *
      * @author jens.vogt\@opitz-consulting.com
      */

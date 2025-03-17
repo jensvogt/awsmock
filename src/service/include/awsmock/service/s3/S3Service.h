@@ -15,6 +15,7 @@
 #endif
 
 // Boost includes
+#include <boost/coroutine/all.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -81,12 +82,6 @@
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 
-#define DEFAULT_USER "none"
-#define DEFAULT_REGION "eu-central-1"
-#define DEFAULT_DATA_DIR "/home/awsmock/data"
-#define DEFAULT_TRANSFER_DATA_DIR "/tmp/awsmock/data/transfer"
-#define DEFAULT_TRANSFER_BUCKET_NAME "transfer-server"
-
 namespace AwsMock::Service {
 
     /**
@@ -101,7 +96,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -110,7 +105,7 @@ namespace AwsMock::Service {
          * @param bucket bucket name
          * @return true if bucket exists
          */
-        bool BucketExists(const std::string &region, const std::string &bucket) const;
+        [[nodiscard]] bool BucketExists(const std::string &region, const std::string &bucket) const;
 
         /**
          * @brief Returns the metadata of an S3 bucket
@@ -118,7 +113,7 @@ namespace AwsMock::Service {
          * @param request get metadata request
          * @return GetMetadataResponse
          */
-        Dto::S3::GetMetadataResponse GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const;
+        [[nodiscard]] Dto::S3::GetMetadataResponse GetBucketMetadata(const Dto::S3::GetMetadataRequest &request) const;
 
         /**
          * @brief Returns the S3 bucket.
@@ -130,7 +125,7 @@ namespace AwsMock::Service {
          * @return GetBucketResponse
          * @see GetBucketResponse
          */
-        Dto::S3::GetBucketResponse GetBucket(const Dto::S3::GetBucketRequest &request) const;
+        [[nodiscard]] Dto::S3::GetBucketResponse GetBucket(const Dto::S3::GetBucketRequest &request) const;
 
         /**
          * @brief Returns the metadata of an S3 object
@@ -171,7 +166,7 @@ namespace AwsMock::Service {
          *
          * @return ListAllBucketResponse
          */
-        Dto::S3::ListAllBucketResponse ListAllBuckets() const;
+        [[nodiscard]] Dto::S3::ListAllBucketResponse ListAllBuckets() const;
 
         /**
          * @brief Lists contents of bucket
@@ -179,7 +174,7 @@ namespace AwsMock::Service {
          * @param s3Request S3 create request
          * @return CreateBucketResponse
          */
-        Dto::S3::ListBucketResponse ListBucket(const Dto::S3::ListBucketRequest &s3Request) const;
+        [[nodiscard]] Dto::S3::ListBucketResponse ListBucket(const Dto::S3::ListBucketRequest &s3Request) const;
 
         /**
          * @brief Lists bucket counters
@@ -528,6 +523,11 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
+
+        /**
+         * IO context
+         */
+        boost::asio::io_context _ioc;
     };
 }// namespace AwsMock::Service
 

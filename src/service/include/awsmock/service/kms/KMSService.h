@@ -55,12 +55,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit KMSService();
 
         /**
-         * List all keys
+         * @brief List all keys
          *
          * @param request list queue request
          * @return ListKeysResponse
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
 
         /**
-         * Creates a new key
+         * @brief Creates a new key
          *
          * @param request create key request
          * @return CreateKeyResponse
@@ -97,7 +97,7 @@ namespace AwsMock::Service {
         void WaitForAesKey(const std::string &keyId, int maxSeconds) const;
 
         /**
-         * Schedules a key deletion
+         * @brief Schedules a key deletion
          *
          * @param request create queue request
          * @return ScheduleKeyDeletionRequest
@@ -107,7 +107,7 @@ namespace AwsMock::Service {
         Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
 
         /**
-         * Describe a key
+         * @brief Describe a key
          *
          * @param request describe key request
          * @return DescribeKeyResponse
@@ -115,10 +115,10 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DescribeKeyRequest
          * @see Dto::KMS::DescribeKeyResponse
          */
-        Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
+        [[nodiscard]] Dto::KMS::DescribeKeyResponse DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const;
 
         /**
-         * Encrypt a plain text using a given algorithm
+         * @brief Encrypt a plain text using a given algorithm
          *
          * @param request encrypt request
          * @return EncryptResponse
@@ -126,10 +126,10 @@ namespace AwsMock::Service {
          * @see Dto::KMS::EncryptRequest
          * @see Dto::KMS::EncryptResponse
          */
-        Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
+        [[nodiscard]] Dto::KMS::EncryptResponse Encrypt(const Dto::KMS::EncryptRequest &request) const;
 
         /**
-         * Decrypts a cipher text using a given algorithm
+         * @brief Decrypts a cipher text using a given algorithm
          *
          * @param request decrypt request
          * @return DecryptResponse
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Encrypt a plaintext.
+         * @brief Encrypt a plaintext.
          *
          * @param key KMS key
          * @param plainText plain text
@@ -151,7 +151,7 @@ namespace AwsMock::Service {
         static std::string EncryptPlaintext(const Database::Entity::KMS::Key &key, const std::string &plainText);
 
         /**
-         * Decrypt a ciphertext.
+         * @brief Decrypt a ciphertext.
          *
          * @param key KMS key
          * @param ciphertext cipher text
