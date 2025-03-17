@@ -112,6 +112,11 @@ namespace AwsMock::Monitoring {
 
       private:
 
+            /**
+             * Number of cores
+             */
+            int _numProcessors;
+
 #ifdef __linux__
 
         /**
@@ -132,11 +137,6 @@ namespace AwsMock::Monitoring {
          * Last collection timestamp for user CPU utilization
          */
         clock_t _lastUserCPU = 0;
-
-        /**
-         * Number of cores
-         */
-        int _numProcessors;
 
 #elif _WIN32
 

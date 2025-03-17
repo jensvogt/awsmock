@@ -161,7 +161,7 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        if (const long diff = std::chrono::duration_cast<std::chrono::microseconds>(system_clock::now() - _startTime).count(); diff > 0) {
+        if (const long diff = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - _startTime).count(); diff > 0) {
 
             // User CPU
             long millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec;
