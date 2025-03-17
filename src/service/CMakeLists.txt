@@ -38,8 +38,7 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ../db/include ../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX} ${EXT_INCLUDE})
-link_directories(${EXT_LIB})
+include_directories(./include ../core/include ../db/include ../dto/include ${BSONCXX_INCLUDES} ${MONGOCXX_INCLUDES})
 
 # Shared library
 if (NOT WIN32)

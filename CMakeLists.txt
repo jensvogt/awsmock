@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-#set(CMAKE_TOOLCHAIN_FILE)
+set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_HOME}/scripts/buildsystems/vcpkg.cmake)
 
 project(awsmock)
 
@@ -66,7 +66,7 @@ find_package(jwt-cpp CONFIG REQUIRED)
 #target_link_libraries(main PRIVATE jwt-cpp::jwt-cpp)
 find_package(prometheus-cpp CONFIG REQUIRED)
 #target_link_libraries(main PRIVATE prometheus::core prometheus::pull)
-find_package(gtest CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 #target_link_libraries(main PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 find_package(unofficial-libmagic REQUIRED)
 #target_link_libraries(main PRIVATE unofficial::libmagic::libmagic)
