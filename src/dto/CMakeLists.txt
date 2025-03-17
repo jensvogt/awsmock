@@ -129,19 +129,25 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} ${EXT_INCLUDE})
-link_directories(${EXT_LIB})
+include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
 
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb
+            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
+            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
+            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
+            LibArchive::LibArchive unofficial::libmagic::libmagic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static ${mongocxx_LIBRARIES}
-        ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static
+        $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
+        $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
+        Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
+        LibArchive::LibArchive unofficial::libmagic::libmagic)
 
 if (NOT WIN32)
     install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
