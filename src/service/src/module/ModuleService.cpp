@@ -15,7 +15,7 @@ namespace AwsMock::Service {
 
     Dto::Module::ListModuleNamesResponse ModuleService::ListModuleNames() const {
 
-        Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
+        const Database::Entity::Module::ModuleList modules = _moduleDatabase.ListModules();
         log_debug << "Module list, count: " << modules.size();
         Dto::Module::ListModuleNamesResponse moduleNamesResponse;
         for (const auto &module: modules) {
@@ -178,10 +178,8 @@ namespace AwsMock::Service {
             const Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
             if (!infrastructure.sqsQueues.empty()) {
                 for (auto &queue: infrastructure.sqsQueues) {
-                    queue.modified = system_clock::now();
-                    queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
-                    queue = _sqsDatabase.CreateOrUpdateQueue(queue);
-                    log_debug << "SQS queues imported, url: " << queue.queueUrl;
+                    _sqsDatabase.ImportQueue(queue);
+                    log_debug << "SQS queues imported, name: " << queue.name;
                 }
                 log_info << "SQS queues imported, count: " << infrastructure.sqsQueues.size();
             }
@@ -216,7 +214,7 @@ namespace AwsMock::Service {
 
         // Lambdas
         if (!infrastructure.lambdas.empty()) {
-            Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+            const Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
             for (auto &lambda: infrastructure.lambdas) {
                 _lambdaDatabase.ImportLambda(lambda);
             }

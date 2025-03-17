@@ -142,6 +142,11 @@ namespace AwsMock::Database {
         return queueList;
     }
 
+    void SQSMemoryDb::ImportQueue(Entity::SQS::Queue &queue) {
+
+        UpdateQueue(queue);
+    }
+
     long SQSMemoryDb::PurgeQueue(const std::string &queueArn) {
         boost::mutex::scoped_lock lock(_sqsQueueMutex);
 
