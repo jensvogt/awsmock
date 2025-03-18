@@ -18,38 +18,5 @@ RUN cd /usr/src && \
     ./vcpkg update
 
 RUN cd /usr/src/vcpkg && \
-    ./vcpkg install openssl boost jwt-cpp prometheus-cpp mongo-cxx-driver plog
+    ./vcpkg install openssl boost yaml-cpp jwt-cpp prometheus-cpp mongo-cxx-driver plog libarchive libmagic gtest
 
-# Install jwt-cpp
-#RUN cd /usr/src && \
-#    git clone https://github.com/Thalhammer/jwt-cpp.git && \
-#    cd jwt-cpp && \
-#    cmake . && \
-#    cmake --install .
-
-# Prometheus-CPP
-#RUN cd /usr/src && \
-#    git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
-#    cd prometheus-cpp && \
-#    cmake . -DBUILD_SHARED_LIBS=ON && \
-#    cmake --build . -j16 && \
-#    cmake --install .
-
-# Install mongo-cxx-driver
-#RUN cd /usr/src && \
-#    git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
-#    cd mongo-cxx-driver && \
-#    cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
-#    cmake --build . --config Release -j 16 && \
-#    cmake --install . --prefix /usr/local
-
-# Install Boost 1.87
-#RUN cd /usr/src && \
-#    wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz && \
-#    tar -xzf boost_1_87_0.tar.gz && \
-#    cd boost_1_87_0 && \
-#    ./bootstrap.sh && \
-#    ./b2 install
-
-# Cleanup
-RUN rm -rf /usr/src

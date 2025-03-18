@@ -7,6 +7,7 @@ project(awsmock)
 # Defaults
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_BUILD_PARALLEL_LEVEL 16)
+set(X_VCPKG_APPLOCAL_DEPS_INSTALL ON)
 if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
     add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc)
@@ -48,7 +49,7 @@ enable_testing()
 
 # External packages
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread program_options json process locale url)
-find_package(OpenSSL CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
 find_package(LibArchive REQUIRED)
 find_package(bsoncxx CONFIG REQUIRED)
 find_package(mongocxx CONFIG REQUIRED)

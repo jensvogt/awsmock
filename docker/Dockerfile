@@ -9,7 +9,7 @@ RUN git config --global http.version HTTP/1.1
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    cmake . && \
+    cmake . -DCMAKE_TOOLCHAIN_FILE=/usr/src/vcpkg/scripts/buildsystems/vcpkg.cmake && \
     cmake --build . --config Release -j 16 && \
     cmake --install .
 
@@ -52,6 +52,7 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
+RUN ldd src/manager/awsmockmgr | cut -d ' ' -f3 | sed '/^[[:space:]]*$/d'
 # Install Mongo C/C++ driver
 COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
 RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0

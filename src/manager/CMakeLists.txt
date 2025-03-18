@@ -14,6 +14,16 @@ if (WIN32)
             $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
             Boost::locale Boost::filesystem Boost::url yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::Crypto
             LibArchive::LibArchive prometheus-cpp::pull prometheus-cpp::core unofficial::libmagic::libmagic)
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockMgr)
+    install(RUNTIME_DEPENDENCY_SET libAwsMockMgr
+            PRE_EXCLUDE_REGEXES
+            [=[api-ms-]=]
+            [=[ext-ms-]=]
+            [[kernel32\.dll]]
+            [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
+            POST_EXCLUDE_REGEXES
+            [=[.*(\\|/)system32(\\|/).*\.dll]=]
+            [=[^/(lib|usr/lib|usr/local/lib/lib64)]=])
 else ()
     add_executable(${BINARY} ${SOURCES})
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore
@@ -21,6 +31,16 @@ else ()
             $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
             Boost::locale Boost::filesystem Boost::url Boost::program_options yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::Crypto
             LibArchive::LibArchive prometheus-cpp::pull prometheus-cpp::core unofficial::libmagic::libmagic)
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockMgr)
+    install(RUNTIME_DEPENDENCY_SET libAwsMockMgr
+            PRE_EXCLUDE_REGEXES
+            [=[api-ms-]=]
+            [=[ext-ms-]=]
+            [[kernel32\.dll]]
+            [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
+            POST_EXCLUDE_REGEXES
+            [=[.*(\\|/)system32(\\|/).*\.dll]=]
+            [=[^/(lib|usr/lib|usr/local/lib/lib64)]=] DESTINATION /usr/lib)
 endif ()
 
-install(TARGETS ${BINARY} DESTINATION ${BIN_INSTALL_DIR})
+
