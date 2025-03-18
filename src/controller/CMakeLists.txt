@@ -12,6 +12,16 @@ if (WIN32)
             Boost::filesystem Boost::url Boost::thread Boost::locale Boost::program_options yaml-cpp::yaml-cpp
             OpenSSL::SSL OpenSSL::SSL prometheus-cpp::core prometheus-cpp::pull LibArchive::LibArchive
             unofficial::libmagic::libmagic)
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockCtl)
+    install(RUNTIME_DEPENDENCY_SET libAwsMockCtl
+            PRE_EXCLUDE_REGEXES
+            [=[api-ms-]=]
+            [=[ext-ms-]=]
+            [[kernel32\.dll]]
+            [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
+            POST_EXCLUDE_REGEXES
+            [=[.*(\\|/)system32(\\|/).*\.dll]=]
+            [=[^/(lib|usr/lib|usr/local/lib/lib64)]=])
 else ()
     add_executable(${BINARY} ${SOURCES})
     # Check systemd
@@ -25,7 +35,7 @@ else ()
                 Boost::filesystem Boost::url Boost::thread Boost::locale Boost::program_options yaml-cpp::yaml-cpp
                 OpenSSL::SSL OpenSSL::SSL prometheus-cpp::core prometheus-cpp::pull LibArchive::LibArchive
                 unofficial::libmagic::libmagic systemd)
-        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockCtl)
+        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockCtl)
         install(RUNTIME_DEPENDENCY_SET libAwsMockCtl
                 PRE_EXCLUDE_REGEXES
                 [=[api-ms-]=]
@@ -43,7 +53,7 @@ else ()
                 Boost::filesystem Boost::url Boost::thread Boost::locale Boost::program_options yaml-cpp::yaml-cpp
                 OpenSSL::SSL OpenSSL::SSL prometheus-cpp::core prometheus-cpp::pull LibArchive::LibArchive
                 unofficial::libmagic::libmagic)
-        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockCtl)
+        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockCtl)
         install(RUNTIME_DEPENDENCY_SET libAwsMockCtl
                 PRE_EXCLUDE_REGEXES
                 [=[api-ms-]=]

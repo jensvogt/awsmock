@@ -26,7 +26,7 @@ else ()
             Boost::filesystem Boost::url Boost::thread Boost::locale Boost::program_options yaml-cpp::yaml-cpp
             OpenSSL::SSL OpenSSL::SSL prometheus-cpp::core prometheus-cpp::pull LibArchive::LibArchive
             unofficial::libmagic::libmagic)
-    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockLocal)
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockLocal)
     install(RUNTIME_DEPENDENCY_SET libAwsMockLocal
             PRE_EXCLUDE_REGEXES
             [=[api-ms-]=]
