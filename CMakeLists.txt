@@ -12,7 +12,7 @@ if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
     add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc)
 else ()
-
+    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
     if (${CMAKE_BUILD_TYPE} MATCHES Debug)
         add_compile_options("$<$<CONFIG:Debug>:-Og>")
     else ()

@@ -11,7 +11,7 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     cmake . -DCMAKE_TOOLCHAIN_FILE=/usr/src/vcpkg/scripts/buildsystems/vcpkg.cmake && \
     cmake --build . --config Release -j 16 && \
-    cmake --install .
+    cmake --install . --config Release
 
 # Cleanup
 RUN rm -rf /usr/src
@@ -78,13 +78,13 @@ RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-pu
 RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push.so
 
 # Install Boost libraries
-COPY --from=build /usr/local/lib/libboost_json.so.1.87.0 /usr/lib/libboost_json.so.1.87.0
-COPY --from=build /usr/local/lib/libboost_thread.so.1.87.0 /usr/lib/libboost_thread.so.1.87.0
-COPY --from=build /usr/local/lib/libboost_program_options.so.1.87.0 /usr/lib/libboost_program_options.so.1.87.0
-COPY --from=build /usr/local/lib/libboost_locale.so.1.87.0 /usr/lib/libboost_locale.so.1.87.0
-COPY --from=build /usr/local/lib/libboost_url.so.1.87.0 /usr/lib/libboost_url.so.1.87.0
-COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
-COPY --from=build /usr/local/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
+COPY --from=build /usr/lib/libboost_json.so.1.87.0 /usr/lib/libboost_json.so.1.87.0
+COPY --from=build /usr/lib/libboost_thread.so.1.87.0 /usr/lib/libboost_thread.so.1.87.0
+COPY --from=build /usr/lib/libboost_program_options.so.1.87.0 /usr/lib/libboost_program_options.so.1.87.0
+COPY --from=build /usr/lib/libboost_locale.so.1.87.0 /usr/lib/libboost_locale.so.1.87.0
+COPY --from=build /usr/lib/libboost_url.so.1.87.0 /usr/lib/libboost_url.so.1.87.0
+COPY --from=build /usr/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
+COPY --from=build /usr/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
 COPY --from=build /usr/lib/libgtest_main.so.1.15.2 /usr/lib/libgtest_main.so.1.15.2
 COPY --from=build /usr/lib/libgtest.so.1.15.2 /usr/lib/libgtest.so.1.15.2
 

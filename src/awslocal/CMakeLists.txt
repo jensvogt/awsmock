@@ -35,6 +35,6 @@ else ()
             [[libc\.so\..*]] [[libgcc_s\.so\..*]] [[libm\.so\..*]] [[libstdc\+\+\.so\..*]]
             POST_EXCLUDE_REGEXES
             [=[.*(\\|/)system32(\\|/).*\.dll]=]
-            [=[^/(lib|usr/lib|usr/local/lib/lib64)]=] DESTINATION /usr/lib)
+            [=[^/(lib|usr/lib|usr/local/lib/lib64)]=] DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
 
