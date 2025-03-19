@@ -112,6 +112,11 @@ namespace AwsMock::Monitoring {
 
       private:
 
+            /**
+             * Number of cores
+             */
+            int _numProcessors;
+
 #ifdef __linux__
 
         /**

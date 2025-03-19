@@ -130,6 +130,14 @@ namespace AwsMock::Service {
          * @param sb prepared strean buffer
          */
         static long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
+        /**
+         * @brief Gets bucket and key from source header
+         *
+         * @param path path from soiurce header
+         * @param bucket bucket name
+         * @param key S3 object key
+         */
+        static void GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key);
 
         /**
          * S3 service

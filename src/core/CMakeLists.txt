@@ -21,22 +21,25 @@ if (NOT WIN32)
     add_subdirectory(tst)
 endif ()
 
-include_directories(./include ${EXT_INCLUDE} ${INC_BSON_CXX} ${INC_MONGO_CXX})
-link_directories(${EXT_LIB})
+include_directories(./include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
 
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_MONGO_C} ${LIB_BSON_C} ${LIB_BOOST_LOCALE}
-            ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_THREAD} ${LIB_BOOST_PROCESS} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST}
-            ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+    target_link_libraries(${LIBRARY} PRIVATE
+            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
+            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
+            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
+            LibArchive::LibArchive unofficial::libmagic::libmagic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_MONGO_C} ${LIB_BSON_C} ${LIB_BOOST_LOCALE}
-        ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_BOOST_THREAD} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE}
-        ${LIB_PROMETHEUS} ${LIB_MAGIC})
+target_link_libraries(${LIBRARY_STATIC}
+        $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
+        $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
+        Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
+        LibArchive::LibArchive unofficial::libmagic::libmagic)
 
 # Installation
 if (NOT WIN32)

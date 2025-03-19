@@ -46,8 +46,8 @@ namespace AwsMock::Core {
         return PrepareResult(response);
     }
 
-    DomainSocketResult UnixSocket::SendBinary(verb method, const std::string &path, const std::string &fileName) {
-        return SendBinary(method, fileName, {});
+    DomainSocketResult UnixSocket::SendBinary(const verb method, const std::string &path, const std::string &fileName) {
+        return SendBinary(method, path, fileName, {});
     }
 
     DomainSocketResult UnixSocket::SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) {

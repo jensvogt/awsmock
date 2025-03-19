@@ -40,17 +40,15 @@ namespace AwsMock::Dto::Common {
         const std::string cType = request["Content-Type"];
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
-            // awsmock command from UI
             cmd = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-www-form-urlencoded")) {
 
-            cmd = Core::HttpUtils::GetQueryParameterValueByName(payload, "Action");
+            cmd = Core::HttpUtils::GetStringParameterFromPayload(payload, "Action");
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
-            const std::string headerValue = request["X-Amz-Target"];
-            cmd = Core::StringUtils::Split(headerValue, '.')[1];
+            cmd = Core::StringUtils::Split(request["X-Amz-Target"], '.')[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);
     }

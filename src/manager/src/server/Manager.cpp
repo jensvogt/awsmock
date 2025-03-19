@@ -120,6 +120,7 @@ namespace AwsMock::Manager {
             // eventually destroying the `io_context` and all the sockets in it.
             log_info << "Manager stopped on signal";
             StopModules();
+            _running = false;
             ios.stop();
         });
         log_info << "Signal handler installed";
@@ -172,7 +173,7 @@ namespace AwsMock::Manager {
 
         // Start IO context
         while (_running) {
-            ios.poll();
+            ios.poll_one();
         }
         log_info << "So long, and thanks for all the fish!";
     }
