@@ -8,8 +8,9 @@ add_executable(${BINARY} ${SOURCES})
 if (WIN32)
     set_target_properties(${BINARY} PROPERTIES WIN32_EXECUTABLE ON)
     set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
-    target_link_libraries(${BINARY} awsmockcore_static ${LIB_BOOST_PROCESS})
-    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX} RUNTIME_DEPENDENCY_SET libAwsMockLocal)
+    target_link_libraries(${BINARY} awsmockcore_static Boost::filesystem Boost::url Boost::thread Boost::locale
+            Boost::program_options)
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockLocal)
     install(RUNTIME_DEPENDENCY_SET libAwsMockLocal
             PRE_EXCLUDE_REGEXES
             [=[api-ms-]=]

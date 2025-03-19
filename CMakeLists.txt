@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-#set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_HOME}/scripts/buildsystems/vcpkg.cmake)
+#set(CMAKE_TOOLCHAIN_FILE D:/work/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
 project(awsmock)
 
