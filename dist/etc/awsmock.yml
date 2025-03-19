@@ -16,6 +16,8 @@ awsmock:
   # JSON settings
   json:
     pretty: true                                                      # JSON pretty print
+  magic: # Magic settings
+    file: /usr/local/awsmock/etc/magic.mgc
   # AWS settings
   aws:
     # AWS signature settings

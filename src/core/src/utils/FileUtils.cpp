@@ -10,7 +10,7 @@ namespace AwsMock::Core {
             {".avif", "image/avif"},
             {".avi", "video/x-msvideo"},
             {".azw", "application/vnd.amazon.ebook"},
-            {".bin", "application/octet-stream"},
+            {".bin", DEFAULT_MIME_TYPE},
             {".bmp", "application/bmp"},
             {".bz", "application/x-bzip"},
             {".bz2", "application/x-bzip"},
@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -266,7 +266,7 @@ namespace AwsMock::Core {
 #ifdef WIN32
         // TODO: Fix windows port
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -330,26 +330,32 @@ namespace AwsMock::Core {
 
     std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
 
+        // Check input file
         if (!FileExists(path)) {
-            return "application/octet-stream";
+            return DEFAULT_MIME_TYPE;
         }
+
+        // Magic database
+        const std::string magicFile = Configuration::instance().GetValueString("awsmock.magic.file");
 
         // allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
             log_error << "Could not open libmagic";
+            return DEFAULT_MIME_TYPE;
         }
 
         // load the default magic database (indicated by nullptr)
-        if (magic_load(magic, nullptr) != 0) {
+        if (magic_load(magic, magicFile.c_str()) != 0) {
             log_error << "Could not load libmagic mime types, fileName: " << magic_getpath(nullptr, 0);
+            return DEFAULT_MIME_TYPE;
         }
 
         // get description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
         if (mime == nullptr) {
             log_error << "Could not get mime type";
-            mime = "application/octet-stream";
+            mime = DEFAULT_MIME_TYPE;
         } else {
             log_debug << "Found content-type: " << mime;
         }
@@ -382,7 +388,7 @@ namespace AwsMock::Core {
         const char *mime = magic_buffer(magic, content.data(), content.size());
         if (mime == nullptr) {
             log_error << "Could not get mime type";
-            mime = "application/octet-stream";
+            mime = DEFAULT_MIME_TYPE;
         } else {
             log_debug << "Found content-type: " << mime;
         }

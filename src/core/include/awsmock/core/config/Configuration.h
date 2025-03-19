@@ -16,6 +16,12 @@
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
+#ifdef _WIN32
+#define DEFAULT_MAGIC_FILE "C:/Program Files (x86)/awsmock/etc/magic.mgc"
+#else
+#define DEFAULT_MAGIC_FILE "/usr/looal/awsmock/etc/magic.mgc"
+#endif
+
 namespace AwsMock::Core {
 
     // Node lookup

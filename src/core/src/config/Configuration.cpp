@@ -26,6 +26,7 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "$HOME/awsmock/data");
         DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "$HOME/awsmock/tmp");
         DefineBoolProperty("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
+        DefineBoolProperty("awsmock.magic.file", "AWSMOCK_MAGIC_FILE", DEFAULT_MAGIC_FILE);
         DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
 
