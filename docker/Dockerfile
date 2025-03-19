@@ -13,12 +13,9 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --config Release
 
-# Cleanup
-RUN rm -rf /usr/src
-
 FROM node:21-bookworm AS buildfrontend
 
-RUN apt update && apt-get install -y git nodejs npm
+RUN apt update && apt-get install -y git
 
 # Install aws-mock-ui
 WORKDIR /usr/src
@@ -29,9 +26,9 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     npm run build --prod
 
 # Stick to alpine:latest
-FROM debian:12.10-slim
+FROM debian:trixie-slim
 
-RUN apt update && apt upgrade
+RUN apt update && apt upgrade -y
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -49,41 +46,6 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
 
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
-
-# Install Mongo C/C++ driver
-#COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
-#RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0
-#RUN ln -s /usr/lib/libbson-1.0.so.0 /usr/lib/libbson-1.0.so
-#COPY --from=build /usr/local/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
-#RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
-#RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
-#COPY --from=build /usr/local/lib/libmongocxx.so.4.0.0 /usr/lib/
-#RUN ln -s /usr/lib/libmongocxx.so.4.0.0 /usr/lib/libmongocxx.so._noabi
-#COPY --from=build /usr/local/lib/libbsoncxx.so.4.0.0 /usr/lib/
-#RUN ln -s /usr/lib/libbsoncxx.so.4.0.0 /usr/lib/libbsoncxx.so._noabi
-#RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
-
-# Install prometheus
-#COPY --from=build /usr/local/lib/libprometheus-cpp-core.so.1.3.0 /usr/lib/
-#RUN ln -s /usr/lib/libprometheus-cpp-core.so.1.3.0 /usr/lib/libprometheus-cpp-core.so.1.3
-#RUN ln -s /usr/lib/libprometheus-cpp-core.so.1.3 /usr/lib/libprometheus-cpp-core.so
-#COPY --from=build /usr/local/lib/libprometheus-cpp-pull.so.1.3.0 /usr/lib/
-#RUN ln -s /usr/lib/libprometheus-cpp-pull.so.1.3.0 /usr/lib/libprometheus-cpp-pull.so.1.3
-#RUN ln -s /usr/lib/libprometheus-cpp-pull.so.1.3 /usr/lib/libprometheus-cpp-pull.so
-#COPY --from=build /usr/local/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/
-#RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-push.so.1.3
-#RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push.so
-
-# Install Boost libraries
-#COPY --from=build /usr/lib/libboost_json.so.1.87.0 /usr/lib/libboost_json.so.1.87.0
-#COPY --from=build /usr/lib/libboost_thread.so.1.87.0 /usr/lib/libboost_thread.so.1.87.0
-#COPY --from=build /usr/lib/libboost_program_options.so.1.87.0 /usr/lib/libboost_program_options.so.1.87.0
-#COPY --from=build /usr/lib/libboost_locale.so.1.87.0 /usr/lib/libboost_locale.so.1.87.0
-#COPY --from=build /usr/lib/libboost_url.so.1.87.0 /usr/lib/libboost_url.so.1.87.0
-#COPY --from=build /usr/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
-#COPY --from=build /usr/lib/libboost_filesystem.so.1.87.0 /usr/lib/libboost_filesystem.so.1.87.0
-#COPY --from=build /usr/lib/libgtest_main.so.1.15.2 /usr/lib/libgtest_main.so.1.15.2
-#COPY --from=build /usr/lib/libgtest.so.1.15.2 /usr/lib/libgtest.so.1.15.2
 
 # Install aws-mock
 COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin

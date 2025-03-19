@@ -1,6 +1,4 @@
-FROM gcc:14
-
-#RUN apk add --no-cache cmake --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main
+FROM gcc:13.2.0-bookworm
 
 RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip autoconf automake \
     autoconf-archive libtool linux-libc-dev pandoc
