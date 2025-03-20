@@ -2,35 +2,31 @@
 // Created by vogje01 on 07/01/2023.
 //
 
+#include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/service/monitoring/MetricCacheService.h>
 
 namespace AwsMock::Monitoring {
 
-    boost::mutex MetricCacheService::_gaugeMutex;
-    boost::mutex MetricCacheService::_counterMutex;
+    boost::mutex MetricCacheService::_cacheMutex;
 
-    MetricCacheService::MetricCacheService() : _database(Database::MonitoringDatabase::instance()) {}
+    MetricCacheService::MetricCacheService() : _database(Database::MonitoringDatabase::instance()) {
 
-    void MetricCacheService::Initialize() {
-        log_debug << "Monitoring cache initialized";
+        // Aggregation period in minutes
+        _aggregationPeriod = Core::Configuration::instance().GetValueInt("awsmock.monitoring.aggregation");
     }
 
-    void MetricCacheService::ClearCounter(const std::string &name) {
-        boost::mutex::scoped_lock lock(_counterMutex);
+    void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        boost::mutex::scoped_lock lock(_cacheMutex);
 
-        const auto count = std::erase_if(_metricCache, [this, name](const auto &item) {
+        const auto count = std::erase_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[key, value] = item;
-            return value.name == GetId(name);
+            return key == GetId(name, labelName, labelValue);
         });
         log_trace << "Counter cleared, count: " << count;
     }
 
-    void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        ClearCounter(GetId(name, labelName, labelValue));
-    }
-
     void MetricCacheService::IncrementCounter(const std::string &name, const int value, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_counterMutex);
+        boost::mutex::scoped_lock lock(_cacheMutex);
 
         const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[k, v] = item;
@@ -40,7 +36,7 @@ namespace AwsMock::Monitoring {
         if (it != _metricCache.end()) {
             it->second.value += value;
             it->second.count++;
-            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > 1) {
+            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > _aggregationPeriod) {
                 _database.IncCounter(name, it->second.value / it->second.count, labelName, labelValue);
                 it->second.lastWritten = system_clock::now();
                 it->second.value = 0;
@@ -49,11 +45,11 @@ namespace AwsMock::Monitoring {
         } else {
             _metricCache[GetId(name, labelName, labelValue)] = {.name = name, .labelName = labelName, .labelValue = labelValue, .value = static_cast<double>(value), .count = 1};
         }
-        log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
+        log_trace << "Counter incremented, name: " << name << ", labelName: " << labelName << ", labelValue: " << labelValue << ", size: " << _metricCache.size();
     }
 
     void MetricCacheService::SetGauge(const std::string &name, const double value, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_gaugeMutex);
+        boost::mutex::scoped_lock lock(_cacheMutex);
 
         const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[k, v] = item;
@@ -63,7 +59,7 @@ namespace AwsMock::Monitoring {
         if (it != _metricCache.end()) {
             it->second.value += value;
             it->second.count++;
-            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > 1) {
+            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > _aggregationPeriod) {
                 _database.SetGauge(name, it->second.value / it->second.count, labelName, labelValue);
                 it->second.lastWritten = system_clock::now();
                 it->second.value = 0;
@@ -72,6 +68,7 @@ namespace AwsMock::Monitoring {
         } else {
             _metricCache[GetId(name, labelName, labelValue)] = {.name = name, .labelName = labelName, .labelValue = labelValue, .value = value, .count = 1};
         }
+        log_trace << "Gauge set, name: " << name << ", labelName: " << labelName << ", labelValue: " << labelValue << ", size: " << _metricCache.size();
     }
 
     std::string MetricCacheService::GetId(const std::string &name, const std::string &labelName, const std::string &labelValue) {
