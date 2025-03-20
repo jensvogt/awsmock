@@ -47,7 +47,7 @@ namespace AwsMock::Monitoring {
                 it->second.count = 0;
             }
         } else {
-            _metricCache[GetId(name, labelName, labelValue)] = {.name=name, .labelName = labelName, .labelValue = labelValue, .value = static_cast<double>(value), .count = 1};
+            _metricCache[GetId(name, labelName, labelValue)] = {.name = name, .labelName = labelName, .labelValue = labelValue, .value = static_cast<double>(value), .count = 1};
         }
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
     }
@@ -57,7 +57,7 @@ namespace AwsMock::Monitoring {
 
         const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[k, v] = item;
-            return k ==  GetId(name, labelName, labelValue);
+            return k == GetId(name, labelName, labelValue);
         });
 
         if (it != _metricCache.end()) {
@@ -70,12 +70,12 @@ namespace AwsMock::Monitoring {
                 it->second.count = 0;
             }
         } else {
-            _metricCache[GetId(name, labelName, labelValue)] = {.name=name, .labelName = labelName, .labelValue = labelValue, .value = value, .count = 1};
+            _metricCache[GetId(name, labelName, labelValue)] = {.name = name, .labelName = labelName, .labelValue = labelValue, .value = value, .count = 1};
         }
     }
 
     std::string MetricCacheService::GetId(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        if(labelName.empty()) {
+        if (labelName.empty()) {
             return name;
         }
         return name + ":" + labelName + ":" + labelValue;
