@@ -115,7 +115,7 @@ namespace AwsMock::Manager {
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::io_context ios;
         boost::asio::signal_set signals(ios, SIGINT, SIGTERM);
-        signals.async_wait([&](boost::beast::error_code const &, int) {
+        signals.async_wait([&](beast::error_code const &, int) {
             // Stop the `io_context`. This will cause `run()` to return immediately,
             // eventually destroying the `io_context` and all the sockets in it.
             log_info << "Manager stopped on signal";
@@ -168,13 +168,11 @@ namespace AwsMock::Manager {
         // Start listener threads
         const int numProcs = Core::SystemUtils::GetNumberOfCores();
         for (auto i = 0; i < numProcs; i++) {
-            _threadGroup.create_thread([ObjectPtr = &ios] { return ObjectPtr->run(); });
+            _threadGroup.create_thread([&ios] { return ios.run(); });
         }
 
         // Start IO context
-        while (_running) {
-            ios.poll_one();
-        }
+        ios.run();
         log_info << "So long, and thanks for all the fish!";
     }
 

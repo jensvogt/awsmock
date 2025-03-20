@@ -29,6 +29,7 @@ namespace AwsMock::Core {
         DefineBoolProperty("awsmock.magic.file", "AWSMOCK_MAGIC_FILE", DEFAULT_MAGIC_FILE);
         DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
+        DefineStringProperty("awsmock.magic-file", "AWSMOCK_MAGIC_FILE", "magic.mgc");
 
         // Auto load
         DefineBoolProperty("awsmock.autoload.active", "AWSMOCK_AUTOLOAD_ACTIVE", true);
