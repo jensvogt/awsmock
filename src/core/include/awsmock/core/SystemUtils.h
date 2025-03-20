@@ -34,7 +34,6 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SystemUtils {
-
       public:
 
         /**

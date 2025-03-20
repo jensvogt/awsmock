@@ -123,8 +123,8 @@ namespace AwsMock::Controller {
                 modules = GetAllModuleNames();
             }
 
-            bool pretty = _vm.contains("pretty");
-            bool includeObjects = _vm.contains("include-objects");
+            bool pretty = _vm.count("pretty");
+            bool includeObjects = _vm.count("include-objects");
 
             ExportInfrastructure(modules, pretty, includeObjects);
 

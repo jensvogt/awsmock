@@ -16,6 +16,8 @@ awsmock:
   magic-file: C:/Program Files (x86)/awsmock
   json: # JSON settings                                               # JSON settings
     pretty: true                                                      # JSON pretty print
+  magic: # Magic settings
+    file: C:/Program Files (x86)/awsmock/etc/magic.mgc
   aws: # AWS settings
     signature: # AWS signature settings
       verify: false                                                   # Verify AWS signature
