@@ -476,8 +476,11 @@ namespace AwsMock::Service {
 
             // Check max concurrency
             if (lambda.instances.size() < lambda.concurrency) {
+
                 // Create instance
                 instanceId = Core::StringUtils::GenerateRandomHexString(8);
+
+                // Create lambda
                 LambdaCreator lambdaCreator;
                 boost::thread t(boost::ref(lambdaCreator), lambda.code.zipFile, lambda.oid, instanceId);
                 t.join();
@@ -485,6 +488,7 @@ namespace AwsMock::Service {
                 // Replace lambda
                 lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
                 log_info << "New lambda instance created, name: " << functionName << ", totalSize: " << lambda.instances.size();
+
             } else {
                 WaitForIdleInstance(lambda);
             }

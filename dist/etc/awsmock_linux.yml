@@ -13,6 +13,7 @@ awsmock:
   temp-dir: /usr/local/awsmock/data/tmp                               # General temp directory
   data-dir: /usr/local/awsmock/data                                   # General data directory
   dockerized: false                                                   # Dockerized flag
+  magic-file: /usr/local/awsmock/etc/magic.mgc                        # Libmagic database
   # JSON settings
   json:
     pretty: true                                                      # JSON pretty print

@@ -547,7 +547,7 @@ namespace AwsMock::Database {
 
                 const auto result = messageCollection.find_one(query.extract());
                 log_trace << "Message exists: " << std::boolalpha << result->empty();
-                return !result->empty();
+                return result && !result->empty();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

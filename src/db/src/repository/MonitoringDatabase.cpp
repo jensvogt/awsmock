@@ -53,6 +53,7 @@ namespace AwsMock::Database {
                     return;
                 }
 
+                /*
                 // As mongoDB uses UTC timestamps, we need to calculate everything in UTC
                 const system_clock::time_point now = Core::DateTimeUtils::UtcDateTimeNow();
                 const system_clock::time_point end = Core::CeilTimePoint(now, std::chrono::seconds(300));
@@ -67,24 +68,29 @@ namespace AwsMock::Database {
                 if (!labelValue.empty()) {
                     document.append(kvp("labelValue", labelValue));
                 }
+                */
 
                 session.start_transaction();
-                if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
-                    double currentValue = mResult.value()["value"].get_double().value;
-                    int currentCount = mResult.value()["count"].get_int32().value;
-                    currentValue += value / static_cast<double>(++currentCount);
-                    _monitoringCollection.update_one(make_document(kvp("_id", mResult.value()["_id"].get_oid())),
-                                                     make_document(kvp("$set", make_document(kvp("value", currentValue), kvp("count", currentCount)))));
-                } else {
-                    bsoncxx::builder::basic::document newDocument;
-                    newDocument.append(kvp("value", value));
-                    newDocument.append(kvp("count", 1));
-                    newDocument.append(kvp("name", name));
-                    newDocument.append(kvp("created", bsoncxx::types::b_date(middle)));
-                    if (!labelName.empty()) { newDocument.append(kvp("labelName", labelName)); }
-                    if (!labelValue.empty()) { newDocument.append(kvp("labelValue", labelValue)); }
-                    _monitoringCollection.insert_one(newDocument.extract());
+                // if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
+                //     double currentValue = mResult.value()["value"].get_double().value;
+                //     int currentCount = mResult.value()["count"].get_int32().value;
+                //     currentValue += value / static_cast<double>(++currentCount);
+                //     _monitoringCollection.update_one(make_document(kvp("_id", mResult.value()["_id"].get_oid())),
+                //                                      make_document(kvp("$set", make_document(kvp("value", currentValue), kvp("count", currentCount)))));
+                // } else {
+                bsoncxx::builder::basic::document newDocument;
+                newDocument.append(kvp("value", value));
+                newDocument.append(kvp("count", 1));
+                newDocument.append(kvp("name", name));
+                if (!labelName.empty()) {
+                    newDocument.append(kvp("labelName", labelName));
                 }
+                if (!labelName.empty()) {
+                    newDocument.append(kvp("labelValue", labelValue));
+                }
+                newDocument.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
+                _monitoringCollection.insert_one(newDocument.extract());
+                //}
                 session.commit_transaction();
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
