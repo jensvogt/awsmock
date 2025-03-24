@@ -11,7 +11,8 @@ namespace AwsMock::Service {
         log_debug << "Create transfer manager";
 
         // Check existence
-        if (_transferDatabase.TransferExists(request.region, request.protocols)) {
+        // TODO: How can see that a server exists already
+        if (_transferDatabase.TransferExists(request.region, ProtocolTypeToString(request.protocols[0]))) {
             log_error << "Transfer manager exists already";
             throw Core::ServiceException("Transfer manager exists already");
         }
@@ -25,7 +26,8 @@ namespace AwsMock::Service {
 
         // Create entity
         int ftpPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
-        transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .protocols = request.protocols, .port = ftpPort, .listenAddress = listenAddress};
+        transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .port = ftpPort, .listenAddress = listenAddress};
+        transferEntity.protocols.emplace_back(ProtocolTypeToString(request.protocols[0]));
 
         // Add anonymous user
         Database::Entity::Transfer::User anonymousUser = {.userName = "anonymous", .password = "secret", .homeDirectory = "/"};
