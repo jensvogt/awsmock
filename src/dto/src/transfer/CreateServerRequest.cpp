@@ -10,16 +10,37 @@ namespace AwsMock::Dto::Transfer {
 
         try {
 
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
-            return Core::Bson::BsonUtils::ToJsonString(document);
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Domain", domain);
+
+            // Protocols
+            if (!protocols.empty()) {
+                array jsonProtocolArray;
+                for (const auto protocol: protocols) {
+                    jsonProtocolArray.append(ProtocolTypeToString(protocol));
+                }
+                rootDocument.append(kvp("Protocols", jsonProtocolArray));
+            }
+
+            // Tags
+            if (!tags.empty()) {
+                array jsonTagsArray;
+                for (const auto [fst, snd]: tags) {
+                    document tagDocument;
+                    tagDocument.append(kvp(fst, snd));
+                    jsonTagsArray.append(tagDocument);
+                }
+            }
+
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
+
 
     void CreateServerRequest::FromJson(const std::string &jsonString) {
 
@@ -31,7 +52,7 @@ namespace AwsMock::Dto::Transfer {
             // Protocols
             if (rootDocument.find("Protocols") != rootDocument.end()) {
                 for (const view protocolsArray = rootDocument.view()["Protocols"].get_array().value; const auto &protocol: protocolsArray) {
-                    protocols.emplace_back(protocol.get_string().value);
+                    protocols.emplace_back(ProtocolTypeFromString(protocol.get_string().value.data()));
                 }
             }
 

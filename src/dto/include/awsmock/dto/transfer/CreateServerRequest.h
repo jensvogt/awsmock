@@ -13,6 +13,8 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/transfer/IdentityProviderDetails.h>
+#include <awsmock/dto/transfer/model/Protocol.h>
+
 
 namespace AwsMock::Dto::Transfer {
 
@@ -31,7 +33,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Protocols
          */
-        std::vector<std::string> protocols;
+        std::vector<ProtocolType> protocols;
 
         /**
          * Tags
@@ -74,4 +76,4 @@ namespace AwsMock::Dto::Transfer {
 
 }// namespace AwsMock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_TRANSFER_CREATE_TRANSFER_REQUEST_H
+#endif

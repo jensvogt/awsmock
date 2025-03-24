@@ -105,7 +105,7 @@ awsmock:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
-      data-dir: /usr/local/awsmock/data/lambda                       # Lambda data directory
+      data-dir: C:/Program Files (x86)/awsmock/data/lambda           # Lambda data directory
       # Lambda runtimes
       runtime:
         java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
@@ -188,6 +188,7 @@ awsmock:
     prometheus: false                                                   # Use Prometheus as monitoring collector
     intern: true                                                        # Use internal monitoring
     retention: 3                                                        # Retention of monitoring data in days
+    aggregation: 1                                                      # Aggregation period in minutes
     smooth: false                                                       # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
