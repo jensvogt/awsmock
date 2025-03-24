@@ -11,6 +11,7 @@ namespace AwsMock::Service {
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.lambda.monitoring.period");
         _counterPeriod = configuration.GetValueInt("awsmock.modules.lambda.counter.period");
         _removePeriod = configuration.GetValueInt("awsmock.modules.lambda.remove.period");
+        log_debug << "Lambda remove period: " << _removePeriod << ", counterPeriod: " << _counterPeriod << ", monitoringPeriod: " << _monitoringPeriod;
 
         // Directories
         _lambdaDir = configuration.GetValueString("awsmock.modules.lambda.data-dir");
@@ -36,13 +37,14 @@ namespace AwsMock::Service {
 
         // Start lambda monitoring update counters
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
+        log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _monitoringPeriod;
 
         // Start delete old message task
-        scheduler.AddTask("lambda-remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
+        scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
+        log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
 
         // Set running
         SetRunning();
-
         log_debug << "Lambda server initialized";
     }
 
@@ -76,6 +78,7 @@ namespace AwsMock::Service {
             log_debug << "Get containers";
             for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest"); const auto &container: containers) {
                 ContainerService::instance().StopContainer(container.id);
+                ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
