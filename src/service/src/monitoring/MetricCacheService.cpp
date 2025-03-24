@@ -6,31 +6,22 @@
 
 namespace AwsMock::Monitoring {
 
-    boost::mutex MetricCacheService::_gaugeMutex;
-    boost::mutex MetricCacheService::_counterMutex;
+    boost::mutex MetricCacheService::_cacheMutex;
 
-    MetricCacheService::MetricCacheService() : _database(Database::MonitoringDatabase::instance()) {}
+    MetricCacheService::MetricCacheService() :_aggregationPeriod(300), _database(Database::MonitoringDatabase::instance()) {}
 
-    void MetricCacheService::Initialize() {
-        log_debug << "Monitoring cache initialized";
-    }
+    void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+        boost::mutex::scoped_lock lock(_cacheMutex);
 
-    void MetricCacheService::ClearCounter(const std::string &name) {
-        boost::mutex::scoped_lock lock(_counterMutex);
-
-        const auto count = std::erase_if(_metricCache, [this, name](const auto &item) {
+        const auto count = std::erase_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[key, value] = item;
-            return value.name == GetId(name, {}, {});
+            return key == GetId(name, labelName, labelValue);
         });
         log_trace << "Counter cleared, count: " << count;
     }
 
-    void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        ClearCounter(GetId(name, labelName, labelValue));
-    }
-
     void MetricCacheService::IncrementCounter(const std::string &name, const int value, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_counterMutex);
+        boost::mutex::scoped_lock lock(_cacheMutex);
 
         const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[k, v] = item;
@@ -53,7 +44,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricCacheService::SetGauge(const std::string &name, const double value, const std::string &labelName, const std::string &labelValue) {
-        boost::mutex::scoped_lock lock(_gaugeMutex);
+        boost::mutex::scoped_lock lock(_cacheMutex);
 
         const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
             auto const &[k, v] = item;
