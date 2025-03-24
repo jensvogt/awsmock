@@ -20,7 +20,7 @@ namespace AwsMock::Monitoring {
 
         const auto count = std::erase_if(_metricCache, [this, name](const auto &item) {
             auto const &[key, value] = item;
-            return value.name == GetId(name);
+            return value.name == GetId(name, {}, {});
         });
         log_trace << "Counter cleared, count: " << count;
     }
