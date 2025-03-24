@@ -13,7 +13,7 @@ awsmock:
   data-dir: C:/Program Files (x86)/awsmock/data                       # General data directory
   dockerized: false                                                   # Dockerized flag
   # Libmagic database
-  magic-file: C:/Program Files (x86)/awsmock
+  magic-file: C:/Program Files (x86)/awsmock/magic.mgc
   json: # JSON settings                                               # JSON settings
     pretty: true                                                      # JSON pretty print
   magic: # Magic settings

@@ -52,7 +52,7 @@ COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
-COPY --from=build /usr/local/awsmock/etc/awsmock.yml /usr/local/awsmock/etc
+COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
 
 # Set library search path
 ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
