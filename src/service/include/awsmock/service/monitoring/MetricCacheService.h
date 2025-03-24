@@ -168,6 +168,9 @@ namespace AwsMock::Monitoring {
          */
         Database::MonitoringDatabase &_database;
 
+        /**
+         * Monitoring metric cache
+         */
         std::map<std::string, MetricCache> _metricCache;
     };
 

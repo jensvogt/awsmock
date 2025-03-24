@@ -574,9 +574,9 @@ namespace AwsMock::Service {
     std::string ContainerService::WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) {
 
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
-        std::string supportedRuntime = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.runtime." + boost::algorithm::to_lower_copy(runtime));
-
-        //std::string supportedRuntime = _supportedRuntimes[boost::algorithm::to_lower_copy(runtime)];
+        std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
+        Core::StringUtils::Replace(providedRuntime, ".", "-");
+        std::string supportedRuntime = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.runtime." + providedRuntime);
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
