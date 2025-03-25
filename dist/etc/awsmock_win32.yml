@@ -14,9 +14,11 @@ awsmock:
   dockerized: false                                                   # Dockerized flag
   # Libmagic database
   magic-file: C:/Program Files (x86)/awsmock/magic.mgc
-  json: # JSON settings                                               # JSON settings
+  # JSON settings
+  json:
     pretty: true                                                      # JSON pretty print
-  magic: # Magic settings
+  # LibMagic settings
+  magic:
     file: C:/Program Files (x86)/awsmock/etc/magic.mgc
   aws: # AWS settings
     signature: # AWS signature settings
