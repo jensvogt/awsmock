@@ -42,27 +42,27 @@ namespace AwsMock::Monitoring {
 
     void MetricSystemCollector::GetCpuInfoAwsmockLinux() {
 
-         clock_t now = system_clock::now().time_since_epoch().count();
+        clock_t now = system_clock::now().time_since_epoch().count();
 
-         std::ifstream ifs("/proc/self/stat");
-         if(ifs) {
-             std::string line;
-             std::getline(ifs, line);
-             std::vector<std::string> tokens = Core::StringUtils::Split(line,' ');
-             long long userCpu = std::stoll(tokens[13]);
-             long long systemCpu = std::stoll(tokens[14]);
+        std::ifstream ifs("/proc/self/stat");
+        if (ifs) {
+            std::string line;
+            std::getline(ifs, line);
+            std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
+            long long userCpu = std::stoll(tokens[13]);
+            long long systemCpu = std::stoll(tokens[14]);
 
-             if (auto diff = static_cast<double>(now - _lastAwsmockTime); diff > 0) {
-                double percentUserCpu = static_cast<double>(userCpu)/diff;
-                double percentSystemCpu = static_cast<double>(systemCpu)/diff;
+            if (auto diff = static_cast<double>(now - _lastAwsmockTime); diff > 0) {
+                double percentUserCpu = static_cast<double>(userCpu) / diff;
+                double percentSystemCpu = static_cast<double>(systemCpu) / diff;
                 double percentTotalCpu = (percentUserCpu + percentSystemCpu);
-                 log_info<< "User: " << percentUserCpu << ", system: " << percentSystemCpu << ", total: " << percentTotalCpu;
+                log_info << "User: " << percentUserCpu << ", system: " << percentSystemCpu << ", total: " << percentTotalCpu;
                 MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user_awsmock", percentUserCpu);
                 MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system_awsmock", percentSystemCpu);
                 MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total_awsmock", percentTotalCpu);
-             }
-         }
-         ifs.close();
+            }
+        }
+        ifs.close();
         _lastAwsmockTime = now;
     }
 
