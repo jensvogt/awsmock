@@ -21,25 +21,19 @@ if (NOT WIN32)
     add_subdirectory(tst)
 endif ()
 
-include_directories(./include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
-
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} PRIVATE
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-            LibArchive::LibArchive unofficial::libmagic::libmagic)
+    target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
+    target_link_libraries(${LIBRARY} PRIVATE mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
+            yaml-cpp ssl crypto archive magic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC}
-        $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-        $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-        Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-        LibArchive::LibArchive unofficial::libmagic::libmagic)
+target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
+target_link_libraries(${LIBRARY_STATIC} mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
+        yaml-cpp ssl crypto archive magic)
 
 # Installation
 if (NOT WIN32)

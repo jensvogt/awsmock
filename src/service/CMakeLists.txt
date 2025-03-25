@@ -44,11 +44,8 @@ include_directories(./include ../core/include ../db/include ../dto/include ${BSO
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb awsmockdto
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-            LibArchive::LibArchive unofficial::libmagic::libmagic)
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb awsmockdto boost_locale yaml-cpp ssl crypto archive
+            magic prometheus-cpp-core prometheus-cpp-pull)
 endif ()
 
 # Static library
@@ -61,10 +58,7 @@ if (WIN32)
             LibArchive::LibArchive unofficial::libmagic::libmagic pdh.lib)
 else ()
     target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-            LibArchive::LibArchive unofficial::libmagic::libmagic)
+            boost_locale yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull-cpp)
 endif ()
 
 if (NOT WIN32)

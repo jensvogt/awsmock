@@ -134,20 +134,14 @@ include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIRS
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-            LibArchive::LibArchive unofficial::libmagic::libmagic)
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
+            boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static
-        $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-        $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-        Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-        LibArchive::LibArchive unofficial::libmagic::libmagic)
+target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mongocxx bsoncxx boost_filesystem
+        boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
 
 if (NOT WIN32)
     install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})

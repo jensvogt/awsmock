@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
 
-#set(CMAKE_TOOLCHAIN_FILE D:/work/vcpkg/scripts/buildsystems/vcpkg.cmake)
-
 project(awsmock)
 
 # Defaults
@@ -12,7 +10,9 @@ if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
     add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc)
 else ()
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    #    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+    set(BSONCXX_INCLUDE_DIR /usr/local/include/bsoncxx/v_noabi)
+    set(MONGOCXX_INCLUDE_DIR /usr/local/include/mongocxx/v_noabi)
     if (${CMAKE_BUILD_TYPE} MATCHES Debug)
         add_compile_options("$<$<CONFIG:Debug>:-Og>")
     else ()
@@ -46,19 +46,6 @@ endif ()
 
 # Testing
 enable_testing()
-
-# External packages
-find_package(Boost CONFIG REQUIRED COMPONENTS filesystem thread program_options json process locale url)
-find_package(OpenSSL REQUIRED)
-find_package(LibArchive REQUIRED)
-find_package(bsoncxx CONFIG REQUIRED)
-find_package(mongocxx CONFIG REQUIRED)
-find_package(plog CONFIG REQUIRED)
-find_package(yaml-cpp CONFIG REQUIRED)
-find_package(jwt-cpp CONFIG REQUIRED)
-find_package(prometheus-cpp CONFIG REQUIRED)
-find_package(GTest CONFIG REQUIRED)
-find_package(unofficial-libmagic REQUIRED)
 
 add_subdirectory(src/core)
 add_subdirectory(src/db)

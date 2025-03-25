@@ -9,7 +9,7 @@ RUN git config --global http.version HTTP/1.1
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    cmake . -DCMAKE_TOOLCHAIN_FILE=/usr/src/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock && \
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --config Release
 

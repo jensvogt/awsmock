@@ -81,17 +81,27 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get number of threads on macOS
          */
-        static void GetThreadInfoLinux();
+        static void GetThreadInfoAwsmockLinux();
 
         /**
-         * @brief Get CPU utilization on macOS
-        */
-        void GetCpuInfoLinux();
-
-        /**
-         * @brief Get memory info on Linux systems
+         * @brief Get AwsMock CPU utilization on Linux
          */
-        static void GetMemoryInfoLinux();
+        void GetCpuInfoAwsmockLinux();
+
+        /**
+         * @brief Get total CPU utilization on Linux
+         */
+        void GetCpuInfoTotalLinux();
+
+        /**
+         * @brief Get AwsMock memory info on Linux systems
+         */
+        static void GetMemoryInfoAwsmockLinux();
+
+        /**
+         * @brief Get AwsMock memory info on Linux systems
+         */
+        static void GetMemoryInfoTotalLinux();
 
 #elif _WIN32
 
@@ -124,7 +134,7 @@ namespace AwsMock::Monitoring {
         /**
          * Last collection timestamp
          */
-        clock_t _lastTime = 0;
+        clock_t _lastTotalTime = 0;
 
         /**
          * Last collection timestamp for total CPU utilization
@@ -133,12 +143,32 @@ namespace AwsMock::Monitoring {
         /**
          * Last collection timestamp for system CPU utilization
          */
-        clock_t _lastSysCPU = 0;
+        clock_t _lastTotalSysCPU = 0;
 
         /**
          * Last collection timestamp for user CPU utilization
          */
-        clock_t _lastUserCPU = 0;
+        clock_t _lastTotalUserCPU = 0;
+
+        /**
+         * Last collection timestamp
+         */
+        clock_t _lastAwsmockTime = 0;
+
+        /**
+         * Last collection timestamp for Awsmock CPU utilization
+         */
+        clock_t _lastAwsmockCPU = 0;
+
+        /**
+         * Last collection timestamp for system CPU utilization
+         */
+        clock_t _lastAwsmockSysCPU = 0;
+
+        /**
+         * Last collection timestamp for user CPU utilization
+         */
+        clock_t _lastAwsmockUserCPU = 0;
 
 #elif _WIN32
 

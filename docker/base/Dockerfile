@@ -1,19 +1,40 @@
 FROM gcc:13.2.0-bookworm
 
 RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip autoconf automake \
-    autoconf-archive libtool linux-libc-dev pandoc
+    autoconf-archive libtool linux-libc-dev pandoc wget
 
 # Create build environment
 RUN mkdir -p /usr/src
 
-# Install vcpkg
+# Install jwt-cpp
 RUN cd /usr/src && \
-    git clone https://github.com/microsoft/vcpkg.git && \
-    cd /usr/src/vcpkg && \
-    ./bootstrap-vcpkg.sh && \
-    git pull && \
-    ./vcpkg update
+    git clone https://github.com/Thalhammer/jwt-cpp.git && \
+    cd jwt-cpp && \
+    cmake . && \
+    cmake --install .
 
-RUN cd /usr/src/vcpkg && \
-    ./vcpkg install openssl boost yaml-cpp jwt-cpp prometheus-cpp mongo-cxx-driver plog libarchive libmagic gtest
+# Prometheus-CPP
+RUN cd /usr/src && \
+    git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
+    cd prometheus-cpp && \
+    cmake . && \
+    cmake --build . -j16 && \
+    cmake --install .
+
+# Install mongo-cxx-driver
+RUN cd /usr/src && \
+    git clone -b releases/v3.10 https://github.com/mongodb/mongo-cxx-driver.git && \
+    cd mongo-cxx-driver && \
+    cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
+    cmake --build . --config Release -j 16 && \
+    cmake --install . --prefix /usr/local
+
+# Install mongo-cxx-driver
+RUN cd /usr/src && \
+    wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz && \
+    tar -xzf boost_1_87_0.tar.gz && \
+    cd boost_1_87_0 && \
+    ./bootstrap.sh && \
+    ./b2 -j 16 && \
+    ./b2 install --prefix /usr/local
 

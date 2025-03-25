@@ -28,11 +28,8 @@ if (WIN32)
             [=[^/(lib|usr/lib|usr/local/lib/lib64)]=])
 else ()
     add_executable(${BINARY} ${SOURCES})
-    target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            Boost::locale Boost::filesystem Boost::url Boost::program_options yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::Crypto
-            LibArchive::LibArchive prometheus-cpp::pull prometheus-cpp::core unofficial::libmagic::libmagic)
+    target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
+            boost_url boost_thread boost_locale boost_program_options yaml-cpp ssl crypto archive magic)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin RUNTIME_DEPENDENCY_SET libAwsMockMgr)
     install(RUNTIME_DEPENDENCY_SET libAwsMockMgr
             PRE_EXCLUDE_REGEXES

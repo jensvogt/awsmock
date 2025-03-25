@@ -5,15 +5,10 @@ set(SOURCES CryptoTests.cpp FileUtilsTests.cpp DirUtilsTests.cpp StringUtilsTest
         RandomUtilsTests.cpp AwsUtilsTests.cpp HttpUtilsTests.cpp SystemUtilsTests.cpp XmlUtilsTests.cpp
         JwtUtilsTests.cpp TarUtilsTests.cpp DateTimeUtilsTests.cpp main.cpp)
 
-include_directories(../include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
-
 add_executable(${BINARY} ${SOURCES})
-target_link_libraries(${BINARY} awsmockcore
-        $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-        $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-        Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-        LibArchive::LibArchive unofficial::libmagic::libmagic GTest::gtest GTest::gtest_main GTest::gmock
-        GTest::gmock_main)
+target_include_directories(${BINARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
+target_link_libraries(${BINARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
+        boost_program_options yaml-cpp ssl crypto archive magic gtest gmock)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
