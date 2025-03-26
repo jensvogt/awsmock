@@ -6,6 +6,7 @@
 #define AWMOCK_CORE_DIR_UTILS_TEST_H
 
 // GTest includes
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 // Local includes

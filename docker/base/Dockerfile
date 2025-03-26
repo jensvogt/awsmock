@@ -54,3 +54,11 @@ RUN cd /usr/src && \
     ./b2 -j 16 && \
     ./b2 install
 
+# Install gtest
+RUN cd /usr/src && \
+    rm -rf googletest gtest && \
+    git clone https://github.com/google/googletest.git && \
+    cd googletest && \
+    cmake . && \
+    cmake --build . --config Release -j 16 && \
+    cmake --install . --prefix /usr/local
