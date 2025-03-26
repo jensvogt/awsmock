@@ -1,7 +1,7 @@
 FROM gcc:13.2.0-bookworm
 
 RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip libtool linux-libc-dev  \
-    pandoc wget libarchive-dev libmagic-dev libgtest-dev libgmock-dev
+    pandoc wget libarchive-dev libmagic-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -25,7 +25,7 @@ RUN cd /usr/src && \
 RUN cd /usr/src && \
     git clone --recursive https://github.com/jupp0r/prometheus-cpp && \
     cd prometheus-cpp && \
-    cmake . && \
+    cmake . -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF && \
     cmake --build . -j16 && \
     cmake --install .
 

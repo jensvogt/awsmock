@@ -57,8 +57,8 @@ if (WIN32)
             Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
             LibArchive::LibArchive unofficial::libmagic::libmagic pdh.lib)
 else ()
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
-            boost_locale yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull-cpp)
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
+            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull-cpp)
 endif ()
 
 if (NOT WIN32)
