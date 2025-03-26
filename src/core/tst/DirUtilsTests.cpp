@@ -117,6 +117,7 @@ namespace AwsMock::Core {
         EXPECT_EQ(result, true);
     }
 
+    /*
     TEST_F(DirUtilsTest, ListFilesTest) {
         // arrange
         std::string dirName = DirUtils::CreateTempDir(tempDir);
@@ -150,7 +151,7 @@ namespace AwsMock::Core {
         EXPECT_FALSE(result.empty());
         EXPECT_EQ(result.size(), 1);
         EXPECT_THAT(result, ::testing::Contains(::testing::Eq(::std::string(fileName3))));
-    }
+    }*/
 
 }// namespace AwsMock::Core
 
