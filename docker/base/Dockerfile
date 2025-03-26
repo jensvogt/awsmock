@@ -1,10 +1,18 @@
 FROM gcc:13.2.0-bookworm
 
-RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip autoconf automake \
-    autoconf-archive libtool linux-libc-dev pandoc wget
+RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip libtool linux-libc-dev  \
+    pandoc wget libarchive-dev libmagic-dev libgtest-dev libgmock-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
+
+# Install plog
+RUN cd /usr/src && \
+    git clone https://github.com/SergiusTheBest/plog.git && \
+    cd plog && \
+    cmake . -DPLOG_BUILD_SAMPLES=OFF && \
+    cmake --build . --config Release -j 16 && \
+    cmake --install . --prefix /usr/local
 
 # Install jwt-cpp
 RUN cd /usr/src && \
@@ -21,6 +29,14 @@ RUN cd /usr/src && \
     cmake --build . -j16 && \
     cmake --install .
 
+# Yaml-CPP
+RUN cd /usr/src && \
+    git clone https://github.com/jbeder/yaml-cpp.git && \
+    cd yaml-cpp && \
+    cmake . && \
+    cmake --build . --config Release -j16 && \
+    cmake --install . --prefix /usr/local
+
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
     git clone -b releases/v3.10 https://github.com/mongodb/mongo-cxx-driver.git && \
@@ -29,12 +45,12 @@ RUN cd /usr/src && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --prefix /usr/local
 
-# Install mongo-cxx-driver
+# Install boost 1.87
 RUN cd /usr/src && \
-    wget https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz && \
+    wget -nv https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz && \
     tar -xzf boost_1_87_0.tar.gz && \
     cd boost_1_87_0 && \
-    ./bootstrap.sh && \
+    ./bootstrap.sh --prefix=/usr/local && \
     ./b2 -j 16 && \
-    ./b2 install --prefix /usr/local
+    ./b2 install
 
