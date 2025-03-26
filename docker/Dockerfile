@@ -55,7 +55,7 @@ COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
 COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
 
 # Set library search path
-ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib
 
 # Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
