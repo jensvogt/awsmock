@@ -87,7 +87,7 @@ namespace AwsMock::Monitoring {
             const auto counter = GetCounter(name);
             counter->Add({}).Increment(value);
         }
-        _database.IncCounter(name, value);
+        _metricCacheService.IncrementCounter(name, value);
         log_trace << "Counter incremented, name: " << name;
     }
 
@@ -97,7 +97,7 @@ namespace AwsMock::Monitoring {
             const auto counter = GetCounter(name);
             counter->Add({{labelName, labelValue}}).Increment(value);
         }
-        _database.IncCounter(name, value, labelName, labelValue);
+        _metricCacheService.IncrementCounter(name, value, labelName, labelValue);
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
     }
 
@@ -140,7 +140,7 @@ namespace AwsMock::Monitoring {
             const auto gauge = GetGauge(name);
             gauge->Add({}).Set(value);
         }
-        _database.SetGauge(name, value);
+        _metricCacheService.SetGauge(name, value);
         log_trace << "Gauge value set, name: " << name;
     }
 
@@ -149,7 +149,7 @@ namespace AwsMock::Monitoring {
             if (!GaugeExists(name, labelName, labelValue)) { AddGauge(name, labelName, labelValue); }
             _gaugeMap[name]->Add({{labelName, labelValue}}).Set(value);
         }
-        _database.SetGauge(name, value, labelName, labelValue);
+        _metricCacheService.SetGauge(name, value, labelName, labelValue);
         log_trace << "Gauge value set, name: " << name;
     }
 

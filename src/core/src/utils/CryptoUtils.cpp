@@ -278,14 +278,13 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
         auto *key_data = key;
-        int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
+        if (const int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256EncryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
             log_error << "Couldn't initialize AES256 cipher";
             return {};
         }
 
-        /* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
+        // max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
         int c_len = *len + CRYPTO_AES256_BLOCK_SIZE, f_len = 0;
         auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
 

@@ -20,6 +20,15 @@ namespace AwsMock::Dto::S3 {
                 }
             }
 
+            // Filter rules
+            if (document.view().find("filterRules") != document.view().end()) {
+                for (const view filterRuleView = document.view()["filterRules"].get_array().value; bsoncxx::document::element element: filterRuleView) {
+                    FilterRule filterRule;
+                    filterRule.FromDocument(element.get_document().view());
+                    filterRules.emplace_back(filterRule);
+                }
+            }
+
         } catch (bsoncxx::exception &e) {
             log_error << e.what();
             throw Core::JsonException(e.what());

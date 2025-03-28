@@ -15,6 +15,7 @@
 #endif
 
 // Boost includes
+//#include <boost/coroutine/all.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -522,6 +523,11 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
+
+        /**
+         * IO context
+         */
+        boost::asio::io_context _ioc;
     };
 }// namespace AwsMock::Service
 

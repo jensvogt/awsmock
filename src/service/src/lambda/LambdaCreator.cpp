@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
+        const Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
         Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
 
         // Start docker container, in case it is not already running.
@@ -73,7 +73,7 @@ namespace AwsMock::Service {
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
-        std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+        std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
 
         // Write base64 encoded zip file
@@ -115,14 +115,17 @@ namespace AwsMock::Service {
     std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) {
 
         std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
+        const std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
 
         // Decode Base64 file
         std::string decoded = Core::Crypto::Base64Decode(functionCode);
-        std::string zipFile = tempDir + "/zipfile.zip";
+        const std::string zipFile = tempDir + "/zipfile.zip";
+        int tmp = decoded.length();
+
         try {
 
             // Write to temp file
+
             std::ofstream ofs(zipFile);
             ofs << decoded;
             ofs.close();
@@ -132,7 +135,7 @@ namespace AwsMock::Service {
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create classes directory
-                std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
+                const std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.

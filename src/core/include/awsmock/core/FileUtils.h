@@ -10,7 +10,6 @@
 
 // Standard C++ includes
 #include <filesystem>
-#include <format>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -42,6 +41,7 @@
 #include <awsmock/core/config/Configuration.h>
 
 #define BUFFER_LEN 8092
+#define DEFAULT_MIME_TYPE "application/octet-stream"
 
 namespace AwsMock::Core {
 

@@ -383,11 +383,8 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            return _memoryDb.UserExists(region, userPoolId, userName);
         }
+        return _memoryDb.UserExists(region, userPoolId, userName);
     }
 
     bool CognitoDatabase::UserExists(const std::string &region, const std::string &userName) const {

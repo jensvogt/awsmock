@@ -26,8 +26,10 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "$HOME/awsmock/data");
         DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "$HOME/awsmock/tmp");
         DefineBoolProperty("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
+        DefineBoolProperty("awsmock.magic.file", "AWSMOCK_MAGIC_FILE", DEFAULT_MAGIC_FILE);
         DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
         DefineBoolProperty("awsmock.dockerized", "AWSMOCK_DOCKERIZED", false);
+        DefineStringProperty("awsmock.magic-file", "AWSMOCK_MAGIC_FILE", "magic.mgc");
 
         // Auto load
         DefineBoolProperty("awsmock.autoload.active", "AWSMOCK_AUTOLOAD_ACTIVE", true);
@@ -56,6 +58,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.modules.sqs.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
         DefineIntProperty("awsmock.modules.sqs.reset.period", "AWSMOCK_WORKER_SQS_RESET_PERIOD", 30);
         DefineIntProperty("awsmock.modules.sqs.counter.period", "AWSMOCK_WORKER_SQS_COUNTER_PERIOD", 30);
+        DefineIntProperty("awsmock.modules.sqs.receive-poll", "AWSMOCK_WORKER_SQS_RECEIVE_POLL", 1000);
 
         // SNS
         DefineBoolProperty("awsmock.modules.sns.active", "AWSMOCK_MODULES_SNS_ACTIVE", true);

@@ -17,32 +17,27 @@ services:
 
   # AwsMock
   awsmock:
-    container_name: awsmock
-    image: jensvogt/awsmock:latest
+    container_name: pim-awsmock
     hostname: awsmock
+    image: jensvogt/awsmock:latest
     depends_on:
       - mongodb
-    environment:
-      - AWSMOCK_MONGODB_ACTIVE=true
-      - AWSMOCK_MONGODB_NAME=awsmock
-      - AWSMOCK_MONGODB_HOST=awsmock-mongodb
-      - AWSMOCK_MONGODB_PORT=27017
-      - AWSMOCK_MONGODB_USER=admin
-      - AWSMOCK_MONGODB_PASSWORD=admin
-      - AWSMOCK_LOG_LEVEL=debug
     networks:
-      - "local"
+      - local
     ports:
-      - "4566:4566"
-      - "4567:4567"
-      - "8081:8081"
+      - 20-22:20-22
+      - 4566-4567:4566-4567
+      - 6000-6100:6000-6100
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./etc/awsmock.yml:/usr/local/awsmock/etc/awsmock.yml
+      - ./init:/usr/local/awsmock/init
+      - ./lambda:/usr/local/awsmock/data/lambda
     restart: on-failure
     healthcheck:
-      test: [ "CMD", "awsmock", "s3",  "ls" ]
+      test: [ "CMD", "awsmockctl", "ping" ]
       interval: 60s
-      timeout: 10s
+      timeout: 1s
       retries: 15
 
   dynamodb-local:

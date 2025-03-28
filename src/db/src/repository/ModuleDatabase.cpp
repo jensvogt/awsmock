@@ -334,12 +334,11 @@ namespace AwsMock::Database {
 
         if (ModuleExists(modules.name)) {
             return UpdateModule((modules));
-        } else {
-            return CreateModule(modules);
         }
+        return CreateModule(modules);
     }
 
-    int ModuleDatabase::ModuleCount() {
+    int ModuleDatabase::ModuleCount() const {
 
         if (HasDatabase()) {
 

@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Transfer {
         }
 
         std::string _region;
-        std::vector<std::string> _protocols = {"ftp", "sftp"};
+        std::vector<ProtocolType> _protocols = {ProtocolTypeFromString("FTP"), ProtocolTypeFromString("SFTP")};
         IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethods = "sftpAuthenticationMethods", .url = "url"};
         std::map<std::string, std::string> _tags = {{"version", "1.0"}};
     };

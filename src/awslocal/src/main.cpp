@@ -86,13 +86,13 @@ int main(const int argc, char *argv[]) {
     notify(vm);
 
     // Show usage.
-    if (vm.contains("help")) {
+    if (vm.count("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show version
-    if (vm.contains("version")) {
+    if (vm.count("version")) {
         std::cout << std::endl
                   << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
@@ -101,7 +101,7 @@ int main(const int argc, char *argv[]) {
 
     // Read configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.contains("config")) {
+    if (vm.count("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);

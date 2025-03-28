@@ -50,9 +50,10 @@ namespace AwsMock::Core {
          * @brief Send a CLI command
          *
          * @param command command name
+         * @param args vector of string arguments command name
          * @return exec result
          */
-        static ExecResult SendCliCommand(const std::string &command);
+        static std::string SendCliCommand(const std::string &command, const std::vector<std::string> &args);
     };
 }// namespace AwsMock::Core
 

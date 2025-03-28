@@ -19,6 +19,7 @@
 
 // AwsMock utils
 #include <awsmock/repository/MonitoringDatabase.h>
+#include <awsmock/service/monitoring/MetricCacheService.h>
 
 namespace AwsMock::Monitoring {
 
@@ -265,6 +266,11 @@ namespace AwsMock::Monitoring {
          * Database
          */
         Database::MonitoringDatabase &_database;
+
+        /**
+         * Database connection
+         */
+        MetricCacheService _metricCacheService;
     };
 
 }// namespace AwsMock::Monitoring

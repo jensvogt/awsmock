@@ -182,7 +182,7 @@ int main(const int argc, char *argv[]) {
     notify(vm);
 
     // Show usage
-    if (vm.contains("help")) {
+    if (vm.count("help")) {
         std::cout << std::endl
                   << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl
@@ -194,7 +194,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Show version
-    if (vm.contains("version")) {
+    if (vm.count("version")) {
         std::cout << std::endl
                   << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
@@ -202,7 +202,7 @@ int main(const int argc, char *argv[]) {
     }
 
 #ifdef WIN32
-    if (vm.contains("install")) {
+    if (vm.count("install")) {
         boost::system::error_code ec;
         boost::application::example::install_windows_service(
                 boost::application::setup_arg(vm["name"].as<std::string>()),
@@ -218,7 +218,7 @@ int main(const int argc, char *argv[]) {
         return 0;
     }
 
-    if (vm.contains("check")) {
+    if (vm.count("check")) {
         boost::system::error_code ec;
         bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
 
@@ -233,7 +233,7 @@ int main(const int argc, char *argv[]) {
         return 0;
     }
 
-    if (vm.contains("uninstall")) {
+    if (vm.count("uninstall")) {
         boost::system::error_code ec;
         boost::application::example::uninstall_windows_service(
                 boost::application::setup_arg(vm["name"].as<std::string>()),
@@ -254,7 +254,7 @@ int main(const int argc, char *argv[]) {
     AwsMock::Core::Configuration::instance().SetFilename(configFilename);
 
     // Set log level
-    if (vm.contains("loglevel")) {
+    if (vm.count("loglevel")) {
         auto value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
@@ -263,8 +263,8 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
-    // Set log file
-    if (vm.contains("logfile")) {
+    // Set log level
+    if (vm.count("logfile")) {
         auto value = vm["logfile"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.file-name", value);
         AwsMock::Core::LogStream::SetFilename(value);
@@ -284,7 +284,8 @@ int main(const int argc, char *argv[]) {
 
     int result = 0;
     boost::system::error_code ec;
-    if (vm.contains("foreground")) {
+    if (vm.count("foreground")) {
+
         // Run as foreground process
         result = boost::application::launch<boost::application::common>(worker, app_context, ec);
         if (ec) {
