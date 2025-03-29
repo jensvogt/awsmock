@@ -184,7 +184,8 @@ awsmock:
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: /usr/local/awsmock/data/transfer                             # FTP data directory
+      sftp: true                                                        # Support SFTP
+      data-dir: /usr/local/awsmock/data/transfer                        # FTP data directory
       directories:
         - incoming/mix
         - feedback
@@ -205,7 +206,7 @@ awsmock:
     intern: true                                                        # Use internal monitoring
     retention: 3                                                        # Retention of monitoring data in days
     aggregation: 1                                                      # Aggregation period in minutes
-    smooth: false                                                       # Use rolling mean
+    smooth: true                                                        # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
     file-name: /usr/local/awsmock/log/awsmock.log                       # Log file name, used additionally to stdout, mainly used on MacOS

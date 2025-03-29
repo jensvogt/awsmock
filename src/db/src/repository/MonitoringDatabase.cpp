@@ -223,6 +223,65 @@ namespace AwsMock::Database {
         return {};
     }
 
+    /*std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
+        log_trace << "Get monitoring values, name: " << name << " start: " << start << " end: " << end << " step: " << step << " labelName: " << labelName << " labelValue:" << labelValue;
+
+        if (HasDatabase()) {
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
+
+            try {
+                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
+#ifdef __APPLE__
+                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
+                const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
+                auto startUtc = bsoncxx::types::b_date(system_clock::time_point(startTime.time_since_epoch()));
+                const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
+                auto endUtc = bsoncxx::types::b_date(system_clock::time_point(endTime.time_since_epoch()));
+#elif __linux__
+                auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
+                auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));
+#else
+                auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
+                auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));
+#endif
+                document document;
+                document.append(kvp("name", name));
+                document.append(kvp("created", make_document(kvp("$gte", startUtc))), kvp("created", make_document(kvp("$lte", endUtc))));
+                if (!labelName.empty()) {
+                    document.append(kvp("labelName", labelName));
+                }
+                if (!labelValue.empty()) {
+                    document.append(kvp("labelValue", labelValue));
+                }
+
+                // Find and accumulate
+                std::vector<Entity::Monitoring::Counter> result;
+                if (_rollingMean) {
+                    mongocxx::options::find opts;
+                    opts.sort(make_document(kvp("created", 1)));
+                    Accumulator acc(boost::accumulators::tag::rolling_window::window_size = step);
+                    for (auto cursor = _monitoringCollection.find(document.extract(), opts); auto it: cursor) {
+                        acc(it["value"].get_double().value);
+                        Entity::Monitoring::Counter counter = {.name = name, .performanceValue = boost::accumulators::mean(acc), .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                        result.emplace_back(counter);
+                    }
+                } else {
+                    for (auto cursor = _monitoringCollection.find(document.extract()); auto it: cursor) {
+                        Entity::Monitoring::Counter counter = {.name = name, .performanceValue = it["value"].get_double().value, .timestamp = bsoncxx::types::b_date(it["created"].get_date().value)};
+                        result.emplace_back(counter);
+                    }
+                }
+                log_debug << "Counters, name: " << name << " count: " << result.size() << " start:" << startUtc << " end: " << endUtc;
+                return result;
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        log_trace << "Performance counter not available if you running the memory DB";
+        return {};
+    }*/
     long MonitoringDatabase::DeleteOldMonitoringData(const int retentionPeriod) const {
         log_trace << "Deleting old monitoring data, retention:: " << retentionPeriod;
 

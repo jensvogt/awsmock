@@ -191,6 +191,11 @@ namespace AwsMock::FtpServer {
         int _maxThreads;
 
         /**
+         * SFTP flag
+         */
+        bool _isSftp = false;
+
+        /**
          * Data directory
          */
         std::string _dataDir;

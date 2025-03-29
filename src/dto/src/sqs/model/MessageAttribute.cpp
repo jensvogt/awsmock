@@ -63,10 +63,10 @@ namespace AwsMock::Dto::SQS {
     void MessageAttribute::FromDocument(const view_or_value<view, value> &jsonObject) {
 
         try {
-            name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Name");
-            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
+            name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "name");
+            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "dataType"));
             if (type == STRING || type == NUMBER) {
-                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "stringValue");
             }
 
         } catch (bsoncxx::exception &e) {
@@ -78,9 +78,9 @@ namespace AwsMock::Dto::SQS {
     void MessageAttribute::FromJson(const view_or_value<view, value> &jsonObject) {
 
         try {
-            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
+            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "dataType"));
             if (type == STRING || type == NUMBER) {
-                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "stringValue");
             }
 
         } catch (bsoncxx::exception &e) {
@@ -93,10 +93,10 @@ namespace AwsMock::Dto::SQS {
 
         try {
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
-            Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
-            Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
-            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
+            Core::Bson::BsonUtils::SetStringValue(document, "name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "stringValue", stringValue);
+            Core::Bson::BsonUtils::SetLongValue(document, "numberValue", numberValue);
+            Core::Bson::BsonUtils::SetStringValue(document, "dataType", MessageAttributeDataTypeToString(type));
             return document.extract();
 
         } catch (bsoncxx::exception &e) {
@@ -109,9 +109,9 @@ namespace AwsMock::Dto::SQS {
 
         try {
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
-            Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
-            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
+            Core::Bson::BsonUtils::SetStringValue(document, "stringValue", stringValue);
+            Core::Bson::BsonUtils::SetLongValue(document, "numberValue", numberValue);
+            Core::Bson::BsonUtils::SetStringValue(document, "dataType", MessageAttributeDataTypeToString(type));
             return document.extract();
 
         } catch (bsoncxx::exception &e) {

@@ -51,6 +51,11 @@ namespace AwsMock::Service {
 
         /**
          * @brief Delete instances from database, which are not running
+         *
+         * @par
+         * This will stop and delete the lambda containers. This is done in case the shutdown was not gracefully and the lambdas are in
+         * an invalid state. Specially the port is not valid anymore. Deleting the lambda function will recreate the lambda later on with
+         * the correct port.
          */
         void CleanupInstances() const;
 

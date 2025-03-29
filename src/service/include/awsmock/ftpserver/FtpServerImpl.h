@@ -8,9 +8,11 @@
 
 // Asio includes
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/ServerCertificate.h>
 #include <awsmock/ftpserver/FtpSession.h>
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
@@ -153,6 +155,11 @@ namespace AwsMock::FtpServer {
          * Asio IO module
          */
         boost::asio::io_context _ioService;
+
+        /**
+         * Asio SSL context
+         */
+        boost::asio::ssl::context _ssl_context{boost::asio::ssl::context::tlsv13_server};
 
         /**
          * Asio session acceptor
