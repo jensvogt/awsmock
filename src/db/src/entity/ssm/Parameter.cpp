@@ -30,7 +30,7 @@ namespace AwsMock::Database::Entity::SSM {
         return parameterDocument.extract();
     }
 
-    void Parameter::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    auto Parameter::FromDocument(const std::optional<view> &mResult) -> void {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
