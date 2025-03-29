@@ -184,7 +184,8 @@ awsmock:
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: /usr/local/awsmock/data/transfer                             # FTP data directory
+      sftp: true                                                        # Support SFTP
+      data-dir: /usr/local/awsmock/data/transfer                        # FTP data directory
       directories:
         - incoming/mix
         - feedback

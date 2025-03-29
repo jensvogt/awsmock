@@ -166,21 +166,22 @@ awsmock:
     transfer:
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: C:/Program Files (x86)/awsmock/data/transfer              # FTP data directory
+      sftp: true                                                        # Support SFTP
+      data-dir: C:/Program Files (x86)/awsmock/data/transfer            # FTP data directory
       # Default directories to create during startup
       directories:
-        - incoming/mix                                                    # Default directory
-        - feedback                                                        # Default directory
+        - incoming/mix                                                  # Default directory
+        - feedback                                                      # Default directory
       # Transfer server monitoring
       monitoring:
-        period: 300                                                       # Monitoring interval
+        period: 300                                                     # Monitoring interval
       # Background worker
       worker:
         period: 3600                                                    # Monitoring interval
       # FTP server
       ftp:
-        port: 21                                                    # FTP port
-        address: 0.0.0.0                                               # FTP listening address
+        port: 22                                                        # FTP port (default:21, SFTP: 22)
+        address: 0.0.0.0                                                # FTP listening address
         pasv-min: 6000                                                  # Passive mode minimum port
         pasv-max: 6100                                                  # Passive mode maximal port
   monitoring: # Monitoring

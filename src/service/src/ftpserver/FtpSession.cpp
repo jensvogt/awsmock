@@ -3,12 +3,13 @@
 
 namespace AwsMock::FtpServer {
     FtpSession::FtpSession(boost::asio::io_context &io_service,
+                           boost::asio::ssl::context &ssl_context,
                            const UserDatabase &user_database,
                            std::string serverName,
                            const std::function<void()> &completion_handler)
-        : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service),
-          command_socket_(io_service),
-          command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service),
+        : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), _context_ssl(ssl_context),
+          command_socket_(io_service), command_write_strand_(io_service),
+          _ssl_stream(io_service, ssl_context), data_type_binary_(false), data_acceptor_(io_service),
           data_buffer_strand_(io_service), file_rw_strand_(io_service),
           _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
 
@@ -17,6 +18,7 @@ namespace AwsMock::FtpServer {
         _region = configuration.GetValueString("awsmock.region");
         _bucket = configuration.GetValueString("awsmock.modules.transfer.bucket");
         _transferDir = configuration.GetValueString("awsmock.modules.transfer.data-dir");
+        _isSftp = configuration.GetValueBool("awsmock.modules.transfer.sftp");
 
         // S3 service
         _s3Service = std::make_shared<Service::S3Service>();
@@ -27,27 +29,67 @@ namespace AwsMock::FtpServer {
         _completion_handler();
     }
 
+    void FtpSession::DoHandshake() {
+
+        _ssl_stream.async_handshake(boost::asio::ssl::stream_base::server,
+                                    boost::beast::bind_front_handler(
+                                            &FtpSession::OnHandshake,
+                                            shared_from_this()));
+    }
+
+    void FtpSession::OnHandshake(const boost::beast::error_code &ec) {
+        if (!ec) {
+            log_info << "Handshake successful";
+            sendFtpMessageSftp(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AwsMock Transfer SFTP Handler"));
+            readFtpCommandSftp();
+        } else {
+            log_error << "SSH handshake failed: " << ec.message();
+        }
+    }
+
     void FtpSession::start() {
         boost::beast::error_code ec;
-        command_socket_.set_option(boost::asio::ip::tcp::no_delay(true), ec);
+
+        getSocket().set_option(boost::asio::ip::tcp::no_delay(true), ec);
         if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
         }
-
-        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
-        readFtpCommand();
+        if (_isSftp) {
+            DoHandshake();
+        } else {
+            sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AwsMock Transfer FTP Handler"));
+            readFtpCommand();
+        }
     }
 
     boost::asio::ip::tcp::socket &FtpSession::getSocket() {
+        if (_isSftp)
+            return static_cast<boost::asio::ip::tcp::socket &>(_ssl_stream.lowest_layer());
         return command_socket_;
     }
 
     void FtpSession::sendFtpMessage(const FtpMessage &message) {
-        sendRawFtpMessage(message.str());
+        if (_isSftp) {
+            sendRawFtpMessageSftp(message.str());
+        } else {
+            sendRawFtpMessage(message.str());
+        }
     }
 
-    void FtpSession::sendFtpMessage(FtpReplyCode code, const std::string &message) {
-        sendFtpMessage(FtpMessage(code, message));
+    void FtpSession::sendFtpMessageSftp(const FtpMessage &message) {
+        sendRawFtpMessageSftp(message.str());
+    }
+
+    void FtpSession::sendFtpMessage(const FtpReplyCode code, const std::string &message) {
+        if (_isSftp) {
+            sendFtpMessageSftp(FtpMessage(code, message));
+        } else {
+            sendFtpMessage(FtpMessage(code, message));
+        }
+    }
+
+    void FtpSession::sendFtpMessageSftp(const FtpReplyCode code, const std::string &message) {
+        sendFtpMessageSftp(FtpMessage(code, message));
     }
 
     void FtpSession::sendRawFtpMessage(const std::string &raw_message) {
@@ -61,63 +103,134 @@ namespace AwsMock::FtpServer {
                                    nullptr);
     }
 
+    void FtpSession::sendRawFtpMessageSftp(const std::string &raw_message) {
+        command_write_strand_.post([me = shared_from_this(), raw_message]() {
+            const bool write_in_progress = !me->command_output_queue_.empty();
+            me->command_output_queue_.push_back(raw_message);
+            if (!write_in_progress) {
+                me->startSendingMessagesSftp();
+            }
+        },
+                                   nullptr);
+    }
+
     void FtpSession::startSendingMessages() {
         log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
-        boost::asio::async_write(command_socket_,
-                                 boost::asio::buffer(command_output_queue_.front()),
-                                 command_write_strand_.wrap(
-                                         [me = shared_from_this()](const boost::beast::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                                             if (!ec) {
-                                                 me->command_output_queue_.pop_front();
+        async_write(command_socket_,
+                    boost::asio::buffer(command_output_queue_.front()),
+                    command_write_strand_.wrap(
+                            [me = shared_from_this()](const boost::beast::error_code ec, std::size_t /*bytes_to_transfer*/) {
+                                if (!ec) {
+                                    me->command_output_queue_.pop_front();
 
-                                                 if (!me->command_output_queue_.empty()) {
-                                                     me->startSendingMessages();
-                                                 }
-                                             } else {
-                                                 log_error << "Command write error: " << ec.message();
-                                             }
-                                         }));
+                                    if (!me->command_output_queue_.empty()) {
+                                        me->startSendingMessages();
+                                    }
+                                } else {
+                                    log_error << "Command write error: " << ec.message();
+                                }
+                            }));
+    }
+
+    void FtpSession::startSendingMessagesSftp() {
+        log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
+        async_write(_ssl_stream,
+                    boost::asio::buffer(command_output_queue_.front()),
+                    command_write_strand_.wrap(
+                            [me = shared_from_this()](const boost::beast::error_code &ec, std::size_t /*bytes_to_transfer*/) {
+                                if (!ec) {
+                                    me->command_output_queue_.pop_front();
+
+                                    if (!me->command_output_queue_.empty()) {
+                                        me->startSendingMessagesSftp();
+                                    }
+                                } else {
+                                    log_error << "Command write error: " << ec.message();
+                                }
+                            }));
     }
 
     void FtpSession::readFtpCommand() {
-        boost::asio::async_read_until(command_socket_,
-                                      command_input_stream_,
-                                      "\r\n",
-                                      [me = shared_from_this()](const boost::beast::error_code ec, const std::size_t length) {
-                                          if (ec) {
-                                              if (ec != boost::asio::error::eof) {
-                                                  log_error << "Read_until error: " << ec.message();
-                                              } else {
-                                                  log_debug << "Control connection closed by client.";
-                                              }
+        async_read_until(command_socket_,
+                         command_input_stream_,
+                         "\r\n",
+                         [me = shared_from_this()](const boost::beast::error_code ec, const std::size_t length) {
+                             if (ec) {
+                                 if (ec != boost::asio::error::eof) {
+                                     log_error << "Read_until error: " << ec.message();
+                                 } else {
+                                     log_debug << "Control connection closed by client.";
+                                 }
 
-                                              // Close the data connection, if it is open
-                                              {
-                                                  boost::beast::error_code ec_;
-                                                  me->data_acceptor_.close(ec_);
-                                              }
-                                              {
-                                                  if (const auto data_socket = me->data_socket_weakptr_.lock()) {
-                                                      boost::beast::error_code ec_;
-                                                      data_socket->close(ec_);
-                                                  }
-                                              }
+                                 // Close the data connection, if it is open
+                                 {
+                                     boost::beast::error_code ec_;
+                                     me->data_acceptor_.close(ec_);
+                                 }
+                                 {
+                                     if (const auto data_socket = me->data_socket_weakptr_.lock()) {
+                                         boost::beast::error_code ec_;
+                                         data_socket->close(ec_);
+                                     }
+                                 }
 
-                                              return;
-                                          }
+                                 return;
+                             }
 
-                                          std::istream stream(&(me->command_input_stream_));
-                                          std::string packet_string(length - 2, ' ');
-                                          // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
-                                          // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
-                                          // in contiguous memory.
-                                          stream.read(&packet_string[0], length - 2);
+                             std::istream stream(&(me->command_input_stream_));
+                             std::string packet_string(length - 2, ' ');
+                             // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
+                             // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
+                             // in contiguous memory.
+                             stream.read(&packet_string[0], length - 2);
 
-                                          stream.ignore(2);// Remove the "\r\n"
-                                          log_debug << "FTP << " << packet_string;
+                             stream.ignore(2);// Remove the "\r\n"
+                             log_debug << "FTP << " << packet_string;
 
-                                          me->handleFtpCommand(packet_string);
-                                      });
+                             me->handleFtpCommand(packet_string);
+                         });
+    }
+
+    void FtpSession::readFtpCommandSftp() {
+        async_read_until(_ssl_stream,
+                         command_input_stream_,
+                         "\r\n",
+                         [me = shared_from_this()](const boost::beast::error_code &ec, const std::size_t length) {
+                             if (ec) {
+                                 if (ec != boost::asio::error::eof) {
+                                     log_error << "Read_until error: " << ec.message();
+                                 } else {
+                                     log_debug << "Control connection closed by client.";
+                                 }
+
+                                 // Close the data connection, if it is open
+                                 {
+                                     boost::beast::error_code ec_;
+                                     me->data_acceptor_.close(ec_);
+                                 }
+                                 {
+                                     //me->_ssl_stream.shutdown();
+                                     if (const auto data_socket = me->data_socket_weakptr_.lock()) {
+                                         boost::beast::error_code ec_;
+                                         data_socket->close(ec_);
+                                     }
+                                 }
+
+                                 return;
+                             }
+
+                             std::istream stream(&(me->command_input_stream_));
+                             std::string packet_string(length - 2, ' ');
+                             // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
+                             // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
+                             // in contiguous memory.
+                             stream.read(&packet_string[0], length - 2);
+
+                             stream.ignore(2);// Remove the "\r\n"
+                             log_debug << "FTP << " << packet_string;
+
+                             me->handleFtpCommand(packet_string);
+                         });
     }
 
     void FtpSession::handleFtpCommand(const std::string &command) {
@@ -187,7 +300,11 @@ namespace AwsMock::FtpServer {
             command_it->second(parameters);
             _lastCommand = ftp_command;
         } else {
-            sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
+            if (_isSftp) {
+                sendFtpMessageSftp(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
+            } else {
+                sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
+            }
         }
 
         if (_lastCommand == "QUIT") {
@@ -195,7 +312,11 @@ namespace AwsMock::FtpServer {
             command_write_strand_.wrap([me = shared_from_this()]() { me->command_socket_.close(); });
         } else {
             // Wait for next command
-            readFtpCommand();
+            if (_isSftp) {
+                readFtpCommandSftp();
+            } else {
+                readFtpCommand();
+            }
         }
     }
 
@@ -1091,7 +1212,11 @@ namespace AwsMock::FtpServer {
         ss << " LANG EN\r\n";
         ss << "211 END\r\n";
 
-        sendRawFtpMessage(ss.str());
+        if (_isSftp) {
+            sendRawFtpMessageSftp(ss.str());
+        } else {
+            sendRawFtpMessage(ss.str());
+        }
     }
 
     void FtpSession::handleFtpCommandOPTS(const std::string &param) {
