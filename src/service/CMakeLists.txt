@@ -19,6 +19,7 @@ set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSWorker.c
 set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
+set(SFTP_SOURCES src/sftpserver/SftpServer.cpp src/sftpserver/SftpUser.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp
         src/gateway/GatewayWorker.cpp src/gateway/GatewayRouter.cpp)
 set(DOCKER_SOURCES src/container/ContainerService.cpp)
@@ -30,8 +31,9 @@ set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSys
 set(FRONTEND_SOURCES src/frontend/FrontendWorker.cpp src/frontend/FrontendServer.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES}
-        ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES}
-        ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES} ${FRONTEND_SOURCES})
+        ${SFTPSOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES}
+        ${SECRETMANAGER_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES}
+        ${FRONTEND_SOURCES})
 
 # Test directory
 if (NOT WIN32)
@@ -43,9 +45,13 @@ include_directories(./include ../core/include ../db/include ../dto/include ${BSO
 
 # Shared library
 if (NOT WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/sftpserver/SftpServer.h
+            src/sftpserver/SftpServer.cpp
+            include/awsmock/sftpserver/SftpUser.h
+            src/sftpserver/SftpUser.cpp)
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale yaml-cpp ssl crypto archive
-            magic prometheus-cpp-core prometheus-cpp-pull)
+            magic prometheus-cpp-core prometheus-cpp-pull ssh)
 endif ()
 
 # Static library
@@ -58,7 +64,7 @@ if (WIN32)
             LibArchive::LibArchive unofficial::libmagic::libmagic pdh.lib)
 else ()
     target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
-            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull)
+            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull ssh)
 endif ()
 
 if (NOT WIN32)

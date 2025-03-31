@@ -11,7 +11,7 @@ namespace AwsMock::FtpServer {
     FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, const uint16_t port)
         : _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0), _serverName(std::move(serverName)) {
         _ssl_context.set_options(
-                boost::asio::ssl::context::default_workarounds | boost::asio::ssl::context::no_sslv2 | boost::asio::ssl::context::no_sslv3 | boost::asio::ssl::context::tlsv11 |
+                boost::asio::ssl::context::default_workarounds | boost::asio::ssl::context::sslv2 | boost::asio::ssl::context::sslv3 | boost::asio::ssl::context::tlsv11 |
                 boost::asio::ssl::context::tlsv12 | boost::asio::ssl::context::tlsv13 | boost::asio::ssl::context::verify_none);
     }
 

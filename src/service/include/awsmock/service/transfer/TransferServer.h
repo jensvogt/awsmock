@@ -19,6 +19,7 @@
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3Service.h>
+#include <awsmock/sftpserver/SftpServer.h>
 
 namespace AwsMock::Service {
 
@@ -138,6 +139,11 @@ namespace AwsMock::Service {
          * Actual FTP manager
          */
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
+
+        /**
+       * Actual SFTP manager
+       */
+        std::shared_ptr<SftpServer> _sftpServer;
     };
 }// namespace AwsMock::Service
 
