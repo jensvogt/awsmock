@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Docker {
         bool oomKilled;
 
         /**
-         * State
+         * Status
          */
         std::string status;
 
