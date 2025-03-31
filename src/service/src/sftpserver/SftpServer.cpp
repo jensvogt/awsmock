@@ -342,7 +342,11 @@ static int realloc_buffer(ssh_buffer_struct *buffer, uint32_t needed) {
             return -1;
         }
         memcpy(newBuffer, buffer->data, buffer->used);
+#ifdef __APPLE__
+        __builtin_bzero(buffer->data, buffer->used);
+#else
         explicit_bzero(buffer->data, buffer->used);
+#endif
         SAFE_FREE(buffer->data);
     } else {
         newBuffer = static_cast<uint8_t *>(realloc(buffer->data, needed));
@@ -377,7 +381,11 @@ static void buffer_shift(ssh_buffer buffer) {
 
     if (buffer->secure) {
         void *ptr = buffer->data + buffer->used;
+#ifdef __APPLE__
+        __builtin_bzero(ptr, burn_pos);
+#else
         explicit_bzero(ptr, burn_pos);
+#endif
     }
 
     buffer_verify(buffer);
@@ -1960,10 +1968,12 @@ int sftp_reply_version(sftp_client_message client_msg) {
        this was a short-sighted decision since on different systems the types
        may have different representations but the values are always the same.  */
 
+#ifndef __APPLE__
 extern uint32_t ntohl(uint32_t __netlong) __THROW __attribute__((__const__));
 extern uint16_t ntohs(uint16_t __netshort) __THROW __attribute__((__const__));
 extern uint32_t htonl(uint32_t __hostlong) __THROW __attribute__((__const__));
 extern uint16_t htons(uint16_t __hostshort) __THROW __attribute__((__const__));
+#endif
 
 const sftp_message_handler message_handlers[] = {
         {"open", nullptr, SSH_FXP_OPEN, process_open},
@@ -2056,9 +2066,9 @@ static int process_client_message(sftp_client_message client_msg) {
             status = dispatch_sftp_request(client_msg);
     }
 
-    if (status != SSH_OK)
+    if (status != SSH_OK) {
         log_debug << "error occurred during processing client message!";
-
+    }
     return status;
 }
 
@@ -2136,7 +2146,7 @@ static sftp_attributes sftp_parse_attr_3(sftp_session sftp, ssh_buffer buf, int 
         if (rc != SSH_OK) {
             goto error;
         }
-        log_debug << "Name: %s", attr->name;
+        log_debug << "Name: " << attr->name;
 
         /* Set owner and group if we talk to openssh and have the longname */
         if (ssh_get_openssh_version(sftp->session)) {
@@ -2798,15 +2808,15 @@ int sftp_channel_default_data_callback(ssh_session session, ssh_channel channel,
     sftp = *sftpp;
 
     decode_len = sftp_decode_channel_data_to_packet(sftp, data, len);
-    if (decode_len == -1)
+    if (decode_len == -1) {
         return -1;
-
+    }
     msg = sftp_get_client_message_from_packet(sftp);
     rc = process_client_message(msg);
     sftp_client_message_free(msg);
-    if (rc != SSH_OK)
+    if (rc != SSH_OK) {
         log_debug << "process sftp failed!";
-
+    }
     return decode_len;
 }
 
@@ -3028,28 +3038,44 @@ cleanup:
                 case 'b':
                     o.byte = va_arg(ap_copy, uint8_t *);
                     if (buffer->secure) {
+#ifdef __APPLE__
+                        __builtin_bzero(o.byte, sizeof(uint8_t));
+#else
                         explicit_bzero(o.byte, sizeof(uint8_t));
+#endif
                         break;
                     }
                     break;
                 case 'w':
                     o.word = va_arg(ap_copy, uint16_t *);
                     if (buffer->secure) {
+#ifdef __APPLE__
+                        __builtin_bzero(o.word, sizeof(uint16_t));
+#else
                         explicit_bzero(o.word, sizeof(uint16_t));
+#endif
                         break;
                     }
                     break;
                 case 'd':
                     o.dword = va_arg(ap_copy, uint32_t *);
                     if (buffer->secure) {
+#ifdef __APPLE__
+                        __builtin_bzero(o.dword, sizeof(uint32_t));
+#else
                         explicit_bzero(o.dword, sizeof(uint32_t));
+#endif
                         break;
                     }
                     break;
                 case 'q':
                     o.qword = va_arg(ap_copy, uint64_t *);
                     if (buffer->secure) {
+#ifdef __APPLE__
+                        __builtin_bzero(o.qword, sizeof(uint64_t));
+#else
                         explicit_bzero(o.qword, sizeof(uint64_t));
+#endif
                         break;
                     }
                     break;
@@ -3067,7 +3093,11 @@ cleanup:
                 case 's':
                     o.cstring = va_arg(ap_copy, char **);
                     if (buffer->secure) {
+#ifdef __APPLE__
+                        __builtin_bzero(*o.cstring, strlen(*o.cstring));
+#else
                         explicit_bzero(*o.cstring, strlen(*o.cstring));
+#endif
                     }
                     SAFE_FREE(*o.cstring);
                     break;
@@ -3075,7 +3105,11 @@ cleanup:
                     len = va_arg(ap_copy, size_t);
                     o.data = va_arg(ap_copy, void **);
                     if (buffer->secure) {
+#ifdef __APPLE__
+                        __builtin_bzero(*o.data, len);
+#else
                         explicit_bzero(*o.data, len);
+#endif
                     }
                     SAFE_FREE(*o.data);
                     break;

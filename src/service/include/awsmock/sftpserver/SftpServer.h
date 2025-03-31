@@ -182,7 +182,9 @@ void ssh_reset_error(void *error);
 #ifdef WORDS_BIGENDIAN
 #define ntohll(x) (x)
 #else
+#ifndef ntohll
 #define ntohll(x) (((uint64_t) ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))
+#endif
 #endif
 #endif
 /** Free memory space */
@@ -207,8 +209,10 @@ typedef BIGNUM *bignum;
 #ifdef WORDS_BIGENDIAN
 #define htonll(x) (x)
 #else
+#ifndef htonll
 #define htonll(x) \
     (((uint64_t) htonl((x) & 0xFFFFFFFF) << 32) | htonl((x) >> 32))
+#endif
 #endif
 #endif
 #define bignum_num_bytes(num) (size_t) BN_num_bytes(num)
