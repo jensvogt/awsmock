@@ -14,12 +14,11 @@ set(TRANSFER_SOURCES TransferServerCliTest.cpp)
 set(MAIN_SOURCES main.cpp ModuleServiceTests.cpp TestBase.cpp)
 
 # Includes
-include_directories(../include ../../core/include ../../db/include ../../dto/include ${INC_BSON_CXX} ${INC_MONGO_CXX}
-        ${EXT_INCLUDE})
-link_directories(../../core ../../db ../../dto ${EXT_LIB})
+include_directories(../include ../../core/include ../../db/include ../../dto/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
 
 add_executable(${BINARY} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
-target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb ${LIB_BOOST_THREAD})
+target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb boost_locale boost_program_options
+        yaml-cpp ssl crypto archive magic gtest gmock)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})

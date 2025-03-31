@@ -15,7 +15,7 @@
 #endif
 
 // Boost includes
-#include <boost/coroutine/all.hpp>
+//#include <boost/coroutine/all.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()) {};
+        explicit S3Service() : _database(Database::S3Database::instance()){};
 
         /**
          * @brief Checks whether a bucket exists

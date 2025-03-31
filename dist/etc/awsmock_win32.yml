@@ -12,8 +12,14 @@ awsmock:
   temp-dir: C:/Program Files (x86)/awsmock/data/tmp                   # General temp directory
   data-dir: C:/Program Files (x86)/awsmock/data                       # General data directory
   dockerized: false                                                   # Dockerized flag
-  json: # JSON settings                                               # JSON settings
+  # Libmagic database
+  magic-file: C:/Program Files (x86)/awsmock/magic.mgc
+  # JSON settings
+  json:
     pretty: true                                                      # JSON pretty print
+  # LibMagic settings
+  magic:
+    file: C:/Program Files (x86)/awsmock/etc/magic.mgc
   aws: # AWS settings
     signature: # AWS signature settings
       verify: false                                                   # Verify AWS signature
@@ -101,20 +107,20 @@ awsmock:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
-      data-dir: /usr/local/awsmock/data/lambda                       # Lambda data directory
+      data-dir: C:/Program Files (x86)/awsmock/data/lambda           # Lambda data directory
       # Lambda runtimes
       runtime:
         java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
         java17: public.ecr.aws/lambda/java:17                        # Lambda Java 17 runtime
         java21: public.ecr.aws/lambda/java:21.2024.11.22.15          # Lambda Java 17 runtime (16.03.2025: latest has problem with classloader)
-        python3.8: public.ecr.aws/lambda/python:3.8                  # Lambda Python 3.8
-        python3.9: public.ecr.aws/lambda/python:3.9                  # Lambda Python 3.9
-        python3.10: public.ecr.aws/lambda/python:3.10                # Lambda Python 3.10
-        python3.11: public.ecr.aws/lambda/python:3.11                # Lambda Python 3.11
-        nodejs20.x: public.ecr.aws/lambda/nodejs:20                  # Lambda NodeJS 20
-        provided.al2: public.ecr.aws/lambda/provided:al2             # Lambda Amazon Linux runtime
-        provided.al2023: public.ecr.aws/lambda/provided:al2023       # Lambda Amazon Linux runtime
-        provided.latest: public.ecr.aws/lambda/provided:latest       # Lambda Amazon Linux runtime
+        python3-8: public.ecr.aws/lambda/python:3.8                  # Lambda Python 3.8
+        python3-9: public.ecr.aws/lambda/python:3.9                  # Lambda Python 3.9
+        python3-10: public.ecr.aws/lambda/python:3.10                # Lambda Python 3.10
+        python3-11: public.ecr.aws/lambda/python:3.11                # Lambda Python 3.11
+        nodejs20-x: public.ecr.aws/lambda/nodejs:20                  # Lambda NodeJS 20
+        provided-al2: public.ecr.aws/lambda/provided:al2             # Lambda Amazon Linux runtime
+        provided-al2023: public.ecr.aws/lambda/provided:al2023       # Lambda Amazon Linux runtime
+        provided-latest: public.ecr.aws/lambda/provided:latest       # Lambda Amazon Linux runtime
         go: public.ecr.aws/lambda/provided:al2023                    # Amazon Linux runtime
       monitoring:
         period: 300
@@ -160,21 +166,22 @@ awsmock:
     transfer:
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: C:/Program Files (x86)/awsmock/data/transfer              # FTP data directory
+      sftp: true                                                        # Support SFTP
+      data-dir: C:/Program Files (x86)/awsmock/data/transfer            # FTP data directory
       # Default directories to create during startup
       directories:
-        - incoming/mix                                                    # Default directory
-        - feedback                                                        # Default directory
+        - incoming/mix                                                  # Default directory
+        - feedback                                                      # Default directory
       # Transfer server monitoring
       monitoring:
-        period: 300                                                       # Monitoring interval
+        period: 300                                                     # Monitoring interval
       # Background worker
       worker:
         period: 3600                                                    # Monitoring interval
       # FTP server
       ftp:
-        port: 21                                                    # FTP port
-        address: 0.0.0.0                                               # FTP listening address
+        port: 22                                                        # FTP port (default:21, SFTP: 22)
+        address: 0.0.0.0                                                # FTP listening address
         pasv-min: 6000                                                  # Passive mode minimum port
         pasv-max: 6100                                                  # Passive mode maximal port
   monitoring: # Monitoring
@@ -184,7 +191,8 @@ awsmock:
     prometheus: false                                                   # Use Prometheus as monitoring collector
     intern: true                                                        # Use internal monitoring
     retention: 3                                                        # Retention of monitoring data in days
-    smooth: false                                                       # Use rolling mean
+    aggregation: 1                                                      # Aggregation period in minutes
+    smooth: true                                                        # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
     file-name: C:/Program Files (x86)/awsmock/log/awsmock.log           # Log file name, used additionally to stdout, mainly used on MacOS

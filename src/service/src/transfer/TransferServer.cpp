@@ -53,12 +53,35 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
-        // Create transfer manager thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, server.port, server.listenAddress);
-        _transferServerList[server.serverId] = _ftpServer;
 
         // Get base dir
         const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+
+        SftpServer _sftpServer("2222", "/etc/ssh/ssh_host_ed25519_key", "0.0.0.0");
+
+        // Add users
+        for (const auto &user: server.users) {
+
+            // Create hom directory
+            std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
+            Core::DirUtils::EnsureDirectory(homeDir);
+
+            // Add user
+            _sftpServer.AddUser(user.userName, user.password, homeDir);
+
+            // Ensure the home directory exists
+            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
+        }
+
+        // Start detached thread
+        boost::thread t(boost::ref(_sftpServer));
+        t.detach();
+
+        // Create transfer manager thread
+        /* _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, server.port, server.listenAddress);
+        _transferServerList[server.serverId] = _ftpServer;
+
+
 
         // Add users
         for (const auto &user: server.users) {
@@ -78,7 +101,7 @@ namespace AwsMock::Service {
         }
         if (_ftpServer->start(server.concurrency)) {
             log_debug << "FTP server started";
-        }
+        }*/
 
         // Update database
         server.lastStarted = system_clock::now();

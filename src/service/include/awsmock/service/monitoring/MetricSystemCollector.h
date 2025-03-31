@@ -29,9 +29,11 @@
 #include <awsmock/service/monitoring/MetricService.h>
 
 #ifdef _WIN32
-#include "windows.h"
-#include <Wbemidl.h>
-#include <comdef.h>
+//#include <Wbemidl.h>
+//#include <comdef.h>
+#include <pdh.h>
+#include <pdhmsg.h>
+#include <windows.h>
 #endif
 
 namespace AwsMock::Monitoring {
@@ -79,71 +81,97 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get number of threads on macOS
          */
-        static void GetThreadInfoLinux();
+        static void GetThreadInfoAwsmockLinux();
 
         /**
-         * @brief Get CPU utilization on macOS
-        */
-        void GetCpuInfoLinux();
-
-        /**
-         * @brief Get memory info on Linux systems
+         * @brief Get AwsMock CPU utilization on Linux
          */
-        static void GetMemoryInfoLinux();
+        void GetCpuInfoAwsmockLinux();
+
+        /**
+         * @brief Get total CPU utilization on Linux
+         */
+        void GetCpuInfoTotalLinux();
+
+        /**
+         * @brief Get AwsMock memory info on Linux systems
+         */
+        static void GetMemoryInfoAwsmockLinux();
+
+        /**
+         * @brief Get AwsMock memory info on Linux systems
+         */
+        static void GetMemoryInfoTotalLinux();
 
 #elif _WIN32
 
         /**
          * @brief Get CPU utilization on Windows
          */
-        void GetCpuInfoWin32() const;
+        void GetCpuInfoWin32();
 
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetMemoryInfoWin32() const;
+        void GetMemoryInfoWin32();
 
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetThreadInfoWin32() const;
+        void GetThreadInfoWin32();
 
 #endif
 
       private:
 
-            /**
-             * Number of cores
-             */
-            int _numProcessors;
+        /**
+         * Number of cores
+         */
+        int _numProcessors;
 
 #ifdef __linux__
 
         /**
          * Last collection timestamp
          */
-        clock_t _lastTime = 0;
+        clock_t _lastTotalTime = 0;
 
         /**
          * Last collection timestamp for total CPU utilization
          */
         clock_t _lastTotalCPU = 0;
+
         /**
          * Last collection timestamp for system CPU utilization
          */
-        clock_t _lastSysCPU = 0;
+        clock_t _lastTotalSysCPU = 0;
 
         /**
          * Last collection timestamp for user CPU utilization
          */
-        clock_t _lastUserCPU = 0;
-
-#elif _WIN32
+        clock_t _lastTotalUserCPU = 0;
 
         /**
-         * Windows WMI service
+         * Last collection timestamp
          */
-        IWbemServices *pSvc = nullptr;
+        clock_t _lastAwsmockTime = 0;
+
+        /**
+         * Last collection timestamp for Awsmock CPU utilization
+         */
+        unsigned long _lastAwsmockTotalCPU = 0;
+
+        /**
+         * Last collection timestamp for system CPU utilization
+         */
+        unsigned long _lastAwsmockSysCPU = 0;
+
+        /**
+         * Last collection timestamp for user CPU utilization
+         */
+        unsigned long _lastAwsmockUserCPU = 0;
+
+#elif _WIN32
 
         /**
          * @brief Returns value from WMI
@@ -151,7 +179,7 @@ namespace AwsMock::Monitoring {
          * @param counter name of the WMI counter
          * @return value of the WMI counter
          */
-        long long GetPerformanceValue(const std::string &counter) const;
+        long long GetPerformanceValue(const std::string &counter);
 
 #endif
 
@@ -168,4 +196,4 @@ namespace AwsMock::Monitoring {
 
 }// namespace AwsMock::Monitoring
 
-#endif// AWSMOCK_MONITORING_METRIC_SYSTEM_COLLECTOR_H
+#endif

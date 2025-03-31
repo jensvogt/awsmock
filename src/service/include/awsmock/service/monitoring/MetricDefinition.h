@@ -6,8 +6,10 @@
 #define AWSMOCK_CORE_METRIC_DEFINITION_H
 
 // System counter
-#define MEMORY_USAGE "memory_usage"
-#define CPU_USAGE "cpu_usage"
+#define CPU_USAGE_AWSMOCK "cpu_usage_awsmock"
+#define CPU_USAGE_TOTAL "cpu_usage_total"
+#define MEMORY_USAGE_AWSMOCK "memory_usage_awsmock"
+#define MEMORY_USAGE_TOTAL "memory_usage_total"
 #define TOTAL_THREADS "total_threads"
 
 // HTTP timer

@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms") {
 
         // HTTP manager configuration
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _workerPeriod = configuration.GetValueInt("awsmock.modules.ssm.worker.period");
         _monitoringPeriod = configuration.GetValueInt("awsmock.modules.ssm.monitoring.period");
         log_debug << "SSM server initialized";
@@ -24,9 +24,6 @@ namespace AwsMock::Service {
         // Monitoring
         // Start SNS monitoring update counters
         scheduler.AddTask("monitoring-ssm-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
-
-        // Start delete old message task
-        //scheduler.AddTask("s3-sync-directories", [this] { this->_ssmWorker.SyncObjects(); }, _workerPeriod);
 
         // Set running
         SetRunning();

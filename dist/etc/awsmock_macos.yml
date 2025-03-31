@@ -13,6 +13,8 @@ awsmock:
   temp-dir: /usr/local/awsmock/data/tmp                               # General temp directory
   data-dir: /usr/local/awsmock/data                                   # General data directory
   dockerized: false                                                   # Dockerized flag
+  # Libmagic database
+  magic-file: /usr/local/awsmock/etc/magic.mgc
   # JSON settings
   json:
     pretty: true                                                      # JSON pretty print
@@ -130,14 +132,14 @@ awsmock:
         java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
         java17: public.ecr.aws/lambda/java:17                        # Lambda Java 17 runtime
         java21: public.ecr.aws/lambda/java:21.2024.11.22.15          # Lambda Java 17 runtime (16.03.2025: latest has problem with classloader)
-        python3.8: public.ecr.aws/lambda/python:3.8                  # Lambda Python 3.8
-        python3.9: public.ecr.aws/lambda/python:3.9                  # Lambda Python 3.9
-        python3.10: public.ecr.aws/lambda/python:3.10                # Lambda Python 3.10
-        python3.11: public.ecr.aws/lambda/python:3.11                # Lambda Python 3.11
-        nodejs20.x: public.ecr.aws/lambda/nodejs:20                  # Lambda NodeJS 20
-        provided.al2: public.ecr.aws/lambda/provided:al2             # Lambda Amazon Linux runtime
-        provided.al2023: public.ecr.aws/lambda/provided:al2023       # Lambda Amazon Linux runtime
-        provided.latest: public.ecr.aws/lambda/provided:latest       # Lambda Amazon Linux runtime
+        python3-8: public.ecr.aws/lambda/python:3.8                  # Lambda Python 3.8
+        python3-9: public.ecr.aws/lambda/python:3.9                  # Lambda Python 3.9
+        python3-10: public.ecr.aws/lambda/python:3.10                # Lambda Python 3.10
+        python3-11: public.ecr.aws/lambda/python:3.11                # Lambda Python 3.11
+        nodejs20-x: public.ecr.aws/lambda/nodejs:20                  # Lambda NodeJS 20
+        provided-al2: public.ecr.aws/lambda/provided:al2             # Lambda Amazon Linux runtime
+        provided-al2023: public.ecr.aws/lambda/provided:al2023       # Lambda Amazon Linux runtime
+        provided-latest: public.ecr.aws/lambda/provided:latest       # Lambda Amazon Linux runtime
         go: public.ecr.aws/lambda/provided:al2023                    # Amazon Linux runtime
       monitoring:
         period: 300
@@ -182,7 +184,8 @@ awsmock:
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: /usr/local/awsmock/data/transfer                             # FTP data directory
+      sftp: true                                                        # Support SFTP
+      data-dir: /usr/local/awsmock/data/transfer                        # FTP data directory
       directories:
         - incoming/mix
         - feedback
@@ -202,7 +205,8 @@ awsmock:
     prometheus: false                                                   # Use Prometheus as monitoring collector
     intern: true                                                        # Use internal monitoring
     retention: 3                                                        # Retention of monitoring data in days
-    smooth: false                                                       # Use rolling mean
+    aggregation: 1                                                      # Aggregation period in minutes
+    smooth: true                                                        # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
     file-name: /usr/local/awsmock/log/awsmock.log                       # Log file name, used additionally to stdout, mainly used on MacOS

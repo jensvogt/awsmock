@@ -7,10 +7,12 @@
 namespace AwsMock::Core {
 
     void TarUtils::Unzip(const std::string &zipFile, const std::string &directory) {
+
+        log_trace << "Unzipping started, zipFile: " << zipFile << ", directory: " << directory;
         archive_entry *entry;
         int r;
 
-        /* Select which attributes we want to restore. */
+        // Select which attributes we want to restore.
         int flags = ARCHIVE_EXTRACT_TIME;
         flags |= ARCHIVE_EXTRACT_PERM;
         flags |= ARCHIVE_EXTRACT_ACL;
@@ -31,25 +33,27 @@ namespace AwsMock::Core {
             if (r == ARCHIVE_EOF)
                 break;
             if (r < ARCHIVE_OK)
-                fprintf(stderr, "%s\n", archive_error_string(a));
-            if (r < ARCHIVE_WARN)
-                exit(1);
+                log_error << archive_error_string(a);
+            if (r < ARCHIVE_WARN) {
+                log_error << archive_error_string(a);
+                return;
+            }
             archive_entry_set_pathname(entry, (directory + "/" + archive_entry_pathname(entry)).c_str());
             r = archive_write_header(ext, entry);
             if (r < ARCHIVE_OK)
-                fprintf(stderr, "%s\n", archive_error_string(ext));
+                log_error << archive_error_string(ext);
             else if (archive_entry_size(entry) > 0) {
                 r = CopyData(a, ext);
                 if (r < ARCHIVE_OK)
-                    fprintf(stderr, "%s\n", archive_error_string(ext));
+                    log_error << archive_error_string(ext);
                 if (r < ARCHIVE_WARN)
-                    exit(1);
+                    return;
             }
             r = archive_write_finish_entry(ext);
             if (r < ARCHIVE_OK)
-                fprintf(stderr, "%s\n", archive_error_string(ext));
+                log_error << archive_error_string(ext);
             if (r < ARCHIVE_WARN)
-                exit(1);
+                return;
         }
         archive_read_close(a);
         archive_read_free(a);
@@ -80,7 +84,7 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, const bool isDir, const bool isLink) {
 
-        struct stat st {};
+        struct stat st{};
         char buff[8192];
 
         std::string entryName = fileName;
@@ -112,13 +116,17 @@ namespace AwsMock::Core {
         }
         archive_write_header(archive, entry);
         const int fd = open(fileName.c_str(), O_RDONLY);
-        long len = read(fd, buff, sizeof(buff));
-        while (len > 0) {
-            archive_write_data(archive, buff, len);
-            len = read(fd, buff, sizeof(buff));
-            log_trace << "File written to archive, name: " << entryName;
+        if (fd >= 0) {
+            long len = read(fd, buff, sizeof(buff));
+            while (len > 0) {
+                archive_write_data(archive, buff, len);
+                len = read(fd, buff, sizeof(buff));
+                log_trace << "File written to archive, name: " << entryName;
+            }
+            close(fd);
+        } else {
+            log_error << "Cannot open file: " << fileName;
         }
-        close(fd);
         archive_entry_free(entry);
     }
 
@@ -148,7 +156,7 @@ namespace AwsMock::Core {
                 return (r);
             r = archive_write_data_block(aw, buff, size, offset);
             if (r < ARCHIVE_OK) {
-                fprintf(stderr, "%s\n", archive_error_string(aw));
+                log_error << archive_error_string(aw);
                 return (r);
             }
         }

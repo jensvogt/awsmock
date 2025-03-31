@@ -40,23 +40,21 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ${EXT_INCLUDE} ${INC_BSON_CXX} ${INC_MONGO_CXX})
-link_directories(${EXT_LIB})
+include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
 
 # Shared library
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_libraries(${LIBRARY} awsmockcore ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE} ${LIB_BOOST_FILESYSTEM}
-            ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE} ${LIB_PROMETHEUS} ${LIB_MAGIC})
+    target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
+            yaml-cpp ssl crypto archive magic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} awsmockcore_static ${LIB_MONGO_CXX} ${LIB_BSON_CXX} ${LIB_BOOST_LOCALE}
-        ${LIB_BOOST_FILESYSTEM} ${LIB_BOOST_URL} ${LIB_YAML} ${LIB_GTEST} ${LIB_SSL} ${LIB_CRYPTO} ${LIB_ARCHIVE}
-        ${LIB_PROMETHEUS} ${LIB_MAGIC})
+target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
+        boost_locale yaml-cpp ssl crypto archive magic)
 
 # Installation
 if (NOT WIN32)
-    install(TARGETS ${LIBRARY} DESTINATION ${LIB_INSTALL_DIR})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
