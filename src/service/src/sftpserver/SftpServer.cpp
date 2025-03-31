@@ -1582,7 +1582,7 @@ static int process_lstat(sftp_client_message client_msg) {
 
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
-    struct sftp_attributes_struct attr{};
+    struct sftp_attributes_struct attr {};
     struct stat st;
     int status = SSH_FX_OK;
     int rv;
@@ -3314,7 +3314,7 @@ namespace AwsMock::Service {
         ssh_bind sshbind = nullptr;
         ssh_session session = nullptr;
         ssh_event event = nullptr;
-        struct sigaction sa{};
+        struct sigaction sa {};
 
         // Set up SIGCHLD handler.
         // sa.sa_handler = sigchld_handler;
