@@ -10,7 +10,7 @@ namespace AwsMock::Service {
 }
 
 //================================= sftpserver =======================================
-
+extern "C" {
 #ifndef _WIN32
 /* internal */
 enum sftp_handle_type {
@@ -753,24 +753,20 @@ int ssh_buffer_prepend_data(ssh_buffer_struct *buffer, const void *data, uint32_
 }
 
 int sftp_packet_write(sftp_session sftp, uint8_t type, ssh_buffer payload) {
-    uint8_t header[5] = {0};
-    uint32_t payload_size;
-    int size;
-    int rc;
+    constexpr uint8_t header[5] = {};
 
     /* Add size of type */
-    payload_size = ssh_buffer_get_len(payload) + sizeof(uint8_t);
+    const uint32_t payload_size = ssh_buffer_get_len(payload) + sizeof(uint8_t);
     PUSH_BE_U32(header, 0, payload_size);
     PUSH_BE_U8(header, 4, type);
 
-    rc = ssh_buffer_prepend_data(payload, header, sizeof(header));
-    if (rc < 0) {
+    if (const int rc = ssh_buffer_prepend_data(payload, header, sizeof(header)); rc < 0) {
         ssh_set_error_oom(sftp->session);
         sftp_set_error(sftp, SSH_FX_FAILURE);
         return -1;
     }
 
-    size = ssh_channel_write(sftp->channel, ssh_buffer_get(payload), ssh_buffer_get_len(payload));
+    const int size = ssh_channel_write(sftp->channel, ssh_buffer_get(payload), ssh_buffer_get_len(payload));
     if (size < 0) {
         sftp_set_error(sftp, SSH_FX_FAILURE);
         return -1;
@@ -830,22 +826,21 @@ static int process_open(sftp_client_message client_msg) {
     struct sftp_handle *h = nullptr;
     int file_flag;
     int fd = -1;
-    int status;
 
     log_debug << "Processing open: filename " << filename << ", mode: " << mode;
 
-    if (((msg_flag & (uint32_t) SSH_FXF_READ) == SSH_FXF_READ) &&
-        ((msg_flag & (uint32_t) SSH_FXF_WRITE) == SSH_FXF_WRITE)) {
+    if ((msg_flag & static_cast<uint32_t>(SSH_FXF_READ)) == SSH_FXF_READ &&
+        (msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
         file_flag = O_RDWR;// file must exist
-        if ((msg_flag & (uint32_t) SSH_FXF_CREAT) == SSH_FXF_CREAT)
+        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT)
             file_flag |= O_CREAT;
-    } else if ((msg_flag & (uint32_t) SSH_FXF_WRITE) == SSH_FXF_WRITE) {
+    } else if ((msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
         file_flag = O_WRONLY;
-        if ((msg_flag & (uint32_t) SSH_FXF_APPEND) == SSH_FXF_APPEND)
+        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_APPEND)) == SSH_FXF_APPEND)
             file_flag |= O_APPEND;
-        if ((msg_flag & (uint32_t) SSH_FXF_CREAT) == SSH_FXF_CREAT)
+        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT)
             file_flag |= O_CREAT;
-    } else if ((msg_flag & (uint32_t) SSH_FXF_READ) == SSH_FXF_READ) {
+    } else if ((msg_flag & static_cast<uint32_t>(SSH_FXF_READ)) == SSH_FXF_READ) {
         file_flag = O_RDONLY;
     } else {
         log_debug << "undefined message flag: " << msg_flag;
@@ -855,9 +850,9 @@ static int process_open(sftp_client_message client_msg) {
 
     fd = open(filename, file_flag, mode);
     if (fd == -1) {
-        int saved_errno = errno;
+        const int saved_errno = errno;
         log_debug << "error open file with error: " << strerror(saved_errno);
-        status = unix_errno_to_ssh_stat(saved_errno);
+        const int status = unix_errno_to_ssh_stat(saved_errno);
         sftp_reply_status(client_msg, status, "Write error");
         return SSH_ERROR;
     }
@@ -865,7 +860,7 @@ static int process_open(sftp_client_message client_msg) {
     h = static_cast<struct sftp_handle *>(calloc(1, sizeof(struct sftp_handle)));
     if (h == nullptr) {
         close(fd);
-        log_debug << "failed to allocate a new handle";
+        log_error << "failed to allocate a new handle";
         sftp_reply_status(client_msg, SSH_FX_FAILURE, "Failed to allocate new handle");
         return SSH_ERROR;
     }
@@ -877,7 +872,7 @@ static int process_open(sftp_client_message client_msg) {
         ssh_string_free(handle_s);
     } else {
         close(fd);
-        log_debug << "Failed to allocate handle";
+        log_error << "Failed to allocate handle";
         sftp_reply_status(client_msg, SSH_FX_FAILURE, "Failed to allocate handle");
     }
 
@@ -951,8 +946,7 @@ void ssh_log_hexdump(const char *descr, const unsigned char *what, size_t len) {
     }
 
     if (len == 0) {
-        printed = snprintf(buffer + count, sizeof(buffer) - count,
-                           "(zero length):");
+        printed = snprintf(buffer + count, sizeof(buffer) - count, "(zero length):");
         if (printed < 0) {
             goto error;
         }
@@ -1063,7 +1057,7 @@ void ssh_log_hexdump(const char *descr, const unsigned char *what, size_t len) {
     return;
 
 error:
-    log_debug << "Could not print to buffer";
+    log_error << "Could not print to buffer";
 }
 
 /**
@@ -1141,13 +1135,13 @@ static int process_read(sftp_client_message client_msg) {
 
     if (fd < 0) {
         sftp_reply_status(client_msg, SSH_FX_INVALID_HANDLE, nullptr);
-        log_debug << "invalid fd (%d) received from handle " << fd;
+        log_error << "invalid fd (%d) received from handle " << fd;
         return SSH_ERROR;
     }
     off = lseek(fd, client_msg->offset, SEEK_SET);
     if (off == -1) {
         sftp_reply_status(client_msg, SSH_FX_FAILURE, nullptr);
-        log_debug << "error seeking file fd: " << fd << " at offset: " << client_msg->offset;
+        log_error << "error seeking file fd: " << fd << " at offset: " << client_msg->offset;
         return SSH_ERROR;
     }
 
@@ -1155,16 +1149,17 @@ static int process_read(sftp_client_message client_msg) {
     if (buffer == nullptr) {
         ssh_set_error_oom(sftp->session);
         sftp_reply_status(client_msg, SSH_FX_FAILURE, nullptr);
-        log_debug << "Failed to allocate memory for read data";
+        log_error << "Failed to allocate memory for read data";
         return SSH_ERROR;
     }
     readn = ssh_readn(fd, buffer, client_msg->len);
     if (readn < 0) {
         sftp_reply_status(client_msg, SSH_FX_FAILURE, nullptr);
-        log_debug << "read file error!";
+        log_error << "read file error!";
         free(buffer);
         return SSH_ERROR;
-    } else if (readn > 0) {
+    }
+    if (readn > 0) {
         sftp_reply_data(client_msg, buffer, readn);
     } else {
         sftp_reply_status(client_msg, SSH_FX_EOF, nullptr);
@@ -1198,15 +1193,14 @@ static int process_read(sftp_client_message client_msg) {
  */
 ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
     size_t total_bytes_written = 0;
-    ssize_t bytes_written;
 
-    if (fd < 0 || buf == NULL || nbytes == 0) {
+    if (fd < 0 || buf == nullptr || nbytes == 0) {
         errno = EINVAL;
         return SSH_ERROR;
     }
 
     do {
-        bytes_written = write(fd, static_cast<const char *>(buf) + total_bytes_written, nbytes - total_bytes_written);
+        const auto bytes_written = write(fd, static_cast<const char *>(buf) + total_bytes_written, nbytes - total_bytes_written);
         if (bytes_written == -1) {
             if (errno == EINTR) {
                 /* Ignoring errors due to signal interrupts */
@@ -1216,25 +1210,23 @@ ssize_t ssh_writen(int fd, const void *buf, size_t nbytes) {
             return SSH_ERROR;
         }
 
-        total_bytes_written += (size_t) bytes_written;
+        total_bytes_written += static_cast<size_t>(bytes_written);
     } while (total_bytes_written < nbytes);
 
-    return total_bytes_written;
+    return static_cast<int>(total_bytes_written);
 }
 
 
 static int process_write(sftp_client_message client_msg) {
 
-    sftp_session sftp = client_msg->sftp;
-    ssh_string handle = client_msg->handle;
-    struct sftp_handle *h = nullptr;
+    const sftp_session sftp = client_msg->sftp;
+    const ssh_string handle = client_msg->handle;
+    const struct sftp_handle *h = nullptr;
     ssize_t written = 0;
     int fd = -1;
     const char *msg_data = nullptr;
-    uint32_t len;
-    off_t off;
 
-    ssh_log_hexdump("Processing write: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
+    //ssh_log_hexdump("Processing write: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, handle));
     if (h->type == SFTP_FILE_HANDLE) {
@@ -1242,23 +1234,22 @@ static int process_write(sftp_client_message client_msg) {
     }
     if (fd < 0) {
         sftp_reply_status(client_msg, SSH_FX_INVALID_HANDLE, nullptr);
-        log_debug << "write file fd error!";
+        log_error << "write file fd error!";
         return SSH_ERROR;
     }
 
     msg_data = ssh_string_get_char(client_msg->data);
-    len = ssh_string_len(client_msg->data);
+    const uint32_t len = ssh_string_len(client_msg->data);
 
-    off = lseek(fd, client_msg->offset, SEEK_SET);
-    if (off == -1) {
+    if (const off_t off = lseek(fd, client_msg->offset, SEEK_SET); off == -1) {
         sftp_reply_status(client_msg, SSH_FX_FAILURE, nullptr);
         log_error << "error seeking file at offset: " << client_msg->offset;
         return SSH_ERROR;
     }
     written = ssh_writen(fd, msg_data, len);
-    if (written != (ssize_t) len) {
+    if (written != static_cast<ssize_t>(len)) {
         sftp_reply_status(client_msg, SSH_FX_FAILURE, "Write error");
-        log_debug << "file write error!";
+        log_error << "file write error!";
         return SSH_ERROR;
     }
 
@@ -1267,8 +1258,7 @@ static int process_write(sftp_client_message client_msg) {
     return SSH_OK;
 }
 
-static int
-process_close(sftp_client_message client_msg) {
+static int process_close(sftp_client_message client_msg) {
     sftp_session sftp = client_msg->sftp;
     ssh_string handle = client_msg->handle;
     struct sftp_handle *h = nullptr;
@@ -1295,7 +1285,7 @@ process_close(sftp_client_message client_msg) {
     if (ret == SSH_OK) {
         sftp_reply_status(client_msg, SSH_FX_OK, nullptr);
     } else {
-        log_debug << "closing file failed";
+        log_error << "closing file failed";
         sftp_reply_status(client_msg, SSH_FX_BAD_MESSAGE, "Invalid handle");
     }
 
@@ -1319,7 +1309,7 @@ static int process_opendir(sftp_client_message client_msg) {
     h = static_cast<struct sftp_handle *>(calloc(1, sizeof(struct sftp_handle)));
     if (h == nullptr) {
         closedir(dir);
-        log_debug << "failed to allocate a new handle";
+        log_error << "failed to allocate a new handle";
         sftp_reply_status(client_msg, SSH_FX_FAILURE, "Failed to allocate new handle");
         return SSH_ERROR;
     }
@@ -1429,7 +1419,6 @@ process_readdir(sftp_client_message client_msg) {
     struct dirent *dentry = nullptr;
     DIR *dir = nullptr;
     char long_path[PATH_MAX];
-    int srclen;
     const char *handle_name = nullptr;
 
     ssh_log_hexdump("Processing readdir: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
@@ -1440,7 +1429,7 @@ process_readdir(sftp_client_message client_msg) {
         handle_name = h->name;
     }
     if (dir == nullptr) {
-        log_debug << "got wrong handle from msg";
+        log_error << "got wrong handle from msg";
         sftp_reply_status(client_msg, SSH_FX_INVALID_HANDLE, nullptr);
         return SSH_ERROR;
     }
@@ -1450,9 +1439,9 @@ process_readdir(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
-    srclen = strlen(handle_name);
+    int srclen = strlen(handle_name);
     if (srclen + 2 >= PATH_MAX) {
-        log_debug << "handle string length exceed max length!";
+        log_error << "handle string length exceed max length!";
         sftp_reply_status(client_msg, SSH_FX_INVALID_HANDLE, nullptr);
         return SSH_ERROR;
     }
@@ -1461,8 +1450,8 @@ process_readdir(sftp_client_message client_msg) {
         dentry = readdir(dir);
 
         if (dentry != nullptr) {
-            struct sftp_attributes_struct attr;
-            struct stat st;
+            sftp_attributes_struct attr{};
+            struct stat st{};
             char long_name[MAX_LONG_NAME_LEN];
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
@@ -1519,7 +1508,7 @@ process_mkdir(sftp_client_message client_msg) {
     rv = mkdir(filename, mode);
     if (rv < 0) {
         int saved_errno = errno;
-        log_debug << "failed to mkdir:" << strerror(saved_errno);
+        log_error << "failed to mkdir:" << strerror(saved_errno);
         status = unix_errno_to_ssh_stat(saved_errno);
         ret = SSH_ERROR;
     }
@@ -1582,10 +1571,8 @@ static int process_lstat(sftp_client_message client_msg) {
 
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
-    struct sftp_attributes_struct attr {};
+    sftp_attributes_struct attr{};
     struct stat st;
-    int status = SSH_FX_OK;
-    int rv;
 
     log_debug << "Processing lstat: " << filename;
 
@@ -1594,10 +1581,11 @@ static int process_lstat(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
-    rv = lstat(filename, &st);
+    int rv = lstat(filename, &st);
     if (rv < 0) {
-        int saved_errno = errno;
-        log_debug << "lstat failed: " << strerror(saved_errno);
+        int status = SSH_FX_OK;
+        const int saved_errno = errno;
+        log_error << "lstat failed: " << strerror(saved_errno);
         status = unix_errno_to_ssh_stat(saved_errno);
         sftp_reply_status(client_msg, status, nullptr);
         ret = SSH_ERROR;
@@ -1612,10 +1600,8 @@ static int process_lstat(sftp_client_message client_msg) {
 static int process_stat(sftp_client_message client_msg) {
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
-    struct sftp_attributes_struct attr;
+    sftp_attributes_struct attr;
     struct stat st;
-    int status = SSH_FX_OK;
-    int rv;
 
     log_debug << "Processing stat: " << filename;
 
@@ -1624,10 +1610,10 @@ static int process_stat(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
-    rv = stat(filename, &st);
-    if (rv < 0) {
-        int saved_errno = errno;
-        log_debug << "lstat failed: " << strerror(saved_errno);
+    if (const int rv = stat(filename, &st); rv < 0) {
+        int status = SSH_FX_OK;
+        const int saved_errno = errno;
+        log_error << "lstat failed: " << strerror(saved_errno);
         status = unix_errno_to_ssh_stat(saved_errno);
         sftp_reply_status(client_msg, status, nullptr);
         ret = SSH_ERROR;
@@ -1641,7 +1627,7 @@ static int process_stat(sftp_client_message client_msg) {
 
 static int process_setstat(sftp_client_message client_msg) {
     int rv;
-    int ret = SSH_OK;
+    constexpr int ret = SSH_OK;
     int status = SSH_FX_OK;
     uint32_t msg_flags = client_msg->attr->flags;
     const char *filename = sftp_client_message_get_filename(client_msg);
@@ -1654,10 +1640,10 @@ static int process_setstat(sftp_client_message client_msg) {
     }
 
     if (msg_flags & SSH_FILEXFER_ATTR_SIZE) {
-        rv = truncate(filename, client_msg->attr->size);
+        rv = truncate(filename, static_cast<int>(client_msg->attr->size));
         if (rv < 0) {
-            int saved_errno = errno;
-            log_debug << "changing size failed: " << strerror(saved_errno);
+            const int saved_errno = errno;
+            log_error << "changing size failed: " << strerror(saved_errno);
             status = unix_errno_to_ssh_stat(saved_errno);
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
@@ -1667,8 +1653,8 @@ static int process_setstat(sftp_client_message client_msg) {
     if (msg_flags & SSH_FILEXFER_ATTR_PERMISSIONS) {
         rv = chmod(filename, client_msg->attr->permissions);
         if (rv < 0) {
-            int saved_errno = errno;
-            log_debug << "chmod failed: " << strerror(saved_errno);
+            const int saved_errno = errno;
+            log_error << "chmod failed: " << strerror(saved_errno);
             status = unix_errno_to_ssh_stat(saved_errno);
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
@@ -1678,8 +1664,8 @@ static int process_setstat(sftp_client_message client_msg) {
     if (msg_flags & SSH_FILEXFER_ATTR_UIDGID) {
         rv = chown(filename, client_msg->attr->uid, client_msg->attr->gid);
         if (rv < 0) {
-            int saved_errno = errno;
-            log_debug << "chown failed: " << strerror(saved_errno);
+            const int saved_errno = errno;
+            log_error << "chown failed: " << strerror(saved_errno);
             status = unix_errno_to_ssh_stat(saved_errno);
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
@@ -1696,8 +1682,8 @@ static int process_setstat(sftp_client_message client_msg) {
 
         rv = utimes(filename, tv);
         if (rv < 0) {
-            int saved_errno = errno;
-            log_debug << "utimes failed: " << strerror(saved_errno);
+            const int saved_errno = errno;
+            log_error << "utimes failed: " << strerror(saved_errno);
             status = unix_errno_to_ssh_stat(saved_errno);
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
@@ -1713,7 +1699,6 @@ static int process_readlink(sftp_client_message client_msg) {
     const char *filename = sftp_client_message_get_filename(client_msg);
     char buf[PATH_MAX];
     int len = -1;
-    const char *err_msg;
     int status = SSH_FX_OK;
 
     log_debug << "Processing readlink: " << filename;
@@ -1723,12 +1708,12 @@ static int process_readlink(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
-    len = readlink(filename, buf, sizeof(buf) - 1);
+    len = static_cast<int>(readlink(filename, buf, sizeof(buf) - 1));
     if (len < 0) {
-        int saved_errno = errno;
+        const int saved_errno = errno;
         log_error << "readlink failed: " << strerror(saved_errno);
         status = unix_errno_to_ssh_stat(saved_errno);
-        err_msg = ssh_str_error(status);
+        const char *err_msg = ssh_str_error(status);
         sftp_reply_status(client_msg, status, err_msg);
         ret = SSH_ERROR;
     } else {
@@ -1739,18 +1724,17 @@ static int process_readlink(sftp_client_message client_msg) {
     return ret;
 }
 
-/* Note, that this function is using reversed order of the arguments than the
+/**
+ * Note, that this function is using reversed order of the arguments than the
  * OpenSSH sftp server as they have the arguments switched. See
- * section "4.1 sftp: Reversal of arguments to SSH_FXP_SYMLINK' in
+ * section '4.1 sftp: Reversal of arguments to SSH_FXP_SYMLINK' in
  * https://github.com/openssh/openssh-portable/blob/master/PROTOCOL
- * for more information */
-static int
-process_symlink(sftp_client_message client_msg) {
+ * for more information
+ */
+static int process_symlink(sftp_client_message client_msg) {
     int ret = SSH_OK;
     const char *destpath = sftp_client_message_get_filename(client_msg);
     const char *srcpath = ssh_string_get_char(client_msg->data);
-    int status = SSH_FX_OK;
-    int rv;
 
     log_debug << "processing symlink: src: " << srcpath << " dest: " << destpath;
 
@@ -1759,9 +1743,9 @@ process_symlink(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
-    rv = symlink(srcpath, destpath);
-    if (rv < 0) {
-        int saved_errno = errno;
+    if (const int rv = symlink(srcpath, destpath); rv < 0) {
+        int status = SSH_FX_OK;
+        const int saved_errno = errno;
         status = unix_errno_to_ssh_stat(saved_errno);
         log_debug << "symlink failed: " << strerror(saved_errno);
         sftp_reply_status(client_msg, status, "Write error");
@@ -1777,12 +1761,11 @@ static int
 process_remove(sftp_client_message client_msg) {
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
-    int rv;
     int status = SSH_FX_OK;
 
     log_debug << "processing remove: " << filename;
 
-    rv = unlink(filename);
+    int rv = unlink(filename);
     if (rv < 0) {
         int saved_errno = errno;
         log_debug << "unlink failed: " << strerror(saved_errno);
@@ -1803,29 +1786,26 @@ static int process_unsupposed(sftp_client_message client_msg) {
 
 static int process_extended_statvfs(sftp_client_message client_msg) {
     const char *path = sftp_client_message_get_filename(client_msg);
-    struct statvfs st;
-    uint64_t flag;
-    int status;
-    int rv;
+    struct statvfs st{};
 
     log_debug << "processing extended statvfs: " << path;
 
-    rv = statvfs(path, &st);
+    int rv = statvfs(path, &st);
     if (rv != 0) {
-        int saved_errno = errno;
+        const int saved_errno = errno;
         log_debug << "statvfs failed: " << strerror(saved_errno);
-        status = unix_errno_to_ssh_stat(saved_errno);
+        const int status = unix_errno_to_ssh_stat(saved_errno);
         sftp_reply_status(client_msg, status, nullptr);
         return SSH_ERROR;
     }
 
-    auto sftp_statvfs = static_cast<sftp_statvfs_t>(calloc(1, sizeof(struct sftp_statvfs_struct)));
+    const auto sftp_statvfs = static_cast<sftp_statvfs_t>(calloc(1, sizeof(struct sftp_statvfs_struct)));
     if (sftp_statvfs == nullptr) {
         log_debug << "Failed to allocate statvfs structure";
         sftp_reply_status(client_msg, SSH_FX_FAILURE, nullptr);
         return SSH_ERROR;
     }
-    flag = (st.f_flag & ST_RDONLY) ? SSH_FXE_STATVFS_ST_RDONLY : 0;
+    uint64_t flag = (st.f_flag & ST_RDONLY) ? SSH_FXE_STATVFS_ST_RDONLY : 0;
     flag |= (st.f_flag & ST_NOSUID) ? SSH_FXE_STATVFS_ST_NOSUID : 0;
 
     sftp_statvfs->f_bsize = st.f_bsize;
@@ -1899,7 +1879,7 @@ error:
 int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel channel, const char *subsystem, void *userdata) {
 
     if (strcmp(subsystem, "sftp") == 0) {
-        sftp_session *sftp = (sftp_session *) userdata;
+        auto *sftp = static_cast<sftp_session *>(userdata);
 
         /* initialize sftp session and file handler */
         *sftp = sftp_server_new(session, channel);
@@ -1913,22 +1893,19 @@ int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel chan
 }
 
 int sftp_reply_version(sftp_client_message client_msg) {
-    sftp_session sftp = client_msg->sftp;
-    ssh_session session = sftp->session;
-    int version;
-    ssh_buffer reply;
-    int rc;
+    const sftp_session sftp = client_msg->sftp;
+    const ssh_session session = sftp->session;
 
-    log_info << "Sending version packet";
+    PLOGI.printf("Sending version packet");
 
-    version = sftp->client_version;
-    reply = ssh_buffer_new();
+    const int version = sftp->client_version;
+    ssh_buffer reply = ssh_buffer_new();
     if (reply == nullptr) {
         ssh_set_error_oom(session);
         return -1;
     }
 
-    rc = ssh_buffer_pack(reply, "dssssss", LIBSFTP_VERSION, "posix-rename@openssh.com", "1", "hardlink@openssh.com", "1", "statvfs@openssh.com", "2");
+    int rc = ssh_buffer_pack(reply, "dssssss", LIBSFTP_VERSION, "posix-rename@openssh.com", "1", "hardlink@openssh.com", "1", "statvfs@openssh.com", "2");
     if (rc != SSH_OK) {
         ssh_set_error_oom(session);
         SSH_BUFFER_FREE(reply);
@@ -1953,18 +1930,14 @@ int sftp_reply_version(sftp_client_message client_msg) {
     return SSH_OK;
 }
 
-/* Functions to convert between host and network byte order.
-
-       Please note that these functions normally take `unsigned long int' or
-       `unsigned short int' values as arguments and also return them.  But
-       this was a short-sighted decision since on different systems the types
-       may have different representations but the values are always the same.  */
-
-extern uint32_t ntohl(uint32_t __netlong) __THROW __attribute__((__const__));
-extern uint16_t ntohs(uint16_t __netshort) __THROW __attribute__((__const__));
-extern uint32_t htonl(uint32_t __hostlong) __THROW __attribute__((__const__));
-extern uint16_t htons(uint16_t __hostshort) __THROW __attribute__((__const__));
-
+/**
+ * Functions to convert between host and network byte order.
+ *
+ * Please note that these functions normally take `unsigned long int' or
+ * `unsigned short int' values as arguments and also return them.  But
+ * this was a short-sighted decision since on different systems the types
+ * may have different representations but the values are always the same.
+ */
 const sftp_message_handler message_handlers[] = {
         {"open", nullptr, SSH_FXP_OPEN, process_open},
         {"close", nullptr, SSH_FXP_CLOSE, process_close},
@@ -2020,9 +1993,9 @@ static int process_extended(sftp_client_message sftp_msg) {
 static int dispatch_sftp_request(sftp_client_message sftp_msg) {
     int status = SSH_ERROR;
     sftp_server_message_callback handler = nullptr;
-    uint8_t type = sftp_client_message_get_type(sftp_msg);
+    const uint8_t type = sftp_client_message_get_type(sftp_msg);
 
-    log_debug << "processing request type: " << type;
+    PLOGI.printf("Sending version packet, type: %02x", type);
 
     for (int i = 0; message_handlers[i].cb != nullptr; i++) {
         if (type == message_handlers[i].type) {
@@ -2072,15 +2045,13 @@ enum sftp_longname_field_e {
     SFTP_LONGNAME_TIME,
     SFTP_LONGNAME_NAME,
 };
-static char *sftp_parse_longname(const char *longname, enum sftp_longname_field_e longname_field) {
-    const char *p, *q;
-    size_t len, field = 0;
 
-    p = longname;
-    /*
-     * Find the beginning of the field which is specified
-     * by sftp_longname_field_e.
-     */
+static char *sftp_parse_longname(const char *longname, enum sftp_longname_field_e longname_field) {
+    size_t field = 0;
+
+    const char *p = longname;
+
+    // Find the beginning of the field which is specified by sftp_longname_field_e.
     while (field != longname_field) {
         if (isspace(*p)) {
             field++;
@@ -2093,31 +2064,32 @@ static char *sftp_parse_longname(const char *longname, enum sftp_longname_field_
         }
     }
 
-    q = p;
+    const char *q = p;
     while (!isspace(*q)) {
         q++;
     }
 
-    len = q - p;
+    const size_t len = q - p;
 
     return strndup(p, len);
 }
 
-/* sftp version 0-3 code. It is different from the v4 */
-/* maybe a paste of the draft is better than the code */
-/*
-    uint32   flags
-    uint64   size           present only if flag SSH_FILEXFER_ATTR_SIZE
-    uint32   uid            present only if flag SSH_FILEXFER_ATTR_UIDGID
-    uint32   gid            present only if flag SSH_FILEXFER_ATTR_UIDGID
-    uint32   permissions    present only if flag SSH_FILEXFER_ATTR_PERMISSIONS
-    uint32   atime          present only if flag SSH_FILEXFER_ACMODTIME
-    uint32   mtime          present only if flag SSH_FILEXFER_ACMODTIME
-    uint32   extended_count present only if flag SSH_FILEXFER_ATTR_EXTENDED
-    string   extended_type
-    string   extended_data
-    ...      more extended data (extended_type - extended_data pairs),
-               so that number of pairs equals extended_count              */
+/**
+ * sftp version 0-3 code. It is different from the v4 maybe a paste of the draft is better than the code
+ *
+ *   uint32   flags
+ *   uint64   size           present only if flag SSH_FILEXFER_ATTR_SIZE
+ *   uint32   uid            present only if flag SSH_FILEXFER_ATTR_UIDGID
+ *   uint32   gid            present only if flag SSH_FILEXFER_ATTR_UIDGID
+ *   uint32   permissions    present only if flag SSH_FILEXFER_ATTR_PERMISSIONS
+ *   uint32   atime          present only if flag SSH_FILEXFER_ACMODTIME
+ *   uint32   mtime          present only if flag SSH_FILEXFER_ACMODTIME
+ *   uint32   extended_count present only if flag SSH_FILEXFER_ATTR_EXTENDED
+ *   string   extended_type
+ *   string   extended_data
+ *   ...      more extended data (extended_type - extended_data pairs),
+ *              so that number of pairs equals extended_count
+ */
 static sftp_attributes sftp_parse_attr_3(sftp_session sftp, ssh_buffer buf, int expectname) {
     sftp_attributes attr;
     int rc;
@@ -2254,44 +2226,41 @@ error:
 }
 
 /**
-     * @internal
-     *
-     * @brief gets a 32 bits unsigned int out of the buffer. Adjusts the read pointer.
-     *
-     * @param[in]  buffer   The buffer to read.
-     *
-     * @param[in]  data     A pointer to a uint32_t where to store the data.
-     *
-     * @returns             0 if there is not enough data in buffer, 4 otherwise.
-     */
+ * @brief gets a 32 bits unsigned int out of the buffer. Adjusts the read pointer.
+ *
+ * @param[in]  buffer   The buffer to read.
+ *
+ * @param[in]  data     A pointer to a uint32_t where to store the data.
+ *
+ * @returns             0 if there is not enough data in buffer, 4 otherwise.
+ */
 uint32_t ssh_buffer_get_u32(struct ssh_buffer_struct *buffer, uint32_t *data) {
     return ssh_buffer_get_data(buffer, data, sizeof(uint32_t));
 }
+
 /**
-     * @internal
-     *
-     * @brief Get a 64 bits unsigned int out of the buffer and adjusts the read
-     * pointer.
-     *
-     * @param[in]  buffer   The buffer to read.
-     *
-     * @param[in]  data     A pointer to a uint64_t where to store the data.
-     *
-     * @returns             0 if there is not enough data in buffer, 8 otherwise.
-     */
+ * @brief Get a 64 bits unsigned int out of the buffer and adjusts the read
+ * pointer.
+ *
+ * @param[in]  buffer   The buffer to read.
+ *
+ * @param[in]  data     A pointer to a uint64_t where to store the data.
+ *
+ * @returns             0 if there is not enough data in buffer, 8 otherwise.
+ */
 uint32_t ssh_buffer_get_u64(struct ssh_buffer_struct *buffer, uint64_t *data) {
     return ssh_buffer_get_data(buffer, data, sizeof(uint64_t));
 }
 
 /**
-     * @brief Validates that the given length can be obtained from the buffer.
-     *
-     * @param[in]  buffer  The buffer to read from.
-     *
-     * @param[in]  len     The length to be checked.
-     *
-     * @return             SSH_OK if the length is valid, SSH_ERROR otherwise.
-     */
+ * @brief Validates that the given length can be obtained from the buffer.
+ *
+ * @param[in]  buffer  The buffer to read from.
+ *
+ * @param[in]  len     The length to be checked.
+ *
+ * @return             SSH_OK if the length is valid, SSH_ERROR otherwise.
+ */
 int ssh_buffer_validate_length(struct ssh_buffer_struct *buffer, size_t len) {
     if (buffer == nullptr || buffer->pos + len < len ||
         buffer->pos + len > buffer->used) {
@@ -2302,27 +2271,23 @@ int ssh_buffer_validate_length(struct ssh_buffer_struct *buffer, size_t len) {
 }
 
 /**
-     * @internal
-     *
-     * @brief Get an SSH String out of the buffer and adjust the read pointer.
-     *
-     * @param[in]  buffer   The buffer to read.
-     *
-     * @returns             The SSH String, nullptr on error.
-     */
-struct ssh_string_struct *
-ssh_buffer_get_ssh_string(struct ssh_buffer_struct *buffer) {
+ * @brief Get an SSH String out of the buffer and adjust the read pointer.
+ *
+ * @param[in]  buffer   The buffer to read.
+ *
+ * @returns             The SSH String, nullptr on error.
+ */
+ssh_string_struct *ssh_buffer_get_ssh_string(ssh_buffer_struct *buffer) {
     uint32_t stringlen;
-    uint32_t hostlen;
-    struct ssh_string_struct *str = nullptr;
-    int rc;
+    ssh_string_struct *str = nullptr;
 
-    rc = ssh_buffer_get_u32(buffer, &stringlen);
+    int rc = ssh_buffer_get_u32(buffer, &stringlen);
     if (rc == 0) {
         return nullptr;
     }
-    hostlen = ntohl(stringlen);
-    /* verify if there is enough space in buffer to get it */
+    uint32_t hostlen = ntohl(stringlen);
+
+    // verify if there is enough space in buffer to get it
     rc = ssh_buffer_validate_length(buffer, hostlen);
     if (rc != SSH_OK) {
         return nullptr; /* it is indeed */
@@ -2334,7 +2299,7 @@ ssh_buffer_get_ssh_string(struct ssh_buffer_struct *buffer) {
 
     stringlen = ssh_buffer_get_data(buffer, ssh_string_data(str), hostlen);
     if (stringlen != hostlen) {
-        /* should never happen */
+        // should never happen
         SAFE_FREE(str);
         return nullptr;
     }
@@ -2342,7 +2307,7 @@ ssh_buffer_get_ssh_string(struct ssh_buffer_struct *buffer) {
     return str;
 }
 
-/*
+/**
  * Parse the attributes from a payload from some messages. It is coded on
  * baselines from the protocol version 4.
  * This code is more or less dead but maybe we will need it in the future.
@@ -2536,8 +2501,7 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
     ssh_session session = sftp->session;
     sftp_client_message msg = nullptr;
     ssh_buffer payload = nullptr;
-    int rc;
-    int version;
+    int version, rc;
 
     msg = static_cast<sftp_client_message>(calloc(1, sizeof(sftp_client_message_struct)));
     if (msg == nullptr) {
@@ -2549,7 +2513,7 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
     msg->type = packet->type;
     msg->sftp = sftp;
 
-    /* take a copy of the whole packet */
+    // take a copy of the whole packet
     msg->complete_message = ssh_buffer_new();
     if (msg->complete_message == nullptr) {
         ssh_set_error_oom(session);
@@ -2562,7 +2526,7 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
     }
 
     if (msg->type != SSH_FXP_INIT) {
-        rc = ssh_buffer_get_u32(payload, &msg->id);
+        rc = static_cast<int>(ssh_buffer_get_u32(payload, &msg->id));
         if (rc != sizeof(uint32_t)) {
             goto error;
         }
@@ -2705,12 +2669,12 @@ error:
 }
 
 /**
-     * @brief Get the client message from a sftp packet.
-     *
-     * @param  sftp         The sftp session handle.
-     *
-     * @return              The pointer to the generated sftp client message.
-     */
+ * @brief Get the client message from a sftp packet.
+ *
+ * @param  sftp         The sftp session handle.
+ *
+ * @return              The pointer to the generated sftp client message.
+ */
 static sftp_client_message sftp_get_client_message_from_packet(sftp_session sftp) {
     sftp_packet packet = nullptr;
 
@@ -2721,55 +2685,44 @@ static sftp_client_message sftp_get_client_message_from_packet(sftp_session sftp
     return sftp_make_client_message(sftp, packet);
 }
 
-/* @internal
-     * Process the incoming data and copy them from the SSH packet buffer to the
-     * SFTP packet buffer.
-     * @returns number of decoded bytes.
-     */
+/**
+ * Process the incoming data and copy them from the SSH packet buffer to the
+ * SFTP packet buffer.
+ * @returns number of decoded bytes.
+ */
 int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t len) {
-    sftp_packet packet = sftp->read_packet;
-    int nread;
-    int payload_len;
-    unsigned int data_offset;
-    int to_read, rc;
+    const sftp_packet packet = sftp->read_packet;
 
     if (packet->sftp == nullptr) {
         packet->sftp = sftp;
     }
 
-    data_offset = sizeof(uint32_t) + sizeof(uint8_t);
-    /* not enough bytes to read */
+    constexpr unsigned int data_offset = sizeof(uint32_t) + sizeof(uint8_t);
+    // not enough bytes to read
     if (len < data_offset) {
         return SSH_ERROR;
     }
 
-    payload_len = PULL_BE_U32(data, 0);
+    const int payload_len = PULL_BE_U32(data, 0);
     packet->type = PULL_BE_U8(data, 4);
 
-    /* We should check the legality of payload length */
+    // We should check the legality of payload length
     if (payload_len + sizeof(uint32_t) > len || payload_len < 0) {
         return SSH_ERROR;
     }
 
-    to_read = payload_len - sizeof(uint8_t);
-    rc = ssh_buffer_add_data(packet->payload,
-                             (void *) ((uint8_t *) data + data_offset),
-                             to_read);
-    if (rc != 0) {
-        return SSH_ERROR;
-    }
-    nread = ssh_buffer_get_len(packet->payload);
-
-    /* We should check if we copied the whole data */
-    if (nread != to_read) {
+    const int to_read = static_cast<int>(payload_len - sizeof(uint8_t));
+    if (const int rc = ssh_buffer_add_data(packet->payload, (static_cast<uint8_t *>(data) + data_offset), to_read); rc != 0) {
         return SSH_ERROR;
     }
 
-    /*
-         * We should return how many bytes we decoded, including packet length header
-         * and the payload length.
-         */
-    return payload_len + sizeof(uint32_t);
+    // We should check if we copied the whole data
+    if (const int nread = static_cast<int>(ssh_buffer_get_len(packet->payload)); nread != to_read) {
+        return SSH_ERROR;
+    }
+
+    // We should return how many bytes we decoded, including packet length header and the payload length.
+    return static_cast<int>(payload_len + sizeof(uint32_t));
 }
 
 /**
@@ -2787,9 +2740,6 @@ int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t l
 int sftp_channel_default_data_callback(ssh_session session, ssh_channel channel, void *data, uint32_t len, int is_stderr, void *userdata) {
     auto *sftpp = static_cast<sftp_session *>(userdata);
     sftp_session sftp = nullptr;
-    sftp_client_message msg;
-    int decode_len;
-    int rc;
 
     if (sftpp == nullptr) {
         log_warning << "nullptr userdata passed to callback";
@@ -2797,12 +2747,12 @@ int sftp_channel_default_data_callback(ssh_session session, ssh_channel channel,
     }
     sftp = *sftpp;
 
-    decode_len = sftp_decode_channel_data_to_packet(sftp, data, len);
+    const int decode_len = sftp_decode_channel_data_to_packet(sftp, data, len);
     if (decode_len == -1)
         return -1;
 
-    msg = sftp_get_client_message_from_packet(sftp);
-    rc = process_client_message(msg);
+    const sftp_client_message msg = sftp_get_client_message_from_packet(sftp);
+    const int rc = process_client_message(msg);
     sftp_client_message_free(msg);
     if (rc != SSH_OK)
         log_debug << "process sftp failed!";
@@ -2850,9 +2800,9 @@ bignum ssh_make_string_bn(ssh_string string) {
      *                      SSH_ERROR on error
      * @see ssh_buffer_get_format() for format list values.
      */
-int ssh_buffer_unpack_va(struct ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
+int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
     int rc = SSH_ERROR;
-    const char *p = format, *last;
+    const char *p = format;
     union {
         uint8_t *byte;
         uint16_t *word;
@@ -2862,7 +2812,7 @@ int ssh_buffer_unpack_va(struct ssh_buffer_struct *buffer, const char *format, s
         char **cstring;
         BIGNUM **bignum;
         void **data;
-    } o;
+    } o{};
     size_t len;
     uint32_t rlen, max_len;
     ssh_string tmp_string = nullptr;
@@ -2880,7 +2830,7 @@ int ssh_buffer_unpack_va(struct ssh_buffer_struct *buffer, const char *format, s
     }
 
     for (count = 0; *p != '\0'; p++, count++) {
-        /* Invalid number of arguments passed */
+        // Invalid number of arguments passed
         if (count > argc) {
             rc = SSH_ERROR;
             goto cleanup;
@@ -3021,6 +2971,7 @@ cleanup:
     }
 
     if (rc != SSH_OK) {
+        const char *last;
         /* Reset the format string and erase everything that was allocated */
         last = p;
         for (p = format; p < last; ++p) {
@@ -3111,12 +3062,11 @@ cleanup:
      * @warning             when using 'P' with a constant size (e.g. 8), do not
      *                      forget to cast to (size_t).
      */
-int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
+int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...) {
     va_list ap;
-    int rc;
 
     va_start(ap, argc);
-    rc = ssh_buffer_unpack_va(buffer, format, argc, ap);
+    const int rc = ssh_buffer_unpack_va(buffer, format, argc, ap);
     va_end(ap);
     return rc;
 }
@@ -3124,7 +3074,7 @@ int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer, const char *format, siz
 
 // ======================================================================================================================
 
-static void set_default_keys(ssh_bind sshbind, int rsa_already_set, int ecdsa_already_set) {
+static void set_default_keys(ssh_bind sshbind, const int rsa_already_set, const int ecdsa_already_set) {
     if (!rsa_already_set) {
         ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_HOSTKEY, KEYS_FOLDER "ssh_host_rsa_key");
     }
@@ -3135,17 +3085,17 @@ static void set_default_keys(ssh_bind sshbind, int rsa_already_set, int ecdsa_al
 }
 
 /**
-     * An user data struct for channel.
-     */
+ * An user data struct for channel.
+ */
 struct channel_data_struct {
-    /* Event which is used to poll the above descriptors. */
+    // Event which is used to poll the above descriptors.
     ssh_event event;
     sftp_session sftp;
 };
 
 /**
-     * A user data struct for session.
-     */
+ * A user data struct for session.
+ */
 struct session_data_struct {
     // Pointer to the channel the session will allocate.
     ssh_channel channel;
@@ -3167,10 +3117,6 @@ static int auth_password(ssh_session session, const char *user, const char *pass
         log_debug << "SFTP user authenticated, userName: " << user;
         return SSH_AUTH_SUCCESS;
     }
-    // if (strcmp(user, USER) == 0 && strcmp(pass, PASS) == 0) {
-    //     sdata->authenticated = 1;
-    //     return SSH_AUTH_SUCCESS;
-    // }
     log_warning << "SFTP user not authenticated, userName: " << user << " password: " << pass;
 
     sdata->auth_attempts++;
@@ -3224,10 +3170,10 @@ static ssh_channel channel_open(ssh_session session, void *userdata) {
 
 static void handle_session(ssh_event event, ssh_session session) {
 
-    /* Our struct holding information about the channel. */
+    // Our struct holding information about the channel.
     channel_data_struct cdata = {.sftp = nullptr};
 
-    /* Our struct holding information about the session. */
+    // Our struct holding information about the session.
     session_data_struct sdata = {.channel = nullptr, .auth_attempts = 0, .authenticated = 0};
 
     ssh_channel_callbacks_struct channel_cb = {.userdata = &(cdata.sftp), .channel_data_function = sftp_channel_default_data_callback, .channel_subsystem_request_function = sftp_channel_default_subsystem_request};
@@ -3281,7 +3227,9 @@ static void handle_session(ssh_event event, ssh_session session) {
             log_debug << "SFTP Event: " << cdata.event;
             continue;
         }
+
         // FIXME The server keeps hanging in the poll above when the client closes the channel
+
     } while (ssh_channel_is_open(sdata.channel));
 
     ssh_channel_send_eof(sdata.channel);
@@ -3299,6 +3247,7 @@ static void sigchld_handler(int signo) {
 
     while (waitpid(-1, nullptr, WNOHANG) > 0);
 }
+}// extern C
 
 namespace AwsMock::Service {
     SftpServer::SftpServer(std::string port, std::string hostKey, std::string address) : _port(std::move(port)), _hostKey(std::move(hostKey)), _address(std::move(address)) {}
@@ -3314,26 +3263,16 @@ namespace AwsMock::Service {
         ssh_bind sshbind = nullptr;
         ssh_session session = nullptr;
         ssh_event event = nullptr;
-        struct sigaction sa {};
-
-        // Set up SIGCHLD handler.
-        // sa.sa_handler = sigchld_handler;
-        // sigemptyset(&sa.sa_mask);
-        // sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
-        // if (sigaction(SIGCHLD, &sa, nullptr) != 0) {
-        //     fprintf(stderr, "Failed to register SIGCHLD handler\n");
-        //     return 1;
-        // }
 
         if (const int rc = ssh_init(); rc < 0) {
             log_error << "SSH initialization failed";
-            goto exit;
+            return;
         }
 
         sshbind = ssh_bind_new();
         if (sshbind == nullptr) {
             log_error << "SSH bind new failed";
-            goto exit;
+            return;
         }
         log_info << "SFTP server starting, endpoint: " << _address << ":" << _port;
 
@@ -3345,7 +3284,7 @@ namespace AwsMock::Service {
 
         if (ssh_bind_listen(sshbind) < 0) {
             log_error << "SSH listen failed, error: " << ssh_get_error(sshbind);
-            goto exit;
+            return;
         }
 
         while (true) {
@@ -3357,30 +3296,17 @@ namespace AwsMock::Service {
 
             // Blocks until there is a new incoming connection.
             if (ssh_bind_accept(sshbind, session) != SSH_ERROR) {
-                //                    switch (fork()) {
-                //                        case 0:
-                // Remove the SIGCHLD handler inherited from parent.
-                sa.sa_handler = SIG_DFL;
-                sigaction(SIGCHLD, &sa, nullptr);
-                // Remove socket binding, which allows us to restart the parent process, without terminating existing sessions.
-                ssh_bind_free(sshbind);
 
                 event = ssh_event_new();
                 if (event != nullptr) {
+
                     // Blocks until the SSH session ends by either child process exiting, or client disconnecting.
                     handle_session(event, session);
                     ssh_event_free(event);
+
                 } else {
                     log_error << "Could not create polling context";
                 }
-                //ssh_disconnect(session);
-                //ssh_free(session);
-
-                // exit(0);
-                /*                        case -1:
-                            log_error << "Failed to fork";
-                        default:;
-                    }*/
             } else {
                 log_error << "Could not bind, error: " << ssh_get_error(sshbind);
             }
@@ -3388,8 +3314,6 @@ namespace AwsMock::Service {
             ssh_disconnect(session);
             ssh_free(session);
         }
-
-    exit:
         ssh_bind_free(sshbind);
         ssh_finalize();
     }

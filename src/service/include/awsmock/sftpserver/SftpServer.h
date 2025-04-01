@@ -134,7 +134,7 @@ struct error_struct {
     int error_code;
     char error_buffer[ERROR_BUFFERLEN];
 };
-
+extern "C" {
 void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) PRINTF_ATTRIBUTE(4, 5);
 #define ssh_set_error(error, code, ...) _ssh_set_error(error, code, __func__, __VA_ARGS__)
 
@@ -260,7 +260,7 @@ int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer,
 #define ssh_buffer_unpack(buffer, format, ...) _ssh_buffer_unpack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 #define MAX_ENTRIES_NUM_IN_PACKET 50
 #define MAX_LONG_NAME_LEN 350
-
+}
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/sftpserver/SftpUser.h>
