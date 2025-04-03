@@ -99,7 +99,7 @@ namespace AwsMock::Database::Entity::SSM {
          *
          * @param mResult MongoDB document view.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.

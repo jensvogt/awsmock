@@ -56,7 +56,7 @@ namespace AwsMock::Dto::DynamoDb {
                     }
                 } else if (ele.key() == "BOOL") {
                     boolValue = std::make_shared<bool>(jsonObject["BOOL"].get_bool().value);
-                } else if (ele.key() == "NULL") {
+                } else if (ele.key() == "nullptr") {
                     nullValue = std::make_shared<bool>(true);
                 }
             }

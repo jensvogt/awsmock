@@ -20,7 +20,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "BOOL", *boolValue);
         }
         if (nullValue) {
-            Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "NULL", *nullValue);
+            Core::Bson::BsonUtils::SetBoolValue(attributeDoc, "nullptr", *nullValue);
         }
 
         // Convert string set to document
@@ -50,8 +50,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
             numberValue = Core::Bson::BsonUtils::GetStringValue(mResult, "N");
         } else if (mResult.view().find("BOOL") != mResult.view().end()) {
             boolValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "BOOL"));
-        } else if (mResult.view().find("NULL") != mResult.view().end()) {
-            nullValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "NULL"));
+        } else if (mResult.view().find("nullptr") != mResult.view().end()) {
+            nullValue = std::make_shared<bool>(Core::Bson::BsonUtils::GetBoolValue(mResult, "nullptr"));
         }
     }
 

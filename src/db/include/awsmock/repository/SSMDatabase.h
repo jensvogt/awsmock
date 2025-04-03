@@ -31,7 +31,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit SSMDatabase() : _memoryDb(SSMMemoryDb::instance()), _databaseName(GetDatabaseName()), _parameterCollectionName("ssm_parameter") {}
+        explicit SSMDatabase() : _databaseName(GetDatabaseName()), _parameterCollectionName("ssm_parameter"), _memoryDb(SSMMemoryDb::instance()) {}
 
         /**
          * @brief Singleton instance

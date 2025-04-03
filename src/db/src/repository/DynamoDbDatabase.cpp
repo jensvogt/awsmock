@@ -347,7 +347,7 @@ namespace AwsMock::Database {
                             query.append(kvp("attributes." + keyName + ".BOOL", *it->second.boolValue));
                         }
                         if (it->second.nullValue && *it->second.nullValue) {
-                            query.append(kvp("attributes." + keyName + ".NULL", *it->second.nullValue));
+                            query.append(kvp("attributes." + keyName + ".nullptr", *it->second.nullValue));
                         }
                     }
                 }
@@ -500,7 +500,7 @@ namespace AwsMock::Database {
                             query.append(kvp("attributes." + key + ".BOOL", *it->second.boolValue));
                         }
                         if (it->second.nullValue && it->second.nullValue) {
-                            query.append(kvp("attributes." + key + ".NULL", *it->second.nullValue));
+                            query.append(kvp("attributes." + key + ".nullptr", *it->second.nullValue));
                         }
                     }
                 }
@@ -580,7 +580,7 @@ namespace AwsMock::Database {
                     } else if (snd.boolValue) {
                         query.append(kvp(fst + "BOOL", *snd.boolValue));
                     } else if (snd.nullValue && *snd.nullValue) {
-                        query.append(kvp(fst + "NULL", *snd.nullValue));
+                        query.append(kvp(fst + "nullptr", *snd.nullValue));
                     }
                 }
                 const auto result = _itemCollection.delete_one(make_document(kvp("tableName", tableName)));

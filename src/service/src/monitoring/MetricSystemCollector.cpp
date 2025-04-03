@@ -166,24 +166,24 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        if (const long diff = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - _startTime).count(); diff > 0) {
+        if (const long diff = std::chrono::duration_cast<milliseconds>(system_clock::now() - _startTime).count(); diff > 0) {
 
             // User CPU
             long millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec;
             double percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", percent);
+            MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
             millies = r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "system", percent);
+            MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
             millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
-            MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", percent);
+            MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }
     }
@@ -198,8 +198,8 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
-        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", static_cast<double>(t_info.resident_size));
+        MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
+        MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(t_info.resident_size));
         log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
     }
 

@@ -2,6 +2,7 @@
 // Created by vogje01 on 12/18/23.
 //
 
+#include <awsmock/dto/transfer/model/IdentityProviderDetails.h>
 #include <awsmock/dto/transfer/model/Server.h>
 
 namespace AwsMock::Dto::Transfer {
@@ -15,6 +16,7 @@ namespace AwsMock::Dto::Transfer {
             arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
             domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
             endpointType = Core::Bson::BsonUtils::GetStringValue(document, "EndpointType");
+            identityProviderType = IdentityProviderTypeFromString(Core::Bson::BsonUtils::GetStringValue(document, "IdentityProviderType"));
             state = Core::Bson::BsonUtils::GetStringValue(document, "State");
             userCount = Core::Bson::BsonUtils::GetIntValue(document, "UserCount");
             port = Core::Bson::BsonUtils::GetIntValue(document, "Port");
@@ -22,6 +24,10 @@ namespace AwsMock::Dto::Transfer {
             lastStarted = Core::Bson::BsonUtils::GetDateValue(document, "LastStarted");
             created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
             modified = Core::Bson::BsonUtils::GetDateValue(document, "Modified");
+
+            if (document.find("IdentityProviderDetails") != document.end()) {
+                identityProviderDetails.FromDocument(document.view()["IdentityProviderDetails"].get_document().value);
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -38,7 +44,7 @@ namespace AwsMock::Dto::Transfer {
             Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
             Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
             Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
-            Core::Bson::BsonUtils::SetStringValue(document, "IdentityProviderType", identityProviderType);
+            Core::Bson::BsonUtils::SetStringValue(document, "IdentityProviderType", IdentityProviderTypeToString(identityProviderType));
             Core::Bson::BsonUtils::SetStringValue(document, "EndpointType", endpointType);
             Core::Bson::BsonUtils::SetStringValue(document, "LoggingRole", loggingRole);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
