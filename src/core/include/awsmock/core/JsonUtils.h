@@ -24,8 +24,8 @@ namespace AwsMock::Core::Json {
     inline boost::json::value ParseJsonString(const std::string &jsonString) {
         boost::system::error_code ec;
         boost::json::value result = boost::json::parse(jsonString, ec);
-        if(ec) {
-            throw JsonException("JSON exceptoion, error: " +ec.message());
+        if (ec) {
+            throw JsonException("JSON exceptoion, error: " + ec.message());
         }
         return result;
     }
@@ -399,6 +399,6 @@ namespace AwsMock::Core::Json {
             return bsoncxx::to_json(array);
         }
     };*/
-}// namespace AwsMock::Core::Bson
+}// namespace AwsMock::Core::Json
 
 #endif// AWS_MOCK_CORE_JSON_UTILS_H

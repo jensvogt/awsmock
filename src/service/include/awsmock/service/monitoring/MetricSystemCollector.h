@@ -29,11 +29,9 @@
 #include <awsmock/service/monitoring/MetricService.h>
 
 #ifdef _WIN32
-//#include <Wbemidl.h>
-//#include <comdef.h>
-#include <pdh.h>
-#include <pdhmsg.h>
-#include <windows.h>
+#include "windows.h"
+#include <Wbemidl.h>
+#include <comdef.h>
 #endif
 
 namespace AwsMock::Monitoring {
