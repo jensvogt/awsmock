@@ -6,11 +6,11 @@ if (WIN32)
     add_executable(${BINARY} WIN32 ${SOURCES})
     set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
     target_include_directories(${BINARY} PUBLIC ./include ../db/include ../dto/include ../service/include
-            d:/work/Boost.Application/include ${EXTERNAL_INCLUDE})
+            d:/work/Boost.Application/include ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
-            boost_filesystem-vc143-mt-x64-1_87 yaml-cpp libssl libcrypto
-            archive magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib libmagic crypt32.lib pdh.lib)
+    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static yaml-cpp
+            libssl libcrypto archive magic.lib libmagic crypt32.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
+            pdh.lib boost_program_options-vc143-mt-x64-1_87 ssh.lib)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_executable(${BINARY} ${SOURCES})
