@@ -32,6 +32,7 @@
 #include "windows.h"
 #include <Wbemidl.h>
 #include <comdef.h>
+#include <pdh.h>
 #endif
 
 namespace AwsMock::Monitoring {

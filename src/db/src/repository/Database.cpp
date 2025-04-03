@@ -47,11 +47,6 @@ namespace AwsMock::Database {
     }
 
     bool DatabaseBase::HasDatabase() {
-<<<<<<< HEAD
-        bool tmp = Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
-=======
-        //        log_trace << "Active: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
->>>>>>> a7399913259674c8dcd9d1d8f2276d6759163133
         return Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
     }
 

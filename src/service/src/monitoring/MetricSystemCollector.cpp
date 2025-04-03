@@ -206,14 +206,14 @@ namespace AwsMock::Monitoring {
 #elif _WIN32
 
     void MetricSystemCollector::GetCpuInfoWin32() {
-        MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time") / _numProcessors);
-        MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time") / _numProcessors);
-        MetricService::instance().SetGauge(CPU_USAGE, "cpu_type", "user", GetPerformanceValue("\\Process(awsmockmgr)\\% User Time") / _numProcessors);
+        MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time") / _numProcessors);
+        MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time") / _numProcessors);
+        MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", GetPerformanceValue("\\Process(awsmockmgr)\\% User Time") / _numProcessors);
     }
 
     void MetricSystemCollector::GetMemoryInfoWin32() {
-        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "virtual", GetPerformanceValue("\\Process(awsmockmgr)\\Virtual Bytes"));
-        MetricService::instance().SetGauge(MEMORY_USAGE, "mem_type", "real", GetPerformanceValue("\\Process(awsmockmgr)\\Working Set"));
+        MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", GetPerformanceValue("\\Process(awsmockmgr)\\Virtual Bytes"));
+        MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", GetPerformanceValue("\\Process(awsmockmgr)\\Working Set"));
     }
 
     void MetricSystemCollector::GetThreadInfoWin32() {

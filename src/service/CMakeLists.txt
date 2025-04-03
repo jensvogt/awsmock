@@ -39,7 +39,7 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ../db/include ../dto/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
+include_directories(./include ../core/include ../db/include ../dto/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
 
 # Shared library
 if (NOT WIN32)
@@ -50,17 +50,8 @@ endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (WIN32)
-    target_link_libraries(${LIBRARY_STATIC} PRIVATE ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-            LibArchive::LibArchive unofficial::libmagic::libmagic pdh.lib)
-else ()
+if (NOT WIN32)
     target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
             yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull)
-endif ()
-
-if (NOT WIN32)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
