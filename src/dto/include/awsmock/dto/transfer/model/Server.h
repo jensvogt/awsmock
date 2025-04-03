@@ -11,6 +11,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/transfer/model/IdentityProviderDetails.h>
+#include <awsmock/dto/transfer/model/IdentityProviderType.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -34,7 +36,12 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Identity provider type
          */
-        std::string identityProviderType;
+        IdentityProviderType identityProviderType;
+
+        /**
+         * Identity provider details
+         */
+        IdentityProviderDetails identityProviderDetails;
 
         /**
          * Endpoint type
