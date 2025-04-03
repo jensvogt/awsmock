@@ -2,8 +2,8 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#include "awsmock/sftpserver/SftpUser.h"
 #include <awsmock/sftpserver/SftpServer.h>
+#include <awsmock/sftpserver/SftpUser.h>
 
 namespace AwsMock::Service {
     SftpUsers SftpServer::_sftpUsers;
@@ -11,8 +11,37 @@ namespace AwsMock::Service {
 
 //================================= sftpserver =======================================
 extern "C" {
-#ifndef _WIN32
-/* internal */
+
+#ifdef _WIN32
+
+#define ctime_r(t, b) ctime_s(b, sizeof(b), t)
+
+int gettimeofday(timeval *tp, struct timezone *tzp) {
+    namespace sc = std::chrono;
+    const sc::system_clock::duration d = sc::system_clock::now().time_since_epoch();
+    const auto s = sc::duration_cast<sc::seconds>(d);
+    tp->tv_sec = s.count();
+    tp->tv_usec = sc::duration_cast<sc::microseconds>(d - s).count();
+    return 0;
+}
+size_t my_strnlen(const char *src, size_t n) {
+    size_t len = 0;
+    while (len < n && src[len])
+        len++;
+    return len;
+}
+
+char *strndup(const char *s, size_t n) {
+    const size_t len = my_strnlen(s, n);
+    const auto p = static_cast<char *>(malloc(len + 1));
+    if (p) {
+        memcpy(p, s, len);
+        p[len] = '\0';
+    }
+    return p;
+}
+#endif// _WIN32
+
 enum sftp_handle_type {
     SFTP_nullptr_HANDLE,
     SFTP_DIR_HANDLE,
@@ -20,12 +49,12 @@ enum sftp_handle_type {
 };
 
 struct sftp_handle {
-    enum sftp_handle_type type;
+    sftp_handle_type type;
     int fd;
     DIR *dirp;
     char *name;
 };
-#endif
+//#endif
 
 void sftp_set_error(sftp_session sftp, int errnum) {
     if (sftp != nullptr) {
@@ -189,15 +218,13 @@ int ssh_buffer_add_ssh_string(ssh_buffer_struct *buffer, ssh_string_struct *stri
 
     return 0;
 }
+
 /**
  * @defgroup libssh_log The SSH logging functions
  * @ingroup libssh
  *
  * Logging functions for debugging and problem resolving.
- *
- * @{
  */
-
 static int current_timestring(int hires, char *buf, size_t len) {
     char tbuf[64];
     timeval tv{};
@@ -342,7 +369,11 @@ static int realloc_buffer(ssh_buffer_struct *buffer, uint32_t needed) {
             return -1;
         }
         memcpy(newBuffer, buffer->data, buffer->used);
+#ifdef _WIN32
+        memset(buffer->data, 0, buffer->used);
+#else
         explicit_bzero(buffer->data, buffer->used);
+#endif
         SAFE_FREE(buffer->data);
     } else {
         newBuffer = static_cast<uint8_t *>(realloc(buffer->data, needed));
@@ -377,7 +408,11 @@ static void buffer_shift(ssh_buffer buffer) {
 
     if (buffer->secure) {
         void *ptr = buffer->data + buffer->used;
+#ifdef _WIN32
+        memset(ptr, 0, burn_pos);
+#else
         explicit_bzero(ptr, burn_pos);
+#endif
     }
 
     buffer_verify(buffer);
@@ -1357,6 +1392,7 @@ static int readdir_long_name(char *z_file_name, struct stat *z_st, char *z_long_
     else
         *ptr++ = '-';
 
+#ifndef _WIN32
     if (mode & 0100) {
         if (mode & S_ISUID)
             *ptr++ = 's';
@@ -1364,6 +1400,7 @@ static int readdir_long_name(char *z_file_name, struct stat *z_st, char *z_long_
             *ptr++ = 'x';
     } else
         *ptr++ = '-';
+#endif
 
     /* group */
     if (mode & 040)
@@ -1461,12 +1498,13 @@ process_readdir(sftp_client_message client_msg) {
             }
             snprintf(long_path, PATH_MAX, "%s/%s", handle_name, dentry->d_name);
 
+#ifndef _WIN32
             if (lstat(long_path, &st) == 0) {
                 stat_to_filexfer_attrib(&st, &attr);
             } else {
                 clear_filexfer_attrib(&attr);
             }
-
+#endif
             if (readdir_long_name(dentry->d_name, &st, long_name) == 0) {
                 sftp_reply_names_add(client_msg, dentry->d_name, long_name, &attr);
             } else {
@@ -1505,7 +1543,12 @@ process_mkdir(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
+#ifdef _WIN32
+    // TODO: fix me
+    rv = 0;
+#else
     rv = mkdir(filename, mode);
+#endif
     if (rv < 0) {
         int saved_errno = errno;
         log_error << "failed to mkdir:" << strerror(saved_errno);
@@ -1531,7 +1574,12 @@ static int process_rmdir(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
+#ifdef _WIN32
+    // TODO: fix me
+    rv = 0;
+#else
     rv = rmdir(filename);
+#endif
     if (rv < 0) {
         status = unix_errno_to_ssh_stat(errno);
         ret = SSH_ERROR;
@@ -1547,12 +1595,15 @@ static int process_realpath(sftp_client_message client_msg) {
     char *path = nullptr;
 
     log_debug << "Processing realpath: " << filename;
-
+#ifdef _WIN32
+    // TODO: fix me
+#else
     if (filename[0] == '\0') {
         path = realpath(".", nullptr);
     } else {
         path = realpath(filename, nullptr);
     }
+#endif
     if (path == nullptr) {
         int saved_errno = errno;
         int status = unix_errno_to_ssh_stat(saved_errno);
@@ -1581,6 +1632,9 @@ static int process_lstat(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
+#ifdef _WIN32
+    // TODO: fix me
+#else
     int rv = lstat(filename, &st);
     if (rv < 0) {
         int status = SSH_FX_OK;
@@ -1593,6 +1647,7 @@ static int process_lstat(sftp_client_message client_msg) {
         stat_to_filexfer_attrib(&st, &attr);
         sftp_reply_attr(client_msg, &attr);
     }
+#endif
 
     return ret;
 }
@@ -1640,6 +1695,9 @@ static int process_setstat(sftp_client_message client_msg) {
     }
 
     if (msg_flags & SSH_FILEXFER_ATTR_SIZE) {
+#ifdef _WIN32
+        // TODO: fix me
+#else
         rv = truncate(filename, static_cast<int>(client_msg->attr->size));
         if (rv < 0) {
             const int saved_errno = errno;
@@ -1648,6 +1706,7 @@ static int process_setstat(sftp_client_message client_msg) {
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
         }
+#endif
     }
 
     if (msg_flags & SSH_FILEXFER_ATTR_PERMISSIONS) {
@@ -1662,6 +1721,9 @@ static int process_setstat(sftp_client_message client_msg) {
     }
 
     if (msg_flags & SSH_FILEXFER_ATTR_UIDGID) {
+#ifdef _WIN32
+        // TODO: fix me
+#else
         rv = chown(filename, client_msg->attr->uid, client_msg->attr->gid);
         if (rv < 0) {
             const int saved_errno = errno;
@@ -1670,6 +1732,7 @@ static int process_setstat(sftp_client_message client_msg) {
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
         }
+#endif
     }
 
     if (msg_flags & SSH_FILEXFER_ATTR_ACMODTIME) {
@@ -1679,7 +1742,9 @@ static int process_setstat(sftp_client_message client_msg) {
         tv[0].tv_usec = 0;
         tv[1].tv_sec = client_msg->attr->mtime;
         tv[1].tv_usec = 0;
-
+#ifdef _WIN32
+        // TODO: fix me
+#else
         rv = utimes(filename, tv);
         if (rv < 0) {
             const int saved_errno = errno;
@@ -1688,6 +1753,7 @@ static int process_setstat(sftp_client_message client_msg) {
             sftp_reply_status(client_msg, status, nullptr);
             return rv;
         }
+#endif
     }
 
     sftp_reply_status(client_msg, status, nullptr);
@@ -1708,6 +1774,9 @@ static int process_readlink(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
+#ifdef _WIN32
+    // TODO: fix me
+#else
     len = static_cast<int>(readlink(filename, buf, sizeof(buf) - 1));
     if (len < 0) {
         const int saved_errno = errno;
@@ -1720,7 +1789,7 @@ static int process_readlink(sftp_client_message client_msg) {
         buf[len] = '\0';
         sftp_reply_name(client_msg, buf, nullptr);
     }
-
+#endif
     return ret;
 }
 
@@ -1743,6 +1812,9 @@ static int process_symlink(sftp_client_message client_msg) {
         return SSH_ERROR;
     }
 
+#ifdef _WIN32
+    // TODO: fix me
+#else
     if (const int rv = symlink(srcpath, destpath); rv < 0) {
         int status = SSH_FX_OK;
         const int saved_errno = errno;
@@ -1753,7 +1825,7 @@ static int process_symlink(sftp_client_message client_msg) {
     } else {
         sftp_reply_status(client_msg, SSH_FX_OK, "write success");
     }
-
+#endif
     return ret;
 }
 
@@ -1786,6 +1858,11 @@ static int process_unsupposed(sftp_client_message client_msg) {
 
 static int process_extended_statvfs(sftp_client_message client_msg) {
     const char *path = sftp_client_message_get_filename(client_msg);
+
+#ifdef _WIN32
+    // TODO: fix me
+#else
+
     struct statvfs st{};
 
     log_debug << "processing extended statvfs: " << path;
@@ -1825,6 +1902,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     if (rv == 0) {
         return SSH_OK;
     }
+#endif
     return SSH_ERROR;
 }
 
@@ -2979,28 +3057,44 @@ cleanup:
                 case 'b':
                     o.byte = va_arg(ap_copy, uint8_t *);
                     if (buffer->secure) {
+#ifdef _WIN32
+                        memset(o.byte, 0, sizeof(uint8_t));
+#else
                         explicit_bzero(o.byte, sizeof(uint8_t));
+#endif
                         break;
                     }
                     break;
                 case 'w':
                     o.word = va_arg(ap_copy, uint16_t *);
                     if (buffer->secure) {
+#ifdef _WIN32
+                        memset(o.word, 0, sizeof(uint16_t));
+#else
                         explicit_bzero(o.word, sizeof(uint16_t));
+#endif
                         break;
                     }
                     break;
                 case 'd':
                     o.dword = va_arg(ap_copy, uint32_t *);
                     if (buffer->secure) {
+#ifdef _WIN32
+                        memset(o.dword, 0, sizeof(uint32_t));
+#else
                         explicit_bzero(o.dword, sizeof(uint32_t));
+#endif
                         break;
                     }
                     break;
                 case 'q':
                     o.qword = va_arg(ap_copy, uint64_t *);
                     if (buffer->secure) {
+#ifdef _WIN32
+                        memset(o.qword, 0, sizeof(uint64_t));
+#else
                         explicit_bzero(o.qword, sizeof(uint64_t));
+#endif
                         break;
                     }
                     break;
@@ -3018,7 +3112,11 @@ cleanup:
                 case 's':
                     o.cstring = va_arg(ap_copy, char **);
                     if (buffer->secure) {
+#ifdef _WIN32
+                        memset(o.cstring, 0, strlen(*o.cstring));
+#else
                         explicit_bzero(*o.cstring, strlen(*o.cstring));
+#endif
                     }
                     SAFE_FREE(*o.cstring);
                     break;
@@ -3026,7 +3124,11 @@ cleanup:
                     len = va_arg(ap_copy, size_t);
                     o.data = va_arg(ap_copy, void **);
                     if (buffer->secure) {
+#ifdef _WIN32
+                        memset(o.data, 0, len);
+#else
                         explicit_bzero(*o.data, len);
+#endif
                     }
                     SAFE_FREE(*o.data);
                     break;
@@ -3239,13 +3341,6 @@ static void handle_session(ssh_event event, ssh_session session) {
     for (n = 0; n < 50 && (ssh_get_status(session) & SESSION_END) == 0; n++) {
         ssh_event_dopoll(event, 100);
     }
-}
-
-// SIGCHLD handler for cleaning up dead children.
-static void sigchld_handler(int signo) {
-    (void) signo;
-
-    while (waitpid(-1, nullptr, WNOHANG) > 0);
 }
 }// extern C
 

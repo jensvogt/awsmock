@@ -40,7 +40,7 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
+include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
 
 # Shared library
 if (NOT WIN32)
@@ -51,10 +51,8 @@ endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
-        boost_locale yaml-cpp ssl crypto archive magic)
-
-# Installation
 if (NOT WIN32)
+    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
+            boost_locale yaml-cpp ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

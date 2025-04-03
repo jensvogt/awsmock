@@ -47,7 +47,6 @@ namespace AwsMock::Database {
     }
 
     bool DatabaseBase::HasDatabase() {
-        bool tmp = Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
         return Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
     }
 

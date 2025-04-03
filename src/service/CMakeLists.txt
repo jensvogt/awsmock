@@ -18,8 +18,8 @@ set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSWorker.c
         src/kms/KMSMonitoring.cpp src/kms/KMSCreator.cpp)
 set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
-        src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp)
-set(SFTP_SOURCES src/sftpserver/SftpServer.cpp src/sftpserver/SftpUser.cpp)
+        src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp src/sftpserver/SftpServer.cpp
+        src/sftpserver/SftpUser.cpp)
 set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp src/gateway/GatewayListener.cpp
         src/gateway/GatewayWorker.cpp src/gateway/GatewayRouter.cpp)
 set(DOCKER_SOURCES src/container/ContainerService.cpp)
@@ -31,9 +31,8 @@ set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSys
 set(FRONTEND_SOURCES src/frontend/FrontendWorker.cpp src/frontend/FrontendServer.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES}
-        ${SFTPSOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES}
-        ${SECRETMANAGER_SOURCES} ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES}
-        ${FRONTEND_SOURCES})
+        ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES}
+        ${DOCKER_SOURCES} ${GATEWAY_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES} ${FRONTEND_SOURCES})
 
 # Test directory
 if (NOT WIN32)
@@ -41,32 +40,20 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ../db/include ../dto/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
+include_directories(./include ../core/include ../db/include ../dto/include ${EXTERNAL_INCLUDE_DIR} ${BSONCXX_INCLUDE_DIR}
+        ${MONGOCXX_INCLUDE_DIR})
 
 # Shared library
 if (NOT WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/sftpserver/SftpServer.h
-            src/sftpserver/SftpServer.cpp
-            include/awsmock/sftpserver/SftpUser.h
-            src/sftpserver/SftpUser.cpp)
+    add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale yaml-cpp ssl crypto archive
-            magic prometheus-cpp-core prometheus-cpp-pull ssh)
+            magic prometheus-cpp-core prometheus-cpp-pull)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (WIN32)
-    target_link_libraries(${LIBRARY_STATIC} PRIVATE ${STATIC_LIB} awsmockcore_static awsmockdb_static awsmockdto_static
-            $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
-            $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
-            Boost::filesystem Boost::url Boost::thread Boost::locale yaml-cpp::yaml-cpp OpenSSL::SSL OpenSSL::SSL
-            LibArchive::LibArchive unofficial::libmagic::libmagic pdh.lib)
-else ()
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
-            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull ssh)
-endif ()
-
 if (NOT WIN32)
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
+            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

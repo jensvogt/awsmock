@@ -2,8 +2,8 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_SFTPSERVER_H
-#define AWSMOCK_SERVICE_TRANSFER_SERVER_SFTPSERVER_H
+#ifndef AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H
+#define AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H
 /**
  * This is a sample implementation of a libssh based SSH server
  * Copyright 2014 Audrius Butkevicius
@@ -18,24 +18,27 @@
  * The goal is to show the API in action.
 */
 
-//#include "config.h"
 #include <sstream>
 #include <string>
 
+#include <chrono>
 #include <libssh/callbacks.h>
 #include <libssh/server.h>
 #include <libssh/sftp.h>
-#include <libssh/sftpserver.h>
 
 #include <csignal>
 #include <cstdbool>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
+#ifndef _WIN32
 #include <poll.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#endif
+#include <sys/stat.h>
 
 // below are for sftp
 #include <cerrno>
@@ -44,8 +47,6 @@
 #include <dirent.h>
 #include <openssl/bn.h>
 #include <openssl/opensslv.h>
-#include <sys/statvfs.h>
-#include <unistd.h>
 
 #ifndef KEYS_FOLDER
 #ifdef _WIN32
@@ -134,7 +135,33 @@ struct error_struct {
     int error_code;
     char error_buffer[ERROR_BUFFERLEN];
 };
+
 extern "C" {
+
+#define SSH_SFTP_CALLBACK(name) \
+    static int name(sftp_client_message message)
+
+typedef int (*sftp_server_message_callback)(sftp_client_message message);
+
+struct sftp_message_handler {
+    const char *name;
+    const char *extended_name;
+    uint8_t type;
+
+    sftp_server_message_callback cb;
+};
+
+LIBSSH_API int sftp_channel_default_subsystem_request(ssh_session session,
+                                                      ssh_channel channel,
+                                                      const char *subsystem,
+                                                      void *userdata);
+LIBSSH_API int sftp_channel_default_data_callback(ssh_session session,
+                                                  ssh_channel channel,
+                                                  void *data,
+                                                  uint32_t len,
+                                                  int is_stderr,
+                                                  void *userdata);
+
 void _ssh_set_error(void *error, int code, const char *function, const char *descr, ...) PRINTF_ATTRIBUTE(4, 5);
 #define ssh_set_error(error, code, ...) _ssh_set_error(error, code, __func__, __VA_ARGS__)
 
@@ -261,6 +288,7 @@ int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer,
 #define MAX_ENTRIES_NUM_IN_PACKET 50
 #define MAX_LONG_NAME_LEN 350
 }
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/sftpserver/SftpUser.h>
@@ -317,4 +345,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTPSERVER_H
+#endif// AWSMOCK_SERVICE_TRANSFER_SERVER_SFTP_SERVER_H
