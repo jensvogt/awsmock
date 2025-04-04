@@ -1488,7 +1488,7 @@ process_readdir(sftp_client_message client_msg) {
 
         if (dentry != nullptr) {
             sftp_attributes_struct attr{};
-            struct stat st{};
+            struct stat st {};
             char long_name[MAX_LONG_NAME_LEN];
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
@@ -1863,7 +1863,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st{};
+    struct statvfs st {};
 
     log_debug << "processing extended statvfs: " << path;
 
