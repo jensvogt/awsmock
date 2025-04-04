@@ -855,8 +855,12 @@ static int sftp_reply_statvfs(sftp_client_message msg, sftp_statvfs_t st) {
 
 static int process_open(sftp_client_message client_msg) {
     const char *filename = sftp_client_message_get_filename(client_msg);
-    uint32_t msg_flag = sftp_client_message_get_flags(client_msg);
-    uint32_t mode = client_msg->attr->permissions;
+
+    // Convert filename
+    std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+    const std::string filenameStr = std::string(filename);
+    const uint32_t msg_flag = sftp_client_message_get_flags(client_msg);
+    const uint32_t mode = client_msg->attr->permissions;
     ssh_string handle_s = nullptr;
     struct sftp_handle *h = nullptr;
     int file_flag;
@@ -1328,8 +1332,13 @@ static int process_close(sftp_client_message client_msg) {
 }
 
 static int process_opendir(sftp_client_message client_msg) {
+
     DIR *dir = nullptr;
     const char *dir_name = sftp_client_message_get_filename(client_msg);
+
+    // Convert dir_name
+    const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+
     ssh_string handle_s = nullptr;
     struct sftp_handle *h = nullptr;
 
@@ -1488,7 +1497,7 @@ process_readdir(sftp_client_message client_msg) {
 
         if (dentry != nullptr) {
             sftp_attributes_struct attr{};
-            struct stat st {};
+            struct stat st{};
             char long_name[MAX_LONG_NAME_LEN];
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
@@ -1863,7 +1872,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st {};
+    struct statvfs st{};
 
     log_debug << "processing extended statvfs: " << path;
 
@@ -2093,7 +2102,7 @@ static int dispatch_sftp_request(sftp_client_message sftp_msg) {
     return status;
 }
 
-static int process_client_message(sftp_client_message client_msg) {
+static int process_client_message(const sftp_client_message &client_msg) {
     int status = SSH_OK;
     if (client_msg == nullptr) {
         return SSH_ERROR;
@@ -2815,7 +2824,7 @@ int sftp_decode_channel_data_to_packet(sftp_session sftp, void *data, uint32_t l
  *
  * @return number of bytes processed, -1 when error occurs.
  */
-int sftp_channel_default_data_callback(ssh_session session, ssh_channel channel, void *data, uint32_t len, int is_stderr, void *userdata) {
+auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[maybe_unused]] ssh_channel channel, void *data, const uint32_t len, [[maybe_unused]] int is_stderr, void *userdata) -> int {
     auto *sftpp = static_cast<sftp_session *>(userdata);
     sftp_session sftp = nullptr;
 
@@ -3270,7 +3279,7 @@ static ssh_channel channel_open(ssh_session session, void *userdata) {
     return sdata->channel;
 }
 
-static void handle_session(ssh_event event, ssh_session session) {
+static void handle_session(const ssh_event &event, const ssh_session &session) {
 
     // Our struct holding information about the channel.
     channel_data_struct cdata = {.sftp = nullptr};

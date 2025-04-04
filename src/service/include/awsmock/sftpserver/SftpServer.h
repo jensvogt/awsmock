@@ -291,6 +291,7 @@ int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer,
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/sftpserver/SftpUser.h>
 
 #define DEF_STR_SIZE 1024
