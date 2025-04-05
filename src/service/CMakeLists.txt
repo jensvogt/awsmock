@@ -47,13 +47,13 @@ include_directories(./include ../core/include ../db/include ../dto/include ${EXT
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale yaml-cpp ssl crypto archive
-            magic prometheus-cpp-core prometheus-cpp-pull)
+            magic prometheus-cpp-core prometheus-cpp-pull boost_log boost_log_setup)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 if (NOT WIN32)
     target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
-            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull)
+            yaml-cpp jwt-cpp ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull boost_log boost_log_setup)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

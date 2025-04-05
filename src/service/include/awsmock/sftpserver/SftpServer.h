@@ -277,10 +277,10 @@ typedef struct ssh_string_struct *ssh_string;
 int _ssh_buffer_pack(struct ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 #define ssh_buffer_pack(buffer, format, ...) _ssh_buffer_pack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 
-int ssh_buffer_unpack_va(struct ssh_buffer_struct *buffer,
+int ssh_buffer_unpack_va(ssh_buffer_struct *buffer,
                          const char *format, size_t argc,
                          va_list ap);
-int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer,
+int _ssh_buffer_unpack(ssh_buffer_struct *buffer,
                        const char *format,
                        size_t argc,
                        ...);
@@ -293,7 +293,7 @@ int _ssh_buffer_unpack(struct ssh_buffer_struct *buffer,
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/sftpserver/SftpUser.h>
-
+#include <boost/log/trivial.hpp>
 #define DEF_STR_SIZE 1024
 inline char authorizedkeys[DEF_STR_SIZE] = {0};
 
@@ -309,7 +309,7 @@ namespace AwsMock::Service {
          * @param hostKey host key
          * @param address listen address
          */
-        SftpServer(std::string port, std::string hostKey, std::string address);
+        SftpServer(const std::string &port, const std::string &hostKey, const std::string &address);
 
         /**
          * Add a user to the database

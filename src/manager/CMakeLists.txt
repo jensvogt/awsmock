@@ -16,7 +16,8 @@ else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PUBLIC ./include ../dto/include ../db/include ../core/include ../service/include)
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale boost_program_options yaml-cpp ssl crypto archive magic ssh)
+            boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup yaml-cpp ssl crypto
+            archive magic ssh)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
 

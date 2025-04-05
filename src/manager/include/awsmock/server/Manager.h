@@ -9,6 +9,7 @@
 #include <boost/thread.hpp>
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>

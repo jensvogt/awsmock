@@ -26,7 +26,7 @@ if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
     target_link_libraries(${LIBRARY} PRIVATE mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
-            yaml-cpp ssl crypto archive magic)
+            boost_log boost_log_setup yaml-cpp ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
 
@@ -35,5 +35,5 @@ add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
 if (NOT WIN32)
     target_link_libraries(${LIBRARY_STATIC} mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
-            yaml-cpp ssl crypto archive magic)
+            boost_log boost_log_setup yaml-cpp ssl crypto archive magic)
 endif ()
