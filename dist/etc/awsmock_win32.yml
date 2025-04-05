@@ -195,7 +195,8 @@ awsmock:
     smooth: true                                                        # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
-    file-name: C:/Program Files (x86)/awsmock/log/awsmock.log           # Log file name, used additionally to stdout, mainly used on MacOS
+    dir: C:/Program Files (x86)/awsmock/log                             # Log directory
+    prefix: awsmock                                                     # Log file name prefix, used additionally to stdout, mainly used on MacOS
     file-size: 10485760                                                 # Log file size for the rolling file appender, default 10MB
     file-count: 5                                                       # Log file count, default 5
 

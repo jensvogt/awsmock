@@ -58,11 +58,6 @@ namespace AwsMock::Database {
          */
         void Shutdown();
 
-        /**
-         * @brief Private constructor
-         */
-        ConnectionPool() = default;
-
       private:
 
         /**

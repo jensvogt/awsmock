@@ -7,7 +7,7 @@
 namespace AwsMock::Database {
 
     void ConnectionPool::Configure() {
-        Core::Configuration &configuration = Core::Configuration::instance();
+        const Core::Configuration &configuration = Core::Configuration::instance();
         const std::string name = configuration.GetValueString("awsmock.mongodb.name");
         const std::string host = configuration.GetValueString("awsmock.mongodb.host");
         const std::string user = configuration.GetValueString("awsmock.mongodb.user");

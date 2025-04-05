@@ -38,6 +38,7 @@
 #endif
 
 // AwsMock includes
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/server/Manager.h>
 #include <awsmock/service/frontend/FrontendServer.h>
@@ -50,6 +51,14 @@
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
 #endif
+
+// Logging
+#define log_trace_d log_trace_c("AwsMock::Manager::Main")
+#define log_debug_d log_debug_c("AwsMock::Manager::Main")
+#define log_info_d log_info_c("AwsMock::Manager::Main")
+#define log_warning_d log_warning_c("AwsMock::Manager::Main")
+#define log_error_d log_error_c("AwsMock::Manager::Main")
+#define log_fatal_d log_fatal_c("AwsMock::Manager::Main")
 
 /**
  * @brief Unix foreground application
@@ -301,6 +310,8 @@ int main(const int argc, char *argv[]) {
     return result;
 
 #else
+
+    log_debug << "Starting manager";
 
     Daemon worker;
     return worker.Run();

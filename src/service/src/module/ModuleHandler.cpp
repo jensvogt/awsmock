@@ -110,7 +110,7 @@ namespace AwsMock::Service {
             }
             if (action == "set-log-level") {
 
-                plog::get()->setMaxSeverity(plog::severityFromString(payload.c_str()));
+                Core::LogStream::SetSeverity(payload);
                 log_info << "Log level set to '" << payload << "'";
 
                 // Send response

@@ -4,7 +4,7 @@ project(awsmock)
 
 # Defaults
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_BUILD_PARALLEL_LEVEL 16)
+set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK")
 if (WIN32)
     add_definitions(-D_WIN32_WINNT=0x0A00)
     add_compile_options(/MP16 "/Zc:__cplusplus" /EHsc /MT)

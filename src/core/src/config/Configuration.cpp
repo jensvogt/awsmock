@@ -23,8 +23,13 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.access.account-id", "AWSMOCK_ACCESS_ACCOUNT_ID", "000000000000");
         DefineStringProperty("awsmock.access.client-id", "AWSMOCK_ACCESS_CLIENT_ID", "00000000");
         DefineStringProperty("awsmock.access.secret-access-key", "AWSMOCK_ACCESS_SECRET_ACCESS_KEY", "none");
-        DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "$HOME/awsmock/data");
-        DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "$HOME/awsmock/tmp");
+#ifdef _WIN32
+        DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "C:/Program Files (x86)/awsmock/data/");
+        DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "C:/Program Files (x86)/awsmock/tmp/");
+#else
+        DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "/usr/local/awsmock/data");
+        DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "/usr/local/awsmock/tmp");
+#endif
         DefineBoolProperty("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
         DefineBoolProperty("awsmock.magic.file", "AWSMOCK_MAGIC_FILE", DEFAULT_MAGIC_FILE);
         DefineBoolProperty("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
@@ -33,9 +38,13 @@ namespace AwsMock::Core {
 
         // Auto load
         DefineBoolProperty("awsmock.autoload.active", "AWSMOCK_AUTOLOAD_ACTIVE", true);
-        DefineStringProperty("awsmock.autoload.file", "AWSMOCK_AUTOLOAD_FILE", "$HOME/awsmock/init/init.json");
-        DefineStringProperty("awsmock.autoload.dir", "AWSMOCK_AUTOLOAD_DIR", "$HOME/awsmock/init");
-
+#ifdef _WIN32
+        DefineStringProperty("awsmock.autoload.file", "AWSMOCK_AUTOLOAD_FILE", "C:/Program Files (x86)/awsmock/init/init.json");
+        DefineStringProperty("awsmock.autoload.dir", "AWSMOCK_AUTOLOAD_DIR", "C:/Program Files (x86)/awsmock/init");
+#else
+        DefineStringProperty("awsmock.autoload.file", "AWSMOCK_AUTOLOAD_FILE", "/usr/local/awsmock/init/init.json");
+        DefineStringProperty("awsmock.autoload.dir", "AWSMOCK_AUTOLOAD_DIR", "/usr/local/awsmock/init");
+#endif
         // Gateway
         DefineBoolProperty("awsmock.gateway.active", "AWSMOCK_GATEWAY_ACTIVE", true);
         DefineStringProperty("awsmock.gateway.http.host", "AWSMOCK_GATEWAY_HOST", "localhost");
@@ -48,7 +57,11 @@ namespace AwsMock::Core {
 
         // S3
         DefineBoolProperty("awsmock.modules.s3.active", "AWSMOCK_MODULES_S3_ACTIVE", true);
-        DefineStringProperty("awsmock.modules.s3.data-dir", "AWSMOCK_MODULES_S3_DATA_DIR", "/tmp/awsmock/data/s3");
+#ifdef _WIN32
+        DefineStringProperty("awsmock.modules.s3.data-dir", "AWSMOCK_MODULES_S3_DATA_DIR", "C:/Program Files (x86)/awsmock/data/s3");
+#else
+        DefineStringProperty("awsmock.modules.s3.data-dir", "AWSMOCK_MODULES_S3_DATA_DIR", "/usr/local/awsmock/data/s3");
+#endif
         DefineIntProperty("awsmock.modules.s3.monitoring.period", "AWSMOCK_MODULES_S3_MONITORING_PERIOD", 900);
         DefineIntProperty("awsmock.modules.s3.sync.object.period", "AWSMOCK_MODULES_S3_SYNC_OBJECT_PERIOD", 3600);
         DefineIntProperty("awsmock.modules.s3.sync.bucket.period", "AWSMOCK_MODULES_S3_SYNC_BUCKET_PERIOD", 300);
@@ -70,7 +83,11 @@ namespace AwsMock::Core {
         // Lambda
         DefineBoolProperty("awsmock.modules.lambda.active", "AWSMOCK_MODULES_LAMBDA_ACTIVE", true);
         DefineIntProperty("awsmock.modules.lambda.lifetime", "AWSMOCK_MODULES_LAMBDA_LIFETIME", 3600);
-        DefineStringProperty("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "$HOME/awsmock/data/lambda");
+#ifdef _WIN32
+        DefineStringProperty("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "C:/Program Files (x86)/awsmock/data/lambda");
+#else
+        DefineStringProperty("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "/Usr/local/awsmock/data/lambda");
+#endif
         DefineIntProperty("awsmock.modules.lambda.monitoring.period", "AWSMOCK_MODULES_LAMBDA_MONITORING_PERIOD", 300);
         DefineIntProperty("awsmock.modules.lambda.remove.period", "AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD", 300);
         DefineIntProperty("awsmock.modules.lambda.counter.period", "AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD", 300);
@@ -78,7 +95,11 @@ namespace AwsMock::Core {
         // Transfer server
         DefineBoolProperty("awsmock.modules.transfer.active", "AWSMOCK_MODULES_TRANSFER_ACTIVE", true);
         DefineStringProperty("awsmock.modules.transfer.bucket", "AWSMOCK_MODULES_TRANSFER_BUCKET", "transfer-server");
-        DefineStringProperty("awsmock.modules.transfer.data-dir", "AWSMOCK_MODULES_TRANSFER_DATA_DIR", "/tmp/awsmock/data/transfer");
+#ifdef _WIN32
+        DefineStringProperty("awsmock.modules.transfer.data-dir", "AWSMOCK_MODULES_TRANSFER_DATA_DIR", "C:/Program Files (x86)/awsmock/data/transfer");
+#else
+        DefineStringProperty("awsmock.modules.transfer.data-dir", "AWSMOCK_MODULES_TRANSFER_DATA_DIR", "/usr/local/awsmock/data/transfer");
+#endif
         DefineIntProperty("awsmock.modules.transfer.monitoring.period", "AWSMOCK_MODULES_TRANSFER_MONITORING_PERIOD", 300);
         DefineIntProperty("awsmock.modules.transfer.worker.period", "AWSMOCK_MODULES_TRANSFER_WORKER_PERIOD", 300);
         DefineIntProperty("awsmock.modules.transfer.ftp.pasv-min", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MIN", 6000);
@@ -153,11 +174,20 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.frontend.port", "AWSMOCK_FRONTEND_PORT", 4567);
         DefineIntProperty("awsmock.frontend.workers", "AWSMOCK_FRONTEND_WORKERS", 10);
         DefineIntProperty("awsmock.frontend.timeout", "AWSMOCK_FRONTEND_TIMEOUT", 900);
-        DefineStringProperty("awsmock.frontend.doc-root", "AWSMOCK_FRONTEND_DOC_ROOT", "$HOME/awsmock/frontend");
+#ifdef _WIN32
+        DefineStringProperty("awsmock.frontend.doc-root", "AWSMOCK_FRONTEND_DOC_ROOT", "C:/Program Files (x86)/awsmock/frontend");
+#else
+        DefineStringProperty("awsmock.frontend.doc-root", "AWSMOCK_FRONTEND_DOC_ROOT", "/usr/local/awsmock/frontend");
+#endif
 
         // Logging
         DefineStringProperty("awsmock.logging.level", "AWSMOCK_LOG_LEVEL", "info");
-        DefineStringProperty("awsmock.logging.file-name", "AWSMOCK_LOG_FILE_NAME", "/usr/local/awsmock/logs/awsmock.log");
+#ifdef _WIN32
+        DefineStringProperty("awsmock.logging.dir", "AWSMOCK_LOG_DIR_NAME", "C:/Program Files (x86)/awsmock/log");
+#else
+        DefineStringProperty("awsmock.logging.dir", "AWSMOCK_LOG_DIR_NAME", "/usr/local/awsmock/log");
+#endif
+        DefineStringProperty("awsmock.logging.prefix", "AWSMOCK_LOG_FILE_PREFIX", "awsmock");
         DefineLongProperty("awsmock.logging.file-size", "AWSMOCK_LOG_FILE_SIZE", 10485760);
         DefineIntProperty("awsmock.logging.file-count", "AWSMOCK_LOG_FILE_COUNT", 5);
     }
