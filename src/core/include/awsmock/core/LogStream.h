@@ -98,7 +98,24 @@ namespace AwsMock::Core {
          */
         static int logCount;
 
+        /**
+         * Log directory
+         */
+        static std::string logDir;
+
+        /**
+         * Log filename prefix
+         */
+        static std::string logPrefix;
+
+        /**
+         * Console appender
+         */
         static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> console_sink;
+
+        /**
+         * File appender
+         */
         static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> file_sink;
     };
 

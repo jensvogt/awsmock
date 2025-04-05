@@ -5,6 +5,8 @@ namespace AwsMock::Core {
 
     long LogStream::logSize = DEFAULT_LOG_SIZE;
     int LogStream::logCount = DEFAULT_LOG_COUNT;
+    std::string LogStream::logDir;
+    std::string LogStream::logPrefix;
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> LogStream::console_sink;
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
 
@@ -44,6 +46,30 @@ namespace AwsMock::Core {
 
         std::string func = processFuncName(boost::log::extract<std::string>("Function", rec)->c_str());
 
+        // Set the color
+        const auto severity = rec[boost::log::trivial::severity];
+        if (severity) {
+            switch (severity.get()) {
+                case boost::log::trivial::trace:
+                    strm << "\033[36m";
+                    break;
+                case boost::log::trivial::debug:
+                    strm << "\033[32m";
+                    break;
+                case boost::log::trivial::info:
+                    strm << "\033[97m";
+                    break;
+                case boost::log::trivial::warning:
+                    strm << "\033[33m";
+                    break;
+                case boost::log::trivial::error:
+                case boost::log::trivial::fatal:
+                    strm << "\033[31m";
+                    break;
+                default:
+                    break;
+            }
+        }
         auto date_time_formatter = boost::log::expressions::stream << boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f");
         date_time_formatter(rec, strm);
 
@@ -54,6 +80,7 @@ namespace AwsMock::Core {
 
         // Finally, put the record message to the stream
         strm << rec[boost::log::expressions::smessage];
+        strm << "\033[97m";
     }
 
     void LogStream::Initialize() {
@@ -76,6 +103,12 @@ namespace AwsMock::Core {
     }
 
     void LogStream::SetFilename(const std::string &filename) {
+        if (Configuration::instance().HasValue("awsmock.logging.dir")) {
+            logDir = Configuration::instance().GetValueString("awsmock.logging.dir");
+        }
+        if (Configuration::instance().HasValue("awsmock.logging.prefix")) {
+            logDir = Configuration::instance().GetValueString("awsmock.logging.prefix");
+        }
         if (Configuration::instance().HasValue("awsmock.logging.file-size")) {
             logSize = Configuration::instance().GetValueLong("awsmock.logging.file-size");
         }
@@ -83,7 +116,7 @@ namespace AwsMock::Core {
             logCount = Configuration::instance().GetValueInt("awsmock.logging.file-count");
         }
         file_sink = add_file_log(
-                boost::log::keywords::file_name = "awsmock-%N.log",
+                boost::log::keywords::file_name = logDir + "/" + logPrefix + "-%N.log",
                 boost::log::keywords::rotation_size = logSize,
                 boost::log::keywords::max_files = logCount,
                 boost::log::keywords::format = &LogFormatter);
