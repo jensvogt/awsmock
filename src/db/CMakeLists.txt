@@ -40,7 +40,7 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
+include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
 # Shared library
 if (NOT WIN32)

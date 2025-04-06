@@ -5,6 +5,12 @@
 #ifndef AWS_MOCK_CORE_DIRECTORY_UTILS_H
 #define AWS_MOCK_CORE_DIRECTORY_UTILS_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 // C++ standard includes
 #include <string>
 

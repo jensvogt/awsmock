@@ -23,6 +23,13 @@
 #include <sys/uio.h>
 #elif __linux__
 #include <sys/sendfile.h>
+#elif _WIN32
+#include "accctrl.h"
+#include "aclapi.h"
+#include <stdio.h>
+#include <tchar.h>
+#include <windows.h>
+#pragma comment(lib, "advapi32.lib")
 #endif
 
 // Boost includes

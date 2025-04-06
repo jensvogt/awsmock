@@ -1458,7 +1458,7 @@ process_readdir(sftp_client_message client_msg) {
         if (dentry != nullptr) {
             char long_path[PATH_MAX];
             sftp_attributes_struct attr{};
-            struct stat st {};
+            struct stat st{};
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
                 log_error << "Dandle string length exceed max length!";
@@ -1512,8 +1512,7 @@ static int process_mkdir(sftp_client_message client_msg) {
     }
 
 #ifdef _WIN32
-    // TODO: fix me
-    rv = 0;
+    rv = _mkdir(filename);
 #else
     rv = mkdir(filename, mode);
 #endif
@@ -1543,8 +1542,7 @@ static int process_rmdir(sftp_client_message client_msg) {
     }
 
 #ifdef _WIN32
-    // TODO: fix me
-    rv = 0;
+    rv = _rmdir(filename);
 #else
     rv = rmdir(filename);
 #endif
@@ -1837,7 +1835,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st {};
+    struct statvfs st{};
 
     log_debug << "processing extended statvfs: " << path;
 
@@ -3344,11 +3342,15 @@ namespace AwsMock::Service {
 
         // Change working directory
         const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
-        if (const int rc = chdir(ftpBaseDir.c_str()) < 0) {
+#ifdef _WIN32
+        const int rc = _chdir(ftpBaseDir.c_str());
+#else
+        const int rc = chdir(ftpBaseDir.c_str())
+#endif
+        if (rc < 0) {
             log_error << "Could not change to base path, basPath:" << ftpBaseDir;
             return;
         }
-
         if (const int rc = ssh_init(); rc < 0) {
             log_error << "SSH initialization failed";
             return;

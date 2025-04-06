@@ -5,14 +5,17 @@
 #ifndef AWSMOCK_CORE_TAR_UTILS_H
 #define AWSMOCK_CORE_TAR_UTILS_H
 
+#undef BOOST_FILESYSTEM_DYN_LINK
+
+// C++ standard includes
+#include <fcntl.h>
+#include <string>
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#include <io.h>
 #endif
-
-// C++ standard includes
-#include <string>
 
 // Boost includes
 #include <boost/filesystem/directory.hpp>
@@ -22,7 +25,7 @@
 #include <archive_entry.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+//#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {

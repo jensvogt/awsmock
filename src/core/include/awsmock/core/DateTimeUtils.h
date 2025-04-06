@@ -17,6 +17,8 @@
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {
+    using std::max;
+    using std::min;
 
     using std::chrono::system_clock;
 

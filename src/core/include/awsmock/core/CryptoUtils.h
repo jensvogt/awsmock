@@ -22,6 +22,12 @@
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 // Boost includes
 #include <boost/algorithm/hex.hpp>
 #include <boost/archive/iterators/base64_from_binary.hpp>

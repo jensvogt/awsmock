@@ -8,7 +8,7 @@ namespace AwsMock::Core {
 
     void TarUtils::Unzip(const std::string &zipFile, const std::string &directory) {
 
-        log_trace << "Unzipping started, zipFile: " << zipFile << ", directory: " << directory;
+        // log_trace << "Unzipping started, zipFile: " << zipFile << ", directory: " << directory;
         archive_entry *entry;
         int r;
 
@@ -25,7 +25,7 @@ namespace AwsMock::Core {
         archive_write_disk_set_options(ext, flags);
         archive_write_disk_set_standard_lookup(ext);
         if ((r = archive_read_open_filename(a, zipFile.c_str(), 10240)) != 0) {
-            log_error << "Could not open ZIP file, path: " << zipFile;
+            //   log_error << "Could not open ZIP file, path: " << zipFile;
             return;
         }
         for (;;) {
@@ -34,20 +34,20 @@ namespace AwsMock::Core {
                 break;
             }
             if (r < ARCHIVE_OK) {
-                log_error << archive_error_string(a);
+                //     log_error << archive_error_string(a);
             }
             if (r < ARCHIVE_WARN) {
-                log_error << archive_error_string(a);
+                //   log_error << archive_error_string(a);
                 return;
             }
             archive_entry_set_pathname(entry, (directory + "/" + archive_entry_pathname(entry)).c_str());
             r = archive_write_header(ext, entry);
             if (r < ARCHIVE_OK) {
-                log_error << archive_error_string(ext);
+                // log_error << archive_error_string(ext);
             } else if (archive_entry_size(entry) > 0) {
                 r = CopyData(a, ext);
                 if (r < ARCHIVE_OK) {
-                    log_error << archive_error_string(ext);
+                    //   log_error << archive_error_string(ext);
                 }
                 if (r < ARCHIVE_WARN) {
                     return;
@@ -55,7 +55,7 @@ namespace AwsMock::Core {
             }
             r = archive_write_finish_entry(ext);
             if (r < ARCHIVE_OK) {
-                log_error << archive_error_string(ext);
+                //log_error << archive_error_string(ext);
             }
             if (r < ARCHIVE_WARN) {
                 return;
@@ -90,12 +90,11 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(archive *archive, const std::string &fileName, const std::string &removeDir, const bool isDir, const bool isLink) {
 
-        struct stat st {};
-        char buff[8192];
+        struct stat st{};
 
         std::string entryName = fileName;
         StringUtils::Replace(entryName, removeDir, "");
-        log_trace << "Removed directory, name: " << entryName;
+        //   log_trace << "Removed directory, name: " << entryName;
 
         stat(fileName.c_str(), &st);
         archive_entry *entry = archive_entry_new();// Note 2
@@ -121,26 +120,40 @@ namespace AwsMock::Core {
             archive_entry_set_gid(entry, 0);
         }
         archive_write_header(archive, entry);
+
+#ifdef WIN32
+        int fd;
+        _sopen_s(&fd, fileName.c_str(), 0, 0, O_RDONLY);
+        if (fd >= 0) {
+            char buff[8192];
+            long len = _read(fd, buff, sizeof(buff));
+            while (len > 0) {
+                archive_write_data(archive, buff, len);
+                len = _read(fd, buff, sizeof(buff));
+                //       log_trace << "File written to archive, name: " << entryName;
+            }
+            _close(fd);
+#else
         const int fd = open(fileName.c_str(), O_RDONLY);
         if (fd >= 0) {
+            char buff[8192];
             long len = read(fd, buff, sizeof(buff));
             while (len > 0) {
                 archive_write_data(archive, buff, len);
                 len = read(fd, buff, sizeof(buff));
                 log_trace << "File written to archive, name: " << entryName;
             }
-            close(fd);
+            _close(fd);
+#endif
         } else {
-            log_error << "Cannot open file: " << fileName;
+            //          log_error << "Cannot open file: " << fileName;
         }
         archive_entry_free(entry);
     }
 
     std::string TarUtils::Readsymlink(const std::string &path) {
         size_t len;
-#ifdef WIN32
-        // TODO: Fix windows porting issues
-#else
+#ifndef WIN32
         if (char buf[1024]; (len = readlink(path.c_str(), buf, sizeof(buf) - 1)) != -1) {
             buf[len] = '\0';
             return {buf};
@@ -162,7 +175,7 @@ namespace AwsMock::Core {
                 return (r);
             r = archive_write_data_block(aw, buff, size, offset);
             if (r < ARCHIVE_OK) {
-                log_error << archive_error_string(aw);
+                // log_error << archive_error_string(aw);
                 return (r);
             }
         }

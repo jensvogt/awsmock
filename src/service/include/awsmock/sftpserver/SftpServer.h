@@ -33,7 +33,10 @@
 #include <cstdlib>
 #include <fcntl.h>
 #ifndef _WIN32
+#include <direct.h>
 #include <poll.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/statvfs.h>
 #include <sys/wait.h>
@@ -51,6 +54,7 @@
 
 #ifndef KEYS_FOLDER
 #ifdef _WIN32
+#include <direct.h>
 #define KEYS_FOLDER
 #else
 #define KEYS_FOLDER "/etc/ssh/"

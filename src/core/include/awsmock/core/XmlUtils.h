@@ -5,6 +5,12 @@
 #ifndef AWSMOCK_CORE_XML_UTILS_H
 #define AWSMOCK_CORE_XML_UTILS_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 // Standard C++ includes
 #include <string>
 
