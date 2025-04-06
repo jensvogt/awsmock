@@ -32,6 +32,7 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/utility/manipulators/add_value.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
@@ -90,21 +91,6 @@ namespace AwsMock::Core {
         static void SetFilename(const std::string &filename);
 
       private:
-
-        /**
-         * @brief Set output colors
-         *
-         * @param rec log record
-         * @param strm output stream
-         */
-        static void SetColorCoding(boost::log::record_view const &rec, boost::log::formatting_ostream &strm);
-
-        /**
-         * @brief Reset of the output colors coding
-         *
-         * @param strm output stream
-         */
-        static void ResetColorCoding(boost::log::formatting_ostream &strm);
 
         /**
          * Log size

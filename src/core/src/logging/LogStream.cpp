@@ -42,6 +42,37 @@ namespace AwsMock::Core {
 #endif
     }
 
+    void SetColorCoding(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
+
+        const auto severity = rec[boost::log::trivial::severity];
+        if (severity) {
+            switch (severity.get()) {
+                case boost::log::trivial::trace:
+                    strm << "\033[36m";
+                    break;
+                case boost::log::trivial::debug:
+                    strm << "\033[32m";
+                    break;
+                case boost::log::trivial::info:
+                    strm << "\033[97m";
+                    break;
+                case boost::log::trivial::warning:
+                    strm << "\033[33m";
+                    break;
+                case boost::log::trivial::error:
+                case boost::log::trivial::fatal:
+                    strm << "\033[31m";
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void ResetColorCoding(boost::log::formatting_ostream &strm) {
+        strm << "\033[97m";
+    }
+
     void LogFormatter(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
 
         std::string func = processFuncName(boost::log::extract<std::string>("Function", rec)->c_str());
@@ -105,36 +136,5 @@ namespace AwsMock::Core {
                 boost::log::keywords::format = &LogFormatter);
 
         log_info << "Start logging to " << filename << " size: " << logSize << " count: " << logCount;
-    }
-
-    void LogStream::SetColorCoding(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
-
-        const auto severity = rec[boost::log::trivial::severity];
-        if (severity) {
-            switch (severity.get()) {
-                case boost::log::trivial::trace:
-                    strm << "\033[36m";
-                    break;
-                case boost::log::trivial::debug:
-                    strm << "\033[32m";
-                    break;
-                case boost::log::trivial::info:
-                    strm << "\033[97m";
-                    break;
-                case boost::log::trivial::warning:
-                    strm << "\033[33m";
-                    break;
-                case boost::log::trivial::error:
-                case boost::log::trivial::fatal:
-                    strm << "\033[31m";
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    void LogStream::ResetColorCoding(boost::log::formatting_ostream &strm) {
-        strm << "\033[97m";
     }
 }// namespace AwsMock::Core

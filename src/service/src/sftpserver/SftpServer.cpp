@@ -3343,15 +3343,15 @@ namespace AwsMock::Service {
         // Change working directory
         const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
 #ifdef _WIN32
-        const int rc = _chdir(ftpBaseDir.c_str());
+        int rc = _chdir(ftpBaseDir.c_str());
 #else
-        const int rc = chdir(ftpBaseDir.c_str())
+        int rc = chdir(ftpBaseDir.c_str());
 #endif
         if (rc < 0) {
             log_error << "Could not change to base path, basPath:" << ftpBaseDir;
             return;
         }
-        if (const int rc = ssh_init(); rc < 0) {
+        if (rc = ssh_init(); rc < 0) {
             log_error << "SSH initialization failed";
             return;
         }

@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#include <boost/asio/readable_pipe.hpp>
 
 namespace AwsMock::Core {
 
@@ -52,16 +53,16 @@ namespace AwsMock::Core {
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
-        extern boost::asio::io_context ctx;
+        boost::asio::io_context ctx;
         boost::asio::readable_pipe inPipe{ctx};
         boost::asio::readable_pipe outPipe{ctx};
         boost::asio::readable_pipe errPipe{ctx};
         boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{inPipe, outPipe, errPipe});
         boost::system::error_code ec;
         boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
-        assert(!ec || (ec == asio::error::eof));
+        assert(!ec || (ec == boost::asio::error::eof));
         boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
-        assert(!ec || (ec == asio::error::eof));
+        assert(!ec || (ec == boost::asio::error::eof));
         proc.wait();
         /*
         boost::asio::io_context ios;

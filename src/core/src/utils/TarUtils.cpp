@@ -143,7 +143,7 @@ namespace AwsMock::Core {
                 len = read(fd, buff, sizeof(buff));
                 log_trace << "File written to archive, name: " << entryName;
             }
-            _close(fd);
+            close(fd);
 #endif
         } else {
             //          log_error << "Cannot open file: " << fileName;

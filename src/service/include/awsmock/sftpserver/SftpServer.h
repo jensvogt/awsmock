@@ -33,7 +33,6 @@
 #include <cstdlib>
 #include <fcntl.h>
 #ifndef _WIN32
-#include <direct.h>
 #include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +40,8 @@
 #include <sys/statvfs.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#else
+#include <direct.h>
 #endif
 #include <sys/stat.h>
 
