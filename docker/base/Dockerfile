@@ -39,9 +39,9 @@ RUN cd /usr/src && \
 
 # Install boost 1.87
 RUN cd /usr/src && \
-    wget -nv https://archives.boost.io/release/1.87.0/source/boost_1_87_0.tar.gz && \
-    tar -xzf boost_1_87_0.tar.gz && \
-    cd boost_1_87_0 && \
+    wget -nv https://archives.boost.io/beta/1.88.0.beta1/source/boost_1_88_0_b1.tar.gz && \
+    tar -xzf boost_1_88_0_b1.tar.gz && \
+    cd boost_1_88_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
     ./b2 -j 16 && \
     ./b2 install
