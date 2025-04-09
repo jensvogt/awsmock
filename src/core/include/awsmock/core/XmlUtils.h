@@ -5,6 +5,16 @@
 #ifndef AWSMOCK_CORE_XML_UTILS_H
 #define AWSMOCK_CORE_XML_UTILS_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
+
 // Standard C++ includes
 #include <string>
 

@@ -5,7 +5,21 @@
 #ifndef AWS_MOCK_CORE_LOG_STREAM_H
 #define AWS_MOCK_CORE_LOG_STREAM_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+#ifdef _WIN32
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+#endif
+
+#ifndef _WIN32
 #define BOOST_LOG_DYN_LINK 1
+#endif
 
 // C++ standard includes
 #include <filesystem>
@@ -15,7 +29,6 @@
 
 // Boost includes
 #include <boost/log/attributes.hpp>
-#include <boost/log/attributes/clock.hpp>
 #include <boost/log/attributes/scoped_attribute.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/sources/channel_feature.hpp>
@@ -23,15 +36,12 @@
 #include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/sources/logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/severity_channel_logger.hpp>
 #include <boost/log/support/date_time.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/manipulators/add_value.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
-#include <boost/move/utility_core.hpp>
-#include <boost/phoenix.hpp>
 
 // Awsmock includes
 #include <awsmock/core/config/Configuration.h>
@@ -121,11 +131,20 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
+#if defined(_WIN32) || defined(CYGWIN)
+#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_debug BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_trace BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#else
 #define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_debug BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_trace BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
+#endif
 
-#endif// AWS_MOCK_CORE_LOG_STREAM_H
+#endif

@@ -69,14 +69,19 @@ namespace AwsMock::Dto::Transfer {
         int userCount;
 
         /**
-         * Port
+         * Ports
          */
-        int port;
+        std::vector<int> ports;
 
         /**
          * Concurrency
          */
         int concurrency;
+
+        /**
+         * Protocols
+         */
+        std::vector<std::string> protocols;
 
         /**
          * Last started

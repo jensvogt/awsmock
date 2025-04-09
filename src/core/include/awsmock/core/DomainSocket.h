@@ -34,7 +34,7 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit DomainSocket(std::string path) : _path(std::move(path)){};
+        explicit DomainSocket(std::string path) : _basePath(std::move(path)) {};
 
         /**
          * @brief Send JSON data
@@ -144,7 +144,7 @@ namespace AwsMock::Core {
         /**
          * Domain socket path
          */
-        std::string _path;
+        std::string _basePath;
     };
 
 }// namespace AwsMock::Core

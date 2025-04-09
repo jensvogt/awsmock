@@ -5,6 +5,13 @@
 #ifndef AWSMOCK_CORE_JWT_UTILS_H
 #define AWSMOCK_CORE_JWT_UTILS_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#undef BOOST_FILESYSTEM_DYN_LINK
+#endif
+
 // C++ standard includes
 #include <fcntl.h>
 #include <string>

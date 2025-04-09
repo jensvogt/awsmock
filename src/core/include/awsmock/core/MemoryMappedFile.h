@@ -5,6 +5,16 @@
 #ifndef AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 #define AWS_MOCK_CORE_MEMORY_MAPPED_FILE_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
+
 // C includes
 #include <cerrno>
 #include <fcntl.h>

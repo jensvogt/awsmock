@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#include <boost/asio/readable_pipe.hpp>
 
 namespace AwsMock::Core {
 
@@ -52,6 +53,18 @@ namespace AwsMock::Core {
 
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
+        boost::asio::io_context ctx;
+        boost::asio::readable_pipe inPipe{ctx};
+        boost::asio::readable_pipe outPipe{ctx};
+        boost::asio::readable_pipe errPipe{ctx};
+        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{inPipe, outPipe, errPipe});
+        boost::system::error_code ec;
+        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        proc.wait();
+        /*
         boost::asio::io_context ios;
         std::future<std::string> outData, errData;
         boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
@@ -61,6 +74,6 @@ namespace AwsMock::Core {
 
         // Get stdout/stderr
         output = outData.get();
-        error = errData.get();
+        error = errData.get();*/
     }
 }// namespace AwsMock::Core

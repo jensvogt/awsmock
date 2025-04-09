@@ -42,11 +42,8 @@ namespace AwsMock::Core {
 #endif
     }
 
-    void LogFormatter(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
+    void SetColorCoding(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
 
-        std::string func = processFuncName(boost::log::extract<std::string>("Function", rec)->c_str());
-
-        // Set the color
         const auto severity = rec[boost::log::trivial::severity];
         if (severity) {
             switch (severity.get()) {
@@ -70,6 +67,20 @@ namespace AwsMock::Core {
                     break;
             }
         }
+    }
+
+    void ResetColorCoding(boost::log::formatting_ostream &strm) {
+        strm << "\033[97m";
+    }
+
+    void LogFormatter(boost::log::record_view const &rec, boost::log::formatting_ostream &strm) {
+
+        std::string func = processFuncName(boost::log::extract<std::string>("Function", rec)->c_str());
+
+#ifndef _WIN32
+        SetColorCoding(rec, strm);
+#endif
+
         auto date_time_formatter = boost::log::expressions::stream << boost::log::expressions::format_date_time<boost::posix_time::ptime>("TimeStamp", "%Y-%m-%d %H:%M:%S.%f");
         date_time_formatter(rec, strm);
 
@@ -80,7 +91,10 @@ namespace AwsMock::Core {
 
         // Finally, put the record message to the stream
         strm << rec[boost::log::expressions::smessage];
-        strm << "\033[97m";
+
+#ifndef _WIN32
+        ResetColorCoding(strm);
+#endif
     }
 
     void LogStream::Initialize() {
@@ -123,5 +137,4 @@ namespace AwsMock::Core {
 
         log_info << "Start logging to " << filename << " size: " << logSize << " count: " << logCount;
     }
-
 }// namespace AwsMock::Core

@@ -33,8 +33,8 @@ namespace AwsMock::Core {
         request.method(method);
         request.target(path);
         request.base().set("Host", "localhost");
-        request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-        request.body().open(filename.c_str(), boost::beast::file_mode::scan, ec);
+        request.set(field::user_agent, BOOST_BEAST_VERSION_STRING);
+        request.body().open(filename.c_str(), boost::beast::file_mode::read, ec);
         request.prepare_payload();
 
         if (!headers.empty()) {

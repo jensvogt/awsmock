@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -264,9 +264,91 @@ namespace AwsMock::Core {
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
 #ifdef WIN32
-        // TODO: Fix windows port
+        DWORD dwRtnCode = 0;
+        PSID pSidOwner = nullptr;
+        BOOL bRtnBool = TRUE;
+        LPTSTR AcctName = nullptr;
+        LPTSTR DomainName = nullptr;
+        DWORD dwAcctName = 1, dwDomainName = 1;
+        SID_NAME_USE eUse = SidTypeUnknown;
+        PSECURITY_DESCRIPTOR pSD = nullptr;
+
+
+        // Get the handle of the file object.
+        HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, nullptr,
+                                  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+        // Check GetLastError for CreateFile error code.
+        if (hFile == INVALID_HANDLE_VALUE) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "CreateFile error: " << dwErrorCode;
+            return {};
+        }
+
+        // Get the owner SID of the file.
+        dwRtnCode = GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &pSidOwner, nullptr, nullptr, nullptr, &pSD);
+
+        // Check GetLastError for GetSecurityInfo error condition.
+        if (dwRtnCode != ERROR_SUCCESS) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "GetSecurityInfo error: " << dwErrorCode;
+            return {};
+        }
+
+        // First call to LookupAccountSid to get the buffer sizes.
+        bRtnBool = LookupAccountSid(nullptr, pSidOwner, AcctName, (LPDWORD) &dwAcctName, DomainName, (LPDWORD) &dwDomainName, &eUse);
+
+        // Reallocate memory for the buffers.
+        AcctName = static_cast<LPTSTR>(GlobalAlloc(GMEM_FIXED, dwAcctName));
+
+        // Check GetLastError for GlobalAlloc error condition.
+        if (AcctName == nullptr) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "GlobalAlloc error: " << dwErrorCode;
+            return {};
+        }
+
+        DomainName = static_cast<LPTSTR>(GlobalAlloc(GMEM_FIXED, dwDomainName));
+
+        // Check GetLastError for GlobalAlloc error condition.
+        if (DomainName == nullptr) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "GlobalAlloc error: " << dwErrorCode;
+            return {};
+        }
+
+        // Second call to LookupAccountSid to get the account name.
+        bRtnBool = LookupAccountSid(nullptr, pSidOwner, AcctName, &dwAcctName, DomainName, &dwDomainName, &eUse);
+
+        // Check GetLastError for LookupAccountSid error condition.
+        if (bRtnBool == FALSE) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+
+            if (dwErrorCode == ERROR_NONE_MAPPED) {
+                _tprintf(TEXT("Account owner not found for specified SID.\n"));
+            } else {
+                _tprintf(TEXT("Error in LookupAccountSid.\n"));
+            }
+            return {};
+        }
+        if (bRtnBool == TRUE) {
+
+            // Print the account name.
+            log_debug << "Account owner: " << AcctName;
+            return AcctName;
+        }
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;

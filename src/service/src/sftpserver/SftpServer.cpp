@@ -25,6 +25,7 @@ int gettimeofday(timeval *tp, struct timezone *tzp) {
     tp->tv_usec = sc::duration_cast<sc::microseconds>(d - s).count();
     return 0;
 }
+
 size_t my_strnlen(const char *src, size_t n) {
     size_t len = 0;
     while (len < n && src[len])
@@ -32,7 +33,7 @@ size_t my_strnlen(const char *src, size_t n) {
     return len;
 }
 
-char *strndup(const char *s, size_t n) {
+char *mystrndup(const char *s, size_t n) {
     const size_t len = my_strnlen(s, n);
     const auto p = static_cast<char *>(malloc(len + 1));
     if (p) {
@@ -171,7 +172,7 @@ void _ssh_set_error_oom(void *error, const char *function) {
  * @param[in]  data     The 16 bits integer to add.
  * @return              0 on success, -1 on error.
  */
-int ssh_buffer_add_u16(ssh_buffer_struct *buffer, uint16_t data) {
+int awsmock_ssh_buffer_add_u16(ssh_buffer_struct *buffer, uint16_t data) {
 
     if (const int rc = ssh_buffer_add_data(buffer, &data, sizeof(data)); rc < 0) {
         return -1;
@@ -189,7 +190,7 @@ int ssh_buffer_add_u16(ssh_buffer_struct *buffer, uint16_t data) {
  * @param[in]  data     The 32 bits integer to add.
  * @return              0 on success, -1 on error.
  */
-int ssh_buffer_add_u32(ssh_buffer_struct *buffer, uint32_t data) {
+int awsmock_ssh_buffer_add_u32(ssh_buffer_struct *buffer, uint32_t data) {
 
     if (const int rc = ssh_buffer_add_data(buffer, &data, sizeof(data)); rc < 0) {
         return -1;
@@ -207,7 +208,7 @@ int ssh_buffer_add_u32(ssh_buffer_struct *buffer, uint32_t data) {
  * @param[in]  string   The SSH String to add.
  * @return              0 on success, < 0 on error.
  */
-int ssh_buffer_add_ssh_string(ssh_buffer_struct *buffer, ssh_string_struct *string) {
+int awsmock_ssh_buffer_add_ssh_string(ssh_buffer_struct *buffer, ssh_string_struct *string) {
     uint32_t len = 0;
 
     if (string == NULL) {
@@ -314,7 +315,7 @@ void _ssh_set_error(void *error, int code, const char *function, const char *des
  * @param[in]  data     The 64 bits integer to add.
  * @return              0 on success, -1 on error.
  */
-int ssh_buffer_add_u64(struct ssh_buffer_struct *buffer, uint64_t data) {
+int awsmock_ssh_buffer_add_u64(struct ssh_buffer_struct *buffer, uint64_t data) {
 
     if (const int rc = ssh_buffer_add_data(buffer, &data, sizeof(data)); rc < 0) {
         return -1;
@@ -332,7 +333,7 @@ int ssh_buffer_add_u64(struct ssh_buffer_struct *buffer, uint64_t data) {
  * @param[in]  data     The 8 bits integer to add.
  * @return              0 on success, -1 on error.
  */
-int ssh_buffer_add_u8(struct ssh_buffer_struct *buffer, uint8_t data) {
+int awsmock_ssh_buffer_add_u8(struct ssh_buffer_struct *buffer, uint8_t data) {
 
     if (const int rc = ssh_buffer_add_data(buffer, &data, sizeof(uint8_t)); rc < 0) {
         return -1;
@@ -340,6 +341,7 @@ int ssh_buffer_add_u8(struct ssh_buffer_struct *buffer, uint8_t data) {
 
     return 0;
 }
+
 static int realloc_buffer(ssh_buffer_struct *buffer, uint32_t needed) {
 
     uint32_t smallest = 1;
@@ -423,7 +425,7 @@ static void buffer_shift(ssh_buffer buffer) {
  *
  * @return              0 on success, < 0 on error.
  */
-int ssh_buffer_allocate_size(struct ssh_buffer_struct *buffer, uint32_t len) {
+int awsmock_ssh_buffer_allocate_size(ssh_buffer_struct *buffer, uint32_t len) {
     buffer_verify(buffer);
 
     if (buffer->allocated < len) {
@@ -533,7 +535,7 @@ static int ssh_buffer_pack_allocate_va(ssh_buffer_struct *buffer, const char *fo
         }
     }
 
-    rc = ssh_buffer_allocate_size(buffer, static_cast<uint32_t>(needed_size));
+    rc = awsmock_ssh_buffer_allocate_size(buffer, static_cast<uint32_t>(needed_size));
     if (rc != 0) {
         return SSH_ERROR;
     }
@@ -616,32 +618,32 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
         switch (*p) {
             case 'b':
                 o.byte = static_cast<uint8_t>(va_arg(ap, unsigned int));
-                rc = ssh_buffer_add_u8(buffer, o.byte);
+                rc = awsmock_ssh_buffer_add_u8(buffer, o.byte);
                 break;
             case 'w':
                 o.word = static_cast<uint16_t>(va_arg(ap, unsigned int));
                 o.word = htons(o.word);
-                rc = ssh_buffer_add_u16(buffer, o.word);
+                rc = awsmock_ssh_buffer_add_u16(buffer, o.word);
                 break;
             case 'd':
                 o.dword = va_arg(ap, uint32_t);
                 o.dword = htonl(o.dword);
-                rc = ssh_buffer_add_u32(buffer, o.dword);
+                rc = awsmock_ssh_buffer_add_u32(buffer, o.dword);
                 break;
             case 'q':
                 o.qword = va_arg(ap, uint64_t);
                 o.qword = htonll(o.qword);
-                rc = ssh_buffer_add_u64(buffer, o.qword);
+                rc = awsmock_ssh_buffer_add_u64(buffer, o.qword);
                 break;
             case 'S':
                 o.string = va_arg(ap, ssh_string);
-                rc = ssh_buffer_add_ssh_string(buffer, o.string);
+                rc = awsmock_ssh_buffer_add_ssh_string(buffer, o.string);
                 o.string = nullptr;
                 break;
             case 's':
                 cstring = va_arg(ap, char *);
                 len = strlen(cstring);
-                rc = ssh_buffer_add_u32(buffer, htonl(len));
+                rc = awsmock_ssh_buffer_add_u32(buffer, htonl(len));
                 if (rc == SSH_OK) {
                     rc = ssh_buffer_add_data(buffer, cstring, len);
                 }
@@ -663,7 +665,7 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
                     rc = SSH_ERROR;
                     break;
                 }
-                rc = ssh_buffer_add_ssh_string(buffer, o.string);
+                rc = awsmock_ssh_buffer_add_ssh_string(buffer, o.string);
                 SAFE_FREE(o.string);
                 break;
             case 't':
@@ -743,7 +745,7 @@ int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc,
  * @param[in]  len      The length of data to prepend.
  * @return              0 on success, -1 on error.
  */
-int ssh_buffer_prepend_data(ssh_buffer_struct *buffer, const void *data, uint32_t len) {
+int awsmock_ssh_buffer_prepend_data(ssh_buffer_struct *buffer, const void *data, uint32_t len) {
     buffer_verify(buffer);
 
     if (len <= buffer->pos) {
@@ -771,7 +773,7 @@ int ssh_buffer_prepend_data(ssh_buffer_struct *buffer, const void *data, uint32_
     return 0;
 }
 
-int sftp_packet_write(sftp_session sftp, uint8_t type, ssh_buffer payload) {
+int awsmock_sftp_packet_write(sftp_session sftp, uint8_t type, ssh_buffer payload) {
     constexpr uint8_t header[5] = {};
 
     /* Add size of type */
@@ -779,7 +781,7 @@ int sftp_packet_write(sftp_session sftp, uint8_t type, ssh_buffer payload) {
     PUSH_BE_U32(header, 0, payload_size);
     PUSH_BE_U8(header, 4, type);
 
-    if (const int rc = ssh_buffer_prepend_data(payload, header, sizeof(header)); rc < 0) {
+    if (const int rc = awsmock_ssh_buffer_prepend_data(payload, header, sizeof(header)); rc < 0) {
         ssh_set_error_oom(sftp->session);
         sftp_set_error(sftp, SSH_FX_FAILURE);
         return -1;
@@ -815,19 +817,19 @@ static int sftp_reply_statvfs(sftp_client_message msg, sftp_statvfs_t st) {
 
     log_debug << "Sending statvfs reply";
 
-    if (ssh_buffer_add_u32(out, msg->id) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_bsize)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_frsize)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_blocks)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_bfree)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_bavail)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_files)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_ffree)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_favail)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_fsid)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_flag)) < 0 ||
-        ssh_buffer_add_u64(out, ntohll(st->f_namemax)) < 0 ||
-        sftp_packet_write(msg->sftp, SSH_FXP_EXTENDED_REPLY, out) < 0) {
+    if (awsmock_ssh_buffer_add_u32(out, msg->id) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_bsize)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_frsize)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_blocks)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_bfree)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_bavail)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_files)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_ffree)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_favail)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_fsid)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_flag)) < 0 ||
+        awsmock_ssh_buffer_add_u64(out, ntohll(st->f_namemax)) < 0 ||
+        awsmock_sftp_packet_write(msg->sftp, SSH_FXP_EXTENDED_REPLY, out) < 0) {
         ret = -1;
     }
     SSH_BUFFER_FREE(out);
@@ -923,7 +925,7 @@ static int process_open(sftp_client_message client_msg) {
  * @note If a too long description is provided (which would result in a first
  * line longer than 80 bytes), the function will fail.
  */
-void ssh_log_hexdump(const char *descr, const unsigned char *what, size_t len) {
+void awsmock_ssh_log_hexdump(const char *descr, const unsigned char *what, size_t len) {
     size_t i;
     char ascii[17];
     const unsigned char *pc = nullptr;
@@ -1135,7 +1137,7 @@ static int process_read(sftp_client_message client_msg) {
     int fd = -1;
     char *buffer = nullptr;
 
-    ssh_log_hexdump("Processing read: handle:", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
+    awsmock_ssh_log_hexdump("Processing read: handle:", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, handle));
     if (h->type == SFTP_FILE_HANDLE) {
@@ -1229,7 +1231,7 @@ static int process_write(sftp_client_message client_msg) {
     int fd = -1;
     const char *msg_data = nullptr;
 
-    ssh_log_hexdump("Processing write: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
+    awsmock_ssh_log_hexdump("Processing write: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, handle));
     if (h->type == SFTP_FILE_HANDLE) {
@@ -1267,7 +1269,7 @@ static int process_close(sftp_client_message client_msg) {
     struct sftp_handle *h = nullptr;
     int ret;
 
-    ssh_log_hexdump("Processing close: handle:", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
+    awsmock_ssh_log_hexdump("Processing close: handle:", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, handle));
     if (h->type == SFTP_FILE_HANDLE) {
@@ -1427,7 +1429,7 @@ process_readdir(sftp_client_message client_msg) {
     DIR *dir = nullptr;
     const char *handle_name = nullptr;
 
-    ssh_log_hexdump("Processing readdir: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
+    awsmock_ssh_log_hexdump("Processing readdir: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, client_msg->handle));
     if (h->type == SFTP_DIR_HANDLE) {
@@ -1512,8 +1514,7 @@ static int process_mkdir(sftp_client_message client_msg) {
     }
 
 #ifdef _WIN32
-    // TODO: fix me
-    rv = 0;
+    rv = _mkdir(filename);
 #else
     rv = mkdir(filename, mode);
 #endif
@@ -1543,8 +1544,7 @@ static int process_rmdir(sftp_client_message client_msg) {
     }
 
 #ifdef _WIN32
-    // TODO: fix me
-    rv = 0;
+    rv = _rmdir(filename);
 #else
     rv = rmdir(filename);
 #endif
@@ -1880,7 +1880,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     return SSH_ERROR;
 }
 
-sftp_session sftp_server_new(ssh_session session, ssh_channel chan) {
+sftp_session awsmock_sftp_server_new(ssh_session session, ssh_channel chan) {
     sftp_session sftp = nullptr;
 
     sftp = static_cast<sftp_session>(calloc(1, sizeof(sftp_session_struct)));
@@ -1934,7 +1934,7 @@ int sftp_channel_default_subsystem_request(ssh_session session, ssh_channel chan
         auto *sftp = static_cast<sftp_session *>(userdata);
 
         /* initialize sftp session and file handler */
-        *sftp = sftp_server_new(session, channel);
+        *sftp = awsmock_sftp_server_new(session, channel);
         if (*sftp == nullptr) {
             return SSH_ERROR;
         }
@@ -1964,7 +1964,7 @@ int sftp_reply_version(sftp_client_message client_msg) {
         return -1;
     }
 
-    rc = sftp_packet_write(sftp, SSH_FXP_VERSION, reply);
+    rc = awsmock_sftp_packet_write(sftp, SSH_FXP_VERSION, reply);
     if (rc < 0) {
         SSH_BUFFER_FREE(reply);
         return -1;
@@ -2123,7 +2123,7 @@ static char *sftp_parse_longname(const char *longname, enum sftp_longname_field_
 
     const size_t len = q - p;
 
-    return strndup(p, len);
+    return mystrndup(p, len);
 }
 
 /**
@@ -2280,12 +2280,10 @@ error:
  * @brief gets a 32 bits unsigned int out of the buffer. Adjusts the read pointer.
  *
  * @param[in]  buffer   The buffer to read.
- *
  * @param[in]  data     A pointer to a uint32_t where to store the data.
- *
  * @returns             0 if there is not enough data in buffer, 4 otherwise.
  */
-uint32_t ssh_buffer_get_u32(struct ssh_buffer_struct *buffer, uint32_t *data) {
+uint32_t awsmock_ssh_buffer_get_u32(ssh_buffer_struct *buffer, uint32_t *data) {
     return ssh_buffer_get_data(buffer, data, sizeof(uint32_t));
 }
 
@@ -2294,12 +2292,10 @@ uint32_t ssh_buffer_get_u32(struct ssh_buffer_struct *buffer, uint32_t *data) {
  * pointer.
  *
  * @param[in]  buffer   The buffer to read.
- *
  * @param[in]  data     A pointer to a uint64_t where to store the data.
- *
  * @returns             0 if there is not enough data in buffer, 8 otherwise.
  */
-uint32_t ssh_buffer_get_u64(struct ssh_buffer_struct *buffer, uint64_t *data) {
+uint32_t awsmock_ssh_buffer_get_u64(ssh_buffer_struct *buffer, uint64_t *data) {
     return ssh_buffer_get_data(buffer, data, sizeof(uint64_t));
 }
 
@@ -2307,12 +2303,10 @@ uint32_t ssh_buffer_get_u64(struct ssh_buffer_struct *buffer, uint64_t *data) {
  * @brief Validates that the given length can be obtained from the buffer.
  *
  * @param[in]  buffer  The buffer to read from.
- *
  * @param[in]  len     The length to be checked.
- *
  * @return             SSH_OK if the length is valid, SSH_ERROR otherwise.
  */
-int ssh_buffer_validate_length(struct ssh_buffer_struct *buffer, size_t len) {
+int awsmock_ssh_buffer_validate_length(struct ssh_buffer_struct *buffer, size_t len) {
     if (buffer == nullptr || buffer->pos + len < len ||
         buffer->pos + len > buffer->used) {
         return SSH_ERROR;
@@ -2325,21 +2319,20 @@ int ssh_buffer_validate_length(struct ssh_buffer_struct *buffer, size_t len) {
  * @brief Get an SSH String out of the buffer and adjust the read pointer.
  *
  * @param[in]  buffer   The buffer to read.
- *
  * @returns             The SSH String, nullptr on error.
  */
-ssh_string_struct *ssh_buffer_get_ssh_string(ssh_buffer_struct *buffer) {
+ssh_string_struct *awsmock_ssh_buffer_get_ssh_string(ssh_buffer_struct *buffer) {
     uint32_t stringlen;
     ssh_string_struct *str = nullptr;
 
-    int rc = ssh_buffer_get_u32(buffer, &stringlen);
+    int rc = awsmock_ssh_buffer_get_u32(buffer, &stringlen);
     if (rc == 0) {
         return nullptr;
     }
     uint32_t hostlen = ntohl(stringlen);
 
     // verify if there is enough space in buffer to get it
-    rc = ssh_buffer_validate_length(buffer, hostlen);
+    rc = awsmock_ssh_buffer_validate_length(buffer, hostlen);
     if (rc != SSH_OK) {
         return nullptr; /* it is indeed */
     }
@@ -2382,7 +2375,7 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
 
     /* This isn't really a loop, but it is like a try..catch.. */
     do {
-        if (ssh_buffer_get_u32(buf, &flags) != 4) {
+        if (awsmock_ssh_buffer_get_u32(buf, &flags) != 4) {
             break;
         }
 
@@ -2390,14 +2383,14 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
         attr->flags = flags;
 
         if (flags & SSH_FILEXFER_ATTR_SIZE) {
-            if (ssh_buffer_get_u64(buf, &attr->size) != 8) {
+            if (awsmock_ssh_buffer_get_u64(buf, &attr->size) != 8) {
                 break;
             }
             attr->size = ntohll(attr->size);
         }
 
         if (flags & SSH_FILEXFER_ATTR_OWNERGROUP) {
-            owner = ssh_buffer_get_ssh_string(buf);
+            owner = awsmock_ssh_buffer_get_ssh_string(buf);
             if (owner == nullptr) {
                 break;
             }
@@ -2407,7 +2400,7 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
                 break;
             }
 
-            group = ssh_buffer_get_ssh_string(buf);
+            group = awsmock_ssh_buffer_get_ssh_string(buf);
             if (group == nullptr) {
                 break;
             }
@@ -2419,7 +2412,7 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
         }
 
         if (flags & SSH_FILEXFER_ATTR_PERMISSIONS) {
-            if (ssh_buffer_get_u32(buf, &attr->permissions) != 4) {
+            if (awsmock_ssh_buffer_get_u32(buf, &attr->permissions) != 4) {
                 break;
             }
             attr->permissions = ntohl(attr->permissions);
@@ -2448,13 +2441,13 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
         }
 
         if (flags & SSH_FILEXFER_ATTR_ACCESSTIME) {
-            if (ssh_buffer_get_u64(buf, &attr->atime64) != 8) {
+            if (awsmock_ssh_buffer_get_u64(buf, &attr->atime64) != 8) {
                 break;
             }
             attr->atime64 = ntohll(attr->atime64);
 
             if (flags & SSH_FILEXFER_ATTR_SUBSECOND_TIMES) {
-                if (ssh_buffer_get_u32(buf, &attr->atime_nseconds) != 4) {
+                if (awsmock_ssh_buffer_get_u32(buf, &attr->atime_nseconds) != 4) {
                     break;
                 }
                 attr->atime_nseconds = ntohl(attr->atime_nseconds);
@@ -2462,13 +2455,13 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
         }
 
         if (flags & SSH_FILEXFER_ATTR_CREATETIME) {
-            if (ssh_buffer_get_u64(buf, &attr->createtime) != 8) {
+            if (awsmock_ssh_buffer_get_u64(buf, &attr->createtime) != 8) {
                 break;
             }
             attr->createtime = ntohll(attr->createtime);
 
             if (flags & SSH_FILEXFER_ATTR_SUBSECOND_TIMES) {
-                if (ssh_buffer_get_u32(buf, &attr->createtime_nseconds) != 4) {
+                if (awsmock_ssh_buffer_get_u32(buf, &attr->createtime_nseconds) != 4) {
                     break;
                 }
                 attr->createtime_nseconds = ntohl(attr->createtime_nseconds);
@@ -2476,13 +2469,13 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
         }
 
         if (flags & SSH_FILEXFER_ATTR_MODIFYTIME) {
-            if (ssh_buffer_get_u64(buf, &attr->mtime64) != 8) {
+            if (awsmock_ssh_buffer_get_u64(buf, &attr->mtime64) != 8) {
                 break;
             }
             attr->mtime64 = ntohll(attr->mtime64);
 
             if (flags & SSH_FILEXFER_ATTR_SUBSECOND_TIMES) {
-                if (ssh_buffer_get_u32(buf, &attr->mtime_nseconds) != 4) {
+                if (awsmock_ssh_buffer_get_u32(buf, &attr->mtime_nseconds) != 4) {
                     break;
                 }
                 attr->mtime_nseconds = ntohl(attr->mtime_nseconds);
@@ -2490,20 +2483,20 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
         }
 
         if (flags & SSH_FILEXFER_ATTR_ACL) {
-            if ((attr->acl = ssh_buffer_get_ssh_string(buf)) == nullptr) {
+            if ((attr->acl = awsmock_ssh_buffer_get_ssh_string(buf)) == nullptr) {
                 break;
             }
         }
 
         if (flags & SSH_FILEXFER_ATTR_EXTENDED) {
-            if (ssh_buffer_get_u32(buf, &attr->extended_count) != 4) {
+            if (awsmock_ssh_buffer_get_u32(buf, &attr->extended_count) != 4) {
                 break;
             }
             attr->extended_count = ntohl(attr->extended_count);
 
             while (attr->extended_count &&
-                   (attr->extended_type = ssh_buffer_get_ssh_string(buf)) &&
-                   (attr->extended_data = ssh_buffer_get_ssh_string(buf))) {
+                   (attr->extended_type = awsmock_ssh_buffer_get_ssh_string(buf)) &&
+                   (attr->extended_data = awsmock_ssh_buffer_get_ssh_string(buf))) {
                 attr->extended_count--;
             }
 
@@ -2531,7 +2524,7 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
     return attr;
 }
 
-sftp_attributes sftp_parse_attr(sftp_session session, ssh_buffer buf, int expectname) {
+sftp_attributes awsmock_sftp_parse_attr(sftp_session session, ssh_buffer buf, int expectname) {
     switch (session->version) {
         case 4:
             return sftp_parse_attr_4(session, buf, expectname);
@@ -2577,7 +2570,7 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
     }
 
     if (msg->type != SSH_FXP_INIT) {
-        rc = static_cast<int>(ssh_buffer_get_u32(payload, &msg->id));
+        rc = static_cast<int>(awsmock_ssh_buffer_get_u32(payload, &msg->id));
         if (rc != sizeof(uint32_t)) {
             goto error;
         }
@@ -2595,7 +2588,7 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
             break;
         case SSH_FXP_CLOSE:
         case SSH_FXP_READDIR:
-            msg->handle = ssh_buffer_get_ssh_string(payload);
+            msg->handle = awsmock_ssh_buffer_get_ssh_string(payload);
             if (msg->handle == nullptr) {
                 goto error;
             }
@@ -2635,17 +2628,17 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
             if (rc != SSH_OK) {
                 goto error;
             }
-            msg->attr = sftp_parse_attr(sftp, payload, 0);
+            msg->attr = awsmock_sftp_parse_attr(sftp, payload, 0);
             if (msg->attr == nullptr) {
                 goto error;
             }
             break;
         case SSH_FXP_FSETSTAT:
-            msg->handle = ssh_buffer_get_ssh_string(payload);
+            msg->handle = awsmock_ssh_buffer_get_ssh_string(payload);
             if (msg->handle == nullptr) {
                 goto error;
             }
-            msg->attr = sftp_parse_attr(sftp, payload, 0);
+            msg->attr = awsmock_sftp_parse_attr(sftp, payload, 0);
             if (msg->attr == nullptr) {
                 goto error;
             }
@@ -2670,7 +2663,7 @@ static sftp_client_message sftp_make_client_message(sftp_session sftp, sftp_pack
             if (rc != SSH_OK) {
                 goto error;
             }
-            msg->attr = sftp_parse_attr(sftp, payload, 0);
+            msg->attr = awsmock_sftp_parse_attr(sftp, payload, 0);
             if (msg->attr == nullptr) {
                 goto error;
             }
@@ -2812,18 +2805,14 @@ auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[
 }
 
 /**
-     * @internal
-     *
-     * @brief Get a 8 bits unsigned int out of the buffer and adjust the read
-     * pointer.
-     *
-     * @param[in]  buffer   The buffer to read.
-     *
-     * @param[in]  data     A pointer to a uint8_t where to store the data.
-     *
-     * @returns             0 if there is not enough data in buffer, 1 otherwise.
-     */
-uint32_t ssh_buffer_get_u8(struct ssh_buffer_struct *buffer, uint8_t *data) {
+ * @brief Get a 8 bits unsigned int out of the buffer and adjust the read
+ * pointer.
+ *
+ * @param[in]  buffer   The buffer to read.
+ * @param[in]  data     A pointer to a uint8_t where to store the data.
+ * @returns             0 if there is not enough data in buffer, 1 otherwise.
+ */
+uint32_t awsmock_ssh_buffer_get_u8(struct ssh_buffer_struct *buffer, uint8_t *data) {
     return ssh_buffer_get_data(buffer, data, sizeof(uint8_t));
 }
 
@@ -2843,14 +2832,14 @@ bignum ssh_make_string_bn(ssh_string string) {
 }
 
 /** @internal
-     * @brief Get multiple values from a buffer on a single function call
-     * @param[in] buffer    The buffer to get from
-     * @param[in] format    A format string of arguments.
-     * @param[in] ap        A va_list of arguments.
-     * @returns             SSH_OK on success
-     *                      SSH_ERROR on error
-     * @see ssh_buffer_get_format() for format list values.
-     */
+ * @brief Get multiple values from a buffer on a single function call
+ * @param[in] buffer    The buffer to get from
+ * @param[in] format    A format string of arguments.
+ * @param[in] ap        A va_list of arguments.
+ * @returns             SSH_OK on success
+ *                      SSH_ERROR on error
+ * @see ssh_buffer_get_format() for format list values.
+ */
 int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap) {
     int rc = SSH_ERROR;
     const char *p = format;
@@ -2891,7 +2880,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
         switch (*p) {
             case 'b':
                 o.byte = va_arg(ap, uint8_t *);
-                rlen = ssh_buffer_get_u8(buffer, o.byte);
+                rlen = awsmock_ssh_buffer_get_u8(buffer, o.byte);
                 rc = rlen == 1 ? SSH_OK : SSH_ERROR;
                 break;
             case 'w':
@@ -2904,7 +2893,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
                 break;
             case 'd':
                 o.dword = va_arg(ap, uint32_t *);
-                rlen = ssh_buffer_get_u32(buffer, o.dword);
+                rlen = awsmock_ssh_buffer_get_u32(buffer, o.dword);
                 if (rlen == 4) {
                     *o.dword = ntohl(*o.dword);
                     rc = SSH_OK;
@@ -2912,7 +2901,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
                 break;
             case 'q':
                 o.qword = va_arg(ap, uint64_t *);
-                rlen = ssh_buffer_get_u64(buffer, o.qword);
+                rlen = awsmock_ssh_buffer_get_u64(buffer, o.qword);
                 if (rlen == 8) {
                     *o.qword = ntohll(*o.qword);
                     rc = SSH_OK;
@@ -2921,7 +2910,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
             case 'B':
                 o.bignum = va_arg(ap, bignum *);
                 *o.bignum = nullptr;
-                tmp_string = ssh_buffer_get_ssh_string(buffer);
+                tmp_string = awsmock_ssh_buffer_get_ssh_string(buffer);
                 if (tmp_string == nullptr) {
                     break;
                 }
@@ -2932,7 +2921,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
                 break;
             case 'S':
                 o.string = va_arg(ap, ssh_string *);
-                *o.string = ssh_buffer_get_ssh_string(buffer);
+                *o.string = awsmock_ssh_buffer_get_ssh_string(buffer);
                 rc = *o.string != nullptr ? SSH_OK : SSH_ERROR;
                 o.string = nullptr;
                 break;
@@ -2941,7 +2930,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
 
                 o.cstring = va_arg(ap, char **);
                 *o.cstring = nullptr;
-                rlen = ssh_buffer_get_u32(buffer, &u32len);
+                rlen = awsmock_ssh_buffer_get_u32(buffer, &u32len);
                 if (rlen != 4) {
                     break;
                 }
@@ -2950,7 +2939,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
                     break;
                 }
 
-                rc = ssh_buffer_validate_length(buffer, len);
+                rc = awsmock_ssh_buffer_validate_length(buffer, len);
                 if (rc != SSH_OK) {
                     break;
                 }
@@ -2978,7 +2967,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
                     break;
                 }
 
-                rc = ssh_buffer_validate_length(buffer, len);
+                rc = awsmock_ssh_buffer_validate_length(buffer, len);
                 if (rc != SSH_OK) {
                     break;
                 }
@@ -3144,7 +3133,6 @@ int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t arg
     va_end(ap);
     return rc;
 }
-
 
 // ======================================================================================================================
 
@@ -3344,12 +3332,16 @@ namespace AwsMock::Service {
 
         // Change working directory
         const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
-        if (const int rc = chdir(ftpBaseDir.c_str()) < 0) {
+#ifdef _WIN32
+        int rc = _chdir(ftpBaseDir.c_str());
+#else
+        int rc = chdir(ftpBaseDir.c_str());
+#endif
+        if (rc < 0) {
             log_error << "Could not change to base path, basPath:" << ftpBaseDir;
             return;
         }
-
-        if (const int rc = ssh_init(); rc < 0) {
+        if (rc = ssh_init(); rc < 0) {
             log_error << "SSH initialization failed";
             return;
         }

@@ -34,10 +34,14 @@
 #include <fcntl.h>
 #ifndef _WIN32
 #include <poll.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/statvfs.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#else
+#include <direct.h>
 #endif
 #include <sys/stat.h>
 
@@ -51,6 +55,7 @@
 
 #ifndef KEYS_FOLDER
 #ifdef _WIN32
+#include <direct.h>
 #define KEYS_FOLDER
 #else
 #define KEYS_FOLDER "/etc/ssh/"
@@ -278,13 +283,8 @@ typedef struct ssh_string_struct *ssh_string;
 int _ssh_buffer_pack(struct ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 #define ssh_buffer_pack(buffer, format, ...) _ssh_buffer_pack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 
-int ssh_buffer_unpack_va(ssh_buffer_struct *buffer,
-                         const char *format, size_t argc,
-                         va_list ap);
-int _ssh_buffer_unpack(ssh_buffer_struct *buffer,
-                       const char *format,
-                       size_t argc,
-                       ...);
+int awsmock_ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap);
+int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 #define ssh_buffer_unpack(buffer, format, ...) _ssh_buffer_unpack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 #define MAX_ENTRIES_NUM_IN_PACKET 50
 #define MAX_LONG_NAME_LEN 350

@@ -2,7 +2,6 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include <awsmock/dto/transfer/model/IdentityProviderDetails.h>
 #include <awsmock/dto/transfer/model/Server.h>
 
 namespace AwsMock::Dto::Transfer {
@@ -19,11 +18,16 @@ namespace AwsMock::Dto::Transfer {
             identityProviderType = IdentityProviderTypeFromString(Core::Bson::BsonUtils::GetStringValue(document, "IdentityProviderType"));
             state = Core::Bson::BsonUtils::GetStringValue(document, "State");
             userCount = Core::Bson::BsonUtils::GetIntValue(document, "UserCount");
-            port = Core::Bson::BsonUtils::GetIntValue(document, "Port");
             concurrency = Core::Bson::BsonUtils::GetIntValue(document, "Concurrency");
             lastStarted = Core::Bson::BsonUtils::GetDateValue(document, "LastStarted");
             created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
             modified = Core::Bson::BsonUtils::GetDateValue(document, "Modified");
+
+            if (document.find("ports") != document.end()) {
+                for (const auto &p: document.view()["ports"].get_array().value) {
+                    ports.emplace_back(p.get_int32().value);
+                }
+            }
 
             if (document.find("IdentityProviderDetails") != document.end()) {
                 identityProviderDetails.FromDocument(document.view()["IdentityProviderDetails"].get_document().value);
@@ -49,11 +53,20 @@ namespace AwsMock::Dto::Transfer {
             Core::Bson::BsonUtils::SetStringValue(document, "LoggingRole", loggingRole);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
             Core::Bson::BsonUtils::SetIntValue(document, "UserCount", userCount);
-            Core::Bson::BsonUtils::SetIntValue(document, "Port", port);
             Core::Bson::BsonUtils::SetIntValue(document, "Concurrency", concurrency);
             Core::Bson::BsonUtils::SetDateValue(document, "LastStarted", lastStarted);
             Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
+
+            // Ports
+            if (!ports.empty()) {
+                array portsArray;
+                for (const auto &p: ports) {
+                    portsArray.append(p);
+                }
+                document.append(kvp("Ports", portsArray));
+            }
+
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {

@@ -45,7 +45,7 @@ awsmock:
       port: 8080                                                      # Docker container default port
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
-    socket: tcp://localhost:2375                                      # Docker REST API domain/HTTP socket, default: /var/run/docker.sock (Linux, MacOS), tcp://localhost:2375 (Windows)
+    socket: http://localhost:2375                                      # Docker REST API domain/HTTP socket, default: /var/run/docker.sock (Linux, MacOS), tcp://localhost:2375 (Windows)
   podman: # Podman settings
     active: false                                                     # Podman daemon activation flag
     network-mode: podman                                              # Podman network mode, default: local
@@ -163,24 +163,24 @@ awsmock:
       worker:
         period: 3600
     # AWS transfer server
-    transfer:
+    transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      sftp: true                                                        # Support SFTP
-      data-dir: C:/Program Files (x86)/awsmock/data/transfer            # FTP data directory
-      # Default directories to create during startup
+      data-dir: /usr/local/awsmock/data/transfer                        # FTP data directory
       directories:
-        - incoming/mix                                                  # Default directory
-        - feedback                                                      # Default directory
-      # Transfer server monitoring
-      monitoring:
+        - incoming/mix
+        - feedback
+      monitoring: # Transfer server monitoring
         period: 300                                                     # Monitoring interval
-      # Background worker
-      worker:
+      worker: # Background worker
         period: 3600                                                    # Monitoring interval
-      # FTP server
-      ftp:
-        port: 22                                                        # FTP port (default:21, SFTP: 22)
+      ftp: # FTP server
+        port: 2121                                                      # FTP port
+        address: 0.0.0.0                                                # FTP listening address
+        pasv-min: 6000                                                  # Passive mode minimum port
+        pasv-max: 6100                                                  # Passive mode maximal port
+      sftp: # SFTP server
+        port: 2222                                                      # FTP port
         address: 0.0.0.0                                                # FTP listening address
         pasv-min: 6000                                                  # Passive mode minimum port
         pasv-max: 6100                                                  # Passive mode maximal port

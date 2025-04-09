@@ -22,7 +22,7 @@ namespace AwsMock::Database {
     using std::chrono::system_clock;
 
     /**
-     * SNS in-memory database.
+     * @brief SNS in-memory database.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

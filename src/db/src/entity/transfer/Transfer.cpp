@@ -31,29 +31,43 @@ namespace AwsMock::Database::Entity::Transfer {
 
     view_or_value<view, value> Transfer::ToDocument() const {
 
-        auto protocolsDoc = array{};
-        for (const auto &protocol: protocols) {
-            protocolsDoc.append(protocol);
-        }
-
-        auto usersDoc = array{};
-        for (const auto &user: users) {
-            usersDoc.append(user.ToDocument());
-        }
-
         document transferDoc;
         Core::Bson::BsonUtils::SetStringValue(transferDoc, "region", region);
         Core::Bson::BsonUtils::SetStringValue(transferDoc, "serverId", serverId);
         Core::Bson::BsonUtils::SetStringValue(transferDoc, "arn", arn);
-        Core::Bson::BsonUtils::SetIntValue(transferDoc, "port", port);
         Core::Bson::BsonUtils::SetIntValue(transferDoc, "concurrency", concurrency);
         Core::Bson::BsonUtils::SetStringValue(transferDoc, "listenAddress", listenAddress);
         Core::Bson::BsonUtils::SetStringValue(transferDoc, "state", ServerStateToString(state));
-        Core::Bson::BsonUtils::SetArrayValue(transferDoc, "protocols", protocolsDoc);
-        Core::Bson::BsonUtils::SetArrayValue(transferDoc, "users", usersDoc);
         Core::Bson::BsonUtils::SetDateValue(transferDoc, "lastStarted", lastStarted);
         Core::Bson::BsonUtils::SetDateValue(transferDoc, "created", created);
         Core::Bson::BsonUtils::SetDateValue(transferDoc, "modified", modified);
+
+        // Users
+        if (!users.empty()) {
+            auto usersArray = array{};
+            for (const auto &user: users) {
+                usersArray.append(user.ToDocument());
+            }
+            transferDoc.append(kvp("users", usersArray));
+        }
+
+        // Protocols
+        if (!protocols.empty()) {
+            auto protocolsArray = array{};
+            for (const auto &protocol: protocols) {
+                protocolsArray.append(protocol);
+            }
+            transferDoc.append(kvp("protocols", protocolsArray));
+        }
+
+        // Ports
+        if (!ports.empty()) {
+            array portsArray;
+            for (const auto &p: ports) {
+                portsArray.append(p);
+            }
+            transferDoc.append(kvp("ports", portsArray));
+        }
 
         return transferDoc.extract();
     }
@@ -66,7 +80,6 @@ namespace AwsMock::Database::Entity::Transfer {
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         state = ServerStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
         concurrency = Core::Bson::BsonUtils::GetIntValue(mResult, "concurrency");
-        port = Core::Bson::BsonUtils::GetIntValue(mResult, "port");
         listenAddress = Core::Bson::BsonUtils::GetStringValue(mResult, "listenAddress");
         lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStarted");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
@@ -77,6 +90,14 @@ namespace AwsMock::Database::Entity::Transfer {
             auto [value] = mResult.view()["protocols"].get_array();
             for (auto &p: value) {
                 protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
+            }
+        }
+
+        // Ports
+        if (mResult.view().find("ports") != mResult.view().end()) {
+            auto [value] = mResult.view()["ports"].get_array();
+            for (auto &p: value) {
+                ports.emplace_back(p.get_int32().value);
             }
         }
 

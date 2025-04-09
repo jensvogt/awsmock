@@ -94,7 +94,7 @@ namespace AwsMock::Service {
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
         // Cleanup
-        Core::DirUtils::DeleteDirectory(codeDir);
+        //Core::DirUtils::DeleteDirectory(codeDir);
         log_debug << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
     }
 
@@ -118,18 +118,10 @@ namespace AwsMock::Service {
         const std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
 
         // Decode Base64 file
-        std::string decoded = Core::Crypto::Base64Decode(functionCode);
         const std::string zipFile = tempDir + "/zipfile.zip";
-        int tmp = decoded.length();
+        Core::Crypto::Base64Decode(functionCode, zipFile);
 
         try {
-
-            // Write to temp file
-
-            std::ofstream ofs(zipFile);
-            ofs << decoded;
-            ofs.close();
-            decoded.clear();
 
             // Save zip file
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {

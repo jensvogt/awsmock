@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/CryptoUtils.h>
+#include <boost/beast/core/detail/base64.hpp>
 
 namespace AwsMock::Core {
 
@@ -488,6 +489,17 @@ namespace AwsMock::Core {
             output.clear();
         }
         return output;
+    }
+
+    void Crypto::Base64Decode(const std::string &encodedString, const std::string &filename) {
+        typedef std::basic_ofstream<unsigned char> uofstream;
+        uofstream ofs(filename, std::ios::out | std::ios::binary);
+        const int size = boost::beast::detail::base64::decoded_size(encodedString.length());
+        const auto bytes = static_cast<unsigned char *>(malloc(size));
+        boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
+        ofs.write(bytes, size);
+        ofs.close();
+        free(bytes);
     }
 
     bool Crypto::IsBase64(const std::string &inputString) {
