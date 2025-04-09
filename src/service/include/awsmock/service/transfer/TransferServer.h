@@ -59,6 +59,20 @@ namespace AwsMock::Service {
         void StartTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
+         * @brief Starts an FTP server
+         *
+         * @param server transfer manager entity
+         */
+        void StartFtpServer(Database::Entity::Transfer::Transfer &server);
+
+        /**
+         * @brief Starts an SFTP server
+         *
+         * @param server transfer manager entity
+         */
+        void StartSftpServer(Database::Entity::Transfer::Transfer &server);
+
+        /**
          * @brief Stops a single transfer manager
          *
          * @param server transfer manager entity

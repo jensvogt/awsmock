@@ -141,14 +141,17 @@ See [AwsMock SystemsManager supported commands](docs/man/awsmocksecretsmanager.1
 
 ### Building AwsMock
 
-Building of the AwsMOck executables is CMake based.
+Building of the AwsMock executables is CMake based. Supported platforms are Linux, MacOS und Windows. Windows has some
+operating system based limitations.
+
+### Building on Linux
 
 #### Minimum Requirements:
 
-- GNU Compiler Collection (GCC) 4.9 or later or Clang 3.3 or later
-- yaml-cpp, jwt-cpp, prometheus-cpp
+- GNU Compiler Collection (GCC) 4.9 or later or Clang 3.3 or later (Linux)
+- yaml-cpp, jwt-cpp, prometheus-cpp, boost
 - MongoDB C and CXX driver (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
-- Development releases of boost, libz, libssl, libcrypto, libarchive
+- Development releases of boost, libz, libssl, libcrypto, libarchive, libmagic, libssh
 - 4GB of RAM.
 
 #### Building the manager from source:
@@ -166,8 +169,8 @@ To create an out-of-source build:
    ```
 3. Build the project:
    ```
-   cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH=<path-to-install>
-   cmake --build . --config=Debug
+   cmake . -DCMAKE_BUILD_TYPE=<build-type> -DCMAKE_PREFIX_PATH=<path-to-install>
+   cmake --build . --config=<build-type> -j<parallel-threads>
    ```
 4. Install the executables, libraries and man pages:
    ```

@@ -98,9 +98,9 @@ namespace AwsMock::Database::Entity::Transfer {
         int concurrency = 8;
 
         /**
-         * Port
+         * Ports, default: FTP 2121, SFTP 2222
          */
-        int port = 21;
+        std::vector<int> ports = {2121, 2222};
 
         /**
          * Listen address

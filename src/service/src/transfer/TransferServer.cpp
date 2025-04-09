@@ -54,8 +54,57 @@ namespace AwsMock::Service {
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
+        if (std::ranges::find(server.protocols, "FTP") != server.protocols.end()) {
+            StartFtpServer(server);
+        } else if (std::ranges::find(server.protocols, "FTP") != server.protocols.end()) {
+            StartSftpServer(server);
+        }
+
+        // Update database
+        server.lastStarted = system_clock::now();
+        server.state = Database::Entity::Transfer::ServerState::ONLINE;
+        server = _transferDatabase.UpdateTransfer(server);
+        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress;
+    }
+
+    void TransferServer::StartFtpServer(Database::Entity::Transfer::Transfer &server) {
+
         // Get base dir
         const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
+        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.address");
+
+        // Create transfer manager thread
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address);
+        _transferServerList[server.serverId] = _ftpServer;
+
+        // Add users
+        for (const auto &user: server.users) {
+            std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
+
+            // Ensure the home directory exists
+            Core::DirUtils::EnsureDirectory(homeDir);
+            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
+
+            // Create default directories
+            CreateDirectories(user.userName);
+
+            // Add to FTP manager
+            if (_ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All)) {
+                log_debug << "User created successfully";
+            }
+        }
+        if (_ftpServer->start(server.concurrency)) {
+            log_debug << "FTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
+        }
+    }
+
+    void TransferServer::StartSftpServer(Database::Entity::Transfer::Transfer &server) {
+
+        // Get base dir
+        const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.sftp.port");
+        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.address");
 
         SftpServer _sftpServer("2222", "/etc/ssh/ssh_host_ed25519_key", "0.0.0.0");
 
@@ -76,38 +125,6 @@ namespace AwsMock::Service {
         // Start detached thread
         boost::thread t(boost::ref(_sftpServer));
         t.detach();
-
-        // Create transfer manager thread
-        /* _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, server.port, server.listenAddress);
-        _transferServerList[server.serverId] = _ftpServer;
-
-
-
-        // Add users
-        for (const auto &user: server.users) {
-            std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
-
-            // Ensure the home directory exists
-            Core::DirUtils::EnsureDirectory(homeDir);
-            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
-
-            // Create default directories
-            CreateDirectories(user.userName);
-
-            // Add to FTP manager
-            if (_ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All)) {
-                log_debug << "User created successfully";
-            }
-        }
-        if (_ftpServer->start(server.concurrency)) {
-            log_debug << "FTP server started";
-        }*/
-
-        // Update database
-        server.lastStarted = system_clock::now();
-        server.state = Database::Entity::Transfer::ServerState::ONLINE;
-        server = _transferDatabase.UpdateTransfer(server);
-        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << " port: " << server.port;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
@@ -117,7 +134,7 @@ namespace AwsMock::Service {
 
         // Update database
         server.state = Database::Entity::Transfer::ServerState::OFFLINE;
-        log_info << "Transfer server " << server.serverId << " stopped, address = " << server.listenAddress << " port: " << server.port;
+        log_info << "Transfer server " << server.serverId << " stopped, address = " << server.listenAddress;
     }
 
     void TransferServer::StartTransferServers() {

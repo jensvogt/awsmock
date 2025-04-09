@@ -8,9 +8,28 @@ if (WIN32)
     target_include_directories(${BINARY} PUBLIC ./include ../db/include ../dto/include ../service/include
             d:/work/Boost.Application/include ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static yaml-cpp
-            libssl libcrypto archive magic.lib libmagic crypt32.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
-            pdh.lib boost_program_options-vc143-mt-x64-1_87 ssh.lib)
+    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static yaml-cpp.lib
+            libssl.lib libcrypto.lib archive_static.lib libmagic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
+            "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_url-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_url-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_thread-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_thread-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_locale-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_locale-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_program_options-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_program_options-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_log-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_log-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_log_setup-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_log_setup-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_process-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_process-vc143-mt-sgd-x64-1_88.lib>"
+            ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+    #    add_custom_command(TARGET ${BINARY} POST_BUILD
+    #            COMMAND "mt.exe -manifest \"${CMAKE_CURRENT_SOURCE_DIR}\\longfilename.manifest\" -updateresource:${CMAKE_CURRENT_BINARY_DIR}\\${BINARY}.exe"
+    #            COMMENT "Adding manifest...${CMAKE_CURRENT_BINARY_DIR}\\${BINARY}.exe")
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_executable(${BINARY} ${SOURCES})

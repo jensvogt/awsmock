@@ -5,6 +5,16 @@
 #ifndef AWSMOCK_CORE_YAML_CONFIGURATION_H
 #define AWSMOCK_CORE_YAML_CONFIGURATION_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
+
 // Standard C++ includes
 #include <string>
 
@@ -20,7 +30,7 @@
 #ifdef _WIN32
 #define DEFAULT_MAGIC_FILE "C:/Program Files (x86)/awsmock/etc/magic.mgc"
 #else
-#define DEFAULT_MAGIC_FILE "/usr/looal/awsmock/etc/magic.mgc"
+#define DEFAULT_MAGIC_FILE "/usr/local/awsmock/etc/magic.mgc"
 #endif
 
 namespace AwsMock::Core {

@@ -5,6 +5,15 @@
 #ifndef AWS_MOCK_CORE_CRYPTO_UTILS_H
 #define AWS_MOCK_CORE_CRYPTO_UTILS_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
 // Standard C++ includes
 #include <array>
 #include <string>
@@ -22,12 +31,6 @@
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 
-#ifdef _WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#endif
-
 // Boost includes
 #include <boost/algorithm/hex.hpp>
 #include <boost/archive/iterators/base64_from_binary.hpp>
@@ -38,6 +41,7 @@
 #include <boost/archive/iterators/transform_width.hpp>
 
 // AwsMock includes
+#include <awsmock/core/Base64Utils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
@@ -271,6 +275,8 @@ namespace AwsMock::Core {
          * @return BASE64 decoded string.
          */
         static std::string Base64Decode(const std::string &encodedString);
+
+        static void Base64Decode(const std::string &encodedString, const std::string &filename);
 
         /**
          * @brief Checks whether the input string is Base64 encoded.

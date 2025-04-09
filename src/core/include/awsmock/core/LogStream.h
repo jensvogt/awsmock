@@ -9,6 +9,12 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
+#ifdef _WIN32
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
 #endif
 
 #ifndef _WIN32

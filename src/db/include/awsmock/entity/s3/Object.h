@@ -5,6 +5,12 @@
 #ifndef AWSMOCK_DB_ENTITY_S3_OBJECT_H
 #define AWSMOCK_DB_ENTITY_S3_OBJECT_H
 
+#ifdef _WIN32
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
 // C++ includes
 #include <chrono>
 #include <map>

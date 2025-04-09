@@ -9,7 +9,11 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
 #endif
+
 
 // C++ standard includes
 #include <string>

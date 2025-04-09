@@ -56,6 +56,7 @@ namespace AwsMock::Manager {
                 }
             }
         }
+        log_info << "Autoload finished";
     }
 
     void Manager::StopModules() {

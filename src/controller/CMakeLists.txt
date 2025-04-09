@@ -7,9 +7,13 @@ if (WIN32)
     target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
             ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static yaml-cpp
-            boost_program_options-vc143-mt-x64-1_87 boost_log-vc143-mt-x64-1_87 libssl libcrypto archive magic.lib
-            prometheus-cpp-pull.lib prometheus-cpp-core.lib libmagic crypt32.lib pdh.lib)
+    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static awsmockcore_static yaml-cpp.lib
+            libssl.lib libcrypto.lib archive_static.lib libmagic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
+            libboost_filesystem-vc143-mt-s-x64-1_88.lib libboost_url-vc143-mt-s-x64-1_88.lib
+            libboost_thread-vc143-mt-s-x64-1_88.lib libboost_locale-vc143-mt-s-x64-1_88.lib
+            libboost_program_options-vc143-mt-s-x64-1_88.lib libboost_log-vc143-mt-s-x64-1_88.lib
+            libboost_log_setup-vc143-mt-s-x64-1_88.lib libboost_process-vc143-mt-s-x64-1_88.lib ssh.lib crypt32.lib
+            Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_executable(${BINARY} ${SOURCES})
