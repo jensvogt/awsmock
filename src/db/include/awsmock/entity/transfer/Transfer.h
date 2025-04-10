@@ -50,6 +50,30 @@ namespace AwsMock::Database::Entity::Transfer {
         return OFFLINE;
     }
 
+    enum Protocol {
+        FTP,
+        SFTP,
+        UNKNOWN
+    };
+
+    static std::map<Protocol, std::string> ProtocolNames{
+            {FTP, "FTP"},
+            {SFTP, "SFTP"},
+            {UNKNOWN, "UNKNOWN"}};
+
+    static std::string ProtocolToString(const Protocol &protocol) {
+        return ProtocolNames[protocol];
+    }
+
+    static Protocol ProtocolFromString(const std::string &protocol) {
+        for (auto &[fst, snd]: ProtocolNames) {
+            if (snd == protocol) {
+                return fst;
+            }
+        }
+        return UNKNOWN;
+    }
+
     /**
      * Transfer manager server entity
      *
@@ -80,7 +104,7 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Server protocols
          */
-        std::vector<std::string> protocols;
+        std::vector<Protocol> protocols;
 
         /**
          * Users

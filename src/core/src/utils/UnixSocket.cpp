@@ -18,13 +18,13 @@ namespace AwsMock::Core {
 
         boost::system::error_code ec;
 
-        std::string fullPath = _basePath + path;
+        //std::string fullPath = _basePath + path;
         boost::asio::io_context ctx;
-        boost::asio::local::stream_protocol::endpoint endpoint(fullPath);
+        boost::asio::local::stream_protocol::endpoint endpoint(_basePath);
         boost::asio::local::stream_protocol::socket socket(ctx);
         ec = socket.connect(endpoint, ec);
         if (ec) {
-            log_error << "Could not connect to docker UNIX domain socket, fullPath: " << fullPath << ", method: " << method << ", error: " << ec.message();
+            log_error << "Could not connect to docker UNIX domain socket, path: " << path << ", method: " << method << ", error: " << ec.message();
             return {.statusCode = status::internal_server_error, .body = "Could not connect to docker UNIX domain socket, error: " + ec.message()};
         }
 
@@ -55,14 +55,13 @@ namespace AwsMock::Core {
 
         boost::system::error_code ec;
 
-        std::string fullPath = _basePath + path;
         boost::asio::io_context ctx;
-        boost::asio::local::stream_protocol::endpoint endpoint(fullPath);
+        boost::asio::local::stream_protocol::endpoint endpoint(_basePath);
         boost::asio::local::stream_protocol::socket socket(ctx);
         ec = socket.connect(endpoint, ec);
         if (ec) {
-            log_error << "Could not connect to docker UNIX domain socket, fullPath: " << fullPath << ", method: " << method << ", error: " << ec.message();
-            return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
+            log_error << "Could not connect to docker UNIX domain socket, basePath: " << _basePath << ", method: " << method << ", error: " << ec.message();
+            return {.statusCode = status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
         }
 
         // Prepare message

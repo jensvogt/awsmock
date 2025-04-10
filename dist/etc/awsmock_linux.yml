@@ -51,7 +51,7 @@ awsmock:
       port: 8080                                                      # Docker container default port
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
-    socket: http://localhost:2375                                     # Docker REST API domain socket
+    socket: /var/run/docker.sock                                      # Docker REST API domain socket
   # Podman settings
   podman:
     active: false                                                     # Podman daemon activation flag
@@ -60,11 +60,11 @@ awsmock:
     # Podman defaults
     defaults:
       memory-size: 512                                                # Podman container memory size
-      temp-size: 10240                                                # Docker container tmp size
+      temp-size: 10240                                                # Podman container tmp size
     # Podman container defaults
     container:
-      port: 8080                                                      # Docker container default port
-    socket: http://localhost:2375                                     # Docker REST API domain socket
+      port: 8080                                                      # Podman container default port
+    socket: /var/run/podman/podman.sock                               # Podman REST API domain socket
   # Mongo DB settings
   mongodb:
     active: true                                                      # MongoDB activation flag
@@ -132,7 +132,7 @@ awsmock:
       runtime:
         java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
         java17: public.ecr.aws/lambda/java:17                        # Lambda Java 17 runtime
-        java21: public.ecr.aws/lambda/java:21.2024.11.22.15          # Lambda Java 17 runtime (16.03.2025: latest has problem with classloader)
+        java21: public.ecr.aws/lambda/java:21                        # Lambda Java 21 runtime
         python3-8: public.ecr.aws/lambda/python:3.8                  # Lambda Python 3.8
         python3-9: public.ecr.aws/lambda/python:3.9                  # Lambda Python 3.9
         python3-10: public.ecr.aws/lambda/python:3.10                # Lambda Python 3.10

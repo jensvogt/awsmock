@@ -54,9 +54,9 @@ namespace AwsMock::Service {
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
-        if (std::ranges::find(server.protocols, "FTP") != server.protocols.end()) {
+        if (std::ranges::find(server.protocols, Database::Entity::Transfer::Protocol::FTP) != server.protocols.end()) {
             StartFtpServer(server);
-        } else if (std::ranges::find(server.protocols, "FTP") != server.protocols.end()) {
+        } else if (std::ranges::find(server.protocols, Database::Entity::Transfer::Protocol::SFTP) != server.protocols.end()) {
             StartSftpServer(server);
         }
 
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
         // Get base dir
         const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
-        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.address");
+        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.ftp.address");
 
         // Create transfer manager thread
         _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address);
@@ -125,6 +125,7 @@ namespace AwsMock::Service {
         // Start detached thread
         boost::thread t(boost::ref(_sftpServer));
         t.detach();
+        log_debug << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {

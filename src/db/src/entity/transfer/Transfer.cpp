@@ -13,8 +13,8 @@ namespace AwsMock::Database::Entity::Transfer {
     }
 
     bool Transfer::HasProtocol(const std::string &p) {
-        return std::ranges::find_if(protocols, [p](const std::string &protocol) {
-                   return protocol == p;
+        return std::ranges::find_if(protocols, [p](const Protocol &protocol) {
+                   return protocol == ProtocolFromString(p);
                }) != protocols.end();
     }
 
@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::Transfer {
         if (!protocols.empty()) {
             auto protocolsArray = array{};
             for (const auto &protocol: protocols) {
-                protocolsArray.append(protocol);
+                protocolsArray.append(ProtocolToString(protocol));
             }
             transferDoc.append(kvp("protocols", protocolsArray));
         }
@@ -87,16 +87,14 @@ namespace AwsMock::Database::Entity::Transfer {
 
         // Protocols
         if (mResult.view().find("protocols") != mResult.view().end()) {
-            auto [value] = mResult.view()["protocols"].get_array();
-            for (auto &p: value) {
-                protocols.emplace_back(bsoncxx::string::to_string(p.get_string().value));
+            for (auto [value] = mResult.view()["protocols"].get_array(); auto &p: value) {
+                protocols.emplace_back(ProtocolFromString(bsoncxx::string::to_string(p.get_string().value)));
             }
         }
 
         // Ports
         if (mResult.view().find("ports") != mResult.view().end()) {
-            auto [value] = mResult.view()["ports"].get_array();
-            for (auto &p: value) {
+            for (auto [value] = mResult.view()["ports"].get_array(); auto &p: value) {
                 ports.emplace_back(p.get_int32().value);
             }
         }

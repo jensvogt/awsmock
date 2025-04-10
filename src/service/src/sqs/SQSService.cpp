@@ -808,6 +808,8 @@ namespace AwsMock::Service {
             } else {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
+            // Set attributes
+            // request.attributes
 
             // Set parameters
             message.queueArn = queue.queueArn;
@@ -818,7 +820,7 @@ namespace AwsMock::Service {
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
-            message.md5UserAttr = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
+            message.md5MessageAttributes = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
 
             // Update database
             queue.attributes.approximateNumberOfMessages++;
@@ -867,8 +869,8 @@ namespace AwsMock::Service {
                             .id = entry.id,
                             .messageId = response.messageId,
                             .md5Body = response.md5Body,
-                            .md5UserAttr = response.md5UserAttr,
-                            .md5SystemAttr = response.md5SystemAttr};
+                            .md5MessageAttributes = response.md5MessageAttributes,
+                            .md5SystemAttributes = response.md5SystemAttributes};
                     sqsResponse.successful.emplace_back(s);
                 } catch (Core::DatabaseException &exc) {
                     Dto::SQS::MessageFailed f = {.id = Core::StringUtils::CreateRandomUuid(), .message = exc.message(), .senderFault = false};

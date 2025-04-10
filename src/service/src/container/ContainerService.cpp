@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.docker.socket");
         _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
 #else
-        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.podman.socket");
+        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : Core::Configuration::instance().GetValueString("awsmock.podman.socket");
         _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
 #endif
     }

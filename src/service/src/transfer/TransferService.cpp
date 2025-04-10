@@ -27,7 +27,7 @@ namespace AwsMock::Service {
         // Create entity
         int ftpPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
         transferEntity = {.region = request.region, .serverId = serverId, .arn = transferArn, .ports = {ftpPort}, .listenAddress = listenAddress};
-        transferEntity.protocols.emplace_back(ProtocolTypeToString(request.protocols[0]));
+        transferEntity.protocols.emplace_back(Database::Entity::Transfer::ProtocolFromString(ProtocolTypeToString(request.protocols[0])));
 
         // Add anonymous user
         Database::Entity::Transfer::User anonymousUser = {.userName = "anonymous", .password = "secret", .homeDirectory = "/"};

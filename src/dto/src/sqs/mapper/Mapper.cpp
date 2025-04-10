@@ -29,8 +29,8 @@ namespace AwsMock::Dto::SQS {
         response.messageId = messageEntity.messageId,
         response.receiptHandle = messageEntity.receiptHandle,
         response.md5Body = messageEntity.md5Body,
-        response.md5UserAttr = messageEntity.md5UserAttr,
-        response.md5SystemAttr = messageEntity.md5SystemAttr,
+        response.md5MessageAttributes = messageEntity.md5MessageAttributes,
+        response.md5SystemAttributes = messageEntity.md5SystemAttributes,
         response.requestId = request.requestId;
         return response;
     }

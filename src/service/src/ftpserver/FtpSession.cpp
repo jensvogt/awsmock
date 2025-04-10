@@ -18,7 +18,6 @@ namespace AwsMock::FtpServer {
         _region = configuration.GetValueString("awsmock.region");
         _bucket = configuration.GetValueString("awsmock.modules.transfer.bucket");
         _transferDir = configuration.GetValueString("awsmock.modules.transfer.data-dir");
-        _isSftp = configuration.GetValueBool("awsmock.modules.transfer.sftp");
 
         // S3 service
         _s3Service = std::make_shared<Service::S3Service>();
@@ -54,26 +53,16 @@ namespace AwsMock::FtpServer {
         if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
         }
-        if (_isSftp) {
-            DoHandshake();
-        } else {
-            sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AwsMock Transfer FTP Handler"));
-            readFtpCommand();
-        }
+        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AwsMock Transfer FTP Handler"));
+        readFtpCommand();
     }
 
     boost::asio::ip::tcp::socket &FtpSession::getSocket() {
-        if (_isSftp)
-            return static_cast<boost::asio::ip::tcp::socket &>(_ssl_stream.lowest_layer());
         return command_socket_;
     }
 
     void FtpSession::sendFtpMessage(const FtpMessage &message) {
-        if (_isSftp) {
-            sendRawFtpMessageSftp(message.str());
-        } else {
-            sendRawFtpMessage(message.str());
-        }
+        sendRawFtpMessage(message.str());
     }
 
     void FtpSession::sendFtpMessageSftp(const FtpMessage &message) {
@@ -81,11 +70,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::sendFtpMessage(const FtpReplyCode code, const std::string &message) {
-        if (_isSftp) {
-            sendFtpMessageSftp(FtpMessage(code, message));
-        } else {
-            sendFtpMessage(FtpMessage(code, message));
-        }
+        sendFtpMessage(FtpMessage(code, message));
     }
 
     void FtpSession::sendFtpMessageSftp(const FtpReplyCode code, const std::string &message) {
@@ -300,11 +285,7 @@ namespace AwsMock::FtpServer {
             command_it->second(parameters);
             _lastCommand = ftp_command;
         } else {
-            if (_isSftp) {
-                sendFtpMessageSftp(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
-            } else {
-                sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
-            }
+            sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "Unrecognized command");
         }
 
         if (_lastCommand == "QUIT") {
@@ -312,11 +293,7 @@ namespace AwsMock::FtpServer {
             command_write_strand_.wrap([me = shared_from_this()]() { me->command_socket_.close(); });
         } else {
             // Wait for next command
-            if (_isSftp) {
-                readFtpCommandSftp();
-            } else {
-                readFtpCommand();
-            }
+            readFtpCommand();
         }
     }
 
@@ -1211,12 +1188,7 @@ namespace AwsMock::FtpServer {
         ss << " SIZE\r\n";
         ss << " LANG EN\r\n";
         ss << "211 END\r\n";
-
-        if (_isSftp) {
-            sendRawFtpMessageSftp(ss.str());
-        } else {
-            sendRawFtpMessage(ss.str());
-        }
+        sendRawFtpMessage(ss.str());
     }
 
     void FtpSession::handleFtpCommandOPTS(const std::string &param) {
