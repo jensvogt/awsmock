@@ -28,11 +28,7 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM debian:trixie-slim
 
-#RUN echo "deb http://deb.debian.org/debian experimental main" > /etc/apt/sources.list
-#RUN echo "deb http://ftp.de.debian.org/debian experimental main" >> /etc/apt/sources.list
-
-RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libicu72
-#&& apt -y install libmongocxx-noabi wget
+RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libicu72 libssh-4
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
