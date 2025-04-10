@@ -1,11 +1,11 @@
 
 #include <awsmock/core/scheduler/PeriodicTask.h>
-#include <boost/bind/bind.hpp>
 
 namespace AwsMock::Core {
 
     PeriodicTask::PeriodicTask(boost::asio::io_context &ioService, std::string const &name, const int interval, handler_fn task, const int delay)
         : ioService(ioService), timer(ioService), task(std::move(task)), name(name), interval(interval), _delay(delay) {
+
         log_debug << "Create PeriodicTask '" << name << "'";
 
         // Schedule start to be run by the _io_service

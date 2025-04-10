@@ -68,7 +68,7 @@ namespace AwsMock::Dto::SNS {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

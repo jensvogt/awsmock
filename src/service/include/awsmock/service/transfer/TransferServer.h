@@ -19,6 +19,7 @@
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/s3/S3Service.h>
+#include <awsmock/sftpserver/SftpServer.h>
 
 namespace AwsMock::Service {
 
@@ -56,6 +57,20 @@ namespace AwsMock::Service {
          * @param server transfer manager entity
          */
         void StartTransferServer(Database::Entity::Transfer::Transfer &server);
+
+        /**
+         * @brief Starts an FTP server
+         *
+         * @param server transfer manager entity
+         */
+        void StartFtpServer(Database::Entity::Transfer::Transfer &server);
+
+        /**
+         * @brief Starts an SFTP server
+         *
+         * @param server transfer manager entity
+         */
+        void StartSftpServer(Database::Entity::Transfer::Transfer &server);
 
         /**
          * @brief Stops a single transfer manager
@@ -138,6 +153,11 @@ namespace AwsMock::Service {
          * Actual FTP manager
          */
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
+
+        /**
+       * Actual SFTP manager
+       */
+        std::shared_ptr<SftpServer> _sftpServer;
     };
 }// namespace AwsMock::Service
 

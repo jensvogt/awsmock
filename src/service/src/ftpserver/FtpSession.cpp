@@ -1,17 +1,15 @@
 
 #include <awsmock/ftpserver/FtpSession.h>
 
-#include <picojson/picojson.h>
-#include <utility>
-
 namespace AwsMock::FtpServer {
     FtpSession::FtpSession(boost::asio::io_context &io_service,
+                           boost::asio::ssl::context &ssl_context,
                            const UserDatabase &user_database,
                            std::string serverName,
                            const std::function<void()> &completion_handler)
-        : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service),
-          command_socket_(io_service),
-          command_write_strand_(io_service), data_type_binary_(false), data_acceptor_(io_service),
+        : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service), _context_ssl(ssl_context),
+          command_socket_(io_service), command_write_strand_(io_service),
+          _ssl_stream(io_service, ssl_context), data_type_binary_(false), data_acceptor_(io_service),
           data_buffer_strand_(io_service), file_rw_strand_(io_service),
           _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
 
@@ -30,14 +28,32 @@ namespace AwsMock::FtpServer {
         _completion_handler();
     }
 
+    void FtpSession::DoHandshake() {
+
+        _ssl_stream.async_handshake(boost::asio::ssl::stream_base::server,
+                                    boost::beast::bind_front_handler(
+                                            &FtpSession::OnHandshake,
+                                            shared_from_this()));
+    }
+
+    void FtpSession::OnHandshake(const boost::beast::error_code &ec) {
+        if (!ec) {
+            log_info << "Handshake successful";
+            sendFtpMessageSftp(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AwsMock Transfer SFTP Handler"));
+            readFtpCommandSftp();
+        } else {
+            log_error << "SSH handshake failed: " << ec.message();
+        }
+    }
+
     void FtpSession::start() {
         boost::beast::error_code ec;
-        command_socket_.set_option(boost::asio::ip::tcp::no_delay(true), ec);
+
+        getSocket().set_option(boost::asio::ip::tcp::no_delay(true), ec);
         if (ec) {
             log_error << "Unable to set socket option tcp::no_delay: " << ec.message();
-	}
-
-        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AWS Transfer FTP Handler"));
+        }
+        sendFtpMessage(FtpMessage(FtpReplyCode::SERVICE_READY_FOR_NEW_USER, "Welcome to AwsMock Transfer FTP Handler"));
         readFtpCommand();
     }
 
@@ -49,8 +65,16 @@ namespace AwsMock::FtpServer {
         sendRawFtpMessage(message.str());
     }
 
-    void FtpSession::sendFtpMessage(FtpReplyCode code, const std::string &message) {
+    void FtpSession::sendFtpMessageSftp(const FtpMessage &message) {
+        sendRawFtpMessageSftp(message.str());
+    }
+
+    void FtpSession::sendFtpMessage(const FtpReplyCode code, const std::string &message) {
         sendFtpMessage(FtpMessage(code, message));
+    }
+
+    void FtpSession::sendFtpMessageSftp(const FtpReplyCode code, const std::string &message) {
+        sendFtpMessageSftp(FtpMessage(code, message));
     }
 
     void FtpSession::sendRawFtpMessage(const std::string &raw_message) {
@@ -64,63 +88,134 @@ namespace AwsMock::FtpServer {
                                    nullptr);
     }
 
+    void FtpSession::sendRawFtpMessageSftp(const std::string &raw_message) {
+        command_write_strand_.post([me = shared_from_this(), raw_message]() {
+            const bool write_in_progress = !me->command_output_queue_.empty();
+            me->command_output_queue_.push_back(raw_message);
+            if (!write_in_progress) {
+                me->startSendingMessagesSftp();
+            }
+        },
+                                   nullptr);
+    }
+
     void FtpSession::startSendingMessages() {
         log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
-        boost::asio::async_write(command_socket_,
-                                 boost::asio::buffer(command_output_queue_.front()),
-                                 command_write_strand_.wrap(
-                                         [me = shared_from_this()](const boost::beast::error_code ec, std::size_t /*bytes_to_transfer*/) {
-                                             if (!ec) {
-                                                 me->command_output_queue_.pop_front();
+        async_write(command_socket_,
+                    boost::asio::buffer(command_output_queue_.front()),
+                    command_write_strand_.wrap(
+                            [me = shared_from_this()](const boost::beast::error_code ec, std::size_t /*bytes_to_transfer*/) {
+                                if (!ec) {
+                                    me->command_output_queue_.pop_front();
 
-                                                 if (!me->command_output_queue_.empty()) {
-                                                     me->startSendingMessages();
-                                                 }
-                                             } else {
-                                                 log_error << "Command write error: " << ec.message();
-                                             }
-                                         }));
+                                    if (!me->command_output_queue_.empty()) {
+                                        me->startSendingMessages();
+                                    }
+                                } else {
+                                    log_error << "Command write error: " << ec.message();
+                                }
+                            }));
+    }
+
+    void FtpSession::startSendingMessagesSftp() {
+        log_debug << "FTP >> " << Core::StringUtils::StripLineEndings(command_output_queue_.front());
+        async_write(_ssl_stream,
+                    boost::asio::buffer(command_output_queue_.front()),
+                    command_write_strand_.wrap(
+                            [me = shared_from_this()](const boost::beast::error_code &ec, std::size_t /*bytes_to_transfer*/) {
+                                if (!ec) {
+                                    me->command_output_queue_.pop_front();
+
+                                    if (!me->command_output_queue_.empty()) {
+                                        me->startSendingMessagesSftp();
+                                    }
+                                } else {
+                                    log_error << "Command write error: " << ec.message();
+                                }
+                            }));
     }
 
     void FtpSession::readFtpCommand() {
-        boost::asio::async_read_until(command_socket_,
-                                      command_input_stream_,
-                                      "\r\n",
-                                      [me = shared_from_this()](const boost::beast::error_code ec, const std::size_t length) {
-                                          if (ec) {
-                                              if (ec != boost::asio::error::eof) {
-                                                  log_error << "Read_until error: " << ec.message();
-                                              } else {
-                                                  log_debug << "Control connection closed by client.";
-                                              }
+        async_read_until(command_socket_,
+                         command_input_stream_,
+                         "\r\n",
+                         [me = shared_from_this()](const boost::beast::error_code ec, const std::size_t length) {
+                             if (ec) {
+                                 if (ec != boost::asio::error::eof) {
+                                     log_error << "Read_until error: " << ec.message();
+                                 } else {
+                                     log_debug << "Control connection closed by client.";
+                                 }
 
-                                              // Close the data connection, if it is open
-                                              {
-                                                  boost::beast::error_code ec_;
-                                                  me->data_acceptor_.close(ec_);
-                                              }
-                                              {
-                                                  if (const auto data_socket = me->data_socket_weakptr_.lock()) {
-                                                      boost::beast::error_code ec_;
-                                                      data_socket->close(ec_);
-                                                  }
-                                              }
+                                 // Close the data connection, if it is open
+                                 {
+                                     boost::beast::error_code ec_;
+                                     me->data_acceptor_.close(ec_);
+                                 }
+                                 {
+                                     if (const auto data_socket = me->data_socket_weakptr_.lock()) {
+                                         boost::beast::error_code ec_;
+                                         data_socket->close(ec_);
+                                     }
+                                 }
 
-                                              return;
-                                          }
+                                 return;
+                             }
 
-                                          std::istream stream(&(me->command_input_stream_));
-                                          std::string packet_string(length - 2, ' ');
-                                          // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
-                                          // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
-                                          // in contiguous memory.
-                                          stream.read(&packet_string[0], length - 2);
+                             std::istream stream(&(me->command_input_stream_));
+                             std::string packet_string(length - 2, ' ');
+                             // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
+                             // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
+                             // in contiguous memory.
+                             stream.read(&packet_string[0], length - 2);
 
-                                          stream.ignore(2);// Remove the "\r\n"
-                                          log_debug << "FTP << " << packet_string;
+                             stream.ignore(2);// Remove the "\r\n"
+                             log_debug << "FTP << " << packet_string;
 
-                                          me->handleFtpCommand(packet_string);
-                                      });
+                             me->handleFtpCommand(packet_string);
+                         });
+    }
+
+    void FtpSession::readFtpCommandSftp() {
+        async_read_until(_ssl_stream,
+                         command_input_stream_,
+                         "\r\n",
+                         [me = shared_from_this()](const boost::beast::error_code &ec, const std::size_t length) {
+                             if (ec) {
+                                 if (ec != boost::asio::error::eof) {
+                                     log_error << "Read_until error: " << ec.message();
+                                 } else {
+                                     log_debug << "Control connection closed by client.";
+                                 }
+
+                                 // Close the data connection, if it is open
+                                 {
+                                     boost::beast::error_code ec_;
+                                     me->data_acceptor_.close(ec_);
+                                 }
+                                 {
+                                     //me->_ssl_stream.shutdown();
+                                     if (const auto data_socket = me->data_socket_weakptr_.lock()) {
+                                         boost::beast::error_code ec_;
+                                         data_socket->close(ec_);
+                                     }
+                                 }
+
+                                 return;
+                             }
+
+                             std::istream stream(&(me->command_input_stream_));
+                             std::string packet_string(length - 2, ' ');
+                             // NOLINT(readability-container-data-pointer) Reason: I need a non-const pointer here, As I am directly reading into the buffer,
+                             // but .data() returns a const pointer. I don't consider a const_cast to be better. Since C++11 this is safe, as strings are stored
+                             // in contiguous memory.
+                             stream.read(&packet_string[0], length - 2);
+
+                             stream.ignore(2);// Remove the "\r\n"
+                             log_debug << "FTP << " << packet_string;
+
+                             me->handleFtpCommand(packet_string);
+                         });
     }
 
     void FtpSession::handleFtpCommand(const std::string &command) {
@@ -683,8 +778,10 @@ namespace AwsMock::FtpServer {
         const std::ios::openmode open_mode =
                 std::ios::ate | (data_type_binary_ ? (std::ios::in | std::ios::binary) : (std::ios::in));
 #if defined(WIN32) && !defined(__GNUG__)
-        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
-        std::ifstream file(wLocalPath, open_mode);
+        // TODO fix windows porting issues
+        std::ifstream file(local_path, open_mode);
+//        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
+//        std::ifstream file(wLocalPath, open_mode);
 #else
         std::ifstream file(local_path, open_mode);
 #endif
@@ -898,7 +995,7 @@ namespace AwsMock::FtpServer {
 
         const std::string local_path = toLocalPath(param);
 #ifdef _WIN32
-        _rmdir(local_path.c_str());
+        _wrmdir(reinterpret_cast<const wchar_t *>(local_path.c_str()));
 #else
         if (rmdir(local_path.c_str()) == 0) {
             sendFtpMessage(FtpReplyCode::FILE_ACTION_COMPLETED, "Successfully removed directory");
@@ -923,7 +1020,7 @@ namespace AwsMock::FtpServer {
 
         auto local_path = toLocalPath(param);
 #ifdef _WIN32
-        if (_mkdir(reinterpret_cast<const char *>(local_path.c_str() == 0))) {
+        if (_wmkdir(reinterpret_cast<const wchar_t *>(reinterpret_cast<const char *>(local_path.c_str() == 0)))) {
             sendFtpMessage(FtpReplyCode::PATHNAME_CREATED, createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
             return;
         }
@@ -933,11 +1030,11 @@ namespace AwsMock::FtpServer {
                            createQuotedFtpPath(toAbsoluteFtpPath(param)) + " Successfully created");
             return;
         }
+#endif
         // If would be a good idea to return a 4xx error code here (-> temp error)
         // (e.g. FILE_ACTION_NOT_TAKEN), but RFC 959 assumes that all directory
         // errors are permanent.
         sendFtpMessage(FtpReplyCode::ACTION_NOT_TAKEN, "Unable to create directory");
-#endif
     }
 
     void FtpSession::handleFtpCommandPWD(const std::string & /*param*/) {
@@ -968,9 +1065,9 @@ namespace AwsMock::FtpServer {
         // Some FTP clients send those commands, as if they would call ls on unix.
         //
         // We try to support those parameters (or rather ignore them), even though
-        // this techniqually breaks listing directories that actually use "-a" etc.
+        // this technically breaks listing directories that actually use "-a" etc.
         // as directory name. As most clients however first CWD into a directory and
-        // call LIST without parameter afterwards and starting a directory name with
+        // call LIST without parameter afterward and starting a directory name with
         // "-a " / "-l " / "-al " / "-la " is not that common, the compatibility
         // benefit should outperform te potential problems by a lot.
         //
@@ -1091,7 +1188,6 @@ namespace AwsMock::FtpServer {
         ss << " SIZE\r\n";
         ss << " LANG EN\r\n";
         ss << "211 END\r\n";
-
         sendRawFtpMessage(ss.str());
     }
 

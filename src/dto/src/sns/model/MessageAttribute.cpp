@@ -55,6 +55,7 @@ namespace AwsMock::Dto::SNS {
         EVP_DigestInit(context, md);
         for (const auto &[fst, snd]: attributes) {
 
+            log_debug << "MD5sum, attribute: " << fst;
             if (fst == "contentType" && !includeContentType) {
                 continue;
             }

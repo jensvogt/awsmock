@@ -54,11 +54,10 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec SYMMETRIC_DEFAULT --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
+        std::string output = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "SYMMETRIC_DEFAULT", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(1, keyList.size());
         EXPECT_FALSE(keyList.at(0).arn.empty());
         EXPECT_TRUE(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::SYMMETRIC_DEFAULT));
@@ -70,11 +69,10 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec RSA_2048 --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
+        std::string output = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "RSA_2048", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(1, keyList.size());
         EXPECT_FALSE(keyList.at(0).arn.empty());
         EXPECT_TRUE(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::RSA_2048));
@@ -86,11 +84,10 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec RSA_3072 --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
+        std::string output = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "RSA_3072", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(1, keyList.size());
         EXPECT_FALSE(keyList.at(0).arn.empty());
         EXPECT_TRUE(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::RSA_3072));
@@ -102,11 +99,10 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        auto [status, output] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec RSA_4096 --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
+        std::string output = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "RSA_4096", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        EXPECT_EQ(0, status);
         EXPECT_EQ(1, keyList.size());
         EXPECT_FALSE(keyList.at(0).arn.empty());
         EXPECT_TRUE(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::RSA_4096));
@@ -116,12 +112,10 @@ namespace AwsMock::Service {
     TEST_F(KMSServerCliTest, KeyListTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec RSA_4096 --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
-        ASSERT_EQ(0, status1);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "RSA_4096", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
 
         // act
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws kms list-keys --endpoint " + _endpoint);
-        ASSERT_EQ(0, status2);
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"kms", "list-keys", "--endpoint", _endpoint});
 
         // assert
         EXPECT_FALSE(output2.empty());
@@ -133,14 +127,12 @@ namespace AwsMock::Service {
     TEST_F(KMSServerCliTest, EncryptTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec SYMMETRIC_DEFAULT --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
-        ASSERT_EQ(0, status1);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "SYMMETRIC_DEFAULT", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
         const std::string keyId = keyList.at(0).keyId;
 
         // act
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws kms encrypt --key-id " + keyId + " --plaintext " + PLAIN_TEXT_BASE64 + " --endpoint " + _endpoint);
-        ASSERT_EQ(0, status1);
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"kms", "encrypt", "--key-id", keyId, "--plaintext", PLAIN_TEXT_BASE64, "--endpoint", _endpoint});
         Dto::KMS::EncryptResponse response;
         response.FromJson(output2);
 
@@ -152,18 +144,15 @@ namespace AwsMock::Service {
     TEST_F(KMSServerCliTest, DecryptTest) {
 
         // arrange
-        auto [status1, output1] = Core::TestUtils::SendCliCommand("aws kms create-key --key-spec SYMMETRIC_DEFAULT --key-usage ENCRYPT_DECRYPT --endpoint " + _endpoint);
-        ASSERT_EQ(0, status1);
+        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"kms", "create-key", "--key-spec", "SYMMETRIC_DEFAULT", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
         const std::string keyId = keyList.at(0).keyId;
-        auto [status2, output2] = Core::TestUtils::SendCliCommand("aws kms encrypt --key-id " + keyId + " --plaintext " + PLAIN_TEXT_BASE64 + " --endpoint " + _endpoint);
-        ASSERT_EQ(0, status2);
+        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"kms", "encrypt", "--key-id", keyId, "--plaintext", PLAIN_TEXT_BASE64, "--endpoint", _endpoint});
         Dto::KMS::EncryptResponse response1;
         response1.FromJson(output2);
 
         // act
-        auto [status3, output3] = Core::TestUtils::SendCliCommand("aws kms decrypt --key-id " + keyId + " --ciphertext-blob " + response1.ciphertext + " --endpoint " + _endpoint);
-        ASSERT_EQ(0, status3);
+        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"kms", "decrypt", "--key-id", keyId, "--ciphertext-blob", response1.ciphertext, "--endpoint", _endpoint});
         Dto::KMS::DecryptResponse response2;
         response2.FromJson(output3);
 
@@ -174,4 +163,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWMOCK_KMS_SERVER_CLI_TEST{
+#endif// AWMOCK_KMS_SERVER_CLI_TEST_H

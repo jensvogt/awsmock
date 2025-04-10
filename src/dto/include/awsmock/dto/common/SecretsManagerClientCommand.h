@@ -26,6 +26,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported secrets manager client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class SecretsManagerCommandType {
         CREATE_SECRET,
         DELETE_SECRET,

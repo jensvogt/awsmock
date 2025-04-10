@@ -43,7 +43,7 @@ namespace AwsMock::Database {
         return _memoryDb.TransferExists(serverId);
     }
 
-    bool TransferDatabase::TransferExists(const std::string &region, const std::vector<std::string> &protocols) const {
+    bool TransferDatabase::TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) const {
 
         if (HasDatabase()) {
 

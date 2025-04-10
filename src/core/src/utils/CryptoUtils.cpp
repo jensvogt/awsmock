@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/CryptoUtils.h>
+#include <boost/beast/core/detail/base64.hpp>
 
 namespace AwsMock::Core {
 
@@ -278,14 +279,13 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
         auto *key_data = key;
-        int key_data_len = (int) strlen(reinterpret_cast<const char *>(key_data));
 
-        if (Aes256EncryptionInit(key_data, key_data_len, (unsigned char *) &_salt, ctx)) {
+        if (const int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256EncryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
             log_error << "Couldn't initialize AES256 cipher";
             return {};
         }
 
-        /* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
+        // max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
         int c_len = *len + CRYPTO_AES256_BLOCK_SIZE, f_len = 0;
         auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
 
@@ -491,6 +491,45 @@ namespace AwsMock::Core {
         return output;
     }
 
+#ifdef _WIN32
+    void Crypto::Base64Decode(const std::string &encodedString, const std::string &filename) {
+        typedef std::basic_ofstream<unsigned char> uofstream;
+        uofstream ofs(filename, std::ios::out | std::ios::binary);
+        const int size = boost::beast::detail::base64::decoded_size(encodedString.length());
+        const auto bytes = static_cast<unsigned char *>(malloc(size));
+        const std::pair<std::size_t, std::size_t> sizes = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
+        ofs.write(bytes, sizes.second);
+        ofs.flush();
+        ofs.close();
+        free(bytes);
+    }
+#else
+    void Crypto::Base64Decode(const std::string &encodedString, const std::string &filename) {
+        std::string output;
+        std::string input = encodedString;
+        using namespace boost::archive::iterators;
+        typedef remove_whitespace<std::string::const_iterator> StripIt;
+        typedef transform_width<binary_from_base64<std::string::const_iterator>, 8, 6> ItBinaryT;
+        try {
+            /// Trailing whitespace makes remove_whitespace barf because the iterator never == end().
+            while (!input.empty() && std::isspace(input.back())) { input.pop_back(); }
+            //inputString.swap(StripIt(inputString.begin()), StripIt(inputString.end()));
+            /// If the input isn't a multiple of 4, pad with =
+            input.append((4 - input.size() % 4) % 4, '=');
+            const size_t pad_chars(std::count(input.end() - 4, input.end(), '='));
+            std::replace(input.end() - 4, input.end(), '=', 'A');
+            output.clear();
+            output.reserve(input.size() * 1.3334);
+            output.assign(ItBinaryT(input.begin()), ItBinaryT(input.end()));
+            output.erase(output.end() - (pad_chars < 2 ? pad_chars : 2), output.end());
+        } catch (std::exception const &) {
+            output.clear();
+        }
+        std::ofstream ofs(filename);
+        ofs << output;
+        ofs.close();
+    }
+#endif
     bool Crypto::IsBase64(const std::string &inputString) {
         if (inputString.length() % 4 == 0 && std::ranges::all_of(inputString,
                                                                  [](const char c) { return ((c >= 'a' && c <= 'z') ||

@@ -16,6 +16,11 @@ namespace AwsMock::Dto::Cognito {
 
     using std::chrono::system_clock;
 
+    /**
+     * @brief Cognito authentication result
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct AuthenticationResult {
 
         /**

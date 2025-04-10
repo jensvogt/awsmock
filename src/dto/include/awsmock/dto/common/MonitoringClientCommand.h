@@ -27,6 +27,11 @@ namespace AwsMock::Dto::Common {
     namespace http = boost::beast::http;
     namespace ip = boost::asio::ip;
 
+    /**
+     * @brief Supported monitoring client commands
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class MonitoringCommandType {
         GET_COUNTERS,
         GET_MULTI_COUNTERS,

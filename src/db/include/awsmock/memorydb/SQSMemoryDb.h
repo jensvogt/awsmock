@@ -9,7 +9,7 @@
 #include <string>
 
 // Boost includes
-#include <boost/thread/pthread/mutex.hpp>
+#include <boost/thread/mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -109,6 +109,18 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns);
+
+        /**
+         * @brief Import s a single queue
+         *
+         * @par
+         * During import pof a queue, the queue URL it adjusted, as it contains the hostname of the machine where the
+         * queue is imported. Additionally, the counters are set to zero and the modified timestamp is adjusted.
+         *
+         * @param queue queue entity
+         * @throws DatabaseException
+         */
+        void ImportQueue(Entity::SQS::Queue &queue);
 
         /**
          * @brief Returns a queue by ARN

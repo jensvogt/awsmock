@@ -15,8 +15,6 @@
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
 
-#define DEFAULT_SQS_ACCOUNT_ID "000000000000"
-
 namespace AwsMock::Service {
 
     namespace http = boost::beast::http;
@@ -34,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringHandler() : AbstractHandler("monitoring-handler") {};
+        explicit MonitoringHandler() : AbstractHandler("monitoring-handler"){};
 
         /**
          * @brief HTTP POST request.

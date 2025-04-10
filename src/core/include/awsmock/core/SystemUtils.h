@@ -5,19 +5,8 @@
 #ifndef AWSMOCK_CORE_SYSTEM_UTILS_H
 #define AWSMOCK_CORE_SYSTEM_UTILS_H
 
-// C includes
-#include <fcntl.h>
-
 // C++ includes
-#include <array>
-#include <climits>
-#include <cstdio>
-#include <cstdlib>
 #include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <regex>
-#include <stdexcept>
 #include <string>
 
 #ifdef __APPLE__
@@ -27,24 +16,17 @@
 
 // Boost includes
 #include <boost/asio/ip/host_name.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/process.hpp>
+#include <boost/thread/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/RandomUtils.h>
-#include <awsmock/core/StreamFilter.h>
-#include <awsmock/core/exception/CoreException.h>
 
 #define RANDOM_PORT_MIN 32768
 #define RANDOM_PORT_MAX 65536
 
 namespace AwsMock::Core {
-
-    struct ExecResult {
-        int status = -1;
-        std::string output;
-    };
-    typedef ExecResult ExecResult;
 
     /**
      * @brief System utils for command line execution and other system routines.
@@ -52,24 +34,7 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SystemUtils {
-
       public:
-
-        /**
-         * @brief Execute system command and capture the stdout output result.
-         *
-         * @param command command string
-         * @return command output.
-         */
-        static ExecResult Exec(const std::string &command);
-
-        /**
-         * @brief Execute system command and capture the stdout output result.
-         *
-         * @param command command string
-         * @return command output.
-         */
-        static ExecResult Exec2(const std::string &command);
 
         /**
          * @brief Returns the current working directory.
@@ -112,6 +77,17 @@ namespace AwsMock::Core {
          * @return number of CPU cores
          */
         static int GetNumberOfCores();
+
+        /**
+         * @brief Run command in a shell
+         *
+         * @param shellcmd command
+         * @param args vector of string arguments
+         * @param input input stream
+         * @param output output stream
+         * @param error error stream
+         */
+        static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error);
     };
 
 }// namespace AwsMock::Core

@@ -38,7 +38,8 @@ namespace AwsMock::Database {
         }
 
         void TearDown() override {
-            _transferDatabase.DeleteAllTransfers();
+            const long deleted = _transferDatabase.DeleteAllTransfers();
+            log_info << "Database cleaned, count:" << deleted;
         }
 
         std::string _region;
@@ -49,26 +50,26 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferCreateTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        const Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
 
         // act
-        Entity::Transfer::Transfer result = _transferDatabase.CreateTransfer(transfer);
+        const Entity::Transfer::Transfer result = _transferDatabase.CreateTransfer(transfer);
 
         // assert
-        EXPECT_TRUE(result.protocols[0] == "tcp");
+        EXPECT_TRUE(result.protocols[0] == Entity::Transfer::FTP);
         EXPECT_TRUE(result.region == _region);
     }
 
     TEST_F(TransferMemoryDbTest, TransferExistsUniqueTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
-        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {"tcp", "http"}};
+        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        const Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
 
         // act
-        bool result1 = _transferDatabase.TransferExists(_region, transfer1.protocols);
-        bool result2 = _transferDatabase.TransferExists(_region, transfer2.protocols);
+        const bool result1 = _transferDatabase.TransferExists(_region, transfer1.protocols);
+        const bool result2 = _transferDatabase.TransferExists(_region, transfer2.protocols);
 
         // assert
         EXPECT_TRUE(result1);
@@ -78,7 +79,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferExistsByServerIdTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -93,7 +94,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferGetByServerIdTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -106,7 +107,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferGetByServerArnTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .arn = "aws:transfer", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .arn = "aws:transfer", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -119,7 +120,7 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferUpdateTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
@@ -133,12 +134,12 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferDeleteTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
         _transferDatabase.DeleteTransfer(transfer.serverId);
-        bool result = _transferDatabase.TransferExists(transfer.serverId);
+        const bool result = _transferDatabase.TransferExists(transfer.serverId);
 
         // assert
         EXPECT_FALSE(result);
@@ -147,15 +148,15 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferDeleteAllTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {"tcp", "ftp"}};
-        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {"tcp", "ftp"}};
+        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
         transfer2 = _transferDatabase.CreateTransfer(transfer2);
 
         // act
-        _transferDatabase.DeleteAllTransfers();
-        bool result1 = _transferDatabase.TransferExists(transfer1.serverId);
-        bool result2 = _transferDatabase.TransferExists(transfer2.serverId);
+        long deleted = _transferDatabase.DeleteAllTransfers();
+        const bool result1 = _transferDatabase.TransferExists(transfer1.serverId);
+        const bool result2 = _transferDatabase.TransferExists(transfer2.serverId);
 
         // assert
         EXPECT_FALSE(result1);

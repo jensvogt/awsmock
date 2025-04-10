@@ -46,10 +46,11 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
-    void Environment::FromDocument(const std::optional<view> &mResult) {
+    void Environment::FromDocument(const view_or_value<view, value> &mResult) {
 
-        if (mResult.value().find("variables") != mResult.value().end()) {
-            for (auto [value] = mResult.value()["variables"].get_array(); auto &v: value) {
+        if (mResult.view().find("variables") != mResult.view().end()) {
+            auto value = mResult.view()["variables"].get_array().value;
+            for (auto &v: value) {
                 for (auto &it: v.get_document().value) {
                     variables[std::string{it.key()}] = bsoncxx::string::to_string(it.get_string().value);
                 }

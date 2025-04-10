@@ -17,6 +17,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief List SQS queues response.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListQueuesResponse {
 
         /**
@@ -35,28 +40,28 @@ namespace AwsMock::Dto::SQS {
         long total;
 
         /**
-         * Convert to XML representation
+         * @brief Convert to XML representation
          *
          * @return XML string
          */
         [[nodiscard]] std::string ToXml() const;
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

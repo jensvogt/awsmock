@@ -18,10 +18,10 @@
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
+
     using bsoncxx::builder::basic::kvp;
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
-
 
     /**
      * Lambda MongoDB database.

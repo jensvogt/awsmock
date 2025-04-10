@@ -55,6 +55,7 @@ namespace AwsMock::Core {
 
         // SQS configuration
         Configuration::instance().SetValueBool("awsmock.modules.sqs.active", true);
+        Configuration::instance().SetValueInt("awsmock.modules.sqs.receive-poll", 1000);
 
         // SNS configuration
         Configuration::instance().SetValueBool("awsmock.modules.sns.active", true);
@@ -81,7 +82,7 @@ namespace AwsMock::Core {
 
         // Logging
         Configuration::instance().SetValueString("awsmock.logging.level", "debug");
-        Configuration::instance().SetValueString("awsmock.logging.file-name", "/tmp/awsmock-test.log");
+        Configuration::instance().SetValueString("awsmock.logging.prefix", "/tmp/awsmock-test.log");
         Configuration::instance().SetValueLong("awsmock.logging.file-size", 1024 * 1024);
         Configuration::instance().SetValueInt("awsmock.logging.file-count", 5);
 
@@ -109,8 +110,13 @@ namespace AwsMock::Core {
         return configuration;
     }
 
-    ExecResult TestUtils::SendCliCommand(const std::string &command) {
-        return SystemUtils::Exec2(command);
+    std::string TestUtils::SendCliCommand(const std::string &command, const std::vector<std::string> &args) {
+        std::string output, error;
+        SystemUtils::RunShellCommand(command, args, {}, output, error);
+        if (!error.empty()) {
+            std::cerr << error << std::endl;
+        }
+        return output;
     }
 
 }// namespace AwsMock::Core

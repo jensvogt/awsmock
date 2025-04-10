@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief Redrive messages request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct RedriveMessagesRequest {
 
         /**

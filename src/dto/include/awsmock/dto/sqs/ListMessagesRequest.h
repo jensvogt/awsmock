@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief List SQS messages request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListMessagesRequest {
 
         /**

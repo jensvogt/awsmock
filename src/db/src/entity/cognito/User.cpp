@@ -27,19 +27,19 @@ namespace AwsMock::Database::Entity::Cognito {
             groupsDoc.append(group.ToDocument());
         }
 
-        view_or_value<view, value> userDocument = make_document(
-                kvp("region", region),
-                kvp("userName", userName),
-                kvp("userPoolId", userPoolId),
-                kvp("enabled", enabled),
-                kvp("groups", groupsDoc),
-                kvp("userStatus", UserStatusToString(userStatus)),
-                kvp("userAttributes", userAttributesDoc),
-                kvp("confirmationCode", confirmationCode),
-                kvp("password", password),
-                kvp("created", bsoncxx::types::b_date(created)),
-                kvp("modified", bsoncxx::types::b_date(modified)));
-        return userDocument;
+        document userDocument;
+        userDocument.append(kvp("region", region));
+        userDocument.append(kvp("userName", userName));
+        userDocument.append(kvp("userPoolId", userPoolId));
+        userDocument.append(kvp("enabled", enabled));
+        userDocument.append(kvp("groups", groupsDoc));
+        userDocument.append(kvp("userStatus", UserStatusToString(userStatus)));
+        userDocument.append(kvp("userAttributes", userAttributesDoc));
+        userDocument.append(kvp("confirmationCode", confirmationCode));
+        userDocument.append(kvp("password", password));
+        userDocument.append(kvp("created", bsoncxx::types::b_date(created)));
+        userDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
+        return userDocument.extract();
     }
 
     void User::FromDocument(const std::optional<view> &mResult) {
@@ -84,7 +84,7 @@ namespace AwsMock::Database::Entity::Cognito {
     }
 
     std::ostream &operator<<(std::ostream &os, const User &u) {
-        os << "User=" << to_json(u.ToDocument());
+        os << "User=" << u.ToJson();
         return os;
     }
 }// namespace AwsMock::Database::Entity::Cognito

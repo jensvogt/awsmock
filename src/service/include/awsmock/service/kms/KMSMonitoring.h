@@ -25,24 +25,24 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit KMSMonitoring() = default;
 
         /**
-         * Update counters
+         * @brief Update counters
          */
         void UpdateCounter();
 
       private:
 
         /**
-         * Metric service
+         * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
-         * Database connection
+         * @brief Database connection
          */
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
     };

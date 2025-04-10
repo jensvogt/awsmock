@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * Schedule a KMS key deletion
+     * @brief Schedule a KMS key deletion
      *
      * Example:
      * @code{.json}

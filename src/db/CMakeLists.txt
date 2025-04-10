@@ -12,15 +12,16 @@ set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src
         src/repository/S3Database.cpp src/memorydb/S3MemoryDb.cpp src/entity/s3/FilterRule.cpp
         src/entity/s3/QueueNotification.cpp src/entity/s3/TopicNotification.cpp src/entity/s3/LambdaNotification.cpp
         src/entity/s3/BucketEncryption.cpp)
-set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp src/entity/lambda/Code.cpp
-        src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp
-        src/entity/lambda/EventSourceMapping.cpp)
+set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp
+        src/entity/lambda/Code.cpp src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp
+        src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp src/entity/lambda/EventSourceMapping.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp
         src/memorydb/TransferMemoryDb.cpp)
-set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp src/entity/cognito/Group.cpp
-        src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
-set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp src/entity/dynamodb/ProvisionedThroughput.cpp
-        src/repository/DynamoDbDatabase.cpp src/memorydb/DynamoDbMemoryDb.cpp)
+set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp
+        src/entity/cognito/Group.cpp src/memorydb/CognitoMemoryDb.cpp src/repository/CognitoDatabase.cpp)
+set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
+        src/entity/dynamodb/ProvisionedThroughput.cpp src/repository/DynamoDbDatabase.cpp
+        src/memorydb/DynamoDbMemoryDb.cpp)
 set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
         src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
@@ -29,22 +30,29 @@ set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cp
 set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp)
 set(MONITORING_SOURCES src/entity/monitoring/Counter.cpp src/repository/MonitoringDatabase.cpp)
 
-set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES}
-        ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
+set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
+        ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
+        ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
+if (NOT WIN32)
+    add_subdirectory(tst)
+endif ()
 
 # Includes
-include_directories(./include ../core/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(${CMAKE_SOURCE_DIR}/src/core /usr/local/lib)
+include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
-add_library(${LIBRARY} SHARED ${SOURCES})
-set_target_properties(${LIBRARY} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY} PUBLIC awsmockcore)
+# Shared library
+if (NOT WIN32)
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
+            yaml-cpp ssl crypto archive magic)
+endif ()
+
+# Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} ${LIB_BSON_CXX} ${LIB_MONGO_CXX} awsmockcore boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
-        archive z prometheus-cpp-core prometheus-cpp-pull magic)
-
-install(TARGETS ${LIBRARY} DESTINATION /usr/local/awsmock/lib)
+if (NOT WIN32)
+    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
+            boost_locale yaml-cpp ssl crypto archive magic)
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif ()

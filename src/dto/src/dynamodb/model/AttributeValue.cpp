@@ -41,7 +41,7 @@ namespace AwsMock::Dto::DynamoDb {
     void AttributeValue::FromDocument(const view &jsonObject) {
 
         try {
-            for (const bsoncxx::document::element& ele: jsonObject) {
+            for (const bsoncxx::document::element &ele: jsonObject) {
                 if (ele.key() == "S") {
                     stringValue = bsoncxx::string::to_string(jsonObject["S"].get_string().value);
                 } else if (ele.key() == "SS") {
@@ -56,7 +56,7 @@ namespace AwsMock::Dto::DynamoDb {
                     }
                 } else if (ele.key() == "BOOL") {
                     boolValue = std::make_shared<bool>(jsonObject["BOOL"].get_bool().value);
-                } else if (ele.key() == "NULL") {
+                } else if (ele.key() == "nullptr") {
                     nullValue = std::make_shared<bool>(true);
                 }
             }

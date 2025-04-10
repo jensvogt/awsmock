@@ -13,6 +13,7 @@
 // Boost includes
 #include <boost/asio/local/stream_protocol.hpp>
 #include <boost/beast.hpp>
+#include <utility>
 
 // AwsMock includes
 #include <awsmock/core/DomainSocketResult.h>
@@ -26,16 +27,48 @@ namespace AwsMock::Core {
 
       public:
 
+        virtual ~DomainSocket() = default;
+
         /**
          * @brief Constructor
          *
          * @param path domain socket path
          */
-        explicit DomainSocket(const std::string &path) : _path(path){};
+        explicit DomainSocket(std::string path) : _basePath(std::move(path)){};
 
         /**
          * @brief Send JSON data
          *
+         * @par
+         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * to boost http response.
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @return result struct
+         * @see Core::DomainSocketResult
+         */
+        [[nodiscard]] virtual DomainSocketResult SendJson(verb method, const std::string &path) = 0;
+
+        /**
+         * @brief Send JSON data
+         *
+         * @par
+         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * to boost http response.
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param body optional HTTP body
+         * @return result struct
+         * @see Core::DomainSocketResult
+         */
+        [[nodiscard]] virtual DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body) = 0;
+
+        /**
+         * @brief Send JSON data
+         *
+         * @par
          * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
@@ -46,7 +79,21 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body = {}, const std::map<std::string, std::string> &headers = {}) const;
+        [[nodiscard]] virtual DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) = 0;
+
+        /**
+         * @brief Send binary data
+         *
+         * This will send a file as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * to boost http response.
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param fileName filename to send
+         * @return result struct
+         * @see Core::DomainSocketResult
+         */
+        [[nodiscard]] virtual DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName) = 0;
 
         /**
          * @brief Send binary data
@@ -61,9 +108,9 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers = {}) const;
+        [[nodiscard]] virtual DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) = 0;
 
-      private:
+      protected:
 
         /**
          * @brief Prepare HTTP message
@@ -97,7 +144,7 @@ namespace AwsMock::Core {
         /**
          * Domain socket path
          */
-        std::string _path;
+        std::string _basePath;
     };
 
 }// namespace AwsMock::Core

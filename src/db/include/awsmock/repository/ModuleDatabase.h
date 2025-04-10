@@ -180,14 +180,14 @@ namespace AwsMock::Database {
          *
          * @return total number of modules
          */
-        int ModuleCount();
+        int ModuleCount() const;
 
         /**
          * @brief Returns a list of all modules
          *
          * @return list of all modules
          */
-        Entity::Module::ModuleList ListModules() const;
+        [[nodiscard]] Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Deletes module

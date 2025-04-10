@@ -9,15 +9,15 @@ namespace AwsMock::Monitoring {
     boost::mutex MetricService::_gaugeMutex;
     boost::mutex MetricService::_counterMutex;
 
-    MetricService::MetricService() : _port(Core::Configuration::instance().GetValueInt("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValueBool("awsmock.monitoring.prometheus")), _database(Database::MonitoringDatabase::instance()) {}
+    MetricService::MetricService() : _port(Core::Configuration::instance().GetValueInt("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValueBool("awsmock.monitoring.prometheus")), _intern(Core::Configuration::instance().GetValueBool("awsmock.monitoring.intern")), _database(Database::MonitoringDatabase::instance()) {}
 
     void MetricService::Initialize() {
+        log_debug << "Monitoring initialized, prometheus: " << std::boolalpha << _prometheus << " intern: " << _intern;
         if (_prometheus) {
             std::string bindAddress = "localhost:" + std::to_string(_port);
             _server = std::make_shared<prometheus::Exposer>(bindAddress);
             _registry = std::make_shared<prometheus::Registry>();
             _server->RegisterCollectable(_registry);
-            log_debug << "Monitoring initialized";
         }
     }
 
@@ -31,9 +31,9 @@ namespace AwsMock::Monitoring {
     void MetricService::DoAddCounter(const std::string &name) {
         try {
             auto &counter = prometheus::BuildCounter()
-                            .Name(name)
-                            .Help(name)
-                            .Register(*_registry);
+                                    .Name(name)
+                                    .Help(name)
+                                    .Register(*_registry);
             _counterMap[name] = &counter;
             log_trace << "Counter added, name: " << name;
         } catch (std::exception &e) { log_error << e.what(); }
@@ -87,7 +87,7 @@ namespace AwsMock::Monitoring {
             const auto counter = GetCounter(name);
             counter->Add({}).Increment(value);
         }
-        _database.IncCounter(name, value);
+        _metricCacheService.IncrementCounter(name, value);
         log_trace << "Counter incremented, name: " << name;
     }
 
@@ -97,7 +97,7 @@ namespace AwsMock::Monitoring {
             const auto counter = GetCounter(name);
             counter->Add({{labelName, labelValue}}).Increment(value);
         }
-        _database.IncCounter(name, value, labelName, labelValue);
+        _metricCacheService.IncrementCounter(name, value, labelName, labelValue);
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
     }
 
@@ -121,9 +121,9 @@ namespace AwsMock::Monitoring {
     void MetricService::DoAddGauge(const std::string &name) {
         try {
             auto &gauge = prometheus::BuildGauge()
-                          .Name(name)
-                          .Help(name)
-                          .Register(*_registry);
+                                  .Name(name)
+                                  .Help(name)
+                                  .Register(*_registry);
             _gaugeMap[name] = &gauge;
             log_trace << "Gauge added, name: " << name;
         } catch (std::exception &e) { log_error << e.what(); }
@@ -140,7 +140,7 @@ namespace AwsMock::Monitoring {
             const auto gauge = GetGauge(name);
             gauge->Add({}).Set(value);
         }
-        _database.SetGauge(name, value);
+        _metricCacheService.SetGauge(name, value);
         log_trace << "Gauge value set, name: " << name;
     }
 
@@ -149,7 +149,7 @@ namespace AwsMock::Monitoring {
             if (!GaugeExists(name, labelName, labelValue)) { AddGauge(name, labelName, labelValue); }
             _gaugeMap[name]->Add({{labelName, labelValue}}).Set(value);
         }
-        _database.SetGauge(name, value, labelName, labelValue);
+        _metricCacheService.SetGauge(name, value, labelName, labelValue);
         log_trace << "Gauge value set, name: " << name;
     }
 

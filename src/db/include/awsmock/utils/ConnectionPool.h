@@ -16,6 +16,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Database {
 
@@ -42,11 +43,8 @@ namespace AwsMock::Database {
 
         /**
          * @brief Configure the connection pool
-         *
-         * @param instance MongoDB instance
-         * @param pool connection pool
          */
-        void configure(std::unique_ptr<mongocxx::instance> instance, std::unique_ptr<mongocxx::pool> pool);
+        void Configure();
 
         /**
          * @brief Return a connection from the pool
@@ -56,33 +54,21 @@ namespace AwsMock::Database {
         [[nodiscard]] mongocxx::pool::entry GetConnection() const;
 
         /**
-         * @brief Try to get a connection
-         *
-         * @return optional connection from the pool
-         */
-        [[nodiscard]] bsoncxx::stdx::optional<mongocxx::pool::entry> TryGetConnection() const;
-
-        /**
          * @brief Shutdown the connection pool
          */
         void Shutdown();
-
-        /**
-         * @brief Private constructor
-         */
-        ConnectionPool() = default;
 
       private:
 
         /**
          * MongoDB instance
          */
-        std::unique_ptr<mongocxx::instance> _instance = nullptr;
+        std::shared_ptr<mongocxx::instance> _instance = nullptr;
 
         /**
          * Connection pool
          */
-        std::unique_ptr<mongocxx::pool> _pool = nullptr;
+        std::shared_ptr<mongocxx::pool> _pool = nullptr;
     };
 
 }// namespace AwsMock::Database

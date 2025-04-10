@@ -26,7 +26,11 @@ namespace AwsMock::Service {
     }
 
     std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey) {
-        return _routingTable.at(routingKey);
+        if (_routingTable.contains(routingKey)) {
+            return _routingTable.at(routingKey);
+        }
+        log_error << "Routing table entry not found, routingKey: " << routingKey;
+        return nullptr;
     }
 
 }// namespace AwsMock::Service

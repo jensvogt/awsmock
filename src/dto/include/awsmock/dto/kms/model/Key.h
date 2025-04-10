@@ -20,7 +20,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * KMS metadata
+     * @brief KMS metadata
      *
      * Example:
      * @code{.json}
@@ -108,7 +108,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate = system_clock::to_time_t(system_clock::now());
+        long creationDate = static_cast<long>(system_clock::to_time_t(system_clock::now()));
 
         /**
          * Deletion date

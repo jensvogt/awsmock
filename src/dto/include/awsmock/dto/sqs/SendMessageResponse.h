@@ -61,12 +61,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * MD5 sum of sqs of user attributes
          */
-        std::string md5UserAttr;
+        std::string md5MessageAttributes;
 
         /**
          * MD5 sum of sqs system attributes
          */
-        std::string md5SystemAttr;
+        std::string md5SystemAttributes;
 
         /**
          * Message sequence number

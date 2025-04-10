@@ -17,8 +17,9 @@
 namespace AwsMock::Dto::SQS {
 
     /**
+     * @brief List SQS queues request
      *
-     * Example
+     * Example:
      * @code(.json)
      * {
      *   "MaxResults":10,
@@ -51,28 +52,28 @@ namespace AwsMock::Dto::SQS {
         std::string queueNamePrefix;
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to JSON representation
+         * @brief Convert to JSON representation
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

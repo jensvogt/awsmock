@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/jensvogt/awsmock/compare/v1.1.0...v1.2.0) (2025-03-05)
+
+
+### Features
+
+* **123-windows-port:** add some auto pointer ([84b1dfa](https://github.com/jensvogt/awsmock/commit/84b1dfaa638b5aedb0c2b2070ac19f5115835eef))
+* **801-macos-port:** first try ([d23225a](https://github.com/jensvogt/awsmock/commit/d23225a83ed023f9447a504d03d2476c77a96be7))
+* **801-macos-port:** first try ([3a42343](https://github.com/jensvogt/awsmock/commit/3a423438ffaafcc69e2a77d9eacab88c839d6dd3))
+* **801-macos-port:** first try ([ae15f05](https://github.com/jensvogt/awsmock/commit/ae15f05bf84c6c21c8d6998f6f748e12c16e15cc))
+* **891-macos-port:** add some includes for macos ([252cf50](https://github.com/jensvogt/awsmock/commit/252cf50731ea3302ab42516e953679548ce6a359))
+
+
+### Bug Fixes
+
+* **801-macos-port:** fix ListAllBuckets call ([e2268b1](https://github.com/jensvogt/awsmock/commit/e2268b11c87ff4133745ae45f9c7df39f2f010a4))
+* **801-macos-port:** fix performance counters ([a8c412b](https://github.com/jensvogt/awsmock/commit/a8c412bb2ebde4789f980cd2d5ee8a4365a7c0dd))
+
 ## [1.1.0](https://github.com/jensvogt/awsmock/compare/v1.0.1...v1.1.0) (2025-02-01)
 
 

@@ -17,7 +17,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * Decryption request
+     * @brief Decryption request
      *
      * <p>
      * Recipients are not implemented yet.
@@ -80,28 +80,28 @@ namespace AwsMock::Dto::KMS {
         bool dryRun = false;
 
         /**
-         * Converts the JSON string to DTO.
+         * @brief Converts the JSON string to DTO.
          *
          * @param jsonString JSON string
         */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as JSON string.
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

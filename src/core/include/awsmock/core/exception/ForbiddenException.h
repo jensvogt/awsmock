@@ -9,6 +9,8 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/status.hpp>
 
+// AwsMock includes
+
 namespace AwsMock::Core {
 
     namespace http = boost::beast::http;

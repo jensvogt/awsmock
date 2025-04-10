@@ -2,7 +2,7 @@
 // Created by vogje01 on 21/12/2022.
 // Copyright 2022 - 2024 Jens Vogt
 //
-// This file is part of aws-mock.
+// This file is part of awsmock (AWS Cloud Simulation).
 //
 // aws-mock is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,15 +22,17 @@
 #include <iostream>
 
 // Boost includes
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
 // AwsMock includes
 #include <awsmock/controller/Controller.h>
 
+#ifdef _WIN32
+#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.yml"
+#else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#endif
 
 // Allowed actions
 static std::list<std::string> allowedActions() {
@@ -43,7 +45,7 @@ static std::list<std::string> allowedActions() {
 void ShowHelp(const boost::program_options::options_description &desc) {
     constexpr int leftIndent = 40;
     std::cout << std::endl
-              << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+              << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awsmockctl [Options] Commands" << std::endl
@@ -97,39 +99,37 @@ int main(const int argc, char *argv[]) {
 
     // Get command line options.
     boost::program_options::variables_map vm;
-    store(parse_command_line(argc, argv, desc), vm);
+    const boost::program_options::parsed_options parsed = boost::program_options::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
+    store(parsed, vm);
     notify(vm);
 
     // Get commands.
-    std::vector<std::string> commands;
-    for (size_t i = vm.size() + 1; i < argc; i++) {
-        commands.emplace_back(argv[i]);
-    }
+    const std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
 
     // Show usage.
-    if (vm.contains("help")) {
+    if (vm.count("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show version
-    if (vm.contains("version")) {
+    if (vm.count("version")) {
         std::cout << std::endl
-                  << "AwsMock controller v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+                  << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
     // Read configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.contains("config")) {
+    if (vm.count("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
     // Set log level.
-    if (vm.contains("loglevel")) {
+    if (vm.count("loglevel")) {
         const std::string value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
@@ -138,7 +138,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Set log file
-    if (vm.contains("logfile")) {
+    if (vm.count("logfile")) {
         const std::string value = vm["logfile"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.file", value);
         AwsMock::Core::LogStream::SetFilename(value);
@@ -167,3 +167,9 @@ int main(const int argc, char *argv[]) {
 
     return EXIT_SUCCESS;
 }
+
+#ifdef WIN32
+int APIENTRY mainCRTStartup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    return main(__argc, __argv);
+}
+#endif

@@ -18,7 +18,7 @@
 namespace AwsMock::Dto::KMS {
 
     /**
-     * Decryption response
+     * @brief Decryption response
      *
      * <p>
      * Ciphertext recipients are not implemented yet.

@@ -50,6 +50,30 @@ namespace AwsMock::Database::Entity::Transfer {
         return OFFLINE;
     }
 
+    enum Protocol {
+        FTP,
+        SFTP,
+        UNKNOWN
+    };
+
+    static std::map<Protocol, std::string> ProtocolNames{
+            {FTP, "FTP"},
+            {SFTP, "SFTP"},
+            {UNKNOWN, "UNKNOWN"}};
+
+    static std::string ProtocolToString(const Protocol &protocol) {
+        return ProtocolNames[protocol];
+    }
+
+    static Protocol ProtocolFromString(const std::string &protocol) {
+        for (auto &[fst, snd]: ProtocolNames) {
+            if (snd == protocol) {
+                return fst;
+            }
+        }
+        return UNKNOWN;
+    }
+
     /**
      * Transfer manager server entity
      *
@@ -80,7 +104,7 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Server protocols
          */
-        std::vector<std::string> protocols;
+        std::vector<Protocol> protocols;
 
         /**
          * Users
@@ -98,9 +122,9 @@ namespace AwsMock::Database::Entity::Transfer {
         int concurrency = 8;
 
         /**
-         * Port
+         * Ports, default: FTP 2121, SFTP 2222
          */
-        int port = 21;
+        std::vector<int> ports = {2121, 2222};
 
         /**
          * Listen address
@@ -158,7 +182,7 @@ namespace AwsMock::Database::Entity::Transfer {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const view_or_value<view,value> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.

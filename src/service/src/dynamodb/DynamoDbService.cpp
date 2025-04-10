@@ -90,10 +90,12 @@ namespace AwsMock::Service {
             // Send request to docker container
             std::map<std::string, std::string> headers = request.headers;
             auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status};
-            listTableResponse.ScanResponse();
-            log_trace << "DynamoDb list tables, region: " << request.region << " body: " << body;
-            return listTableResponse;
+            if (Dto::DynamoDb::ListTableResponse listTableResponse = {.body = body, .headers = outHeaders, .status = status}; listTableResponse.status == http::status::ok) {
+                listTableResponse.ScanResponse();
+                log_trace << "DynamoDb list tables, region: " << request.region << " body: " << body;
+                return listTableResponse;
+            }
+            return {};
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd list tables failed, error: " << exc.message();

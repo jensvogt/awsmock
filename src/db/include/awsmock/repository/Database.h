@@ -18,14 +18,12 @@
 #include <mongocxx/uri.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
-
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_document;
 
     struct IndexColumnDefinition {
 

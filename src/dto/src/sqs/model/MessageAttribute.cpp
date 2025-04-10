@@ -21,6 +21,8 @@ namespace AwsMock::Dto::SQS {
         EVP_DigestInit(context, md);
         for (const auto &[fst, snd]: attributes) {
 
+            log_debug << "MD5sum, attribute: " << fst;
+
             // Encoded name
             UpdateLengthAndBytes(context, fst);
 
@@ -60,15 +62,31 @@ namespace AwsMock::Dto::SQS {
         free(bytes);
     }
 
+    /*"MessageAttributes" : {
+    "file_type" : {
+    "StringValue" : "ONIX",
+    "DataType" : "String"
+    },
+    "file_origin" : {
+    "StringValue" : "FTP_UPLOAD",
+    "DataType" : "String"
+    },
+    "contentType" : {
+    "StringValue" : "application/json",
+    "DataType" : "String"
+    }
+    },*/
     void MessageAttribute::FromDocument(const view_or_value<view, value> &jsonObject) {
 
         try {
-            name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Name");
-            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
-            if (type == STRING || type == NUMBER) {
-                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+            for (const auto &element: jsonObject.view()) {
+                std::string name = bsoncxx::string::to_string(element.key());
+                view value = element[name].get_document().value;
+                type = MessageAttributeDataTypeFromString(bsoncxx::string::to_string(value["DataType"].get_string().value));
+                if (type == STRING || type == NUMBER) {
+                    stringValue = Core::Bson::BsonUtils::GetStringValue(value, "StringValue");
+                }
             }
-
         } catch (bsoncxx::exception &e) {
             log_error << e.what();
             throw Core::JsonException(e.what());
@@ -77,23 +95,27 @@ namespace AwsMock::Dto::SQS {
 
     void MessageAttribute::FromJson(const view_or_value<view, value> &jsonObject) {
 
-        try {
-            type = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
-            if (type == STRING || type == NUMBER) {
-                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+        FromDocument(jsonObject);
+        /*        try {
+            for (const auto &element: jsonObject) {
+                std::string name = bsoncxx::string::to_string(element.key());
+                view value = element[name].get_document().value;
+                type = MessageAttributeDataTypeFromString(bsoncxx::string::to_string(value["DataType"].get_string().value));
+                if (type == STRING || type == NUMBER) {
+                    stringValue = Core::Bson::BsonUtils::GetStringValue(value, "StringValue");
+                }
             }
-
         } catch (bsoncxx::exception &e) {
             log_error << e.what();
             throw Core::JsonException(e.what());
-        }
+        }*/
     }
 
     view_or_value<view, value> MessageAttribute::ToDocument() const {
 
         try {
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+            Core::Bson::BsonUtils::SetStringValue(document, "name", name);
             Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
             Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
             Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));

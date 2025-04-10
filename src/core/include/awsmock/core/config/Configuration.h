@@ -5,6 +5,16 @@
 #ifndef AWSMOCK_CORE_YAML_CONFIGURATION_H
 #define AWSMOCK_CORE_YAML_CONFIGURATION_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
+
 // Standard C++ includes
 #include <string>
 
@@ -13,9 +23,15 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
-#include <boost/accumulators/statistics/stats.hpp>
+
+#ifdef _WIN32
+#define DEFAULT_MAGIC_FILE "C:/Program Files (x86)/awsmock/etc/magic.mgc"
+#else
+#define DEFAULT_MAGIC_FILE "/usr/local/awsmock/etc/magic.mgc"
+#endif
 
 namespace AwsMock::Core {
 
@@ -85,6 +101,7 @@ namespace AwsMock::Core {
      * @author jens.vogt\@opitz-consulting.com
      */
     class Configuration {
+
       public:
 
         /**
@@ -218,7 +235,7 @@ namespace AwsMock::Core {
         [[nodiscard]] int GetValueInt(const std::string &key) const;
 
         /**
-         * @brief Returns a integer configuration value
+         * @brief Returns a long integer configuration value
          *
          * @param key property key
          * @return configuration value
@@ -234,7 +251,15 @@ namespace AwsMock::Core {
         [[nodiscard]] bool GetValueBool(const std::string &key) const;
 
         /**
-         * @brief Returns a boolean configuration value
+         * @brief Returns a float configuration value
+         *
+         * @param key property key
+         * @return configuration value
+         */
+        [[nodiscard]] float GetValueFloat(const std::string &key) const;
+
+        /**
+         * @brief Returns a double configuration value
          *
          * @param key property key
          * @return configuration value
@@ -271,7 +296,7 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValueLong(const std::string &key, long value);
+        void SetValueLong(const std::string &key, const long value);
 
         /**
          * @brief Sets an double configuration value
@@ -279,12 +304,21 @@ namespace AwsMock::Core {
          * @param key property key
          * @param value configuration value
          */
-        void SetValue(const std::string &key, double value);
+        void SetValueFloat(const std::string &key, const float value);
 
         /**
-         * @brief Checks whether the provided key exists
+         * @brief Sets an double configuration value
          *
-         * @return true if key/value pair exists
+         * @param key property key
+         * @param value configuration value
+         */
+        void SetValueDouble(const std::string &key, const double value);
+
+        /**
+         * @brief Checks whether a value exists
+         *
+         * @param key configuration key
+         * @return true if value exists
          */
         bool HasValue(const std::string &key) const;
 

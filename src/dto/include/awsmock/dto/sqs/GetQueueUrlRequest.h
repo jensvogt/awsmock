@@ -15,6 +15,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief Get SQS queue URL request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct GetQueueUrlRequest {
 
         /**

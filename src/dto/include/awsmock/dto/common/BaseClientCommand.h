@@ -12,6 +12,14 @@ namespace AwsMock::Dto::Common {
 
     namespace http = boost::beast::http;
 
+    /**
+     * @brief Base client command
+     *
+     * @par
+     * Defines some common attributes, like url, HTTP method, headers, payload, contentLength.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class BaseClientCommand {
 
       public:

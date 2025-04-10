@@ -8,9 +8,13 @@
 #include <map>
 #include <sstream>
 #include <utility>
+#ifdef WIN32
+#include <direct.h>
+#endif
 
 // Asio includes
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
@@ -23,19 +27,15 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/s3/S3Service.h>
 
-#define DEFAULT_TRANSFER_BASE_DIR "/home/awsmock/data/transfer"
-#define DEFAULT_TRANSFER_REGION "eu-central-1"
-
 namespace AwsMock::FtpServer {
+    typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket;
 
     class FtpSession : public std::enable_shared_from_this<FtpSession> {
 
       private:
 
         struct IoFile {
-            IoFile(const std::string &filename, std::string user, const std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024),
-                                                                                                   _fileName(filename), _user(std::move(user)) {
-
+            IoFile(const std::string &filename, std::string user, const std::ios::openmode mode) : file_stream_(filename, mode), stream_buffer_(1024 * 1024), _fileName(filename), _user(std::move(user)) {
                 file_stream_.rdbuf()->pubsetbuf(stream_buffer_.data(), static_cast<std::streamsize>(stream_buffer_.size()));
             }
 
@@ -65,7 +65,7 @@ namespace AwsMock::FtpServer {
         ////////////////////////////////////////////////////////
       public:
 
-        FtpSession(boost::asio::io_context &io_service, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
+        FtpSession(boost::asio::io_context &io_service, boost::asio::ssl::context &ssl_context, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
         FtpSession(const FtpSession &) = delete;
@@ -79,6 +79,8 @@ namespace AwsMock::FtpServer {
 
         ~FtpSession();
 
+        void OnHandshake(const boost::beast::error_code &ec);
+
         void start();
 
         boost::asio::ip::tcp::socket &getSocket();
@@ -90,13 +92,23 @@ namespace AwsMock::FtpServer {
 
         void sendFtpMessage(const FtpMessage &message);
 
+        void sendFtpMessageSftp(const FtpMessage &message);
+
         void sendFtpMessage(FtpReplyCode code, const std::string &message);
+
+        void sendFtpMessageSftp(FtpReplyCode code, const std::string &message);
 
         void sendRawFtpMessage(const std::string &raw_message);
 
+        void sendRawFtpMessageSftp(const std::string &raw_message);
+
         void startSendingMessages();
 
+        void startSendingMessagesSftp();
+
         void readFtpCommand();
+
+        void readFtpCommandSftp();
 
         void handleFtpCommand(const std::string &command);
 
@@ -279,6 +291,11 @@ namespace AwsMock::FtpServer {
       private:
 
         /**
+         * SFTP handshake
+         */
+        void DoHandshake();
+
+        /**
          * Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
@@ -302,14 +319,17 @@ namespace AwsMock::FtpServer {
          * Global IO module
          */
         boost::asio::io_context &_io_service;
+        boost::asio::ssl::context &_context_ssl;
 
         /**
          * Command Socket
          */
         boost::asio::ip::tcp::socket command_socket_;
+        //boost::asio::ip::tcp::socket command_socket_ssl_;
         boost::asio::io_context::strand command_write_strand_;
         boost::asio::streambuf command_input_stream_;
         std::deque<std::string> command_output_queue_;
+        boost::asio::ssl::stream<boost::asio::ip::tcp::socket> _ssl_stream;
 
         std::string _lastCommand;
         std::string _renameFromPath;

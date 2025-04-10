@@ -15,13 +15,23 @@ namespace AwsMock::Dto::Transfer {
             arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
             domain = Core::Bson::BsonUtils::GetStringValue(document, "Domain");
             endpointType = Core::Bson::BsonUtils::GetStringValue(document, "EndpointType");
+            identityProviderType = IdentityProviderTypeFromString(Core::Bson::BsonUtils::GetStringValue(document, "IdentityProviderType"));
             state = Core::Bson::BsonUtils::GetStringValue(document, "State");
             userCount = Core::Bson::BsonUtils::GetIntValue(document, "UserCount");
-            port = Core::Bson::BsonUtils::GetIntValue(document, "Port");
             concurrency = Core::Bson::BsonUtils::GetIntValue(document, "Concurrency");
             lastStarted = Core::Bson::BsonUtils::GetDateValue(document, "LastStarted");
             created = Core::Bson::BsonUtils::GetDateValue(document, "Created");
             modified = Core::Bson::BsonUtils::GetDateValue(document, "Modified");
+
+            if (document.find("ports") != document.end()) {
+                for (const auto &p: document.view()["ports"].get_array().value) {
+                    ports.emplace_back(p.get_int32().value);
+                }
+            }
+
+            if (document.find("IdentityProviderDetails") != document.end()) {
+                identityProviderDetails.FromDocument(document.view()["IdentityProviderDetails"].get_document().value);
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -38,16 +48,25 @@ namespace AwsMock::Dto::Transfer {
             Core::Bson::BsonUtils::SetStringValue(document, "ServerId", serverId);
             Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
             Core::Bson::BsonUtils::SetStringValue(document, "Domain", domain);
-            Core::Bson::BsonUtils::SetStringValue(document, "IdentityProviderType", identityProviderType);
+            Core::Bson::BsonUtils::SetStringValue(document, "IdentityProviderType", IdentityProviderTypeToString(identityProviderType));
             Core::Bson::BsonUtils::SetStringValue(document, "EndpointType", endpointType);
             Core::Bson::BsonUtils::SetStringValue(document, "LoggingRole", loggingRole);
             Core::Bson::BsonUtils::SetStringValue(document, "State", state);
             Core::Bson::BsonUtils::SetIntValue(document, "UserCount", userCount);
-            Core::Bson::BsonUtils::SetIntValue(document, "Port", port);
             Core::Bson::BsonUtils::SetIntValue(document, "Concurrency", concurrency);
             Core::Bson::BsonUtils::SetDateValue(document, "LastStarted", lastStarted);
             Core::Bson::BsonUtils::SetDateValue(document, "Created", created);
             Core::Bson::BsonUtils::SetDateValue(document, "Modified", modified);
+
+            // Ports
+            if (!ports.empty()) {
+                array portsArray;
+                for (const auto &p: ports) {
+                    portsArray.append(p);
+                }
+                document.append(kvp("Ports", portsArray));
+            }
+
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {

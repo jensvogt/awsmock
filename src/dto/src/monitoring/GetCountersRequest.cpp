@@ -17,8 +17,13 @@ namespace AwsMock::Dto::Monitoring {
             request.labelValue = Core::Bson::BsonUtils::GetStringValue(documentValue, "labelValue");
             request.limit = Core::Bson::BsonUtils::GetIntValue(documentValue, "limit");
             request.step = Core::Bson::BsonUtils::GetIntValue(documentValue, "step");
+#ifdef _WIN32
+            request.start = Core::DateTimeUtils::FromUnixTimestamp(Core::Bson::BsonUtils::GetLongLongValue(documentValue, "start"));
+            request.end = Core::DateTimeUtils::FromUnixTimestamp(Core::Bson::BsonUtils::GetLongLongValue(documentValue, "end"));
+#else
             request.start = Core::DateTimeUtils::FromUnixTimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "start"));
             request.end = Core::DateTimeUtils::FromUnixTimestamp(Core::Bson::BsonUtils::GetLongValue(documentValue, "end"));
+#endif
 
             return request;
 

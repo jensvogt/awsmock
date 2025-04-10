@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::SQS {
 
+    /**
+     * @brief Purge SQS queue request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct PurgeQueueRequest {
 
         /**

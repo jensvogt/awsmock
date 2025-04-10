@@ -31,12 +31,12 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit KMSWorker() = default;
 
         /**
-         * Delete keys which are pending for deletion
+         * @brief Delete keys which are pending for deletion
          */
         void DeleteKeys();
 

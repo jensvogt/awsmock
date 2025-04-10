@@ -36,7 +36,6 @@ namespace AwsMock::Database {
     };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {
-
         _useDatabase = Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
         _name = Core::Configuration::instance().GetValueString("awsmock.mongodb.name");
     }
@@ -46,9 +45,13 @@ namespace AwsMock::Database {
         return (*_client)[_name];
     }
 
-    bool DatabaseBase::HasDatabase() { return Core::Configuration::instance().GetValueBool("awsmock.mongodb.active"); }
+    bool DatabaseBase::HasDatabase() {
+        return Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
+    }
 
-    std::string DatabaseBase::GetDatabaseName() const { return _name; }
+    std::string DatabaseBase::GetDatabaseName() const {
+        return _name;
+    }
 
     void DatabaseBase::StartDatabase() {
 
@@ -89,9 +92,9 @@ namespace AwsMock::Database {
 
         log_trace << "Start creating index, name: " << indexName;
         auto [collectionName, indexColumns] = indexDefinitions.at(indexName);
-        bsoncxx::builder::basic::document queryDoc;
+        document queryDoc;
         for (const auto &[columns, direction]: indexColumns) { queryDoc.append(kvp(columns, direction)); }
-        bsoncxx::builder::basic::document nameDoc;
+        document nameDoc;
         nameDoc.append(kvp("name", indexName));
 
         database[collectionName].create_index(queryDoc.extract(), nameDoc.extract());

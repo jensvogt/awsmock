@@ -3,61 +3,31 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#include <boost/asio/readable_pipe.hpp>
 
 namespace AwsMock::Core {
 
-    ExecResult SystemUtils::Exec(const std::string &command) {
-
-        // set up file redirection
-        std::filesystem::path redirection = std::filesystem::absolute(".output.temp");
-        std::string cmd = command + " > " + redirection.string() + " 2>&1";
-
-        // execute command
-#if __APPLE__
-        auto status = std::system(cmd.c_str());
-#else
-        auto status = WEXITSTATUS(std::system(cmd.c_str()));
-#endif
-        log_trace << "Exec status: " << status;
-
-        // read redirection file and remove the file
-        std::ifstream output_file(redirection);
-        std::string output((std::istreambuf_iterator(output_file)), std::istreambuf_iterator<char>());
-        std::filesystem::remove(redirection);
-
-        return ExecResult{status - 120, output};
-    }
-
-    ExecResult SystemUtils::Exec2(const std::string &command) {
-        std::array<char, 128> buffer{};
-        std::string result;
-        const std::unique_ptr<FILE, void (*)(FILE *)> pipe(popen(command.c_str(), "r"),
-                                                           [](FILE *f) -> void {
-                                                               std::ignore = pclose(f);
-                                                           });
-        if (!pipe) {
-            throw std::runtime_error("popen() failed!");
-        }
-        while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-            result += buffer.data();
-        }
-        return ExecResult{0, result};
-    }
-
     std::string SystemUtils::GetCurrentWorkingDir() {
-        char result[PATH_MAX];
-        const ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
-        const std::string path = {std::string(result, (count > 0) ? count : 0)};
-        return path.substr(0, path.find_last_of('/'));
+        return boost::filesystem::current_path().string();
     }
 
     std::string SystemUtils::GetHomeDir() {
         std::string homeDir;
+#ifdef WIN32
+        size_t size = 1024;
+        auto buffer = static_cast<char *>(malloc(size));
+        _dupenv_s(&buffer, &size, "HOMEPATH");
+        if (buffer != nullptr) {
+            homeDir = std::string(buffer);
+        }
+        free(buffer);
+#else
         if (getenv("HOME") != nullptr) {
             homeDir = std::string(getenv("HOME"));
         } else {
             homeDir = std::string(getpwuid(getuid())->pw_dir);
         }
+#endif
         return homeDir;
     }
 
@@ -70,28 +40,40 @@ namespace AwsMock::Core {
     }
 
     int SystemUtils::GetPid() {
-        return getpid();
-    }
-
-    int SystemUtils::GetNumberOfCores() {
-#ifdef __APPLE__
-        int count;
-        size_t countLen;
-        sysctlbyname("hw.logicalcpu", &count, &countLen, nullptr, 0);
-        return count;
+#ifdef WIN32
+        return _getpid();
 #else
-        char line[128];
-
-        FILE *file = fopen("/proc/cpuinfo", "r");
-        int numCores = 0;
-        while (fgets(line, 128, file) != nullptr) {
-            if (strncmp(line, "processor", 9) == 0)
-                numCores++;
-        }
-        fclose(file);
-        log_debug << "Got number of processors, numProcs: " << numCores;
-        return numCores;
+        return getpid();
 #endif
     }
 
+    int SystemUtils::GetNumberOfCores() {
+        return static_cast<int>(boost::thread::hardware_concurrency());
+    }
+
+    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
+
+        boost::asio::io_context ctx;
+        boost::asio::readable_pipe inPipe{ctx};
+        boost::asio::readable_pipe outPipe{ctx};
+        boost::asio::readable_pipe errPipe{ctx};
+        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{inPipe, outPipe, errPipe});
+        boost::system::error_code ec;
+        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        proc.wait();
+        /*
+        boost::asio::io_context ios;
+        std::future<std::string> outData, errData;
+        boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
+
+        // Blocks until command has finished
+        ios.run();
+
+        // Get stdout/stderr
+        output = outData.get();
+        error = errData.get();*/
+    }
 }// namespace AwsMock::Core

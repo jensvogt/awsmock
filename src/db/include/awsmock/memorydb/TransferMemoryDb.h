@@ -8,6 +8,9 @@
 // C++ includes
 #include <string>
 
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -16,7 +19,6 @@
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/entity/transfer/User.h>
 #include <awsmock/repository/Database.h>
-#include <boost/thread/pthread/mutex.hpp>
 
 namespace AwsMock::Database {
 
@@ -78,7 +80,7 @@ namespace AwsMock::Database {
          * @return true if transfer manager already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::vector<std::string> &protocols);
+        bool TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols);
 
         /**
          * @brief Returns a list of transfer manager.

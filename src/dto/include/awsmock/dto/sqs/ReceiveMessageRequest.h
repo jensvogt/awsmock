@@ -35,6 +35,8 @@ namespace AwsMock::Dto::SQS {
      * The wait time seconds parameter is the duration (in seconds) for which the call waits for a message to arrive in the queue before returning. If a message is available, the call returns sooner
      * than WaitTimeSeconds. If no messages are available and the wait time expires, the call does not return a message list. If you are using the Java SDK, it returns a ReceiveMessageResponse object,
      * which has an empty list instead of a Null object.
+     *
+     * @author jens.vogt\@opitz-consulting.com
      */
     struct ReceiveMessageRequest {
 

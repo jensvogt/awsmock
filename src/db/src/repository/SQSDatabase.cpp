@@ -203,7 +203,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueByName(region, queueName);
     }
 
-    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
 
         if (HasDatabase()) {
 
@@ -279,6 +279,26 @@ namespace AwsMock::Database {
             return queueList;
         }
         return _memoryDb.ExportQueues(sortColumns);
+    }
+
+    void SQSDatabase::ImportQueue(Entity::SQS::Queue &queue) const {
+
+        queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
+        queue.modified = system_clock::now();
+        queue.attributes.approximateNumberOfMessages = 0;
+        queue.attributes.approximateNumberOfMessagesDelayed = 0;
+        queue.attributes.approximateNumberOfMessagesNotVisible = 0;
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
+
+            _queueCollection.insert_one(queue.ToDocument());
+            log_trace << "Queue imported, queueName: " << queue.name;
+            return;
+        }
+        _memoryDb.ImportQueue(queue);
     }
 
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) const {
@@ -523,11 +543,11 @@ namespace AwsMock::Database {
             try {
 
                 document query;
-                query.append(kvp("receiptHandle", make_document(kvp("$exists", receiptHandle))));
+                query.append(kvp("receiptHandle", receiptHandle));
 
                 const auto result = messageCollection.find_one(query.extract());
                 log_trace << "Message exists: " << std::boolalpha << result->empty();
-                return !result->empty();
+                return result && !result->empty();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -545,7 +565,7 @@ namespace AwsMock::Database {
             auto messageCollection = (*client)[_databaseName][_collectionNameMessage];
             try {
 
-                const auto result = messageCollection.find_one(make_document(kvp("messageId", make_document(kvp("$exists", messageId)))));
+                const auto result = messageCollection.find_one(make_document(kvp("messageId", messageId)));
                 log_trace << "Message exists: " << std::boolalpha << result.has_value();
                 return result.has_value();
 

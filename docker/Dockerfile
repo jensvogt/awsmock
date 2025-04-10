@@ -3,22 +3,19 @@ FROM jensvogt/awsmock-base:latest AS build
 # Create build environment
 RUN mkdir -p /usr/src
 RUN git config --global http.postBuffer 524288000
-RUN git config --global http.version HTTP/2
+RUN git config --global http.version HTTP/1.1
 
 # Install aws-mock
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    cmake . && \
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock && \
     cmake --build . --config Release -j 16 && \
-    cmake --install .
+    cmake --install . --config Release
 
-# Cleanup
-RUN rm -rf /usr/src
+FROM node:21-bookworm AS buildfrontend
 
-FROM node:21-alpine AS buildfrontend
-
-RUN apk update && apk add git
+RUN apt update && apt-get install -y git
 
 # Install aws-mock-ui
 WORKDIR /usr/src
@@ -29,10 +26,9 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     npm run build --prod
 
 # Stick to alpine:latest
-FROM alpine:latest
+FROM debian:trixie-slim
 
-RUN apk update && apk add aws-cli boost-program_options boost-filesystem boost-thread boost-url boost-locale plog  \
-    yaml-cpp libarchive libmagic
+RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libicu72 libssh-4 libquadmath0
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -51,41 +47,18 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
-# Install Mongo C/C++ driver
-COPY --from=build /usr/local/lib/libbson-1.0.so.0.0.0 /usr/lib/
-RUN ln -s /usr/lib/libbson-1.0.so.0.0.0 /usr/lib/libbson-1.0.so.0
-RUN ln -s /usr/lib/libbson-1.0.so.0 /usr/lib/libbson-1.0.so
-COPY --from=build /usr/local/lib/libmongoc-1.0.so.0.0.0 /usr/lib/
-RUN ln -s /usr/lib/libmongoc-1.0.so.0.0.0 /usr/lib/libmongoc-1.0.so.0
-RUN ln -s /usr/lib/libmongoc-1.0.so.0 /usr/lib/libmongoc-1.0.so
-COPY --from=build /usr/local/lib/libmongocxx.so.4.0.0 /usr/lib/
-RUN ln -s /usr/lib/libmongocxx.so.4.0.0 /usr/lib/libmongocxx.so._noabi
-COPY --from=build /usr/local/lib/libbsoncxx.so.4.0.0 /usr/lib/
-RUN ln -s /usr/lib/libbsoncxx.so.4.0.0 /usr/lib/libbsoncxx.so._noabi
-RUN ln -s /usr/lib/libbsoncxx.so._noabi /usr/lib/libbsoncxx.so
-
-# Install prometheus
-COPY --from=build /usr/local/lib/libprometheus-cpp-core.so.1.3.0 /usr/lib/
-RUN ln -s /usr/lib/libprometheus-cpp-core.so.1.3.0 /usr/lib/libprometheus-cpp-core.so.1.3
-RUN ln -s /usr/lib/libprometheus-cpp-core.so.1.3 /usr/lib/libprometheus-cpp-core.so
-COPY --from=build /usr/local/lib/libprometheus-cpp-pull.so.1.3.0 /usr/lib/
-RUN ln -s /usr/lib/libprometheus-cpp-pull.so.1.3.0 /usr/lib/libprometheus-cpp-pull.so.1.3
-RUN ln -s /usr/lib/libprometheus-cpp-pull.so.1.3 /usr/lib/libprometheus-cpp-pull.so
-COPY --from=build /usr/local/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/
-RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3.0 /usr/lib/libprometheus-cpp-push.so.1.3
-RUN ln -s /usr/lib/libprometheus-cpp-push.so.1.3 /usr/lib/libprometheus-cpp-push.so
-
 # Install aws-mock
 COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
-COPY --from=build /usr/local/awsmock/lib/libawsmock* /usr/local/awsmock/lib
-COPY --from=build /usr/local/awsmock/etc/awsmock.yml /usr/local/awsmock/etc
+COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
+COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
+COPY --from=build /usr/local/lib/* /usr/local/lib
 
 # Set library search path
-ENV LD_LIBRARY_PATH /usr/local/awsmock/lib:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
 
-# Expose manager/controller ports
+# Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
 # Prometheus ports
 EXPOSE 9091 9091

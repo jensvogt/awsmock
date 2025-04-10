@@ -47,11 +47,11 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
+        const Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
         Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
 
         // Start docker container, in case it is not already running.
-        if (!inspectContainerResponse.state.running) {
+        if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
             ContainerService::instance().StartDockerContainer(inspectContainerResponse.id);
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             log_debug << "Lambda docker container started, containerId: " << inspectContainerResponse.id;
@@ -73,12 +73,12 @@ namespace AwsMock::Service {
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
-        std::string codeDir = Core::DirUtils::CreateTempDir("/tmp");
+        std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
 
         // Write base64 encoded zip file
         const std::string encodedFile = WriteBase64File(functionCode, lambdaEntity, dockerTag);
-        log_debug << "Create Base64 string, length: " << functionCode.size();
+        log_debug << "Created Base64 string, length: " << functionCode.size();
 
         // Unzip provided zip-file into a temporary directory
         codeDir = UnpackZipFile(codeDir, functionCode, lambdaEntity.runtime);
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
         // Cleanup
-        Core::DirUtils::DeleteDirectory(codeDir);
+        //Core::DirUtils::DeleteDirectory(codeDir);
         log_debug << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
     }
 
@@ -115,24 +115,19 @@ namespace AwsMock::Service {
     std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) {
 
         std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
+        const std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
 
         // Decode Base64 file
-        std::string decoded = Core::Crypto::Base64Decode(functionCode);
-        std::string zipFile = tempDir + "/zipfile.zip";
-        try {
+        const std::string zipFile = tempDir + "/zipfile.zip";
+        Core::Crypto::Base64Decode(functionCode, zipFile);
 
-            // Write to temp file
-            std::ofstream ofs(zipFile);
-            ofs << decoded;
-            ofs.close();
-            decoded.clear();
+        try {
 
             // Save zip file
             if (Core::StringUtils::ContainsIgnoreCase(runtime, "java")) {
 
                 // Create classes directory
-                std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
+                const std::string classesDir = codeDir + Core::FileUtils::separator() + "classes";
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.

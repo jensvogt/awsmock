@@ -2,25 +2,35 @@
 set(LIBRARY awsmockdto)
 set(LIBRARY_STATIC awsmockdto_static)
 
-set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp src/common/Services.cpp src/module/model/Infrastructure.cpp
-        src/common/SNSClientCommand.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
+set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
+        src/common/Services.cpp src/module/model/Infrastructure.cpp src/common/SNSClientCommand.cpp
+        src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
         src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp src/common/MonitoringClientCommand.cpp)
-set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp src/sqs/SendMessageRequest.cpp
-        src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
-        src/sqs/GetQueueUrlRequest.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/SetQueueAttributesRequest.cpp
-        src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp src/sqs/ReceiveMessageRequest.cpp src/sqs/intern/UpdateDqlRequest.cpp
-        src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
-        src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp
-        src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
-        src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp
-        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp src/sqs/model/QueueCounter.cpp src/sqs/intern/ListQueueCountersRequest.cpp
-        src/sqs/intern/ListQueueCountersResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
-        src/sqs/ListQueueTagsResponse.cpp src/sqs/intern/GetQueueDetailsRequest.cpp src/sqs/intern/GetQueueDetailsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
-        src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/model/Message.cpp src/sqs/mapper/Mapper.cpp
-        src/sqs/intern/ListMessageCountersRequest.cpp src/sqs/intern/ListMessageCountersResponse.cpp src/sqs/model/AttributeCounter.cpp src/sqs/intern/ListQueueAttributeCountersRequest.cpp
-        src/sqs/intern/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp src/sqs/intern/ListQueueTagCountersRequest.cpp src/sqs/intern/ListQueueTagCountersResponse.cpp
-        src/sqs/UntagQueueRequest.cpp src/sqs/model/LambdaTriggerCounter.cpp src/sqs/intern/ListLambdaTriggerCountersRequest.cpp src/sqs/intern/ListLambdaTriggerCountersResponse.cpp
-        src/sqs/intern/UpdateMessageRequest.cpp src/sqs/DeleteAttributeRequest.cpp src/sqs/RedriveMessagesRequest.cpp src/sqs/intern/ResendMessageRequest.cpp)
+set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
+        src/sqs/SendMessageRequest.cpp src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp
+        src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
+        src/sqs/GetQueueUrlRequest.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp
+        src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
+        src/sqs/ReceiveMessageRequest.cpp src/sqs/intern/UpdateDqlRequest.cpp src/sqs/ReceiveMessageResponse.cpp
+        src/sqs/PurgeQueueRequest.cpp src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
+        src/sqs/DeleteMessageRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp
+        src/sqs/SqsCommonRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp
+        src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp
+        src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp
+        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp src/sqs/model/QueueCounter.cpp
+        src/sqs/intern/ListQueueCountersRequest.cpp src/sqs/intern/ListQueueCountersResponse.cpp
+        src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
+        src/sqs/ListQueueTagsResponse.cpp src/sqs/intern/GetQueueDetailsRequest.cpp src/sqs/intern/GetQueueDetailsResponse.cpp
+        src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
+        src/sqs/DeleteMessageBatchResponse.cpp src/sqs/model/Message.cpp src/sqs/mapper/Mapper.cpp
+        src/sqs/intern/ListMessageCountersRequest.cpp src/sqs/intern/ListMessageCountersResponse.cpp
+        src/sqs/model/AttributeCounter.cpp src/sqs/intern/ListQueueAttributeCountersRequest.cpp
+        src/sqs/intern/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp
+        src/sqs/intern/ListQueueTagCountersRequest.cpp src/sqs/intern/ListQueueTagCountersResponse.cpp
+        src/sqs/UntagQueueRequest.cpp src/sqs/model/LambdaTriggerCounter.cpp
+        src/sqs/intern/ListLambdaTriggerCountersRequest.cpp src/sqs/intern/ListLambdaTriggerCountersResponse.cpp
+        src/sqs/intern/UpdateMessageRequest.cpp src/sqs/DeleteAttributeRequest.cpp src/sqs/RedriveMessagesRequest.cpp
+        src/sqs/intern/ResendMessageRequest.cpp)
 set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
         src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
         src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp src/sns/TagResourceRequest.cpp src/sns/TagResourceResponse.cpp src/sns/GetTopicAttributesRequest.cpp
@@ -44,7 +54,7 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/internal/ListBucketCounterRequest.cpp src/s3/internal/ListBucketCounterResponse.cpp
         src/s3/model/ObjectCounter.cpp src/s3/internal/ListObjectCounterRequest.cpp src/s3/internal/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
         src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp
-        src/s3/internal/UpdateObjectRequest.cpp)
+        src/s3/internal/UpdateObjectRequest.cpp src/s3/internal/UpdateLambdaConfigurationRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -81,10 +91,10 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/AdminGetUserResponse.cpp src/cognito/ListUserPoolCountersRequest.cpp src/cognito/ListUserPoolCountersResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
-        src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
+        src/transfer/model/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
         src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp src/transfer/model/User.cpp src/transfer/mapper/Mapper.cpp src/transfer/ListServerCountersRequest.cpp
         src/transfer/ListServerCountersResponse.cpp src/transfer/GetServerDetailsRequest.cpp src/transfer/GetServerDetailsResponse.cpp src/transfer/ListUserCountersRequest.cpp
-        src/transfer/ListUserCountersResponse.cpp src/transfer/DeleteUserRequest.cpp)
+        src/transfer/ListUserCountersResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/model/IdentityProviderDetails.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp src/dynamodb/DeleteTableResponse.cpp
         src/dynamodb/model/ProvisionedThroughput.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp
@@ -109,21 +119,29 @@ set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cp
         src/module/ExportInfrastructureResponse.cpp src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp)
 set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp src/monitoring/GetMultiCountersResponse.cpp)
 
-set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
+set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
+        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}
+        ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
-add_subdirectory(tst)
+if (NOT WIN32)
+    add_subdirectory(tst)
+endif ()
 
 # Includes
-include_directories(include ../core/include ../db/include ${INC_BSON_CXX} ${INC_MONGO_CXX} /usr/local/include)
-link_directories(/usr/local/lib)
+include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
-add_library(${LIBRARY} SHARED ${SOURCES})
-target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb)
+# Shared library
+if (NOT WIN32)
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
+            boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
+endif ()
 
+# Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-set_target_properties(${LIBRARY_STATIC} PROPERTIES OUTPUT_NAME ${LIBRARY})
-target_link_libraries(${LIBRARY_STATIC} PUBLIC ${STATIC_LIB} awsmockcore awsmockdb bsoncxx mongocxx boost_locale boost_filesystem boost_url yaml-cpp gtest pthread ssl crypto
-        archive z prometheus-cpp-core prometheus-cpp-pull magic)
-install(TARGETS ${LIBRARY} DESTINATION /usr/local/awsmock/lib)
+if (NOT WIN32)
+    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mongocxx bsoncxx boost_filesystem
+            boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+endif ()
