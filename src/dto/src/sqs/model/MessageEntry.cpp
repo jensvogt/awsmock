@@ -33,6 +33,7 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
             Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 
+            // Message attributes
             if (!messageAttributes.empty()) {
                 array jsonMessageAttributeArray;
                 for (const auto &[fst, snd]: messageAttributes) {
@@ -43,6 +44,7 @@ namespace AwsMock::Dto::SQS {
                 rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
             }
 
+            // System attributes
             if (!attributes.empty()) {
                 array jsonAttributeArray;
                 for (const auto &[fst, snd]: attributes) {
