@@ -71,7 +71,7 @@ namespace AwsMock::Dto::SQS {
             messageTree.put("ReceiptHandle", it.receiptHandle);
             messageTree.put("Body", it.body);
             messageTree.put("MD5OfBody", it.md5Body);
-            messageTree.put("MD5OfMessageAttributes", it.md5UserAttr);
+            messageTree.put("MD5OfMessageAttributes", it.md5MessageAttributes);
 
             // Attribute
             boost::property_tree::ptree attributesTree;

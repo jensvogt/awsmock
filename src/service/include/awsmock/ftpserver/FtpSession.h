@@ -384,10 +384,5 @@ namespace AwsMock::FtpServer {
          * AWS region
          */
         std::string _region;
-
-        /**
-         * SFTP flag
-         */
-        bool _isSftp = false;
     };
 }// namespace AwsMock::FtpServer

@@ -26,8 +26,8 @@ namespace AwsMock::Dto::SQS {
             Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
             Core::Bson::BsonUtils::SetStringValue(document, "SequenceNumber", sequenceNumber);
             Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageBody", md5Body);
-            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageAttributes", md5UserAttr);
-            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageSystemAttributes", md5SystemAttr);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageAttributes", md5MessageAttributes);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageSystemAttributes", md5SystemAttributes);
             return document.extract();
 
         } catch (bsoncxx::exception &exc) {
@@ -44,8 +44,8 @@ namespace AwsMock::Dto::SQS {
             messageId = Core::Bson::BsonUtils::GetStringValue(document, "MessageId");
             sequenceNumber = Core::Bson::BsonUtils::GetStringValue(document, "SequenceNumber");
             md5Body = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageBody");
-            md5UserAttr = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageAttributes");
-            md5SystemAttr = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageSystemAttributes");
+            md5MessageAttributes = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageAttributes");
+            md5SystemAttributes = Core::Bson::BsonUtils::GetStringValue(document, "MD5OfMessageSystemAttributes");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

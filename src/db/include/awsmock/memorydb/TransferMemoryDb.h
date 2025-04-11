@@ -80,7 +80,7 @@ namespace AwsMock::Database {
          * @return true if transfer manager already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::vector<std::string> &protocols);
+        bool TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols);
 
         /**
          * @brief Returns a list of transfer manager.

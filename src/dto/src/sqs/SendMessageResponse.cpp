@@ -12,8 +12,8 @@ namespace AwsMock::Dto::SQS {
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "MessageId", messageId);
             Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageBody", md5Body);
-            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageAttributes", md5UserAttr);
-            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageSystemAttributes", md5SystemAttr);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageAttributes", md5MessageAttributes);
+            Core::Bson::BsonUtils::SetStringValue(document, "MD5OfMessageSystemAttributes", md5SystemAttributes);
             Core::Bson::BsonUtils::SetStringValue(document, "SequenceNumber", sequenceNumber);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
@@ -31,8 +31,8 @@ namespace AwsMock::Dto::SQS {
             messageId = Core::Bson::BsonUtils::GetStringValue(documentValue, "MessageId");
             sequenceNumber = Core::Bson::BsonUtils::GetStringValue(documentValue, "SequenceNumber");
             md5Body = Core::Bson::BsonUtils::GetStringValue(documentValue, "MD5OfMessageBody");
-            md5UserAttr = Core::Bson::BsonUtils::GetStringValue(documentValue, "MD5OfMessageAttributes");
-            md5SystemAttr = Core::Bson::BsonUtils::GetStringValue(documentValue, "MD5OfMessageSystemAttributes");
+            md5MessageAttributes = Core::Bson::BsonUtils::GetStringValue(documentValue, "MD5OfMessageAttributes");
+            md5SystemAttributes = Core::Bson::BsonUtils::GetStringValue(documentValue, "MD5OfMessageSystemAttributes");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -48,8 +48,8 @@ namespace AwsMock::Dto::SQS {
             read_xml(xmlString, pt);
             messageId = pt.get<std::string>("MessageId");
             md5Body = pt.get<std::string>("MD5OfMessageBody");
-            md5UserAttr = pt.get<std::string>("MD5OfMessageAttributes");
-            md5SystemAttr = pt.get<std::string>("MD5OfMessageSystemAttributes");
+            md5MessageAttributes = pt.get<std::string>("MD5OfMessageAttributes");
+            md5SystemAttributes = pt.get<std::string>("MD5OfMessageSystemAttributes");
             sequenceNumber = pt.get<std::string>("SequenceNumber");
 
         } catch (std::exception &exc) {
@@ -65,8 +65,8 @@ namespace AwsMock::Dto::SQS {
             boost::property_tree::ptree pt;
             pt.put("SendMessageResponse.SendMessageResult.MessageId", messageId);
             pt.put("SendMessageResponse.SendMessageResult.MD5OfMessageBody", md5Body);
-            pt.put("SendMessageResponse.SendMessageResult.MD5OfMessageAttributes", md5UserAttr);
-            pt.put("SendMessageResponse.SendMessageResult.MD5OfMessageSystemAttributes", md5SystemAttr);
+            pt.put("SendMessageResponse.SendMessageResult.MD5OfMessageAttributes", md5MessageAttributes);
+            pt.put("SendMessageResponse.SendMessageResult.MD5OfMessageSystemAttributes", md5SystemAttributes);
             pt.put("SendMessageResponse.SendMessageResult.SequenceNumber", sequenceNumber);
             pt.put("SendMessageResponse.ResponseMetadata.RequestId", sequenceNumber);
             pt.put("SendMessageResponse.ResponseMetadata.requestId", sequenceNumber);

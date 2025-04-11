@@ -78,7 +78,7 @@ namespace AwsMock::Database {
          * @return true if transfer server already exists
          * @throws DatabaseException
          */
-        bool TransferExists(const std::string &region, const std::vector<std::string> &protocols) const;
+        bool TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) const;
 
         /**
          * @brief Create a new transfer server
