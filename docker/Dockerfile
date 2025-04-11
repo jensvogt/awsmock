@@ -42,6 +42,7 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/lib && \
     mkdir -p /usr/local/awsmock/etc && \
     mkdir -p /usr/local/awsmock/init && \
+    mkdir -p /usr/local/awsmock/log && \
     mkdir -p /usr/local/awsmock/frontend
 
 # Install frontend

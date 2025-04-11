@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/transfer/ListUserCountersRequest.h>
+#include <awsmock/dto/transfer/internal/ListUserCountersRequest.h>
 
 namespace AwsMock::Dto::Transfer {
 
