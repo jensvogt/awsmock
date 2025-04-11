@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_LIST_USERS_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_TRANSFER_LIST_USERS_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_TRANSFER_LIST_PROTOCOL_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_TRANSFER_LIST_PROTOCOL_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -14,7 +14,7 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListUserCountersRequest {
+    struct ListProtocolCountersRequest {
 
         /**
          * Region
@@ -72,9 +72,9 @@ namespace AwsMock::Dto::Transfer {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ListUserCountersRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ListProtocolCountersRequest &r);
     };
 
 }// namespace AwsMock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_TRANSFER_LIST_USERS_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_TRANSFER_LIST_PROTOCOL_COUNTERS_REQUEST_H

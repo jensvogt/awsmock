@@ -1,5 +1,5 @@
 
-#include <awsmock/dto/transfer/ListServerCountersResponse.h>
+#include <awsmock/dto/transfer/internal/ListServerCountersResponse.h>
 
 namespace AwsMock::Dto::Transfer {
 

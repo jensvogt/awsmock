@@ -95,7 +95,7 @@ namespace AwsMock::Service {
             }
         }
         if (_ftpServer->start(server.concurrency)) {
-            log_debug << "FTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
+            log_info << "FTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
         }
     }
 
@@ -104,9 +104,9 @@ namespace AwsMock::Service {
         // Get base dir
         const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.sftp.port");
-        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.address");
+        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.address");
 
-        SftpServer _sftpServer("2222", "/etc/ssh/ssh_host_ed25519_key", "0.0.0.0");
+        SftpServer _sftpServer(std::to_string(port), "/etc/ssh/ssh_host_ed25519_key", address);
 
         // Add users
         for (const auto &user: server.users) {
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
         // Start detached thread
         boost::thread t(boost::ref(_sftpServer));
         t.detach();
-        log_debug << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
+        log_info << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {

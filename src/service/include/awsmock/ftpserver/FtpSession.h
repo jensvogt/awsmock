@@ -65,7 +65,7 @@ namespace AwsMock::FtpServer {
         ////////////////////////////////////////////////////////
       public:
 
-        FtpSession(boost::asio::io_context &io_service, boost::asio::ssl::context &ssl_context, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
+        FtpSession(boost::asio::io_context &io_service, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
         FtpSession(const FtpSession &) = delete;
@@ -79,8 +79,6 @@ namespace AwsMock::FtpServer {
 
         ~FtpSession();
 
-        void OnHandshake(const boost::beast::error_code &ec);
-
         void start();
 
         boost::asio::ip::tcp::socket &getSocket();
@@ -92,8 +90,6 @@ namespace AwsMock::FtpServer {
 
         void sendFtpMessage(const FtpMessage &message);
 
-        void sendFtpMessageSftp(const FtpMessage &message);
-
         void sendFtpMessage(FtpReplyCode code, const std::string &message);
 
         void sendFtpMessageSftp(FtpReplyCode code, const std::string &message);
@@ -103,8 +99,6 @@ namespace AwsMock::FtpServer {
         void sendRawFtpMessageSftp(const std::string &raw_message);
 
         void startSendingMessages();
-
-        void startSendingMessagesSftp();
 
         void readFtpCommand();
 
@@ -319,17 +313,14 @@ namespace AwsMock::FtpServer {
          * Global IO module
          */
         boost::asio::io_context &_io_service;
-        boost::asio::ssl::context &_context_ssl;
 
         /**
          * Command Socket
          */
         boost::asio::ip::tcp::socket command_socket_;
-        //boost::asio::ip::tcp::socket command_socket_ssl_;
         boost::asio::io_context::strand command_write_strand_;
         boost::asio::streambuf command_input_stream_;
         std::deque<std::string> command_output_queue_;
-        boost::asio::ssl::stream<boost::asio::ip::tcp::socket> _ssl_stream;
 
         std::string _lastCommand;
         std::string _renameFromPath;

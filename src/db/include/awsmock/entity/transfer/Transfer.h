@@ -171,6 +171,14 @@ namespace AwsMock::Database::Entity::Transfer {
         bool HasProtocol(const std::string &p);
 
         /**
+         * @brief Checks whether a protocol exists already.
+         *
+         * @param p protocol
+         * @return true if transfer manager with the given protocol exists.
+         */
+        bool HasProtocol(const Protocol &p);
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

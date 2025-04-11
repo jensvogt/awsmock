@@ -157,11 +157,6 @@ namespace AwsMock::FtpServer {
         boost::asio::io_context _ioService;
 
         /**
-         * Asio SSL context
-         */
-        boost::asio::ssl::context _ssl_context{boost::asio::ssl::context::sslv23};
-
-        /**
          * Asio session acceptor
          */
         boost::asio::ip::tcp::acceptor _acceptor;
