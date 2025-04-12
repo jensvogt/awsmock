@@ -288,17 +288,8 @@ namespace AwsMock::Database {
         queue.attributes.approximateNumberOfMessages = 0;
         queue.attributes.approximateNumberOfMessagesDelayed = 0;
         queue.attributes.approximateNumberOfMessagesNotVisible = 0;
-
-        if (HasDatabase()) {
-
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
-
-            _queueCollection.insert_one(queue.ToDocument());
-            log_trace << "Queue imported, queueName: " << queue.name;
-            return;
-        }
-        _memoryDb.ImportQueue(queue);
+        CreateOrUpdateQueue(queue);
+        log_trace << "Queue imported, queueName: " << queue.name;
     }
 
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) const {
