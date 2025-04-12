@@ -375,8 +375,10 @@ namespace AwsMock::Service {
 #elif __linux__
         const long copied = sendfile(dest, source, &start, length);
 #else
-        // TODO: Fix windows porting
-        const long copied = 0;
+        istreambuf_iterator<char> begin_source(source);
+        istreambuf_iterator<char> end_source;
+        ostreambuf_iterator<char> begin_dest(dest);
+        copy(begin_source, end_source, begin_dest);
 #endif
         close(source);
         close(dest);
@@ -1058,18 +1060,16 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "delete_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "delete_object");
 
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string dataS3Dir = dataDir + Core::FileUtils::separator() + "s3";
-        const std::string transferDir = dataDir + Core::FileUtils::separator() + "transfer";
-        Core::DirUtils::EnsureDirectory(dataS3Dir);
-        Core::DirUtils::EnsureDirectory(transferDir);
+        const std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string transferDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
 
         if (!internalName.empty()) {
             std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
             Core::FileUtils::DeleteFile(filename);
             log_debug << "File system object deleted, filename: " << filename;
 
-            if (const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket"); bucket == transferBucket) {
+            if (bucket == transferBucket) {
                 filename = transferDir + Core::FileUtils::separator() + key;
                 Core::FileUtils::DeleteFile(filename);
                 log_debug << "Transfer file system object deleted, filename: " << filename;
@@ -1315,9 +1315,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::QueueNotification queueNotification = {.id = attrId, .queueArn = queueArn};
 
             // Get events
@@ -1343,9 +1341,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::TopicNotification topicNotification = {.id = attrId, .topicArn = topicArn};
 
             // Get events
@@ -1371,9 +1367,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaArn};
 
             // Get events

@@ -86,7 +86,7 @@ namespace AwsMock::Core {
 
         // The same for the severity
         strm << " [" << rec[boost::log::trivial::severity] << "]";
-        strm << " [" << rec[process_id].get().native_id() << "]";
+        strm << " [" << rec[thread_id].get().native_id() << "]";
         strm << " [" << func << ":" << boost::log::extract<int>("Line", rec) << "] ";
 
         // Finally, put the record message to the stream

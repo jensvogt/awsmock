@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-    std::string HttpUtils::GetPathParameter(const std::string &uri, int index) {
+    std::string HttpUtils::GetPathParameter(const std::string &uri, const int index) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
@@ -17,7 +17,7 @@ namespace AwsMock::Core {
         if (index < seq.size()) {
             return seq[index];
         }
-        log_error << "Invalid index, index: " << index << ", size: " << seq.size();
+        log_warning << "Invalid index, index: " << index << ", size: " << seq.size() << ", path:" << uri;
         return {};
     }
 
