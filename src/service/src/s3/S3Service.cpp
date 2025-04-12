@@ -1144,16 +1144,10 @@ namespace AwsMock::Service {
 
         // Write file in chunks
         std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-        constexpr std::size_t buffer_size = 4096;
-        char buffer[buffer_size];
-        long count = size;
-        while (count > buffer_size) {
-            stream.read(buffer, buffer_size);
-            ofs.write(buffer, buffer_size);
-            count -= buffer_size;
-        }
-        stream.read(buffer, count);
-        ofs.write(buffer, count);
+        std::istreambuf_iterator begin_source(stream);
+        std::istreambuf_iterator<char> end_source;
+        std::ostreambuf_iterator begin_dest(ofs);
+        std::copy(begin_source, end_source, begin_dest);
         ofs.close();
 
         // Check file encoding
@@ -1163,7 +1157,10 @@ namespace AwsMock::Service {
         }
 
         // Get content type
-        std::string contentType = Core::FileUtils::GetContentType(filePath);
+        std::string contentType = request.contentType;
+        if (contentType.empty()) {
+            contentType = Core::FileUtils::GetContentType(filePath);
+        }
 
         // Create entity
         Database::Entity::S3::Object object = {

@@ -434,6 +434,12 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
+        // compile the default magic database (indicated by nullptr)
+        if (magic_compile(magic, magicFile.c_str()) != 0) {
+            log_error << "Could not compile libmagic";
+            return DEFAULT_MIME_TYPE;
+        }
+
         // get description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
         if (mime == nullptr) {
@@ -471,8 +477,9 @@ namespace AwsMock::Core {
         }
 
         // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, nullptr) != 0) {
+        if (magic_compile(magic, magicFile.c_str()) != 0) {
             log_error << "Could not compile libmagic";
+            return DEFAULT_MIME_TYPE;
         }
 
         // get description of the filename argument

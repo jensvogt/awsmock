@@ -431,9 +431,10 @@ namespace AwsMock::Database {
                 p.match(make_document(kvp("queueArn", queueArn)));
                 p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
-                auto totalSizeCursor = _objectCollection.aggregate(p);
-                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    return t["totalSize"].get_int64().value;
+                if (auto totalSizeCursor = _objectCollection.aggregate(p); !totalSizeCursor.begin()->empty()) {
+                    if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                        return t["totalSize"].get_int64().value;
+                    }
                 }
                 return 0;
             } catch (const mongocxx::exception &exc) {
@@ -1327,7 +1328,7 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 auto totalSizeCursor = messageCollection.aggregate(p);
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    long size = GetQueueSize(queueArn);
+                    const long size = GetQueueSize(queueArn);
                     queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
                                                make_document(kvp("$set", make_document(
                                                                                  kvp("size", bsoncxx::types::b_int64(size)),
