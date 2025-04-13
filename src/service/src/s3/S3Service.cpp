@@ -487,12 +487,50 @@ namespace AwsMock::Service {
                 return SaveUnversionedObject(request, bucket, stream, request.contentLength);
             }
 
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void S3Service::PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "put_object");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "put_object");
+        log_trace << "Put object request, username: " << username << ", filename: " << filename;
+
+        // Get environment
+        std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        std::string userHomeDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
+
+        // Build metadata
+        std::map<std::string, std::string> metadata;
+        metadata["user-agent"] = "FTPService";
+        metadata["user-agent-id"] = username + "@" + serverId;
+
+        // Build request
+        Dto::S3::PutObjectRequest request;
+        request.region = region;
+        request.bucket = transferBucket;
+        request.owner = username;
+        request.key = Core::StringUtils::StripBeginning(filename, userHomeDir + Core::FileUtils::separator());
+        request.contentType = Core::FileUtils::GetContentType(filename);
+        request.contentLength = Core::FileUtils::FileSize(filename);
+        request.metadata = metadata;
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        try {
+
             // Get bucket
+            std::ifstream ifs(filename, std::ios::binary);
             if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
-                return SaveVersionedObject(request, bucket, stream);
+                SaveVersionedObject(request, bucket, ifs);
             } else {
-                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
+                SaveUnversionedObject(request, bucket, ifs, request.contentLength);
             }
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
