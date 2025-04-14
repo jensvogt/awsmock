@@ -53,6 +53,9 @@
 #include <openssl/bn.h>
 #include <openssl/opensslv.h>
 
+// Awsmock includes
+#include <awsmock/service/s3/S3Service.h>
+
 #ifndef KEYS_FOLDER
 #ifdef _WIN32
 #include <direct.h>
@@ -144,8 +147,7 @@ struct error_struct {
 
 extern "C" {
 
-#define SSH_SFTP_CALLBACK(name) \
-    static int name(sftp_client_message message)
+#define SSH_SFTP_CALLBACK(name) static int name(sftp_client_message message)
 
 typedef int (*sftp_server_message_callback)(sftp_client_message message);
 
@@ -279,8 +281,8 @@ struct ssh_string_struct {
     uint32_t size;
     unsigned char data[1];
 };
-typedef struct ssh_string_struct *ssh_string;
-int _ssh_buffer_pack(struct ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
+typedef ssh_string_struct *ssh_string;
+int _ssh_buffer_pack(ssh_buffer_struct *buffer, const char *format, size_t argc, ...);
 #define ssh_buffer_pack(buffer, format, ...) _ssh_buffer_pack((buffer), (format), __VA_NARG__(__VA_ARGS__), __VA_ARGS__, SSH_BUFFER_PACK_END)
 
 int awsmock_ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t argc, va_list ap);
@@ -301,16 +303,13 @@ inline char authorizedkeys[DEF_STR_SIZE] = {0};
 namespace AwsMock::Service {
 
     class SftpServer {
+
       public:
 
         /**
          * Constructor
-         *
-         * @param port SFTP port
-         * @param hostKey host key
-         * @param address listen address
          */
-        SftpServer(const std::string &port, const std::string &hostKey, const std::string &address);
+        SftpServer() = default;
 
         /**
          * Add a user to the database
@@ -319,8 +318,13 @@ namespace AwsMock::Service {
 
         /**
          * Main method
+         *
+         * @param port SFTP port
+         * @param hostKey host key
+         * @param address listen address
+         * @param serverId server ID
          */
-        void operator()() const;
+        void operator()(const std::string &port, const std::string &hostKey, const std::string &address, const std::string &serverId) const;
 
         /**
          * SFTP users

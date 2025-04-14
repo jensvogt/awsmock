@@ -22,6 +22,7 @@ namespace AwsMock::Dto::Common {
         this->url = request.target();
         this->host = Core::HttpUtils::GetHost(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
+        this->headers = Core::HttpUtils::GetHeaders(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
 
         // Core values

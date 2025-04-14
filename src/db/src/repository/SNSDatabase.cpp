@@ -345,6 +345,13 @@ namespace AwsMock::Database {
         return CreateTopic(topic);
     }
 
+    void SNSDatabase::ImportTopic(Entity::SNS::Topic &topic) const {
+
+        topic.topicAttribute.availableMessages = 0;
+        CreateOrUpdateTopic(topic);
+        log_trace << "Topic imported, topicName: " << topic.topicName;
+    }
+
     long SNSDatabase::CountTopics(const std::string &region, const std::string &prefix) const {
         if (HasDatabase()) {
             try {

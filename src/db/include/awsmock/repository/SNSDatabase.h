@@ -153,6 +153,14 @@ namespace AwsMock::Database {
         Entity::SNS::Topic CreateOrUpdateTopic(Entity::SNS::Topic &topic) const;
 
         /**
+         * @brief Imports a topic
+         *
+         * @param topic topic entity
+         * @throws DatabaseException
+         */
+        void ImportTopic(Entity::SNS::Topic &topic) const;
+
+        /**
          * @brief List all available topics
          *
          * @param region AWS region

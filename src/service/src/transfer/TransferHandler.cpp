@@ -27,6 +27,15 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, transferResponse.ToJson());
             }
 
+            if (target == "TransferService.CreateProtocol") {
+
+                Dto::Transfer::CreateProtocolRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+
+                _transferService.CreateProtocol(transferRequest);
+                return SendOkResponse(request);
+            }
+
             if (target == "TransferService.ListServers") {
 
                 Dto::Transfer::ListServerRequest transferRequest = {.region = region};
@@ -48,6 +57,15 @@ namespace AwsMock::Service {
                 Dto::Transfer::ListUserCountersRequest transferRequest = {.region = region};
                 transferRequest.FromJson(body);
                 Dto::Transfer::ListUserCountersResponse transferResponse = _transferService.ListUserCounters(transferRequest);
+                return SendOkResponse(request, transferResponse.ToJson());
+            }
+
+            if (target == "TransferService.ListProtocolCounters") {
+
+                Dto::Transfer::ListProtocolCountersRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+                Dto::Transfer::ListProtocolCountersResponse transferResponse = _transferService.ListProtocolCounters(transferRequest);
+                std::string tmp = transferResponse.ToJson();
                 return SendOkResponse(request, transferResponse.ToJson());
             }
 
@@ -100,6 +118,16 @@ namespace AwsMock::Service {
                 transferRequest.FromJson(body);
                 _transferService.DeleteUser(transferRequest);
                 log_info << "Delete user, region: " << transferRequest.region << " serverId: " << transferRequest.serverId << " userName: " << transferRequest.userName;
+
+                return SendOkResponse(request);
+            }
+
+            if (target == "TransferService.DeleteProtocol") {
+
+                Dto::Transfer::DeleteProtocolRequest transferRequest = {.region = region};
+                transferRequest.FromJson(body);
+                _transferService.DeleteProtocol(transferRequest);
+                log_info << "Delete protocol, region: " << transferRequest.region << " serverId: " << transferRequest.serverId << " protocol: " << Dto::Transfer::ProtocolTypeToString(transferRequest.protocol);
 
                 return SendOkResponse(request);
             }

@@ -96,7 +96,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
     };
 
-    [[maybe_unused]] static std::string S3CommandTypeToString(S3CommandType commandType) {
+    [[maybe_unused]] static std::string S3CommandTypeToString(const S3CommandType &commandType) {
         return S3CommandTypeNames[commandType];
     }
 

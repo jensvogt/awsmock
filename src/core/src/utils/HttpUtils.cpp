@@ -6,7 +6,7 @@
 
 namespace AwsMock::Core {
 
-    std::string HttpUtils::GetPathParameter(const std::string &uri, int index) {
+    std::string HttpUtils::GetPathParameter(const std::string &uri, const int index) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
 
@@ -17,7 +17,7 @@ namespace AwsMock::Core {
         if (index < seq.size()) {
             return seq[index];
         }
-        log_error << "Invalid index, index: " << index << ", size: " << seq.size();
+        log_warning << "Invalid index, index: " << index << ", size: " << seq.size() << ", path:" << uri;
         return {};
     }
 
@@ -292,8 +292,11 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
-
-        return StringUtils::ContainsIgnoreCase(request.base()[http::field::content_type], "json") ? "json" : "xml";
+        std::string ct = request.base()[http::field::content_type];
+        if (ct.contains("json")) {
+            return "application/json";
+        }
+        return ct;
     }
 
     long HttpUtils::GetContentLength(const http::request<http::dynamic_body> &request) {

@@ -43,13 +43,13 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::CreateUserResponse TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_user_server");
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_user");
         log_debug << "Create user request";
 
         Database::Entity::Transfer::Transfer transferEntity;
 
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-
+            log_error << "Transfer manager with ID '" + request.serverId + "  does not exist";
             throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
         }
         transferEntity = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
@@ -85,6 +85,31 @@ namespace AwsMock::Service {
         Dto::Transfer::CreateUserResponse response{.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = request.userName};
 
         return response;
+    }
+
+    void TransferService::CreateProtocol(Dto::Transfer::CreateProtocolRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_protocol");
+        log_debug << "Create protocol request";
+
+        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            log_error << "Transfer manager with ID '" + request.serverId + "  does not exist";
+            throw Core::ServiceException("Transfer manager with ID '" + request.serverId + "  does not exist");
+        }
+        Database::Entity::Transfer::Transfer transferEntity = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+
+        // Check protocol
+        if (transferEntity.HasProtocol(ProtocolTypeToString(request.protocol))) {
+            log_warning << "Transfer manager has already a protocol with name '" + ProtocolTypeToString(request.protocol) + "'";
+            return;
+        }
+
+        // Add protocol
+        transferEntity.protocols.emplace_back(Database::Entity::Transfer::ProtocolFromString(ProtocolTypeToString(request.protocol)));
+        transferEntity.ports.emplace_back(request.port);
+
+        // Update database
+        transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
+        log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
     }
 
     Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) const {
@@ -123,6 +148,7 @@ namespace AwsMock::Service {
             response.total = _transferDatabase.CountServers(request.region);
             for (const auto &s: servers) {
                 Dto::Transfer::Server server = {
+                        .region = request.region,
                         .arn = s.arn,
                         .serverId = s.serverId,
                         .state = ServerStateToString(s.state),
@@ -195,6 +221,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException(ex.what());
         }
     }
+
     Dto::Transfer::ListUserCountersResponse TransferService::ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
 
@@ -217,6 +244,31 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << "Transfer user list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::Transfer::ListProtocolCountersResponse TransferService::ListProtocolCounters(const Dto::Transfer::ListProtocolCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_protocol_counters");
+
+        try {
+            const Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+
+            auto response = Dto::Transfer::ListProtocolCountersResponse();
+            response.total = server.protocols.size();
+            for (int i = 0; i < server.protocols.size(); i++) {
+                Dto::Transfer::ProtocolCounter protocolDto = {
+                        .protocol = Dto::Transfer::ProtocolTypeFromString(ProtocolToString(server.protocols.at(i))),
+                        .port = server.ports.at(i),
+                };
+                response.protocolCounters.emplace_back(protocolDto);
+            }
+
+            log_trace << "Transfer protocol list result: " << response.ToJson();
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Transfer protocol list request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -313,12 +365,13 @@ namespace AwsMock::Service {
     void TransferService::DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_user");
 
+        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            log_error << "Transfer server does not exist, serverId: " << request.serverId;
+            throw Core::ServiceException("Transfer server does not exist, serverId: " + request.serverId);
+        }
+
         Database::Entity::Transfer::Transfer server;
         try {
-            if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
-                log_error << "Transfer server does not exist, serverId: " << request.serverId;
-                throw Core::ServiceException("Transfer server does not exist, serverId: " + request.serverId);
-            }
 
             // Get the manager
             server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
@@ -337,6 +390,38 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << "Delete user request failed, serverId: " << server.serverId << " message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void TransferService::DeleteProtocol(const Dto::Transfer::DeleteProtocolRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_protocol");
+
+        if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
+            log_error << "Transfer server does not exist, serverId: " << request.serverId;
+            throw Core::ServiceException("Transfer server does not exist, serverId: " + request.serverId);
+        }
+
+        Database::Entity::Transfer::Transfer server;
+        try {
+
+            // Get the manager
+            server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+
+            if (server.HasProtocol(ProtocolTypeToString(request.protocol))) {
+                std::string protocolName = ProtocolTypeToString(request.protocol);
+                std::erase_if(server.protocols,
+                              [protocolName](const Database::Entity::Transfer::Protocol &protocol) {
+                                  return protocol == Database::Entity::Transfer::ProtocolFromString(protocolName);
+                              });
+            }
+
+            // Update server
+            server = _transferDatabase.UpdateTransfer(server);
+            log_info << "Protocol deleted, serverId: " << server.serverId << " protocolName: " << ProtocolTypeToString(request.protocol);
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Delete protocol request failed, serverId: " << server.serverId << " message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

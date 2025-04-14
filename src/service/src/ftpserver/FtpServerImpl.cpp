@@ -10,9 +10,6 @@ namespace AwsMock::FtpServer {
 
     FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, const uint16_t port)
         : _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0), _serverName(std::move(serverName)) {
-        _ssl_context.set_options(
-                boost::asio::ssl::context::default_workarounds | boost::asio::ssl::context::sslv2 | boost::asio::ssl::context::sslv3 | boost::asio::ssl::context::tlsv11 |
-                boost::asio::ssl::context::tlsv12 | boost::asio::ssl::context::tlsv13 | boost::asio::ssl::context::verify_none);
     }
 
     FtpServerImpl::~FtpServerImpl() {
@@ -29,14 +26,7 @@ namespace AwsMock::FtpServer {
 
     bool FtpServerImpl::start(const size_t thread_count) {
 
-        // SSL handshake verification
-        _ssl_context.set_verify_mode(boost::asio::ssl::verify_none);
-        _ssl_context.set_default_verify_paths();
-
-        // This holds the self-signed certificate used by the server
-        LoadCertificate(_ssl_context);
-
-        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ssl_context, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
+        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
 
         // set up the acceptor to listen on the tcp port
         boost::beast::error_code make_address_ec;
@@ -116,7 +106,7 @@ namespace AwsMock::FtpServer {
 
         ftp_session->start();
 
-        auto new_session = std::make_shared<FtpSession>(_ioService, _ssl_context, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
+        auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
 
         _acceptor.async_accept(new_session->getSocket(), [this, new_session](auto ec) {
             ++_openConnectionCount;

@@ -30,20 +30,31 @@ namespace AwsMock::Monitoring {
         /**
          * Counter name
          */
-        std::string name;
+        std::string name{};
 
         /**
          * Counter label name
          */
-        std::string labelName;
+        std::string labelName{};
 
         /**
          * Counter label value
          */
-        std::string labelValue;
+        std::string labelValue{};
 
-        double value;
-        int count;
+        /**
+         * Current value
+         */
+        double value = 0.0;
+
+        /**
+         * Value counter
+         */
+        int count = 0;
+
+        /**
+         * Last written timestamp
+         */
         system_clock::time_point lastWritten = system_clock::now();
     };
 
