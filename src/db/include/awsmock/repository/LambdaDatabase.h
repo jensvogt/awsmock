@@ -234,9 +234,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing lambda functions
          *
+         * @return number of lambda object deleted
          * @throws DatabaseException
          */
-        void DeleteAllLambdas() const;
+        long DeleteAllLambdas() const;
 
       private:
 

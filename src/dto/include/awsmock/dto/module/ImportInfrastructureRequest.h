@@ -2,8 +2,8 @@
 // Created by vogje01 on 10/6/24.
 //
 
-#ifndef AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
-#define AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
+#ifndef AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H
+#define AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H
 
 // C++ includes
 #include <string>
@@ -13,39 +13,35 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/module/model/Infrastructure.h>
 
 namespace AwsMock::Dto::Module {
 
     /**
-     * @brief Export infrastructure request
+     * @brief Import infrastructure request
      *
      * Example:
      * @code{.json}
      * {
-     *   "modules": ["string", ...],
-     *   "onlyObjects": bool,
-     *   "prettyPrint": bool,
+     *   "infrastructure": {infrastructure},
+     *   "includeObjects": bool,
+     *   "cleanFirst": bool
      * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ExportInfrastructureRequest {
+    struct ImportInfrastructureRequest {
 
         /**
-         * Modules
+         * Infrastructure JSON
          */
-        std::vector<std::string> modules;
+        Infrastructure infrastructure;
 
         /**
          * Include objects, default: false
          */
         bool includeObjects = false;
-
-        /**
-         * Pretty print, default: true
-         */
-        bool prettyPrint = true;
 
         /**
          * Clean infrastructure first, default: false
@@ -78,9 +74,9 @@ namespace AwsMock::Dto::Module {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const ExportInfrastructureRequest &r);
+        friend std::ostream &operator<<(std::ostream &os, const ImportInfrastructureRequest &r);
     };
 
 }// namespace AwsMock::Dto::Module
 
-#endif//AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
+#endif//AWSMOCK_DTO_IMPORT_INFRASTRUCTURE_REQUEST_H

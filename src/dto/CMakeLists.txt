@@ -116,8 +116,10 @@ set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/k
 set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp
         src/ssm/GetParameterResponse.cpp src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
         src/ssm/DescribeParametersResponse.cpp)
-set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp src/module/ExportInfrastructureRequest.cpp
-        src/module/ExportInfrastructureResponse.cpp src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp)
+set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
+        src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
+        src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
+        src/module/ImportInfrastructureRequest.cpp)
 set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp src/monitoring/GetMultiCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}

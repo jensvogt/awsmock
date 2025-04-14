@@ -109,10 +109,12 @@ namespace AwsMock::Database {
         log_debug << "Key deleted, count: " << count;
     }
 
-    void KMSMemoryDb::DeleteAllKeys() {
+    long KMSMemoryDb::DeleteAllKeys() {
         boost::mutex::scoped_lock lock(_keyMutex);
+        const long deleted = _keys.size();
         _keys.clear();
-        log_debug << "All KMS keys deleted";
+        log_debug << "All KMS keys deleted, count: " << deleted;
+        return deleted;
     }
 
 }// namespace AwsMock::Database

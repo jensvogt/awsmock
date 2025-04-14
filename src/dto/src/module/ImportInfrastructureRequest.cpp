@@ -2,21 +2,23 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/ImportInfrastructureRequest.h>
 
 namespace AwsMock::Dto::Module {
 
-    void ExportInfrastructureRequest::FromJson(const std::string &payload) {
+    void ImportInfrastructureRequest::FromJson(const std::string &payload) {
 
         try {
 
             const value documentValue = bsoncxx::from_json(payload);
             includeObjects = Core::Bson::BsonUtils::GetBoolValue(documentValue, "includeObjects");
-            prettyPrint = Core::Bson::BsonUtils::GetBoolValue(documentValue, "prettyPrint");
             cleanFirst = Core::Bson::BsonUtils::GetBoolValue(documentValue, "cleanFirst");
 
-            if (documentValue.find("modules") != documentValue.end()) {
+            /*            if (documentValue.find("modules") != documentValue.end()) {
                 Core::Bson::FromBsonStringArray(documentValue, "modules", &modules);
+            }*/
+            if (documentValue.find("infrastructure") != documentValue.end()) {
+                infrastructure.FromDocument(documentValue.view()["infrastructure"].get_document().value);
             }
 
         } catch (bsoncxx::exception &exc) {
@@ -25,23 +27,14 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    std::string ExportInfrastructureRequest::ToJson() const {
+    std::string ImportInfrastructureRequest::ToJson() const {
 
         try {
 
             document rootDocument;
             Core::Bson::BsonUtils::SetBoolValue(rootDocument, "includeObjects", includeObjects);
-            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "prettyPrint", prettyPrint);
             Core::Bson::BsonUtils::SetBoolValue(rootDocument, "cleanFirst", cleanFirst);
-
-            if (!modules.empty()) {
-                array jsonArray;
-                for (const auto &it: modules) {
-                    jsonArray.append(it);
-                }
-                rootDocument.append(kvp("modules", jsonArray));
-            }
-
+            Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "infrastructure", infrastructure.ToDocument().view());
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 
         } catch (bsoncxx::exception &exc) {
@@ -50,14 +43,14 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    std::string ExportInfrastructureRequest::ToString() const {
+    std::string ImportInfrastructureRequest::ToString() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
     }
 
-    std::ostream &operator<<(std::ostream &os, const ExportInfrastructureRequest &r) {
-        os << "ExportInfrastructureRequest=" << r.ToJson();
+    std::ostream &operator<<(std::ostream &os, const ImportInfrastructureRequest &r) {
+        os << "ImportInfrastructureRequest=" << r.ToJson();
         return os;
     }
 }// namespace AwsMock::Dto::Module

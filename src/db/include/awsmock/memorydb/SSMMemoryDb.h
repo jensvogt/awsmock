@@ -123,9 +123,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all parameters
          *
+         * @return number of entities deleted
          * @throws DatabaseException
          */
-        void DeleteAllParameters();
+        long DeleteAllParameters();
 
       private:
 

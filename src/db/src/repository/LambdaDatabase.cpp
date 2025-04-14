@@ -474,7 +474,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void LambdaDatabase::DeleteAllLambdas() const {
+    long LambdaDatabase::DeleteAllLambdas() const {
 
         if (HasDatabase()) {
 
@@ -484,16 +484,14 @@ namespace AwsMock::Database {
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 const auto result = _lambdaCollection.delete_many({});
                 log_debug << "All lambdas deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteAllLambdas();
         }
+        return _memoryDb.DeleteAllLambdas();
     }
 
 }// namespace AwsMock::Database

@@ -148,11 +148,15 @@ namespace AwsMock::Service {
         return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
     }
 
-    void ModuleService::ImportInfrastructure(const std::string &jsonString) {
-        log_info << "Importing services, length: " << jsonString.length();
+    void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) {
+        log_info << "Importing services, cleanFirst" << std::boolalpha << request.cleanFirst;
 
-        Dto::Module::Infrastructure infrastructure;
-        infrastructure.FromJson(jsonString);
+        Dto::Module::Infrastructure infrastructure = request.infrastructure;
+
+        // Check clean flag
+        if (request.cleanFirst) {
+            CleanInfrastructure();
+        }
 
         // S3
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
@@ -340,15 +344,16 @@ namespace AwsMock::Service {
     void ModuleService::CleanObjects(const Dto::Module::CleanInfrastructureRequest &request) {
         log_info << "Cleaning objects, length: " << request.modules.size();
 
+        long count = 0;
         for (const auto &m: request.modules) {
             if (m == "s3") {
-                Database::S3Database::instance().DeleteAllObjects();
+                count += Database::S3Database::instance().DeleteAllObjects();
             } else if (m == "sqs") {
-                Database::SQSDatabase::instance().DeleteAllMessages();
+                count += Database::SQSDatabase::instance().DeleteAllMessages();
             } else if (m == "sns") {
                 Database::SNSDatabase::instance().DeleteAllMessages();
             } else if (m == "lambda") {
-                Database::LambdaDatabase::instance().DeleteAllLambdas();
+                count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
                 Database::CognitoDatabase::instance().DeleteAllUsers();
                 Database::CognitoDatabase::instance().DeleteAllUserPools();
@@ -358,11 +363,12 @@ namespace AwsMock::Service {
             } else if (m == "secretsmanager") {
                 Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {
-                Database::KMSDatabase::instance().DeleteAllKeys();
+                count += Database::KMSDatabase::instance().DeleteAllKeys();
             } else if (m == "ssm") {
-                Database::SSMDatabase::instance().DeleteAllParameters();
+                count += Database::SSMDatabase::instance().DeleteAllParameters();
             } else if (m == "transfer") {
                 Database::S3Database::instance().DeleteObjects("transfer-server");
+                count += Database::TransferDatabase::instance().DeleteAllTransfers();
             }
         }
     }
