@@ -375,8 +375,10 @@ namespace AwsMock::Service {
 #elif __linux__
         const long copied = sendfile(dest, source, &start, length);
 #else
-        // TODO: Fix windows porting
-        const long copied = 0;
+        istreambuf_iterator<char> begin_source(source);
+        istreambuf_iterator<char> end_source;
+        ostreambuf_iterator<char> begin_dest(dest);
+        copy(begin_source, end_source, begin_dest);
 #endif
         close(source);
         close(dest);
@@ -485,12 +487,50 @@ namespace AwsMock::Service {
                 return SaveUnversionedObject(request, bucket, stream, request.contentLength);
             }
 
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    void S3Service::PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "put_object");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "put_object");
+        log_trace << "Put object request, username: " << username << ", filename: " << filename;
+
+        // Get environment
+        std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        std::string userHomeDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
+
+        // Build metadata
+        std::map<std::string, std::string> metadata;
+        metadata["user-agent"] = "FTPService";
+        metadata["user-agent-id"] = username + "@" + serverId;
+
+        // Build request
+        Dto::S3::PutObjectRequest request;
+        request.region = region;
+        request.bucket = transferBucket;
+        request.owner = username;
+        request.key = Core::StringUtils::StripBeginning(filename, userHomeDir + Core::FileUtils::separator());
+        request.contentType = Core::FileUtils::GetContentType(filename);
+        request.contentLength = Core::FileUtils::FileSize(filename);
+        request.metadata = metadata;
+
+        // Check existence
+        CheckBucketExistence(request.region, request.bucket);
+
+        try {
+
             // Get bucket
+            std::ifstream ifs(filename, std::ios::binary);
             if (const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket); bucket.IsVersioned()) {
-                return SaveVersionedObject(request, bucket, stream);
+                SaveVersionedObject(request, bucket, ifs);
             } else {
-                return SaveUnversionedObject(request, bucket, stream, request.contentLength);
+                SaveUnversionedObject(request, bucket, ifs, request.contentLength);
             }
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 put object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
@@ -1058,18 +1098,16 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "delete_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "delete_object");
 
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string dataS3Dir = dataDir + Core::FileUtils::separator() + "s3";
-        const std::string transferDir = dataDir + Core::FileUtils::separator() + "transfer";
-        Core::DirUtils::EnsureDirectory(dataS3Dir);
-        Core::DirUtils::EnsureDirectory(transferDir);
+        const std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string transferDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
 
         if (!internalName.empty()) {
             std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
             Core::FileUtils::DeleteFile(filename);
             log_debug << "File system object deleted, filename: " << filename;
 
-            if (const std::string transferBucket = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket"); bucket == transferBucket) {
+            if (bucket == transferBucket) {
                 filename = transferDir + Core::FileUtils::separator() + key;
                 Core::FileUtils::DeleteFile(filename);
                 log_debug << "Transfer file system object deleted, filename: " << filename;
@@ -1144,16 +1182,10 @@ namespace AwsMock::Service {
 
         // Write file in chunks
         std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-        constexpr std::size_t buffer_size = 4096;
-        char buffer[buffer_size];
-        long count = size;
-        while (count > buffer_size) {
-            stream.read(buffer, buffer_size);
-            ofs.write(buffer, buffer_size);
-            count -= buffer_size;
-        }
-        stream.read(buffer, count);
-        ofs.write(buffer, count);
+        std::istreambuf_iterator begin_source(stream);
+        std::istreambuf_iterator<char> end_source;
+        std::ostreambuf_iterator begin_dest(ofs);
+        std::copy(begin_source, end_source, begin_dest);
         ofs.close();
 
         // Check file encoding
@@ -1163,7 +1195,10 @@ namespace AwsMock::Service {
         }
 
         // Get content type
-        std::string contentType = Core::FileUtils::GetContentType(filePath);
+        std::string contentType = request.contentType;
+        if (contentType.empty()) {
+            contentType = Core::FileUtils::GetContentType(filePath);
+        }
 
         // Create entity
         Database::Entity::S3::Object object = {
@@ -1315,9 +1350,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::QueueNotification queueNotification = {.id = attrId, .queueArn = queueArn};
 
             // Get events
@@ -1343,9 +1376,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::TopicNotification topicNotification = {.id = attrId, .topicArn = topicArn};
 
             // Get events
@@ -1371,9 +1402,7 @@ namespace AwsMock::Service {
             }
 
             // General attributes
-            const std::string attrId = id.empty()
-                                               ? Core::StringUtils::CreateRandomUuid()
-                                               : id;
+            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
             Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaArn};
 
             // Get events
