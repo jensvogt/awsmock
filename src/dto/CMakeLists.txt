@@ -91,10 +91,11 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/AdminGetUserResponse.cpp src/cognito/ListUserPoolCountersRequest.cpp src/cognito/ListUserPoolCountersResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
-        src/transfer/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
-        src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp src/transfer/model/User.cpp src/transfer/mapper/Mapper.cpp src/transfer/ListServerCountersRequest.cpp
-        src/transfer/ListServerCountersResponse.cpp src/transfer/GetServerDetailsRequest.cpp src/transfer/GetServerDetailsResponse.cpp src/transfer/ListUserCountersRequest.cpp
-        src/transfer/ListUserCountersResponse.cpp src/transfer/DeleteUserRequest.cpp)
+        src/transfer/model/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
+        src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp src/transfer/model/User.cpp src/transfer/mapper/Mapper.cpp src/transfer/internal/ListServerCountersRequest.cpp
+        src/transfer/internal/ListServerCountersResponse.cpp src/transfer/GetServerDetailsRequest.cpp src/transfer/GetServerDetailsResponse.cpp src/transfer/internal/ListUserCountersRequest.cpp
+        src/transfer/internal/ListUserCountersResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/model/IdentityProviderDetails.cpp src/transfer/internal/ListProtocolCountersRequest.cpp
+        src/transfer/internal/ListProtocolCountersResponse.cpp src/transfer/DeleteProtocolRequest.cpp src/transfer/CreateProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp src/dynamodb/DeleteTableResponse.cpp
         src/dynamodb/model/ProvisionedThroughput.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp
@@ -129,7 +130,7 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
+include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
 # Shared library
 if (NOT WIN32)
@@ -140,9 +141,8 @@ endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mongocxx bsoncxx boost_filesystem
-        boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
-
 if (NOT WIN32)
+    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mongocxx bsoncxx boost_filesystem
+            boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

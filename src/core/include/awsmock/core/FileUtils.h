@@ -5,6 +5,15 @@
 #ifndef AWS_MOCK_CORE_FILE_UTILS_H
 #define AWS_MOCK_CORE_FILE_UTILS_H
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
+#include <boost/asio.hpp>
+#include <windows.h>
+#endif
+
 // Standard C includes
 #include <magic.h>
 
@@ -23,6 +32,12 @@
 #include <sys/uio.h>
 #elif __linux__
 #include <sys/sendfile.h>
+#elif _WIN32
+#include "accctrl.h"
+#include "aclapi.h"
+#include <stdio.h>
+#include <tchar.h>
+#pragma comment(lib, "advapi32.lib")
 #endif
 
 // Boost includes
@@ -30,6 +45,7 @@
 #include <boost/beast/core/file.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/iostreams/copy.hpp>
+
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>

@@ -42,7 +42,7 @@ namespace AwsMock::Core {
                                   // We expect token to come from a known authorization server
                                   .with_issuer(issuer);
         } catch (jwt::error::token_verification_error &ex) {
-            log_error << "Invalid JWT token, code: " << make_error_code(ex);
+            //log_error << "Invalid JWT token, code: " << make_error_code(ex);
             return false;
         }
         return true;
@@ -56,7 +56,7 @@ namespace AwsMock::Core {
                                   // We expect token to come from a known authorization server
                                   .with_issuer(issuer);
         } catch (jwt::error::token_verification_error &ex) {
-            log_error << "Invalid JWT token, code: " << make_error_code(ex);
+            //log_error << "Invalid JWT token, code: " << make_error_code(ex);
             return false;
         }
         return true;

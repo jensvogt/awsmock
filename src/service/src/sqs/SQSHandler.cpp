@@ -21,7 +21,7 @@ namespace AwsMock::Service {
                     Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                     log_info << "Create queue, queueName: " << sqsRequest.queueName;
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
@@ -45,7 +45,7 @@ namespace AwsMock::Service {
                     Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
                     log_info << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
                     Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
                     log_info << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_URL: {
@@ -69,7 +69,7 @@ namespace AwsMock::Service {
                     Dto::SQS::GetQueueUrlResponse sqsResponse = _sqsService.GetQueueUrl(sqsRequest);
                     log_info << "Get queue url, queueName: " << sqsRequest.queueName;
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_DETAILS: {
@@ -89,7 +89,7 @@ namespace AwsMock::Service {
                     Dto::SQS::ListQueueArnsResponse sqsResponse = _sqsService.ListQueueArns();
                     log_info << "List queue ARNs";
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
@@ -251,7 +251,7 @@ namespace AwsMock::Service {
                     log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;
 
                     // Send response
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::CHANGE_MESSAGE_VISIBILITY: {
@@ -343,7 +343,7 @@ namespace AwsMock::Service {
                     Dto::SQS::DeleteMessageBatchResponse sqsResponse = _sqsService.DeleteMessageBatch(sqsRequest);
                     log_info << "Delete message batch, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request, clientCommand.contentType == "json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
                 case Dto::Common::SqsCommandType::DELETE_ATTRIBUTE: {

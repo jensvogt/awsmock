@@ -130,7 +130,7 @@ namespace AwsMock::Service {
                     }
 
                     // Send range response
-                    log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
+                    log_debug << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
                     return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                 }
 
@@ -356,7 +356,7 @@ namespace AwsMock::Service {
 
                     Dto::S3::UploadPartCopyResponse s3Response = _s3Service.UploadPartCopy(s3Request);
 
-                    log_info << "Finished S3 multipart upload part copy: " << partNumber;
+                    log_debug << "Finished S3 multipart upload part copy: " << partNumber;
 
                     return SendOkResponse(request, s3Response.ToXml());
                 }

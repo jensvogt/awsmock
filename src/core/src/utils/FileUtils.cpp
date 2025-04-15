@@ -264,7 +264,89 @@ namespace AwsMock::Core {
     std::string FileUtils::GetOwner(const std::string &fileName) {
 
 #ifdef WIN32
-        // TODO: Fix windows port
+        DWORD dwRtnCode = 0;
+        PSID pSidOwner = nullptr;
+        BOOL bRtnBool = TRUE;
+        LPTSTR AcctName = nullptr;
+        LPTSTR DomainName = nullptr;
+        DWORD dwAcctName = 1, dwDomainName = 1;
+        SID_NAME_USE eUse = SidTypeUnknown;
+        PSECURITY_DESCRIPTOR pSD = nullptr;
+
+
+        // Get the handle of the file object.
+        HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, nullptr,
+                                  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+        // Check GetLastError for CreateFile error code.
+        if (hFile == INVALID_HANDLE_VALUE) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "CreateFile error: " << dwErrorCode;
+            return {};
+        }
+
+        // Get the owner SID of the file.
+        dwRtnCode = GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &pSidOwner, nullptr, nullptr, nullptr, &pSD);
+
+        // Check GetLastError for GetSecurityInfo error condition.
+        if (dwRtnCode != ERROR_SUCCESS) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "GetSecurityInfo error: " << dwErrorCode;
+            return {};
+        }
+
+        // First call to LookupAccountSid to get the buffer sizes.
+        bRtnBool = LookupAccountSid(nullptr, pSidOwner, AcctName, (LPDWORD) &dwAcctName, DomainName, (LPDWORD) &dwDomainName, &eUse);
+
+        // Reallocate memory for the buffers.
+        AcctName = static_cast<LPTSTR>(GlobalAlloc(GMEM_FIXED, dwAcctName));
+
+        // Check GetLastError for GlobalAlloc error condition.
+        if (AcctName == nullptr) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "GlobalAlloc error: " << dwErrorCode;
+            return {};
+        }
+
+        DomainName = static_cast<LPTSTR>(GlobalAlloc(GMEM_FIXED, dwDomainName));
+
+        // Check GetLastError for GlobalAlloc error condition.
+        if (DomainName == nullptr) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+            log_error << "GlobalAlloc error: " << dwErrorCode;
+            return {};
+        }
+
+        // Second call to LookupAccountSid to get the account name.
+        bRtnBool = LookupAccountSid(nullptr, pSidOwner, AcctName, &dwAcctName, DomainName, &dwDomainName, &eUse);
+
+        // Check GetLastError for LookupAccountSid error condition.
+        if (bRtnBool == FALSE) {
+            DWORD dwErrorCode = 0;
+
+            dwErrorCode = GetLastError();
+
+            if (dwErrorCode == ERROR_NONE_MAPPED) {
+                _tprintf(TEXT("Account owner not found for specified SID.\n"));
+            } else {
+                _tprintf(TEXT("Error in LookupAccountSid.\n"));
+            }
+            return {};
+        }
+        if (bRtnBool == TRUE) {
+
+            // Print the account name.
+            log_debug << "Account owner: " << AcctName;
+            return AcctName;
+        }
 #else
         struct stat info{};
         stat(fileName.c_str(), &info);
@@ -277,11 +359,14 @@ namespace AwsMock::Core {
 
     void FileUtils::DeleteFile(const std::string &fileName) {
         if (fileName.empty()) {
+            log_error << "Empty filename";
             return;
         }
         if (std::filesystem::exists(fileName)) {
             std::filesystem::remove(fileName);
+            return;
         }
+        log_warning << "File does not exist: " << fileName;
     }
 
     bool FileUtils::Touch(const std::string &fileName) {
@@ -349,6 +434,12 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
+        // compile the default magic database (indicated by nullptr)
+        if (magic_compile(magic, magicFile.c_str()) != 0) {
+            log_error << "Could not compile libmagic";
+            return DEFAULT_MIME_TYPE;
+        }
+
         // get description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
         if (mime == nullptr) {
@@ -386,8 +477,9 @@ namespace AwsMock::Core {
         }
 
         // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, nullptr) != 0) {
+        if (magic_compile(magic, magicFile.c_str()) != 0) {
             log_error << "Could not compile libmagic";
+            return DEFAULT_MIME_TYPE;
         }
 
         // get description of the filename argument

@@ -30,11 +30,11 @@ namespace AwsMock::Database {
                                     }) != _transfers.end();
     }
 
-    bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<std::string> &protocols) {
+    bool TransferMemoryDb::TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) {
 
         return std::ranges::find_if(_transfers,
                                     [region, protocols](const std::pair<std::string, Entity::Transfer::Transfer> &transfer) {
-                                        return transfer.second.region == region && transfer.second.protocols == protocols;
+                                        return transfer.second.region == region && std::equal(transfer.second.protocols.begin(), transfer.second.protocols.end(), protocols.begin());
                                     }) != _transfers.end();
     }
 

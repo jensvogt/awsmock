@@ -1,18 +1,10 @@
 FROM gcc:13.2.0-bookworm
 
 RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip libtool linux-libc-dev  \
-    pandoc wget libarchive-dev libmagic-dev
+    pandoc wget libarchive-dev libmagic-dev libssh-dev
 
 # Create build environment
 RUN mkdir -p /usr/src
-
-# Install plog
-RUN cd /usr/src && \
-    git clone https://github.com/SergiusTheBest/plog.git && \
-    cd plog && \
-    cmake . -DPLOG_BUILD_SAMPLES=OFF && \
-    cmake --build . --config Release -j 16 && \
-    cmake --install . --prefix /usr/local
 
 # Install jwt-cpp
 RUN cd /usr/src && \

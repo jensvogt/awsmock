@@ -24,7 +24,7 @@ namespace AwsMock::Core {
             boost::system::error_code ec;
             std::string host = "localhost";
             int port = 2375;
-            GetHostPort(_path, host, port);
+            GetHostPort(_basePath, host, port);
             auto const results = resolver.resolve(host, std::to_string(port));
 
             // Connect
@@ -71,15 +71,66 @@ namespace AwsMock::Core {
     }
 
     DomainSocketResult WindowsSocket::SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) {
-        boost::system::error_code ec;
 
         boost::asio::io_context ctx;
-        boost::asio::local::stream_protocol::endpoint endpoint(_path);
+
+        boost::asio::ip::tcp::resolver resolver(ctx);
+        boost::beast::tcp_stream stream(ctx);
+
+        // Resolve host/port
+        try {
+            boost::system::error_code ec;
+            std::string host = "localhost";
+            int port = 2375;
+            GetHostPort(_basePath, host, port);
+            auto const results = resolver.resolve(host, std::to_string(port));
+
+            // Connect
+            stream.connect(results, ec);
+            if (ec) {
+                log_error << "Connect to " << host << ":" << port << " failed, error: " << ec.message();
+                return {.statusCode = status::internal_server_error, .body = ec.message()};
+            }
+
+            // Prepare message
+            request<file_body> request = PrepareBinaryMessage(method, path, fileName, {});
+
+            // Write to TCP socket
+            http::write(stream, request, ec);
+            if (ec) {
+                log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
+                return {.statusCode = status::internal_server_error, .body = ec.message()};
+            }
+
+            boost::beast::flat_buffer buffer;
+            response<string_body> response;
+
+            http::read(stream, buffer, response);
+            if (ec) {
+                log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
+                return {.statusCode = status::internal_server_error, .body = ec.message()};
+            }
+
+            // Cleanup
+            ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+            if (ec) {
+                log_error << "Shutdown socket failed, error: " << ec.message();
+                return {.statusCode = status::internal_server_error, .body = ec.message()};
+            }
+            return PrepareResult(response);
+        } catch (const boost::system::system_error &exc) {
+            log_error << "Error sending JSON message, error: " << exc.what();
+        }
+        return {.statusCode = status::internal_server_error, .body = "General error"};
+        /*boost::system::error_code ec;
+        std::string fullPath = _basePath + path;
+        boost::asio::io_context ctx;
+        boost::asio::local::stream_protocol::endpoint endpoint(fullPath);
         boost::asio::local::stream_protocol::socket socket(ctx);
         ec = socket.connect(endpoint, ec);
         if (ec) {
-            log_error << "Could not connect to docker UNIX domain socket";
-            return {.statusCode = http::status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
+            log_error << "Could not connect to docker Windows Docker API, fullPath: " << fullPath << ", method: " << method << ", error: " << ec.message();
+            return {.statusCode = status::internal_server_error, .body = "Could not connect to docker Windows Docker API"};
         }
 
         // Prepare message
@@ -99,7 +150,7 @@ namespace AwsMock::Core {
             log_error << "Shutdown socket failed, error: " << ec.message();
             return {.statusCode = status::internal_server_error, .body = ec.message()};
         }
-        return PrepareResult(response);
+        return PrepareResult(response);*/
     }
 
     void WindowsSocket::GetHostPort(const std::string &url, std::string &host, int &port) {

@@ -212,8 +212,8 @@ namespace AwsMock::Service {
         // assert
         EXPECT_FALSE(response.messageId.empty());
         EXPECT_TRUE(response.md5Body == BODY_MD5);
-        EXPECT_TRUE(response.md5UserAttr == EMPTY_MD5);
-        EXPECT_TRUE(response.md5SystemAttr.empty());
+        EXPECT_TRUE(response.md5MessageAttributes == EMPTY_MD5);
+        EXPECT_TRUE(response.md5SystemAttributes.empty());
     }
 
     TEST_F(SQSServiceTest, MessagesCreateTest) {
@@ -238,12 +238,12 @@ namespace AwsMock::Service {
         // assert
         EXPECT_FALSE(response1.messageId.empty());
         EXPECT_TRUE(response1.md5Body == BODY_MD5);
-        EXPECT_TRUE(response1.md5UserAttr == EMPTY_MD5);
-        EXPECT_TRUE(response1.md5SystemAttr.empty());
+        EXPECT_TRUE(response1.md5MessageAttributes == EMPTY_MD5);
+        EXPECT_TRUE(response1.md5SystemAttributes.empty());
         EXPECT_FALSE(response2.messageId.empty());
         EXPECT_TRUE(response2.md5Body == BODY_MD5);
-        EXPECT_TRUE(response2.md5UserAttr == EMPTY_MD5);
-        EXPECT_TRUE(response2.md5SystemAttr.empty());
+        EXPECT_TRUE(response2.md5MessageAttributes == EMPTY_MD5);
+        EXPECT_TRUE(response2.md5SystemAttributes.empty());
     }
 
     TEST_F(SQSServiceTest, MessageReceiveTest) {

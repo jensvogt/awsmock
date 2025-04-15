@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/transfer/IdentityProviderDetails.h>
+#include <awsmock/dto/transfer/model/IdentityProviderDetails.h>
 #include <awsmock/dto/transfer/model/Protocol.h>
 
 
