@@ -81,6 +81,7 @@
 #include <awsmock/service/s3/S3HashCreator.h>
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
+#include <awsmock/service/transfer/TransferService.h>
 
 namespace AwsMock::Service {
 
@@ -246,6 +247,15 @@ namespace AwsMock::Service {
          * @return PutObjectResponse
          */
         Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
+
+        /**
+         * @brief Put object, reading a file path
+         *
+         * @param username
+         * @param filename input file
+         * @param serverId current server id
+         */
+        void PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const;
 
         /**
          * @brief Touch object

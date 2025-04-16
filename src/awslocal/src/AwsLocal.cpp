@@ -7,15 +7,15 @@
 namespace AwsMock::AwsLocal {
 
     void AwsLocal::Initialize(const boost::program_options::variables_map &vm) {
-        if (vm.count("host")) {
+        if (vm.contains("host")) {
             _host = vm.at("host").as<std::string>();
             _baseUrl = "http://" + _host + ":" + std::to_string(_port);
         }
-        if (vm.count("port")) {
+        if (vm.contains("port")) {
             _port = vm.at("port").as<int>();
             _baseUrl = "http://" + _host + ":" + std::to_string(_port);
         }
-        if (vm.count("profile")) {
+        if (vm.contains("profile")) {
             _profile = vm.at("profile").as<std::string>();
             ReadAwsConfigFile();
         }
@@ -26,7 +26,7 @@ namespace AwsMock::AwsLocal {
         std::string out, err;
         command.push_back("--endpoint");
         command.push_back(_baseUrl);
-        Core::SystemUtils::RunShellCommand("C:/Program Files/Amazon/AWSCLIV2/aws.exe", command, "", out, err);
+        Core::SystemUtils::RunShellCommand(AWS_CMD, command, {}, out, err);
         if (!out.empty()) {
             std::cout << out;
         }

@@ -54,17 +54,19 @@ namespace AwsMock::Service {
 
     void TransferServer::StartTransferServer(Database::Entity::Transfer::Transfer &server) {
 
-        if (std::ranges::find(server.protocols, Database::Entity::Transfer::Protocol::FTP) != server.protocols.end()) {
-            StartFtpServer(server);
-        } else if (std::ranges::find(server.protocols, Database::Entity::Transfer::Protocol::SFTP) != server.protocols.end()) {
-            StartSftpServer(server);
+        for (const auto protocol: server.protocols) {
+            if (protocol == Database::Entity::Transfer::Protocol::FTP) {
+                StartFtpServer(server);
+            } else if (protocol == Database::Entity::Transfer::Protocol::SFTP) {
+                StartSftpServer(server);
+            }
         }
 
         // Update database
         server.lastStarted = system_clock::now();
         server.state = Database::Entity::Transfer::ServerState::ONLINE;
         server = _transferDatabase.UpdateTransfer(server);
-        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress;
+        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << ", protocols:" << server.protocols.size();
     }
 
     void TransferServer::StartFtpServer(Database::Entity::Transfer::Transfer &server) {
@@ -106,7 +108,7 @@ namespace AwsMock::Service {
         const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.sftp.port");
         const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.address");
 
-        SftpServer _sftpServer(std::to_string(port), "/etc/ssh/ssh_host_ed25519_key", address);
+        SftpServer _sftpServer;
 
         // Add users
         for (const auto &user: server.users) {
@@ -123,7 +125,7 @@ namespace AwsMock::Service {
         }
 
         // Start detached thread
-        boost::thread t(boost::ref(_sftpServer));
+        boost::thread t(boost::ref(_sftpServer), std::to_string(port), "/etc/ssh/ssh_host_ed25519_key", address, server.serverId);
         t.detach();
         log_info << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
     }

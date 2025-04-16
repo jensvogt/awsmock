@@ -47,6 +47,7 @@ char *mystrndup(const char *s, size_t n) {
 // User home directory
 char *userBasePath;
 char *currentUser;
+const char *currentServerId;
 
 enum sftp_handle_type {
     SFTP_nullptr_HANDLE,
@@ -84,17 +85,17 @@ static const char *ssh_str_error(int u_errno) {
 }
 
 static void stat_to_filexfer_attrib(const struct stat *z_st, struct sftp_attributes_struct *z_attr) {
-    z_attr->flags = 0 | (uint32_t) SSH_FILEXFER_ATTR_SIZE;
+    z_attr->flags = 0 | static_cast<uint32_t>(SSH_FILEXFER_ATTR_SIZE);
     z_attr->size = z_st->st_size;
 
-    z_attr->flags |= (uint32_t) SSH_FILEXFER_ATTR_UIDGID;
+    z_attr->flags |= static_cast<uint32_t>(SSH_FILEXFER_ATTR_UIDGID);
     z_attr->uid = z_st->st_uid;
     z_attr->gid = z_st->st_gid;
 
-    z_attr->flags |= (uint32_t) SSH_FILEXFER_ATTR_PERMISSIONS;
+    z_attr->flags |= static_cast<uint32_t>(SSH_FILEXFER_ATTR_PERMISSIONS);
     z_attr->permissions = z_st->st_mode;
 
-    z_attr->flags |= (uint32_t) SSH_FILEXFER_ATTR_ACMODTIME;
+    z_attr->flags |= static_cast<uint32_t>(SSH_FILEXFER_ATTR_ACMODTIME);
     z_attr->atime = z_st->st_atime;
     z_attr->mtime = z_st->st_mtime;
 }
@@ -146,6 +147,19 @@ static int unix_errno_to_ssh_stat(int u_errno) {
     }
 
     return ret;
+}
+
+/**
+ * @brief Return s3 key
+ *
+ * @param name filename
+ * @param prefix basedir prefix
+ * @return S3 key
+ */
+static const char *get_s3_key(const char *name, const char *prefix) {
+    const auto s3Key = static_cast<char *>(malloc(PATH_MAX));
+    strcpy(s3Key, name + strlen(prefix) + 1);
+    return s3Key;
 }
 
 /**
@@ -211,7 +225,7 @@ int awsmock_ssh_buffer_add_u32(ssh_buffer_struct *buffer, uint32_t data) {
 int awsmock_ssh_buffer_add_ssh_string(ssh_buffer_struct *buffer, ssh_string_struct *string) {
     uint32_t len = 0;
 
-    if (string == NULL) {
+    if (string == nullptr) {
         return -1;
     }
 
@@ -235,7 +249,7 @@ static int current_timestring(int hires, char *buf, size_t len) {
     time_t t;
 
     gettimeofday(&tv, nullptr);
-    t = (time_t) tv.tv_sec;
+    t = tv.tv_sec;
 
     const tm *tm = localtime(&t);
     if (tm == nullptr) {
@@ -256,7 +270,7 @@ static int current_timestring(int hires, char *buf, size_t len) {
 static void ssh_log_stderr(int verbosity, const char *function, const char *buffer) {
     char date[128] = {};
 
-    if (int rc = current_timestring(1, date, sizeof(date)); rc == 0) {
+    if (const int rc = current_timestring(1, date, sizeof(date)); rc == 0) {
         fprintf(stderr, "[%s, %d] %s:", date, verbosity, function);
     } else {
         fprintf(stderr, "[%d] %s", verbosity, function);
@@ -271,10 +285,10 @@ static void ssh_log_custom(ssh_logging_callback log_fn, int verbosity, const cha
     snprintf(buf, sizeof(buf), "%s: %s", function, buffer);
     log_fn(verbosity, function, buf, ssh_get_log_userdata());
 }
-void ssh_log_function(int verbosity, const char *function, const char *buffer) {
-    ssh_logging_callback log_fn = ssh_get_log_callback();
 
-    if (log_fn) {
+void ssh_log_function(const int verbosity, const char *function, const char *buffer) {
+
+    if (const ssh_logging_callback log_fn = ssh_get_log_callback()) {
         ssh_log_custom(log_fn, verbosity, function, buffer);
         return;
     }
@@ -1269,9 +1283,22 @@ static int process_close(sftp_client_message client_msg) {
     struct sftp_handle *h = nullptr;
     int ret;
 
+    log_debug << "Processing close, handle: " << reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle);
     awsmock_ssh_log_hexdump("Processing close: handle:", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
     h = static_cast<struct sftp_handle *>(sftp_handle(sftp, handle));
+
+    // Send to S3
+    if (h->fd > 0) {
+        char filePath[PATH_MAX];
+        char realFilePath[PATH_MAX];
+        sprintf(filePath, "%s/%d", "/proc/self/fd", h->fd);
+        const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
+        realFilePath[nBytes] = '\0';
+        const auto p = new AwsMock::Service::S3Service();
+        p->PutObject(currentUser, realFilePath, currentServerId);
+    }
+
     if (h->type == SFTP_FILE_HANDLE) {
         const int fd = h->fd;
         close(fd);
@@ -1283,6 +1310,7 @@ static int process_close(sftp_client_message client_msg) {
     } else {
         ret = SSH_ERROR;
     }
+
     SAFE_FREE(h->name);
     sftp_handle_remove(sftp, h);
     SAFE_FREE(h);
@@ -1290,7 +1318,7 @@ static int process_close(sftp_client_message client_msg) {
     if (ret == SSH_OK) {
         sftp_reply_status(client_msg, SSH_FX_OK, nullptr);
     } else {
-        log_error << "Closing file failed";
+        log_error << "Error closing file failed";
         sftp_reply_status(client_msg, SSH_FX_BAD_MESSAGE, "Invalid handle");
     }
 
@@ -1418,8 +1446,7 @@ static int readdir_long_name(char *z_file_name, struct stat *z_st, char *z_long_
     return SSH_OK;
 }
 
-static int
-process_readdir(sftp_client_message client_msg) {
+static int process_readdir(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
     const ssh_string handle = client_msg->handle;
     const struct sftp_handle *h = nullptr;
@@ -1428,6 +1455,8 @@ process_readdir(sftp_client_message client_msg) {
     dirent *dentry = nullptr;
     DIR *dir = nullptr;
     const char *handle_name = nullptr;
+
+    log_info << "Processing readdir: " << reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle);
 
     awsmock_ssh_log_hexdump("Processing readdir: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
@@ -1602,6 +1631,7 @@ static int process_lstat(sftp_client_message client_msg) {
     log_debug << "Processing lstat: " << filename;
 
     if (filename == nullptr) {
+        log_error << "File name error, filename: " << filename;
         sftp_reply_status(client_msg, SSH_FX_NO_SUCH_FILE, "File name error");
         return SSH_ERROR;
     }
@@ -1609,11 +1639,10 @@ static int process_lstat(sftp_client_message client_msg) {
 #ifdef _WIN32
     // TODO: fix me
 #else
-    int rv = lstat(filename, &st);
-    if (rv < 0) {
+    if (const int rv = lstat(filename, &st); rv < 0) {
         int status = SSH_FX_OK;
         const int saved_errno = errno;
-        log_error << "lstat failed: " << strerror(saved_errno);
+        log_error << "lstat failed: " << strerror(saved_errno) << ", filename:" << filename;
         status = unix_errno_to_ssh_stat(saved_errno);
         sftp_reply_status(client_msg, status, nullptr);
         ret = SSH_ERROR;
@@ -1826,7 +1855,7 @@ process_remove(sftp_client_message client_msg) {
 
 static int process_unsupported(sftp_client_message client_msg) {
     sftp_reply_status(client_msg, SSH_FX_OP_UNSUPPORTED, "Operation not supported");
-    log_debug << "Message type " << sftp_client_message_get_type(client_msg) << " not implemented";
+    log_warning << "Message type not implemented: " << sftp_client_message_get_type(client_msg);
     return SSH_OK;
 }
 
@@ -1953,6 +1982,7 @@ int sftp_reply_version(sftp_client_message client_msg) {
     const int version = sftp->client_version;
     ssh_buffer reply = ssh_buffer_new();
     if (reply == nullptr) {
+        log_error << "Could not allocate reply buffer";
         ssh_set_error_oom(session);
         return -1;
     }
@@ -1966,6 +1996,7 @@ int sftp_reply_version(sftp_client_message client_msg) {
 
     rc = awsmock_sftp_packet_write(sftp, SSH_FXP_VERSION, reply);
     if (rc < 0) {
+        log_error << "Could not write to reply buffer";
         SSH_BUFFER_FREE(reply);
         return -1;
     }
@@ -1997,14 +2028,14 @@ const sftp_message_handler message_handlers[] = {
         {"write", nullptr, SSH_FXP_WRITE, process_write},
         {"lstat", nullptr, SSH_FXP_LSTAT, process_lstat},
         {"fstat", nullptr, SSH_FXP_FSTAT, process_unsupported},
-        {"setstat", nullptr, SSH_FXP_SETSTAT, process_setstat},
+        {"setstat", nullptr, SSH_FXP_SETSTAT, process_setstat},//7
         {"fsetstat", nullptr, SSH_FXP_FSETSTAT, process_unsupported},
         {"opendir", nullptr, SSH_FXP_OPENDIR, process_opendir},
         {"readdir", nullptr, SSH_FXP_READDIR, process_readdir},
         {"remove", nullptr, SSH_FXP_REMOVE, process_remove},
         {"mkdir", nullptr, SSH_FXP_MKDIR, process_mkdir},
         {"rmdir", nullptr, SSH_FXP_RMDIR, process_rmdir},
-        {"realpath", nullptr, SSH_FXP_REALPATH, process_realpath},
+        {"realpath", nullptr, SSH_FXP_REALPATH, process_realpath},//14
         {"stat", nullptr, SSH_FXP_STAT, process_stat},
         {"rename", nullptr, SSH_FXP_RENAME, process_unsupported},
         {"readlink", nullptr, SSH_FXP_READLINK, process_readlink},
@@ -2047,7 +2078,7 @@ static int dispatch_sftp_request(sftp_client_message sftp_msg) {
     sftp_server_message_callback handler = nullptr;
     const uint8_t type = sftp_client_message_get_type(sftp_msg);
 
-    log_info << "Dispatch request, type: " << std::to_string(type) << ", name: " << message_handlers[type].name;
+    log_trace << "Dispatch request, type: " << std::to_string(type) << ", name: " << message_handlers[type].name;
 
     for (int i = 0; message_handlers[i].cb != nullptr; i++) {
         if (type == message_handlers[i].type) {
@@ -2864,7 +2895,7 @@ int ssh_buffer_unpack_va(ssh_buffer_struct *buffer, const char *format, size_t a
 
     max_len = ssh_buffer_get_len(buffer);
 
-    /* copy the argument list in case a rollback is needed */
+    // copy the argument list in case a rollback is needed
     va_copy(ap_copy, ap);
 
     if (argc > 256) {
@@ -3319,7 +3350,6 @@ static void handle_session(const ssh_event &event, const ssh_session &session) {
 }// extern C
 
 namespace AwsMock::Service {
-    SftpServer::SftpServer(const std::string &port, const std::string &hostKey, const std::string &address) : _port(port), _hostKey(hostKey), _address(address) {}
 
     void SftpServer::AddUser(const std::string &userName, const std::string &password, const std::string &homeDirectory) {
 
@@ -3327,11 +3357,12 @@ namespace AwsMock::Service {
         _sftpUsers.emplace_back(user);
     }
 
-    void SftpServer::operator()() const {
+    void SftpServer::operator()(const std::string &port, const std::string &hostKey, const std::string &address, const std::string &serverId) const {
 
         ssh_bind sshbind = nullptr;
         ssh_session session = nullptr;
         ssh_event event = nullptr;
+        currentServerId = serverId.c_str();
 
         // Change working directory
         const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
@@ -3354,12 +3385,12 @@ namespace AwsMock::Service {
             log_error << "SSH bind new failed";
             return;
         }
-        log_info << "SFTP server starting, endpoint: " << _address.c_str() << ":" << _port.c_str();
+        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str();
 
         // Command line options
-        ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT_STR, "2222");
-        ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_HOSTKEY, _hostKey.c_str());
-        ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDADDR, "0.0.0.0");
+        ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT_STR, port.c_str());
+        ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_HOSTKEY, hostKey.c_str());
+        ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDADDR, address.c_str());
         set_default_keys(sshbind, 0, 0);
 
         if (ssh_bind_listen(sshbind) < 0) {

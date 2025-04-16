@@ -202,6 +202,7 @@ awsmock:
         address: 0.0.0.0                                                # FTP listening address
         pasv-min: 6000                                                  # Passive mode minimum port
         pasv-max: 6100                                                  # Passive mode maximal port
+        host-key: /usr/local/awsmock/etc/ssh_host_key                   # SSH host private key
   monitoring: # Monitoring
     active: true                                                        # Activation flag
     port: 9091                                                          # Prometheus port
