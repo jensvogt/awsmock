@@ -12,14 +12,11 @@ awsmock:
   temp-dir: C:/Program Files (x86)/awsmock/data/tmp                   # General temp directory
   data-dir: C:/Program Files (x86)/awsmock/data                       # General data directory
   dockerized: false                                                   # Dockerized flag
-  # Libmagic database
-  magic-file: C:/Program Files (x86)/awsmock/magic.mgc
-  # JSON settings
-  json:
+  magic-file: C:/Program Files (x86)/awsmock/magic.mgc                # Libmagic database
+  json: # JSON settings
     pretty: true                                                      # JSON pretty print
-  # LibMagic settings
-  magic:
-    file: C:/Program Files (x86)/awsmock/etc/magic.mgc
+  magic: # LibMagic settings
+    file: C:/Program Files (x86)/awsmock/etc/magic.mgc                # LibMagic database
   aws: # AWS settings
     signature: # AWS signature settings
       verify: false                                                   # Verify AWS signature
@@ -55,7 +52,7 @@ awsmock:
       temp-size: 10240                                                # Docker container tmp size
     container: # Podman container defaults
       port: 8080                                                      # Docker container default port
-    socket: /var/run/podman/podman.sock                               # Docker REST API domain socket
+    socket: http://localhost:2375                                     # Docker REST API domain/HTTP socket, default: /var/run/docker.sock (Linux, MacOS), tcp://localhost:2375 (Windows)
   mongodb: # Mongo DB settings
     active: true                                                      # MongoDB activation flag
     name: awsmock                                                     # MongoDB database name
@@ -108,8 +105,7 @@ awsmock:
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
       data-dir: C:/Program Files (x86)/awsmock/data/lambda           # Lambda data directory
-      # Lambda runtimes
-      runtime:
+      runtime: # Lambda runtimes
         java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
         java17: public.ecr.aws/lambda/java:17                        # Lambda Java 17 runtime
         java21: public.ecr.aws/lambda/java:21.2024.11.22.15          # Lambda Java 17 runtime (16.03.2025: latest has problem with classloader)
@@ -162,11 +158,10 @@ awsmock:
         period: 300
       worker:
         period: 3600
-    # AWS transfer server
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: /usr/local/awsmock/data/transfer                        # FTP data directory
+      data-dir: C:/Program Files (x86)/awsmock/data/transfer            # FTP data directory
       directories:
         - incoming/mix
         - feedback
@@ -184,6 +179,7 @@ awsmock:
         address: 0.0.0.0                                                # FTP listening address
         pasv-min: 6000                                                  # Passive mode minimum port
         pasv-max: 6100                                                  # Passive mode maximal port
+        host-key: C:/Program Files (x86)/awsmock/etc/ssh_host_key       # SSH host private key
   monitoring: # Monitoring
     active: true                                                        # Activation flag
     port: 9091                                                          # Prometheus port

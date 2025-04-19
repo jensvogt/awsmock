@@ -132,7 +132,7 @@ namespace AwsMock::Core {
 }// namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
-#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+macos __FILE__, __LINE__macos #define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)

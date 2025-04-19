@@ -267,7 +267,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
-    // Set log level
+    // Set log file
     if (vm.contains("logfile")) {
         auto value = vm["logfile"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.prefix", value);
