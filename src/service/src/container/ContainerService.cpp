@@ -86,14 +86,14 @@ namespace AwsMock::Service {
         const std::string imageName = name + ":" + tag;
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/images/" + imageName + "/json");
         if (statusCode != http::status::ok) {
-            log_warning << "Get image by name failed, statusCode: " << statusCode;
+            log_warning << "Get image by name failed, name: " << imageName << ", statusCode: " << statusCode;
             return {};
         }
         Dto::Docker::Image response;
         response.FromJson(body);
         response.id = Core::StringUtils::Split(response.id, ':')[1];
 
-        log_debug << "Image found, name: " << name << ":" << tag;
+        log_debug << "Image found, name: " << imageName;
         return response;
     }
 
@@ -328,7 +328,6 @@ namespace AwsMock::Service {
             return inspectContainerResponse;
         }
 
-
         inspectContainerResponse.FromJson(body);
         log_debug << "Container found, containerId: " << containerId;
         return inspectContainerResponse;
@@ -460,20 +459,19 @@ namespace AwsMock::Service {
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
             if (statusCode == http::status::ok) {
                 log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+            response.FromJson(body);
             } else {
                 log_error << "Docker network create failed, statusCode: " << statusCode;
             }
-            response.FromJson(body);
-
         } else {
 
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
             if (statusCode == http::status::ok) {
                 log_debug << "Podman network created, name: " << request.name << " driver: " << request.driver;
+                response.FromJson(body);
             } else {
                 log_error << "Podman network create failed, statusCode: " << statusCode;
             }
-            response.FromJson(body);
         }
         return response;
     }

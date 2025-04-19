@@ -19,10 +19,10 @@ namespace AwsMock::Core {
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
-        DefineStringProperty("awsmock.access.key-id", "AWSMOCK_ACCESS_ACCOUNT_KEY_ID", "none");
-        DefineStringProperty("awsmock.access.account-id", "AWSMOCK_ACCESS_ACCOUNT_ID", "000000000000");
-        DefineStringProperty("awsmock.access.client-id", "AWSMOCK_ACCESS_CLIENT_ID", "00000000");
-        DefineStringProperty("awsmock.access.secret-access-key", "AWSMOCK_ACCESS_SECRET_ACCESS_KEY", "none");
+        DefineStringProperty("awsmock.access.keyid", "AWSMOCK_ACCESS_ACCOUNT_KEY_ID", "none");
+        DefineStringProperty("awsmock.access.accountid", "AWSMOCK_ACCESS_ACCOUNT_ID", "000000000000");
+        DefineStringProperty("awsmock.access.clientid", "AWSMOCK_ACCESS_CLIENT_ID", "00000000");
+        DefineStringProperty("awsmock.access.secretaccesskey", "AWSMOCK_ACCESS_SECRET_ACCESS_KEY", "none");
 #ifdef _WIN32
         DefineStringProperty("awsmock.data-dir", "AWSMOCK_DATA_DIR", "C:/Program Files (x86)/awsmock/data/");
         DefineStringProperty("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "C:/Program Files (x86)/awsmock/tmp/");
@@ -106,6 +106,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.modules.transfer.ftp.pasv-max", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MAX", 6100);
         DefineIntProperty("awsmock.modules.transfer.ftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 21);
         DefineStringProperty("awsmock.modules.transfer.ftp.address", "AWSMOCK_MODULES_TRANSFER_FTP_ADDRESS", "0.0.0.0");
+        DefineStringArrayProperty("awsmock.modules.transfer.directories", "AWSMOCK_MODULES_TRANSFER_DIRECTORIES", "incoming;outgoing");
 
         // Cognito
         DefineBoolProperty("awsmock.modules.cognito.active", "AWSMOCK_MODULES_COGNITO_ACTIVE", true);
@@ -280,8 +281,6 @@ namespace AwsMock::Core {
 
         // Reapply environment settings
         ApplyEnvSettings();
-
-        log_debug << ToString();
     }
 
     void Configuration::SetValueString(const std::string &key, const std::string &value) {
@@ -472,7 +471,7 @@ namespace AwsMock::Core {
     }
 
     std::ostream &operator<<(std::ostream &os, const Configuration &s) {
-        os << "Configuration={" + s.ToString() + "}";
+        os << "Configuration=" + YAML::Dump(s._yamlConfig);
         return os;
     }
 }// namespace AwsMock::Core
