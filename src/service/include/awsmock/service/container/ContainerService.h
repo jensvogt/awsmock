@@ -185,6 +185,18 @@ namespace AwsMock::Service {
         [[nodiscard]] bool ContainerExistsByName(const std::string &containerName) const;
 
         /**
+         * @brief Checks whether a container exists by image name.
+         *
+         * @par
+         * The image name should be given als '<image>:<tag>'.
+         *
+         * @param imageName image name including the tag
+         * @param tag image tag
+         * @return true if container exists, otherwise false
+         */
+        [[nodiscard]] bool ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const;
+
+        /**
          * @brief Checks whether a container is in running state
          *
          * @par

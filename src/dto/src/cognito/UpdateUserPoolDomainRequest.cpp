@@ -2,7 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include "awsmock/dto/cognito/UpdateUserPoolDomainRequest.h"
+#include <awsmock/dto/cognito/UpdateUserPoolDomainRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -24,7 +24,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string UpdateUserPoolDomainRequest::ToJson() const {
+    std::string UpdateUserPoolDomainRequest::ToJson() {
 
         try {
 
@@ -43,14 +43,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string UpdateUserPoolDomainRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const UpdateUserPoolDomainRequest &r) {
-        os << "UpdateUserPoolDomainRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

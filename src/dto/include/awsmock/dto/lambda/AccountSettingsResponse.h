@@ -37,7 +37,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct AccountSettingsResponse : Common::BaseRequest {
+    struct AccountSettingsResponse : Common::BaseRequest<AccountSettingsResponse> {
 
         /**
          * Account limits
@@ -54,21 +54,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AccountSettingsResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

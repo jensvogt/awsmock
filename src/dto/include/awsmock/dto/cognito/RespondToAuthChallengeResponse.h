@@ -44,7 +44,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RespondToAuthChallengeResponse : Common::BaseRequest {
+    struct RespondToAuthChallengeResponse final : Common::BaseRequest<RespondToAuthChallengeResponse> {
 
         /**
          * The session that should be passed both ways in challenge-response calls to the service. If InitiateAuth or RespondToAuthChallenge API
@@ -75,21 +75,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const RespondToAuthChallengeResponse &i);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Cognito

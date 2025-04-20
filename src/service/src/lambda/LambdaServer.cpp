@@ -157,7 +157,10 @@ namespace AwsMock::Service {
             // Loop over lambdas and create the containers
             log_info << "Start creating lambda functions, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
-                Dto::Lambda::CreateFunctionRequest request = {{.region = _region}, lambda.function, lambda.runtime};
+                Dto::Lambda::CreateFunctionRequest request;
+                request.region = _region;
+                request.functionName = lambda.function;
+                request.runtime = lambda.runtime;
                 Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
                 log_debug << "Lambda containers created, function: " << lambda.function;
             }

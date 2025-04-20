@@ -25,7 +25,7 @@ namespace AwsMock::Core {
         archive_write_disk_set_options(ext, flags);
         archive_write_disk_set_standard_lookup(ext);
         if ((r = archive_read_open_filename(a, zipFile.c_str(), 10240)) != 0) {
-            log_error << "Could not open ZIP file, path: " << zipFile;
+            log_error << "Could not open ZIP file, path: " << zipFile << ", directory: "<< directory;
             return;
         }
         for (;;) {

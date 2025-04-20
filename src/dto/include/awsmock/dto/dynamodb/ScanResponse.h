@@ -59,7 +59,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ScanResponse : Common::BaseRequest {
+    struct ScanResponse final : Common::BaseRequest<ScanResponse> {
 
         /**
          * Region
@@ -108,32 +108,18 @@ namespace AwsMock::Dto::DynamoDb {
         void PrepareResponse(const Database::Entity::DynamoDb::Table &table);
 
         /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Parse a JSON stream
+         * @brief Parse a JSON stream
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ScanResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

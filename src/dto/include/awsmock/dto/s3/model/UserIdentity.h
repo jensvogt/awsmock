@@ -16,6 +16,11 @@
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief S3 object user identity DTO
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct UserIdentity {
 
         /**

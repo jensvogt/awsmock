@@ -37,7 +37,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteItemResponse : Common::BaseRequest {
+    struct DeleteItemResponse : Common::BaseRequest<DeleteItemResponse> {
 
         /**
          * Region
@@ -65,13 +65,6 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Parse a JSON stream
          *
          * @param jsonString JSON string
@@ -79,18 +72,11 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteItemResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

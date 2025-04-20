@@ -43,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListItemCountersResponse : Common::BaseRequest {
+    struct ListItemCountersResponse : Common::BaseRequest<ListItemCountersResponse> {
 
         /**
          * Items

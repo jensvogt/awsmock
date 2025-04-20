@@ -24,6 +24,7 @@
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/LogStream.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
@@ -46,42 +47,46 @@ namespace AwsMock::Core {
 
     template<typename T>
     void SetValueByPath(YAML::Node &_yamlConfig, const std::string &key, T value) {
+        try{
+            const std::vector<std::string> tags = StringUtils::Split(key, '.');
+            const int numTags = static_cast<int>(tags.size());
 
-        const std::vector<std::string> tags = StringUtils::Split(key, '.');
-        const int numTags = static_cast<int>(tags.size());
+            // Reads root node.
+            assert(numTags > 0);
+            assert(_yamlConfig);
+            YAML::Node *parentNode = &_yamlConfig;
 
-        // Reads root node.
-        assert(numTags > 0);
-        assert(_yamlConfig);
-        YAML::Node *parentNode = &_yamlConfig;
+            // Determines index of first non-existing node.
+            int i = 0;
+            for (; i < numTags - 1; i++) {
+                if (const std::string &tag = tags.at(i); (*parentNode)[tag]) {
+                    auto childNode = (*parentNode)[tag];
+                    parentNode = &childNode;
+                } else {
+                    break;
+                }
+            }
 
-        // Determines index of first non-existing node.
-        int i = 0;
-        for (; i < numTags - 1; i++) {
-            if (const std::string &tag = tags.at(i); (*parentNode)[tag]) {
-                auto childNode = (*parentNode)[tag];
-                parentNode = &childNode;
+            // Note: necessary because *parentNode will later point to a different node due to lib behavior .
+            YAML::Node lastExistingNode = *parentNode;
+
+            // Sets node value and creates missing nodes.
+            if (i == numTags - 1) {
+                lastExistingNode[tags.back()] = value;
             } else {
-                break;
+                YAML::Node newNode;
+                newNode = value;
+                for (int j = numTags - 1; j > i; j--) {
+                    YAML::Node tmpNode;
+                    tmpNode[tags.at(j)] = newNode;
+                    newNode = tmpNode;
+                }
+                // Inserts missing nodes.
+                lastExistingNode[tags.at(i)] = newNode;
             }
-        }
-
-        // Note: necessary because *parentNode will later point to a different node due to lib behavior .
-        YAML::Node lastExistingNode = *parentNode;
-
-        // Sets node value and creates missing nodes.
-        if (i == numTags - 1) {
-            lastExistingNode[tags.back()] = value;
-        } else {
-            YAML::Node newNode;
-            newNode = value;
-            for (int j = numTags - 1; j > i; j--) {
-                YAML::Node tmpNode;
-                tmpNode[tags.at(j)] = newNode;
-                newNode = tmpNode;
-            }
-            // Inserts missing nodes.
-            lastExistingNode[tags.at(i)] = newNode;
+        } catch (YAML::Exception &e) {
+            //log_error << "YAML exception: " << e.msg.c_str() << ", key: " << key.c_str();
+            std::cerr << "YAML exception: " << e.msg << ", key: " << key << std::endl;
         }
     }
 
@@ -123,6 +128,7 @@ namespace AwsMock::Core {
          * @param basename basename of the configuration file.
          */
         explicit Configuration(const std::string &basename);
+        void (Configuration::*get_value())(const std::string &, const std::string &, bool);
 
         /**
          * @brief Define a new configuration property.

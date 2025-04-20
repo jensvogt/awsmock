@@ -6,21 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string PutItemResponse::ToJson() const {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
-            return Core::Bson::BsonUtils::ToJsonString(document);
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void PutItemResponse::FromJson(const std::string &jsonString) {
 
         body = jsonString;
@@ -37,15 +22,19 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string PutItemResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string PutItemResponse::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const PutItemResponse &r) {
-        os << "PutItemResponse=" << r.ToJson();
-        return os;
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

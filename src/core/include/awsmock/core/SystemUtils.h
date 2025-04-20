@@ -25,6 +25,9 @@
 
 #define RANDOM_PORT_MIN 32768
 #define RANDOM_PORT_MAX 65536
+#ifdef _WIN32
+#define BUFSIZE 4096
+#endif
 
 namespace AwsMock::Core {
 
@@ -77,6 +80,23 @@ namespace AwsMock::Core {
          * @return number of CPU cores
          */
         static int GetNumberOfCores();
+
+        /**
+         * @brief Returns the value of an environment variable or empty string, if not existent.
+         *
+         * @param name of the environment variable
+         * @return value of the environment variable as string
+         */
+        static std::string GetEnvironmentVariableValue(const std::string &name);
+
+        /**
+         * @brief Returns true if environment variable exists.
+         *
+         * @param name of the environment variable
+         * @return true if existent, otherwise false
+         */
+        static bool HasEnvironmentVariable(const std::string &name);
+
 
         /**
          * @brief Run command in a shell

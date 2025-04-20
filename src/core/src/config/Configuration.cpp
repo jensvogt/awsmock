@@ -102,10 +102,19 @@ namespace AwsMock::Core {
 #endif
         DefineIntProperty("awsmock.modules.transfer.monitoring.period", "AWSMOCK_MODULES_TRANSFER_MONITORING_PERIOD", 300);
         DefineIntProperty("awsmock.modules.transfer.worker.period", "AWSMOCK_MODULES_TRANSFER_WORKER_PERIOD", 300);
+        DefineStringArrayProperty("awsmock.modules.transfer.directories", "AWSMOCK_MODULES_TRANSFER_DIRECTORIES", "incoming;outgoing");
+
+        // FTP server
         DefineIntProperty("awsmock.modules.transfer.ftp.pasv-min", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MIN", 6000);
         DefineIntProperty("awsmock.modules.transfer.ftp.pasv-max", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MAX", 6100);
-        DefineIntProperty("awsmock.modules.transfer.ftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 21);
+        DefineIntProperty("awsmock.modules.transfer.ftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 2121);
         DefineStringProperty("awsmock.modules.transfer.ftp.address", "AWSMOCK_MODULES_TRANSFER_FTP_ADDRESS", "0.0.0.0");
+
+        // SFTP server
+        DefineIntProperty("awsmock.modules.transfer.sftp.pasv-min", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MIN", 6000);
+        DefineIntProperty("awsmock.modules.transfer.sftp.pasv-max", "AWSMOCK_MODULES_TRANSFER_FTP_PASV_MAX", 6100);
+        DefineIntProperty("awsmock.modules.transfer.sftp.port", "AWSMOCK_MODULES_TRANSFER_FTP_PORT", 22222);
+        DefineStringProperty("awsmock.modules.transfer.sftp.address", "AWSMOCK_MODULES_TRANSFER_FTP_ADDRESS", "0.0.0.0");
 
         // Cognito
         DefineBoolProperty("awsmock.modules.cognito.active", "AWSMOCK_MODULES_COGNITO_ACTIVE", true);
@@ -194,9 +203,9 @@ namespace AwsMock::Core {
 
     void Configuration::DefineStringProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
         std::string value = defaultValue;
-        if (getenv(envProperty.c_str()) != nullptr) {
-            value = getenv(envProperty.c_str());
-            AddToEnvList(key, getenv(envProperty.c_str()));
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = SystemUtils::GetEnvironmentVariableValue(envProperty);
+            AddToEnvList(key, value);
         }
         value = ReplaceEnvironmentVariables(value);
         SetValueByPath(_yamlConfig, key, value);
@@ -205,9 +214,9 @@ namespace AwsMock::Core {
 
     void Configuration::DefineStringArrayProperty(const std::string &key, const std::string &envProperty, const std::string &defaultValue) {
         std::string value = defaultValue;
-        if (getenv(envProperty.c_str()) != nullptr) {
-            value = getenv(envProperty.c_str());
-            AddToEnvList(key, getenv(envProperty.c_str()));
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = SystemUtils::GetEnvironmentVariableValue(envProperty);
+            AddToEnvList(key, value);
         }
         std::vector<std::string> values = StringUtils::Split(value, ';');
         for (auto &v: values) { value = ReplaceEnvironmentVariables(v); }
@@ -217,9 +226,9 @@ namespace AwsMock::Core {
 
     void Configuration::DefineBoolProperty(const std::string &key, const std::string &envProperty, const bool defaultValue) {
         bool value = defaultValue;
-        if (getenv(envProperty.c_str()) != nullptr) {
-            value = StringUtils::Equals(getenv(envProperty.c_str()), "true");
-            AddToEnvList(key, getenv(envProperty.c_str()));
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = StringUtils::Equals(SystemUtils::GetEnvironmentVariableValue(envProperty), "true");
+            AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
         SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -227,9 +236,9 @@ namespace AwsMock::Core {
 
     void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
         std::string value = std::to_string(defaultValue);
-        if (getenv(envProperty.c_str()) != nullptr) {
-            value = getenv(envProperty.c_str());
-            AddToEnvList(key, getenv(envProperty.c_str()));
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = std::stoi(SystemUtils::GetEnvironmentVariableValue(envProperty));
+            AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
         SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -237,9 +246,9 @@ namespace AwsMock::Core {
 
     void Configuration::DefineLongProperty(const std::string &key, const std::string &envProperty, const long defaultValue) {
         long value = defaultValue;
-        if (getenv(envProperty.c_str()) != nullptr) {
-            value = std::stol(getenv(envProperty.c_str()));
-            AddToEnvList(key, getenv(envProperty.c_str()));
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = std::stol(SystemUtils::GetEnvironmentVariableValue(envProperty));
+            AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
         SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -247,9 +256,9 @@ namespace AwsMock::Core {
 
     void Configuration::DefineDoubleProperty(const std::string &key, const std::string &envProperty, const double defaultValue) {
         double value = defaultValue;
-        if (getenv(envProperty.c_str()) != nullptr) {
-            value = std::stod(getenv(envProperty.c_str()));
-            AddToEnvList(key, getenv(envProperty.c_str()));
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = std::stod(SystemUtils::GetEnvironmentVariableValue(envProperty));
+            AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
         SetValueByPath(_yamlConfig, key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
@@ -270,6 +279,7 @@ namespace AwsMock::Core {
         }
         if (!FileUtils::FileExists(filename)) {
             log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
+            return;
         }
 
         // Save file name
@@ -280,13 +290,11 @@ namespace AwsMock::Core {
 
         // Reapply environment settings
         ApplyEnvSettings();
-
-        log_debug << ToString();
     }
 
     void Configuration::SetValueString(const std::string &key, const std::string &value) {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         SetValueByPath(_yamlConfig, key, value);
@@ -301,7 +309,7 @@ namespace AwsMock::Core {
 
     void Configuration::SetValueInt(const std::string &key, const int value) {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         SetValueByPath(_yamlConfig, key, value);
@@ -310,7 +318,7 @@ namespace AwsMock::Core {
 
     void Configuration::SetValueLong(const std::string &key, const long value) {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         SetValueByPath(_yamlConfig, key, value);
@@ -319,7 +327,7 @@ namespace AwsMock::Core {
 
     void Configuration::SetValueFloat(const std::string &key, const float value) {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         SetValueByPath(_yamlConfig, key, value);
@@ -328,7 +336,7 @@ namespace AwsMock::Core {
 
     void Configuration::SetValueDouble(const std::string &key, const double value) {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         SetValueByPath(_yamlConfig, key, value);
@@ -337,7 +345,7 @@ namespace AwsMock::Core {
 
     std::string Configuration::GetValueString(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -347,7 +355,7 @@ namespace AwsMock::Core {
 
     std::vector<std::string> Configuration::GetValueStringArray(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -358,7 +366,7 @@ namespace AwsMock::Core {
 
     int Configuration::GetValueInt(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -367,7 +375,7 @@ namespace AwsMock::Core {
 
     long Configuration::GetValueLong(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -376,7 +384,7 @@ namespace AwsMock::Core {
 
     bool Configuration::GetValueBool(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -385,7 +393,7 @@ namespace AwsMock::Core {
 
     float Configuration::GetValueFloat(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -394,7 +402,7 @@ namespace AwsMock::Core {
 
     double Configuration::GetValueDouble(const std::string &key) const {
         if (!HasProperty(key)) {
-            log_error << "Property not found, key: " + key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> paths = StringUtils::Split(key, '.');
@@ -454,11 +462,10 @@ namespace AwsMock::Core {
                 }
 
                 // Search for env var and replace if found
-                if (const char *s = getenv(envVarName.c_str()); s != nullptr) {
-                    std::string temp(s);
+                if (SystemUtils::HasEnvironmentVariable(envVarName)) {
+                    std::string temp = SystemUtils::GetEnvironmentVariableValue(envVarName);
 
-                    // Since we're manipulating the string, do a new find
-                    // instead of using original match info
+                    // Since we're manipulating the string, do a new find instead of using original match info
                     if (const size_t pos = value.find(match, offset); pos != std::string::npos) {
                         value.replace(pos, match.length(), temp);
                         offset = pos + value.length();
@@ -472,7 +479,7 @@ namespace AwsMock::Core {
     }
 
     std::ostream &operator<<(std::ostream &os, const Configuration &s) {
-        os << "Configuration={" + s.ToString() + "}";
+        os << "Configuration=" + Dump(s._yamlConfig);
         return os;
     }
 }// namespace AwsMock::Core

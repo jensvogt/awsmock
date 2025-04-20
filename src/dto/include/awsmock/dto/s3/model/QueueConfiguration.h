@@ -19,7 +19,7 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 notification configuration for a SQS queue.
+     * @brief S3 notification configuration for a SQS queue.
      *
      * <p>
      * This configures the S3 module to send a message to the supplied SQS queue. Depending on the event type and the

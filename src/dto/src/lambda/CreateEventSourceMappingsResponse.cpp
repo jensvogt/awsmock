@@ -6,7 +6,22 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string CreateEventSourceMappingsResponse::ToJson() const {
+    void CreateEventSourceMappingsResponse::FromJson(const std::string &jsonString) {
+        try {
+            const value document = bsoncxx::from_json(jsonString);
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
+            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "EventSourceArn");
+            batchSize = Core::Bson::BsonUtils::GetIntValue(document, "BatchSize");
+            maximumBatchingWindowInSeconds = Core::Bson::BsonUtils::GetIntValue(document, "MaximumBatchingWindowInSeconds");
+            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "Enabled");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    std::string CreateEventSourceMappingsResponse::ToJson() {
 
         try {
 
@@ -24,32 +39,6 @@ namespace AwsMock::Dto::Lambda {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-    void CreateEventSourceMappingsResponse::FromJson(const std::string &jsonString) {
-        try {
-            const value document = bsoncxx::from_json(jsonString);
-            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
-            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "EventSourceArn");
-            batchSize = Core::Bson::BsonUtils::GetIntValue(document, "BatchSize");
-            maximumBatchingWindowInSeconds = Core::Bson::BsonUtils::GetIntValue(document, "MaximumBatchingWindowInSeconds");
-            enabled = Core::Bson::BsonUtils::GetBoolValue(document, "Enabled");
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    std::string CreateEventSourceMappingsResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const CreateEventSourceMappingsResponse &r) {
-        os << "CreateEventSourceMappingsResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::Lambda

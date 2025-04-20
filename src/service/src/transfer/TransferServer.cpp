@@ -33,12 +33,12 @@ namespace AwsMock::Service {
 
     void TransferServer::CreateTransferBucket() {
         Dto::S3::CreateBucketRequest request;
-        request.name = "transfer-server";
         request.owner = Core::Configuration::instance().GetValueString("awsmock.user");
         request.region = Core::Configuration::instance().GetValueString("awsmock.region");
+        request.name = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
         if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
+            log_debug << "Creating bucket " << request.name << ", region: " << request.region << ", owner: " << request.owner;
             Dto::S3::CreateBucketResponse response = s3Service.CreateBucket(request);
-            log_debug << "Created bucket " << request.name;
         }
     }
 
@@ -107,26 +107,25 @@ namespace AwsMock::Service {
         const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.sftp.port");
         const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.address");
-        const std::string hostKey = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.host-key");
 
         SftpServer _sftpServer;
 
         // Add users
         for (const auto &user: server.users) {
 
-            // Create home directory
+            // Create hom directory
             std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
             Core::DirUtils::EnsureDirectory(homeDir);
 
             // Add user
-            _sftpServer.AddUser(user.userName, user.password, homeDir);
+            SftpServer::AddUser(user.userName, user.password, homeDir);
 
             // Ensure the home directory exists
             log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
         }
 
         // Start detached thread
-        boost::thread t(boost::ref(_sftpServer), std::to_string(port), hostKey, address, server.serverId);
+        boost::thread t(boost::ref(_sftpServer), std::to_string(port), "/etc/ssh/ssh_host_ed25519_key", address, server.serverId);
         t.detach();
         log_info << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
     }

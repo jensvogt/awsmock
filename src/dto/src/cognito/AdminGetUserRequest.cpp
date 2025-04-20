@@ -6,22 +6,6 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string AdminGetUserRequest::ToJson() const {
-
-        try {
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
-            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
-
-            return Core::Bson ::BsonUtils::ToJsonString(document);
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void AdminGetUserRequest::FromJson(const std::string &payload) {
 
         try {
@@ -37,14 +21,20 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminGetUserRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
+    std::string AdminGetUserRequest::ToJson() {
+
+        try {
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "UserPoolId", userPoolId);
+            Core::Bson::BsonUtils::SetStringValue(document, "Username", userName);
+
+            return Core::Bson ::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
-    std::ostream &operator<<(std::ostream &os, const AdminGetUserRequest &r) {
-        os << "AdminGetUserRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

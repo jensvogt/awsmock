@@ -30,7 +30,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EncryptResponse : Common::BaseRequest {
+    struct EncryptResponse : Common::BaseRequest<EncryptResponse> {
 
         /**
          * Key ID
@@ -63,21 +63,7 @@ namespace AwsMock::Dto::KMS {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const EncryptResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::KMS

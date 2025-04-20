@@ -6,60 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string CreateTableRequest::ToJson() const {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
-            Core::Bson::BsonUtils::SetStringValue(document, "TableClass", tableClass);
-            Core::Bson::BsonUtils::SetDocumentValue(document, "ProvisionedThroughput", provisionedThroughput.ToDocument());
-
-            // Attributes
-            if (!attributes.empty()) {
-                array attributeArray;
-                for (const auto &[fst, snd]: attributes) {
-                    bsoncxx::builder::basic::document attributeDocument;
-                    Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeName", fst);
-                    Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeType", snd);
-                    attributeArray.append(attributeDocument);
-                }
-                document.append(kvp("AttributeDefinitions", attributeArray));
-            }
-
-            // Key schema
-            if (!keySchemas.empty()) {
-                array keySchemasArray;
-                for (const auto &[fst, snd]: keySchemas) {
-                    bsoncxx::builder::basic::document keySchemaDocument;
-                    Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "AttributeName", fst);
-                    Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "KeyType", snd);
-                    keySchemasArray.append(keySchemaDocument);
-                }
-                document.append(kvp("KeySchema", keySchemasArray));
-            }
-
-            // Tags
-            if (!tags.empty()) {
-                array tagsArray;
-                for (const auto &[fst, snd]: tags) {
-                    bsoncxx::builder::basic::document tagDocument;
-                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Key", fst);
-                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Value", snd);
-                    tagsArray.append(tagDocument);
-                }
-                document.append(kvp("Tags", tagsArray));
-            }
-
-            return Core::Bson::BsonUtils::ToJsonString(document);
-
-        } catch (std::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void CreateTableRequest::FromJson(const std::string &jsonBody) {
 
         if (jsonBody.empty()) {
@@ -116,15 +62,58 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string CreateTableRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string CreateTableRequest::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const CreateTableRequest &r) {
-        os << "CreateTableRequest=" << r.ToJson();
-        return os;
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableClass", tableClass);
+            Core::Bson::BsonUtils::SetDocumentValue(document, "ProvisionedThroughput", provisionedThroughput.ToDocument());
+
+            // Attributes
+            if (!attributes.empty()) {
+                array attributeArray;
+                for (const auto &[fst, snd]: attributes) {
+                    bsoncxx::builder::basic::document attributeDocument;
+                    Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeName", fst);
+                    Core::Bson::BsonUtils::SetStringValue(attributeDocument, "AttributeType", snd);
+                    attributeArray.append(attributeDocument);
+                }
+                document.append(kvp("AttributeDefinitions", attributeArray));
+            }
+
+            // Key schema
+            if (!keySchemas.empty()) {
+                array keySchemasArray;
+                for (const auto &[fst, snd]: keySchemas) {
+                    bsoncxx::builder::basic::document keySchemaDocument;
+                    Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "AttributeName", fst);
+                    Core::Bson::BsonUtils::SetStringValue(keySchemaDocument, "KeyType", snd);
+                    keySchemasArray.append(keySchemaDocument);
+                }
+                document.append(kvp("KeySchema", keySchemasArray));
+            }
+
+            // Tags
+            if (!tags.empty()) {
+                array tagsArray;
+                for (const auto &[fst, snd]: tags) {
+                    bsoncxx::builder::basic::document tagDocument;
+                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Key", fst);
+                    Core::Bson::BsonUtils::SetStringValue(tagDocument, "Value", snd);
+                    tagsArray.append(tagDocument);
+                }
+                document.append(kvp("Tags", tagsArray));
+            }
+
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

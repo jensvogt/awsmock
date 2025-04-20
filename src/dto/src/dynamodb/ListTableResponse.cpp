@@ -6,27 +6,8 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string ListTableResponse::ToJson() const {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "LastEvaluatedTableName", lastEvaluatedTableName);
-
-            if (!tableNames.empty()) {
-                array array;
-                for (const auto &tableName: tableNames) {
-                    array.append(tableName);
-                }
-                document.append(kvp("TableNames", array));
-            }
-            return Core::Bson::BsonUtils::ToJsonString(document);
-
-        } catch (std::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
+    void ListTableResponse::ScanResponse() {
+        FromJson(body, headers);
     }
 
     void ListTableResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headers) {
@@ -51,19 +32,27 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    void ListTableResponse::ScanResponse() {
-        FromJson(body, headers);
-    }
+    std::string ListTableResponse::ToJson() {
 
-    std::string ListTableResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+        try {
 
-    std::ostream &operator<<(std::ostream &os, const ListTableResponse &r) {
-        os << "ListTableResponse=" << r.ToJson();
-        return os;
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "LastEvaluatedTableName", lastEvaluatedTableName);
+
+            if (!tableNames.empty()) {
+                array array;
+                for (const auto &tableName: tableNames) {
+                    array.append(tableName);
+                }
+                document.append(kvp("TableNames", array));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

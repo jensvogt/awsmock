@@ -92,9 +92,10 @@ namespace AwsMock::Core {
         /**
          * @brief Set the log filename
          *
-         * @param filename name of the log file
+         * @par
+         * The filename is constructed from <logDirectory>/<logPrefix>_nn.log
          */
-        static void SetFilename(const std::string &filename);
+        static void AddFile();
 
       private:
 

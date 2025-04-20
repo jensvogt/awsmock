@@ -21,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListItemCountersRequest : Common::BaseRequest {
+    struct ListItemCountersRequest : Common::BaseRequest<ListItemCountersRequest> {
 
         /**
          * AWS region
@@ -54,13 +54,6 @@ namespace AwsMock::Dto::DynamoDb {
         std::vector<Core::SortColumn> sortColumns;
 
         /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Parse a JSON stream
          *
          * @param jsonString JSON string
@@ -68,18 +61,11 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListItemCountersRequest &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

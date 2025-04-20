@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolRequest : Common::BaseRequest {
+    struct ListUserPoolRequest : Common::BaseRequest<ListUserPoolRequest> {
 
         /**
          * Page size
@@ -50,21 +50,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListUserPoolRequest &i);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Cognito

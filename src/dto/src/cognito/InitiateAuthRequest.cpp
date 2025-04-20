@@ -41,7 +41,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string InitiateAuthRequest::ToJson() const {
+    std::string InitiateAuthRequest::ToJson() {
 
         try {
 
@@ -76,14 +76,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string InitiateAuthRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const InitiateAuthRequest &r) {
-        os << "InitiateAuthRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

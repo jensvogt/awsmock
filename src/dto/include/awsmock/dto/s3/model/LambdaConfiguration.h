@@ -18,7 +18,7 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 notification configuration for a Lambda function.
+     * @brief S3 notification configuration for a Lambda function.
      *
      * <p>
      * This configures the S3 module to send a message to the supplied Lambda function. Depending on the event type

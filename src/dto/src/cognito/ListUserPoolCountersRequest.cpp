@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToJson() const {
+    std::string ListUserPoolCountersRequest::ToJson() {
 
         try {
 
@@ -57,14 +57,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListUserPoolCountersRequest &i) {
-        os << "ListUserPoolRequest=" << i.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

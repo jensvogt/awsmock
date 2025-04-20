@@ -15,7 +15,7 @@ namespace AwsMock::Core {
         return std::string(func);
 #else
         const char *funcBegin = func;
-        const char *funcEnd = ::strchr(funcBegin, '(');
+        const char *funcEnd = strchr(funcBegin, '(');
         int foundTemplate = 0;
 
         if (!funcEnd) {
@@ -101,7 +101,7 @@ namespace AwsMock::Core {
 
         console_sink = boost::log::add_console_log(std::cout);
         console_sink->set_formatter(&LogFormatter);
-        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::trace);
 
         boost::log::add_common_attributes();
     }
@@ -116,12 +116,12 @@ namespace AwsMock::Core {
         log_info << "Logging level set to " << severity;
     }
 
-    void LogStream::SetFilename(const std::string &filename) {
+    void LogStream::AddFile() {
         if (Configuration::instance().HasValue("awsmock.logging.dir")) {
             logDir = Configuration::instance().GetValueString("awsmock.logging.dir");
         }
         if (Configuration::instance().HasValue("awsmock.logging.prefix")) {
-            logDir = Configuration::instance().GetValueString("awsmock.logging.prefix");
+            logPrefix = Configuration::instance().GetValueString("awsmock.logging.prefix");
         }
         if (Configuration::instance().HasValue("awsmock.logging.file-size")) {
             logSize = Configuration::instance().GetValueLong("awsmock.logging.file-size");
@@ -135,6 +135,6 @@ namespace AwsMock::Core {
                 boost::log::keywords::max_files = logCount,
                 boost::log::keywords::format = &LogFormatter);
 
-        log_info << "Start logging to " << filename << " size: " << logSize << " count: " << logCount;
+        log_info << "Start logging to file, dir:" << logDir << ", prefix: " << logPrefix << " size: " << logSize << " count: " << logCount;
     }
 }// namespace AwsMock::Core

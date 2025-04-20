@@ -21,18 +21,8 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string AccountUsage::ToJson() const {
+    std::string AccountUsage::ToJson() {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 
-    std::string AccountUsage::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const AccountUsage &f) {
-        os << "AccountLimit=" << f.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Lambda

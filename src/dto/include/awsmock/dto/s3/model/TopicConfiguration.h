@@ -21,11 +21,11 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * @brief S3 notification configuration for a SNS topic.
+     * @brief S3 notification configuration for an SNS topic.
      *
      * <p>
      * This configures the S3 module to send a message to the supplied SNS topic. Depending on the event type and the
-     * filter rules, the event is executed and a message is send to the provided SNS queue.
+     * filter rules, the event is executed and a message is sent to the provided SNS queue.
      * </p>
      *
      * Example:
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::S3 {
      *       <S3Key>
      *         <FilterRule>
      *           <Name>string</Name>
-     *           <Value>string</Value>
+     *           <Value></Value>
      *         </FilterRule>
      *         ...
      *      </S3Key>

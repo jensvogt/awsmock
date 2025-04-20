@@ -51,6 +51,27 @@ namespace AwsMock::Core {
         return static_cast<int>(boost::thread::hardware_concurrency());
     }
 
+    std::string SystemUtils::GetEnvironmentVariableValue(const std::string &name) {
+        char *pValue;
+#ifdef _WIN32
+        pValue = static_cast<LPTSTR>(malloc(BUFSIZE * sizeof(TCHAR)));
+        if (DWORD result; (result = GetEnvironmentVariable(name.c_str(), pValue, BUFSIZE))) {
+            log_info << "Environment variable not found, name: " << name << ", error: " << result;
+        }
+        return {pValue};
+#else
+        size_t len;
+        if (const errno_t result = _dupenv_s(&pValue, &len, name.c_str())) {
+            log_info << "Environment variable not found, name: " << name << ", error: " << result;
+        }
+        return {pValue, len};
+#endif
+    }
+
+    bool SystemUtils::HasEnvironmentVariable(const std::string &name) {
+        return !GetEnvironmentVariableValue(name).empty();
+    }
+
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
         boost::asio::io_context ctx;
@@ -64,16 +85,5 @@ namespace AwsMock::Core {
         boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
         assert(!ec || (ec == boost::asio::error::eof));
         proc.wait();
-        /*
-        boost::asio::io_context ios;
-        std::future<std::string> outData, errData;
-        boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
-
-        // Blocks until command has finished
-        ios.run();
-
-        // Get stdout/stderr
-        output = outData.get();
-        error = errData.get();*/
     }
 }// namespace AwsMock::Core

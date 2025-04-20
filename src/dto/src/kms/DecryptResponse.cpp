@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string DecryptResponse::ToJson() const {
+    std::string DecryptResponse::ToJson() {
 
         try {
             document document;
@@ -35,17 +35,6 @@ namespace AwsMock::Dto::KMS {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-    std::string DecryptResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const DecryptResponse &r) {
-        os << "DecryptResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::KMS

@@ -60,12 +60,14 @@ namespace AwsMock::Service {
         // Get the public port
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         instance.instanceId = instanceId;
-        instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(8080);
-        instance.status = Database::Entity::Lambda::InstanceIdle;
-        instance.containerId = inspectContainerResponse.id;
-        instance.containerName = containerName;
-        instance.created = system_clock::now();
-        lambdaEntity.instances.emplace_back(instance);
+        if (!inspectContainerResponse.id.empty()) {
+            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(8080);
+            instance.status = Database::Entity::Lambda::InstanceIdle;
+            instance.containerId = inspectContainerResponse.id;
+            instance.containerName = containerName;
+            instance.created = system_clock::now();
+            lambdaEntity.instances.emplace_back(instance);
+        }
 
         // Save size in entity
         lambdaEntity.containerSize = container.sizeRootFs;

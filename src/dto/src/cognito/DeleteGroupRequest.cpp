@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DeleteGroupRequest::ToJson() const {
+    std::string DeleteGroupRequest::ToJson() {
 
         try {
 
@@ -34,14 +34,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DeleteGroupRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const DeleteGroupRequest &r) {
-        os << "DeleteGroupRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

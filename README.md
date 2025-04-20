@@ -295,45 +295,91 @@ cd /usr/local/share/awsmock/s3
 
 ## Windows support
 
-The distribution contains Windows ports of ```awslocal``` and ```awsmockctl``` in the ```./dist/bin``` directory. This
-Windows executables are written in Go and ported to Windows. These executables allow to control awsmock from a Windows
-machine.
+The distribution contains Windows ports of ```awslocal``` and ```awsmockctl``` in the ```./dist/bin``` directory. These
+executables allow to control awsmock docker image from a Windows machine.
 
 ```
 c:\Program Files\awsmock\bin\awsmockctl status
 ```
 
+### Windows native
+
+AwsMock can be used natively on Windows. The base directory for the Windows port is usually
+```C:\Program Files (x86)\awsmock```. Below the base directory are secondary directory like ```$AWS_ROOT\bin```, or
+```$AWS_ROOT\log``` for the log files. Start the Windows executable by using:
+
+```
+"C:\Program Files (x86)\awsmock\bin\awsmockmgr.exe" --foreground
+```
+
+Log files will be written to ```$AWS_ROOT\log```. The frontend is available at ```http://localhost:4567````.
+
+### Windows service
+
+AwsMock can be installed as a Windows service. In order to install the AwsMock manager as a Windows service use
+(assuming the root directory of AwsMock is ```C:\Program Files (x86)\awsmock```) in a Windows CMD shell:
+
+```
+"C:\Program Files (x86)\awsmock\bin\awsmockmgr.exe" --install
+```
+
+### Compiling on Windows
+
+AwsMock uses the MSVC C++ compiler (Microsoft Visual Studio 2019). In order to compile AwsMock on Windows install the
+prerequisites:
+
+```
+prometheus-cpp
+yaml-cpp
+jwt-cpp
+mongo-cxx-driver
+libarchive
+libmagic
+openssl (v3)
+boost (v1.88)
+// Documentation (optional)
+doxygen 
+pandoc
+graphviz
+```
+
+See the detailed installation instructions coming with the different packages.
+
 ## MacOS support
 
-On MacOS the manager can be run as normal process. A MacOS can be installed using the normal development setup. Start
-the manager as ```awsmockmgr```. The frontend is available at ```http://localhost:4567```
+On macOS the manager can be run as normal process. A macOS port can be installed using the normal development setup.
+Start the manager as ```awsmockmgr```. The frontend is available at ```http://localhost:4567```
 
 ### Compiling on MacOS
 
-Prerequisites:
+In order to compile AwsMock on Windows install the prerequisites:
 
 ```
+
 brew install prometheus-cpp
 brew install yaml-cpp
 brew install jwt-cpp
-brew install mongo-c-driver
 brew install mongo-cxx-driver
 brew install libarchive
 brew install libmagic
-brew install openssl@3
-brew install boost
-// Documentation
-brew install doxygen pandoc
+brew install openssl (v3)
+brew install boost (v1.88)
+// Documentation (optional)
+brew install doxygen 
+brew install pandoc
+brew install graphviz
 ```
 
 Download the backend source code
 
 ```
+
 git clone https://github.com/jensvogt/awsmock
 cd awsmock
 cmake .
 cmake --build . -j 16
 sudo make install
+
 ```
 
 This will compile and install the backend executables into ```/usr/local/bin``` and the libraries in
@@ -343,10 +389,12 @@ This will compile and install the backend executables into ```/usr/local/bin``` 
 Download the frontend code
 
 ```
+
 git clone https://github.com/jensvogt/awsmock-ui
 cd awsmock-ui
 npm install
 npm run build --prod
+
 ```
 
 ## Configuration
@@ -354,3 +402,7 @@ npm run build --prod
 In order to configure your infrastructure, you use the provided web interface on ```http://localhost:4567`. This is a
 Angular application which is hosted by awsmock. In there you can import/export JSON files, which are simply dumps of
 MongoDB collection. This way its very easy to load different infrastructure scenarios rapidly.
+
+## Documentation
+
+C++ documentation is available at [CodeDocs](https://codedocs.xyz/jensvogt/awsmock/)
