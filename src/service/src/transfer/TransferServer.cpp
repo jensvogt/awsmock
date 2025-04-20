@@ -33,12 +33,12 @@ namespace AwsMock::Service {
 
     void TransferServer::CreateTransferBucket() {
         Dto::S3::CreateBucketRequest request;
-        request.name = "transfer-server";
         request.owner = Core::Configuration::instance().GetValueString("awsmock.user");
         request.region = Core::Configuration::instance().GetValueString("awsmock.region");
+        request.name = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
         if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
+            log_debug << "Creating bucket " << request.name << ", region: " << request.region << ", owner: " << request.owner;
             Dto::S3::CreateBucketResponse response = s3Service.CreateBucket(request);
-            log_debug << "Created bucket " << request.name;
         }
     }
 
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
             Core::DirUtils::EnsureDirectory(homeDir);
 
             // Add user
-            _sftpServer.AddUser(user.userName, user.password, homeDir);
+            SftpServer::AddUser(user.userName, user.password, homeDir);
 
             // Ensure the home directory exists
             log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;

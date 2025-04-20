@@ -368,20 +368,23 @@ namespace AwsMock::Service {
         long start = request.min;
         long length = request.max - request.min + 1;
         const std::string destFile = uploadDir + Core::FileUtils::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
-        const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
-        const int source = open(sourceFile.c_str(), O_RDONLY, 0);
 #if __APPLE__
+        std::istreambuf_iterator<char> source = open(sourceFile.c_str(), O_RDONLY, 0);
+        const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
         const long copied = sendfile(dest, source, start, reinterpret_cast<off_t *>(&length), nullptr, 0);
-#elif __linux__
-        const long copied = sendfile(dest, source, &start, length);
-#else
-        istreambuf_iterator<char> begin_source(source);
-        istreambuf_iterator<char> end_source;
-        ostreambuf_iterator<char> begin_dest(dest);
-        copy(begin_source, end_source, begin_dest);
-#endif
         close(source);
         close(dest);
+#elif __linux__
+        std::istreambuf_iterator<char> source = open(sourceFile.c_str(), O_RDONLY, 0);
+        const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
+        const long copied = sendfile(dest, source, &start, length);
+        close(source);
+        close(dest);
+#else
+        std::ifstream ifs(sourceFile);
+        std::ofstream ofs(destFile);
+        const long copied = boost::iostreams::copy(ifs, ofs);
+#endif
 
         // Get md5sum as ETag
         Dto::S3::UploadPartCopyResponse response;

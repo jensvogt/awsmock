@@ -18,7 +18,7 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 name type for the filter rules
+     * @brief S3 name type for the filter rules
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -45,7 +45,7 @@ namespace AwsMock::Dto::S3 {
     }
 
     /**
-     * Filter rule for the S3 bucket notification to SQS queues
+     * @brief Filter rule for the S3 bucket notification to SQS queues
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -62,14 +62,14 @@ namespace AwsMock::Dto::S3 {
         std::string filterValue;
 
         /**
-         * Converts the DTO to a JSON object.
+         * @brief Converts the DTO to a JSON object.
          *
          * @return DTO as object.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
          * @param document JSON object.
          */
@@ -83,21 +83,21 @@ namespace AwsMock::Dto::S3 {
         void FromXml(const boost::property_tree::ptree &pt);
 
         /**
-         * Converts the DTO to a JSON string.
+         * @brief Converts the DTO to a JSON string.
          *
          * @return DTO as string.
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

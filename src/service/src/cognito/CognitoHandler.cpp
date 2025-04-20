@@ -417,7 +417,7 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_ENABLE_USER: {
-                    Dto::Cognito::AdminEnableUserRequest cognitoRequest{};
+                    Dto::Cognito::AdminEnableUserRequest cognitoRequest;
                     cognitoRequest.FromJson(clientCommand.payload);
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;

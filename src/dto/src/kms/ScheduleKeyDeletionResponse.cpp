@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::KMS {
 
-    std::string ScheduledKeyDeletionResponse::ToJson() const {
+    std::string ScheduledKeyDeletionResponse::ToJson() {
 
         try {
 
@@ -21,17 +21,6 @@ namespace AwsMock::Dto::KMS {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-    std::string ScheduledKeyDeletionResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ScheduledKeyDeletionResponse &r) {
-        os << "ScheduledKeyDeletionResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::KMS

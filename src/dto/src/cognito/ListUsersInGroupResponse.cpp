@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string ListUsersInGroupResponse::ToJson() const {
+    std::string ListUsersInGroupResponse::ToJson() {
 
         try {
 
@@ -27,14 +27,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUsersInGroupResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListUsersInGroupResponse &r) {
-        os << "ListUsersInGroupResponse=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

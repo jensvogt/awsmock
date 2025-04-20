@@ -9,9 +9,11 @@ namespace AwsMock::Core {
     void TestUtils::CreateTestConfigurationFile(const bool withDatabase) {
 
         // Logging
-        if (getenv("AWSMOCK_TEST_LOG") != nullptr) {
+        char *pValue;
+        size_t len;
+        if (!SystemUtils::GetEnvironmentVariableValue("AWSMOCK_TEST_LOG").empty()) {
             LogStream::Initialize();
-            LogStream::SetFilename("/tmp/awsmock-test.log");
+            LogStream::AddFile();
             LogStream::SetSeverity("debug");
         } else {
             LogStream::Initialize();

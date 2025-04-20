@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string AccountSettingsResponse::ToJson() const {
+    std::string AccountSettingsResponse::ToJson() {
 
         try {
 
@@ -23,17 +23,6 @@ namespace AwsMock::Dto::Lambda {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-    std::string AccountSettingsResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const AccountSettingsResponse &r) {
-        os << "AccountSettingsResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::Lambda

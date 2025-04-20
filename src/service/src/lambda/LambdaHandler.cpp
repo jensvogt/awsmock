@@ -59,7 +59,6 @@ namespace AwsMock::Service {
 
             if (action == "functions") {
 
-
                 if (Core::HttpUtils::HasPathParameters(request.target(), 2)) {
 
                     std::string functionName = Core::HttpUtils::GetPathParameters(request.target())[2];

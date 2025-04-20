@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminRemoveUserFromGroupRequest : Common::BaseRequest {
+    struct AdminRemoveUserFromGroupRequest final : Common::BaseRequest<AdminRemoveUserFromGroupRequest> {
 
         /**
          * Name of the group
@@ -48,13 +48,6 @@ namespace AwsMock::Dto::Cognito {
         std::string userPoolId;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert from a JSON object.
          *
          * @param payload json string object
@@ -62,20 +55,11 @@ namespace AwsMock::Dto::Cognito {
         void FromJson(const std::string &payload);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Convert to a JSON string
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param r request
-         * @param os output stream
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AdminRemoveUserFromGroupRequest &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Cognito

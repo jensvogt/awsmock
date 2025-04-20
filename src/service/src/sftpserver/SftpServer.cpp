@@ -1293,7 +1293,12 @@ static int process_close(sftp_client_message client_msg) {
         char filePath[PATH_MAX];
         char realFilePath[PATH_MAX];
         snprintf(filePath, PATH_MAX, "%s/%d", "/proc/self/fd", h->fd);
+#ifdef _WIN32
+        strncpy_s(realFilePath, reinterpret_cast<char const *>(std::filesystem::canonical(filePath).c_str()), PATH_MAX);
+        const int nBytes = strlen(realFilePath);
+#else
         const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
+#endif
         realFilePath[nBytes] = '\0';
         const auto p = new AwsMock::Service::S3Service();
         p->PutObject(currentUser, realFilePath, currentServerId);
@@ -1489,7 +1494,7 @@ static int process_readdir(sftp_client_message client_msg) {
         if (dentry != nullptr) {
             char long_path[PATH_MAX];
             sftp_attributes_struct attr{};
-            struct stat st {};
+            struct stat st{};
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
                 log_error << "Dandle string length exceed max length!";
@@ -1866,7 +1871,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st {};
+    struct statvfs st{};
 
     log_debug << "processing extended statvfs: " << path;
 

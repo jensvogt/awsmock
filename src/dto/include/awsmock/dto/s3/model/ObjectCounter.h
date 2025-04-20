@@ -14,6 +14,14 @@
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief AWS S3 object counter DTO.
+     *
+     * @par
+     * Used only internally by the frontend.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ObjectCounter {
 
         /**

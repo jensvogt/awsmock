@@ -91,7 +91,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateFunctionRequest : Common::BaseRequest {
+    struct CreateFunctionRequest final : Common::BaseRequest<CreateFunctionRequest> {
 
         /**
          * Name of the function
@@ -144,13 +144,6 @@ namespace AwsMock::Dto::Lambda {
         int timeout = 15 * 60;
 
         /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Parse a JSON string.
          *
          * @param jsonString JSON string
@@ -158,18 +151,11 @@ namespace AwsMock::Dto::Lambda {
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

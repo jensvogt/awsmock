@@ -40,7 +40,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableResponse : Common::BaseRequest {
+    struct ListTableResponse : Common::BaseRequest<ListTableResponse> {
 
         /**
          * Region
@@ -78,13 +78,6 @@ namespace AwsMock::Dto::DynamoDb {
         void ScanResponse();
 
         /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * Parse a JSON stream
          *
          * @param body JSON body
@@ -93,18 +86,11 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-         * Converts the DTO to a string representation.
+         * Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListTableResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

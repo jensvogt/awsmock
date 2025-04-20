@@ -6,33 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string ListItemCountersRequest::ToJson() const {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "tableName", tableName);
-            Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
-            Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
-            Core::Bson::BsonUtils::SetIntValue(document, "pageIndex", pageIndex);
-
-            // Sort columns
-            if (!sortColumns.empty()) {
-                array jsonArray;
-                for (const auto &sortColumn: sortColumns) {
-                    jsonArray.append(sortColumn.ToDocument());
-                }
-                document.append(kvp("sortColumns", jsonArray));
-            }
-            return Core::Bson::BsonUtils::ToJsonString(document);
-
-        } catch (std::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void ListItemCountersRequest::FromJson(const std::string &jsonString) {
 
         try {
@@ -60,15 +33,31 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string ListItemCountersRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string ListItemCountersRequest::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const ListItemCountersRequest &r) {
-        os << "ListItemCountersRequest=" << r.ToJson();
-        return os;
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "tableName", tableName);
+            Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
+            Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
+            Core::Bson::BsonUtils::SetIntValue(document, "pageIndex", pageIndex);
+
+            // Sort columns
+            if (!sortColumns.empty()) {
+                array jsonArray;
+                for (const auto &sortColumn: sortColumns) {
+                    jsonArray.append(sortColumn.ToDocument());
+                }
+                document.append(kvp("sortColumns", jsonArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

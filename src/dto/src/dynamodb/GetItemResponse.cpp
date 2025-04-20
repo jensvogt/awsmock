@@ -6,23 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string GetItemResponse::ToJson() const {
-
-        /* Todo
-        try {
-            Poco::JSON::Object rootJson;
-            rootJson.set("Region", region);
-            rootJson.set("TableName", tableName);
-
-            return Core::JsonUtils::ToJsonString(rootJson);
-
-        } catch (Poco::Exception &exc) {
-            log_error << exc.message();
-            throw Core::JsonException(exc.message());
-        }*/
-        return {};
-    }
-
     void GetItemResponse::FromJson(const std::string &jsonString) {
 
         body = jsonString;
@@ -38,15 +21,21 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string GetItemResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string GetItemResponse::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const GetItemResponse &r) {
-        os << "GetItemResponse=" << r.ToJson();
-        return os;
+        /* Todo
+        try {
+            Poco::JSON::Object rootJson;
+            rootJson.set("Region", region);
+            rootJson.set("TableName", tableName);
+
+            return Core::JsonUtils::ToJsonString(rootJson);
+
+        } catch (Poco::Exception &exc) {
+            log_error << exc.message();
+            throw Core::JsonException(exc.message());
+        }*/
+        return {};
     }
 
 }// namespace AwsMock::Dto::DynamoDb

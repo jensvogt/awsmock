@@ -15,7 +15,7 @@
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 notification events
+     * @brief S3 notification events
      *
      * @author jens.vogt\@opitz-consulting.com
      */

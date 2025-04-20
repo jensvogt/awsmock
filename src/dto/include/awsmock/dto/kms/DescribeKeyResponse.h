@@ -29,19 +29,12 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeKeyResponse : Common::BaseRequest {
+    struct DescribeKeyResponse : Common::BaseRequest<DescribeKeyResponse> {
 
         /**
          * Key metadata
          */
         Key key;
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.
@@ -51,11 +44,11 @@ namespace AwsMock::Dto::KMS {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Stream provider.
+         * @brief Convert to a JSON string
          *
-         * @return output stream
+         * @return JSON string
          */
-        friend std::ostream &operator<<(std::ostream &os, const DescribeKeyResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::KMS

@@ -17,6 +17,11 @@
 
 namespace AwsMock::Dto::S3 {
 
+    /**
+     * @brief S3 object restore status DTO
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct RestoreStatus {
 
         /**
@@ -30,7 +35,7 @@ namespace AwsMock::Dto::S3 {
         system_clock::time_point restoreExpiryDate;
 
         /**
-         * Convert to a JSON object
+         * @brief Convert to a JSON object
          *
          * @return JSON object
          */

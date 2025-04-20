@@ -6,18 +6,16 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string ScanResponse::ToJson() const {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
-            return Core::Bson::BsonUtils::ToJsonString(document);
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
+    void ScanResponse::PrepareResponse(const Database::Entity::DynamoDb::Table &table) {
+        FromJson(body);
+        for (auto &item: items) {
+            item.region = table.region;
+            item.tableName = table.name;
+            for (const auto &key: table.keySchemas | std::views::keys) {
+                if (item.attributes.contains(key)) {
+                    item.keys[key] = item.attributes.at(key);
+                }
+            }
         }
     }
 
@@ -47,28 +45,19 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    void ScanResponse::PrepareResponse(const Database::Entity::DynamoDb::Table &table) {
-        FromJson(body);
-        for (auto &item: items) {
-            item.region = table.region;
-            item.tableName = table.name;
-            for (const auto &key: table.keySchemas | std::views::keys) {
-                if (item.attributes.contains(key)) {
-                    item.keys[key] = item.attributes.at(key);
-                }
-            }
+    std::string ScanResponse::ToJson() {
+
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
         }
-    }
-
-    std::string ScanResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ScanResponse &r) {
-        os << "ScanResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -81,7 +81,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateEventSourceMappingsRequest : public Dto::Common::BaseRequest {
+    struct CreateEventSourceMappingsRequest final : Common::BaseRequest<CreateEventSourceMappingsRequest> {
 
         /**
          * Name of the function
@@ -109,17 +109,12 @@ namespace AwsMock::Dto::Lambda {
         bool enabled = true;
 
         /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Parse a JSON stream.
+         * @brief Parse a JSON stream.
          *
          * @code{.json}
-         *"{\"JAVA_TOOL_OPTIONS\":\"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost\"}"
+         * {
+         *   "JAVA_TOOL_OPTIONS":"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"
+         * }
          * @endcode
          *
          * @param jsonString JSON string
@@ -127,18 +122,11 @@ namespace AwsMock::Dto::Lambda {
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateEventSourceMappingsRequest &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

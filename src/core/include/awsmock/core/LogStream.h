@@ -92,9 +92,10 @@ namespace AwsMock::Core {
         /**
          * @brief Set the log filename
          *
-         * @param filename name of the log file
+         * @par
+         * The filename is constructed from <logDirectory>/<logPrefix>_nn.log
          */
-        static void SetFilename(const std::string &filename);
+        static void AddFile();
 
       private:
 
@@ -132,7 +133,7 @@ namespace AwsMock::Core {
 }// namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
-macos __FILE__, __LINE__macos #define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)

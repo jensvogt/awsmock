@@ -6,23 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string DeleteTableResponse::ToJson() const {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
-            Core::Bson::BsonUtils::SetStringValue(document, "TableArn", tableArn);
-
-            return Core::Bson::BsonUtils::ToJsonString(document);
-
-        } catch (std::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void DeleteTableResponse::FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap) {
 
         this->body = body;
@@ -50,15 +33,21 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string DeleteTableResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string DeleteTableResponse::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const DeleteTableResponse &r) {
-        os << "DeleteTableResponse=" << r.ToJson();
-        return os;
+        try {
+
+            document document;
+            Core::Bson::BsonUtils::SetStringValue(document, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableName", tableName);
+            Core::Bson::BsonUtils::SetStringValue(document, "TableArn", tableArn);
+
+            return Core::Bson::BsonUtils::ToJsonString(document);
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

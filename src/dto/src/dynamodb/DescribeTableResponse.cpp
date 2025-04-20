@@ -6,48 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string DescribeTableResponse::ToJson() const {
-
-        try {
-            document rootDocument;
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableName", tableName);
-            Core::Bson::BsonUtils::SetLongValue(rootDocument, "TableSizeBytes", tableSize);
-            Core::Bson::BsonUtils::SetLongValue(rootDocument, "ItemCount", itemCount);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableArn", tableArn);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableStatus", TableStatusTypeToString(tableStatus));
-            rootDocument.append(kvp("ProvisionedThroughput", provisionedThroughput.ToDocument()));
-
-            if (!keySchemas.empty()) {
-                array jsonKeySchemasArray;
-                for (const auto &[fst, snd]: keySchemas) {
-                    document object;
-                    object.append(kvp("AttributeName", fst));
-                    object.append(kvp("KeyType", snd));
-                    jsonKeySchemasArray.append(object);
-                }
-                rootDocument.append(kvp("KeySchema", jsonKeySchemasArray));
-            }
-
-            if (!attributes.empty()) {
-                array jsonAttributesArray;
-                for (const auto &[fst, snd]: attributes) {
-                    document object;
-                    object.append(kvp("AttributeName", fst));
-                    object.append(kvp("AttributeType", snd));
-                    jsonAttributesArray.append(object);
-                }
-                rootDocument.append(kvp("AttributeDefinitions", jsonAttributesArray));
-            }
-
-            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void DescribeTableResponse::PrepareResponse() {
         FromJson(body, headers);
     }
@@ -106,15 +64,46 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string DescribeTableResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string DescribeTableResponse::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const DescribeTableResponse &r) {
-        os << "DescribeTableResponse=" << r.ToJson();
-        return os;
+        try {
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableName", tableName);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "TableSizeBytes", tableSize);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "ItemCount", itemCount);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableArn", tableArn);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableStatus", TableStatusTypeToString(tableStatus));
+            rootDocument.append(kvp("ProvisionedThroughput", provisionedThroughput.ToDocument()));
+
+            if (!keySchemas.empty()) {
+                array jsonKeySchemasArray;
+                for (const auto &[fst, snd]: keySchemas) {
+                    document object;
+                    object.append(kvp("AttributeName", fst));
+                    object.append(kvp("KeyType", snd));
+                    jsonKeySchemasArray.append(object);
+                }
+                rootDocument.append(kvp("KeySchema", jsonKeySchemasArray));
+            }
+
+            if (!attributes.empty()) {
+                array jsonAttributesArray;
+                for (const auto &[fst, snd]: attributes) {
+                    document object;
+                    object.append(kvp("AttributeName", fst));
+                    object.append(kvp("AttributeType", snd));
+                    jsonAttributesArray.append(object);
+                }
+                rootDocument.append(kvp("AttributeDefinitions", jsonAttributesArray));
+            }
+
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

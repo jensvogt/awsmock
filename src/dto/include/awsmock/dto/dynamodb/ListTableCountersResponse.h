@@ -40,7 +40,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableCountersResponse : Common::BaseRequest {
+    struct ListTableCountersResponse : Common::BaseRequest<ListTableCountersResponse> {
 
         /**
          * Table names
@@ -57,21 +57,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListTableCountersResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

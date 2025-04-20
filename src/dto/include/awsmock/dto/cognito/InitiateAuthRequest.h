@@ -42,7 +42,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct InitiateAuthRequest : Common::BaseRequest {
+    struct InitiateAuthRequest final : Common::BaseRequest<InitiateAuthRequest> {
 
         /**
          * Auth flow
@@ -67,27 +67,6 @@ namespace AwsMock::Dto::Cognito {
         std::map<std::string, std::string> clientMetaData;
 
         /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
          * @brief Returns the username
          *
          * @return user ID
@@ -109,11 +88,18 @@ namespace AwsMock::Dto::Cognito {
         std::string GetClientSecret();
 
         /**
-         * @brief Stream provider.
+         * @brief Convert from a JSON object.
          *
-         * @return output stream
+         * @param jsonString json string object
          */
-        friend std::ostream &operator<<(std::ostream &os, const InitiateAuthRequest &i);
+        void FromJson(const std::string &jsonString);
+
+        /**
+         * @brief Convert to a JSON string
+         *
+         * @return JSON string
+         */
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Cognito

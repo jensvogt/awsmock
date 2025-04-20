@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DescribeUserPoolClientRequest::ToJson() const {
+    std::string DescribeUserPoolClientRequest::ToJson() {
 
         try {
 
@@ -36,14 +36,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DescribeUserPoolClientRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const DescribeUserPoolClientRequest &r) {
-        os << "DescribeUserPoolClientRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

@@ -6,35 +6,6 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string PutItemRequest::ToJson() const {
-
-        try {
-
-            document rootDocument;
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableName", tableName);
-
-            if (!attributes.empty()) {
-                document attributeObject;
-                for (const auto &[fst, snd]: attributes) {
-                    document attributeDoc;
-                    if (!snd.stringValue.empty()) {
-                        attributeDoc.append(kvp("S", snd.stringValue));
-                    } else if (!snd.numberValue.empty()) {
-                        attributeDoc.append(kvp("N", snd.stringValue));
-                    }
-                    attributeObject.append(kvp(fst, attributeDoc));
-                }
-                rootDocument.append(kvp("Item", attributeObject));
-            }
-            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void PutItemRequest::FromJson(const std::string &jsonString) {
 
         // Save original body
@@ -61,15 +32,33 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string PutItemRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string PutItemRequest::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const PutItemRequest &r) {
-        os << "PutItemRequest=" << r.ToJson();
-        return os;
+        try {
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "TableName", tableName);
+
+            if (!attributes.empty()) {
+                document attributeObject;
+                for (const auto &[fst, snd]: attributes) {
+                    document attributeDoc;
+                    if (!snd.stringValue.empty()) {
+                        attributeDoc.append(kvp("S", snd.stringValue));
+                    } else if (!snd.numberValue.empty()) {
+                        attributeDoc.append(kvp("N", snd.stringValue));
+                    }
+                    attributeObject.append(kvp(fst, attributeDoc));
+                }
+                rootDocument.append(kvp("Item", attributeObject));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::DynamoDb

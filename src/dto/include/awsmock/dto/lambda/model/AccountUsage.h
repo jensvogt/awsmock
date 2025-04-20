@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountUsage : Common::BaseRequest {
+    struct AccountUsage final : Common::BaseRequest<AccountUsage> {
 
         /**
          * Function count
@@ -52,21 +52,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON object
          */
-        std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AccountUsage &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

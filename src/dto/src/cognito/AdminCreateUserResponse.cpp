@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminCreateUserResponse::ToJson() const {
+    std::string AdminCreateUserResponse::ToJson() {
 
         try {
             document userDocument;
@@ -59,14 +59,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminCreateUserResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const AdminCreateUserResponse &r) {
-        os << "AdminCreateUserResponse=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

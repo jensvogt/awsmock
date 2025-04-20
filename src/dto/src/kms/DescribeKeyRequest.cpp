@@ -26,7 +26,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string DescribeKeyRequest::ToJson() const {
+    std::string DescribeKeyRequest::ToJson() {
 
         try {
 
@@ -46,18 +46,6 @@ namespace AwsMock::Dto::KMS {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-
-    std::string DescribeKeyRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const DescribeKeyRequest &r) {
-        os << "DescribeKeyRequest=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::KMS

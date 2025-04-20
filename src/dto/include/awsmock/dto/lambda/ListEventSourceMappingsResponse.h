@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListEventSourceMappingsResponse : Common::BaseRequest {
+    struct ListEventSourceMappingsResponse final : Common::BaseRequest<ListEventSourceMappingsResponse> {
 
         /**
          * List of event source mappings.
@@ -30,25 +30,11 @@ namespace AwsMock::Dto::Lambda {
         std::vector<EventSourceMapping> eventSourceMappings;
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListEventSourceMappingsResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct CreateFunctionResponse : Common::BaseRequest {
+    struct CreateFunctionResponse final : Common::BaseRequest<CreateFunctionResponse> {
 
         /**
          * Name of the function
@@ -142,25 +142,11 @@ namespace AwsMock::Dto::Lambda {
         std::string dockerContainerId;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

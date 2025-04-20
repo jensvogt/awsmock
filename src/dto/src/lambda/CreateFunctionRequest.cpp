@@ -6,41 +6,6 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string CreateFunctionRequest::ToJson() const {
-
-        try {
-
-            document rootDocument;
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "User", user);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "FunctionName", functionName);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Runtime", runtime);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Role", role);
-            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Handler", handler);
-            Core::Bson::BsonUtils::SetLongValue(rootDocument, "MemorySize", memorySize);
-            Core::Bson::BsonUtils::SetIntValue(rootDocument, "Timeout", timeout);
-
-            // Code
-            rootDocument.append(kvp("Code", code.ToDocument()));
-
-            // Tags
-            if (!tags.empty()) {
-                array jsonArray;
-                for (const auto &[fst, snd]: tags) {
-                    document tagObject;
-                    tagObject.append(kvp(fst, snd));
-                    jsonArray.append(tagObject);
-                }
-                rootDocument.append(kvp("Tags", jsonArray));
-            }
-            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
     void CreateFunctionRequest::FromJson(const std::string &jsonString) {
 
         try {
@@ -82,15 +47,39 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string CreateFunctionRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+    std::string CreateFunctionRequest::ToJson() {
 
-    std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r) {
-        os << "CreateFunctionRequest=" << r.ToJson();
-        return os;
+        try {
+
+            document rootDocument;
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "User", user);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "FunctionName", functionName);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Runtime", runtime);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Role", role);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Handler", handler);
+            Core::Bson::BsonUtils::SetLongValue(rootDocument, "MemorySize", memorySize);
+            Core::Bson::BsonUtils::SetIntValue(rootDocument, "Timeout", timeout);
+
+            // Code
+            rootDocument.append(kvp("Code", code.ToDocument()));
+
+            // Tags
+            if (!tags.empty()) {
+                array jsonArray;
+                for (const auto &[fst, snd]: tags) {
+                    document tagObject;
+                    tagObject.append(kvp(fst, snd));
+                    jsonArray.append(tagObject);
+                }
+                rootDocument.append(kvp("Tags", jsonArray));
+            }
+            return Core::Bson::BsonUtils::ToJsonString(rootDocument);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Dto::Lambda

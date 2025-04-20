@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountLimit : Common::BaseRequest {
+    struct AccountLimit final : Common::BaseRequest<AccountLimit> {
 
         /**
          * Code size unzipped limit
@@ -70,21 +70,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AccountLimit &r);
+        std::string ToJson() override;
     };
 
 }// namespace AwsMock::Dto::Lambda

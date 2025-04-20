@@ -268,10 +268,9 @@ int main(const int argc, char *argv[]) {
     }
 
     // Set log file
-    if (vm.contains("logfile")) {
-        auto value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.prefix", value);
-        AwsMock::Core::LogStream::SetFilename(value);
+    if (AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.dir") &&
+        AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.prefix")) {
+        AwsMock::Core::LogStream::AddFile();
     }
 
 #ifdef WIN32

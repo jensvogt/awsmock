@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string ListEventSourceMappingsResponse::ToJson() const {
+    std::string ListEventSourceMappingsResponse::ToJson() {
 
         try {
 
@@ -24,17 +24,6 @@ namespace AwsMock::Dto::Lambda {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-    std::string ListEventSourceMappingsResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListEventSourceMappingsResponse &r) {
-        os << "ListEventSourceMappingsResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::Lambda

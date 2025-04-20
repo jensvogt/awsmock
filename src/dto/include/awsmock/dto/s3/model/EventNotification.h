@@ -639,6 +639,14 @@ namespace AwsMock::Dto::S3 {
         }
     };
 
+    /**
+     * @brief AWS S3 event notification DTO.
+     *
+     * @par
+     * Issued in case the S3 bucket has an event notification attached.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct EventNotification {
 
         /**

@@ -20,6 +20,11 @@ namespace AwsMock::Dto::S3 {
 
     using std::chrono::system_clock;
 
+    /**
+     * @brief AWS S3 content DTO.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct Content {
 
         /**
