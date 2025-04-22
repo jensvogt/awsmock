@@ -90,6 +90,9 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.modules.lambda.monitoring.period", "AWSMOCK_MODULES_LAMBDA_MONITORING_PERIOD", 300);
         DefineIntProperty("awsmock.modules.lambda.remove.period", "AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD", 300);
         DefineIntProperty("awsmock.modules.lambda.counter.period", "AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD", 300);
+        DefineStringProperty("awsmock.modules.lambda.runtime.java11", "AWSMOCK_MODULES_LAMBDA_JAVA11", "public.ecr.aws/lambda/java:11");
+        DefineStringProperty("awsmock.modules.lambda.runtime.java17", "AWSMOCK_MODULES_LAMBDA_JAVA17", "public.ecr.aws/lambda/java:17");
+        DefineStringProperty("awsmock.modules.lambda.runtime.java21", "AWSMOCK_MODULES_LAMBDA_JAVA21", "public.ecr.aws/lambda/java:21");
 
         // Transfer server
         DefineBoolProperty("awsmock.modules.transfer.active", "AWSMOCK_MODULES_TRANSFER_ACTIVE", true);

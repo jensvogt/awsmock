@@ -33,6 +33,7 @@ namespace AwsMock::Database {
 
         void SetUp() override {
             _region = _configuration.GetValueString("awsmock.region");
+            Core::Configuration::instance().SetValueBool("awsmock.mongodb.active", false);
         }
 
         void TearDown() override {
@@ -51,7 +52,7 @@ namespace AwsMock::Database {
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
+        const Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
 
         // assert
         EXPECT_TRUE(result.topicName == TOPIC);
@@ -79,7 +80,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
+        const Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
 
         // assert
         EXPECT_TRUE(result.topicArn == topic.topicArn);
@@ -92,9 +93,8 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        std::string url = "http://localhost:4567/" + topic.topicName;
-        topic.topicUrl = url;
-        Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
+        topic.topicArn = Core::AwsUtils::CreateSNSTopicArn(_region, "000000000000", topic.topicName);
+        const Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
 
         // assert
         EXPECT_TRUE(result.topicUrl == topic.topicUrl);
@@ -107,7 +107,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        long result = _snsDatabase.CountTopics(topic.region);
+        const long result = _snsDatabase.CountTopics(topic.region);
 
         // assert
         EXPECT_EQ(1, result);
@@ -120,7 +120,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
+        const Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
 
         // assert
         EXPECT_EQ(result.size(), 1);
@@ -135,7 +135,7 @@ namespace AwsMock::Database {
         topic = _snsDatabase.UpdateTopic(topic);
 
         // act
-        Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
+        const Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
 
         // assert
         EXPECT_EQ(result.size(), 1);

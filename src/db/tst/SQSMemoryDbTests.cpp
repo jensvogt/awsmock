@@ -39,6 +39,7 @@ namespace AwsMock::Database {
             _dlqueueUrl = Core::CreateSQSQueueUrl(DLQ_NAME);
             _dlqueueArn = Core::CreateSQSQueueArn(DLQ_NAME);
             _region = _configuration.GetValueString("awsmock.region");
+            Core::Configuration::instance().SetValueBool("awsmock.mongodb.active", false);
         }
 
         void TearDown() override {
@@ -166,7 +167,7 @@ namespace AwsMock::Database {
     TEST_F(SQSMemoryDbTest, QueueUpdateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::CreateSQSQueueArn(QUEUE_NAME)};
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act

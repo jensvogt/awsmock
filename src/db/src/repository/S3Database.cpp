@@ -145,8 +145,8 @@ namespace AwsMock::Database {
             mongocxx::options::find opts;
             if (!sortColumns.empty()) {
                 document sort = {};
-                for (const auto sortColumn: sortColumns) {
-                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                for (const auto [column, sortDirection]: sortColumns) {
+                    sort.append(kvp(column, sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -534,12 +534,6 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto insert_one_result = _objectCollection.insert_one(object.ToDocument().view());
                 object.oid = insert_one_result->inserted_id().get_oid().value.to_string();
-
-                // Update bucket counters
-                Entity::S3::Bucket bucket = GetBucketByRegionName(object.region, object.bucket);
-                bucket.size += object.size;
-                bucket.keys++;
-                UpdateBucket(bucket);
                 session.commit_transaction();
 
                 return object;

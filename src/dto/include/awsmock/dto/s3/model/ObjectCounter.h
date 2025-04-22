@@ -106,6 +106,14 @@ namespace AwsMock::Dto::S3 {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ObjectCounter const &obj) {
+
+            // Metadata
+            boost::json::object metadata;
+            if (!obj.metadata.empty()) {
+                for (const auto &[fst, snd]: obj.metadata) {
+                    metadata[fst] = snd;
+                }
+            }
             jv = {
                     {"region", obj.region},
                     {"oid", obj.oid},
@@ -114,16 +122,10 @@ namespace AwsMock::Dto::S3 {
                     {"contentType", obj.contentType},
                     {"size", obj.size},
                     {"internalName", obj.internalName},
+                    {"metadata", metadata},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
-
-            // Metadata
-            if (!obj.metadata.empty()) {
-                for (const auto &[fst, snd]: obj.metadata) {
-                    jv.at(fst) = snd;
-                }
-            }
         }
     };
 

@@ -11,10 +11,10 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/utils/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 

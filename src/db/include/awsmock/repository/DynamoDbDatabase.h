@@ -231,9 +231,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all items
          *
+         * @return number of items deleted
          * @throws DatabaseException
          */
-        void DeleteAllItems() const;
+        long DeleteAllItems() const;
 
       private:
 

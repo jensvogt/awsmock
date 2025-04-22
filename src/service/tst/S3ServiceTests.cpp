@@ -92,7 +92,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_TRUE(response.total > 0);
-        EXPECT_TRUE(response.bucketList.front().name == BUCKET);
+        EXPECT_TRUE(response.bucketList.front().bucketName == BUCKET);
     }
 
     TEST_F(S3ServiceTest, BucketDeleteTest) {
@@ -136,7 +136,10 @@ namespace AwsMock::Service {
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // act
-        Dto::S3::GetObjectRequest getRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::GetObjectRequest getRequest;
+        getRequest.region = REGION;
+        getRequest.bucket = BUCKET;
+        getRequest.key = KEY;
         Dto::S3::GetObjectResponse getResponse = _service.GetObject(getRequest);
 
         // assert

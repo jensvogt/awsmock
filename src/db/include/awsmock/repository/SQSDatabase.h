@@ -16,7 +16,6 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/utils/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -24,6 +23,7 @@
 #include <awsmock/memorydb/SQSMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/MongoUtils.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 

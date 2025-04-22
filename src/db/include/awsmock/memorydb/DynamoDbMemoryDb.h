@@ -46,11 +46,11 @@ namespace AwsMock::Database {
         }
 
         /**
-         * @brief Check existence of DynamoDb table
+         * @brief Check the existence of the DynamoDb table
          *
          * @param region AWS region name
          * @param tableName table name
-         * @return true if DynamoDb table already exists
+         * @return true if the DynamoDb table already exists
          * @throws DatabaseException
          */
         bool TableExists(const std::string &region, const std::string &tableName);
@@ -195,8 +195,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all items
+         *
+         * @return nuber of items deleted.
          */
-        void DeleteAllItems();
+        long DeleteAllItems();
 
       private:
 

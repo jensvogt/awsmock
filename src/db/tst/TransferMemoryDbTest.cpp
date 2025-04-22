@@ -35,6 +35,7 @@ namespace AwsMock::Database {
 
         void SetUp() override {
             _region = _configuration.GetValueString("awsmock.region");
+            Core::Configuration::instance().SetValueBool("awsmock.mongodb.active", false);
         }
 
         void TearDown() override {
@@ -63,8 +64,8 @@ namespace AwsMock::Database {
     TEST_F(TransferMemoryDbTest, TransferExistsUniqueTest) {
 
         // arrange
-        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
-        const Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP}};
+        const Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {Entity::Transfer::SFTP}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
 
         // act

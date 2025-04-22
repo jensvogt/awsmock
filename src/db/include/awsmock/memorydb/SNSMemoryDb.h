@@ -13,9 +13,9 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/utils/SortColumn.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 

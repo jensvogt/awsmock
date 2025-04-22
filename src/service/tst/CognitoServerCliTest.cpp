@@ -62,7 +62,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        std::string output = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
 
         // assert
@@ -72,10 +72,10 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserPoolListTest) {
 
         // arrange
-        std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "list-user-pools", "--max-results", "10", "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "list-user-pools", "--max-results", "10", "--endpoint", _endpoint});
 
         // assert
         EXPECT_FALSE(output2.empty());
@@ -84,12 +84,12 @@ namespace AwsMock::Service {
 
     TEST_F(CognitoServerCliTest, UserPoolCreateClientTest) {
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool-client", "--user-pool-id", userPoolId, "--client-name", CLIENT_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool-client", "--user-pool-id", userPoolId, "--client-name", CLIENT_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
 
         // assert
@@ -100,12 +100,12 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserPoolCreateDomainTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool-domain", "--user-pool-id", userPoolId, "--domain", DOMAIN_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool-domain", "--user-pool-id", userPoolId, "--domain", DOMAIN_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
 
         // assert
@@ -116,12 +116,12 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserPoolDeleteTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "delete-user-pool", "--user-pool-id", userPoolId, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "delete-user-pool", "--user-pool-id", userPoolId, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
 
         // assert
@@ -131,12 +131,12 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserCreateTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -146,15 +146,15 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserEnableTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-enable-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-enable-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
         userList = _database.ListUsers();
 
         // assert
@@ -165,18 +165,18 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserDisableTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
 
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
         Database::Entity::Cognito::UserList userList = _database.ListUsers();
         EXPECT_EQ(1, userList.size());
 
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-enable-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-enable-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
 
         // act
-        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-disable-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-disable-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
         userList = _database.ListUsers();
 
         // assert
@@ -187,13 +187,13 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserDeleteTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
-        const std::string createUserResult = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string createUserResult = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-delete-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-delete-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -203,12 +203,12 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, GroupCreateTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
 
         // assert
@@ -218,13 +218,13 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, GroupDeleteTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "delete-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "delete-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::GroupList groupList = _database.ListGroups();
 
         // assert
@@ -234,16 +234,16 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserAddToGroupTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
 
         const std::string userPoolId = createdPoolList.front().userPoolId;
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
 
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
 
         // act
-        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-add-user-to-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-add-user-to-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--username", USER_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -255,15 +255,15 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserRemoveFromGroupTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserPoolList createdPoolList = _database.ListUserPools();
         const std::string userPoolId = createdPoolList.front().userPoolId;
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
-        const std::string output4 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-add-user-to-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-create-user", "--user-pool-id", userPoolId, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-add-user-to-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--username", USER_NAME, "--endpoint", _endpoint});
 
         // act
-        const std::string output5 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "admin-remove-user-from-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--username", USER_NAME, "--endpoint", _endpoint});
+        const std::string output5 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "admin-remove-user-from-group", "--user-pool-id", userPoolId, "--group-name", GROUP_NAME, "--username", USER_NAME, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
@@ -274,15 +274,15 @@ namespace AwsMock::Service {
     TEST_F(CognitoServerCliTest, UserSignUpTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool", "--pool-name", USER_POOL_NAME, "--endpoint", _endpoint});
         Database::Entity::Cognito::UserPoolList userPoolList = _database.ListUserPools();
         const std::string userPoolId = userPoolList.front().userPoolId;
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "create-user-pool-client", "--user-pool-id", userPoolId, "--client-name", CLIENT_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "create-user-pool-client", "--user-pool-id", userPoolId, "--client-name", CLIENT_NAME, "--endpoint", _endpoint});
         userPoolList = _database.ListUserPools();
         const std::string clientId = userPoolList.front().userPoolClients.front().clientId;
 
         // act
-        const std::string output3 = Core::TestUtils::SendCliCommand("aws", {"cognito-idp", "sign-up", "--client-id", clientId, "--username", USER_NAME, "--password", PASSWORD, "--endpoint", _endpoint});
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"cognito-idp", "sign-up", "--client-id", clientId, "--username", USER_NAME, "--password", PASSWORD, "--endpoint", _endpoint});
         const Database::Entity::Cognito::UserList userList = _database.ListUsers();
 
         // assert
