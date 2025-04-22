@@ -134,7 +134,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetBucketByRegionName(region, name);
     }
 
-    Entity::S3::BucketList S3Database::ListBuckets(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::S3::BucketList S3Database::ListBuckets(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::S3::BucketList bucketList;
         if (HasDatabase()) {
@@ -145,8 +145,8 @@ namespace AwsMock::Database {
             mongocxx::options::find opts;
             if (!sortColumns.empty()) {
                 document sort = {};
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -179,7 +179,7 @@ namespace AwsMock::Database {
         return bucketList;
     }
 
-    Entity::S3::BucketList S3Database::ExportBuckets(const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::S3::BucketList S3Database::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
 
         Entity::S3::BucketList bucketList;
         if (HasDatabase()) {
@@ -190,8 +190,8 @@ namespace AwsMock::Database {
             mongocxx::options::find opts;
             if (!sortColumns.empty()) {
                 document sort = {};
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -776,7 +776,7 @@ namespace AwsMock::Database {
         return _memoryDb.ObjectCount(region, bucket);
     }
 
-    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const int pageSize, const int pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::S3::ObjectList objectList;
         if (HasDatabase()) {
@@ -787,8 +787,8 @@ namespace AwsMock::Database {
             mongocxx::options::find opts;
             if (!sortColumns.empty()) {
                 document sort = {};
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }

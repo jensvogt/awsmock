@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
             if (documentValue.find("sortColumns") != documentValue.end()) {
 
                 for (const bsoncxx::array::view arrayView{documentValue["sortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
-                    Core::SortColumn sortColumn;
+                    Database::SortColumn sortColumn;
                     sortColumn.FromDocument(element.get_document());
                     sortColumns.emplace_back(sortColumn);
                 }
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToJson() {
+    std::string ListUserPoolCountersRequest::ToJson() const {
 
         try {
 

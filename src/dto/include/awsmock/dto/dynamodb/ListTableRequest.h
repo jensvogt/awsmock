@@ -13,7 +13,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableRequest : Common::BaseRequest<ListTableRequest> {
+    struct ListTableRequest final : Common::BaseDto<ListTableRequest> {
 
         /**
          * AWS region
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         /**
          * The first table name that this operation will evaluate. Use the value that was returned for LastEvaluatedTableName
-         * in a previous operation, so that you can obtain the next page of results.
+         * in a previous operation so that you can obtain the next page of results.
          */
         std::string exclusiveStartTableName;
 
@@ -67,7 +67,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -32,7 +32,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string PutItemRequest::ToJson() {
+    std::string PutItemRequest::ToJson() const {
 
         try {
 

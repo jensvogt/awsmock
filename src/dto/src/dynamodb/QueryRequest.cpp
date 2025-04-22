@@ -23,7 +23,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string QueryRequest::ToJson() {
+    std::string QueryRequest::ToJson() const {
 
         try {
 

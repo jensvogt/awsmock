@@ -66,7 +66,7 @@ namespace AwsMock::Core {
     TEST_F(HttpUtilsTest, GetParameterValueTest) {
 
         // arrange
-        const std::string uri = "arg1=1";
+        const std::string uri = "/ftpuser1/incoming?arg1=1";
 
         // act
         const std::string result = HttpUtils::GetStringParameter(uri, "arg1");
@@ -99,7 +99,7 @@ namespace AwsMock::Core {
         const std::string key = HttpUtils::GetPathParameter(uri, 1);
 
         // assert
-        EXPECT_TRUE("incoming/mix/pim123.xml" == key);
+        EXPECT_TRUE("incoming" == key);
     }
 
     TEST_F(HttpUtilsTest, GetQueryParametersByPrefixTest) {
@@ -194,7 +194,7 @@ namespace AwsMock::Core {
     TEST_F(HttpUtilsTest, GetStringParameterTest) {
 
         // arrange
-        const std::string uri = "testqueue?stringParameter1=testvalue";
+        const std::string uri = "/ftpuser1/testqueue?stringParameter1=testvalue";
 
         // act
         const int count = HttpUtils::CountQueryParametersByPrefix(uri, "stringParameter");

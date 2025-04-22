@@ -21,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string GetItemResponse::ToJson() {
+    std::string GetItemResponse::ToJson() const {
 
         /* Todo
         try {

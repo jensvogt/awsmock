@@ -12,7 +12,7 @@
 namespace AwsMock::Dto::DynamoDb {
 
     /**
-     * DynamoDB response from docker image
+     * @brief DynamoDB response from docker image
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Status from DynamoDb docker image
          */
-        boost::beast::http::status status;
+        http::status status;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

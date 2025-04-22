@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/common/BaseDto.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
@@ -21,7 +24,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetObjectRequest {
+    struct GetObjectRequest : Common::BaseDto<GetObjectRequest> {
 
         /**
          * AWS region name
@@ -58,21 +61,7 @@ namespace AwsMock::Dto::S3 {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::S3

@@ -49,7 +49,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct TopicConfiguration {
+    struct TopicConfiguration : Common::BaseDto<TopicConfiguration> {
 
         /**
          * ID, optional, if empty a random ID will be generated
@@ -88,30 +88,24 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Convert from an XML string
          *
-         * @param pt boost property tree
+         * @param pt boost a property tree
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        std::string ToJson() const override {
+            return ToJson2();
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TopicConfiguration &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TopicConfiguration const &obj) {
+            jv = {
+                    {"id", obj.id},
+                    {"topicArn", obj.topicArn},
+                    {"filterRules", boost::json::value_from(obj.filterRules)},
+                    {"events", boost::json::value_from(obj.events)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

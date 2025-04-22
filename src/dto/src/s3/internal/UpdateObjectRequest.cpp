@@ -2,7 +2,7 @@
 #include <awsmock/dto/s3/internal/UpdateObjectRequest.h>
 
 namespace AwsMock::Dto::S3 {
-
+    /*
     void UpdateObjectRequest::FromJson(const std::string &body) {
 
         try {
@@ -53,5 +53,5 @@ namespace AwsMock::Dto::S3 {
         os << "UpdateObjectRequest=" << r.ToJson();
         return os;
     }
-
+*/
 }// namespace AwsMock::Dto::S3

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string CreateUserPoolClientResponse::ToJson() {
+    std::string CreateUserPoolClientResponse::ToJson() const {
 
         try {
 

@@ -14,7 +14,7 @@
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,7 +23,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminDeleteUserRequest final : Common::BaseRequest<AdminDeleteUserRequest> {
+    struct AdminDeleteUserRequest final : Common::BaseDto<AdminDeleteUserRequest> {
 
         /**
          * ID of the user pool
@@ -47,7 +47,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

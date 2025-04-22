@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -40,7 +40,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Sorting
          */
-        std::vector<Core::SortColumn> sortColumns;
+        std::vector<Database::SortColumn> sortColumns;
 
         /**
          * @brief Parse a JSON stream

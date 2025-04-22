@@ -253,7 +253,7 @@ namespace AwsMock::Database {
         return userPools;
     }
 
-    std::vector<Entity::Cognito::UserPool> CognitoDatabase::ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Cognito::UserPool> CognitoDatabase::ExportUserPools(const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -265,8 +265,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -552,7 +552,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListUsers(region, userPoolId);
     }
 
-    std::vector<Entity::Cognito::User> CognitoDatabase::ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Cognito::User> CognitoDatabase::ExportUsers(const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -566,8 +566,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -849,7 +849,7 @@ namespace AwsMock::Database {
         return groups;
     }
 
-    std::vector<Entity::Cognito::Group> CognitoDatabase::ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Cognito::Group> CognitoDatabase::ExportGroups(const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -862,8 +862,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }

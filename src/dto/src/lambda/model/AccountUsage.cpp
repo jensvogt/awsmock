@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string AccountUsage::ToJson() {
+    std::string AccountUsage::ToJson() const {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
     }
 

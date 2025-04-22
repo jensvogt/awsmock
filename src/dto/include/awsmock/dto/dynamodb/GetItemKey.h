@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -19,17 +19,17 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemKey : Common::BaseRequest<GetItemKey> {
+    struct GetItemKey final : Common::BaseDto<GetItemKey> {
 
         /**
-         * Region
+         * Key type
          */
-        std::string type;
+        std::string keyType;
 
         /**
-         * Table name
+         * Key value
          */
-        std::string value;
+        std::string keyValue;
 
         /**
          * @brief Parse a JSON stream
@@ -43,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

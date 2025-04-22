@@ -18,7 +18,7 @@ namespace AwsMock::Dto::Module {
                 Core::Bson::FromBsonStringArray(documentValue, "modules", &modules);
             }*/
             if (documentValue.find("infrastructure") != documentValue.end()) {
-                infrastructure.FromDocument(documentValue.view()["infrastructure"].get_document().value);
+                infrastructure.FromJson(std::string(documentValue.view()["infrastructure"].get_string().value));
             }
 
         } catch (bsoncxx::exception &exc) {
@@ -43,14 +43,4 @@ namespace AwsMock::Dto::Module {
         }
     }
 
-    std::string ImportInfrastructureRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ImportInfrastructureRequest &r) {
-        os << "ImportInfrastructureRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Module

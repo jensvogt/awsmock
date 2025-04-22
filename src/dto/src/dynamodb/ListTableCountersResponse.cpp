@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::DynamoDb {
 
-    std::string ListTableCountersResponse::ToJson() {
+    std::string ListTableCountersResponse::ToJson() const {
 
         try {
 

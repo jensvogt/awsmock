@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DeleteGroupRequest::ToJson() {
+    std::string DeleteGroupRequest::ToJson() const {
 
         try {
 

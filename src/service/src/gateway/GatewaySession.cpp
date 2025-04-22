@@ -131,6 +131,10 @@ namespace AwsMock::Service {
 
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
             handler = GatewayRouter::instance().GetHandler(target);
+            if (!handler) {
+                log_error << "Handler not found, target: " << target;
+                return Core::HttpUtils::BadRequest(request, "Handler not found");
+            }
             log_trace << "Handler found, name: " << handler->name();
 
         } else {
@@ -146,6 +150,10 @@ namespace AwsMock::Service {
 
             region = authKey.region;
             handler = GatewayRouter::instance().GetHandler(authKey.module);
+            if (!handler) {
+                log_error << "Handler not found, target: " << authKey.module;
+                return Core::HttpUtils::BadRequest(request, "Handler not found");
+            }
             log_trace << "Handler found, name: " << handler->name();
         }
 

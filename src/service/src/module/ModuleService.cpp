@@ -155,7 +155,10 @@ namespace AwsMock::Service {
 
         // Check clean flag
         if (request.cleanFirst) {
-            CleanInfrastructure();
+            Dto::Module::CleanInfrastructureRequest cleanRequest;
+            cleanRequest.modules.emplace_back("All");
+            cleanRequest.onlyObjects = request.includeObjects;
+            CleanInfrastructure(cleanRequest);
         }
 
         // S3
@@ -262,9 +265,15 @@ namespace AwsMock::Service {
                 for (auto &table: infrastructure.dynamoDbTables) {
                     if (!_dynamoDbService.ExistTable(table.region, table.name)) {
                         constexpr Dto::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = 1, .writeCapacityUnits = 1};
-                        Dto::DynamoDb::CreateTableRequest request = {.region = table.region, .tableName = table.name, .attributes = table.attributes, .keySchemas = table.keySchemas, .provisionedThroughput = provisionedThroughput, .tags = table.tags};
-                        request.body = request.ToJson();
-                        Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+                        Dto::DynamoDb::CreateTableRequest dynamoDbRequest;
+                        dynamoDbRequest.region = table.region;
+                        dynamoDbRequest.tableName = table.name;
+                        dynamoDbRequest.attributes = table.attributes;
+                        dynamoDbRequest.keySchemas = table.keySchemas;
+                        dynamoDbRequest.provisionedThroughput = provisionedThroughput;
+                        dynamoDbRequest.tags = table.tags;
+                        dynamoDbRequest.body = dynamoDbRequest.ToJson();
+                        Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
                     } else {
                         _dynamoDatabase.CreateOrUpdateTable(table);
                     }
@@ -275,9 +284,13 @@ namespace AwsMock::Service {
             if (!infrastructure.dynamoDbItems.empty()) {
                 for (auto &item: infrastructure.dynamoDbItems) {
                     if (_dynamoDbService.ExistTable(item.region, item.tableName)) {
-                        Dto::DynamoDb::PutItemRequest request = {.region = item.region, .tableName = item.tableName, .attributes = Dto::DynamoDb::Mapper::map(item.attributes), .keys = Dto::DynamoDb::Mapper::map(item.keys)};
-                        request.body = request.ToJson();
-                        Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(request);
+                        Dto::DynamoDb::PutItemRequest putItemRequest;
+                        putItemRequest.region = item.region;
+                        putItemRequest.tableName = item.tableName;
+                        putItemRequest.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
+                        putItemRequest.keys = Dto::DynamoDb::Mapper::map(item.keys);
+                        putItemRequest.body = putItemRequest.ToJson();
+                        Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(putItemRequest);
                         log_debug << "DynamoDB item created, tableName: " << response.tableName;
                     }
                 }

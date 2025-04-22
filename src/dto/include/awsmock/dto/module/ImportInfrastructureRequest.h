@@ -10,6 +10,9 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/dto/common/BaseDto.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
@@ -31,7 +34,7 @@ namespace AwsMock::Dto::Module {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ImportInfrastructureRequest {
+    struct ImportInfrastructureRequest final : Common::BaseDto<ImportInfrastructureRequest> {
 
         /**
          * Infrastructure JSON
@@ -49,32 +52,18 @@ namespace AwsMock::Dto::Module {
         bool cleanFirst = false;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @param payload json string object
          */
         void FromJson(const std::string &payload);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Convert to a JSON string
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ImportInfrastructureRequest &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Module

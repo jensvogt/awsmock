@@ -30,7 +30,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string DecryptRequest::ToJson() {
+    std::string DecryptRequest::ToJson() const {
 
         try {
 

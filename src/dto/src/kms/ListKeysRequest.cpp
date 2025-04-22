@@ -20,7 +20,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string ListKeysRequest::ToJson() {
+    std::string ListKeysRequest::ToJson() const {
 
         try {
 

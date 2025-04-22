@@ -12,6 +12,9 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
+#include "awsmock/utils/SortColumn.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
@@ -108,7 +111,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns);
+        Entity::SQS::QueueList ExportQueues(const std::vector<SortColumn> &sortColumns);
 
         /**
          * @brief Import s a single queue

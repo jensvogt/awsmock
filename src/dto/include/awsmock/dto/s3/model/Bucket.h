@@ -9,10 +9,17 @@
 #include <string>
 #include <vector>
 
+// Boost includes
+#include <boost/describe.hpp>
+#include <boost/json.hpp>
+#include <boost/mp11.hpp>
+#include <boost/version.hpp>
+
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/ObjectVersion.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
@@ -27,7 +34,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Bucket {
+    struct Bucket final : Common::BaseDto<Bucket> {
 
         /**
          * AWS region
@@ -108,23 +115,30 @@ namespace AwsMock::Dto::S3 {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
+        std::string ToJson() const override {
+            return ToJson2();
+        };
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Bucket &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Bucket const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"bucketName", obj.bucketName},
+                    {"owner", obj.owner},
+                    {"arn", obj.arn},
+                    {"keys", obj.keys},
+                    {"size", obj.size},
+                    {"versionStatus", obj.versionStatus},
+                    {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
+                    {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
+                    {"lambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
-
+    //BOOST_DESCRIBE_STRUCT(Bucket, (Common::BaseDto<Bucket>), (region, bucketName, owner, arn, keys, size, versionStatus))
 }// namespace AwsMock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_MODEL_BUCKET_H

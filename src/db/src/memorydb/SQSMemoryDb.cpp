@@ -2,7 +2,6 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
 namespace AwsMock::Database {
@@ -127,7 +126,7 @@ namespace AwsMock::Database {
         return queueList;
     }
 
-    Entity::SQS::QueueList SQSMemoryDb::ExportQueues(const std::vector<Core::SortColumn> &sortColumns) {
+    Entity::SQS::QueueList SQSMemoryDb::ExportQueues(const std::vector<SortColumn> &sortColumns) {
 
         Entity::SQS::QueueList queueList;
         for (auto &val: _queues | std::views::values) {

@@ -32,6 +32,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueString("awsmock.access.secret-access-key", "none");
         Configuration::instance().SetValueString("awsmock.temp-dir", "/tmp/awsmock/data/tmp");
         Configuration::instance().SetValueString("awsmock.data-dir", "/tmp/awsmock/data");
+        Configuration::instance().SetValueString("awsmock.magic-file", DEFAULT_MAGIC_FILE);
 
         // Gateway
         Configuration::instance().SetValueBool("awsmock.gateway.active", true);

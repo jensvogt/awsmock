@@ -6,6 +6,7 @@
 #define AWSMOCK_DTO_S3_EVENT_H
 
 // C++ standard includes
+#include <boost/describe.hpp>
 #include <string>
 
 // AwsMock includes
@@ -60,6 +61,18 @@ namespace AwsMock::Dto::S3 {
         return NotificationEventType::OBJECT_CREATED;
     }
 
+    BOOST_DESCRIBE_ENUM(NotificationEventType,
+                        REDUCED_REDUNDANCY_LOST_OBJECT,
+                        OBJECT_CREATED,
+                        OBJECT_REMOVED,
+                        OBJECT_RESTORED,
+                        REPLICATION,
+                        OBJECT_RESTORE,
+                        OBJECT_LIFECYCLE_TRANSITION,
+                        INTELLIGENT_TIERING,
+                        OBJECT_ACL,
+                        LIFECYCLE_EXPIRATION,
+                        OBJECT_TAGGING);
 
 }// namespace AwsMock::Dto::S3
 #endif// AWSMOCK_DTO_S3_EVENT_H

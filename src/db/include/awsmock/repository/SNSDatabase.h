@@ -16,12 +16,12 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -180,7 +180,7 @@ namespace AwsMock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
+        Entity::SNS::TopicList ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region = {}) const;
 
         /**
          * @brief Export all available topics
@@ -189,7 +189,7 @@ namespace AwsMock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const;
+        Entity::SNS::TopicList ExportTopics(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Counts the number of topics
@@ -304,7 +304,7 @@ namespace AwsMock::Database {
          * @return list of SNS messages
          * @throws DatabaseException
          */
-        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Updates an existing message

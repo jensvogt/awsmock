@@ -99,7 +99,7 @@ namespace AwsMock::Dto::SQS {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson();
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

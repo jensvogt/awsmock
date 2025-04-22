@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
-#include <boost/asio/readable_pipe.hpp>
 
 namespace AwsMock::Core {
 
@@ -52,19 +51,19 @@ namespace AwsMock::Core {
     }
 
     std::string SystemUtils::GetEnvironmentVariableValue(const std::string &name) {
-        char *pValue;
 #ifdef _WIN32
+        char *pValue;
         pValue = static_cast<LPTSTR>(malloc(BUFSIZE * sizeof(TCHAR)));
         if (DWORD result; (result = GetEnvironmentVariable(name.c_str(), pValue, BUFSIZE))) {
             log_info << "Environment variable not found, name: " << name << ", error: " << result;
         }
         return {pValue};
 #else
-        size_t len;
-        if (const errno_t result = _dupenv_s(&pValue, &len, name.c_str())) {
-            log_info << "Environment variable not found, name: " << name << ", error: " << result;
+        if (getenv(name.c_str()) == nullptr) {
+            log_debug << "Environment variable not found, name: " << name;
+            return {};
         }
-        return {pValue, len};
+        return {getenv(name.c_str())};
 #endif
     }
 
@@ -72,8 +71,24 @@ namespace AwsMock::Core {
         return !GetEnvironmentVariableValue(name).empty();
     }
 
+    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error) {
+
+        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
+        boost::asio::io_context ctx;
+        boost::asio::readable_pipe outPipe{ctx};
+        boost::asio::readable_pipe errPipe{ctx};
+        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{{}, outPipe, errPipe});
+        boost::system::error_code ec;
+        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        proc.wait();
+    }
+
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
+        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
         boost::asio::io_context ctx;
         boost::asio::readable_pipe inPipe{ctx};
         boost::asio::readable_pipe outPipe{ctx};

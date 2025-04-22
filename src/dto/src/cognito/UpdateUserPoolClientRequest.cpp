@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string UpdateUserPoolClientRequest::ToJson() {
+    std::string UpdateUserPoolClientRequest::ToJson() const {
 
         try {
 

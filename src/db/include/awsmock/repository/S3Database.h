@@ -12,13 +12,13 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -121,7 +121,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export all buckets
@@ -129,7 +129,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ExportBuckets(const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Check whether the bucket has still objects
@@ -359,7 +359,7 @@ namespace AwsMock::Database {
          * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Counts the number of keys in a bucket

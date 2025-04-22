@@ -20,11 +20,12 @@ namespace AwsMock::Service {
 
     Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "list_keys");
-        log_trace << "List keys request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "List keys request: " << request.ToString();
 
         try {
 
-            Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
             Dto::KMS::ListKeysResponse listKeysResponse;
             for (const auto &k: keyList) {
                 Dto::KMS::ListKey key = {.keyId = k.keyId, .keyArn = k.arn};
@@ -42,7 +43,8 @@ namespace AwsMock::Service {
 
     Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "create_key");
-        log_trace << "Create key request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "Create key request: " << request.ToString();
 
         try {
             // Update database
@@ -58,7 +60,7 @@ namespace AwsMock::Service {
                     .description = request.description,
                     .tags = request.tags};
 
-            // Store in database
+            // Store in a database
             keyEntity = _kmsDatabase.CreateKey(keyEntity);
             log_trace << "KMS keyEntity created: " << keyEntity.ToString();
 
@@ -73,7 +75,8 @@ namespace AwsMock::Service {
                     .keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage),
                     .keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState),
                     .description = keyEntity.description};
-            Dto::KMS::CreateKeyResponse response = {.key = key};
+            Dto::KMS::CreateKeyResponse response;
+            response.key = key;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -108,7 +111,8 @@ namespace AwsMock::Service {
 
     Dto::KMS::ScheduledKeyDeletionResponse KMSService::ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "schedule_key_deletion");
-        log_trace << "Schedule key deletion request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "Schedule key deletion request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
@@ -124,16 +128,16 @@ namespace AwsMock::Service {
             key.scheduledDeletion = system_clock::now() + std::chrono::days(request.pendingWindowInDays);
             key.keyState = Dto::KMS::KeyStateToString(Dto::KMS::KeyState::PENDING_DELETION);
 
-            // Store in database
+            // Store in a database
             key = _kmsDatabase.UpdateKey(key);
-            log_trace << "KMS key updated: " << key.ToString();
-
-            return {
-                    .keyId = request.keyId,
-                    .keyState = key.keyState,
-                    .deletionDate = Core::DateTimeUtils::UnixTimestamp(key.scheduledDeletion),
-                    .pendingWindowInDays = request.pendingWindowInDays,
-            };
+            // TODO:: Fix for new tenplates
+            //log_trace << "KMS key updated: " << key.ToString();
+            Dto::KMS::ScheduledKeyDeletionResponse response;
+            response.keyId = request.keyId;
+            response.keyState = key.keyState;
+            response.deletionDate = Core::DateTimeUtils::UnixTimestamp(key.scheduledDeletion);
+            response.pendingWindowInDays = request.pendingWindowInDays;
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "KMS create key failed, message: " << exc.message();
@@ -143,7 +147,8 @@ namespace AwsMock::Service {
 
     Dto::KMS::DescribeKeyResponse KMSService::DescribeKey(const Dto::KMS::DescribeKeyRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "describe_key");
-        log_trace << "Create key request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "Create key request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
@@ -165,7 +170,11 @@ namespace AwsMock::Service {
                     .creationDate = Core::DateTimeUtils::UnixTimestamp(keyEntity.created),
                     .deletionDate = Core::DateTimeUtils::UnixTimestamp(keyEntity.scheduledDeletion),
                     .enabled = Core::StringUtils::Equals(keyEntity.keyState, Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED))};
-            Dto::KMS::DescribeKeyResponse response = {.key = key};
+            Dto::KMS::DescribeKeyResponse response;
+            response.requestId = request.requestId;
+            response.region = request.region;
+            response.user = request.user;
+            response.key = key;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -176,7 +185,8 @@ namespace AwsMock::Service {
 
     Dto::KMS::EncryptResponse KMSService::Encrypt(const Dto::KMS::EncryptRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "encrypt");
-        log_trace << "Encrypt plaintext request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "Encrypt plaintext request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
@@ -190,7 +200,11 @@ namespace AwsMock::Service {
 
             const std::string cipherText = EncryptPlaintext(keyEntity, request.plainText);
 
-            Dto::KMS::EncryptResponse response = {{.region = request.region}, keyEntity.keyId, request.encryptionAlgorithm, cipherText};
+            Dto::KMS::EncryptResponse response;
+            response.region = request.region;
+            response.keyId = keyEntity.keyId;
+            response.encryptionAlgorithm = request.encryptionAlgorithm;
+            response.ciphertext = cipherText;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -201,7 +215,8 @@ namespace AwsMock::Service {
 
     Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "decrypt");
-        log_trace << "Decrypt plaintext request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "Decrypt plaintext request: " << request.ToString();
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
@@ -210,12 +225,16 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
+            const Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
-            std::string plainText = DecryptPlaintext(keyEntity, request.ciphertext);
+            const std::string plainText = DecryptPlaintext(keyEntity, request.ciphertext);
 
-            Dto::KMS::DecryptResponse response = {{.region = request.region}, keyEntity.keyId, request.encryptionAlgorithm, plainText};
+            Dto::KMS::DecryptResponse response;
+            response.region = request.region;
+            response.keyId = keyEntity.keyId;
+            response.encryptionAlgorithm = request.encryptionAlgorithm;
+            response.plaintext = plainText;
             return response;
 
         } catch (Core::DatabaseException &exc) {

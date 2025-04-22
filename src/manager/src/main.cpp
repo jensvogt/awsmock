@@ -257,7 +257,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 
-    // Set log level
+    // Set the log level
     if (vm.contains("loglevel")) {
         auto value = vm["loglevel"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
@@ -267,7 +267,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
-    // Set log file
+    // Set the log file
     if (AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.dir") &&
         AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.prefix")) {
         AwsMock::Core::LogStream::AddFile();

@@ -35,11 +35,11 @@ namespace AwsMock::Service {
             };
 
             userPool = _database.CreateUserPool(userPool);
-            response = {
-                    {.requestId = request.requestId, .region = userPool.region},
-                    userPool.name,
-                    userPool.arn,
-                    userPool.userPoolId};
+            response.requestId = request.requestId;
+            response.region = userPool.region;
+            response.name = userPool.name;
+            response.arn = userPool.arn;
+            response.userPoolId = userPool.userPoolId;
             log_trace << "Create user pool outcome: " + response.ToJson();
             return response;
 
@@ -171,7 +171,9 @@ namespace AwsMock::Service {
             userPool = _database.UpdateUserPool(userPool);
 
             Dto::Cognito::CreateUserPoolDomainResponse response{};
-            response = {{.requestId = request.requestId, .region = userPool.region}, userPool.domain.domain};
+            response.requestId = request.requestId;
+            response.region = userPool.region;
+            response.cloudFrontDomain = userPool.domain.domain;
 
             log_trace << "Create user pool domain result: " + response.ToJson();
             return response;
@@ -199,8 +201,13 @@ namespace AwsMock::Service {
             // Update database
             userPool = _database.UpdateUserPool(userPool);
             log_trace << "User pool domain updated, userPoolId: " << userPool.userPoolId << " Domain: " << request.domain;
+            Dto::Cognito::UpdateUserPoolDomainResponse response{};
+            response.requestId = request.requestId;
+            response.user = request.user;
+            response.region = userPool.region;
+            response.cloudFrontDomain = userPool.domain.domain;
+            return response;
 
-            return {.cloudFrontDomain = userPool.domain.domain};
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -249,10 +256,12 @@ namespace AwsMock::Service {
             userPool = _database.UpdateUserPool(userPool);
 
             Dto::Cognito::CreateUserPoolClientResponse response{};
-            response = {{.requestId = request.requestId, .region = userPool.region}, userPool.domain.domain};
-
+            response.requestId = request.requestId;
+            response.region = userPool.region;
+            response.userGroupClient.clientId = userPoolClient.clientId;
             log_trace << "Create user pool client result: " + response.ToJson();
             return response;
+
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -397,8 +406,7 @@ namespace AwsMock::Service {
         }
 
         if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
-            throw Core::ServiceException(
-                    "User exists exists already, userPoolId: " + request.userPoolId + " userName: " + request.userName);
+            throw Core::ServiceException("User exists exists already, userPoolId: " + request.userPoolId + " userName: " + request.userName);
         }
 
         try {
@@ -414,12 +422,13 @@ namespace AwsMock::Service {
             };
 
             user = _database.CreateUser(user);
-            Dto::Cognito::AdminCreateUserResponse response = {
-                    {.region = user.region},
-                    user.userName,
-                    user.enabled};
+            Dto::Cognito::AdminCreateUserResponse response;
+            response.region = user.region;
+            response.userName = user.userName;
+            response.enabled = user.enabled;
             log_trace << "Create user response: " + response.ToJson();
             return response;
+
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
@@ -455,7 +464,8 @@ namespace AwsMock::Service {
     void CognitoService::AdminAddUserToGroup(const Dto::Cognito::AdminAddUserToGroupRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "add_user_to_group");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "add_user_to_group");
-        log_debug << "Admin add user to group request, request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_debug << "Admin add user to group request, request: " << request.ToString();
 
         if (!_database.UserPoolExists(request.userPoolId)) {
             log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
@@ -498,7 +508,8 @@ namespace AwsMock::Service {
     void CognitoService::AdminRemoveUserFromGroup(const Dto::Cognito::AdminRemoveUserFromGroupRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "add_user_to_group");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "add_user_to_group");
-        log_debug << "Admin add user to group request, request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_debug << "Admin add user to group request, request: " << request.ToString();
 
         if (!_database.UserPoolExists(request.userPoolId)) {
             log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
@@ -585,7 +596,8 @@ namespace AwsMock::Service {
     Dto::Cognito::ListUsersInGroupResponse CognitoService::ListUsersInGroup(const Dto::Cognito::ListUsersInGroupRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "list_users_in_group");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "list_users_in_group");
-        log_debug << "Admin add user to group request, request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_debug << "Admin add user to group request, request: " << request.ToString();
 
         if (!_database.UserPoolExists(request.userPoolId)) {
             log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
@@ -613,7 +625,8 @@ namespace AwsMock::Service {
     void CognitoService::AdminEnableUser(const Dto::Cognito::AdminEnableUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "enable_user");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "enable_user");
-        log_debug << "Admin enable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+        // TODO:: Fix for new tenplates
+        //log_debug << "Admin enable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
             log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
@@ -642,7 +655,8 @@ namespace AwsMock::Service {
     void CognitoService::AdminDisableUser(const Dto::Cognito::AdminDisableUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "disable_user");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "disable_user");
-        log_debug << "Admin disable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+        // TODO:: Fix for new tenplates
+        //log_debug << "Admin disable user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
             log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
@@ -668,7 +682,8 @@ namespace AwsMock::Service {
     void CognitoService::AdminDeleteUser(const Dto::Cognito::AdminDeleteUserRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "delete_user");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "delete_user");
-        log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
+        // TODO:: Fix for new tenplates
+        //log_debug << "Admin delete user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
             log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
@@ -695,7 +710,8 @@ namespace AwsMock::Service {
     CognitoService::CreateGroup(const Dto::Cognito::CreateGroupRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "create_group");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "create_group");
-        log_debug << "Create group request, region:  " << request.region << " name: " << request.groupName;
+        // TODO:: Fix for new tenplates
+        //log_debug << "Create group request, region:  " << request.region << " name: " << request.groupName;
 
         if (_database.GroupExists(request.region, request.groupName)) {
             log_error << "User group exists already, region: " << request.region << " name: " << request.groupName;
@@ -741,7 +757,9 @@ namespace AwsMock::Service {
 
         try {
             _database.DeleteGroup(request.region, request.userPoolId, request.groupName);
-            log_trace << "Cognito group deleted, group: " + request.ToJson();
+            // TODO:: Fix for new tenplates
+            //log_trace << "Cognito group deleted, group: " << request.ToString();
+
         } catch (bsoncxx::exception &ex) {
             log_error << "Delete group request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
@@ -771,12 +789,13 @@ namespace AwsMock::Service {
             };
 
             user = _database.CreateUser(user);
-            Dto::Cognito::SignUpResponse response = {
-                    {.region = user.region},
-                    Core::StringUtils::CreateRandomUuid(),
-                    false};
+            Dto::Cognito::SignUpResponse response;
+            response.userConfirmed = false;
+            response.region = user.region;
+            response.requestId = request.requestId;
             log_trace << "Signup user response: " + response.ToJson();
             return response;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "Create user request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());

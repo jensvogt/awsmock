@@ -86,19 +86,4 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string LambdaConfiguration::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string LambdaConfiguration::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const LambdaConfiguration &r) {
-        os << "LambdaConfiguration=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

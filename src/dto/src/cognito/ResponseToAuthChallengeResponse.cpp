@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string RespondToAuthChallengeResponse::ToJson() {
+    std::string RespondToAuthChallengeResponse::ToJson() const {
 
         try {
 

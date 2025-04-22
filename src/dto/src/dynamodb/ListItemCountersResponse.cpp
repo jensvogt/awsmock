@@ -29,15 +29,4 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string ListItemCountersResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListItemCountersResponse &r) {
-        os << "ListItemCountersResponse=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::DynamoDb

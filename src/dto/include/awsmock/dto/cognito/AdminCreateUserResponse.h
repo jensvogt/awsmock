@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminCreateUserResponse final : Common::BaseRequest<AdminCreateUserResponse> {
+    struct AdminCreateUserResponse final : Common::BaseDto<AdminCreateUserResponse> {
 
         /**
          * Name of the user
@@ -50,7 +50,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON representation of the object
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

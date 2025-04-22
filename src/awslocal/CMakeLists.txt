@@ -1,7 +1,6 @@
 set(BINARY awslocal)
 set(SOURCES src/AwsLocal.cpp src/main.cpp)
 
-
 if (WIN32)
     add_executable(${BINARY} WIN32 ${SOURCES})
     set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
@@ -20,5 +19,5 @@ else ()
     target_link_libraries(${BINARY} PUBLIC awsmockcore boost_program_options boost_process)
 endif ()
 
-install(TARGETS ${BINARY} DESTINATION ${BIN_INSTALL_DIR})
+install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 

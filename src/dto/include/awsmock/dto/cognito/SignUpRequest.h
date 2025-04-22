@@ -13,7 +13,7 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/cognito/model/UserContextData.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -53,7 +53,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SignUpRequest : Common::BaseRequest<SignUpRequest> {
+    struct SignUpRequest : Common::BaseDto<SignUpRequest> {
 
         /**
          * Client ID
@@ -117,7 +117,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

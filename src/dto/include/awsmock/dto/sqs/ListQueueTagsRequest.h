@@ -10,9 +10,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/sqs/model/QueueCounter.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Sort column
          */
-        std::vector<Core::SortColumn> sortColumns;
+        std::vector<Database::SortColumn> sortColumns;
 
         /**
          * @brief Convert from JSON representation

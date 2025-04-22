@@ -361,7 +361,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListLambdas(region);
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ExportLambdas(const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ExportLambdas(const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas = ListLambdaCounters({}, {}, -1, 0, sortColumns);
 
@@ -374,7 +374,7 @@ namespace AwsMock::Database {
         return lambdas;
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {
@@ -387,8 +387,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }

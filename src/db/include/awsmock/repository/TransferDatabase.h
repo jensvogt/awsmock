@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
+#include <awsmock/utils/SortColumn.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/transfer/Transfer.h>
@@ -151,7 +151,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting
          * @return list of transfer manager
          */
-        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of transfer users.
@@ -164,7 +164,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting column names
          * @return list of transfer users
          */
-        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns the total number of servers.

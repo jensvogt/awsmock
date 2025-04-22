@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/dto/cognito/model/UserContextData.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -43,7 +43,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RespondToAuthChallengeRequest final : Common::BaseRequest<RespondToAuthChallengeRequest> {
+    struct RespondToAuthChallengeRequest final : Common::BaseDto<RespondToAuthChallengeRequest> {
 
         /**
          * The app client ID.
@@ -134,7 +134,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

@@ -105,7 +105,9 @@ namespace AwsMock::Service {
             }
             if (action == "import") {
 
-                _moduleService.ImportInfrastructure(payload);
+                Dto::Module::ImportInfrastructureRequest moduleRequest;
+                moduleRequest.FromJson(payload);
+                _moduleService.ImportInfrastructure(moduleRequest);
                 return SendOkResponse(request);
             }
             if (action == "set-log-level") {

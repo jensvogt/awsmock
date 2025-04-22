@@ -13,7 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/SortColumn.h>
+#include <awsmock/utils/SortColumn.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 
@@ -140,7 +140,7 @@ namespace AwsMock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const;
+        Entity::SNS::TopicList ExportTopics(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Counts the number of topics

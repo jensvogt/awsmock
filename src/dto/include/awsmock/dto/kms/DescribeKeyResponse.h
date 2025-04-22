@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/kms/model/Key.h>
 
 namespace AwsMock::Dto::KMS {
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeKeyResponse : Common::BaseRequest<DescribeKeyResponse> {
+    struct DescribeKeyResponse final : Common::BaseDto<DescribeKeyResponse> {
 
         /**
          * Key metadata
@@ -37,18 +37,11 @@ namespace AwsMock::Dto::KMS {
         Key key;
 
         /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::KMS

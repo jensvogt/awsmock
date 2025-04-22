@@ -14,7 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
@@ -27,7 +27,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeTableResponse final : Common::BaseRequest<DescribeTableResponse> {
+    struct DescribeTableResponse final : Common::BaseDto<DescribeTableResponse> {
 
         /**
          * Region
@@ -117,7 +117,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

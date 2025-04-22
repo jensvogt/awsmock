@@ -22,8 +22,8 @@ namespace AwsMock::Dto::DynamoDb {
                 for (const auto &element: keyDocument) {
                     std::string key = bsoncxx::string::to_string(element.key());
                     std::string value = bsoncxx::string::to_string(element[key].get_string().value);
-                    getItemKey.type = key;
-                    getItemKey.value = Core::Bson::BsonUtils::GetStringValue(element);
+                    getItemKey.keyType = key;
+                    getItemKey.keyValue = Core::Bson::BsonUtils::GetStringValue(element);
                 }
             }
         } catch (bsoncxx::exception &exc) {
@@ -32,7 +32,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string GetItemRequest::ToJson() {
+    std::string GetItemRequest::ToJson() const {
 
         try {
 

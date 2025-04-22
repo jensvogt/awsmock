@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string ScheduleKeyDeletionRequest::ToJson() {
+    std::string ScheduleKeyDeletionRequest::ToJson() const {
 
         try {
 

@@ -34,7 +34,7 @@ namespace AwsMock::Core {
         const system_clock::time_point utcTime = DateTimeUtils::ConvertToUtc(localTime);
 
         // assert
-        EXPECT_EQ(3600, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
+        EXPECT_EQ(7200, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
     }
 
     TEST_F(DateTimeUtilsTest, UtcOffsetTest) {

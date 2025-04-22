@@ -172,7 +172,8 @@ namespace AwsMock::Service {
     Dto::S3::GetObjectResponse S3Service::GetObject(const Dto::S3::GetObjectRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_object");
-        log_trace << "Get object request, s3Request: " << request.ToString();
+        // TODO:: Fix for new tenplates
+        //log_trace << "Get object request, s3Request: " << request.ToString();
         const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
 
         // Check existence
@@ -233,7 +234,9 @@ namespace AwsMock::Service {
 
             const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
             Dto::S3::ListAllBucketResponse listAllBucketResponse;
-            listAllBucketResponse.bucketList = bucketList;
+            for (const auto &b: bucketList) {
+                listAllBucketResponse.bucketList.emplace_back(Dto::S3::Mapper::map(b));
+            }
             listAllBucketResponse.total = bucketList.size();
             log_debug << "Count all buckets, size: " << bucketList.size();
             return listAllBucketResponse;
@@ -250,7 +253,14 @@ namespace AwsMock::Service {
         log_trace << "List buckets counters request";
 
         try {
-            Database::Entity::S3::BucketList bucketList = _database.ListBuckets(s3Request.region, s3Request.prefix, s3Request.pageSize, s3Request.pageIndex, s3Request.sortColumns);
+            std::vector<Database::SortColumn> sortColumns;
+            for (const auto &sc: s3Request.sortColumns) {
+                Database::SortColumn sortColumn;
+                sortColumn.column = sc.column;
+                sortColumn.sortDirection = sc.sortDirection;
+                sortColumns.push_back(sortColumn);
+            }
+            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets(s3Request.region, s3Request.prefix, s3Request.pageSize, s3Request.pageIndex, sortColumns);
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
             listAllBucketResponse.total = _database.BucketCount(s3Request.region, s3Request.prefix);
@@ -375,7 +385,7 @@ namespace AwsMock::Service {
         close(source);
         close(dest);
 #elif __linux__
-        std::istreambuf_iterator<char> source = open(sourceFile.c_str(), O_RDONLY, 0);
+        const int source = open(sourceFile.c_str(), O_RDONLY, 0);
         const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
         const long copied = sendfile(dest, source, &start, length);
         close(source);
@@ -924,7 +934,8 @@ namespace AwsMock::Service {
 
         // Create S3 bucket and object
         Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Core::StringUtils::CreateRandomUuid()};
-        Dto::S3::Bucket s3Bucket = {.bucketName = bucketEntity.name};
+        Dto::S3::Bucket s3Bucket;
+        s3Bucket.bucketName = bucketEntity.name;
 
         if (bucketEntity.HasQueueNotificationEvent(event)) {
             if (Database::Entity::S3::QueueNotification notification = bucketEntity.GetQueueNotification(event); notification.CheckFilter(key)) {
@@ -1037,7 +1048,14 @@ namespace AwsMock::Service {
         log_trace << "List objects counters request";
 
         try {
-            Database::Entity::S3::ObjectList objectList = _database.ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, s3Request.sortColumns);
+            std::vector<Database::SortColumn> sortColumns;
+            for (const auto &sc: s3Request.sortColumns) {
+                Database::SortColumn sortColumn;
+                sortColumn.column = sc.column;
+                sortColumn.sortDirection = sc.sortDirection;
+                sortColumns.push_back(sortColumn);
+            }
+            Database::Entity::S3::ObjectList objectList = _database.ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, sortColumns);
 
             Dto::S3::ListObjectCounterResponse listAllObjectResponse;
             listAllObjectResponse.total = _database.ObjectCount(s3Request.region, s3Request.prefix, s3Request.bucket);
@@ -1360,8 +1378,8 @@ namespace AwsMock::Service {
             for (const auto &event: events) { queueNotification.events.emplace_back(EventTypeToString(event)); }
 
             // Get filter rules
-            for (const auto &[name, value]: filterRules) {
-                Database::Entity::S3::FilterRule filterRuleEntity = {.name = NameTypeToString(name), .value = value};
+            for (const auto &filterRule: filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.filterValue};
                 queueNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.queueNotifications.emplace_back(queueNotification);
@@ -1370,24 +1388,24 @@ namespace AwsMock::Service {
     }
 
     void S3Service::PutTopicNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::TopicConfiguration> &topicConfigurations) {
-        for (const auto &[id, topicArn, filterRules, events]: topicConfigurations) {
+        for (const auto &topicConfiguration: topicConfigurations) {
 
             // Check existence
-            if (!id.empty() && bucket.HasTopicNotificationId(id)) {
-                log_debug << "Topic notification configuration exists already, id: " << id;
+            if (!topicConfiguration.id.empty() && bucket.HasTopicNotificationId(topicConfiguration.id)) {
+                log_debug << "Topic notification configuration exists already, id: " << topicConfiguration.id;
                 break;
             }
 
             // General attributes
-            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
-            Database::Entity::S3::TopicNotification topicNotification = {.id = attrId, .topicArn = topicArn};
+            const std::string attrId = topicConfiguration.id.empty() ? Core::StringUtils::CreateRandomUuid() : topicConfiguration.id;
+            Database::Entity::S3::TopicNotification topicNotification = {.id = attrId, .topicArn = topicConfiguration.topicArn};
 
             // Get events
-            for (const auto &event: events) { topicNotification.events.emplace_back(Dto::S3::EventTypeToString(event)); }
+            for (const auto &event: topicConfiguration.events) { topicNotification.events.emplace_back(Dto::S3::EventTypeToString(event)); }
 
             // Get filter rules
-            for (const auto &[name, value]: filterRules) {
-                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(name), .value = value};
+            for (const auto filterRule: topicConfiguration.filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.filterValue};
                 topicNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.topicNotifications.emplace_back(topicNotification);
@@ -1396,24 +1414,24 @@ namespace AwsMock::Service {
     }
 
     void S3Service::PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations) {
-        for (const auto &[id, lambdaArn, filterRules, events]: lambdaConfigurations) {
+        for (const auto &lambdaConfiguration: lambdaConfigurations) {
 
             // Check existence
-            if (!id.empty() && bucket.HasLambdaNotificationId(id)) {
-                log_debug << "Lambda notification configuration exists already, id: " << id;
+            if (!lambdaConfiguration.id.empty() && bucket.HasLambdaNotificationId(lambdaConfiguration.id)) {
+                log_debug << "Lambda notification configuration exists already, id: " << lambdaConfiguration.id;
                 break;
             }
 
             // General attributes
-            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
-            Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaArn};
+            const std::string attrId = lambdaConfiguration.id.empty() ? Core::StringUtils::CreateRandomUuid() : lambdaConfiguration.id;
+            Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaConfiguration.lambdaArn};
 
             // Get events
-            for (const auto &event: events) { lambdaNotification.events.emplace_back(EventTypeToString(event)); }
+            for (const auto &event: lambdaConfiguration.events) { lambdaNotification.events.emplace_back(Dto::S3::EventTypeToString(event)); }
 
             // Get filter rules
-            for (const auto &[name, value]: filterRules) {
-                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(name), .value = value};
+            for (const auto &filterRule: lambdaConfiguration.filterRules) {
+                Database::Entity::S3::FilterRule filterRuleEntity = {.name = Dto::S3::NameTypeToString(filterRule.name), .value = filterRule.filterValue};
                 lambdaNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.lambdaNotifications.emplace_back(lambdaNotification);

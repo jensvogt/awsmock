@@ -20,7 +20,7 @@ namespace AwsMock::Dto::SQS {
             if (document.find("SortColumns") != document.end()) {
 
                 for (const bsoncxx::array::view arrayView{document["SortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
-                    Core::SortColumn sortColumn;
+                    Database::SortColumn sortColumn;
                     sortColumn.FromDocument(element.get_document());
                     sortColumns.emplace_back(sortColumn);
                 }

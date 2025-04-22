@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersResponse final : Common::BaseRequest<ListUsersResponse> {
+    struct ListUsersResponse final : Common::BaseDto<ListUsersResponse> {
 
         /**
          * User entities
@@ -38,7 +38,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return user pools json string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

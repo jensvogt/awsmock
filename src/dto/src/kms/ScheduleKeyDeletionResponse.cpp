@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::KMS {
 
-    std::string ScheduledKeyDeletionResponse::ToJson() {
+    std::string ScheduledKeyDeletionResponse::ToJson() const {
 
         try {
 

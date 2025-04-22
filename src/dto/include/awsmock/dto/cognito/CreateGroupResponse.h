@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/Group.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateGroupResponse final : Common::BaseRequest<CreateGroupResponse> {
+    struct CreateGroupResponse final : Common::BaseDto<CreateGroupResponse> {
 
         /**
          * Group
@@ -48,7 +48,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return json string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

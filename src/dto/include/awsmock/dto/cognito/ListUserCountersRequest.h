@@ -11,8 +11,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserCountersRequest final : Common::BaseRequest<ListUserCountersRequest> {
+    struct ListUserCountersRequest final : Common::BaseDto<ListUserCountersRequest> {
 
         /**
          * User pool ID
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Sort columns
          */
-        std::vector<Core::SortColumn> sortColumns;
+        std::vector<Database::SortColumn> sortColumns;
 
         /**
          * @brief Convert from a JSON object.
@@ -60,7 +60,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

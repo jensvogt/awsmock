@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct CreateFunctionResponse final : Common::BaseRequest<CreateFunctionResponse> {
+    struct CreateFunctionResponse final : Common::BaseDto<CreateFunctionResponse> {
 
         /**
          * Name of the function
@@ -146,7 +146,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

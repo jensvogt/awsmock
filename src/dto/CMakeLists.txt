@@ -4,9 +4,8 @@ set(LIBRARY_STATIC awsmockdto_static)
 
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
         src/common/Services.cpp src/module/model/Infrastructure.cpp src/common/SNSClientCommand.cpp
-        src/common/BaseRequest.cpp src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
-        src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
-        src/common/MonitoringClientCommand.cpp)
+        src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
+        src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp src/common/MonitoringClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
@@ -48,14 +47,14 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/CreateBucketConstraint.cpp src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp src/s3/ListAllBucketResponse.cpp
         src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
         src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp src/s3/ListObjectVersionsRequest.cpp
-        src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/internal/TouchObjectRequest.cpp
+        src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp src/s3/PutBucketNotificationConfigurationRequest.cpp
         src/s3/PutBucketNotificationConfigurationResponse.cpp src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
         src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/internal/ListBucketCounterRequest.cpp src/s3/internal/ListBucketCounterResponse.cpp
-        src/s3/model/ObjectCounter.cpp src/s3/internal/ListObjectCounterRequest.cpp src/s3/internal/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
-        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp src/s3/internal/GetObjectCounterRequest.cpp src/s3/internal/GetObjectCounterResponse.cpp
-        src/s3/internal/UpdateObjectRequest.cpp src/s3/internal/UpdateLambdaConfigurationRequest.cpp)
+        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/internal/ListBucketCounterResponse.cpp
+        src/s3/model/ObjectCounter.cpp src/s3/internal/ListObjectCounterResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
+        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp
+        src/s3/internal/UpdateObjectRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -103,7 +102,7 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp
         src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
         src/dynamodb/mapper/Mapper.cpp src/dynamodb/model/TableCounter.cpp src/dynamodb/ListTableCountersRequest.cpp src/dynamodb/ListTableCountersResponse.cpp
-        src/dynamodb/model/ItemCounter.cpp src/dynamodb/ListItemCountersRequest.cpp src/dynamodb/ListItemCountersResponse.cpp)
+        src/dynamodb/model/ItemCounter.cpp src/dynamodb/ListItemCountersRequest.cpp src/dynamodb/ListItemCountersResponse.cpp src/dynamodb/GetItemKey.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
         src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
         src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp
@@ -139,13 +138,13 @@ include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
+            boost_url boost_thread boost_locale boost_json yaml-cpp ssl crypto archive magic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 if (NOT WIN32)
     target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale yaml-cpp ssl crypto archive magic)
+            boost_url boost_thread boost_locale boost_json yaml-cpp ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

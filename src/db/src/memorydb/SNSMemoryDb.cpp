@@ -147,7 +147,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<SortColumn> &sortColumns) const {
 
         Entity::SNS::TopicList topicList;
         for (const auto &topic: _topics) {

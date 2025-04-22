@@ -17,6 +17,7 @@
 // Boost includes
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/read.hpp>
+#include <boost/asio/readable_pipe.hpp>
 #include <boost/process.hpp>
 #include <boost/thread/thread.hpp>
 
@@ -97,6 +98,15 @@ namespace AwsMock::Core {
          */
         static bool HasEnvironmentVariable(const std::string &name);
 
+        /**
+         * @brief Run command in a shell
+         *
+         * @param shellcmd command
+         * @param args vector of string arguments
+         * @param output output stream
+         * @param error error stream
+         */
+        static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error);
 
         /**
          * @brief Run command in a shell
