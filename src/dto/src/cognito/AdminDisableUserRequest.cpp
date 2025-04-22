@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminDisableUserRequest::ToJson() {
+    std::string AdminDisableUserRequest::ToJson() const {
 
         try {
             document document;

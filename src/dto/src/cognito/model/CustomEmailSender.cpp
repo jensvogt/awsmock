@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string CustomEmailSender::ToJson() {
+    std::string CustomEmailSender::ToJson() const {
 
         try {
 

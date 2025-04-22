@@ -18,7 +18,7 @@ namespace AwsMock::Dto::SQS {
             if (document.find("sortColumns") != document.end()) {
                 array jsonAttributesArray;
                 for (const auto &s: document["sortColumns"].get_array().value) {
-                    Core::SortColumn sortColumn;
+                    Database::SortColumn sortColumn;
                     sortColumn.FromDocument(s.get_document());
                     sortColumns.emplace_back(sortColumn);
                 }

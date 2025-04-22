@@ -33,7 +33,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string DescribeTableRequest::ToJson() {
+    std::string DescribeTableRequest::ToJson() const {
 
         try {
 

@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminRemoveUserFromGroupRequest::ToJson() {
+    std::string AdminRemoveUserFromGroupRequest::ToJson() const {
 
         try {
             document document;

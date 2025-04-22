@@ -53,7 +53,12 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, CreateSymmetricKeyTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::SYMMETRIC_DEFAULT, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
@@ -70,7 +75,12 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, CreateRSA2048KeyTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_2048, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_2048;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
@@ -87,7 +97,12 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, CreateRSA3072KeyTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_3072, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_3072;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
@@ -104,7 +119,12 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, CreateRSA4096KeyTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_4096, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_4096;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
 
         // act
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
@@ -121,9 +141,17 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, ListKeyTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::SYMMETRIC_DEFAULT, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
-        Dto::KMS::ListKeysRequest listRequest = {{.region = _region}, 10};
+        Dto::KMS::ListKeysRequest listRequest;
+        listRequest.region = REGION;
+        listRequest.limit = 10;
 
         // act
         Dto::KMS::ListKeysResponse listResponse = _kmsService.ListKeys(listRequest);
@@ -140,11 +168,21 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, SymmetricEncryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::SYMMETRIC_DEFAULT, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForAesKey(response.key.keyId, 5);
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
@@ -157,13 +195,29 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, SymmetricDecryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::SYMMETRIC_DEFAULT, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForAesKey(response.key.keyId, 5);
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
+
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
-        Dto::KMS::DecryptRequest decryptRequest = {{.region = _region}, keyId, encryptResponse.ciphertext, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+        Dto::KMS::DecryptRequest decryptRequest;
+        decryptRequest.region = _region;
+        decryptRequest.keyId = keyId;
+        decryptRequest.ciphertext = encryptResponse.ciphertext;
+        decryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
         // act
@@ -177,11 +231,21 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, RSA2048EncryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_2048, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_2048;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForRsaKey(response.key.keyId, 5);
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT};
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
@@ -194,13 +258,29 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, RSA2024DecryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_2048, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_2048;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForRsaKey(response.key.keyId, 5);
+
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
+
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
-        Dto::KMS::DecryptRequest decryptRequest = {{.region = _region}, keyId, encryptResponse.ciphertext, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+        Dto::KMS::DecryptRequest decryptRequest;
+        decryptRequest.region = _region;
+        decryptRequest.keyId = keyId;
+        decryptRequest.ciphertext = encryptResponse.ciphertext;
+        decryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
@@ -213,11 +293,21 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, RSA3072EncryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_3072, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_3072;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForRsaKey(response.key.keyId, 5);
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT};
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
@@ -230,13 +320,28 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, RSA3072DecryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_3072, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_3072;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForRsaKey(response.key.keyId, 5);
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
+
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
-        Dto::KMS::DecryptRequest decryptRequest = {{.region = _region}, keyId, encryptResponse.ciphertext, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+        Dto::KMS::DecryptRequest decryptRequest;
+        decryptRequest.region = _region;
+        decryptRequest.keyId = keyId;
+        decryptRequest.ciphertext = encryptResponse.ciphertext;
+        decryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
@@ -249,11 +354,22 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, RSA4096EncryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_4096, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_4096;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForRsaKey(response.key.keyId, 5);
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT};
+
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
@@ -266,13 +382,28 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, RSA4096DecryptTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::RSA_4096, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::RSA_4096;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         _kmsService.WaitForRsaKey(response.key.keyId, 5);
+
         std::string keyId = response.key.keyId;
-        Dto::KMS::EncryptRequest encryptRequest = {{.region = _region}, keyId, SYMMETRIC_BASE64_PLAIN_TEXT, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.region = _region;
+        encryptRequest.keyId = keyId;
+        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
-        Dto::KMS::DecryptRequest decryptRequest = {{.region = _region}, keyId, encryptResponse.ciphertext, Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT};
+
+        Dto::KMS::DecryptRequest decryptRequest;
+        decryptRequest.region = _region;
+        decryptRequest.keyId = keyId;
+        decryptRequest.ciphertext = encryptResponse.ciphertext;
+        decryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
         Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
@@ -285,12 +416,20 @@ namespace AwsMock::Service {
     TEST_F(KMSServiceTest, DeleteKeyTest) {
 
         // arrange
-        Dto::KMS::CreateKeyRequest request = {{.region = _region}, Dto::KMS::KeySpec::SYMMETRIC_DEFAULT, Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, "Description"};
+        Dto::KMS::CreateKeyRequest request;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
+        request.region = _region;
+        request.user = "user";
+        request.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        request.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
         Dto::KMS::CreateKeyResponse response = _kmsService.CreateKey(request);
         long keyCount = _kmsDatabase.CountKeys();
         std::string keyId = response.key.keyId;
         EXPECT_EQ(1, keyCount);
-        Dto::KMS::ScheduleKeyDeletionRequest deleteRequest = {.keyId = keyId, .pendingWindowInDays = 1};
+
+        Dto::KMS::ScheduleKeyDeletionRequest deleteRequest;
+        deleteRequest.keyId = keyId;
+        deleteRequest.pendingWindowInDays = 1;
 
         // act
         Dto::KMS::ScheduledKeyDeletionResponse deleteResponse = _kmsService.ScheduleKeyDeletion(deleteRequest);

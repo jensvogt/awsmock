@@ -54,7 +54,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
-            const int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("protocols", make_document(kvp("$all", mProtocol)))));
+            const int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("protocols", make_document(kvp("$elemMatch", make_document(kvp("$in", mProtocol)))))));
             log_trace << "Transfer manager exists: " << std::boolalpha << count;
             return count > 0;
         }
@@ -154,7 +154,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetTransferByArn(arn);
     }
 
-    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 
@@ -176,8 +176,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -207,7 +207,7 @@ namespace AwsMock::Database {
         return transfers;
     }
 
-    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 

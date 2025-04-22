@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -22,7 +23,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ObjectCounter {
+    struct ObjectCounter final : Common::BaseCounter<ObjectCounter> {
 
         /**
          * Database OID
@@ -81,26 +82,51 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ObjectCounter tag_invoke(boost::json::value_to_tag<ObjectCounter>, boost::json::value const &v) {
+            ObjectCounter r;
+            r.region = v.at("region").as_string();
+            r.oid = v.at("oid").as_string();
+            r.bucketName = v.at("bucketName").as_string();
+            r.key = v.at("key").as_string();
+            r.contentType = v.at("contentType").as_string();
+            r.size = v.at("size").as_int64();
+            r.internalName = v.at("internalName").as_string();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ObjectCounter &r);
+            // Metadata
+            if (v.as_object().contains("metadata")) {
+                for (const auto &m: v.at("metadata").as_object()) {
+                    r.metadata[m.key()] = m.value().as_string().data();
+                }
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ObjectCounter const &obj) {
+
+            // Metadata
+            boost::json::object metadata;
+            if (!obj.metadata.empty()) {
+                for (const auto &[fst, snd]: obj.metadata) {
+                    metadata[fst] = snd;
+                }
+            }
+            jv = {
+                    {"region", obj.region},
+                    {"oid", obj.oid},
+                    {"bucketName", obj.bucketName},
+                    {"key", obj.key},
+                    {"contentType", obj.contentType},
+                    {"size", obj.size},
+                    {"internalName", obj.internalName},
+                    {"metadata", metadata},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

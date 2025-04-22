@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -22,7 +23,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BucketCounter {
+    struct BucketCounter final : Common::BaseCounter<BucketCounter> {
 
         /**
          * Bucket name
@@ -61,26 +62,33 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend BucketCounter tag_invoke(boost::json::value_to_tag<BucketCounter>, boost::json::value const &v) {
+            BucketCounter r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.bucketName = v.at("bucketName").as_string();
+            r.keys = v.at("keys").as_int64();
+            r.size = v.at("size").as_int64();
+            r.owner = v.at("owner").as_string();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const BucketCounter &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BucketCounter const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"bucketName", obj.bucketName},
+                    {"keys", obj.keys},
+                    {"owner", obj.owner},
+                    {"size", obj.size},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

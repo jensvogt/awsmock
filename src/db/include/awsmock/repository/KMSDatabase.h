@@ -139,11 +139,12 @@ namespace AwsMock::Database {
         void DeleteKey(const Entity::KMS::Key &key) const;
 
         /**
-         * @brief Delete a all keys
+         * @brief Delete all keys
          *
+         * @return number of entities deleted
          * @throws DatabaseException
          */
-        void DeleteAllKeys() const;
+        long DeleteAllKeys() const;
 
       private:
 

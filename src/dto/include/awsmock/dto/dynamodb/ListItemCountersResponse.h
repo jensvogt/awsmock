@@ -23,7 +23,7 @@
 
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/dynamodb/model/TableCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -43,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListItemCountersResponse : Common::BaseRequest<ListItemCountersResponse> {
+    struct ListItemCountersResponse final : Common::BaseDto<ListItemCountersResponse> {
 
         /**
          * Items
@@ -60,21 +60,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListItemCountersResponse &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

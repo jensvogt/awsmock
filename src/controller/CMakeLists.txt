@@ -14,7 +14,6 @@ if (WIN32)
             libboost_program_options-vc143-mt-s-x64-1_88.lib libboost_log-vc143-mt-s-x64-1_88.lib
             libboost_log_setup-vc143-mt-s-x64-1_88.lib libboost_process-vc143-mt-s-x64-1_88.lib ssh.lib crypt32.lib
             Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
-    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_executable(${BINARY} ${SOURCES})
     # Check systemd
@@ -27,7 +26,6 @@ else ()
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
                 boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process
                 yaml-cpp ssl crypto archive magic systemd)
-        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     else ()
         # systemd not available
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
@@ -35,8 +33,8 @@ else ()
                 yaml-cpp ssl crypto archive magic)
         target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
                 ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
-        install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     endif ()
 endif ()
 
+install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 

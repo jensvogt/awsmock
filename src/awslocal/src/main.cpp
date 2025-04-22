@@ -40,16 +40,10 @@
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
 #endif
 
-// Allowed actions
-static std::list<std::string> allowedActions() {
-    return {"profile", "host", "port"};
-}
-
 /**
  * Show help
  */
 void ShowHelp(const boost::program_options::options_description &desc) {
-    constexpr int leftIndent = 40;
     std::cout << std::endl
               << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
               << std::endl
@@ -86,22 +80,22 @@ int main(const int argc, char *argv[]) {
     notify(vm);
 
     // Show usage.
-    if (vm.count("help")) {
+    if (vm.contains("help")) {
         ShowHelp(desc);
         return EXIT_SUCCESS;
     }
 
     // Show version
-    if (vm.count("version")) {
+    if (vm.contains("version")) {
         std::cout << std::endl
                   << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
-    // Read configuration.
+    // Read the configuration.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
-    if (vm.count("config")) {
+    if (vm.contains("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);

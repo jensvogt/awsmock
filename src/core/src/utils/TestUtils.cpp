@@ -9,8 +9,6 @@ namespace AwsMock::Core {
     void TestUtils::CreateTestConfigurationFile(const bool withDatabase) {
 
         // Logging
-        char *pValue;
-        size_t len;
         if (!SystemUtils::GetEnvironmentVariableValue("AWSMOCK_TEST_LOG").empty()) {
             LogStream::Initialize();
             LogStream::AddFile();
@@ -32,6 +30,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueString("awsmock.access.secret-access-key", "none");
         Configuration::instance().SetValueString("awsmock.temp-dir", "/tmp/awsmock/data/tmp");
         Configuration::instance().SetValueString("awsmock.data-dir", "/tmp/awsmock/data");
+        Configuration::instance().SetValueString("awsmock.magic-file", DEFAULT_MAGIC_FILE);
 
         // Gateway
         Configuration::instance().SetValueBool("awsmock.gateway.active", true);
@@ -64,6 +63,7 @@ namespace AwsMock::Core {
 
         // Lambda configuration
         Configuration::instance().SetValueBool("awsmock.modules.lambda.active", true);
+        Configuration::instance().SetValueString("awsmock.modules.lambda.runtime.java11", "public.ecr.aws/lambda/java:11");
 
         // Transfer configuration
         Configuration::instance().SetValueBool("awsmock.modules.transfer.active", true);
@@ -97,7 +97,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValueString("awsmock.podman.network-name", "local");
         Configuration::instance().SetValueString("awsmock.podman.socket", "/var/run/podman/podman.sock");
 
-        // Write file
+        // Write a file
         Configuration::instance().WriteFile(TMP_PROPERTIES_FILE);
     }
 
@@ -114,7 +114,7 @@ namespace AwsMock::Core {
 
     std::string TestUtils::SendCliCommand(const std::string &command, const std::vector<std::string> &args) {
         std::string output, error;
-        SystemUtils::RunShellCommand(command, args, {}, output, error);
+        SystemUtils::RunShellCommand(command, args, output, error);
         if (!error.empty()) {
             std::cerr << error << std::endl;
         }

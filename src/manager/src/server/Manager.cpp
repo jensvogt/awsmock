@@ -43,15 +43,23 @@ namespace AwsMock::Manager {
             if (const std::string autoLoadDir = Core::Configuration::instance().GetValueString("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
                 for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
                     if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
-                        Service::ModuleService _moduleService;
-                        Service::ModuleService::ImportInfrastructure(jsonString);
+                        Dto::Module::Infrastructure infrastructure;
+                        infrastructure.FromJson(jsonString);
+                        Dto::Module::ImportInfrastructureRequest importRequest;
+                        importRequest.cleanFirst = false;
+                        importRequest.infrastructure = infrastructure;
+                        Service::ModuleService::ImportInfrastructure(importRequest);
                         log_info << "Loaded infrastructure from " << file;
                     }
                 }
             } else if (const std::string autoLoadFile = Core::Configuration::instance().GetValueString("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
-                    Service::ModuleService _moduleService;
-                    Service::ModuleService::ImportInfrastructure(jsonString);
+                    Dto::Module::Infrastructure infrastructure;
+                    infrastructure.FromJson(jsonString);
+                    Dto::Module::ImportInfrastructureRequest importRequest;
+                    importRequest.cleanFirst = false;
+                    importRequest.infrastructure = infrastructure;
+                    Service::ModuleService::ImportInfrastructure(importRequest);
                     log_info << "Loaded infrastructure from " << autoLoadFile;
                 }
             }

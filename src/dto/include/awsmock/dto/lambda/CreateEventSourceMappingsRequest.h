@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -81,7 +81,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateEventSourceMappingsRequest final : Common::BaseRequest<CreateEventSourceMappingsRequest> {
+    struct CreateEventSourceMappingsRequest final : Common::BaseDto<CreateEventSourceMappingsRequest> {
 
         /**
          * Name of the function
@@ -126,7 +126,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

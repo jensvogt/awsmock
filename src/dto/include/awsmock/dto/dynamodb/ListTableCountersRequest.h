@@ -11,8 +11,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/SortColumn.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -21,7 +21,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableCountersRequest final : Common::BaseRequest<ListTableCountersRequest> {
+    struct ListTableCountersRequest final : Common::BaseDto<ListTableCountersRequest> {
 
         /**
          * AWS region
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Page index
          */
-        std::vector<Core::SortColumn> sortColumns;
+        std::vector<Database::SortColumn> sortColumns;
 
         /**
          * @brief Parse a JSON stream
@@ -60,7 +60,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-         std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

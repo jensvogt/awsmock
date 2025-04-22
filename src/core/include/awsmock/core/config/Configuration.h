@@ -23,8 +23,8 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
 
@@ -47,7 +47,7 @@ namespace AwsMock::Core {
 
     template<typename T>
     void SetValueByPath(YAML::Node &_yamlConfig, const std::string &key, T value) {
-        try{
+        try {
             const std::vector<std::string> tags = StringUtils::Split(key, '.');
             const int numTags = static_cast<int>(tags.size());
 

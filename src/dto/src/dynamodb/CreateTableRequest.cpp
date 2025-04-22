@@ -62,7 +62,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string CreateTableRequest::ToJson() {
+    std::string CreateTableRequest::ToJson() const {
 
         try {
 

@@ -167,7 +167,7 @@ namespace AwsMock::Service {
          * @return DescribeUserPoolDomainResponse DTO
          * @see DescribeUserPoolDomainResponse DTO
          */
-        Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
+        static Dto::Cognito::DescribeUserPoolDomainResponse DescribeUserPoolDomain(const Dto::Cognito::DescribeUserPoolDomainRequest &request);
 
         /**
          * @brief Create a new cognito user pool client

@@ -2,8 +2,6 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include <awsmock/dto/sqs/ReceiveMessageRequest.h>
-#include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 #ifndef AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H
 #define AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H
 
@@ -12,6 +10,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include <awsmock/dto/sqs/ReceiveMessageRequest.h>
+#include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 // Test includes

@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DecryptResponse : Common::BaseRequest<DecryptResponse> {
+    struct DecryptResponse : Common::BaseDto<DecryptResponse> {
 
         /**
          * Key ID
@@ -69,7 +69,7 @@ namespace AwsMock::Dto::KMS {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::KMS

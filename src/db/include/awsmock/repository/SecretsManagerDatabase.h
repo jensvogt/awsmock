@@ -160,9 +160,10 @@ namespace AwsMock::Database {
         /**
          * @brief Delete all secret.
          *
+         * @return number of entities deleted
          * @throws DatabaseException
          */
-        void DeleteAllSecrets() const;
+        long DeleteAllSecrets() const;
 
       private:
 

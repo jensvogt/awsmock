@@ -9,14 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct GetObjectCounterRequest {
+    struct GetObjectCounterRequest final : Common::BaseCounter<GetObjectCounterRequest> {
 
         /**
          * Region
@@ -28,33 +27,21 @@ namespace AwsMock::Dto::S3 {
          */
         std::string oid;
 
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param body json input stream
-         */
-        void FromJson(const std::string &body);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend GetObjectCounterRequest tag_invoke(boost::json::value_to_tag<GetObjectCounterRequest>, boost::json::value const &v) {
+            GetObjectCounterRequest r;
+            r.region = v.at("region").as_string();
+            r.oid = v.at("oid").as_string();
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetObjectCounterRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetObjectCounterRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"oid", obj.oid},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

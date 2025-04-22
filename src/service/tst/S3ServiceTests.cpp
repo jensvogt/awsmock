@@ -88,26 +88,26 @@ namespace AwsMock::Service {
         auto [location, arn] = _service.CreateBucket(createRequest);
 
         // act
-        const auto [bucketList, total] = _service.ListAllBuckets();
+        const Dto::S3::ListAllBucketResponse response = _service.ListAllBuckets();
 
         // assert
-        EXPECT_TRUE(total > 0);
-        EXPECT_TRUE(bucketList.front().name == BUCKET);
+        EXPECT_TRUE(response.total > 0);
+        EXPECT_TRUE(response.bucketList.front().bucketName == BUCKET);
     }
 
     TEST_F(S3ServiceTest, BucketDeleteTest) {
 
         // arrange
-        const Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
-        Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
+        const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        Dto::S3::CreateBucketResponse createResponse = _service.CreateBucket(createRequest);
 
         // act
         const Dto::S3::DeleteBucketRequest s3Request = {.region = REGION, .bucket = BUCKET};
         _service.DeleteBucket(s3Request);
-        auto [bucketList, total] = _service.ListAllBuckets();
+        const Dto::S3::ListAllBucketResponse response = _service.ListAllBuckets();
 
         // assert
-        EXPECT_EQ(0, bucketList.size());
+        EXPECT_EQ(0, response.bucketList.size());
     }
 
     TEST_F(S3ServiceTest, ObjectPutTest) {
@@ -136,7 +136,10 @@ namespace AwsMock::Service {
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // act
-        Dto::S3::GetObjectRequest getRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::GetObjectRequest getRequest;
+        getRequest.region = REGION;
+        getRequest.bucket = BUCKET;
+        getRequest.key = KEY;
         Dto::S3::GetObjectResponse getResponse = _service.GetObject(getRequest);
 
         // assert

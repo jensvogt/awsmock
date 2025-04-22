@@ -45,7 +45,7 @@ namespace AwsMock::Database {
         return userPoolList;
     }
 
-    Entity::Cognito::UserPoolList CognitoMemoryDb::ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::Cognito::UserPoolList CognitoMemoryDb::ExportUserPools(const std::vector<SortColumn> &sortColumns) const {
 
         Entity::Cognito::UserPoolList userPoolList;
         for (const auto &val: _userPools | std::views::values) {
@@ -303,7 +303,7 @@ namespace AwsMock::Database {
         return userList;
     }
 
-    std::vector<Entity::Cognito::User> CognitoMemoryDb::ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Cognito::User> CognitoMemoryDb::ExportUsers(const std::vector<SortColumn> &sortColumns) const {
 
         Entity::Cognito::UserList userList;
         for (const auto &val: _users | std::views::values) {
@@ -432,7 +432,7 @@ namespace AwsMock::Database {
         return groupList;
     }
 
-    std::vector<Entity::Cognito::Group> CognitoMemoryDb::ExportGroups(const std::vector<Core::SortColumn> &sortColumns) {
+    std::vector<Entity::Cognito::Group> CognitoMemoryDb::ExportGroups(const std::vector<SortColumn> &sortColumns) {
 
         Entity::Cognito::GroupList groupList;
         for (const auto &val: _groups | std::views::values) {

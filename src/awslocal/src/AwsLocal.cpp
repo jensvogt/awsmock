@@ -26,7 +26,8 @@ namespace AwsMock::AwsLocal {
         std::string out, err;
         command.emplace_back("--endpoint");
         command.emplace_back(_baseUrl);
-        Core::SystemUtils::RunShellCommand(AWS_CMD, command, {}, out, err);
+        std::cout << "CMD: " << AWS_CMD << "  " << boost::algorithm::join(command, " ") << std::endl;
+        Core::SystemUtils::RunShellCommand(AWS_CMD, command, out, err);
         if (!out.empty()) {
             std::cout << out;
         }

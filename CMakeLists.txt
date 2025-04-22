@@ -73,6 +73,7 @@ install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/transfer)
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/data/tmp)
 install(DIRECTORY dist/samples/ DESTINATION ${CMAKE_INSTALL_PREFIX}/samples)
 install(FILES dist/etc/magic.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
+install(FILES dist/etc/ssh_host_key DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
 
 if (WIN32)
     install(FILES dist/etc/awsmock_win32.yml DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.yml)

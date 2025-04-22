@@ -135,11 +135,12 @@ namespace AwsMock::Database {
         log_debug << "Secret deleted, count: " << count;
     }
 
-    void SecretsManagerMemoryDb::DeleteAllSecrets() {
+    long SecretsManagerMemoryDb::DeleteAllSecrets() {
         boost::mutex::scoped_lock lock(_secretMutex);
-
-        log_debug << "Secrets deleted, count: " << _secrets.size();
+        const long deleted = _secrets.size();
         _secrets.clear();
+        log_debug << "Secrets deleted, count: " << deleted;
+        return deleted;
     }
 
 }// namespace AwsMock::Database

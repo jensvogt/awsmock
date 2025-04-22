@@ -186,10 +186,11 @@ namespace AwsMock::Database {
         log_debug << "Lambda deleted, count: " << count;
     }
 
-    void LambdaMemoryDb::DeleteAllLambdas() {
+    long LambdaMemoryDb::DeleteAllLambdas() {
         boost::mutex::scoped_lock lock(_lambdaMutex);
-
+        const long deleted = _lambdas.size();
         log_debug << "All lambdas deleted, count: " << _lambdas.size();
         _lambdas.clear();
+        return deleted;
     }
 }// namespace AwsMock::Database

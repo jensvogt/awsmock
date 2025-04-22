@@ -48,19 +48,4 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string FilterRule::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string FilterRule::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const FilterRule &s) {
-        os << "FilterRule=" << s.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

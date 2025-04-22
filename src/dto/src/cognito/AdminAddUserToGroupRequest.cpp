@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminAddUserToGroupRequest::ToJson() {
+    std::string AdminAddUserToGroupRequest::ToJson() const {
 
         try {
 

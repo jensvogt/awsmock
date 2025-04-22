@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/lambda/model/AccountLimit.h>
 #include <awsmock/dto/lambda/model/AccountUsage.h>
 
@@ -37,7 +37,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct AccountSettingsResponse : Common::BaseRequest<AccountSettingsResponse> {
+    struct AccountSettingsResponse : Common::BaseDto<AccountSettingsResponse> {
 
         /**
          * Account limits
@@ -54,7 +54,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

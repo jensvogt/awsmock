@@ -32,7 +32,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string AdminCreateUserRequest::ToJson() {
+    std::string AdminCreateUserRequest::ToJson() const {
 
         try {
             document document;

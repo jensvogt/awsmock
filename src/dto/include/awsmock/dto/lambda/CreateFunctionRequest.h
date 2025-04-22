@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/lambda/model/Code.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
@@ -91,7 +91,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateFunctionRequest final : Common::BaseRequest<CreateFunctionRequest> {
+    struct CreateFunctionRequest final : Common::BaseDto<CreateFunctionRequest> {
 
         /**
          * Name of the function
@@ -116,7 +116,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Environment
          */
-        EnvironmentVariables environment;
+        EnvironmentVariables environment{};
 
         /**
          * Memory size in MB. Default: 128, Range: 128 - 10240 MB
@@ -126,17 +126,17 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Temporary disk space in MB
          */
-        EphemeralStorage ephemeralStorage;
+        EphemeralStorage ephemeralStorage{};
 
         /**
          * Code
          */
-        Code code;
+        Code code{};
 
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::map<std::string, std::string> tags{};
 
         /**
          * Timeout
@@ -155,7 +155,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

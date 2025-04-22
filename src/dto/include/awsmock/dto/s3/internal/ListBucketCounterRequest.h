@@ -9,13 +9,14 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListBucketCounterRequest {
+    struct ListBucketCounterRequest final : Common::BaseCounter<ListBucketCounterRequest> {
 
         /**
          * Region
@@ -40,35 +41,36 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief List of sort columns names
          */
-        std::vector<Core::SortColumn> sortColumns;
+        std::vector<Common::SortColumn> sortColumns;
 
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param body json input stream
-         */
-        static ListBucketCounterRequest FromJson(const std::string &body);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListBucketCounterRequest tag_invoke(boost::json::value_to_tag<ListBucketCounterRequest>, boost::json::value const &v) {
+            ListBucketCounterRequest r;
+            r.region = v.at("region").as_string();
+            r.prefix = v.at("prefix").as_string();
+            r.pageSize = v.at("pageSize").as_int64();
+            r.pageIndex = v.at("pageIndex").as_int64();
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            // Sort columns
+            for (const auto &sc: v.at("sortColumns").as_array()) {
+                Common::SortColumn sortColumn;
+                sortColumn.column = sc.at("column").as_string();
+                sortColumn.sortDirection = sc.at("sortDirection").as_int64();
+                r.sortColumns.emplace_back(sortColumn);
+            }
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListBucketCounterRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListBucketCounterRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"prefix", obj.prefix},
+                    {"pageSize", obj.pageSize},
+                    {"pageIndex", obj.pageIndex},
+                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

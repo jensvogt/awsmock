@@ -64,7 +64,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string DescribeTableResponse::ToJson() {
+    std::string DescribeTableResponse::ToJson() const {
 
         try {
             document rootDocument;

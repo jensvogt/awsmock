@@ -148,11 +148,18 @@ namespace AwsMock::Service {
         return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
     }
 
-    void ModuleService::ImportInfrastructure(const std::string &jsonString) {
-        log_info << "Importing services, length: " << jsonString.length();
+    void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) {
+        log_info << "Importing services, cleanFirst" << std::boolalpha << request.cleanFirst;
 
-        Dto::Module::Infrastructure infrastructure;
-        infrastructure.FromJson(jsonString);
+        Dto::Module::Infrastructure infrastructure = request.infrastructure;
+
+        // Check clean flag
+        if (request.cleanFirst) {
+            Dto::Module::CleanInfrastructureRequest cleanRequest;
+            cleanRequest.modules.emplace_back("All");
+            cleanRequest.onlyObjects = request.includeObjects;
+            CleanInfrastructure(cleanRequest);
+        }
 
         // S3
         if (!infrastructure.s3Buckets.empty() || !infrastructure.s3Objects.empty()) {
@@ -258,9 +265,15 @@ namespace AwsMock::Service {
                 for (auto &table: infrastructure.dynamoDbTables) {
                     if (!_dynamoDbService.ExistTable(table.region, table.name)) {
                         constexpr Dto::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = 1, .writeCapacityUnits = 1};
-                        Dto::DynamoDb::CreateTableRequest request = {.region = table.region, .tableName = table.name, .attributes = table.attributes, .keySchemas = table.keySchemas, .provisionedThroughput = provisionedThroughput, .tags = table.tags};
-                        request.body = request.ToJson();
-                        Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(request);
+                        Dto::DynamoDb::CreateTableRequest dynamoDbRequest;
+                        dynamoDbRequest.region = table.region;
+                        dynamoDbRequest.tableName = table.name;
+                        dynamoDbRequest.attributes = table.attributes;
+                        dynamoDbRequest.keySchemas = table.keySchemas;
+                        dynamoDbRequest.provisionedThroughput = provisionedThroughput;
+                        dynamoDbRequest.tags = table.tags;
+                        dynamoDbRequest.body = dynamoDbRequest.ToJson();
+                        Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
                     } else {
                         _dynamoDatabase.CreateOrUpdateTable(table);
                     }
@@ -271,9 +284,13 @@ namespace AwsMock::Service {
             if (!infrastructure.dynamoDbItems.empty()) {
                 for (auto &item: infrastructure.dynamoDbItems) {
                     if (_dynamoDbService.ExistTable(item.region, item.tableName)) {
-                        Dto::DynamoDb::PutItemRequest request = {.region = item.region, .tableName = item.tableName, .attributes = Dto::DynamoDb::Mapper::map(item.attributes), .keys = Dto::DynamoDb::Mapper::map(item.keys)};
-                        request.body = request.ToJson();
-                        Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(request);
+                        Dto::DynamoDb::PutItemRequest putItemRequest;
+                        putItemRequest.region = item.region;
+                        putItemRequest.tableName = item.tableName;
+                        putItemRequest.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
+                        putItemRequest.keys = Dto::DynamoDb::Mapper::map(item.keys);
+                        putItemRequest.body = putItemRequest.ToJson();
+                        Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(putItemRequest);
                         log_debug << "DynamoDB item created, tableName: " << response.tableName;
                     }
                 }
@@ -340,15 +357,16 @@ namespace AwsMock::Service {
     void ModuleService::CleanObjects(const Dto::Module::CleanInfrastructureRequest &request) {
         log_info << "Cleaning objects, length: " << request.modules.size();
 
+        long count = 0;
         for (const auto &m: request.modules) {
             if (m == "s3") {
-                Database::S3Database::instance().DeleteAllObjects();
+                count += Database::S3Database::instance().DeleteAllObjects();
             } else if (m == "sqs") {
-                Database::SQSDatabase::instance().DeleteAllMessages();
+                count += Database::SQSDatabase::instance().DeleteAllMessages();
             } else if (m == "sns") {
                 Database::SNSDatabase::instance().DeleteAllMessages();
             } else if (m == "lambda") {
-                Database::LambdaDatabase::instance().DeleteAllLambdas();
+                count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
                 Database::CognitoDatabase::instance().DeleteAllUsers();
                 Database::CognitoDatabase::instance().DeleteAllUserPools();
@@ -358,11 +376,12 @@ namespace AwsMock::Service {
             } else if (m == "secretsmanager") {
                 Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {
-                Database::KMSDatabase::instance().DeleteAllKeys();
+                count += Database::KMSDatabase::instance().DeleteAllKeys();
             } else if (m == "ssm") {
-                Database::SSMDatabase::instance().DeleteAllParameters();
+                count += Database::SSMDatabase::instance().DeleteAllParameters();
             } else if (m == "transfer") {
                 Database::S3Database::instance().DeleteObjects("transfer-server");
+                count += Database::TransferDatabase::instance().DeleteAllTransfers();
             }
         }
     }

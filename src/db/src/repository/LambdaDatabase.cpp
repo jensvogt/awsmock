@@ -361,7 +361,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListLambdas(region);
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ExportLambdas(const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ExportLambdas(const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas = ListLambdaCounters({}, {}, -1, 0, sortColumns);
 
@@ -374,7 +374,7 @@ namespace AwsMock::Database {
         return lambdas;
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {
@@ -387,8 +387,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -474,7 +474,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void LambdaDatabase::DeleteAllLambdas() const {
+    long LambdaDatabase::DeleteAllLambdas() const {
 
         if (HasDatabase()) {
 
@@ -484,16 +484,14 @@ namespace AwsMock::Database {
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
                 const auto result = _lambdaCollection.delete_many({});
                 log_debug << "All lambdas deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteAllLambdas();
         }
+        return _memoryDb.DeleteAllLambdas();
     }
 
 }// namespace AwsMock::Database

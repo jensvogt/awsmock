@@ -16,7 +16,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 #include <awsmock/entity/dynamodb/Item.h>
 
@@ -59,7 +59,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ScanResponse final : Common::BaseRequest<ScanResponse> {
+    struct ScanResponse final : Common::BaseDto<ScanResponse> {
 
         /**
          * Region
@@ -95,8 +95,9 @@ namespace AwsMock::Dto::DynamoDb {
          * Scanned item count
          */
         long scannedCount;
+
         /**
-         * Items array
+         * Item array
          */
         std::vector<Database::Entity::DynamoDb::Item> items;
 
@@ -119,7 +120,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

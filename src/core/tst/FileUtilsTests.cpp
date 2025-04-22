@@ -228,7 +228,6 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetContentTypeJpgTest) {
 
         // arrange
-        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
 
         // act
         const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/9783911244381.jpg");
@@ -241,7 +240,6 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetContentTypeTifTest) {
 
         // arrange
-        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
 
         // act
         const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/7337529778404.tif");

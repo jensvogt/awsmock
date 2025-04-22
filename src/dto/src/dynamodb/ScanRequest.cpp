@@ -34,7 +34,7 @@ namespace AwsMock::Dto::DynamoDb {
         }
     }
 
-    std::string ScanRequest::ToJson() {
+    std::string ScanRequest::ToJson() const {
 
         try {
 

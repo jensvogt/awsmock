@@ -203,7 +203,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetQueueByName(region, queueName);
     }
 
-    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
 
         if (HasDatabase()) {
 
@@ -232,8 +232,8 @@ namespace AwsMock::Database {
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -249,7 +249,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListQueues(region);
     }
 
-    Entity::SQS::QueueList SQSDatabase::ExportQueues(const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::SQS::QueueList SQSDatabase::ExportQueues(const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -264,8 +264,8 @@ namespace AwsMock::Database {
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -695,7 +695,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListMessages(region);
     }
 
-    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
@@ -713,8 +713,8 @@ namespace AwsMock::Database {
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }

@@ -21,7 +21,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -40,7 +40,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableResponse : Common::BaseRequest<ListTableResponse> {
+    struct ListTableResponse final : Common::BaseDto<ListTableResponse> {
 
         /**
          * Region
@@ -90,7 +90,7 @@ namespace AwsMock::Dto::DynamoDb {
          *
          * @return JSON string
          */
-        std::string ToJson() override;
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -9,6 +9,12 @@
 #include <string>
 #include <vector>
 
+// Boost includes
+#include <boost/describe.hpp>
+#include <boost/json.hpp>
+#include <boost/mp11.hpp>
+#include <boost/version.hpp>
+
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -50,7 +56,7 @@ namespace AwsMock::Dto::S3 {
     struct QueueConfiguration {
 
         /**
-         * ID, optional, if empty a random ID will be generated
+         * ID, optional, if empty, a random ID will be generated
          */
         std::string id;
 
@@ -84,32 +90,22 @@ namespace AwsMock::Dto::S3 {
         void FromDocument(const view_or_value<view, value> &document);
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert from an XML string
          *
-         * @param pt boost property tree
+         * @param pt boost a property tree
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const QueueConfiguration &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueueConfiguration const &obj) {
+            jv = {
+                    {"id", obj.id},
+                    {"queueArn", obj.queueArn},
+                    {"filterRules", boost::json::value_from(obj.filterRules)},
+                    {"events", boost::json::value_from(obj.events)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

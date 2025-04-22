@@ -7,7 +7,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    std::string ReceiveMessageResponse::ToJson() {
+    std::string ReceiveMessageResponse::ToJson() const {
 
         try {
 

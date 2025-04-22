@@ -42,7 +42,7 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetQueryString(const std::string &uri) {
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        return r->path();
+        return r->query();
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {

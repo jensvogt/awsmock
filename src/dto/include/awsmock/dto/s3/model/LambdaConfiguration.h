@@ -46,7 +46,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaConfiguration {
+    struct LambdaConfiguration final : Common::BaseDto<LambdaConfiguration> {
 
         /**
          * ID, optional, if empty a random ID will be generated
@@ -85,30 +85,44 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Convert from an XML string
          *
-         * @param pt boost property tree
+         * @param pt boost a property tree
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        std::string ToJson() const override {
+            return ToJson2();
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend LambdaConfiguration tag_invoke(boost::json::value_to_tag<LambdaConfiguration>, boost::json::value const &v) {
+            LambdaConfiguration r;
+            r.id = v.at("id").as_string();
+            r.lambdaArn = v.at("lambdaArn").as_string();
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const LambdaConfiguration &r);
+            // Filter rules
+            for (auto filterRules = v.at("filterRules").as_array(); const auto &filterRule: filterRules) {
+                FilterRule filterRuleDto;
+                filterRuleDto.filterValue = filterRule.at("filterValue").as_string();
+                filterRuleDto.name = NameTypeFromString(filterRule.at("name").as_string().data());
+                r.filterRules.push_back(filterRuleDto);
+            }
+
+            // Events
+            for (auto events = v.at("events").as_array(); const auto &event: events) {
+                r.events.push_back(EventTypeFromString(event.as_string().data()));
+            }
+            return r;
+        }
+
+      private:
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LambdaConfiguration const &obj) {
+            jv = {
+                    {"id", obj.id},
+                    {"lambdaArn", obj.lambdaArn},
+                    {"filterRules", boost::json::value_from(obj.filterRules)},
+                    {"events", boost::json::value_from(obj.events)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

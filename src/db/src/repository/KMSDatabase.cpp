@@ -209,13 +209,13 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
+            mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", key.keyId)));
+                const auto delete_many_result = _keyCollection.delete_one(make_document(kvp("name", key.keyId)));
                 session.commit_transaction();
                 log_debug << "KMS key deleted, count: " << delete_many_result->deleted_count();
 
@@ -231,31 +231,29 @@ namespace AwsMock::Database {
         }
     }
 
-    void KMSDatabase::DeleteAllKeys() const {
+    long KMSDatabase::DeleteAllKeys() const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _bucketCollection = (*client)[_databaseName][_keyCollectionName];
+            mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _bucketCollection.delete_many({});
+                const auto result = _keyCollection.delete_many({});
                 session.commit_transaction();
-                log_debug << "All KMS keys deleted, count: " << delete_many_result->deleted_count();
+                log_debug << "All KMS keys deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteAllKeys();
         }
+        return _memoryDb.DeleteAllKeys();
     }
 
 }// namespace AwsMock::Database

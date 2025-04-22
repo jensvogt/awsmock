@@ -28,7 +28,7 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string UpdateMessageRequest::ToJson() {
+    std::string UpdateMessageRequest::ToJson() const {
 
         try {
             document rootDocument;

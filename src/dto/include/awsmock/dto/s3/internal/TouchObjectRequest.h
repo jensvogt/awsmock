@@ -9,14 +9,17 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/common/BaseCounter.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct TouchObjectRequest {
+    struct TouchObjectRequest final : Common::BaseCounter<TouchObjectRequest> {
 
         /**
          * Region
@@ -33,33 +36,23 @@ namespace AwsMock::Dto::S3 {
          */
         std::string key;
 
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param body json input stream
-         */
-        void FromJson(const std::string &body);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend TouchObjectRequest tag_invoke(boost::json::value_to_tag<TouchObjectRequest>, boost::json::value const &v) {
+            TouchObjectRequest r;
+            r.region = v.at("region").as_string();
+            r.bucket = v.at("bucket").as_string();
+            r.key = v.at("key").as_string();
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TouchObjectRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TouchObjectRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"bucket", obj.bucket},
+                    {"key", obj.key},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3
