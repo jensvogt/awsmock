@@ -28,7 +28,7 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM debian:trixie-slim
 
-RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libicu72 libssh-4 libquadmath0
+RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libicu72 libssh-4 libquadmath0 dialog
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
