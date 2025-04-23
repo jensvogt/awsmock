@@ -52,10 +52,11 @@ namespace AwsMock::Core {
 
     std::string SystemUtils::GetEnvironmentVariableValue(const std::string &name) {
 #ifdef _WIN32
-        char *pValue;
-        pValue = static_cast<LPTSTR>(malloc(BUFSIZE * sizeof(TCHAR)));
-        if (DWORD result; (result = GetEnvironmentVariable(name.c_str(), pValue, BUFSIZE))) {
-            log_info << "Environment variable not found, name: " << name << ", error: " << result;
+        auto pValue = static_cast<LPTSTR>(malloc(BUFSIZE * sizeof(TCHAR)));
+        memset(pValue, 0, BUFSIZE);
+        if (const DWORD result = GetEnvironmentVariable(name.c_str(), pValue, BUFSIZE); !result) {
+            log_trace << "Environment variable not found, name: " << name << ", error: " << result;
+            return {};
         }
         return {pValue};
 #else

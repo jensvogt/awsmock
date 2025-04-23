@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/service/sqs/SQSService.h>
-#include <queue>
 
 namespace AwsMock::Service {
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
@@ -144,11 +143,11 @@ namespace AwsMock::Service {
         log_trace << "List all queues counters request";
 
         try {
-            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(
+            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(
                     request.prefix,
                     request.pageSize,
                     request.pageIndex,
-                    request.sortColumns,
+                    Dto::Common::Mapper::map(request.sortColumns),
                     request.region);
 
             Dto::SQS::ListQueueCountersResponse listQueueResponse;
@@ -1010,7 +1009,7 @@ namespace AwsMock::Service {
                     request.prefix,
                     request.pageSize,
                     request.pageIndex,
-                    request.sortColumns);
+                    Dto::Common::Mapper::map(request.sortColumns));
 
             Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
             log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();

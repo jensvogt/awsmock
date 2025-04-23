@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/sqs/intern/UpdateDqlRequest.h>
+#include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
 
 namespace AwsMock::Dto::SQS {
 

@@ -444,7 +444,7 @@ namespace AwsMock::Service {
             object.size = fileSize;
             object.md5sum = md5sum;
             object.internalName = filename;
-            object.contentType = request.contentType;
+            object.contentType = Core::FileUtils::GetContentType(outFile);
             object = _database.UpdateObject(object);
 
             // Calculate the hashes asynchronously

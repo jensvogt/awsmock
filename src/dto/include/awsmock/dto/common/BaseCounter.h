@@ -12,11 +12,11 @@
 #include <boost/describe.hpp>
 #include <boost/json.hpp>
 #include <boost/mp11.hpp>
+#include <boost/proto/traits.hpp>
 #include <boost/version.hpp>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
-#include <boost/proto/traits.hpp>
 
 namespace AwsMock::Dto::Common {
 
@@ -71,6 +71,7 @@ namespace AwsMock::Dto::Common {
             return boost::json::value_to<T>(boost::json::parse(jsonString));
         }
 
+#ifndef _WIN32
         /**
          * @brief Return the demangled type name.
          *
@@ -82,6 +83,7 @@ namespace AwsMock::Dto::Common {
             std::string demangledName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
             return demangledName;
         }
+#endif
 
         /**
          * @brief Generalized toString method
@@ -90,7 +92,11 @@ namespace AwsMock::Dto::Common {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream s;
+#ifdef _WIN32
+            std::operator<<(s, typeid(T).name());
+#else
             std::operator<<(s, GetDemangledName(typeid(T).name()));
+#endif
             std::operator<<(s, std::string("="));
             std::operator<<(s, ToJson());
             return s.str();

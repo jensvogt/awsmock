@@ -2,8 +2,8 @@
 // Created by vogje01 on 5/18/24.
 //
 
-#ifndef AWSMOCK_DTO_COMMON_BASEREQUEST_H
-#define AWSMOCK_DTO_COMMON_BASEREQUEST_H
+#ifndef AWSMOCK_DTO_COMMON_BASE_DTO_H
+#define AWSMOCK_DTO_COMMON_BASE_DTO_H
 
 // C++ standard includes
 #include <string>
@@ -21,9 +21,14 @@ namespace AwsMock::Dto::Common {
 
     template<typename T>
     std::ostream &operator<<(std::ostream &os, const T &t) {
+        std::string typeName;
+#ifdef _WIN32
+        typeName = typeid(T).name();
+#else
         int status = -1;
         const std::unique_ptr<char, decltype(&std::free)> demangledPtr(abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, &status), std::free);
-        const std::string_view typeName = demangledPtr && status == 0 ? demangledPtr.get() : typeid(T).name();
+        typeName = demangledPtr && status == 0 ? demangledPtr.get() : typeid(T).name();
+#endif
         std::operator<<(os, typeName);
         std::operator<<(os, std::string("="));
         std::operator<<(os, t.ToJson());
@@ -79,6 +84,7 @@ namespace AwsMock::Dto::Common {
             return ss.str();
         }
 
+#ifndef _WIN32
         /**
          * @brief Return the demangled type name.
          *
@@ -90,6 +96,7 @@ namespace AwsMock::Dto::Common {
             std::string demangledName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
             return demangledName;
         }
+#endif
 
         /**
          * @brief Generalized toString method
@@ -98,7 +105,11 @@ namespace AwsMock::Dto::Common {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream s;
+#ifdef _WIN32
+            std::operator<<(s, typeid(T).name());
+#else
             std::operator<<(s, GetDemangledName(typeid(T).name()));
+#endif
             std::operator<<(s, std::string("="));
             std::operator<<(s, ToJson2());
             return s.str();

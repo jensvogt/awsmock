@@ -4,8 +4,9 @@ set(LIBRARY_STATIC awsmockdto_static)
 
 set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/common/SQSClientCommand.cpp
         src/common/Services.cpp src/module/model/Infrastructure.cpp src/common/SNSClientCommand.cpp
-        src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp src/common/KMSClientCommand.cpp
-        src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp src/common/MonitoringClientCommand.cpp)
+        src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
+        src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
+        src/common/MonitoringClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp
         src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
@@ -17,13 +18,11 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/SqsCommonRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp
         src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp
         src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp
-        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp src/sqs/model/QueueCounter.cpp
-        src/sqs/intern/ListQueueCountersRequest.cpp src/sqs/intern/ListQueueCountersResponse.cpp
+        src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp
         src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
         src/sqs/ListQueueTagsResponse.cpp src/sqs/intern/GetQueueDetailsRequest.cpp src/sqs/intern/GetQueueDetailsResponse.cpp
         src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
         src/sqs/DeleteMessageBatchResponse.cpp src/sqs/model/Message.cpp src/sqs/mapper/Mapper.cpp
-        src/sqs/intern/ListMessageCountersRequest.cpp src/sqs/intern/ListMessageCountersResponse.cpp
         src/sqs/model/AttributeCounter.cpp src/sqs/intern/ListQueueAttributeCountersRequest.cpp
         src/sqs/intern/ListQueueAttributeCountersResponse.cpp src/sqs/model/TagCounter.cpp
         src/sqs/intern/ListQueueTagCountersRequest.cpp src/sqs/intern/ListQueueTagCountersResponse.cpp
@@ -51,10 +50,8 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/PutBucketNotificationConfigurationResponse.cpp src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
         src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp
-        src/s3/model/ObjectCounter.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
-        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp
-)
+        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
+        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -101,8 +98,8 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp
         src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp
         src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
-        src/dynamodb/mapper/Mapper.cpp src/dynamodb/model/TableCounter.cpp src/dynamodb/ListTableCountersRequest.cpp src/dynamodb/ListTableCountersResponse.cpp
-        src/dynamodb/model/ItemCounter.cpp src/dynamodb/ListItemCountersRequest.cpp src/dynamodb/ListItemCountersResponse.cpp src/dynamodb/GetItemKey.cpp)
+        src/dynamodb/mapper/Mapper.cpp
+        src/dynamodb/GetItemKey.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
         src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
         src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp

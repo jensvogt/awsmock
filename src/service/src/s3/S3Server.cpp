@@ -60,6 +60,7 @@ namespace AwsMock::Service {
         // Loop over files and check database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
+                log_debug << "Checking file, basename: " << Core::FileUtils::GetBasename(entry.path().string());
                 if (!_s3Database.ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::DeleteFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
@@ -73,7 +74,7 @@ namespace AwsMock::Service {
     void S3Server::SyncBuckets() const {
         const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
 
-        Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Bucket synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {

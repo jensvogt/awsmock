@@ -87,7 +87,6 @@ class Daemon {
         // Start HTTP frontend server
         AwsMock::Service::Frontend::FrontendServer server;
         frontendThread = boost::thread{boost::ref(server)};
-        frontendThread.detach();
 
         // Start manager
         awsMockManager.Initialize();

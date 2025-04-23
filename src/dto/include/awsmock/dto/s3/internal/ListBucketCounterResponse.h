@@ -25,7 +25,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Total number of buckets
          */
-        long total = 0;
+        long long total = 0;
 
       private:
 
@@ -65,4 +65,4 @@ namespace AwsMock::Dto::S3 {
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_LIST_ALL_BUCKET_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_LIST_BUCKET_COUNTERS_RESPONSE_H

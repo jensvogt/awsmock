@@ -149,7 +149,7 @@ namespace AwsMock::Service {
     }
 
     void ModuleService::ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request) {
-        log_info << "Importing services, cleanFirst" << std::boolalpha << request.cleanFirst;
+        log_info << "Importing services, cleanFirst: " << std::boolalpha << request.cleanFirst;
 
         Dto::Module::Infrastructure infrastructure = request.infrastructure;
 
