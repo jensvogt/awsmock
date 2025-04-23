@@ -3390,7 +3390,7 @@ namespace AwsMock::Service {
             log_error << "SSH bind new failed";
             return;
         }
-        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str();
+        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str() << ", hostKey: " << hostKey;
 
         // Command line options
         ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT_STR, port.c_str());

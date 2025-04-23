@@ -4,6 +4,9 @@
 
 #include <awsmock/repository/SQSDatabase.h>
 
+namespace AwsMock::Dto::Common {
+    struct SortColumn;
+}
 namespace AwsMock::Database {
 
     SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _collectionNameMessage("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {
@@ -232,7 +235,7 @@ namespace AwsMock::Database {
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
-                for (const auto sortColumn: sortColumns) {
+                for (const auto &sortColumn: sortColumns) {
                     sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());

@@ -11,14 +11,15 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
     using std::chrono::system_clock;
 
-    struct QueueCounter {
+    struct QueueCounter final : Common::BaseCounter<QueueCounter> {
 
         /**
          * Queue URL
@@ -34,16 +35,6 @@ namespace AwsMock::Dto::SQS {
          * Queue name
          */
         std::string queueName;
-
-        /**
-         * Created
-         */
-        system_clock::time_point created;
-
-        /**
-         * Modified
-         */
-        system_clock::time_point modified;
 
         /**
          * Number of message available
@@ -91,32 +82,60 @@ namespace AwsMock::Dto::SQS {
         bool isDlq;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
+         * Created
          */
-        [[nodiscard]] std::string ToJson() const;
+        system_clock::time_point created;
 
         /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
+         * Modified
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        system_clock::time_point modified;
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const QueueCounter &r);
+        friend QueueCounter tag_invoke(boost::json::value_to_tag<QueueCounter>, boost::json::value const &v) {
+            QueueCounter r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.queueUrl = v.at("queueUrl").as_string();
+            r.queueArn = v.at("queueArn").as_string();
+            r.queueName = v.at("queueName").as_string();
+            r.available = static_cast<long>(v.at("available").as_int64());
+            r.invisible = static_cast<long>(v.at("invisible").as_int64());
+            r.delayed = static_cast<long>(v.at("delayed").as_int64());
+            r.visibilityTimeout = static_cast<long>(v.at("visibilityTimeout").as_int64());
+            r.delay = static_cast<long>(v.at("delay").as_int64());
+            r.retentionPeriod = static_cast<long>(v.at("retentionPeriod").as_int64());
+            r.maxMessageSize = static_cast<long>(v.at("maxMessageSize").as_int64());
+            r.size = static_cast<long>(v.at("size").as_int64());
+            r.isDlq = v.at("isDlq").as_bool();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueueCounter const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"queueArn", obj.queueArn},
+                    {"queueName", obj.queueName},
+                    {"available", obj.available},
+                    {"invisible", obj.invisible},
+                    {"delayed", obj.delayed},
+                    {"visibilityTimeout", obj.visibilityTimeout},
+                    {"delay", obj.delay},
+                    {"retentionPeriod", obj.retentionPeriod},
+                    {"maxMessageSize", obj.maxMessageSize},
+                    {"size", obj.size},
+                    {"isDlq", obj.isDlq},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
     typedef std::vector<QueueCounter> QueueCounterList;

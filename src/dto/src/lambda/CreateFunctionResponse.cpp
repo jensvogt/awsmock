@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string CreateFunctionResponse::ToJson() {
+    std::string CreateFunctionResponse::ToJson() const {
 
         try {
 

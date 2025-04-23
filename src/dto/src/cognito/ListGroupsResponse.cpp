@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string ListGroupsResponse::ToJson() {
+    std::string ListGroupsResponse::ToJson() const {
 
         try {
 

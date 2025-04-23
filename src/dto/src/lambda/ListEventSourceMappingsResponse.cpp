@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    std::string ListEventSourceMappingsResponse::ToJson() {
+    std::string ListEventSourceMappingsResponse::ToJson() const {
 
         try {
 

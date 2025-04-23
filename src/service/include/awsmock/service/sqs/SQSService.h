@@ -16,6 +16,7 @@
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
+#include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -49,21 +50,21 @@
 #include <awsmock/dto/sqs/SetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
-#include <awsmock/dto/sqs/intern/GetQueueDetailsRequest.h>
-#include <awsmock/dto/sqs/intern/GetQueueDetailsResponse.h>
-#include <awsmock/dto/sqs/intern/ListLambdaTriggerCountersRequest.h>
-#include <awsmock/dto/sqs/intern/ListLambdaTriggerCountersResponse.h>
-#include <awsmock/dto/sqs/intern/ListMessageCountersRequest.h>
-#include <awsmock/dto/sqs/intern/ListMessageCountersResponse.h>
-#include <awsmock/dto/sqs/intern/ListQueueAttributeCountersRequest.h>
-#include <awsmock/dto/sqs/intern/ListQueueAttributeCountersResponse.h>
-#include <awsmock/dto/sqs/intern/ListQueueCountersRequest.h>
-#include <awsmock/dto/sqs/intern/ListQueueCountersResponse.h>
-#include <awsmock/dto/sqs/intern/ListQueueTagCountersRequest.h>
-#include <awsmock/dto/sqs/intern/ListQueueTagCountersResponse.h>
-#include <awsmock/dto/sqs/intern/ResendMessageRequest.h>
-#include <awsmock/dto/sqs/intern/UpdateDqlRequest.h>
-#include <awsmock/dto/sqs/intern/UpdateMessageRequest.h>
+#include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
+#include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
+#include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListMessageCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListQueueAttributeCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListQueueCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueTagCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ResendMessageRequest.h>
+#include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
+#include <awsmock/dto/sqs/internal/UpdateMessageRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
@@ -90,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
 
         /**
          * @brief Creates a new queue.

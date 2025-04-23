@@ -66,7 +66,7 @@ namespace AwsMock::Service {
         server.lastStarted = system_clock::now();
         server.state = Database::Entity::Transfer::ServerState::ONLINE;
         server = _transferDatabase.UpdateTransfer(server);
-        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << ", protocols:" << server.protocols.size();
+        log_info << "Transfer server started, serverId: " << server.serverId << " address: " << server.listenAddress << ", protocols: " << server.protocols.size();
     }
 
     void TransferServer::StartFtpServer(Database::Entity::Transfer::Transfer &server) {
@@ -107,6 +107,7 @@ namespace AwsMock::Service {
         const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.sftp.port");
         const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.address");
+        const std::string hostKey = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.host-key");
 
         SftpServer _sftpServer;
 
@@ -125,7 +126,7 @@ namespace AwsMock::Service {
         }
 
         // Start detached thread
-        boost::thread t(boost::ref(_sftpServer), std::to_string(port), "/etc/ssh/ssh_host_ed25519_key", address, server.serverId);
+        boost::thread t(boost::ref(_sftpServer), std::to_string(port), hostKey, address, server.serverId);
         t.detach();
         log_info << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
     }

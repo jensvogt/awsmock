@@ -12,7 +12,7 @@ namespace AwsMock::Monitoring {
     MetricService::MetricService() : _port(Core::Configuration::instance().GetValueInt("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValueBool("awsmock.monitoring.prometheus")), _intern(Core::Configuration::instance().GetValueBool("awsmock.monitoring.intern")), _database(Database::MonitoringDatabase::instance()) {}
 
     void MetricService::Initialize() {
-        log_debug << "Monitoring initialized, prometheus: " << std::boolalpha << _prometheus << " intern: " << _intern;
+        log_debug << "Monitoring initialized, prometheus: " << std::boolalpha << _prometheus << " internal: " << _intern;
         if (_prometheus) {
             std::string bindAddress = "localhost:" + std::to_string(_port);
             _server = std::make_shared<prometheus::Exposer>(bindAddress);

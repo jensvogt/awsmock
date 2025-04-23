@@ -21,7 +21,7 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string DecryptResponse::ToJson() {
+    std::string DecryptResponse::ToJson() const {
 
         try {
             document document;

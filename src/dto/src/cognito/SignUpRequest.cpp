@@ -23,7 +23,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string SignUpRequest::ToJson() {
+    std::string SignUpRequest::ToJson() const {
 
         try {
 

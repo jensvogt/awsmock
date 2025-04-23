@@ -292,6 +292,9 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
+        if (!HasHeader(request, "Content-Type")) {
+            return "application/octet-stream";
+        }
         std::string ct = request.base()[http::field::content_type];
         if (ct.contains("json")) {
             return "application/json";

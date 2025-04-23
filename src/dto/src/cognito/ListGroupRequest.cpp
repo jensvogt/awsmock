@@ -21,7 +21,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListGroupsRequest::ToJson() {
+    std::string ListGroupsRequest::ToJson() const {
 
         try {
 

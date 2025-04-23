@@ -94,9 +94,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
 
-                    Dto::SQS::ListQueueCountersRequest sqsRequest{};
-                    sqsRequest.FromJson(clientCommand.payload);
+                    Dto::SQS::ListQueueCountersRequest sqsRequest = Dto::SQS::ListQueueCountersRequest::FromJson(clientCommand.payload);
                     sqsRequest.region = clientCommand.region;
+                    sqsRequest.user = clientCommand.user;
+                    sqsRequest.requestId = clientCommand.requestId;
 
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
                     log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
@@ -280,8 +281,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_MESSAGE_COUNTERS: {
 
-                    Dto::SQS::ListMessageCountersRequest sqsRequest{};
-                    sqsRequest.FromJson(clientCommand.payload);
+                    Dto::SQS::ListMessageCountersRequest sqsRequest = Dto::SQS::ListMessageCountersRequest::FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+                    sqsRequest.user = clientCommand.user;
+                    sqsRequest.requestId = clientCommand.requestId;
 
                     Dto::SQS::ListMessageCountersResponse sqsResponse = _sqsService.ListMessageCounters(sqsRequest);
                     log_debug << "List queue message counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.total;

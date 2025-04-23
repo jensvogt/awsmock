@@ -149,7 +149,7 @@ namespace AwsMock::Service {
         try {
             Dto::DynamoDb::ListItemCountersResponse itemResponse;
             itemResponse.total = _dynamoDbDatabase.CountItems(request.region, request.tableName, request.prefix);
-            itemResponse.itemCounters = _dynamoDbDatabase.ListItems(request.region, request.tableName);
+            itemResponse.itemCounters = Dto::DynamoDb::Mapper::mapCounter(_dynamoDbDatabase.ListItems(request.region, request.tableName));
             return itemResponse;
 
         } catch (Core::JsonException &exc) {

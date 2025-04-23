@@ -26,6 +26,8 @@ if (WIN32)
             "$<$<CONFIG:DEBUG>:libboost_log_setup-vc143-mt-sgd-x64-1_88.lib>"
             "$<$<CONFIG:RELEASE>:libboost_process-vc143-mt-s-x64-1_88.lib>"
             "$<$<CONFIG:DEBUG>:libboost_process-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_json-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_json-vc143-mt-sgd-x64-1_88.lib>"
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()

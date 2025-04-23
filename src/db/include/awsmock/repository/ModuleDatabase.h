@@ -81,7 +81,7 @@ namespace AwsMock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleById(const bsoncxx::oid &oid);
+        Entity::Module::Module GetModuleById(const bsoncxx::oid &oid) const;
 
         /**
          * @brief Returns the module by userPoolId

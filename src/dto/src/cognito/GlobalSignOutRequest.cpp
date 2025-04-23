@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string GlobalSignOutRequest::ToJson() {
+    std::string GlobalSignOutRequest::ToJson() const {
 
         try {
 

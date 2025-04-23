@@ -59,7 +59,7 @@ namespace AwsMock::Core {
             // Determines index of first non-existing node.
             int i = 0;
             for (; i < numTags - 1; i++) {
-                if (const std::string &tag = tags.at(i); (*parentNode)[tag]) {
+                if (const std::string &tag = tags.at(i); parentNode && (*parentNode)[tag]) {
                     auto childNode = (*parentNode)[tag];
                     parentNode = &childNode;
                 } else {

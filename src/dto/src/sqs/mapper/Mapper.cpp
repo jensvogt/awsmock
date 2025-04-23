@@ -41,19 +41,19 @@ namespace AwsMock::Dto::SQS {
         listMessageCountersResponse.total = total;
 
         for (const auto &message: messages) {
-            MessageEntry messageEntry;
-            messageEntry.messageId = message.messageId;
-            messageEntry.id = message.oid;
-            messageEntry.body = message.body;
-            messageEntry.receiptHandle = message.receiptHandle;
-            messageEntry.md5Sum = message.md5Body;
-            messageEntry.retries = message.retries;
-            messageEntry.size = message.size;
-            messageEntry.attributes = message.attributes;
-            messageEntry.messageAttributes = map(message.messageAttributes);
-            messageEntry.created = message.created;
-            messageEntry.modified = message.modified;
-            listMessageCountersResponse.messages.emplace_back(messageEntry);
+            MessageCounter messageCounter;
+            messageCounter.messageId = message.messageId;
+            messageCounter.id = message.oid;
+            messageCounter.body = message.body;
+            messageCounter.receiptHandle = message.receiptHandle;
+            messageCounter.md5Sum = message.md5Body;
+            messageCounter.retries = message.retries;
+            messageCounter.size = message.size;
+            messageCounter.attributes = message.attributes;
+            messageCounter.messageAttributes = map(message.messageAttributes);
+            messageCounter.created = message.created;
+            messageCounter.modified = message.modified;
+            listMessageCountersResponse.messages.emplace_back(messageCounter);
         }
         return listMessageCountersResponse;
     }

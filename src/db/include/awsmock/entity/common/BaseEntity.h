@@ -71,6 +71,7 @@ namespace AwsMock::Database::Entity::Common {
             *this = boost::json::value_to<T>(boost::json::parse(jsonString));
         }
 
+#ifndef _WIN32
         /**
          * @brief Return the demangled type name.
          *
@@ -82,6 +83,7 @@ namespace AwsMock::Database::Entity::Common {
             std::string demangledName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
             return demangledName;
         }
+#endif
 
         /**
          * @brief Generalized toString method
@@ -90,7 +92,11 @@ namespace AwsMock::Database::Entity::Common {
          */
         [[nodiscard]] std::string ToString() const {
             std::stringstream s;
+#ifdef _WIN32
+            std::operator<<(s, typeid(T).name());
+#else
             std::operator<<(s, GetDemangledName(typeid(T).name()));
+#endif
             std::operator<<(s, std::string("="));
             std::operator<<(s, ToJson());
             return s.str();

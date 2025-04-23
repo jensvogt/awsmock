@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToJson() {
+    std::string ListUserPoolCountersRequest::ToJson() const {
 
         try {
 

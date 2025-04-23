@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DeleteUserPoolClientRequest::ToJson() {
+    std::string DeleteUserPoolClientRequest::ToJson() const {
 
         try {
 

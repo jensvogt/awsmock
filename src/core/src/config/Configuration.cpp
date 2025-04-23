@@ -6,9 +6,15 @@
 
 namespace AwsMock::Core {
 
+#ifdef _WIN32
+    Configuration::Configuration() {
+        Initialize();
+    }
+#else
     Configuration::Configuration() : _yamlConfig(YAML::Null) {
         Initialize();
     }
+#endif
 
     Configuration::Configuration(const std::string &basename) : _yamlConfig(YAML::Null) {
         Initialize();
@@ -16,6 +22,10 @@ namespace AwsMock::Core {
     }
 
     void Configuration::Initialize() {
+
+        // Root
+        SetValueByPath(_yamlConfig, "awsmock", YAML::Null);
+
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
         DefineStringProperty("awsmock.user", "AWSMOCK_USER", "none");
@@ -166,7 +176,7 @@ namespace AwsMock::Core {
         DefineIntProperty("awsmock.monitoring.port", "AWSMOCK_MONITORING_PORT", 9091);
         DefineIntProperty("awsmock.monitoring.period", "AWSMOCK_MONITORING_PERIOD", 60);
         DefineBoolProperty("awsmock.monitoring.prometheus", "AWSMOCK_MONITORING_PROMETHEUS", false);
-        DefineBoolProperty("awsmock.monitoring.intern", "AWSMOCK_MONITORING_INTERN", true);
+        DefineBoolProperty("awsmock.monitoring.internal", "AWSMOCK_MONITORING_INTERN", true);
         DefineIntProperty("awsmock.monitoring.retention", "AWSMOCK_MONITORING_RETENTION", 3);
         DefineBoolProperty("awsmock.monitoring.smooth", "AWSMOCK_MONITORING_SMOOTH", false);
 

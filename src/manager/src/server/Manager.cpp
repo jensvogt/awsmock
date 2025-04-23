@@ -72,13 +72,13 @@ namespace AwsMock::Manager {
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+        for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
-                log_info << "Stopping module: " << module.name;
                 moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
                 if (moduleMap.HasModule(module.name)) {
+                    log_info << "Stopping module: " << module.name;
                     moduleMap.GetModule(module.name)->Shutdown();
-                    log_debug << "Module " << module.name << " stopped";
+                    log_info << "Module " << module.name << " stopped";
                 }
             }
         }
