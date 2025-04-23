@@ -145,33 +145,34 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
-        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest = {.region = REGION};
+        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest;
+        listQueueCountersRequest.region = REGION;
 
         // act
-        auto [queueCounters, total] = _service.ListQueueCounters(listQueueCountersRequest);
+        Dto::SQS::ListQueueCountersResponse response = _service.ListQueueCounters(listQueueCountersRequest);
 
         // assert
-        EXPECT_EQ(1, total);
-        EXPECT_EQ(1, queueCounters.at(0).available);
+        EXPECT_EQ(1, response.total);
+        EXPECT_EQ(1, response.queueCounters.at(0).available);
     }
 
     TEST_F(SQSServiceTest, QueueListTagsTest) {
 
     // arrange
     std:
-        std::map<std::string, std::string> tags = {{"version", "1.0"}};
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER, .tags = tags};
+        std::map<std::string, std::string> inputTags = {{"version", "1.0"}};
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER, .tags = inputTags};
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::ListQueueTagsRequest listQueueTagsRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl};
 
         // act
-        Dto::SQS::ListQueueTagsResponse listQueueTagsResponse = _service.ListQueueTags(listQueueTagsRequest);
+        auto [tags, total] = _service.ListQueueTags(listQueueTagsRequest);
 
         // assert
-        EXPECT_EQ(1, listQueueTagsResponse.total);
-        EXPECT_EQ(1, listQueueTagsResponse.tags.size());
-        EXPECT_TRUE(listQueueTagsResponse.tags["version"] == "1.0");
+        EXPECT_EQ(1, total);
+        EXPECT_EQ(1, tags.size());
+        EXPECT_TRUE(tags["version"] == "1.0");
     }
 
     TEST_F(SQSServiceTest, QueueDeleteTest) {

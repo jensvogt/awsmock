@@ -47,9 +47,9 @@ namespace AwsMock::Service {
         // Loop over buckets and do some maintenance work
         int filesDeleted = 0, objectsDeleted = 0;
         for (auto &bucket: buckets) {
-            // Get objects and delete object, where the file is not existing anymore
+            // Get objects and delete objects, where the file is not existing anymore, The files are identified by internal name.
             for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object: objects) {
-                if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
+                if (!Core::FileUtils::FileExists(s3DataDir + "/" + object.internalName)) {
                     _s3Database.DeleteObject(object);
                     log_debug << "Object deleted, internalName: " << object.internalName;
                     objectsDeleted++;
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
             }
         }
 
-        // Loop over files and check database for internal name
+        // Loop over files and check the database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
                 log_debug << "Checking file, basename: " << Core::FileUtils::GetBasename(entry.path().string());
