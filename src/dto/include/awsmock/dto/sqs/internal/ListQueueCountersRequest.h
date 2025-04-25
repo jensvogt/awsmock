@@ -17,11 +17,6 @@ namespace AwsMock::Dto::SQS {
     struct ListQueueCountersRequest final : Common::BaseCounter<ListQueueCountersRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
          * Prefix
          */
         std::string prefix;
@@ -29,12 +24,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Page size
          */
-        int pageSize;
+        int pageSize = 10;
 
         /**
          * Page index
          */
-        int pageIndex;
+        int pageIndex = 0;
 
         /**
          * Sort column
@@ -45,20 +40,10 @@ namespace AwsMock::Dto::SQS {
 
         friend ListQueueCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueCountersRequest>, boost::json::value const &v) {
             ListQueueCountersRequest r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-
-            // Sort columns
-            for (const auto &sc: v.at("sortColumns").as_array()) {
-                Common::SortColumn sortColumn;
-                sortColumn.column = sc.at("column").as_string();
-                sortColumn.sortDirection = sc.at("sortDirection").as_int64();
-                r.sortColumns.emplace_back(sortColumn);
-            }
+            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
+            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }
 

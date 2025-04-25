@@ -31,32 +31,17 @@ namespace AwsMock::Dto::SQS {
             r.user = v.at("user").as_string();
             r.requestId = v.at("requestId").as_string();
             r.total = v.at("total").as_int64();
-
-            // Queue counters
-            if (v.as_object().contains("messages")) {
-                for (const auto &o: v.at("messages").as_array()) {
-                    r.messages.emplace_back(boost::json::value_to<MessageCounter>(o));
-                }
-            }
+            r.messages = boost::json::value_to<std::vector<MessageCounter>>(v.at("messages"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListMessageCountersResponse const &obj) {
-
-            // Message counters
-            boost::json::array messageCounters;
-            if (!obj.messages.empty()) {
-                for (const auto &o: obj.messages) {
-                    messageCounters.emplace_back(boost::json::value_from(o));
-                }
-            }
-
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"total", obj.total},
-                    {"messageCounters", messageCounters},
+                    {"messageCounters", boost::json::value_from(obj.messages)},
             };
         }
     };

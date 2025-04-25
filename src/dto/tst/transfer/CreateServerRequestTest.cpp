@@ -26,7 +26,7 @@ namespace AwsMock::Dto::Transfer {
 
         void SetUp() override {
             // General configuration
-            _region = Core::Configuration::instance().GetValueString("awsmock.region");
+            _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         }
 
         std::string _region;

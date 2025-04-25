@@ -78,11 +78,11 @@ namespace AwsMock::Database {
                 query.append(kvp("name", name));
 
                 const auto result = _moduleCollection.find_one(query.extract());
-                log_trace << "Module exists: " << std::boolalpha << result.has_value();
+                log_trace << "Module exists, name: " << name << ", exists: " << std::boolalpha << result.has_value();
                 return result.has_value();
 
             } catch (mongocxx::exception::system_error &e) {
-                log_error << "Module exists failed, error: " << e.what();
+                log_error << "Module exists failed, name: " << ", error: " << e.what();
             }
 
         } else {

@@ -91,7 +91,9 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
-        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest = {.region = REGION, .queueArn = "notExist"};
+        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
+        getQueueDetailsRequest.region = REGION;
+        getQueueDetailsRequest.queueArn = "notExist";
 
         // act
         EXPECT_THROW({
@@ -111,7 +113,9 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
-        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest = {.region = REGION, .queueArn = queueResponse.queueArn};
+        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
+        getQueueDetailsRequest.region = REGION;
+        getQueueDetailsRequest.queueArn = queueResponse.queueArn;
 
         // act
         Dto::SQS::GetQueueDetailsResponse response = _service.GetQueueDetails(getQueueDetailsRequest);
@@ -292,7 +296,10 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.StringValue=application/json
         // MessageAttribute.1.Value.DataType=String
         //
-        const Dto::SQS::MessageAttribute messageAttribute = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING};
+        Dto::SQS::MessageAttribute messageAttribute;
+        messageAttribute.name = "contentType";
+        messageAttribute.stringValue = "application/json";
+        messageAttribute.type = Dto::SQS::MessageAttributeDataType::STRING;
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         messageAttributes[messageAttribute.name] = messageAttribute;
 
@@ -314,8 +321,14 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.StringValue=42
         // MessageAttribute.2.Value.DataType=Number
         //
-        const Dto::SQS::MessageAttribute messageAttribute1 = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING};
-        const Dto::SQS::MessageAttribute messageAttribute2 = {.name = "contentLength", .stringValue = "42", .type = Dto::SQS::MessageAttributeDataType::NUMBER};
+        Dto::SQS::MessageAttribute messageAttribute1;
+        messageAttribute1.name = "contentType";
+        messageAttribute1.stringValue = "application/json";
+        messageAttribute1.type = Dto::SQS::MessageAttributeDataType::STRING;
+        Dto::SQS::MessageAttribute messageAttribute2;
+        messageAttribute2.name = "contentType";
+        messageAttribute2.stringValue = "42";
+        messageAttribute2.type = Dto::SQS::MessageAttributeDataType::NUMBER;
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         messageAttributes[messageAttribute1.name] = messageAttribute1;
         messageAttributes[messageAttribute2.name] = messageAttribute2;

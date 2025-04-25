@@ -9,7 +9,7 @@ namespace AwsMock::Database {
 
     typedef boost::accumulators::accumulator_set<double, boost::accumulators::stats<boost::accumulators::tag::mean>> Accumulator;
 
-    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValueBool("awsmock.monitoring.smooth")) {}
+    MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {}
 
     std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName) const {
         log_trace << "Get distinct label values, labelName: " << labelName;

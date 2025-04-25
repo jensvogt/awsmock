@@ -39,47 +39,47 @@ namespace AwsMock::Dto::SQS {
         /**
          * Number of message available
          */
-        long available;
+        long available{};
 
         /**
          * Number of message invisible
          */
-        long invisible;
+        long invisible{};
 
         /**
          * Number of message delayed
          */
-        long delayed;
+        long delayed{};
 
         /**
          * Visibility timeout
          */
-        int visibilityTimeout;
+        int visibilityTimeout{};
 
         /**
          * Message delay
          */
-        int delay;
+        int delay{};
 
         /**
          * Retention period
          */
-        long retentionPeriod;
+        long retentionPeriod{};
 
         /**
          * Maximal message size
          */
-        long maxMessageSize;
+        long maxMessageSize{};
 
         /**
          * Total size of message in the queue
          */
-        long size;
+        long size{};
 
         /**
          * Is DQL
          */
-        bool isDlq;
+        bool isDlq{};
 
         /**
          * Created
@@ -101,14 +101,14 @@ namespace AwsMock::Dto::SQS {
             r.queueUrl = v.at("queueUrl").as_string();
             r.queueArn = v.at("queueArn").as_string();
             r.queueName = v.at("queueName").as_string();
-            r.available = static_cast<long>(v.at("available").as_int64());
-            r.invisible = static_cast<long>(v.at("invisible").as_int64());
-            r.delayed = static_cast<long>(v.at("delayed").as_int64());
-            r.visibilityTimeout = static_cast<long>(v.at("visibilityTimeout").as_int64());
-            r.delay = static_cast<long>(v.at("delay").as_int64());
-            r.retentionPeriod = static_cast<long>(v.at("retentionPeriod").as_int64());
-            r.maxMessageSize = static_cast<long>(v.at("maxMessageSize").as_int64());
-            r.size = static_cast<long>(v.at("size").as_int64());
+            r.available = v.at("available").as_int64();
+            r.invisible = v.at("invisible").as_int64();
+            r.delayed = v.at("delayed").as_int64();
+            r.visibilityTimeout = v.at("visibilityTimeout").as_int64();
+            r.delay = v.at("delay").as_int64();
+            r.retentionPeriod = v.at("retentionPeriod").as_int64();
+            r.maxMessageSize = v.at("maxMessageSize").as_int64();
+            r.size = (v.at("size").as_int64());
             r.isDlq = v.at("isDlq").as_bool();
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());

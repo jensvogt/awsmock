@@ -17,15 +17,15 @@ namespace AwsMock::Manager {
         std::string boostVersion = BOOST_LIB_VERSION;
         Core::StringUtils::Replace(boostVersion, "_", ".");
         log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << Core::SystemUtils::GetPid()
-                 << " loglevel: " << Core::Configuration::instance().GetValueString("awsmock.logging.level") << " boost version: " << boostVersion;
+                 << " loglevel: " << Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level") << " boost version: " << boostVersion;
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
-        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.dockerized");
+        log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     }
 
     void Manager::InitializeDatabase() const {
 
         // Get database variables
-        if (Core::Configuration::instance().GetValueBool("awsmock.mongodb.active")) {
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.active")) {
 
             _pool.Configure();
 
@@ -39,8 +39,8 @@ namespace AwsMock::Manager {
     }
 
     void Manager::AutoLoad() {
-        if (Core::Configuration::instance().GetValueBool("awsmock.autoload.active")) {
-            if (const std::string autoLoadDir = Core::Configuration::instance().GetValueString("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
+            if (const std::string autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
                 for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
                     if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
                         Dto::Module::Infrastructure infrastructure;
@@ -52,7 +52,7 @@ namespace AwsMock::Manager {
                         log_info << "Loaded infrastructure from " << file;
                     }
                 }
-            } else if (const std::string autoLoadFile = Core::Configuration::instance().GetValueString("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
+            } else if (const std::string autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
                     Dto::Module::Infrastructure infrastructure;
                     infrastructure.FromJson(jsonString);
@@ -91,18 +91,18 @@ namespace AwsMock::Manager {
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
 
         for (const std::map<std::string, Database::Entity::Module::Module> existingModules = Database::ModuleDatabase::GetExisting(); const auto &key: existingModules | std::views::keys) {
-            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << Core::Configuration::instance().GetValueBool("awsmock.modules." + key + ".active");
+            log_trace << "Loading module, key: " << key << " status: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.modules." + key + ".active");
             EnsureModuleExisting(key);
-            Core::Configuration::instance().GetValueBool("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
+            Core::Configuration::instance().GetValue<bool>("awsmock.modules." + key + ".active") ? moduleDatabase.SetStatus(key, ModuleStatus::ACTIVE) : moduleDatabase.SetStatus(key, ModuleStatus::INACTIVE);
         }
 
         // Gateway
         EnsureModuleExisting("gateway");
-        moduleDatabase.SetStatus("gateway", Core::Configuration::instance().GetValueBool("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase.SetStatus("gateway", Core::Configuration::instance().GetValue<bool>("awsmock.gateway.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
 
         // Monitoring
         EnsureModuleExisting("monitoring");
-        moduleDatabase.SetStatus("monitoring", Core::Configuration::instance().GetValueBool("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
+        moduleDatabase.SetStatus("monitoring", Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.active") ? ModuleStatus::ACTIVE : ModuleStatus::INACTIVE);
     }
 
     void Manager::EnsureModuleExisting(const std::string &key) {
@@ -118,7 +118,7 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        // Set running flag
+        // Set the running flag
         _running = true;
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
@@ -144,7 +144,7 @@ namespace AwsMock::Manager {
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
-        for (Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+        for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));

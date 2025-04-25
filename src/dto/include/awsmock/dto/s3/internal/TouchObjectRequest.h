@@ -22,11 +22,6 @@ namespace AwsMock::Dto::S3 {
     struct TouchObjectRequest final : Common::BaseCounter<TouchObjectRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
          * Bucket
          */
         std::string bucket;

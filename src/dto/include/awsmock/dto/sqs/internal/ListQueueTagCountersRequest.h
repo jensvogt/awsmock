@@ -11,16 +11,13 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
 #include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListQueueTagCountersRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListQueueTagCountersRequest final : Common::BaseCounter<ListQueueTagCountersRequest> {
 
         /**
          * Queue ARN
@@ -45,35 +42,30 @@ namespace AwsMock::Dto::SQS {
         /**
          * Sort column
          */
-        std::vector<Database::SortColumn> sortColumns;
+        std::vector<Common::SortColumn> sortColumns;
 
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListQueueTagCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueTagCountersRequest>, boost::json::value const &v) {
+            ListQueueTagCountersRequest r;
+            r.prefix = v.at("prefix").as_string();
+            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
+            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListQueueTagCountersRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueueTagCountersRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"prefix", obj.prefix},
+                    {"pageSize", obj.pageSize},
+                    {"pageIndex", obj.pageIndex},
+                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

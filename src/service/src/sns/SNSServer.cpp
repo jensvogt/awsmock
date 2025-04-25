@@ -8,9 +8,9 @@ namespace AwsMock::Service {
     SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _deletePeriod = configuration.GetValueInt("awsmock.modules.sns.delete.period");
-        _counterPeriod = configuration.GetValueInt("awsmock.modules.sns.counter.period");
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.sns.monitoring.period");
+        _deletePeriod = configuration.GetValue<int>("awsmock.modules.sns.delete.period");
+        _counterPeriod = configuration.GetValue<int>("awsmock.modules.sns.counter.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.sns.monitoring.period");
 
         // Check module active
         if (!IsActive("sns")) {
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
     }
 
     void SNSServer::DeleteOldMessages() const {
-        const int messageTimeout = Core::Configuration::instance().GetValueInt("awsmock.modules.sns.timeout");
+        const int messageTimeout = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.timeout");
         _snsDatabase.DeleteOldMessages(messageTimeout);
     }
 

@@ -34,7 +34,7 @@ namespace AwsMock::Database {
       protected:
 
         void SetUp() override {
-            _region = _configuration.GetValueString("awsmock.region");
+            _region = _configuration.GetValue<std::string>("awsmock.region");
         }
 
         void TearDown() override {

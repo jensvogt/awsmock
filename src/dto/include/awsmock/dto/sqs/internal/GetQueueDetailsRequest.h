@@ -12,48 +12,36 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct GetQueueDetailsRequest {
-
-        /**
-         * AWS region name
-         */
-        std::string region;
+    struct GetQueueDetailsRequest final : Common::BaseCounter<GetQueueDetailsRequest> {
 
         /**
          * Queue ARN
          */
         std::string queueArn;
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend GetQueueDetailsRequest tag_invoke(boost::json::value_to_tag<GetQueueDetailsRequest>, boost::json::value const &v) {
+            GetQueueDetailsRequest r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.queueArn = v.at("queueArn").as_string();
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetQueueDetailsRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetQueueDetailsRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueArn", obj.queueArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

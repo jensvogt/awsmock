@@ -10,11 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/TagCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListQueueTagCountersResponse {
+    struct ListQueueTagCountersResponse final : Common::BaseCounter<ListQueueTagCountersResponse> {
 
         /**
          * List of tag counters
@@ -26,26 +27,27 @@ namespace AwsMock::Dto::SQS {
          */
         long total = 0;
 
-        /**
-         * Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListQueueTagCountersResponse tag_invoke(boost::json::value_to_tag<ListQueueTagCountersResponse>, boost::json::value const &v) {
+            ListQueueTagCountersResponse r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.total = v.at("total").as_int64();
+            r.tagCounters = boost::json::value_to<std::vector<TagCounter>>(v.at("tagCounters"));
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListQueueTagCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueueTagCountersResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"tagCounters", boost::json::value_from(obj.tagCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

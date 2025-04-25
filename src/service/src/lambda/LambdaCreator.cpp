@@ -116,8 +116,8 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime) {
 
-        std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string tempDir = Core::Configuration::instance().GetValueString("awsmock.temp-dir");
+        std::string dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.data-dir");
+        const std::string tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
 
         // Decode Base64 file
         const std::string zipFile = tempDir + "/zipfile.zip";
@@ -187,8 +187,8 @@ namespace AwsMock::Service {
 
     std::string LambdaCreator::WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag) {
 
-        std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
-        std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
+        std::string s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        std::string lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
 
         std::string base64File = lambda.function + "-" + dockerTag + ".b64";
         std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;

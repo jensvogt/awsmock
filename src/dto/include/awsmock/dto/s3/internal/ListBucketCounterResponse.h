@@ -35,30 +35,17 @@ namespace AwsMock::Dto::S3 {
             r.requestId = v.at("requestId").as_string();
             r.user = v.at("user").as_string();
             r.total = v.at("total").as_int64();
-
-            // Bucket counters
-            if (v.as_object().contains("bucketCounters")) {
-                for (const auto &o: v.at("bucketCounters").as_array()) {
-                    r.bucketCounters.emplace_back(boost::json::value_to<BucketCounter>(o));
-                }
-            }
+            r.bucketCounters = boost::json::value_to<std::vector<BucketCounter>>(v.at("bucketCounters"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListBucketCounterResponse const &obj) {
-            // Bucket counters
-            boost::json::array bucketCounters;
-            if (!obj.bucketCounters.empty()) {
-                for (const auto &o: obj.bucketCounters) {
-                    bucketCounters.emplace_back(boost::json::value_from(o));
-                }
-            }
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"total", obj.total},
-                    {"bucketCounters", bucketCounters},
+                    {"bucketCounters", boost::json::value_from(obj.bucketCounters)},
             };
         }
     };

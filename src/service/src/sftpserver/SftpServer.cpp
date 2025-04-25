@@ -1494,7 +1494,7 @@ static int process_readdir(sftp_client_message client_msg) {
         if (dentry != nullptr) {
             char long_path[PATH_MAX];
             sftp_attributes_struct attr{};
-            struct stat st{};
+            struct stat st {};
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
                 log_error << "Dandle string length exceed max length!";
@@ -1603,7 +1603,7 @@ static int process_realpath(sftp_client_message client_msg) {
 #else
     if (filename[0] == '\0' || filename[0] == '.') {
         path = static_cast<char *>(malloc(PATH_MAX));
-        strcpy(path, AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir").c_str());
+        strcpy(path, AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir").c_str());
         strcpy(path + strlen(path), "/");
         strcpy(path + strlen(path), currentUser);
     } else {
@@ -1871,7 +1871,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st{};
+    struct statvfs st {};
 
     log_debug << "processing extended statvfs: " << path;
 
@@ -3221,7 +3221,7 @@ static int auth_password(ssh_session session, const char *user, const char *pass
         strcpy(currentUser, it->userName.c_str());
 
         // Set user home directory
-        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         userBasePath = static_cast<char *>(malloc(1024));
         strcpy(userBasePath, ftpBaseDir.c_str());
         strcpy(userBasePath + strlen(userBasePath), "/");
@@ -3370,7 +3370,7 @@ namespace AwsMock::Service {
         currentServerId = serverId.c_str();
 
         // Change working directory
-        const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
 #ifdef _WIN32
         int rc = _chdir(ftpBaseDir.c_str());
 #else

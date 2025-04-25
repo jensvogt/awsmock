@@ -591,7 +591,7 @@ namespace AwsMock::Core {
      * @return HTTP endpoint
      */
     inline std::string GetEndpoint() {
-        const int port = Configuration::instance().GetValueInt("awsmock.gateway.http.port");
+        const int port = Configuration::instance().GetValue<int>("awsmock.gateway.http.port");
         const std::string hostname = SystemUtils::GetHostName();
         return GATEWAY_DEFAULT_PROTOCOL + "://" + hostname + ":" + std::to_string(port);
     }
@@ -618,9 +618,9 @@ namespace AwsMock::Core {
      */
     inline std::string CreateSQSQueueUrl(const std::string &queueName) {
         const std::string hostname = SystemUtils::GetHostName();
-        const std::string port = Configuration::instance().GetValueString("awsmock.gateway.http.port");
-        const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
+        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         const std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
         log_trace << "queueUrl: " << queueUrl;
         return queueUrl;
@@ -633,8 +633,8 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &queueName) {
-        const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -647,7 +647,7 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &region, const std::string &queueName) {
-        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }

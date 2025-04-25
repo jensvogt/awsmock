@@ -45,12 +45,7 @@ namespace AwsMock::Dto::S3 {
             r.region = v.at("region").as_string();
             r.bucket = v.at("bucket").as_string();
             r.key = v.at("key").as_string();
-
-            // Metadata
-            for (boost::json::object metadataArray = v.at("metadata").as_object(); const auto &m: metadataArray) {
-                r.metadata[m.key()] = m.value().as_string();
-            }
-
+            r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
             return r;
         }
 

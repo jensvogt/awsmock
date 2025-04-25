@@ -38,8 +38,8 @@ namespace AwsMock::Database {
             _queueUrl = Core::CreateSQSQueueUrl(QUEUE_NAME);
             _dlqueueUrl = Core::CreateSQSQueueUrl(DLQ_NAME);
             _dlqueueArn = Core::CreateSQSQueueArn(DLQ_NAME);
-            _region = _configuration.GetValueString("awsmock.region");
-            Core::Configuration::instance().SetValueBool("awsmock.mongodb.active", false);
+            _region = _configuration.GetValue<std::string>("awsmock.region");
+            Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", false);
         }
 
         void TearDown() override {

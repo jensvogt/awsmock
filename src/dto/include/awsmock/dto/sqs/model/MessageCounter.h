@@ -69,7 +69,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message retries
          */
-        int retries = 0;
+        long retries = 0;
 
         /**
          * Created time stamp
@@ -93,8 +93,10 @@ namespace AwsMock::Dto::SQS {
             r.receiptHandle = v.at("receiptHandle").as_string();
             r.body = v.at("body").as_string();
             r.md5Sum = v.at("md5Sum").as_string();
-            r.size = static_cast<long>(v.at("size").as_int64());
-            r.retries = static_cast<long>(v.at("retries").as_int64());
+            r.size = v.at("size").as_int64();
+            r.retries = v.at("retries").as_int64();
+            r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("attributes"));
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
@@ -112,6 +114,8 @@ namespace AwsMock::Dto::SQS {
                     {"md5Sum", obj.md5Sum},
                     {"size", obj.size},
                     {"retries", obj.retries},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

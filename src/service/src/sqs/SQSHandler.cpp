@@ -101,7 +101,6 @@ namespace AwsMock::Service {
 
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
                     log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -433,10 +432,10 @@ namespace AwsMock::Service {
             if (attributeType == "String" || attributeType == "Number") {
                 attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
             }
-            const Dto::SQS::MessageAttribute messageAttribute = {
-                    .name = attributeName,
-                    .stringValue = attributeValue,
-                    .type = Dto::SQS::MessageAttributeDataTypeFromString(attributeType)};
+            Dto::SQS::MessageAttribute messageAttribute;
+            messageAttribute.name = attributeName;
+            messageAttribute.stringValue = attributeValue;
+            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(attributeType);
             messageAttributes[attributeName] = messageAttribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();

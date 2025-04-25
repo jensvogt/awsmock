@@ -9,14 +9,14 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.worker.period");
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.dynamodb.monitoring.period");
-        _containerName = configuration.GetValueString("awsmock.modules.dynamodb.container.name");
-        _containerHost = configuration.GetValueString("awsmock.modules.dynamodb.container.host");
-        _containerPort = configuration.GetValueInt("awsmock.modules.dynamodb.container.port");
-        _imageName = configuration.GetValueString("awsmock.modules.dynamodb.container.image-name");
-        _imageTag = configuration.GetValueString("awsmock.modules.dynamodb.container.image-tag");
-        _region = configuration.GetValueString("awsmock.region");
+        _workerPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.worker.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.monitoring.period");
+        _containerName = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.name");
+        _containerHost = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.host");
+        _containerPort = configuration.GetValue<int>("awsmock.modules.dynamodb.container.port");
+        _imageName = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.image-name");
+        _imageTag = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.image-tag");
+        _region = configuration.GetValue<std::string>("awsmock.region");
         log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
         // Check module active
@@ -98,7 +98,7 @@ namespace AwsMock::Service {
 
             // Get the list of tables from DynamoDB
             Dto::DynamoDb::ListTableRequest request;
-            request.region = Core::Configuration::instance().GetValueString("awsmock.region");
+            request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
             request.PrepareRequest();
             if (const Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 
@@ -141,7 +141,7 @@ namespace AwsMock::Service {
 
             // Get the list of tables from DynamoDB
             Dto::DynamoDb::ListTableRequest request;
-            request.region = Core::Configuration::instance().GetValueString("awsmock.region");
+            request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
             request.PrepareRequest();
             if (const Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 

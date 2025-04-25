@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/SortColumn.h>
-#include <awsmock/dto/sqs/model/QueueCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -29,12 +28,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Page size
          */
-        int pageSize;
+        int pageSize = 10;
 
         /**
          * Page index
          */
-        int pageIndex;
+        int pageIndex = 0;
 
         /**
          * Sort column
@@ -45,20 +44,11 @@ namespace AwsMock::Dto::SQS {
 
         friend ListMessageCountersRequest tag_invoke(boost::json::value_to_tag<ListMessageCountersRequest>, boost::json::value const &v) {
             ListMessageCountersRequest r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
+            r.queueArn = v.at("queueArn").as_string();
             r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-
-            // Sort columns
-            for (const auto &sc: v.at("sortColumns").as_array()) {
-                Common::SortColumn sortColumn;
-                sortColumn.column = sc.at("column").as_string();
-                sortColumn.sortDirection = sc.at("sortDirection").as_int64();
-                r.sortColumns.emplace_back(sortColumn);
-            }
+            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
+            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }
 
@@ -67,6 +57,7 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
+                    {"queueArn", obj.queueArn},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},

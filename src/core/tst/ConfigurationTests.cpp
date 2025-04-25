@@ -40,7 +40,7 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_STREQ(Configuration::instance().GetFilename().c_str(), TMP_PROPERTIES_FILE);
-        EXPECT_FALSE(Configuration::instance().GetValueString("awsmock.logging.level").empty());
+        EXPECT_FALSE(Configuration::instance().GetValue<std::string>("awsmock.logging.level").empty());
     }
 
     TEST_F(ConfigurationTest, EnvironmentTest) {
@@ -56,10 +56,10 @@ namespace AwsMock::Core {
         // act
 
         // assert
-        EXPECT_STREQ(Configuration::instance().GetValueString("awsmock.logging.level").c_str(), "debug");
+        EXPECT_STREQ(Configuration::instance().GetValue<std::string>("awsmock.logging.level").c_str(), "debug");
     }
 
-    TEST_F(ConfigurationTest, YamlConfigurationTest) {
+    TEST_F(ConfigurationTest, JsonConfigurationTest) {
         // arrange
         const std::string yamlString = "awsmock:\n"
                                        "  region: eu-central-1\n"
@@ -72,15 +72,15 @@ namespace AwsMock::Core {
         Configuration::instance().SetFilename(yamlFile);
 
         // act
-        const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string keyId = Configuration::instance().GetValueString("awsmock.access.key-id");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string keyId = Configuration::instance().GetValue<std::string>("awsmock.access.key-id");
 
         // assert
         EXPECT_TRUE(region == "eu-central-1");
         EXPECT_TRUE(keyId == "none");
     }
 
-    TEST_F(ConfigurationTest, YamlConfigurationArrayTest) {
+    TEST_F(ConfigurationTest, JsonConfigurationArrayTest) {
         // arrange
         const std::string yamlString = "awsmock:\n"
                                        "  region: eu-central-1\n"
@@ -98,7 +98,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetFilename(yamlFile);
 
         // act
-        const std::vector<std::string> directories = Configuration::instance().GetValueStringArray("awsmock.modules.transfer.directories");
+        const std::vector<std::string> directories = Configuration::instance().GetValueArray<std::string>("awsmock.modules.transfer.directories");
 
         // assert
         EXPECT_EQ(2, directories.size());

@@ -12,9 +12,9 @@ namespace AwsMock::FtpServer {
           _ftpWorkingDirectory("/"), _serverName(std::move(serverName)), data_acceptor_(io_service) {
         // Environment
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _region = configuration.GetValueString("awsmock.region");
-        _bucket = configuration.GetValueString("awsmock.modules.transfer.bucket");
-        _transferDir = configuration.GetValueString("awsmock.modules.transfer.data-dir");
+        _region = configuration.GetValue<std::string>("awsmock.region");
+        _bucket = configuration.GetValue<std::string>("awsmock.modules.transfer.bucket");
+        _transferDir = configuration.GetValue<std::string>("awsmock.modules.transfer.data-dir");
 
         // S3 service
         _s3Service = std::make_shared<Service::S3Service>();
@@ -294,9 +294,9 @@ namespace AwsMock::FtpServer {
 
         // In case of a dockerized FTP server we need to use some special ports
         boost::asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
-            int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
-            int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
+            int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-max");
             int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port);
         } else {
@@ -333,7 +333,7 @@ namespace AwsMock::FtpServer {
 
         // Split address and port into bytes and get the port the OS chose for us
         boost::asio::ip::address_v4::bytes_type ip_bytes;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
         } else {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
@@ -483,9 +483,9 @@ namespace AwsMock::FtpServer {
         }
 
         boost::asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
-            const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.min");
-            const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.max");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            const int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv.min");
+            const int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv.max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
@@ -550,9 +550,9 @@ namespace AwsMock::FtpServer {
         }
 
         boost::asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
-            const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
-            const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            const int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
+            const int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
