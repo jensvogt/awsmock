@@ -376,7 +376,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        auto value = _treeConfiguration.get_child(key).get_value<std::string>();
+        const auto value = _treeConfiguration.get_child(key).get_value<std::string>();
         return ReplaceEnvironmentVariables(value);
     }
 
