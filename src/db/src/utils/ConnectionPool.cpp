@@ -16,8 +16,7 @@ namespace AwsMock::Database {
         const int poolSize = configuration.GetValue<int>("awsmock.mongodb.pool-size");
 
         // MongoDB URL
-        std::string tmp = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize);
-        mongocxx::uri _uri(tmp);
+        mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
         log_info << "Using MongoDB database url: " << _uri.to_string();
 
         // Create a connection pool
