@@ -17,11 +17,6 @@ namespace AwsMock::Dto::S3 {
     struct ListObjectCounterRequest final : Common::BaseCounter<ListObjectCounterRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
          * Bucket
          */
         std::string bucket;
@@ -39,7 +34,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Page index
          */
-        int pageIndex;
+        int pageIndex = 0;
 
         /**
          * @brief List of sort columns names
@@ -52,16 +47,9 @@ namespace AwsMock::Dto::S3 {
             ListObjectCounterRequest r;
             r.region = v.at("region").as_string();
             r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-
-            // Sort columns
-            for (const auto &sc: v.at("sortColumns").as_array()) {
-                Common::SortColumn sortColumn;
-                sortColumn.column = sc.at("column").as_string();
-                sortColumn.sortDirection = sc.at("sortDirection").as_int64();
-                r.sortColumns.emplace_back(sortColumn);
-            }
+            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
+            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }
 

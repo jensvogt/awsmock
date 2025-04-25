@@ -92,7 +92,7 @@ namespace AwsMock::Service {
 
         try {
             if (request.maxResults > 0) {
-                // Get total number
+                // Get the total number
                 const long total = _sqsDatabase.CountQueues(request.region);
                 const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(
                         request.queueNamePrefix,
@@ -100,7 +100,7 @@ namespace AwsMock::Service {
                         0,
                         {},
                         request.region);
-                const std::string nextToken = queueList.size() > 0 ? queueList.back().oid : "";
+                const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
                 Dto::SQS::ListQueuesResponse listQueueResponse = {
                         .queueList = queueList,
                         .nextToken = nextToken,
@@ -230,7 +230,7 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
             Dto::SQS::ListQueueTagsResponse listQueueTagsResponse;
-            listQueueTagsResponse.total = queue.tags.size();
+            listQueueTagsResponse.total = static_cast<long>(queue.tags.size());
             listQueueTagsResponse.tags = queue.tags;
             log_trace << "SQS create queue tags list response: " << listQueueTagsResponse.ToJson();
             return listQueueTagsResponse;
@@ -260,49 +260,51 @@ namespace AwsMock::Service {
             Dto::SQS::ListQueueAttributeCountersResponse response;
             response.total = total;
             Dto::SQS::AttributeCounter attributeCounter;
-            attributeCounter = {
-                    .attributeKey = "approximateNumberOfMessages",
-                    .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessages)};
+            attributeCounter.attributeKey = "approximateNumberOfMessages";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessages);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "approximateNumberOfMessagesDelayed",
-                    .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesDelayed)};
+
+            attributeCounter.attributeKey = "approximateNumberOfMessagesDelayed";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesDelayed);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "approximateNumberOfMessagesNotVisible",
-                    .attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible)};
+
+            attributeCounter.attributeKey = "approximateNumberOfMessagesNotVisible",
+            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "deadLetterTargetArn",
-                    .attributeValue = queue.attributes.redrivePolicy.deadLetterTargetArn};
+
+            attributeCounter.attributeKey = "deadLetterTargetArn";
+            attributeCounter.attributeValue = queue.attributes.redrivePolicy.deadLetterTargetArn;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "delaySeconds",
-                    .attributeValue = std::to_string(queue.attributes.delaySeconds)};
+
+            attributeCounter.attributeKey = "delaySeconds";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.delaySeconds);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "maxMessageSize",
-                    .attributeValue = std::to_string(queue.attributes.maxMessageSize)};
+
+            attributeCounter.attributeKey = "maxMessageSize";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.maxMessageSize);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "messageRetentionPeriod",
-                    .attributeValue = std::to_string(queue.attributes.messageRetentionPeriod)};
+
+            attributeCounter.attributeKey = "messageRetentionPeriod";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.messageRetentionPeriod);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "policy", .attributeValue = queue.attributes.policy};
+            attributeCounter.attributeKey = "policy";
+            attributeCounter.attributeValue = queue.attributes.policy;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "maxReceiveCount",
-                    .attributeValue = std::to_string(queue.attributes.redrivePolicy.maxReceiveCount)};
+
+            attributeCounter.attributeKey = "maxReceiveCount";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.redrivePolicy.maxReceiveCount);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "queueArn", .attributeValue = queue.attributes.queueArn};
+
+            attributeCounter.attributeKey = "queueArn";
+            attributeCounter.attributeValue = queue.attributes.queueArn;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "redriveAllowPolicy",
-                    .attributeValue = queue.attributes.redriveAllowPolicy};
+
+            attributeCounter.attributeKey = "redriveAllowPolicy";
+            attributeCounter.attributeValue = queue.attributes.redriveAllowPolicy;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {
-                    .attributeKey = "visibilityTimeout",
-                    .attributeValue = std::to_string(queue.attributes.visibilityTimeout)};
+
+            attributeCounter.attributeKey = "visibilityTimeout";
+            attributeCounter.attributeValue = std::to_string(queue.attributes.visibilityTimeout);
             response.attributeCounters.emplace_back(attributeCounter);
 
             auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
@@ -314,7 +316,7 @@ namespace AwsMock::Service {
                     endArray);
             return response;
         } catch (Core::DatabaseException &ex) {
-            log_error << "SNS get attribute counters failed, message: " << ex.what();
+            log_error << "SQS get attribute counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -331,25 +333,24 @@ namespace AwsMock::Service {
         }
 
         try {
-            std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(request.queueArn);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(request.queueArn);
 
             Dto::SQS::ListLambdaTriggerCountersResponse response;
-            response.total = lambdas.size();
+            response.total = static_cast<long>(lambdas.size());
             std::string queueArn = request.queueArn;
             for (const auto &lambda: lambdas) {
                 if (lambda.HasEventSource(request.queueArn)) {
-                    const Database::Entity::Lambda::EventSourceMapping eventSourceMapping = lambda.GetEventSource(
-                            request.queueArn);
-                    Dto::SQS::LambdaTriggerCounter triggerCounter = {
-                            .uuid = eventSourceMapping.uuid,
-                            .arn = lambda.arn,
-                            .enabled = eventSourceMapping.enabled};
+                    const Database::Entity::Lambda::EventSourceMapping eventSourceMapping = lambda.GetEventSource(request.queueArn);
+                    Dto::SQS::LambdaTriggerCounter triggerCounter;
+                    triggerCounter.uuid = eventSourceMapping.uuid;
+                    triggerCounter.arn = lambda.arn;
+                    triggerCounter.enabled = eventSourceMapping.enabled;
                     response.lambdaTriggerCounters.emplace_back(triggerCounter);
                 }
             }
             return response;
         } catch (Core::DatabaseException &ex) {
-            log_error << "SQS get tag counters failed, message: " << ex.what();
+            log_error << "SQS get lambda trigger counters failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -369,9 +370,11 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
 
             Dto::SQS::ListQueueTagCountersResponse response;
-            response.total = queue.tags.size();
+            response.total = static_cast<long>(queue.tags.size());
             for (const auto &[fst, snd]: queue.tags) {
-                Dto::SQS::TagCounter tagCounter = {.tagKey = fst, .tagValue = snd};
+                Dto::SQS::TagCounter tagCounter;
+                tagCounter.tagKey = fst;
+                tagCounter.tagValue = snd;
                 response.tagCounters.emplace_back(tagCounter);
             }
             return response;
@@ -486,70 +489,51 @@ namespace AwsMock::Service {
 
             Dto::SQS::GetQueueAttributesResponse response;
             if (CheckAttribute(request.attributeNames, "all")) {
-                response.attributes.emplace_back("ApproximateNumberOfMessages",
-                                                 std::to_string(queue.attributes.approximateNumberOfMessages));
-                response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed",
-                                                 std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
-                response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible",
-                                                 std::to_string(
-                                                         queue.attributes.approximateNumberOfMessagesNotVisible));
+                response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
+                response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
+                response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
                 response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
                 response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
-                response.attributes.emplace_back("LastModifiedTimestamp",
-                                                 Core::DateTimeUtils::HttpFormat(queue.modified));
+                response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
                 response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
-                response.attributes.emplace_back("MessageRetentionPeriod",
-                                                 std::to_string(queue.attributes.messageRetentionPeriod));
+                response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
                 response.attributes.emplace_back("Policy", queue.attributes.policy);
                 response.attributes.emplace_back("QueueArn", queue.queueArn);
-                response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds",
-                                                 std::to_string(queue.attributes.receiveMessageWaitTime));
-                response.attributes.emplace_back("VisibilityTimeout",
-                                                 std::to_string(queue.attributes.visibilityTimeout));
+                response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
+                response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
             } else {
                 if (CheckAttribute(request.attributeNames, "Policy")) {
                     response.attributes.emplace_back("Policy", queue.attributes.policy);
                 }
                 if (CheckAttribute(request.attributeNames, "VisibilityTimeout")) {
-                    response.attributes.emplace_back("VisibilityTimeout",
-                                                     std::to_string(queue.attributes.visibilityTimeout));
+                    response.attributes.emplace_back("VisibilityTimeout", std::to_string(queue.attributes.visibilityTimeout));
                 }
                 if (CheckAttribute(request.attributeNames, "MaximumMessageSize")) {
-                    response.attributes.emplace_back("MaximumMessageSize",
-                                                     std::to_string(queue.attributes.maxMessageSize));
+                    response.attributes.emplace_back("MaximumMessageSize", std::to_string(queue.attributes.maxMessageSize));
                 }
                 if (CheckAttribute(request.attributeNames, "MessageRetentionPeriod")) {
-                    response.attributes.emplace_back("MessageRetentionPeriod",
-                                                     std::to_string(queue.attributes.messageRetentionPeriod));
+                    response.attributes.emplace_back("MessageRetentionPeriod", std::to_string(queue.attributes.messageRetentionPeriod));
                 }
                 if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessages")) {
-                    response.attributes.emplace_back("ApproximateNumberOfMessages",
-                                                     std::to_string(queue.attributes.approximateNumberOfMessages));
+                    response.attributes.emplace_back("ApproximateNumberOfMessages", std::to_string(queue.attributes.approximateNumberOfMessages));
                 }
                 if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesNotVisible")) {
-                    response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible",
-                                                     std::to_string(
-                                                             queue.attributes.approximateNumberOfMessagesNotVisible));
+                    response.attributes.emplace_back("ApproximateNumberOfMessagesNotVisible", std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible));
                 }
                 if (CheckAttribute(request.attributeNames, "ApproximateNumberOfMessagesDelayed")) {
-                    response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed",
-                                                     std::to_string(
-                                                             queue.attributes.approximateNumberOfMessagesDelayed));
+                    response.attributes.emplace_back("ApproximateNumberOfMessagesDelayed", std::to_string(queue.attributes.approximateNumberOfMessagesDelayed));
                 }
                 if (CheckAttribute(request.attributeNames, "CreatedTimestamp")) {
-                    response.attributes.emplace_back("CreatedTimestamp",
-                                                     Core::DateTimeUtils::HttpFormat(queue.created));
+                    response.attributes.emplace_back("CreatedTimestamp", Core::DateTimeUtils::HttpFormat(queue.created));
                 }
                 if (CheckAttribute(request.attributeNames, "LastModifiedTimestamp")) {
-                    response.attributes.emplace_back("LastModifiedTimestamp",
-                                                     Core::DateTimeUtils::HttpFormat(queue.modified));
+                    response.attributes.emplace_back("LastModifiedTimestamp", Core::DateTimeUtils::HttpFormat(queue.modified));
                 }
                 if (CheckAttribute(request.attributeNames, "DelaySeconds")) {
                     response.attributes.emplace_back("DelaySeconds", std::to_string(queue.attributes.delaySeconds));
                 }
                 if (CheckAttribute(request.attributeNames, "ReceiveMessageWaitTimeSeconds")) {
-                    response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds",
-                                                     std::to_string(queue.attributes.receiveMessageWaitTime));
+                    response.attributes.emplace_back("ReceiveMessageWaitTimeSeconds", std::to_string(queue.attributes.receiveMessageWaitTime));
                 }
                 if (CheckAttribute(request.attributeNames, "RedrivePolicy")) {
                     response.attributes.emplace_back("RedrivePolicy", queue.attributes.redrivePolicy.ToJson());
@@ -699,11 +683,11 @@ namespace AwsMock::Service {
             int count = 0;
             if (!request.tags.empty()) {
                 for (const auto &tag: request.tags) {
-                    count += std::erase_if(queue.tags,
-                                           [tag](const auto &item) {
-                                               auto const &[k, v] = item;
-                                               return k == tag;
-                                           });
+                    count += static_cast<int>(std::erase_if(queue.tags,
+                                                            [tag](const auto &item) {
+                                                                auto const &[k, v] = item;
+                                                                return k == tag;
+                                                            }));
                 }
             }
             queue = _sqsDatabase.UpdateQueue(queue);
@@ -813,7 +797,7 @@ namespace AwsMock::Service {
             // Set parameters
             message.queueArn = queue.queueArn;
             message.queueName = queue.name;
-            message.size = request.body.size();
+            message.size = static_cast<long>(request.body.size());
             message.created = system_clock::now();
             message.modified = system_clock::now();
             message.messageId = Core::AwsUtils::CreateMessageId();
@@ -894,7 +878,7 @@ namespace AwsMock::Service {
                     "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
-        long pollPeriod = Core::Configuration::instance().GetValueLong("awsmock.modules.sqs.receive-poll");
+        long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 
@@ -967,7 +951,7 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn);
 
-            Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(
                     request.queueArn,
                     {},
                     request.pageSize,
@@ -1168,7 +1152,7 @@ namespace AwsMock::Service {
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
-        if (std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
+        if (const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
             log_debug << "Found lambda notification events, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
                 SendLambdaInvocationRequest(lambda, message, queueArn);
@@ -1179,8 +1163,8 @@ namespace AwsMock::Service {
     void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function;
 
-        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
-        const std::string user = Core::Configuration::instance().GetValueString("awsmock.user");
+        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
 
         // Create the event record
         Dto::SQS::Record record = {

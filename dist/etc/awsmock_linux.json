@@ -8,8 +8,8 @@
       "client-id": "00000000",
       "secret-access-key": "none"
     },
-    "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\",
-    "temp-dir": "C:\\Program Files (x86)\\awsmock\\tmp\\",
+    "data-dir": "/usr/local/awsmock/data",
+    "temp-dir": "/usr/local/awsmock/tmp",
     "json": {
       "pretty": false
     },
@@ -19,11 +19,11 @@
       }
     },
     "dockerized": false,
-    "magic-file": "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc",
+    "magic-file": "/usr/local/awsmocket/etc/magic.mgc",
     "autoload": {
       "active": true,
-      "file": "C:\\Program Files (x86)\\awsmock\\init\\init.json",
-      "dir": "C:\\Program Files (x86)\\awsmock\\init"
+      "file": "/usr/local/awsmock/init/init.json",
+      "dir": "/usr/local/awsmock/init"
     },
     "gateway": {
       "active": true,
@@ -40,7 +40,7 @@
     "modules": {
       "s3": {
         "active": true,
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\s3",
+        "data-dir": "/usr/local/awsmockdata/s3",
         "monitoring": {
           "period": "900"
         },
@@ -82,7 +82,7 @@
       "lambda": {
         "active": true,
         "lifetime": 3600,
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\lambda",
+        "data-dir": "/usr/local/awsmockdata/lambda",
         "monitoring": {
           "period": 300
         },
@@ -110,7 +110,7 @@
       "transfer": {
         "active": true,
         "bucket": "transfer-server",
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\transfer",
+        "data-dir": "/usr/local/awsmockdata/transfer",
         "monitoring": {
           "period": 300
         },
@@ -128,7 +128,7 @@
           "address": "0.0.0.0"
         },
         "sftp": {
-          "host-key": "C:\\Program Files (x86)\\awsmock\\etc\\ssh_host_key",
+          "host-key": "/usr/local/awsmock/etc/ssh_host_key",
           "pasv-min": 6000,
           "pasv-max": 6100,
           "port": 2222,
@@ -205,6 +205,7 @@
       "socket": "/run/podman/podman.sock"
     },
     "monitoring": {
+      "active": true,
       "port": 9091,
       "period": 60,
       "prometheus": false,
@@ -227,11 +228,11 @@
       "port": 4567,
       "workers": 10,
       "timeout": 900,
-      "doc-root": "C:\\Program Files (x86)\\awsmock\\frontend"
+      "doc-root": "/usr/local/awsmock/frontend"
     },
     "logging": {
       "level": "info",
-      "dir": "C:\\Program Files (x86)\\awsmock\\log",
+      "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",
       "file-size": 10485760,
       "file-count": 5

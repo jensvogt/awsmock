@@ -9,7 +9,7 @@ namespace AwsMock::Monitoring {
     boost::mutex MetricService::_gaugeMutex;
     boost::mutex MetricService::_counterMutex;
 
-    MetricService::MetricService() : _port(Core::Configuration::instance().GetValueInt("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValueBool("awsmock.monitoring.prometheus")), _intern(Core::Configuration::instance().GetValueBool("awsmock.monitoring.intern")), _database(Database::MonitoringDatabase::instance()) {}
+    MetricService::MetricService() : _port(Core::Configuration::instance().GetValue<int>("awsmock.monitoring.port")), _prometheus(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.prometheus")), _intern(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.internal")), _database(Database::MonitoringDatabase::instance()) {}
 
     void MetricService::Initialize() {
         log_debug << "Monitoring initialized, prometheus: " << std::boolalpha << _prometheus << " internal: " << _intern;

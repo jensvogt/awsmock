@@ -10,9 +10,9 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.s3.monitoring.period");
-        _syncPeriod = configuration.GetValueInt("awsmock.modules.s3.sync.object.period");
-        _sizePeriod = configuration.GetValueInt("awsmock.modules.s3.sync.bucket.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.s3.monitoring.period");
+        _syncPeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.object.period");
+        _sizePeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.bucket.period");
 
         // Check module active
         if (!IsActive("s3")) {
@@ -34,10 +34,10 @@ namespace AwsMock::Service {
 
     void S3Server::SyncObjects() const {
 
-        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
-        const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
 
-        Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
     }
 
     void S3Server::SyncBuckets() const {
-        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
 
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Bucket synchronization starting, bucketCount: " << buckets.size();

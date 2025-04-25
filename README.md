@@ -14,12 +14,12 @@ awsmock is a high performance, persistent AWS simulation. Currently, the followi
 - [SSM](docs/man/awsmockssm.1.md): Amazon Systems management
 
 awsmock is written in C++ with an optional MongoDB persistence layer. If needed all objects can be stored in the
-database. The simulation reacts to all AWS commands send to the default port 4566. For a lists of supported command see
+database. The simulation reacts to all AWS commands sent to default port 4566. For a list of supported commands see
 below tables for the different AWS services.
 
-AwsMock can also be used without persistence layer (for instances used as a test-container). In this cas the
+AwsMock can also be used without a persistence layer (for instances used as a test-container). In this cas the
 configuration and all objects are stored in an in-memory database. As soon as the AwsMock manager goes down all
-infrastructure and runtime objects are lost.
+infrastructures and runtime objects are lost.
 
 For control over the behaviour of the AwsMock simulation a ```awsmockctl``` command line tool is available. This tool
 can be used to start/stop/restart the different AwsMock modules, as well as configure some internal stuff needed by the
@@ -27,13 +27,14 @@ AwsMock manager.
 
 ## S3 module
 
-Data is stored as objects within resources called “buckets”, and a single object can be up to 5 terabytes in size.
+Data is stored as objects within resources called “buckets,” and a single object can be up to 5 terabytes in size.
 Objects can be accessed through S3 Access Points or directly through the bucket hostname. With cost-effective storage
 classes and easy-to-use management features, you can optimize costs, organize data, and configure fine-tuned access
 controls to meet specific business, organizational, and compliance requirements.
 
 AwsMock S3 mock simulates a real AWS S3 bucket and its object. They can be copied, added, moved, deleted any some more
-functions. S3 object are stored on disk and their metadata is part of AwsMock Mongo DB collection. Therefore the MongoDB
+functions. S3 objects are stored on disk, and their metadata is part of AwsMock Mongo DB collection. Therefore the
+MongoDB
 has two collections: Buckets and Objects. Buckets contain the bucket metadata and teh object collection the object data.
 
 See [AwsMock S3 supported commands](docs/man/awsmocks3.1.md) in the supplied man page.
@@ -59,7 +60,7 @@ messages to a topic, which is a logical access point and communication channel. 
 and receive published messages using a supported endpoint type, such as Amazon Kinesis Data Firehose, Amazon SQS,
 AWS Lambda, HTTP, email, mobile push notifications, and mobile text messages (SMS).
 
-Currently only SQS is supported as endpoint type.
+Currently only SQS is supported as an endpoint type.
 
 See [AwsMock SNS supported commands](docs/man/awsmocksns.1.md) for a list of supported commands.
 
@@ -172,7 +173,7 @@ To create an out-of-source build:
    cmake . -DCMAKE_BUILD_TYPE=<build-type> -DCMAKE_PREFIX_PATH=<path-to-install>
    cmake --build . --config=<build-type> -j<parallel-threads>
    ```
-4. Install the executables, libraries and man pages:
+4. Install the executables, libraries, and man pages:
    ```
    cmake --install . --config=Debug
    ```
@@ -185,8 +186,8 @@ As already said, this can be a time-consuming procedure, depending on your machi
 
 #### Building the frontend from source:
 
-IN order to build the frontend you need NodeJS >16.0. The sourcecode is located at
-```http://github.com/jensvogt/awsmock-ui```. In order to build the frontend part use:
+IN order to build the frontend, you need Node.js >16.0. The sourcecode is located at
+```http://github.com/jensvogt/awsmock-ui```. To build the frontend part, use:
 
 ```
 npm run build --prod
@@ -225,7 +226,7 @@ If you have problems with the docker daemon connection and you see errors like:
 2024-06-01 12:28:46.116 ERROR [1] [Core::DomainSocket::SendJson:18] Could not connect to docker UNIX domain socket, error: Connection refused
 ```
 
-you probably need either runs it under root:
+you probably need to run it under root:
 
 ```
 sudo docker run -p 4566-4567:4566-4567 -p 6000-6010:6000:6010 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
@@ -237,13 +238,13 @@ or you can give the current user access to the docker domain socket:
 sudo chmod 666 /var/run/docker.sock
 ```
 
-### Using the docker image with an MongoDB backend
+### Using the docker image with a MongoDB backend
 
 As MongoDB is not supported on alpine, no MongoDB is included in the docker image. Nevertheless, you can connect
-to an external MongoDB instance running as docker container. In ```/usr/local/share/awsmock/docker``` is an example of
+to an external MongoDB instance running as a docker container. In ```/usr/local/share/awsmock/docker``` is an example of
 a docker-compose file.
 
-To connect a MongoDB instance use the provided docker-compose file:
+To connect a MongoDB instance, use the provided docker-compose file:
 
 ```
   cd /usr/local/share/awsmock/docker
@@ -257,7 +258,8 @@ instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www
 ### Running the Manager on the host
 
 In order to run the manager on the host system (Docker ist still needed for the lambda functions and DynamoDB), you need
-tomake sure the manager application has access to the docker daemon REST API. For this put your user id into the docker
+to make sure the manager application has access to the docker daemon REST API. For this, put your user id into the
+docker
 group;
 
 ```
@@ -275,16 +277,16 @@ can start the manager as normal foreground process:
 It will use the configuration file: ```/etc/awsmock.yml```. Logging output will be written to the console. To stop the
 process just type ```<CRTL>-C```. THe frontend will be served by default from the
 ```$HOME/awsmock/frontend``` directory.
-To customize that change the corresponding attribute in the configuration file.
+To customize that, change the corresponding attribute in the configuration file.
 
 ## Examples
 
-There are a couple of examples shell script available. Depending on your installation directory, there in
+There are a couple of example shell scripts available. Depending on your installation directory, there in
 ```/usr/share/awsmock``` or in ```/usr/local/share/awsmock```. Each module has its own directory with bash scripts and
-resource files. The examples cover almost all AwsMock features. All examples are pretty self explaining.
+resource files. The examples cover almost all AwsMock features. All examples are pretty self-explaining.
 
 Some of them require the jq utility (JSON queries). You can install jq using the usual package manager of your Linux
-distribution. For Windows jq can be downloaded from [jq download site](https://jqlang.github.io/jq/download/).
+distribution. For Windows, jq can be downloaded from [jq download site](https://jqlang.github.io/jq/download/).
 
 Simply change to the directory and execute one of the example scripts:
 
@@ -296,7 +298,7 @@ cd /usr/local/share/awsmock/s3
 ## Windows support
 
 The distribution contains Windows ports of ```awslocal``` and ```awsmockctl``` in the ```./dist/bin``` directory. These
-executables allow to control awsmock docker image from a Windows machine.
+executables allow controlling awsmock docker image from a Windows machine.
 
 ```
 c:\Program Files\awsmock\bin\awsmockctl status
@@ -312,11 +314,11 @@ AwsMock can be used natively on Windows. The base directory for the Windows port
 "C:\Program Files (x86)\awsmock\bin\awsmockmgr.exe" --foreground
 ```
 
-Log files will be written to ```$AWS_ROOT\log```. The frontend is available at ```http://localhost:4567````.
+Log files will be written to ```$AWS_ROOT\log```. The frontend is available at ```http://localhost:4567```.
 
 ### Windows service
 
-AwsMock can be installed as a Windows service. In order to install the AwsMock manager as a Windows service use
+AwsMock can be installed as a Windows service. In order to install the AwsMock manager as a Windows service, use
 (assuming the root directory of AwsMock is ```C:\Program Files (x86)\awsmock```) in a Windows CMD shell:
 
 ```
@@ -330,7 +332,6 @@ prerequisites:
 
 ```
 prometheus-cpp
-yaml-cpp
 jwt-cpp
 mongo-cxx-driver
 libarchive
@@ -347,17 +348,15 @@ See the detailed installation instructions coming with the different packages.
 
 ## MacOS support
 
-On macOS the manager can be run as normal process. A macOS port can be installed using the normal development setup.
+On macOS the manager can be run as a normal process. A macOS port can be installed using the normal development setup.
 Start the manager as ```awsmockmgr```. The frontend is available at ```http://localhost:4567```
 
 ### Compiling on MacOS
 
-In order to compile AwsMock on Windows install the prerequisites:
+In order to compile AwsMock on macOS, install the prerequisites (if not already existing):
 
 ```
-
 brew install prometheus-cpp
-brew install yaml-cpp
 brew install jwt-cpp
 brew install mongo-cxx-driver
 brew install libarchive
@@ -382,14 +381,13 @@ sudo make install
 
 ```
 
-This will compile and install the backend executables into ```/usr/local/bin``` and the libraries in
-```/usr/local/lib```. The configuration file should be installed as ```/etc/awsmock.yml```:
-```cp dist/etc/awsmock.yml /etc```
+This will compile and install the backend executables into ```/usr/local/awsmock/bin``` and the libraries in
+```/usr/local/awsmock/lib```. The configuration file should be installed as ```/usr/local/awsmock/etc/awsmock.json```:
+```cp dist/etc/awsmock.json /etc```
 
 Download the frontend code
 
 ```
-
 git clone https://github.com/jensvogt/awsmock-ui
 cd awsmock-ui
 npm install
@@ -399,9 +397,9 @@ npm run build --prod
 
 ## Configuration
 
-In order to configure your infrastructure, you use the provided web interface on ```http://localhost:4567`. This is a
-Angular application which is hosted by awsmock. In there you can import/export JSON files, which are simply dumps of
-MongoDB collection. This way its very easy to load different infrastructure scenarios rapidly.
+To configure your infrastructure, you use the provided web interface on ```http://localhost:4567```.
+This is an Angular application hosted by awsmock. In there you can import/export JSON files, which are simply dumps of
+MongoDB collection. This way it is straightforward to load different infrastructure scenarios rapidly.
 
 ## Documentation
 

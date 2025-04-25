@@ -7,7 +7,7 @@
 namespace AwsMock::Service {
     TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
         // REST manager configuration
-        _monitoringPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.monitoring.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.monitoring.period");
 
         // Check module active
         if (!IsActive("transfer")) {
@@ -33,9 +33,9 @@ namespace AwsMock::Service {
 
     void TransferServer::CreateTransferBucket() {
         Dto::S3::CreateBucketRequest request;
-        request.owner = Core::Configuration::instance().GetValueString("awsmock.user");
-        request.region = Core::Configuration::instance().GetValueString("awsmock.region");
-        request.name = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.bucket");
+        request.owner = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
+        request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        request.name = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
         if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
             log_debug << "Creating bucket " << request.name << ", region: " << request.region << ", owner: " << request.owner;
             Dto::S3::CreateBucketResponse response = s3Service.CreateBucket(request);
@@ -43,8 +43,8 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::CreateDirectories(const std::string &userName) {
-        const std::string basePath = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
-        for (const auto &directory: Core::Configuration::instance().GetValueStringArray("awsmock.modules.transfer.directories")) {
+        const std::string basePath = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        for (const auto &directory: Core::Configuration::instance().GetValueArray<std::string>("awsmock.modules.transfer.directories")) {
             if (std::string dirPath = basePath + Core::FileUtils::separator() + userName + Core::FileUtils::separator() + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
                 Core::DirUtils::MakeDirectory(dirPath, true);
                 log_debug << "Created directory, path: " << dirPath;
@@ -72,11 +72,11 @@ namespace AwsMock::Service {
     void TransferServer::StartFtpServer(Database::Entity::Transfer::Transfer &server) {
 
         // Get base dir
-        const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
-        const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.port");
-        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.ftp.address");
+        const std::string baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const int port = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.port");
+        const std::string address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.ftp.address");
 
-        // Create transfer manager thread
+        // Create a transfer manager thread
         _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address);
         _transferServerList[server.serverId] = _ftpServer;
 
@@ -104,17 +104,17 @@ namespace AwsMock::Service {
     void TransferServer::StartSftpServer(Database::Entity::Transfer::Transfer &server) {
 
         // Get base dir
-        const std::string baseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
-        const int port = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.sftp.port");
-        const std::string address = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.address");
-        const std::string hostKey = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.sftp.host-key");
+        const std::string baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const int port = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.sftp.port");
+        const std::string address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.address");
+        const std::string hostKey = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.host-key");
 
         SftpServer _sftpServer;
 
         // Add users
         for (const auto &user: server.users) {
 
-            // Create home directory
+            // Create a home directory
             std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
             Core::DirUtils::EnsureDirectory(homeDir);
 
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
             log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
         }
 
-        // Start detached thread
+        // Start a detached thread
         boost::thread t(boost::ref(_sftpServer), std::to_string(port), hostKey, address, server.serverId);
         t.detach();
         log_info << "SFTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
@@ -133,7 +133,7 @@ namespace AwsMock::Service {
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
 
-        // Create transfer manager thread
+        // Create a transfer manager thread
         const std::shared_ptr<FtpServer::FtpServer> ftpServer = _transferServerList[server.serverId];
         ftpServer->stop();
 

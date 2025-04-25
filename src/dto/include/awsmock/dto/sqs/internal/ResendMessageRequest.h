@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -25,7 +26,7 @@ namespace AwsMock::Dto::SQS {
      * }
      * @endcode
      */
-    struct ResendMessageRequest {
+    struct ResendMessageRequest final : Common::BaseCounter<ResendMessageRequest> {
 
         /**
          * Queue ARN
@@ -37,33 +38,23 @@ namespace AwsMock::Dto::SQS {
          */
         std::string messageId;
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ResendMessageRequest tag_invoke(boost::json::value_to_tag<ResendMessageRequest>, boost::json::value const &v) {
+            ResendMessageRequest r;
+            r.queueArn = v.at("queueArn").as_string();
+            r.messageId = v.at("messageId").as_string();
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, ResendMessageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ResendMessageRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"messageId", obj.messageId},
+            };
+        }
     };
 }// namespace AwsMock::Dto::SQS
 

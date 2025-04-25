@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
     void S3HashCreator::operator()(std::vector<std::string> &algorithms, Database::Entity::S3::Object &object) const {
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
 
         const std::string filename = dataDir + "/" + object.internalName;
         for (const auto &algorithm: algorithms) {

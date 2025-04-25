@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
         try {
             // Update database
-            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+            const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
             topic = _snsDatabase.CreateTopic(topic);
@@ -221,7 +221,7 @@ namespace AwsMock::Service {
             }
 
             // Create new subscription
-            const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+            const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
@@ -633,7 +633,12 @@ namespace AwsMock::Service {
         };
 
         for (const auto &[fst, snd]: request.messageAttributes) {
-            const Dto::SQS::MessageAttribute messageAttribute = {.name = fst, .stringValue = snd.stringValue, .numberValue = snd.numberValue, .binaryValue = snd.binaryValue, .type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type))};
+            Dto::SQS::MessageAttribute messageAttribute;
+            messageAttribute.name = fst;
+            messageAttribute.stringValue = snd.stringValue;
+            messageAttribute.numberValue = snd.numberValue;
+            messageAttribute.binaryValue = snd.binaryValue;
+            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type));
             sendMessageRequest.messageAttributes[fst] = messageAttribute;
         }
 

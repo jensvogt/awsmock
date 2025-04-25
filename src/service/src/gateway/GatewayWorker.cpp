@@ -9,10 +9,10 @@ namespace AwsMock::Service {
     GatewayWorker::GatewayWorker(tcp::acceptor &acceptor, std::string docRoot) : _acceptor(acceptor), _docRoot(std::move(docRoot)) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        //_queueLimit = configuration.GetValueInt("awsmock.gateway.http.max-queue");
-        //_bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
-        //_timeout = configuration.GetValueInt("awsmock.gateway.http.timeout");
-        _verifySignature = configuration.GetValueBool("awsmock.aws.signature.verify");
+        //_queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
+        //_bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
+        //_timeout = configuration.GetValue<int>("awsmock.gateway.http.timeout");
+        _verifySignature = configuration.GetValue<bool>("awsmock.aws.signature.verify");
         _routingTable = {
                 {"s3", std::make_shared<S3Handler>()},
                 {"s3api", std::make_shared<S3Handler>()},
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
 
     void GatewayWorker::Accept() {
 
-        int timeout = Core::Configuration::instance().GetValueInt("awsmock.frontend.timeout");
+        int timeout = Core::Configuration::instance().GetValue<int>("awsmock.frontend.timeout");
 
         // Clean up any previous connection.
         beast::error_code ec = _socket.close(ec);
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
         }
 
         std::shared_ptr<AbstractHandler> handler;
-        std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             const std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
@@ -319,7 +319,7 @@ namespace AwsMock::Service {
 
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
-                authKeys.region = Core::Configuration::instance().GetValueString("awsmock.region");
+                authKeys.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
             }
 
             return authKeys;

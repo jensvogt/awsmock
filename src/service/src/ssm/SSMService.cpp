@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SSMService::SSMService() : _ssmDatabase(Database::SSMDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
     }
 
     Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) const {

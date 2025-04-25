@@ -15,7 +15,7 @@ namespace AwsMock::Service {
     KMSService::KMSService() : _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
     }
 
     Dto::KMS::ListKeysResponse KMSService::ListKeys(const Dto::KMS::ListKeysRequest &request) const {

@@ -118,16 +118,16 @@ namespace AwsMock::Core {
 
     void LogStream::AddFile() {
         if (Configuration::instance().HasValue("awsmock.logging.dir")) {
-            logDir = Configuration::instance().GetValueString("awsmock.logging.dir");
+            logDir = Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
         }
         if (Configuration::instance().HasValue("awsmock.logging.prefix")) {
-            logPrefix = Configuration::instance().GetValueString("awsmock.logging.prefix");
+            logPrefix = Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
         }
         if (Configuration::instance().HasValue("awsmock.logging.file-size")) {
-            logSize = Configuration::instance().GetValueLong("awsmock.logging.file-size");
+            logSize = Configuration::instance().GetValue<long>("awsmock.logging.file-size");
         }
         if (Configuration::instance().HasValue("awsmock.logging.file-count")) {
-            logCount = Configuration::instance().GetValueInt("awsmock.logging.file-count");
+            logCount = Configuration::instance().GetValue<int>("awsmock.logging.file-count");
         }
         file_sink = add_file_log(
                 boost::log::keywords::file_name = logDir + FileUtils::separator() + logPrefix + "-%N.log",

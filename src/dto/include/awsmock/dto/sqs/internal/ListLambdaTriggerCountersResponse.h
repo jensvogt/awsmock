@@ -9,12 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/LambdaTriggerCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListLambdaTriggerCountersResponse {
+    struct ListLambdaTriggerCountersResponse final : Common::BaseCounter<ListLambdaTriggerCountersResponse> {
 
         /**
          * List of lambda trigger counters
@@ -26,26 +26,27 @@ namespace AwsMock::Dto::SQS {
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListLambdaTriggerCountersResponse tag_invoke(boost::json::value_to_tag<ListLambdaTriggerCountersResponse>, boost::json::value const &v) {
+            ListLambdaTriggerCountersResponse r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.total = v.at("total").as_int64();
+            r.lambdaTriggerCounters = boost::json::value_to<std::vector<LambdaTriggerCounter>>(v.at("lambdaTriggerCounters"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListLambdaTriggerCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListLambdaTriggerCountersResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"lambdaTriggerCounters", boost::json::value_from(obj.lambdaTriggerCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

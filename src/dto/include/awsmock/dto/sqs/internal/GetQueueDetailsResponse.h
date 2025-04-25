@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -22,12 +23,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetQueueDetailsResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct GetQueueDetailsResponse final : Common::BaseCounter<GetQueueDetailsResponse> {
 
         /**
          * Queue name
@@ -47,32 +43,32 @@ namespace AwsMock::Dto::SQS {
         /**
          * Number of messages
          */
-        long messageCount;
+        long messageCount{};
 
         /**
          * Retention period
          */
-        long retentionPeriod;
+        long retentionPeriod{};
 
         /**
          * Maximal message size
          */
-        long maxMessageSize;
+        long maxMessageSize{};
 
         /**
          * Visibility timeout
          */
-        long visibilityTimeout;
+        long visibilityTimeout{};
 
         /**
          * Size of all messages
          */
-        long size;
+        long size{};
 
         /**
          * Delay
          */
-        long delay;
+        long delay{};
 
         /**
          * Queue owner
@@ -80,19 +76,19 @@ namespace AwsMock::Dto::SQS {
         std::string owner;
 
         /**
-         * Number of message available
+         * Number of messages available
          */
-        long available;
+        long available{};
 
         /**
-         * Number of message invisible
+         * Number of messages invisible
          */
-        long invisible;
+        long invisible{};
 
         /**
-         * Number of message delayed
+         * Number of messages delayed
          */
-        long delayed;
+        long delayed{};
 
         /**
          * Dead letter queue ARN
@@ -102,7 +98,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Maximal number of retries
          */
-        int dlqMaxReceive;
+        long dlqMaxReceive{};
 
         /**
          * Created timestamp
@@ -114,26 +110,55 @@ namespace AwsMock::Dto::SQS {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend GetQueueDetailsResponse tag_invoke(boost::json::value_to_tag<GetQueueDetailsResponse>, boost::json::value const &v) {
+            GetQueueDetailsResponse r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.queueName = v.at("queueName").as_string();
+            r.queueUrl = v.at("queueUrl").as_string();
+            r.queueArn = v.at("queueArn").as_string();
+            r.owner = v.at("owner").as_string();
+            r.dlqArn = v.at("dlqArn").as_string();
+            r.dlqMaxReceive = v.at("dlqMaxReceive").as_int64();
+            r.messageCount = v.at("messageCount").as_int64();
+            r.retentionPeriod = v.at("retentionPeriod").as_int64();
+            r.maxMessageSize = v.at("maxMessageSize").as_int64();
+            r.visibilityTimeout = v.at("visibilityTimeout").as_int64();
+            r.size = v.at("size").as_int64();
+            r.delay = v.at("delay").as_int64();
+            r.invisible = v.at("invisible").as_int64();
+            r.delayed = v.at("delayed").as_int64();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetQueueDetailsResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetQueueDetailsResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueName", obj.queueName},
+                    {"queueUrl", obj.queueUrl},
+                    {"queueArn", obj.queueArn},
+                    {"owner", obj.owner},
+                    {"dlqArn", obj.dlqArn},
+                    {"dlqMaxReceive", obj.dlqMaxReceive},
+                    {"messageCount", obj.messageCount},
+                    {"retentionPeriod", obj.retentionPeriod},
+                    {"maxMessageSize", obj.maxMessageSize},
+                    {"visibilityTimeout", obj.visibilityTimeout},
+                    {"size", obj.size},
+                    {"delay", obj.delay},
+                    {"invisible", obj.invisible},
+                    {"delayed", obj.delayed},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

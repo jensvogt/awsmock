@@ -8,17 +8,17 @@ namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.lambda.monitoring.period");
-        _counterPeriod = configuration.GetValueInt("awsmock.modules.lambda.counter.period");
-        _removePeriod = configuration.GetValueInt("awsmock.modules.lambda.remove.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.lambda.monitoring.period");
+        _counterPeriod = configuration.GetValue<int>("awsmock.modules.lambda.counter.period");
+        _removePeriod = configuration.GetValue<int>("awsmock.modules.lambda.remove.period");
         log_debug << "Lambda remove period: " << _removePeriod << ", counterPeriod: " << _counterPeriod << ", monitoringPeriod: " << _monitoringPeriod;
 
         // Directories
-        _lambdaDir = configuration.GetValueString("awsmock.modules.lambda.data-dir");
+        _lambdaDir = configuration.GetValue<std::string>("awsmock.modules.lambda.data-dir");
         log_debug << "Lambda directory: " << _lambdaDir;
 
         // Create environment
-        _region = configuration.GetValueString("awsmock.region");
+        _region = configuration.GetValue<std::string>("awsmock.region");
 
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
@@ -111,7 +111,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda worker starting, count: " << lambdaList.size();
 
         // Get lifetime from configuration
-        const int lifetime = Core::Configuration::instance().GetValueInt("awsmock.modules.lambda.lifetime");
+        const int lifetime = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.lifetime");
         const auto expired = system_clock::now() - std::chrono::seconds(lifetime);
 
         // Loop over lambdas and remove expired instances

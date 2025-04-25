@@ -253,16 +253,20 @@ int main(const int argc, char *argv[]) {
     // Read configuration
     if (vm.contains("config")) {
         const auto configFilename = vm["config"].as<std::string>();
+        if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
+            std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
+            exit(1);
+        }
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 
     // Set the log level
     if (vm.contains("loglevel")) {
         auto value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        const std::string level = AwsMock::Core::Configuration::instance().GetValueString("awsmock.logging.level");
+        const std::string level = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level");
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
@@ -288,13 +292,13 @@ int main(const int argc, char *argv[]) {
     boost::system::error_code ec;
     if (vm.contains("foreground")) {
 
-        // Run as foreground process
+        // Run as a foreground process
         result = boost::application::launch<boost::application::common>(worker, app_context, ec);
         if (ec) {
             log_error << "Windows foreground process failed, error: " << ec.message() << ", code: " << ec.value();
         }
     } else {
-        // Run as Windows service
+        // Run as a Windows service
         result = boost::application::launch<boost::application::server>(worker, app_context, ec);
         if (ec) {
             log_error << "Windows service start failed, error: " << ec.message() << ", code: " << ec.value();

@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     CognitoServer::CognitoServer(Core::PeriodicScheduler &scheduler) : AbstractServer("cognito"), _module("cognito"), _scheduler(scheduler) {
 
         // Get HTTP configuration values
-        _monitoringPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.cognito.monitoring.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.cognito.monitoring.period");
 
         // Check module active
         if (!IsActive("cognito")) {

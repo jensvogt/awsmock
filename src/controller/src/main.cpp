@@ -112,7 +112,7 @@ int main(const int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
 
-    // Show version
+    // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
                   << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
@@ -120,7 +120,7 @@ int main(const int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
 
-    // Read configuration.
+    // Read the configuration file.
     AwsMock::Core::Configuration &configuration = AwsMock::Core::Configuration::instance();
     if (vm.contains("config")) {
         configuration.SetFilename(vm["config"].as<std::string>());
@@ -128,25 +128,25 @@ int main(const int argc, char *argv[]) {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
     }
 
-    // Set log level.
+    // Set the log level.
     if (vm.contains("loglevel")) {
         const std::string value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
         AwsMock::Core::LogStream::SetSeverity("info");
     }
 
-    // Set log file
+    // Set the log file
     if (vm.contains("logfile")) {
         const std::string value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.file", value);
+        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.file", value);
         AwsMock::Core::LogStream::AddFile();
     }
 
     // Check command
     bool found = false;
-    const std::string action = commands.front();
+    const std::string &action = commands.front();
     for (const std::string &s: allowedActions()) {
         if (s == action) {
             found = true;

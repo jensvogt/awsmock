@@ -67,7 +67,7 @@ namespace AwsMock::Database {
         bool IsActive(const std::string &name);
 
         /**
-         * @brief Check existence of name
+         * @brief Check the existence of name
          *
          * @param name name name
          * @return created name

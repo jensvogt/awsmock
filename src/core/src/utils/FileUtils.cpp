@@ -420,7 +420,7 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValueString("awsmock.magic-file");
+        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
         if (!FileExists(magicFile)) {
             log_error << "Magic database not found, path: " << magicFile;
@@ -467,7 +467,7 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValueString("awsmock.magic-file");
+        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
         // allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);

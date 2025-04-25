@@ -10,11 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/AttributeCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListQueueAttributeCountersResponse {
+    struct ListQueueAttributeCountersResponse final : Common::BaseCounter<ListQueueAttributeCountersResponse> {
 
         /**
          * List of attribute counters
@@ -26,26 +27,27 @@ namespace AwsMock::Dto::SQS {
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListQueueAttributeCountersResponse tag_invoke(boost::json::value_to_tag<ListQueueAttributeCountersResponse>, boost::json::value const &v) {
+            ListQueueAttributeCountersResponse r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.total = v.at("total").as_int64();
+            r.attributeCounters = boost::json::value_to<std::vector<AttributeCounter>>(v.at("messages"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListQueueAttributeCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueueAttributeCountersResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"messageCounters", boost::json::value_from(obj.attributeCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

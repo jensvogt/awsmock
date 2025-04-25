@@ -51,14 +51,7 @@ namespace AwsMock::Dto::S3 {
             r.prefix = v.at("prefix").as_string();
             r.pageSize = v.at("pageSize").as_int64();
             r.pageIndex = v.at("pageIndex").as_int64();
-
-            // Sort columns
-            for (const auto &sc: v.at("sortColumns").as_array()) {
-                Common::SortColumn sortColumn;
-                sortColumn.column = sc.at("column").as_string();
-                sortColumn.sortDirection = sc.at("sortDirection").as_int64();
-                r.sortColumns.emplace_back(sortColumn);
-            }
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }
 

@@ -19,12 +19,12 @@ namespace AwsMock::Service {
             if (action == "get-config") {
 
                 Core::Configuration &configuration = Core::Configuration::instance();
-                std::string host = configuration.GetValueString("awsmock.gateway.http.host");
-                std::string address = configuration.GetValueString("awsmock.gateway.http.address");
-                int port = configuration.GetValueInt("awsmock.gateway.http.port");
+                std::string host = configuration.GetValue<std::string>("awsmock.gateway.http.host");
+                std::string address = configuration.GetValue<std::string>("awsmock.gateway.http.address");
+                int port = configuration.GetValue<int>("awsmock.gateway.http.port");
                 std::string endpoint = "http://" + host + ":" + std::to_string(port);
                 Dto::Module::GatewayConfig config = {
-                        .region = configuration.GetValueString("awsmock.region"),
+                        .region = configuration.GetValue<std::string>("awsmock.region"),
                         .endpoint = endpoint,
                         .host = host,
                         .address = address,
@@ -32,12 +32,12 @@ namespace AwsMock::Service {
 #ifndef WIN32
                         .pid = getppid(),
 #endif
-                        .user = configuration.GetValueString("awsmock.user"),
-                        .accessId = configuration.GetValueString("awsmock.access.account-id"),
-                        .clientId = configuration.GetValueString("awsmock.access.client-id"),
-                        .dataDir = configuration.GetValueString("awsmock.data-dir"),
+                        .user = configuration.GetValue<std::string>("awsmock.user"),
+                        .accessId = configuration.GetValue<std::string>("awsmock.access.account-id"),
+                        .clientId = configuration.GetValue<std::string>("awsmock.access.client-id"),
+                        .dataDir = configuration.GetValue<std::string>("awsmock.data-dir"),
                         .version = configuration.GetVersion(),
-                        .databaseActive = configuration.GetValueBool("awsmock.mongodb.active")};
+                        .databaseActive = configuration.GetValue<bool>("awsmock.mongodb.active")};
                 return SendOkResponse(request, config.ToJson());
             }
             if (action == "list-modules") {

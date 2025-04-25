@@ -8,19 +8,18 @@ namespace AwsMock::Database {
 
     void ConnectionPool::Configure() {
         const Core::Configuration &configuration = Core::Configuration::instance();
-        const std::string name = configuration.GetValueString("awsmock.mongodb.name");
-        const std::string host = configuration.GetValueString("awsmock.mongodb.host");
-        const std::string user = configuration.GetValueString("awsmock.mongodb.user");
-        const std::string password = configuration.GetValueString("awsmock.mongodb.password");
-        const int port = configuration.GetValueInt("awsmock.mongodb.port");
-        const int poolSize = configuration.GetValueInt("awsmock.mongodb.pool-size");
+        const std::string name = configuration.GetValue<std::string>("awsmock.mongodb.name");
+        const std::string host = configuration.GetValue<std::string>("awsmock.mongodb.host");
+        const std::string user = configuration.GetValue<std::string>("awsmock.mongodb.user");
+        const std::string password = configuration.GetValue<std::string>("awsmock.mongodb.password");
+        const int port = configuration.GetValue<int>("awsmock.mongodb.port");
+        const int poolSize = configuration.GetValue<int>("awsmock.mongodb.pool-size");
 
         // MongoDB URL
-        std::string tmp = "mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize);
-        mongocxx::uri _uri(tmp);
+        mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
         log_info << "Using MongoDB database url: " << _uri.to_string();
 
-        // Create connection pool
+        // Create a connection pool
         _instance = std::make_shared<mongocxx::instance>();
         _pool = std::make_shared<mongocxx::pool>(_uri);
         log_info << "MongoDB database initialized";

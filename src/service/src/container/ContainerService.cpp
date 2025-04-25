@@ -25,14 +25,14 @@ namespace AwsMock::Service {
 
     ContainerService::ContainerService() {
         // Get network mode
-        _networkName = Core::Configuration::instance().GetValueString("awsmock.docker.network-name");
-        _containerPort = Core::Configuration::instance().GetValueString("awsmock.docker.container.port");
-        _isDocker = Core::Configuration::instance().GetValueBool("awsmock.docker.active");
+        _networkName = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
+        _containerPort = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.container.port");
+        _isDocker = Core::Configuration::instance().GetValue<bool>("awsmock.docker.active");
 #ifdef WIN32
-        _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.docker.socket");
+        _containerSocketPath = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket");
         _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
 #else
-        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : Core::Configuration::instance().GetValueString("awsmock.podman.socket");
+        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
         _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
 #endif
     }
@@ -527,8 +527,8 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::WaitForContainer(const std::string &containerId) const {
-        const int checkTime = Core::Configuration::instance().GetValueInt("awsmock.docker.container.checkTime");
-        const int maxWaitTime = Core::Configuration::instance().GetValueInt("awsmock.docker.container.maxWaitTime");
+        const int checkTime = Core::Configuration::instance().GetValue<int>("awsmock.docker.container.checkTime");
+        const int maxWaitTime = Core::Configuration::instance().GetValue<int>("awsmock.docker.container.maxWaitTime");
         const auto deadline = system_clock::now() + std::chrono::seconds{maxWaitTime};
         while (!IsContainerRunning(containerId) && system_clock::now() < deadline) {
             std::this_thread::sleep_for(std::chrono::milliseconds(checkTime));
@@ -602,7 +602,7 @@ namespace AwsMock::Service {
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
-        std::string supportedRuntime = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.runtime." + providedRuntime);
+        std::string supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
@@ -677,9 +677,9 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetNetworkName() {
-        if (Core::Configuration::instance().GetValueBool("awsmock.docker.active")) {
-            return Core::Configuration::instance().GetValueString("awsmock.docker.network-mode");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.docker.active")) {
+            return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-mode");
         }
-        return Core::Configuration::instance().GetValueString("awsmock.podman.network-mode");
+        return Core::Configuration::instance().GetValue<std::string>("awsmock.podman.network-mode");
     }
 }// namespace AwsMock::Service

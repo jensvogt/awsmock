@@ -29,11 +29,11 @@ namespace AwsMock::Service {
         void SetUp() override {
 
             // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
+            _region = _configuration.GetValue<std::string>("awsmock.region");
 
             // Define endpoint. This is the endpoint of the SQS server, not the gateway
-            _configuration.SetValueInt("awsmock.gateway.http.port", TEST_PORT + 1);
-            _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+            _configuration.SetValue<int>("awsmock.gateway.http.port", TEST_PORT + 1);
+            _configuration.SetValue<std::string>("awsmock.gateway.http.host", "localhost");
 
             // Base URL
             _baseUrl = "/api/dynamodb/";

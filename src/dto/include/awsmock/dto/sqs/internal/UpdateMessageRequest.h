@@ -9,11 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
+
     /**
      * @brief Update message request
      *
@@ -76,7 +76,7 @@ namespace AwsMock::Dto::SQS {
      * }
      * @endcode
      */
-    struct UpdateMessageRequest {
+    struct UpdateMessageRequest final : Common::BaseCounter<UpdateMessageRequest> {
         /**
          * Message ID
          */
@@ -87,33 +87,24 @@ namespace AwsMock::Dto::SQS {
          */
         MessageAttributeList messageAttributes;
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend UpdateMessageRequest tag_invoke(boost::json::value_to_tag<UpdateMessageRequest>, boost::json::value const &v) {
+            UpdateMessageRequest r;
+            r.messageId = v.at("messageId").as_string();
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, UpdateMessageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateMessageRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"messageId", obj.messageId},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+            };
+        }
     };
 }// namespace AwsMock::Dto::SQS
 
