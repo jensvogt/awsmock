@@ -18,7 +18,7 @@ add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SO
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx boost_filesystem boost_program_options
-        boost_url boost_thread boost_locale boost_log boost_log_setup boost_process yaml-cpp ssl crypto archive magic
+        boost_url boost_thread boost_locale boost_log boost_log_setup boost_process ssl crypto archive magic
         gtest gmock)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})
