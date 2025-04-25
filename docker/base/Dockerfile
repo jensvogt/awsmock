@@ -21,14 +21,6 @@ RUN cd /usr/src && \
     cmake --build . -j16 && \
     cmake --install .
 
-# Yaml-CPP
-#RUN cd /usr/src && \
-#    git clone https://github.com/jbeder/yaml-cpp.git && \
-#    cd yaml-cpp && \
-#    cmake . && \
-#    cmake --build . --config Release -j16 && \
-#    cmake --install . --prefix /usr/local
-
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
     git clone -b releases/v3.10 https://github.com/mongodb/mongo-cxx-driver.git && \
@@ -37,7 +29,7 @@ RUN cd /usr/src && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --prefix /usr/local
 
-# Install boost 1.87
+# Install boost 1.88
 RUN cd /usr/src && \
     wget -nv https://archives.boost.io/beta/1.88.0.beta1/source/boost_1_88_0_b1.tar.gz && \
     tar -xzf boost_1_88_0_b1.tar.gz && \
