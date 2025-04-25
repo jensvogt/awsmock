@@ -8,7 +8,7 @@ if (WIN32)
     target_include_directories(${BINARY} PUBLIC ./include ../db/include ../dto/include ../service/include
             d:/work/Boost.Application/include ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static yaml-cpp.lib
+    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
             libssl.lib libcrypto.lib archive_static.lib libmagic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
             "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-s-x64-1_88.lib>"
             "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-sgd-x64-1_88.lib>"
@@ -34,8 +34,8 @@ else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PUBLIC ./include ../dto/include ../db/include ../core/include ../service/include)
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process
-            yaml-cpp ssl crypto archive magic ssh)
+            boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process ssl crypto
+            archive magic ssh)
     if (APPLE)
         add_link_options("-rpath /usr/local/lib")
         set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")

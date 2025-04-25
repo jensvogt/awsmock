@@ -22,12 +22,12 @@ RUN cd /usr/src && \
     cmake --install .
 
 # Yaml-CPP
-RUN cd /usr/src && \
-    git clone https://github.com/jbeder/yaml-cpp.git && \
-    cd yaml-cpp && \
-    cmake . && \
-    cmake --build . --config Release -j16 && \
-    cmake --install . --prefix /usr/local
+#RUN cd /usr/src && \
+#    git clone https://github.com/jbeder/yaml-cpp.git && \
+#    cd yaml-cpp && \
+#    cmake . && \
+#    cmake --build . --config Release -j16 && \
+#    cmake --install . --prefix /usr/local
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \

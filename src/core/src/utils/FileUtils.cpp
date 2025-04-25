@@ -104,7 +104,7 @@ namespace AwsMock::Core {
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
         DirUtils::EnsureDirectory(dir);
         const boost::filesystem::path temp = boost::filesystem::unique_path();
-        return dir + "/" + temp.string() + "." + extension;
+        return dir + separator() + temp.string() + "." + extension;
     }
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
@@ -190,7 +190,7 @@ namespace AwsMock::Core {
             char buffer[BUFFER_LEN];
             FILE *src = fopen(it.c_str(), "rb");
 
-            int n;
+            size_t n;
             while ((n = fread(buffer, 1, BUFFER_LEN, src)) > 0) {
                 fwrite(buffer, 1, n, dest);
                 copied += n;
@@ -275,8 +275,8 @@ namespace AwsMock::Core {
 
 
         // Get the handle of the file object.
-        HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, nullptr,
-                                  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        const HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, nullptr,
+                                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         // Check GetLastError for CreateFile error code.
         if (hFile == INVALID_HANDLE_VALUE) {

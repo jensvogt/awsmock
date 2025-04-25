@@ -5,7 +5,7 @@
 #ifndef AWSMOCK_CORE_YAML_CONFIGURATION_H
 #define AWSMOCK_CORE_YAML_CONFIGURATION_H
 
-#ifdef _WIN32
+/*#ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
@@ -13,13 +13,15 @@
 #include <boost/asio.hpp>
 #include <windows.h>
 #endif
-
+*/
 
 // Standard C++ includes
+#include <ranges>
 #include <string>
 
-// YAML-cpp includes
-#include <yaml-cpp/yaml.h>
+// Boost includes
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
@@ -29,66 +31,12 @@
 #include <awsmock/core/exception/CoreException.h>
 
 #ifdef _WIN32
-#define DEFAULT_MAGIC_FILE "C:/Program Files (x86)/awsmock/etc/magic.mgc"
+#define DEFAULT_MAGIC_FILE "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc"
 #else
 #define DEFAULT_MAGIC_FILE "/usr/local/awsmock/etc/magic.mgc"
 #endif
 
 namespace AwsMock::Core {
-
-    // Node lookup
-    template<typename Iter>
-    YAML::Node lookup(const YAML::Node &node, Iter start, Iter end) {
-        if (start == end) {
-            return node;
-        }
-        return lookup(node[*start], next(start), end);
-    }
-
-    template<typename T>
-    void SetValueByPath(YAML::Node &_yamlConfig, const std::string &key, T value) {
-        try {
-            const std::vector<std::string> tags = StringUtils::Split(key, '.');
-            const int numTags = static_cast<int>(tags.size());
-
-            // Reads root node.
-            assert(numTags > 0);
-            assert(_yamlConfig);
-            YAML::Node *parentNode = &_yamlConfig;
-
-            // Determines index of first non-existing node.
-            int i = 0;
-            for (; i < numTags - 1; i++) {
-                if (const std::string &tag = tags.at(i); parentNode && (*parentNode)[tag]) {
-                    auto childNode = (*parentNode)[tag];
-                    parentNode = &childNode;
-                } else {
-                    break;
-                }
-            }
-
-            // Note: necessary because *parentNode will later point to a different node due to lib behavior .
-            YAML::Node lastExistingNode = *parentNode;
-
-            // Sets node value and creates missing nodes.
-            if (i == numTags - 1) {
-                lastExistingNode[tags.back()] = value;
-            } else {
-                YAML::Node newNode;
-                newNode = value;
-                for (int j = numTags - 1; j > i; j--) {
-                    YAML::Node tmpNode;
-                    tmpNode[tags.at(j)] = newNode;
-                    newNode = tmpNode;
-                }
-                // Inserts missing nodes.
-                lastExistingNode[tags.at(i)] = newNode;
-            }
-        } catch (YAML::Exception &e) {
-            //log_error << "YAML exception: " << e.msg.c_str() << ", key: " << key.c_str();
-            std::cerr << "YAML exception: " << e.msg << ", key: " << key << std::endl;
-        }
-    }
 
     /**
      * @brief Configuration handler.
@@ -134,7 +82,7 @@ namespace AwsMock::Core {
          * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-         * key, the key is preserved, otherwise the default value is taken. </p>
+         * key, the key is preserved, otherwise the default value is taken.</p>
          *
          * @param key configuration key
          * @param envProperty environment variable name
@@ -146,7 +94,7 @@ namespace AwsMock::Core {
          * @brief Define a new string array property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-         * key, the key is preserved, otherwise the default value is taken. </p>
+         * key, the key is preserved, otherwise the default value is taken.</p>
          *
          * @param key configuration key
          * @param envProperty environment variable name
@@ -158,7 +106,7 @@ namespace AwsMock::Core {
          * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-         * key, the key is preserved, otherwise the default value is taken. </p>
+         * key, the key is preserved, otherwise the default value is taken.</p>
          *
          * @param key configuration key
          * @param envProperty environment variable name
@@ -170,7 +118,7 @@ namespace AwsMock::Core {
          * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-         * key, the key is preserved, otherwise the default value is taken. </p>
+         * key, the key is preserved, otherwise the default value is taken.</p>
          *
          * @param key configuration key
          * @param envProperty environment variable name
@@ -182,7 +130,7 @@ namespace AwsMock::Core {
          * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-         * key, the key is preserved, otherwise the default value is taken. </p>
+         * key, the key is preserved, otherwise the default value is taken.</p>
          *
          * @param key configuration key
          * @param envProperty environment variable name
@@ -194,7 +142,19 @@ namespace AwsMock::Core {
          * @brief Define a new configuration property.
          *
          * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
-         * key, the key is preserved, otherwise the default value is taken. </p>
+         * key, the key is preserved, otherwise the default value is taken.</p>
+         *
+         * @param key configuration key
+         * @param envProperty environment variable name
+         * @param defaultValue integer default value
+         */
+        void DefineFloatProperty(const std::string &key, const std::string &envProperty, float defaultValue);
+
+        /**
+         * @brief Define a new configuration property.
+         *
+         * <p>If the system environment has a value for the given configuration key, the environment value is set. If the configuration has already a value for the given
+         * key, the key is preserved, otherwise the default value is taken.</p>
          *
          * @param key configuration key
          * @param envProperty environment variable name
@@ -388,7 +348,7 @@ namespace AwsMock::Core {
          * @param value configuration value
          * @return value with replaced environment variables
          */
-        static std::string ReplaceEnvironmentVariables(std::string &value);
+        static std::string ReplaceEnvironmentVariables(const std::string &value);
 
         /**
          * @brief Checks existence of a property key
@@ -421,9 +381,9 @@ namespace AwsMock::Core {
         friend std::ostream &operator<<(std::ostream &, const Configuration &);
 
         /**
-         * YAML config
+         * Boost property tree
          */
-        YAML::Node _yamlConfig;
+        boost::property_tree::ptree _treeConfiguration;
     };
 
 }// namespace AwsMock::Core

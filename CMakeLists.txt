@@ -77,7 +77,7 @@ install(FILES dist/etc/magic.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
 install(FILES dist/etc/ssh_host_key DESTINATION ${CMAKE_INSTALL_PREFIX}/etc)
 
 if (WIN32)
-    install(FILES dist/etc/awsmock_win32.yml DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.yml)
+    install(FILES dist/etc/awsmock_win32.json DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.json)
 elseif (LINUX)
     install(FILES dist/etc/awsmock_linux.yml DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME awsmock.yml)
     install(FILES dist/etc/systemd/system/awsmock.service DESTINATION /etc/systemd/system)

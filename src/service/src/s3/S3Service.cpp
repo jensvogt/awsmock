@@ -760,11 +760,11 @@ namespace AwsMock::Service {
             try {
 
                 // Get object from database
-                Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
+                const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
                 // Delete from database
                 _database.DeleteObject(object);
-                log_debug << "Database object deleted, bucket: " + request.bucket + " key: " << request.key;
+                log_debug << "Database object deleted, bucket: " + request.bucket + ", key: " << request.key;
 
                 // Delete file system object
                 DeleteObject(object.bucket, object.key, object.internalName);
@@ -1129,7 +1129,8 @@ namespace AwsMock::Service {
             log_debug << "File system object deleted, filename: " << filename;
 
             if (bucket == transferBucket) {
-                filename = transferDir + Core::FileUtils::separator() + key;
+                filename = key;
+                filename = transferDir + Core::FileUtils::separator() + Core::FileUtils::SetFileSeparator(filename);
                 Core::FileUtils::DeleteFile(filename);
                 log_debug << "Transfer file system object deleted, filename: " << filename;
             }
@@ -1140,8 +1141,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "delete_bucket");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "delete_bucket");
 
-        const std::string dataDir = Core::Configuration::instance().GetValueString("awsmock.data-dir");
-        const std::string dataS3Dir = dataDir + Core::FileUtils::separator() + "s3";
+        const std::string dataS3Dir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         if (const std::string bucketDir = dataS3Dir + Core::FileUtils::separator() + bucket; Core::DirUtils::DirectoryExists(bucketDir)) {

@@ -1,7 +1,7 @@
 // ===================================================================================
 //
 // Created by vogje01 on 21/12/2022.
-// Copyright 2022 -2024 Dr. Jens Vogt
+// Copyright 2022 -2025 Dr. Jens Vogt
 //
 // This file is part of aws-mock.
 //
@@ -46,10 +46,10 @@
 #define DEFAULT_LOG_PREFIX std::string("awsmock")
 #define DEFAULT_LOG_LEVEL std::string("info")
 #ifdef WIN32
-#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.yml")
+#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.json")
 #define DEFAULT_SERVICE_PATH std::string("C:\\Program Files (x86)\\awsmock\\bin\\awsmockmgr.exe")
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
 #endif
 
