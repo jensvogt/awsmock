@@ -34,7 +34,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, BasenameTest) {
 
         // arrange
-        const std::string fileName = tempDir + "/" + "example.gif";
+        const std::string fileName = tempDir + Core::FileUtils::separator() + "example.gif";
 
         // act
         const std::string result = FileUtils::GetBasename(fileName);

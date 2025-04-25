@@ -6,25 +6,16 @@
 
 namespace AwsMock::Core {
 
-#ifdef _WIN32
     Configuration::Configuration() {
         Initialize();
     }
-#else
-    Configuration::Configuration() : _yamlConfig(YAML::Null) {
-        Initialize();
-    }
-#endif
 
-    Configuration::Configuration(const std::string &basename) : _yamlConfig(YAML::Null) {
+    Configuration::Configuration(const std::string &basename) {
         Initialize();
         SetFilename(basename);
     }
 
     void Configuration::Initialize() {
-
-        // Root
-        SetValueByPath(_yamlConfig, "awsmock", YAML::Null);
 
         // General
         DefineStringProperty("awsmock.region", "AWSMOCK_REGION", "eu-central-1");
@@ -103,6 +94,15 @@ namespace AwsMock::Core {
         DefineStringProperty("awsmock.modules.lambda.runtime.java11", "AWSMOCK_MODULES_LAMBDA_JAVA11", "public.ecr.aws/lambda/java:11");
         DefineStringProperty("awsmock.modules.lambda.runtime.java17", "AWSMOCK_MODULES_LAMBDA_JAVA17", "public.ecr.aws/lambda/java:17");
         DefineStringProperty("awsmock.modules.lambda.runtime.java21", "AWSMOCK_MODULES_LAMBDA_JAVA21", "public.ecr.aws/lambda/java:21");
+        DefineStringProperty("awsmock.modules.lambda.runtime.python3-8", "AWSMOCK_MODULES_LAMBDA_PYTHON38", "public.ecr.aws/lambda/python:3.8");
+        DefineStringProperty("awsmock.modules.lambda.runtime.python3-9", "AWSMOCK_MODULES_LAMBDA_PYTHON39", "public.ecr.aws/lambda/python:3.9");
+        DefineStringProperty("awsmock.modules.lambda.runtime.python3-10", "AWSMOCK_MODULES_LAMBDA_PYTHON310", "public.ecr.aws/lambda/python:3.10");
+        DefineStringProperty("awsmock.modules.lambda.runtime.python3-11", "AWSMOCK_MODULES_LAMBDA_PYTHON311", "public.ecr.aws/lambda/python:3.11");
+        DefineStringProperty("awsmock.modules.lambda.runtime.nodejs20-x", "AWSMOCK_MODULES_LAMBDA_NODES20", "public.ecr.aws/lambda/nodejs:20");
+        DefineStringProperty("awsmock.modules.lambda.runtime.provided-al2", "AWSMOCK_MODULES_LAMBDA_PROVIDES_AL2", "public.ecr.aws/lambda/provided:al2");
+        DefineStringProperty("awsmock.modules.lambda.runtime.provided-al2023", "AWSMOCK_MODULES_LAMBDA_PROVIDED_2023", "public.ecr.aws/lambda/provided:al2023");
+        DefineStringProperty("awsmock.modules.lambda.runtime.provided-latest", "AWSMOCK_MODULES_LAMBDA_PROVIDED_LATEST", "public.ecr.aws/lambda/provided:latest");
+        DefineStringProperty("awsmock.modules.lambda.runtime.go", "AWSMOCK_MODULES_LAMBDA_GO", "public.ecr.aws/lambda/provided:al2023");
 
         // Transfer server
         DefineBoolProperty("awsmock.modules.transfer.active", "AWSMOCK_MODULES_TRANSFER_ACTIVE", true);
@@ -220,7 +220,7 @@ namespace AwsMock::Core {
             AddToEnvList(key, value);
         }
         value = ReplaceEnvironmentVariables(value);
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.put<std::string>(key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
@@ -230,9 +230,15 @@ namespace AwsMock::Core {
             value = SystemUtils::GetEnvironmentVariableValue(envProperty);
             AddToEnvList(key, value);
         }
-        std::vector<std::string> values = StringUtils::Split(value, ';');
-        for (auto &v: values) { value = ReplaceEnvironmentVariables(v); }
-        SetValueByPath(_yamlConfig, key, values);
+
+        boost::property_tree::ptree array;
+        for (const std::vector<std::string> values = StringUtils::Split(value, ';'); auto &v: values) {
+            value = ReplaceEnvironmentVariables(v);
+            boost::property_tree::ptree child;
+            child.put("", v);
+            array.push_back(std::make_pair("", child));
+        }
+        _treeConfiguration.add_child(key, array);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
@@ -242,17 +248,17 @@ namespace AwsMock::Core {
             value = StringUtils::Equals(SystemUtils::GetEnvironmentVariableValue(envProperty), "true");
             AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.put<bool>(key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
     void Configuration::DefineIntProperty(const std::string &key, const std::string &envProperty, const int defaultValue) {
-        std::string value = std::to_string(defaultValue);
+        int value = defaultValue;
         if (SystemUtils::HasEnvironmentVariable(envProperty)) {
             value = std::stoi(SystemUtils::GetEnvironmentVariableValue(envProperty));
             AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.put<int>(key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
@@ -262,7 +268,17 @@ namespace AwsMock::Core {
             value = std::stol(SystemUtils::GetEnvironmentVariableValue(envProperty));
             AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.put<long>(key, value);
+        log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
+    }
+
+    void Configuration::DefineFloatProperty(const std::string &key, const std::string &envProperty, const float defaultValue) {
+        float value = defaultValue;
+        if (SystemUtils::HasEnvironmentVariable(envProperty)) {
+            value = std::stod(SystemUtils::GetEnvironmentVariableValue(envProperty));
+            AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
+        }
+        _treeConfiguration.put<float>(key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
@@ -272,7 +288,7 @@ namespace AwsMock::Core {
             value = std::stod(SystemUtils::GetEnvironmentVariableValue(envProperty));
             AddToEnvList(key, SystemUtils::GetEnvironmentVariableValue(envProperty));
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.put<double>(key, value);
         log_trace << "Defined property, key: " << key << " property: " << envProperty << " default: " << defaultValue;
     }
 
@@ -298,7 +314,7 @@ namespace AwsMock::Core {
         _filename = filename;
 
         // Parse YAML file
-        _yamlConfig = YAML::LoadFile(filename);
+        read_json(_filename, _treeConfiguration);
 
         // Reapply environment settings
         ApplyEnvSettings();
@@ -309,13 +325,13 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.get_child(key).put_value<std::string>(value);
         log_trace << "Value set, key: " << key;
     }
 
     void Configuration::SetValueBool(const std::string &key, const bool value) {
         if (!HasProperty(key)) { throw CoreException("Property not found, key: " + key); }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.get_child(key).put_value<bool>(value);
         log_trace << "Value set, key: " << key;
     }
 
@@ -324,7 +340,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.get_child(key).put_value<int>(value);
         log_trace << "Value set, key: " << key;
     }
 
@@ -333,7 +349,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.get_child(key).put_value<long>(value);
         log_trace << "Value set, key: " << key;
     }
 
@@ -342,7 +358,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.get_child(key).put_value<float>(value);
         log_trace << "Value set, key: " << key;
     }
 
@@ -351,7 +367,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        SetValueByPath(_yamlConfig, key, value);
+        _treeConfiguration.get_child(key).put_value<double>(value);
         log_trace << "Value set, key: " << key;
     }
 
@@ -360,8 +376,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        auto value = lookup(_yamlConfig, paths.begin(), paths.end()).as<std::string>();
+        const auto value = _treeConfiguration.get_child(key).get_value<std::string>();
         return ReplaceEnvironmentVariables(value);
     }
 
@@ -370,10 +385,10 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        auto values = lookup(_yamlConfig, paths.begin(), paths.end()).as<std::vector<std::string>>();
-        for (auto &v: values) { v = ReplaceEnvironmentVariables(v); }
-        return values;
+        std::vector<std::string> r;
+        for (const auto &val: _treeConfiguration.get_child(key) | std::views::values)
+            r.push_back(val.get_value<std::string>());
+        return r;
     }
 
     int Configuration::GetValueInt(const std::string &key) const {
@@ -381,8 +396,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<int>();
+        return _treeConfiguration.get_child(key).get_value<int>();
     }
 
     long Configuration::GetValueLong(const std::string &key) const {
@@ -390,8 +404,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<long>();
+        return _treeConfiguration.get_child(key).get_value<long>();
     }
 
     bool Configuration::GetValueBool(const std::string &key) const {
@@ -399,8 +412,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<bool>();
+        return _treeConfiguration.get_child(key).get_value<bool>();
     }
 
     float Configuration::GetValueFloat(const std::string &key) const {
@@ -408,8 +420,7 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<float>();
+        return _treeConfiguration.get_child(key).get_value<float>();
     }
 
     double Configuration::GetValueDouble(const std::string &key) const {
@@ -417,13 +428,16 @@ namespace AwsMock::Core {
             log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        return lookup(_yamlConfig, paths.begin(), paths.end()).as<double>();
+        return _treeConfiguration.get_child(key).get_value<double>();
     }
 
-    std::string Configuration::GetAppName() { return PROJECT_NAME; }
+    std::string Configuration::GetAppName() {
+        return PROJECT_NAME;
+    }
 
-    std::string Configuration::GetVersion() { return PROJECT_VERSION; }
+    std::string Configuration::GetVersion() {
+        return PROJECT_VERSION;
+    }
 
     std::string Configuration::ToString() const {
         std::stringstream ss;
@@ -431,12 +445,14 @@ namespace AwsMock::Core {
         return ss.str();
     }
 
-    void Configuration::Dump() const { std::cerr << _yamlConfig << std::endl; }
+    void Configuration::Dump() const {
+        std::ostringstream oss;
+        write_json(oss, _treeConfiguration);
+        std::cerr << oss.str() << std::endl;
+    }
 
     void Configuration::WriteFile(const std::string &filename) const {
-        std::ofstream ofs(filename);
-        ofs << _yamlConfig;
-        ofs.close();
+        write_json(filename, _treeConfiguration);
     }
 
     bool Configuration::HasValue(const std::string &key) const {
@@ -450,14 +466,12 @@ namespace AwsMock::Core {
     }
 
     bool Configuration::HasProperty(const std::string &key) const {
-        std::vector<std::string> paths = StringUtils::Split(key, '.');
-        YAML::Node traverse = _yamlConfig;
-        for (std::string &path_element: paths) { traverse.reset(traverse[path_element]); }
-        return traverse.IsDefined();
+        return _treeConfiguration.get_child(key).get_value_optional<std::string>().has_value();
     }
 
-    std::string Configuration::ReplaceEnvironmentVariables(std::string &value) {
+    std::string Configuration::ReplaceEnvironmentVariables(const std::string &value) {
 
+        std::string val = value;
         if (StringUtils::Contains(value, "$")) {
             size_t offset = 0;
             static std::regex envRegex(R"(\$(\w+|\{\w+\}))", std::regex::ECMAScript);
@@ -479,7 +493,7 @@ namespace AwsMock::Core {
 
                     // Since we're manipulating the string, do a new find instead of using original match info
                     if (const size_t pos = value.find(match, offset); pos != std::string::npos) {
-                        value.replace(pos, match.length(), temp);
+                        val.replace(pos, match.length(), temp);
                         offset = pos + value.length();
                     }
                 } else {
@@ -487,11 +501,13 @@ namespace AwsMock::Core {
                 }
             }
         }
-        return value;
+        return val;
     }
 
     std::ostream &operator<<(std::ostream &os, const Configuration &s) {
-        os << "Configuration=" + Dump(s._yamlConfig);
+        std::ostringstream oss;
+        write_json(oss, s._treeConfiguration);
+        os << "Configuration=" << oss.str();
         return os;
     }
 }// namespace AwsMock::Core

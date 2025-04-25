@@ -45,7 +45,7 @@ namespace AwsMock::Service {
     void TransferServer::CreateDirectories(const std::string &userName) {
         const std::string basePath = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
         for (const auto &directory: Core::Configuration::instance().GetValueStringArray("awsmock.modules.transfer.directories")) {
-            if (std::string dirPath = basePath + "/" + userName + "/" + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
+            if (std::string dirPath = basePath + Core::FileUtils::separator() + userName + Core::FileUtils::separator() + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
                 Core::DirUtils::MakeDirectory(dirPath, true);
                 log_debug << "Created directory, path: " << dirPath;
             }
@@ -114,7 +114,7 @@ namespace AwsMock::Service {
         // Add users
         for (const auto &user: server.users) {
 
-            // Create hom directory
+            // Create home directory
             std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
             Core::DirUtils::EnsureDirectory(homeDir);
 
@@ -132,6 +132,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::StopTransferServer(Database::Entity::Transfer::Transfer &server) {
+
         // Create transfer manager thread
         const std::shared_ptr<FtpServer::FtpServer> ftpServer = _transferServerList[server.serverId];
         ftpServer->stop();

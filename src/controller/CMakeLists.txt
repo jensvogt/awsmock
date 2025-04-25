@@ -25,12 +25,12 @@ else ()
                 ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
                 boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process
-                yaml-cpp ssl crypto archive magic systemd)
+                ssl crypto archive magic systemd)
     else ()
         # systemd not available
         target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
                 boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process
-                yaml-cpp ssl crypto archive magic)
+                ssl crypto archive magic)
         target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
                 ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
     endif ()

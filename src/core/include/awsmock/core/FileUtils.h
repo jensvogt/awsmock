@@ -333,6 +333,13 @@ namespace AwsMock::Core {
          *
          * @return file path separator
          */
+        static std::string SetFileSeparator(std::string &filePath);
+
+        /**
+         * @brief File path separator
+         *
+         * @return file path separator
+         */
         static std::string separator();
 
         /**
@@ -341,8 +348,17 @@ namespace AwsMock::Core {
         const static std::map<std::string, std::string> MimeTypes;
     };
 
+    inline std::string FileUtils::SetFileSeparator(std::string &filePath) {
+        boost::replace_all(filePath, "\\", "/");
+        return filePath;
+    }
+
     inline std::string FileUtils::separator() {
+#ifdef _WIN32
+        return "\\";
+#else
         return "/";
+#endif
     }
 
 }// namespace AwsMock::Core

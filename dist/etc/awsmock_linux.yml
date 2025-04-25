@@ -99,9 +99,9 @@ awsmock:
       sync:
         # S3 object to DB synchronization
         object:
-          period: 300                                                 # S3 file to DB synchronization period in seconds, default:300s
+          period: 300                                                 # S3 file to DB synchronization period in seconds, default: 300s
         bucket:
-          period: 300                                                 # S3 DB to file synchronization period in seconds, default:300s
+          period: 60                                                  # S3 DB to file synchronization period in seconds, default: 60s
     # SQS module
     sqs:
       active: true                                                    # SQS module activation flag

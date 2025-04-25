@@ -149,7 +149,7 @@ operating system based limitations.
 #### Minimum Requirements:
 
 - GNU Compiler Collection (GCC) 4.9 or later or Clang 3.3 or later (Linux)
-- yaml-cpp, jwt-cpp, prometheus-cpp, boost
+- jwt-cpp, prometheus-cpp, boost
 - MongoDB C and CXX driver (see [MongoDB C++ driver](https://www.mongodb.com/docs/drivers/cxx/))
 - Development releases of boost, libz, libssl, libcrypto, libarchive, libmagic, libssh
 - 4GB of RAM.

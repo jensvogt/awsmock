@@ -130,7 +130,7 @@ namespace AwsMock::Core {
             logCount = Configuration::instance().GetValueInt("awsmock.logging.file-count");
         }
         file_sink = add_file_log(
-                boost::log::keywords::file_name = logDir + "/" + logPrefix + "-%N.log",
+                boost::log::keywords::file_name = logDir + FileUtils::separator() + logPrefix + "-%N.log",
                 boost::log::keywords::rotation_size = logSize,
                 boost::log::keywords::max_files = logCount,
                 boost::log::keywords::format = &LogFormatter);

@@ -40,7 +40,7 @@ namespace AwsMock::Core {
                 log_error << archive_error_string(a);
                 return;
             }
-            archive_entry_set_pathname(entry, (directory + "/" + archive_entry_pathname(entry)).c_str());
+            archive_entry_set_pathname(entry, (directory + FileUtils::separator() + archive_entry_pathname(entry)).c_str());
             r = archive_write_header(ext, entry);
             if (r < ARCHIVE_OK) {
                 log_error << archive_error_string(ext);
@@ -96,7 +96,7 @@ namespace AwsMock::Core {
         StringUtils::Replace(entryName, directory, "");
         log_trace << "Removed directory, entryName: " << entryName << ", filename: " << fileName << ", directory: " << directory;
 
-        struct stat st {};
+        struct stat st{};
         stat(fileName.c_str(), &st);
         archive_entry *entry = archive_entry_new();
         archive_entry_set_pathname(entry, entryName.c_str());

@@ -9,14 +9,12 @@ awsmock:
     secret-access-key: none                                           # AWS access secret
     account-id: 000000000000                                          # AWS account ID
     client-id: 00000000                                               # AWS client ID
-  temp-dir: C:/Program Files (x86)/awsmock/data/tmp                   # General temp directory
-  data-dir: C:/Program Files (x86)/awsmock/data                       # General data directory
+  temp-dir: C:\Program Files (x86)\awsmock\data\tmp                   # General temp directory
+  data-dir: C:\Program Files (x86)\awsmock\data                       # General data directory
   dockerized: false                                                   # Dockerized flag
-  magic-file: C:/Program Files (x86)/awsmock/magic.mgc                # Libmagic database
+  magic-file: C:\Program Files (x86)\awsmock\etc\magic.mgc                # Libmagic database
   json: # JSON settings
     pretty: true                                                      # JSON pretty print
-  magic: # LibMagic settings
-    file: C:/Program Files (x86)/awsmock/etc/magic.mgc                # LibMagic database
   aws: # AWS settings
     signature: # AWS signature settings
       verify: false                                                   # Verify AWS signature
@@ -26,11 +24,11 @@ awsmock:
     port: 4567                                                        # Port number
     workers: 20                                                       # Number of worker threads
     timeout: 900                                                      # HTTP timeout
-    doc-root: C:/Program Files (x86)/awsmock/frontend                 # Document root directory
+    doc-root: C:\Program Files (x86)\awsmock\frontend                 # Document root directory
   autoload: # BSON auto load on startup
     active: true                                                      # Autoload activation flag
-    dir: C:/Program Files (x86)/awsmock/init                          # Autoload directory, has priority over autoload file
-    file: C:/Program Files (x86)/awsmock/init/init.json               # Autoload file
+    dir: C:\Program Files (x86)\awsmock\init                          # Autoload directory, has priority over autoload file
+    file: C:\Program Files (x86)\awsmock\init\init.json               # Autoload file
   docker: # Docker settings
     active: true                                                      # Docker daemon activation flag
     network-mode: local                                               # Docker network mode, default: local
@@ -42,7 +40,7 @@ awsmock:
       port: 8080                                                      # Docker container default port
       maxWaitTime: 5                                                  # Maximal waiting time for the container running checks in seconds, default: 5s
       checkTime: 500                                                  # Check interval for the waiting time in milliseconds, default: 500ms
-    socket: http://localhost:2375                                      # Docker REST API domain/HTTP socket, default: /var/run/docker.sock (Linux, MacOS), tcp://localhost:2375 (Windows)
+    socket: http://localhost:2375                                      # Docker REST API domain\HTTP socket, default: \var\run\docker.sock (Linux, MacOS), tcp:\\localhost:2375 (Windows)
   podman: # Podman settings
     active: false                                                     # Podman daemon activation flag
     network-mode: podman                                              # Podman network mode, default: local
@@ -52,7 +50,7 @@ awsmock:
       temp-size: 10240                                                # Docker container tmp size
     container: # Podman container defaults
       port: 8080                                                      # Docker container default port
-    socket: http://localhost:2375                                     # Docker REST API domain/HTTP socket, default: /var/run/docker.sock (Linux, MacOS), tcp://localhost:2375 (Windows)
+    socket: http://localhost:2375                                     # Docker REST API domain\HTTP socket, default: \var\run\docker.sock (Linux, MacOS), tcp:\\localhost:2375 (Windows)
   mongodb: # Mongo DB settings
     active: true                                                      # MongoDB activation flag
     name: awsmock                                                     # MongoDB database name
@@ -74,14 +72,14 @@ awsmock:
   modules: # AwsMock modules
     s3: # S3 module
       active: true                                                    # S3 module activation flag
-      data-dir: C:/Program Files (x86)/awsmock/data/s3                            # S3 module data dir
+      data-dir: C:\Program Files (x86)\awsmock\data\s3                            # S3 module data dir
       monitoring: # S3 module monitoring
         period: 300                                                   # S3 module monitoring period in seconds, default: 300s
       sync: # S3 file system synchronization
         object: # S3 object to DB synchronization
           period: 300                                                 # S3 file to DB synchronization period in seconds, default:300s
         bucket:
-          period: 300                                                 # S3 DB to file synchronization period in seconds, default:300s
+          period: 60                                                  # S3 DB to file synchronization period in seconds, default:60s
     sqs: # SQS module
       active: true                                                    # SQS module activation flag
       monitoring: # SQS module monitoring
@@ -104,7 +102,7 @@ awsmock:
       active: true
       lifetime: 3600                                                 # Maximal lifetime of a lambda container in seconds, default: 3600
       privatePort: 8080                                              # lambda docker container internal port
-      data-dir: C:/Program Files (x86)/awsmock/data/lambda           # Lambda data directory
+      data-dir: C:\Program Files (x86)\awsmock\data\lambda           # Lambda data directory
       runtime: # Lambda runtimes
         java11: public.ecr.aws/lambda/java:11                        # Lambda Java 11 runtime
         java17: public.ecr.aws/lambda/java:17                        # Lambda Java 17 runtime
@@ -140,7 +138,7 @@ awsmock:
         host: localhost                                               # DynamoDB docker image host
         port: 8000                                                    # DynamoDB docker image port
         name: dynamodb-local                                          # Container name, default: dynamodb-local
-        image-name: amazon/dynamodb-local                             # AWS dynamodb image name, default: amazon/dynamodb-local
+        image-name: amazon/dynamodb-local                             # AWS dynamodb image name, default: amazon\dynamodb-local
         image-tag: latest                                             # AWS dynamodb image tag, default: latest
     cognito:
       active: true
@@ -161,7 +159,7 @@ awsmock:
     transfer: # AWS transfer server
       active: true                                                      # Activation flag
       bucket: transfer-server                                           # Transfer server S3 bucket
-      data-dir: C:/Program Files (x86)/awsmock/data/transfer            # FTP data directory
+      data-dir: C:\Program Files (x86)\awsmock\data\transfer            # FTP data directory
       directories:
         - incoming/mix
         - feedback
@@ -179,7 +177,7 @@ awsmock:
         address: 0.0.0.0                                                # FTP listening address
         pasv-min: 6000                                                  # Passive mode minimum port
         pasv-max: 6100                                                  # Passive mode maximal port
-        host-key: C:/Program Files (x86)/awsmock/etc/ssh_host_key       # SSH host private key
+        host-key: C:\Program Files (x86)\awsmock\etc\ssh_host_key       # SSH host private key
   monitoring: # Monitoring
     active: true                                                        # Activation flag
     port: 9091                                                          # Prometheus port
@@ -191,7 +189,7 @@ awsmock:
     smooth: true                                                        # Use rolling mean
   logging:
     level: info                                                         # Log level, valid levels are: verbose, debug, into, warning, error, fatal, default: info
-    dir: C:/Program Files (x86)/awsmock/log                             # Log directory
+    dir: C:\Program Files (x86)\awsmock\log                             # Log directory
     prefix: awsmock                                                     # Log file name prefix, used additionally to stdout, mainly used on MacOS
     file-size: 10485760                                                 # Log file size for the rolling file appender, default 10MB
     file-count: 5                                                       # Log file count, default 5
