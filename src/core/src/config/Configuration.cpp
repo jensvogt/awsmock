@@ -326,7 +326,7 @@ namespace AwsMock::Core {
             throw CoreException("Property not found, key: " + key);
         }
         _treeConfiguration.get_child(key).put_value<std::string>(value);
-        log_trace << "Value set, key: " << key;
+        log_trace << "Value set, key: " << key << ", value: " << _treeConfiguration.get<std::string>(key);
     }
 
     void Configuration::SetValueBool(const std::string &key, const bool value) {
