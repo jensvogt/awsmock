@@ -74,7 +74,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
          * @brief Creates a new topic
