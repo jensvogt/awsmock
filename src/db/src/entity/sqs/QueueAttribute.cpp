@@ -48,15 +48,4 @@ namespace AwsMock::Database::Entity::SQS {
         }
     }
 
-    std::string QueueAttribute::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const QueueAttribute &r) {
-        os << "QueueAttribute=" << to_json(r.ToDocument());
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::SQS

@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
 
@@ -25,17 +25,12 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Queue {
+    struct Queue final : Common::BaseEntity<Queue> {
 
         /**
          * ID
          */
         std::string oid;
-
-        /**
-         * AWS region
-         */
-        std::string region;
 
         /**
          * Queue name
@@ -68,16 +63,6 @@ namespace AwsMock::Database::Entity::SQS {
         std::map<std::string, std::string> tags;
 
         /**
-         * Creation date
-         */
-        system_clock::time_point created = system_clock::now();
-
-        /**
-         * Last modification date
-         */
-        system_clock::time_point modified;
-
-        /**
          * Pagination token
          */
         std::string paginationToken;
@@ -103,6 +88,16 @@ namespace AwsMock::Database::Entity::SQS {
         std::string mainQueue;
 
         /**
+         * Creation date
+         */
+        system_clock::time_point created = system_clock::now();
+
+        /**
+         * Last modification date
+         */
+        system_clock::time_point modified;
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
@@ -116,26 +111,49 @@ namespace AwsMock::Database::Entity::SQS {
          */
         Queue FromDocument(const std::optional<view> &mResult);
 
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend Queue tag_invoke(boost::json::value_to_tag<Queue>, boost::json::value const &v) {
+            Queue r;
+            r.oid = v.at("oid").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.queueUrl = v.at("queueUrl").as_string();
+            r.queueArn = v.at("queueArn").as_string();
+            r.name = v.at("name").as_string();
+            r.owner = v.at("owner").as_string();
+            r.attributes = boost::json::value_to<QueueAttribute>(v.at("attributes"));
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            r.paginationToken = v.at("paginationToken").as_string();
+            r.score = v.at("score").as_double();
+            r.size = v.at("size").as_int64();
+            r.isDlq = v.at("isDlq").as_bool();
+            r.mainQueue = v.at("mainQueue").as_string();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Queue &q);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Queue const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"queueArn", obj.queueArn},
+                    {"name", obj.name},
+                    {"owner", obj.owner},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+                    {"tags", boost::json::value_from(obj.tags)},
+                    {"paginationToken", obj.paginationToken},
+                    {"score", obj.score},
+                    {"size", obj.size},
+                    {"isDlq", obj.isDlq},
+                    {"mainQueue", obj.mainQueue},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
     typedef std::vector<Queue> QueueList;

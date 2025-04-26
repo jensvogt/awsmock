@@ -67,8 +67,8 @@ namespace AwsMock::Database::Entity::Common {
          *
          * @param jsonString JSON string
          */
-        virtual void FromJson(const std::string &jsonString) {
-            *this = boost::json::value_to<T>(boost::json::parse(jsonString));
+        static T FromJson(const std::string &jsonString) {
+            return boost::json::value_to<T>(boost::json::parse(jsonString));
         }
 
 #ifndef _WIN32

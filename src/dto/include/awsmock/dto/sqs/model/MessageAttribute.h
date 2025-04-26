@@ -21,7 +21,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attribute name
          */
-        std::string name;
+        std::string name{};
 
         /**
          * Message attribute string value
@@ -41,7 +41,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Logical data type
          */
-        MessageAttributeDataType type;
+        MessageAttributeDataType type{};
 
         /**
          * @brief Returns the MD5 sum of all message attributes (user attributes).

@@ -62,7 +62,6 @@ namespace AwsMock::Dto::Common {
          */
         [[nodiscard]] virtual std::string ToJson() const {
             std::stringstream ss;
-            //ss << boost::json::value_from(*dynamic_cast<const BaseCounter *>(this));
             ss << boost::json::value_from(*dynamic_cast<const T *>(this));
             return ss.str();
         }
@@ -73,7 +72,6 @@ namespace AwsMock::Dto::Common {
          * @param jsonString JSON string
          */
         static T FromJson(const std::string &jsonString) {
-            //boost::json::value_to<BaseCounter>(boost::json::parse(jsonString));
             return boost::json::value_to<T>(boost::json::parse(jsonString));
         }
 

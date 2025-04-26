@@ -316,7 +316,7 @@ namespace AwsMock::Service {
          *
          * @param request delete object request
          */
-        void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
+        void DeleteObject(const Dto::S3::DeleteObjectRequest &request) const;
 
         /**
          * @brief Delete objects
@@ -324,7 +324,7 @@ namespace AwsMock::Service {
          * @param request delete objects request
          * @return DeleteObjectsResponse
          */
-        Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
+        Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) const;
 
         /**
          * @brief Adds a bucket notification configuration

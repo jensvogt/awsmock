@@ -292,7 +292,7 @@ namespace AwsMock::Core {
             throw CoreException("Property not found, key: " + key);
         }
         _treeConfiguration.get_child(key).put_value<T>(value);
-        log_error << "Value set, key: " << key << ", value: " << _treeConfiguration.get<T>(key);
+        log_debug << "Value set, key: " << key << ", value: " << _treeConfiguration.get<T>(key);
     }
 
     template<class T>
@@ -311,8 +311,10 @@ namespace AwsMock::Core {
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> r;
-        for (const auto &val: _treeConfiguration.get_child(key) | std::views::values)
+        for (const auto &val: _treeConfiguration.get_child(key) | std::views::values) {
             r.push_back(val.get_value<std::string>());
+        }
+        log_debug << "Value aray set, key: " << key << ", count: " << r.size();
         return r;
     }
 

@@ -118,8 +118,8 @@
           "period": 300
         },
         "directories": [
-          "incoming",
-          "outgoing"
+          "incoming/mix",
+          "feedback"
         ],
         "ftp": {
           "pasv-min": 6000,

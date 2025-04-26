@@ -41,7 +41,7 @@ namespace AwsMock::Dto::SQS {
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
-            throw Core::ServiceException(exc.what());
+            throw Core::JsonException(exc.what());
         }
     }
 

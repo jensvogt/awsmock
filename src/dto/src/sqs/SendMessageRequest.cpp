@@ -60,7 +60,7 @@ namespace AwsMock::Dto::SQS {
                 for (const auto &[fst, snd]: messageAttributes) {
                     jsonMessageAttribute.append(kvp(fst, snd.ToDocument()));
                 }
-                rootDocument.append(kvp("messageAttributes", jsonMessageAttribute));
+                rootDocument.append(kvp("MessageAttributes", jsonMessageAttribute));
             }
 
             if (!attributes.empty()) {
@@ -68,7 +68,7 @@ namespace AwsMock::Dto::SQS {
                 for (const auto &[fst, snd]: attributes) {
                     jsonAttributeObject.append(kvp(fst, snd));
                 }
-                rootDocument.append(kvp("attributes", jsonAttributeObject));
+                rootDocument.append(kvp("MessageSystemAttributes", jsonAttributeObject));
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 

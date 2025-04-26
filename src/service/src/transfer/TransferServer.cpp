@@ -43,7 +43,7 @@ namespace AwsMock::Service {
     }
 
     void TransferServer::CreateDirectories(const std::string &userName) {
-        const std::string basePath = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto basePath = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         for (const auto &directory: Core::Configuration::instance().GetValueArray<std::string>("awsmock.modules.transfer.directories")) {
             if (std::string dirPath = basePath + Core::FileUtils::separator() + userName + Core::FileUtils::separator() + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
                 Core::DirUtils::MakeDirectory(dirPath, true);

@@ -62,16 +62,17 @@ namespace AwsMock::Service {
             attributes.queueArn = queueArn;
 
             // Update database
-            Database::Entity::SQS::Queue queue = {
-                    .region = request.region,
-                    .name = request.queueName,
-                    .owner = request.owner,
-                    .queueUrl = queueUrl,
-                    .queueArn = queueArn,
-                    .attributes = attributes,
-                    .tags = request.tags};
+            Database::Entity::SQS::Queue queue;
+            queue.region = request.region;
+            queue.name = request.queueName;
+            queue.owner = request.owner;
+            queue.queueUrl = queueUrl;
+            queue.queueArn = queueArn;
+            queue.attributes = attributes;
+            queue.tags = request.tags;
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << queue.ToString();
+
             Dto::SQS::CreateQueueResponse response = {
                     .region = queue.region,
                     .name = queue.name,
@@ -750,7 +751,10 @@ namespace AwsMock::Service {
             log_debug << "Messages deleted, queue: " << request.queueUrl << " count:" << deleted;
 
             // Update database
-            deleted = _sqsDatabase.DeleteQueue({.region = request.region, .queueUrl = request.queueUrl});
+            Database::Entity::SQS::Queue queue;
+            queue.region = request.region;
+            queue.queueUrl = request.queueUrl;
+            deleted = _sqsDatabase.DeleteQueue(queue);
             log_debug << "Queue deleted, queue: " << request.queueUrl << " count:" << deleted;
 
             return {.region = request.region, .queueUrl = request.queueUrl, .requestId = request.requestId};
@@ -996,7 +1000,7 @@ namespace AwsMock::Service {
                     Dto::Common::Mapper::map(request.sortColumns));
 
             Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
-            log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
+            log_info << "SQS list message counters response: " << listMessagesResponse.ToJson();
             return listMessagesResponse;
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
