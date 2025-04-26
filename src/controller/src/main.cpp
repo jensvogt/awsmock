@@ -138,10 +138,13 @@ int main(const int argc, char *argv[]) {
     }
 
     // Set the log file
-    if (vm.contains("logfile")) {
-        const std::string value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.file", value);
-        AwsMock::Core::LogStream::AddFile();
+    if (AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.dir") &&
+        AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.prefix")) {
+        auto logDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
+        auto prefix = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
+        int size = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-size");
+        int count = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-count");
+        AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
     }
 
     // Check command
