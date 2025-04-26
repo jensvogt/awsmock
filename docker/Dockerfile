@@ -30,7 +30,7 @@ FROM debian:trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libssh-4 libquadmath0 libicu76
+RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libssh-4 libquadmath0 libicu72
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
