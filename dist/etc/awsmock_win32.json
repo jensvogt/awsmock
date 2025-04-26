@@ -151,7 +151,7 @@
         },
         "container": {
           "host": "localhost",
-          "port": "8000",
+          "port": 8000,
           "name": "dynamodb-local",
           "image-name": "amazon/dynamodb-local",
           "image-tag": "latest"
@@ -189,7 +189,7 @@
         "maxWaitTime": 5,
         "checkTime": 500
       },
-      "socket": "/var/run/docker.sock"
+      "socket": "http://localhost:2375"
     },
     "podman": {
       "active": false,
@@ -202,9 +202,10 @@
       "container": {
         "port": 8080
       },
-      "socket": "/run/podman/podman.sock"
+      "socket": "http://localhost:2375"
     },
     "monitoring": {
+      "active": true,
       "port": 9091,
       "period": 60,
       "prometheus": false,
