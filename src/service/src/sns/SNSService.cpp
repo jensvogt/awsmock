@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/sns/SNSService.h>
+#include <map>
 
 namespace AwsMock::Service {
 
@@ -65,21 +66,10 @@ namespace AwsMock::Service {
 
         try {
 
-            Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, request.sortColumns, request.region);
-
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
             Dto::SNS::ListTopicCountersResponse listTopicResponse;
             listTopicResponse.total = _snsDatabase.CountTopics(request.region, request.prefix);
-            for (const auto &topic: topicList) {
-                Dto::SNS::TopicCounter counter;
-                counter.topicName = topic.topicName;
-                counter.topicArn = topic.topicArn;
-                counter.topicUrl = topic.topicUrl;
-                counter.availableMessages = topic.topicAttribute.availableMessages;
-                counter.size = topic.size;
-                counter.created = topic.created;
-                counter.modified = topic.modified;
-                listTopicResponse.topicCounters.emplace_back(counter);
-            }
+            listTopicResponse = Dto::SNS::Mapper::map(request, topicList);
             log_trace << "SNS list topic counters response: " << listTopicResponse.ToJson();
             return listTopicResponse;
 
@@ -371,7 +361,12 @@ namespace AwsMock::Service {
             response.total = topic.subscriptions.size();
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
                 const std::string id = subscriptionArn.substr(subscriptionArn.rfind(':') + 1);
-                Dto::SNS::Subscription subscription = {.id = id, .topicArn = request.topicArn, .protocol = protocol, .subscriptionArn = subscriptionArn, .endpoint = endpoint};
+                Dto::SNS::SubscriptionCounter subscription;
+                subscription.id = id;
+                subscription.topicArn = request.topicArn;
+                subscription.protocol = protocol;
+                subscription.subscriptionArn = subscriptionArn;
+                subscription.endpoint = endpoint;
                 response.subscriptionCounters.emplace_back(subscription);
             }
             return response;
@@ -400,27 +395,48 @@ namespace AwsMock::Service {
             Dto::SNS::ListAttributeCountersResponse response;
             response.total = 11;
             Dto::SNS::AttributeCounter attributeCounter;
-            attributeCounter = {.attributeKey = "availableMessages", .attributeValue = std::to_string(topic.topicAttribute.availableMessages)};
+            attributeCounter.attributeKey = "availableMessages";
+            attributeCounter.attributeValue = std::to_string(topic.topicAttribute.availableMessages);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "archivePolicy", .attributeValue = topic.topicAttribute.archivePolicy};
+
+            attributeCounter.attributeKey = "archivePolicy";
+            attributeCounter.attributeValue = topic.topicAttribute.archivePolicy;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "beginningArchiveTime", .attributeValue = Core::DateTimeUtils::ToISO8601(topic.topicAttribute.beginningArchiveTime)};
+
+            attributeCounter.attributeKey = "beginningArchiveTime";
+            attributeCounter.attributeValue = Core::DateTimeUtils::ToISO8601(topic.topicAttribute.beginningArchiveTime);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "contentBasedDeduplication", .attributeValue = Core::StringUtils::ToString(topic.topicAttribute.contentBasedDeduplication)};
+
+            attributeCounter.attributeKey = "contentBasedDeduplication";
+            attributeCounter.attributeValue = Core::StringUtils::ToString(topic.topicAttribute.contentBasedDeduplication);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "deliveryPolicy", .attributeValue = topic.topicAttribute.deliveryPolicy};
+
+            attributeCounter.attributeKey = "deliveryPolicy";
+            attributeCounter.attributeValue = topic.topicAttribute.deliveryPolicy;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "displayName", .attributeValue = topic.topicAttribute.displayName};
+
+            attributeCounter.attributeKey = "displayName";
+            attributeCounter.attributeValue = topic.topicAttribute.displayName;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "fifoTopic", .attributeValue = Core::StringUtils::ToString(topic.topicAttribute.fifoTopic)};
+
+            attributeCounter.attributeKey = "fifoTopic";
+            attributeCounter.attributeValue = Core::StringUtils::ToString(topic.topicAttribute.fifoTopic);
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "kmsMasterKeyId", .attributeValue = topic.topicAttribute.kmsMasterKeyId};
+
+            attributeCounter.attributeKey = "kmsMasterKeyId";
+            attributeCounter.attributeValue = topic.topicAttribute.kmsMasterKeyId;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "policy", .attributeValue = topic.topicAttribute.policy};
+
+            attributeCounter.attributeKey = "policy";
+            attributeCounter.attributeValue = topic.topicAttribute.policy;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "signatureVersion", .attributeValue = topic.topicAttribute.signatureVersion};
+
+            attributeCounter.attributeKey = "signatureVersion";
+            attributeCounter.attributeValue = topic.topicAttribute.signatureVersion;
             response.attributeCounters.emplace_back(attributeCounter);
-            attributeCounter = {.attributeKey = "tracingConfig", .attributeValue = topic.topicAttribute.tracingConfig};
+
+            attributeCounter.attributeKey = "tracingConfig";
+            attributeCounter.attributeValue = topic.topicAttribute.tracingConfig;
             response.attributeCounters.emplace_back(attributeCounter);
 
             auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
@@ -454,7 +470,9 @@ namespace AwsMock::Service {
             Dto::SNS::ListTagCountersResponse response;
             response.total = topic.tags.size();
             for (const auto &[fst, snd]: topic.tags) {
-                Dto::SNS::TagCounter tagCounter = {.tagKey = fst, .tagValue = snd};
+                Dto::SNS::TagCounter tagCounter;
+                tagCounter.tagKey = fst;
+                tagCounter.tagValue = snd;
                 response.tagCounters.emplace_back(tagCounter);
             }
             return response;
@@ -674,12 +692,9 @@ namespace AwsMock::Service {
 
         try {
 
-            const long total = _snsDatabase.CountMessages(request.topicArn);
-
-            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex, request.sortColumns);
-
-            Dto::SNS::ListMessageCountersResponse listMessageCountersResponse = Dto::SNS::Mapper::map(messageList);
-            listMessageCountersResponse.total = total;
+            const Database::Entity::SNS::MessageList messageList = _snsDatabase.ListMessages(request.region, request.topicArn, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            Dto::SNS::ListMessageCountersResponse listMessageCountersResponse = Dto::SNS::Mapper::map(request, messageList);
+            listMessageCountersResponse.total = _snsDatabase.CountMessages(request.topicArn);
             log_trace << "SNS list messages, response: " << listMessageCountersResponse.ToJson();
 
             return listMessageCountersResponse;
@@ -708,7 +723,7 @@ namespace AwsMock::Service {
 
             // Adjust topic counters
             AdjustTopicCounters(topic);
-            log_trace << "SNS topci counter adjusted, topicArn: " << request.topicArn;
+            log_trace << "SNS topic counter adjusted, topicArn: " << request.topicArn;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS list topics request failed, message: " << ex.what();

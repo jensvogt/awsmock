@@ -37,17 +37,17 @@ namespace AwsMock::Dto::SQS {
         std::string queueName;
 
         /**
-         * Number of message available
+         * Number of messages available
          */
         long available{};
 
         /**
-         * Number of message invisible
+         * Number of messages invisible
          */
         long invisible{};
 
         /**
-         * Number of message delayed
+         * Number of messages delayed
          */
         long delayed{};
 
