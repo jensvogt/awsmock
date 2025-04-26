@@ -20,7 +20,8 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::LIST_BUCKETS: {
 
                     Dto::S3::ListAllBucketResponse s3Response = _s3Service.ListAllBuckets();
-                    log_info << "List buckets";
+                    log_info << "List buckets, count: " << s3Response.total;
+                    log_trace << s3Response;
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
@@ -46,7 +47,7 @@ namespace AwsMock::Service {
                             encodingType = Core::HttpUtils::GetStringParameter(request.target(), "encoding_type");
                         }
 
-                        // Return object list
+                        // Return an object list
                         s3Request = {
                                 .region = clientCommand.region,
                                 .name = clientCommand.bucket,
@@ -73,7 +74,10 @@ namespace AwsMock::Service {
 
                     // Get object request
                     log_debug << "S3 get object request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    Dto::S3::GetObjectRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
+                    Dto::S3::GetObjectRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
 
                     // Get version ID
                     if (std::string versionId = Core::HttpUtils::GetStringParameter(request.target(), "versionId"); !versionId.empty()) {
@@ -110,13 +114,16 @@ namespace AwsMock::Service {
 
                     // Get object request
                     log_debug << "S3 get object request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    Dto::S3::GetObjectRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
+                    Dto::S3::GetObjectRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
 
                     // Get range
                     long size;
                     GetRange(request, s3Request.min, s3Request.max, size);
 
-                    // Get object
+                    // Get an object
                     Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
                     std::map<std::string, std::string> headerMap;
@@ -242,8 +249,6 @@ namespace AwsMock::Service {
 
                     // Get the user metadata
                     std::map<std::string, std::string> metadata = GetMetadata(request);
-                    std::string contentType = Core::HttpUtils::HasHeader(request, "Content-Type") ? std::string(request["Content-Type"]) : Core::FileUtils::GetContentType(clientCommand.key);
-
                     if (clientCommand.copyRequest) {
 
                         Dto::S3::CopyObjectRequest s3Request = {
@@ -272,7 +277,7 @@ namespace AwsMock::Service {
                             .key = clientCommand.key,
                             .owner = clientCommand.user,
                             .md5Sum = request["Content-MD5"],
-                            .contentType = contentType,
+                            .contentType = clientCommand.contentType,
                             .checksumAlgorithm = checksumAlgorithm,
                             .metadata = metadata};
 
@@ -492,10 +497,8 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::COMPLETE_MULTIPART_UPLOAD: {
 
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
-                    std::string contentType = Core::HttpUtils::HasHeader(request, "Content-Type") ? std::string(request["Content-Type"]) : Core::FileUtils::GetContentType(clientCommand.key);
-
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId, .contentType = contentType};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId, .contentType = clientCommand.contentType};
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;
@@ -516,8 +519,9 @@ namespace AwsMock::Service {
 
                     // Get object versions
                     Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
+                    log_debug << s3Response;
 
-                    log_debug << "List object counters";
+                    log_debug << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 

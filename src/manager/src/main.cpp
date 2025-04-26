@@ -1,7 +1,7 @@
 // ===================================================================================
 //
 // Created by vogje01 on 21/12/2022.
-// Copyright 2022 -2024 Dr. Jens Vogt
+// Copyright 2022 -2025 Dr. Jens Vogt
 //
 // This file is part of aws-mock.
 //
@@ -46,10 +46,10 @@
 #define DEFAULT_LOG_PREFIX std::string("awsmock")
 #define DEFAULT_LOG_LEVEL std::string("info")
 #ifdef WIN32
-#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.yml")
+#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.json")
 #define DEFAULT_SERVICE_PATH std::string("C:\\Program Files (x86)\\awsmock\\bin\\awsmockmgr.exe")
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
 #endif
 
@@ -87,7 +87,6 @@ class Daemon {
         // Start HTTP frontend server
         AwsMock::Service::Frontend::FrontendServer server;
         frontendThread = boost::thread{boost::ref(server)};
-        frontendThread.detach();
 
         // Start manager
         awsMockManager.Initialize();
@@ -254,24 +253,27 @@ int main(const int argc, char *argv[]) {
     // Read configuration
     if (vm.contains("config")) {
         const auto configFilename = vm["config"].as<std::string>();
+        if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
+            std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
+            exit(1);
+        }
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 
-    // Set log level
+    // Set the log level
     if (vm.contains("loglevel")) {
         auto value = vm["loglevel"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.level", value);
+        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        const std::string level = AwsMock::Core::Configuration::instance().GetValueString("awsmock.logging.level");
+        const std::string level = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level");
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
-    // Set log level
-    if (vm.contains("logfile")) {
-        auto value = vm["logfile"].as<std::string>();
-        AwsMock::Core::Configuration::instance().SetValueString("awsmock.logging.prefix", value);
-        AwsMock::Core::LogStream::SetFilename(value);
+    // Set the log file
+    if (AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.dir") &&
+        AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.prefix")) {
+        AwsMock::Core::LogStream::AddFile();
     }
 
 #ifdef WIN32
@@ -290,13 +292,13 @@ int main(const int argc, char *argv[]) {
     boost::system::error_code ec;
     if (vm.contains("foreground")) {
 
-        // Run as foreground process
+        // Run as a foreground process
         result = boost::application::launch<boost::application::common>(worker, app_context, ec);
         if (ec) {
             log_error << "Windows foreground process failed, error: " << ec.message() << ", code: " << ec.value();
         }
     } else {
-        // Run as Windows service
+        // Run as a Windows service
         result = boost::application::launch<boost::application::server>(worker, app_context, ec);
         if (ec) {
             log_error << "Windows service start failed, error: " << ec.message() << ", code: " << ec.value();

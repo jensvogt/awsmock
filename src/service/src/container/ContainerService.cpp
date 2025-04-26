@@ -25,14 +25,14 @@ namespace AwsMock::Service {
 
     ContainerService::ContainerService() {
         // Get network mode
-        _networkName = Core::Configuration::instance().GetValueString("awsmock.docker.network-name");
-        _containerPort = Core::Configuration::instance().GetValueString("awsmock.docker.container.port");
-        _isDocker = Core::Configuration::instance().GetValueBool("awsmock.docker.active");
+        _networkName = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
+        _containerPort = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.container.port");
+        _isDocker = Core::Configuration::instance().GetValue<bool>("awsmock.docker.active");
 #ifdef WIN32
-        _containerSocketPath = Core::Configuration::instance().GetValueString("awsmock.docker.socket");
+        _containerSocketPath = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket");
         _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
 #else
-        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValueString("awsmock.docker.socket") : Core::Configuration::instance().GetValueString("awsmock.podman.socket");
+        _containerSocketPath = _isDocker ? Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket") : Core::Configuration::instance().GetValue<std::string>("awsmock.podman.socket");
         _domainSocket = std::make_shared<Core::UnixSocket>(_containerSocketPath);
 #endif
     }
@@ -86,14 +86,14 @@ namespace AwsMock::Service {
         const std::string imageName = name + ":" + tag;
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/images/" + imageName + "/json");
         if (statusCode != http::status::ok) {
-            log_warning << "Get image by name failed, statusCode: " << statusCode;
+            log_warning << "Get image by name failed, name: " << imageName << ", statusCode: " << statusCode;
             return {};
         }
         Dto::Docker::Image response;
         response.FromJson(body);
         response.id = Core::StringUtils::Split(response.id, ':')[1];
 
-        log_debug << "Image found, name: " << name << ":" << tag;
+        log_debug << "Image found, name: " << imageName;
         return response;
     }
 
@@ -246,6 +246,33 @@ namespace AwsMock::Service {
         return false;
     }
 
+    bool ContainerService::ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        if (_isDocker) {
+            const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + imageName + ":" + tag + "\"]}");
+            auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters);
+            if (statusCode == http::status::ok) {
+                const Dto::Docker::ListContainerResponse response(body);
+                log_debug << "Docker container found, name: " << imageName;
+                return !response.containerList.empty();
+            }
+            log_info << "Docker container by image failed, statusCode: " << statusCode;
+            return false;
+        }
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/v5.0.0/libpod/containers/" + imageName + "/exists");
+        if (statusCode == http::status::no_content) {
+            log_debug << "Podman container found, name: " << imageName;
+            return true;
+        }
+        if (statusCode == http::status::not_found) {
+            log_info << "Podman container not found";
+        } else {
+            log_error << "Podman container exists request failed, statusCode: " << statusCode;
+        }
+        return false;
+    }
+
     Dto::Docker::Container ContainerService::GetFirstContainerByImageName(const std::string &name, const std::string &tag) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
@@ -327,7 +354,6 @@ namespace AwsMock::Service {
             log_warning << "Get container by name failed, state: " << statusCode;
             return inspectContainerResponse;
         }
-
 
         inspectContainerResponse.FromJson(body);
         log_debug << "Container found, containerId: " << containerId;
@@ -460,20 +486,19 @@ namespace AwsMock::Service {
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
             if (statusCode == http::status::ok) {
                 log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
+                response.FromJson(body);
             } else {
                 log_error << "Docker network create failed, statusCode: " << statusCode;
             }
-            response.FromJson(body);
-
         } else {
 
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
             if (statusCode == http::status::ok) {
                 log_debug << "Podman network created, name: " << request.name << " driver: " << request.driver;
+                response.FromJson(body);
             } else {
                 log_error << "Podman network create failed, statusCode: " << statusCode;
             }
-            response.FromJson(body);
         }
         return response;
     }
@@ -502,8 +527,8 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::WaitForContainer(const std::string &containerId) const {
-        const int checkTime = Core::Configuration::instance().GetValueInt("awsmock.docker.container.checkTime");
-        const int maxWaitTime = Core::Configuration::instance().GetValueInt("awsmock.docker.container.maxWaitTime");
+        const int checkTime = Core::Configuration::instance().GetValue<int>("awsmock.docker.container.checkTime");
+        const int maxWaitTime = Core::Configuration::instance().GetValue<int>("awsmock.docker.container.maxWaitTime");
         const auto deadline = system_clock::now() + std::chrono::seconds{maxWaitTime};
         while (!IsContainerRunning(containerId) && system_clock::now() < deadline) {
             std::this_thread::sleep_for(std::chrono::milliseconds(checkTime));
@@ -577,7 +602,7 @@ namespace AwsMock::Service {
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
-        std::string supportedRuntime = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.runtime." + providedRuntime);
+        std::string supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
@@ -652,9 +677,9 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetNetworkName() {
-        if (Core::Configuration::instance().GetValueBool("awsmock.docker.active")) {
-            return Core::Configuration::instance().GetValueString("awsmock.docker.network-mode");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.docker.active")) {
+            return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-mode");
         }
-        return Core::Configuration::instance().GetValueString("awsmock.podman.network-mode");
+        return Core::Configuration::instance().GetValue<std::string>("awsmock.podman.network-mode");
     }
 }// namespace AwsMock::Service

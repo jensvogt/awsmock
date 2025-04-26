@@ -130,7 +130,7 @@ namespace AwsMock::Database {
         return _memoryDb.TableExists(region, tableName);
     }
 
-    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const {
+    std::vector<Entity::DynamoDb::Table> DynamoDbDatabase::ListTables(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -160,8 +160,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -619,7 +619,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void DynamoDbDatabase::DeleteAllItems() const {
+    long DynamoDbDatabase::DeleteAllItems() const {
 
         if (HasDatabase()) {
 
@@ -629,16 +629,14 @@ namespace AwsMock::Database {
                 mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
                 const auto result = _itemCollection.delete_many({});
                 log_debug << "DynamoDB items deleted, count: " << result->deleted_count();
+                return static_cast<long>(result->deleted_count());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            _memoryDb.DeleteAllItems();
         }
+        return _memoryDb.DeleteAllItems();
     }
 
 }// namespace AwsMock::Database

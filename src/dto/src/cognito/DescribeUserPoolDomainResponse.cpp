@@ -25,15 +25,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string DescribeUserPoolDomainResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const DescribeUserPoolDomainResponse &r) {
-        os << "DescribeUserPoolDomainResponse=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::Cognito

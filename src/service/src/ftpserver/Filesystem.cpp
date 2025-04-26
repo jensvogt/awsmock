@@ -263,12 +263,7 @@ namespace AwsMock::FtpServer {
         std::string absolute_root;
 
         if (windows_path) {
-            /* On Windows, a root folder can be:
-       *    C:\
-       *    //Host
-       *    \\Host
-       */
-
+            // On Windows, a root folder can be: C:\, //Host, \\Host
             const std::regex win_local_drive(R"(^[a-zA-Z]\:)");       // Local drive
             const std::regex win_network_drive(R"(^[/\\]{2}[^/\\]+)");// Network path starting with two slashes or backslashes followed by a hostname
 
@@ -281,7 +276,7 @@ namespace AwsMock::FtpServer {
                 absolute_root = path.substr(0, sep_pos);// If no seperator was found, this will return the entire string
             }
         } else {
-            // On Unix there is only one root and it is '/'
+            // On Unix there is only one root, and it is '/'
             if (path[0] == '/') {
                 absolute_root = '/';
             }

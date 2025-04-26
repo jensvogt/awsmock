@@ -40,9 +40,10 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string Bucket::ToJson() const {
+    // TODO: Remove
+    /*    std::string Bucket::ToJson() const {
         return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
+    }*/
 
     view_or_value<view, value> Bucket::ToDocument() const {
 
@@ -91,16 +92,4 @@ namespace AwsMock::Dto::S3 {
             throw Core::JsonException(exc.what());
         }
     }
-
-    std::string Bucket::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Bucket &c) {
-        os << "Bucket=" << c.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

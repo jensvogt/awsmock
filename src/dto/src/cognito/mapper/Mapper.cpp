@@ -9,6 +9,9 @@ namespace AwsMock::Dto::Cognito {
     ListUserPoolResponse Mapper::map(const ListUserPoolRequest &request, const std::vector<Database::Entity::Cognito::UserPool> &userPoolList, const long total) {
 
         ListUserPoolResponse response;
+        response.requestId = request.requestId;
+        response.region = request.region;
+        response.user = request.user;
         response.total = total;
         for (const auto &userPool: userPoolList) {
             response.userPools.emplace_back(map(userPool));
@@ -48,13 +51,20 @@ namespace AwsMock::Dto::Cognito {
     }
 
     CreateGroupResponse Mapper::map(const CreateGroupRequest &request, const Database::Entity::Cognito::Group &group) {
-        CreateGroupResponse response = {{.requestId = request.requestId, .region = group.region, .user = request.user}, map(group)};
+        CreateGroupResponse response;
+        response.group = map(group);
+        response.requestId = request.requestId;
+        response.region = request.region;
+        response.user = request.user;
         return response;
     }
 
     ListGroupsResponse Mapper::map(const ListGroupsRequest &request, const std::vector<Database::Entity::Cognito::Group> &groupList) {
 
-        ListGroupsResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
+        ListGroupsResponse response;
+        response.requestId = request.requestId;
+        response.region = request.region;
+        response.user = request.user;
 
         for (const auto &group: groupList) {
             response.groups.emplace_back(map(group));
@@ -64,7 +74,10 @@ namespace AwsMock::Dto::Cognito {
 
     ListUsersInGroupResponse Mapper::map(const ListUsersInGroupRequest &request, const std::vector<Database::Entity::Cognito::User> &userList) {
 
-        ListUsersInGroupResponse response{{.requestId = request.requestId, .region = request.region, .user = request.user}};
+        ListUsersInGroupResponse response;
+        response.requestId = request.requestId;
+        response.region = request.region;
+        response.user = request.user;
 
         for (const auto &user: userList) {
             response.users.emplace_back(map(user));
@@ -73,7 +86,10 @@ namespace AwsMock::Dto::Cognito {
     }
 
     DescribeUserPoolResponse Mapper::map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool) {
-        DescribeUserPoolResponse response = {{request.requestId, request.region, request.user}};
+        DescribeUserPoolResponse response;
+        response.requestId = request.requestId;
+        response.region = request.region;
+        response.user = request.user;
         response.userPool = map(userPool);
         return response;
     }
@@ -201,7 +217,7 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    ValidityUnits Mapper::GetMaxTokenUnits(long validity) {
+    ValidityUnits Mapper::GetMaxTokenUnits(const long validity) {
         if (validity > 3600 * 24) {
             return days;
         }

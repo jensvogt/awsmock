@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -81,7 +81,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListEventSourceMappingsRequest : Common::BaseRequest {
+    struct ListEventSourceMappingsRequest final : Common::BaseDto<ListEventSourceMappingsRequest> {
 
         /**
          * Name of the function
@@ -104,32 +104,18 @@ namespace AwsMock::Dto::Lambda {
         int maxItems;
 
         /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Parse a JSON stream.
+         * @brief Parse a JSON stream.
          *
          * @param jsonString JSON string
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string.
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListEventSourceMappingsRequest &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

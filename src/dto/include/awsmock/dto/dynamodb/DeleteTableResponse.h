@@ -14,7 +14,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
@@ -27,7 +27,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteTableResponse : Common::BaseRequest {
+    struct DeleteTableResponse final : Common::BaseDto<DeleteTableResponse> {
 
         /**
          * Region
@@ -85,14 +85,7 @@ namespace AwsMock::Dto::DynamoDb {
         http::status status;
 
         /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Parse a JSON stream
+         * @brief Parse a JSON stream
          *
          * @param body JSON body
          * @param headerMap map of headers
@@ -100,18 +93,11 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteTableResponse &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

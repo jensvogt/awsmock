@@ -13,7 +13,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -22,7 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableRequest : Common::BaseRequest {
+    struct ListTableRequest final : Common::BaseDto<ListTableRequest> {
 
         /**
          * AWS region
@@ -31,7 +31,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         /**
          * The first table name that this operation will evaluate. Use the value that was returned for LastEvaluatedTableName
-         * in a previous operation, so that you can obtain the next page of results.
+         * in a previous operation so that you can obtain the next page of results.
          */
         std::string exclusiveStartTableName;
 
@@ -51,13 +51,6 @@ namespace AwsMock::Dto::DynamoDb {
         std::map<std::string, std::string> headers;
 
         /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Prepares the request to be sent to the DynamoDB container
          */
         void PrepareRequest();
@@ -70,18 +63,11 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListTableRequest &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

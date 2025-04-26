@@ -10,6 +10,7 @@ namespace AwsMock::Dto::S3 {
 
         try {
 
+            log_info << "region: " << region << ", owner: " << owner << ", name: " << name;
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
             Core::Bson::BsonUtils::SetStringValue(document, "name", name);

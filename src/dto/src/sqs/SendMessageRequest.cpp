@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string SendMessageRequest::ToJson() {
+    std::string SendMessageRequest::ToJson() const {
 
         try {
             document rootDocument;

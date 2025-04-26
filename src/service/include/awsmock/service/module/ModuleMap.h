@@ -56,7 +56,7 @@ namespace AwsMock::Service {
          * @param name name of the module
          * @return true if existing
          */
-        bool HasModule(const std::string &name);
+        bool HasModule(const std::string &name) const;
 
         /**
          * @brief Returns the module mpa

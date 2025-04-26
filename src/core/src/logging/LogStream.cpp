@@ -15,7 +15,7 @@ namespace AwsMock::Core {
         return std::string(func);
 #else
         const char *funcBegin = func;
-        const char *funcEnd = ::strchr(funcBegin, '(');
+        const char *funcEnd = strchr(funcBegin, '(');
         int foundTemplate = 0;
 
         if (!funcEnd) {
@@ -116,25 +116,25 @@ namespace AwsMock::Core {
         log_info << "Logging level set to " << severity;
     }
 
-    void LogStream::SetFilename(const std::string &filename) {
+    void LogStream::AddFile() {
         if (Configuration::instance().HasValue("awsmock.logging.dir")) {
-            logDir = Configuration::instance().GetValueString("awsmock.logging.dir");
+            logDir = Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
         }
         if (Configuration::instance().HasValue("awsmock.logging.prefix")) {
-            logDir = Configuration::instance().GetValueString("awsmock.logging.prefix");
+            logPrefix = Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
         }
         if (Configuration::instance().HasValue("awsmock.logging.file-size")) {
-            logSize = Configuration::instance().GetValueLong("awsmock.logging.file-size");
+            logSize = Configuration::instance().GetValue<long>("awsmock.logging.file-size");
         }
         if (Configuration::instance().HasValue("awsmock.logging.file-count")) {
-            logCount = Configuration::instance().GetValueInt("awsmock.logging.file-count");
+            logCount = Configuration::instance().GetValue<int>("awsmock.logging.file-count");
         }
         file_sink = add_file_log(
-                boost::log::keywords::file_name = logDir + "/" + logPrefix + "-%N.log",
+                boost::log::keywords::file_name = logDir + FileUtils::separator() + logPrefix + "-%N.log",
                 boost::log::keywords::rotation_size = logSize,
                 boost::log::keywords::max_files = logCount,
                 boost::log::keywords::format = &LogFormatter);
 
-        log_info << "Start logging to " << filename << " size: " << logSize << " count: " << logCount;
+        log_info << "Start logging to file, dir:" << logDir << ", prefix: " << logPrefix << " size: " << logSize << " count: " << logCount;
     }
 }// namespace AwsMock::Core

@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/lambda/model/Code.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
@@ -91,7 +91,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateFunctionRequest : Common::BaseRequest {
+    struct CreateFunctionRequest final : Common::BaseDto<CreateFunctionRequest> {
 
         /**
          * Name of the function
@@ -116,7 +116,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Environment
          */
-        EnvironmentVariables environment;
+        EnvironmentVariables environment{};
 
         /**
          * Memory size in MB. Default: 128, Range: 128 - 10240 MB
@@ -126,29 +126,22 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Temporary disk space in MB
          */
-        EphemeralStorage ephemeralStorage;
+        EphemeralStorage ephemeralStorage{};
 
         /**
          * Code
          */
-        Code code;
+        Code code{};
 
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::map<std::string, std::string> tags{};
 
         /**
          * Timeout
          */
         int timeout = 15 * 60;
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Parse a JSON string.
@@ -158,18 +151,11 @@ namespace AwsMock::Dto::Lambda {
         void FromJson(const std::string &jsonString);
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Creates a JSON string from the object.
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateFunctionRequest &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

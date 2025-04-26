@@ -114,9 +114,10 @@ namespace AwsMock::Database {
         /**
          * @brief Delete all keys
          *
+         * @return number of entities deleted
          * @throws DatabaseException
          */
-        void DeleteAllKeys();
+        long DeleteAllKeys();
 
       private:
 

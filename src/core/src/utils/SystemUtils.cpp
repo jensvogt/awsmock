@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
-#include <boost/asio/readable_pipe.hpp>
 
 namespace AwsMock::Core {
 
@@ -51,8 +50,46 @@ namespace AwsMock::Core {
         return static_cast<int>(boost::thread::hardware_concurrency());
     }
 
+    std::string SystemUtils::GetEnvironmentVariableValue(const std::string &name) {
+#ifdef _WIN32
+        auto pValue = static_cast<LPTSTR>(malloc(BUFSIZE * sizeof(TCHAR)));
+        memset(pValue, 0, BUFSIZE);
+        if (const DWORD result = GetEnvironmentVariable(name.c_str(), pValue, BUFSIZE); !result) {
+            log_trace << "Environment variable not found, name: " << name << ", error: " << result;
+            return {};
+        }
+        return {pValue};
+#else
+        if (getenv(name.c_str()) == nullptr) {
+            log_debug << "Environment variable not found, name: " << name;
+            return {};
+        }
+        return {getenv(name.c_str())};
+#endif
+    }
+
+    bool SystemUtils::HasEnvironmentVariable(const std::string &name) {
+        return !GetEnvironmentVariableValue(name).empty();
+    }
+
+    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error) {
+
+        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
+        boost::asio::io_context ctx;
+        boost::asio::readable_pipe outPipe{ctx};
+        boost::asio::readable_pipe errPipe{ctx};
+        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{{}, outPipe, errPipe});
+        boost::system::error_code ec;
+        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
+        assert(!ec || (ec == boost::asio::error::eof));
+        proc.wait();
+    }
+
     void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
 
+        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
         boost::asio::io_context ctx;
         boost::asio::readable_pipe inPipe{ctx};
         boost::asio::readable_pipe outPipe{ctx};
@@ -64,16 +101,5 @@ namespace AwsMock::Core {
         boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
         assert(!ec || (ec == boost::asio::error::eof));
         proc.wait();
-        /*
-        boost::asio::io_context ios;
-        std::future<std::string> outData, errData;
-        boost::process::child c(ios, shellcmd, args, boost::process::std_in.close(), boost::process::std_out > outData, boost::process::std_err > errData);
-
-        // Blocks until command has finished
-        ios.run();
-
-        // Get stdout/stderr
-        output = outData.get();
-        error = errData.get();*/
     }
 }// namespace AwsMock::Core

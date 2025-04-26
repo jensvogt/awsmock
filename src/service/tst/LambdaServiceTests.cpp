@@ -46,7 +46,14 @@ namespace AwsMock::Service {
         static Dto::Lambda::CreateFunctionRequest CreateTestLambdaRequest() {
             Dto::Lambda::Code code;
             code.zipFile = ZIP_FILE;
-            Dto::Lambda::CreateFunctionRequest request = {{.region = REGION}, FUNCTION_NAME, RUNTIME, ROLE, HANDLER};
+            Dto::Lambda::CreateFunctionRequest request;
+            request.requestId = Core::StringUtils::CreateRandomUuid();
+            request.region = REGION;
+            request.user = "user";
+            request.functionName = FUNCTION_NAME;
+            request.runtime = RUNTIME;
+            request.role = ROLE;
+            request.handler = HANDLER;
             request.ephemeralStorage = Dto::Lambda::EphemeralStorage();
             request.environment = Dto::Lambda::EnvironmentVariables();
             request.code = code;

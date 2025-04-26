@@ -382,7 +382,7 @@ static int realloc_buffer(ssh_buffer_struct *buffer, uint32_t needed) {
             return -1;
         }
         memcpy(newBuffer, buffer->data, buffer->used);
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
         memset(buffer->data, 0, buffer->used);
 #else
         explicit_bzero(buffer->data, buffer->used);
@@ -420,7 +420,7 @@ static void buffer_shift(ssh_buffer buffer) {
 
     if (buffer->secure) {
         void *ptr = buffer->data + buffer->used;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
         memset(ptr, 0, burn_pos);
 #else
         explicit_bzero(ptr, burn_pos);
@@ -1292,8 +1292,13 @@ static int process_close(sftp_client_message client_msg) {
     if (h->fd > 0) {
         char filePath[PATH_MAX];
         char realFilePath[PATH_MAX];
-        sprintf(filePath, "%s/%d", "/proc/self/fd", h->fd);
+        snprintf(filePath, PATH_MAX, "%s/%d", "/proc/self/fd", h->fd);
+#ifdef _WIN32
+        strncpy_s(realFilePath, reinterpret_cast<char const *>(std::filesystem::canonical(filePath).c_str()), PATH_MAX);
+        const int nBytes = strlen(realFilePath);
+#else
         const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
+#endif
         realFilePath[nBytes] = '\0';
         const auto p = new AwsMock::Service::S3Service();
         p->PutObject(currentUser, realFilePath, currentServerId);
@@ -1598,7 +1603,7 @@ static int process_realpath(sftp_client_message client_msg) {
 #else
     if (filename[0] == '\0' || filename[0] == '.') {
         path = static_cast<char *>(malloc(PATH_MAX));
-        strcpy(path, AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir").c_str());
+        strcpy(path, AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir").c_str());
         strcpy(path + strlen(path), "/");
         strcpy(path + strlen(path), currentUser);
     } else {
@@ -2193,7 +2198,7 @@ static sftp_attributes sftp_parse_attr_3(sftp_session sftp, ssh_buffer buf, int 
         if (rc != SSH_OK) {
             goto error;
         }
-        log_debug << "Name: %s", attr->name;
+        log_debug << "Attribute name: " << attr->name;
 
         /* Set owner and group if we talk to openssh and have the longname */
         if (ssh_get_openssh_version(sftp->session)) {
@@ -3053,7 +3058,7 @@ cleanup:
                 case 'b':
                     o.byte = va_arg(ap_copy, uint8_t *);
                     if (buffer->secure) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.byte, 0, sizeof(uint8_t));
 #else
                         explicit_bzero(o.byte, sizeof(uint8_t));
@@ -3064,7 +3069,7 @@ cleanup:
                 case 'w':
                     o.word = va_arg(ap_copy, uint16_t *);
                     if (buffer->secure) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.word, 0, sizeof(uint16_t));
 #else
                         explicit_bzero(o.word, sizeof(uint16_t));
@@ -3075,7 +3080,7 @@ cleanup:
                 case 'd':
                     o.dword = va_arg(ap_copy, uint32_t *);
                     if (buffer->secure) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.dword, 0, sizeof(uint32_t));
 #else
                         explicit_bzero(o.dword, sizeof(uint32_t));
@@ -3086,7 +3091,7 @@ cleanup:
                 case 'q':
                     o.qword = va_arg(ap_copy, uint64_t *);
                     if (buffer->secure) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.qword, 0, sizeof(uint64_t));
 #else
                         explicit_bzero(o.qword, sizeof(uint64_t));
@@ -3108,7 +3113,7 @@ cleanup:
                 case 's':
                     o.cstring = va_arg(ap_copy, char **);
                     if (buffer->secure) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.cstring, 0, strlen(*o.cstring));
 #else
                         explicit_bzero(*o.cstring, strlen(*o.cstring));
@@ -3120,7 +3125,7 @@ cleanup:
                     len = va_arg(ap_copy, size_t);
                     o.data = va_arg(ap_copy, void **);
                     if (buffer->secure) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.data, 0, len);
 #else
                         explicit_bzero(*o.data, len);
@@ -3216,7 +3221,7 @@ static int auth_password(ssh_session session, const char *user, const char *pass
         strcpy(currentUser, it->userName.c_str());
 
         // Set user home directory
-        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         userBasePath = static_cast<char *>(malloc(1024));
         strcpy(userBasePath, ftpBaseDir.c_str());
         strcpy(userBasePath + strlen(userBasePath), "/");
@@ -3365,7 +3370,7 @@ namespace AwsMock::Service {
         currentServerId = serverId.c_str();
 
         // Change working directory
-        const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
 #ifdef _WIN32
         int rc = _chdir(ftpBaseDir.c_str());
 #else
@@ -3385,7 +3390,7 @@ namespace AwsMock::Service {
             log_error << "SSH bind new failed";
             return;
         }
-        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str();
+        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str() << ", hostKey: " << hostKey;
 
         // Command line options
         ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT_STR, port.c_str());

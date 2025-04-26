@@ -10,7 +10,7 @@ namespace AwsMock::Service {
 
         // HTTP manager configuration
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.secretsmanager.monitoring.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.secretsmanager.monitoring.period");
         log_debug << "SecretsManager rest module initialized";
 
         // Check module active

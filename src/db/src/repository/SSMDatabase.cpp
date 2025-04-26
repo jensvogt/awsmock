@@ -19,7 +19,7 @@ namespace AwsMock::Database {
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
-                log_error << "SSM database exception " << exc.what();
+                log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         }
@@ -44,7 +44,7 @@ namespace AwsMock::Database {
 
 
         } catch (const mongocxx::exception &exc) {
-            log_error << "SSM database exception " << exc.what();
+            log_error << "SSM database exception: " << exc.what();
             throw Core::DatabaseException(exc.what());
         }
     }
@@ -79,7 +79,7 @@ namespace AwsMock::Database {
 
 
             } catch (const mongocxx::exception &exc) {
-                log_error << "SSM database exception " << exc.what();
+                log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         }
@@ -153,7 +153,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
-                log_error << "SSM database exception " << exc.what();
+                log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         }
@@ -186,7 +186,7 @@ namespace AwsMock::Database {
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
-                log_error << "SSM database exception " << exc.what();
+                log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
 
@@ -210,19 +210,19 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _bucketCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _bucketCollection.delete_one(make_document(kvp("name", parameter.parameterName)));
+                const auto delete_many_result = _parameterCollection.delete_one(make_document(kvp("name", parameter.parameterName)));
                 session.commit_transaction();
                 log_debug << "ssm parameter deleted, count: " << delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
-                log_error << "SSM database exception " << exc.what();
+                log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
 
@@ -232,31 +232,29 @@ namespace AwsMock::Database {
         }
     }
 
-    void SSMDatabase::DeleteAllParameters() const {
+    long SSMDatabase::DeleteAllParameters() const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _bucketCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _bucketCollection.delete_many({});
+                const auto delete_many_result = _parameterCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All ssm parameters deleted, count: " << delete_many_result->deleted_count();
+                return delete_many_result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
-                log_error << "SSM database exception " << exc.what();
+                log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteAllParameters();
         }
+        return _memoryDb.DeleteAllParameters();
     }
 
 }// namespace AwsMock::Database

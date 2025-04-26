@@ -46,7 +46,7 @@ namespace AwsMock::Service {
         // arrange
 
         // act
-        const std::string output = Core::TestUtils::SendCliCommand("aws", {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
+        const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
         const Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
 
         // assert
@@ -57,12 +57,12 @@ namespace AwsMock::Service {
     TEST_F(SSMServerCliTest, ParameterGetTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
         const Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
         EXPECT_EQ(1, parameterList.size());
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"ssm", "get-parameter", "--name", TEST_PARAMETER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "get-parameter", "--name", TEST_PARAMETER_NAME, "--endpoint", _endpoint});
 
         // assert
         EXPECT_EQ(1, parameterList.size());
@@ -72,12 +72,12 @@ namespace AwsMock::Service {
     TEST_F(SSMServerCliTest, ParameterDescribeTest) {
 
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
         Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
         EXPECT_EQ(1, parameterList.size());
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"ssm", "describe", "--parameters", "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "describe-parameters", "--endpoint", _endpoint});
 
         // assert
         EXPECT_TRUE(Core::StringUtils::Contains(output2, TEST_PARAMETER_NAME));
@@ -85,12 +85,12 @@ namespace AwsMock::Service {
 
     TEST_F(SSMServerCliTest, ParameterDeleteTest) {
         // arrange
-        const std::string output1 = Core::TestUtils::SendCliCommand("aws", {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "put-parameter", "--name", TEST_PARAMETER_NAME, "--value", TEST_PARAMETER_VALUE, "--endpoint", _endpoint});
         Database::Entity::SSM::ParameterList parameterList = _ssmDatabase.ListParameters();
         EXPECT_EQ(1, parameterList.size());
 
         // act
-        const std::string output2 = Core::TestUtils::SendCliCommand("aws", {"ssm", "delete-parameter", "--name", TEST_PARAMETER_NAME, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"ssm", "delete-parameter", "--name", TEST_PARAMETER_NAME, "--endpoint", _endpoint});
         parameterList = _ssmDatabase.ListParameters();
 
         // assert

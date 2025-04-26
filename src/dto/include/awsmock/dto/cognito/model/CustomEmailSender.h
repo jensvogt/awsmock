@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomEmailSender : Common::BaseRequest {
+    struct CustomEmailSender final : Common::BaseDto<CustomEmailSender> {
 
         /**
          * Lambda ARN
@@ -41,13 +41,6 @@ namespace AwsMock::Dto::Cognito {
         std::string lambdaVersion;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert to a JSON object
          *
          * @return JSON object
@@ -55,18 +48,11 @@ namespace AwsMock::Dto::Cognito {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Convert to a JSON string
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CustomEmailSender &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

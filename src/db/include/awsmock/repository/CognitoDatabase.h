@@ -11,10 +11,10 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -147,7 +147,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito user pools
          */
-        std::vector<Entity::Cognito::UserPool> ExportUserPools(const std::vector<Core::SortColumn> &sortColumns) const;
+        std::vector<Entity::Cognito::UserPool> ExportUserPools(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Deletes an existing cognito user pool
@@ -246,7 +246,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
-        std::vector<Entity::Cognito::User> ExportUsers(const std::vector<Core::SortColumn> &sortColumns) const;
+        std::vector<Entity::Cognito::User> ExportUsers(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Returns a list of cognito users in given group.
@@ -343,7 +343,7 @@ namespace AwsMock::Database {
          * @param sortColumns sort columns
          * @return list of cognito groups
          */
-        [[nodiscard]] std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<Core::SortColumn> &sortColumns) const;
+        [[nodiscard]] std::vector<Entity::Cognito::Group> ExportGroups(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Deletes an existing cognito user group.

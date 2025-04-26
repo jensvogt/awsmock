@@ -32,10 +32,6 @@
 #include <awsmock/dto/dynamodb/DynamoDbResponse.h>
 #include <awsmock/dto/dynamodb/GetItemRequest.h>
 #include <awsmock/dto/dynamodb/GetItemResponse.h>
-#include <awsmock/dto/dynamodb/ListItemCountersRequest.h>
-#include <awsmock/dto/dynamodb/ListItemCountersResponse.h>
-#include <awsmock/dto/dynamodb/ListTableCountersRequest.h>
-#include <awsmock/dto/dynamodb/ListTableCountersResponse.h>
 #include <awsmock/dto/dynamodb/ListTableRequest.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/dto/dynamodb/PutItemRequest.h>
@@ -44,6 +40,10 @@
 #include <awsmock/dto/dynamodb/QueryResponse.h>
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/dto/dynamodb/internal/ListItemCountersRequest.h>
+#include <awsmock/dto/dynamodb/internal/ListItemCountersResponse.h>
+#include <awsmock/dto/dynamodb/internal/ListTableCountersRequest.h>
+#include <awsmock/dto/dynamodb/internal/ListTableCountersResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/service/container/ContainerService.h>

@@ -35,15 +35,4 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string CreateFunctionResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r) {
-        os << "CreateFunctionResponse=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::Lambda

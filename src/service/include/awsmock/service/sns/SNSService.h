@@ -21,20 +21,10 @@
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/GetTopicDetailsResponse.h>
-#include <awsmock/dto/sns/ListAttributeCountersRequest.h>
-#include <awsmock/dto/sns/ListAttributeCountersResponse.h>
-#include <awsmock/dto/sns/ListMessageCountersRequest.h>
-#include <awsmock/dto/sns/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/ListMessagesRequest.h>
 #include <awsmock/dto/sns/ListMessagesResponse.h>
-#include <awsmock/dto/sns/ListSubscriptionCountersRequest.h>
-#include <awsmock/dto/sns/ListSubscriptionCountersResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
-#include <awsmock/dto/sns/ListTagCountersRequest.h>
-#include <awsmock/dto/sns/ListTagCountersResponse.h>
-#include <awsmock/dto/sns/ListTopicCountersRequest.h>
-#include <awsmock/dto/sns/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
@@ -50,6 +40,16 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListAttributeCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListSubscriptionCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListSubscriptionCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListTagCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListTagCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
+#include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/mapper/Mapper.h>
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
@@ -74,7 +74,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()){};
+        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()) {};
 
         /**
          * @brief Creates a new topic

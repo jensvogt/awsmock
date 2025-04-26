@@ -12,7 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/TokenValidityUnits.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -61,7 +61,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateUserPoolClientRequest : Common::BaseRequest {
+    struct CreateUserPoolClientRequest : Common::BaseDto<CreateUserPoolClientRequest> {
 
         /**
          * User pool of the domain
@@ -112,32 +112,18 @@ namespace AwsMock::Dto::Cognito {
         TokenValidityUnits tokenValidityUnits;
 
         /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @param jsonString json string object
          */
         void FromJson(const std::string &jsonString);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateUserPoolClientRequest &i);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

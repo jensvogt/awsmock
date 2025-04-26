@@ -50,8 +50,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::LIST_TABLE_COUNTERS: {
 
-                    Dto::DynamoDb::ListTableCountersRequest tableRequest;
-                    tableRequest.FromJson(clientCommand.payload);
+                    Dto::DynamoDb::ListTableCountersRequest tableRequest = Dto::DynamoDb::ListTableCountersRequest::FromJson(clientCommand.payload);
                     tableRequest.region = clientCommand.region;
                     tableRequest.requestId = clientCommand.requestId;
                     tableRequest.user = clientCommand.user;
@@ -63,8 +62,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::LIST_ITEM_COUNTERS: {
 
-                    Dto::DynamoDb::ListItemCountersRequest itemRequest;
-                    itemRequest.FromJson(clientCommand.payload);
+                    Dto::DynamoDb::ListItemCountersRequest itemRequest = Dto::DynamoDb::ListItemCountersRequest::FromJson(clientCommand.payload);
                     itemRequest.region = clientCommand.region;
                     itemRequest.requestId = clientCommand.requestId;
                     itemRequest.user = clientCommand.user;

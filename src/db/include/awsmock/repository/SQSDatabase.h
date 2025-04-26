@@ -16,7 +16,6 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -24,6 +23,7 @@
 #include <awsmock/memorydb/SQSMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/MongoUtils.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -159,7 +159,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region = {}) const;
+        Entity::SQS::QueueList ListQueues(const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region = {}) const;
 
         /**
          * @brief List available queues, using paging
@@ -168,7 +168,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ExportQueues(const std::vector<Core::SortColumn> &sortColumns) const;
+        Entity::SQS::QueueList ExportQueues(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Import s a single queue
@@ -349,7 +349,7 @@ namespace AwsMock::Database {
          * @return list of SQS messages
          * @throws DatabaseException
          */
-        Entity::SQS::MessageList ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<Core::SortColumn> &sortColumns) const;
+        Entity::SQS::MessageList ListMessages(const std::string &queueArn, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Receive messages from an queue.

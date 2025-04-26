@@ -21,17 +21,17 @@ namespace AwsMock::Dto::S3 {
         /**
          * Bucket location
          */
-        std::string region;
+        std::string region{};
 
         /**
          * Bucket name
          */
-        std::string name;
+        std::string name{};
 
         /**
          * Bucket owner
          */
-        std::string owner;
+        std::string owner{};
 
         /**
          * @brief Convert to a JSON string

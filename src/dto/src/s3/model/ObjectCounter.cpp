@@ -39,28 +39,4 @@ namespace AwsMock::Dto::S3 {
             throw Core::JsonException(exc.what());
         }
     }
-
-    std::string ObjectCounter::ToJson() const {
-
-        try {
-
-            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    std::string ObjectCounter::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ObjectCounter &c) {
-        os << "ObjectCounter=" << c.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

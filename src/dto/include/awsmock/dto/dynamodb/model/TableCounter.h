@@ -6,15 +6,18 @@
 #define AWSMOCK_DTO_DYNAMODB_TABLE_COUNTER_H
 
 // C++ includes
-#include <map>
+#include <chrono>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
-    struct TableCounter {
+    using std::chrono::system_clock;
+
+    struct TableCounter final : Common::BaseCounter<TableCounter> {
 
         /**
          * Table name
@@ -41,33 +44,28 @@ namespace AwsMock::Dto::DynamoDb {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Convert to a BSON document
-         *
-         * @return BSON document
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend TableCounter tag_invoke(boost::json::value_to_tag<TableCounter>, boost::json::value const &v) {
+            TableCounter r;
+            r.tableName = v.at("tableName").as_string();
+            r.items = v.at("items").as_int64();
+            r.size = v.at("pageSize").as_int64();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TableCounter &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TableCounter const &obj) {
+            jv = {
+                    {"tableName", obj.tableName},
+                    {"items", obj.items},
+                    {"size", obj.size},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

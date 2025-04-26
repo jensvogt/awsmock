@@ -47,15 +47,4 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string CreateKeyRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const CreateKeyRequest &r) {
-        os << "CreateKeyRequest=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::KMS

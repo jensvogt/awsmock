@@ -39,7 +39,11 @@ namespace AwsMock::Service {
                     std::string marker = Core::HttpUtils::GetStringParameter(request.target(), "Marker");
                     int maxItems = Core::HttpUtils::GetIntParameter(request.target(), "MaxItems", 0, 1000, 1000);
 
-                    Dto::Lambda::ListEventSourceMappingsRequest lambdaRequest = {.functionName = functionName, .eventSourceArn = eventSourceArn, .marker = marker, .maxItems = maxItems};
+                    Dto::Lambda::ListEventSourceMappingsRequest lambdaRequest;
+                    lambdaRequest.functionName = functionName;
+                    lambdaRequest.eventSourceArn = eventSourceArn;
+                    lambdaRequest.marker = marker;
+                    lambdaRequest.maxItems = maxItems;
                     lambdaRequest.region = clientCommand.region;
                     lambdaRequest.user = clientCommand.user;
                     lambdaRequest.requestId = clientCommand.requestId;
@@ -58,7 +62,6 @@ namespace AwsMock::Service {
             Core::HttpUtils::GetVersionAction(request.target(), version, action);
 
             if (action == "functions") {
-
 
                 if (Core::HttpUtils::HasPathParameters(request.target(), 2)) {
 

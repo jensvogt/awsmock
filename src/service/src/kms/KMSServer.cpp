@@ -10,8 +10,8 @@ namespace AwsMock::Service {
 
         // HTTP manager configuration
         Core::Configuration &configuration = Core::Configuration::instance();
-        _removePeriod = configuration.GetValueInt("awsmock.modules.kms.remove.period");
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.kms.monitoring.period");
+        _removePeriod = configuration.GetValue<int>("awsmock.modules.kms.remove.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.kms.monitoring.period");
         log_debug << "KMS server initialized";
 
         // Check module active

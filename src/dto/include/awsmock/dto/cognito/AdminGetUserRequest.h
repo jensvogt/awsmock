@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminGetUserRequest : Common::BaseRequest {
+    struct AdminGetUserRequest final : Common::BaseDto<AdminGetUserRequest> {
 
         /**
          * ID of the user pool
@@ -33,34 +33,18 @@ namespace AwsMock::Dto::Cognito {
         std::string userName;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Convert from a JSON object.
+         * @brief Convert from a JSON object.
          *
          * @param payload json string object
          */
         void FromJson(const std::string &payload);
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Convert to a JSON string
          *
-         * @return DTO as string
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @param r request
-         * @param os output stream
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AdminGetUserRequest &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

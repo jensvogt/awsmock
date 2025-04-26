@@ -44,14 +44,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string InitiateAuthResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const InitiateAuthResponse &r) {
-        os << "InitiateAuthResponse=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

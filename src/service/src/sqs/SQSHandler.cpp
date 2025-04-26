@@ -94,13 +94,13 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
 
-                    Dto::SQS::ListQueueCountersRequest sqsRequest{};
-                    sqsRequest.FromJson(clientCommand.payload);
+                    Dto::SQS::ListQueueCountersRequest sqsRequest = Dto::SQS::ListQueueCountersRequest::FromJson(clientCommand.payload);
                     sqsRequest.region = clientCommand.region;
+                    sqsRequest.user = clientCommand.user;
+                    sqsRequest.requestId = clientCommand.requestId;
 
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
                     log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -280,8 +280,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_MESSAGE_COUNTERS: {
 
-                    Dto::SQS::ListMessageCountersRequest sqsRequest{};
-                    sqsRequest.FromJson(clientCommand.payload);
+                    Dto::SQS::ListMessageCountersRequest sqsRequest = Dto::SQS::ListMessageCountersRequest::FromJson(clientCommand.payload);
+                    sqsRequest.region = clientCommand.region;
+                    sqsRequest.user = clientCommand.user;
+                    sqsRequest.requestId = clientCommand.requestId;
 
                     Dto::SQS::ListMessageCountersResponse sqsResponse = _sqsService.ListMessageCounters(sqsRequest);
                     log_debug << "List queue message counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.total;
@@ -430,10 +432,10 @@ namespace AwsMock::Service {
             if (attributeType == "String" || attributeType == "Number") {
                 attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
             }
-            const Dto::SQS::MessageAttribute messageAttribute = {
-                    .name = attributeName,
-                    .stringValue = attributeValue,
-                    .type = Dto::SQS::MessageAttributeDataTypeFromString(attributeType)};
+            Dto::SQS::MessageAttribute messageAttribute;
+            messageAttribute.name = attributeName;
+            messageAttribute.stringValue = attributeValue;
+            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(attributeType);
             messageAttributes[attributeName] = messageAttribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();

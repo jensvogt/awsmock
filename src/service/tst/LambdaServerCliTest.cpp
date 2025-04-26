@@ -44,10 +44,10 @@ namespace AwsMock::Service {
             }
 
             // Define endpoint
-            const std::string _port = _configuration.GetValueString("awsmock.modules.lambda.port");
-            const std::string _host = _configuration.GetValueString("awsmock.modules.lambda.host");
-            _configuration.SetValueString("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.GetValueString("awsmock.access.account-id");
+            const std::string _port = _configuration.GetValue<std::string>("awsmock.modules.lambda.port");
+            const std::string _host = _configuration.GetValue<std::string>("awsmock.modules.lambda.host");
+            _configuration.SetValue<std::string>("awsmock.service.gateway.http.port", _port);
+            _accountId = _configuration.GetValue<std::string>("awsmock.access.account-id");
             _endpoint = "http://" + _host + ":" + _port;
 
             // Start HTTP manager

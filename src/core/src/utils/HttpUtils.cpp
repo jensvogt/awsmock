@@ -42,7 +42,7 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetQueryString(const std::string &uri) {
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        return r->path();
+        return r->query();
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
@@ -292,6 +292,9 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
+        if (!HasHeader(request, "Content-Type")) {
+            return "application/octet-stream";
+        }
         std::string ct = request.base()[http::field::content_type];
         if (ct.contains("json")) {
             return "application/json";

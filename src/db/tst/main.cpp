@@ -32,12 +32,12 @@ class TestEnvironment final : public ::testing::Environment {
     static void InitializeDatabase() {
 
         // Get database variables
-        const std::string name = AwsMock::Core::Configuration::instance().GetValueString("awsmock.mongodb.name");
-        const std::string host = AwsMock::Core::Configuration::instance().GetValueString("awsmock.mongodb.host");
-        const std::string user = AwsMock::Core::Configuration::instance().GetValueString("awsmock.mongodb.user");
-        const std::string password = AwsMock::Core::Configuration::instance().GetValueString("awsmock.mongodb.password");
-        const int _port = AwsMock::Core::Configuration::instance().GetValueInt("awsmock.mongodb.port");
-        const int poolSize = AwsMock::Core::Configuration::instance().GetValueInt("awsmock.mongodb.pool-size");
+        const std::string name = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.name");
+        const std::string host = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.host");
+        const std::string user = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.user");
+        const std::string password = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.password");
+        const int _port = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.mongodb.port");
+        const int poolSize = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.mongodb.pool-size");
 
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(_port) + "/?maxPoolSize=" + std::to_string(poolSize));

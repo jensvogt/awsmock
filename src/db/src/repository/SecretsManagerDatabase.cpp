@@ -256,7 +256,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SecretsManagerDatabase::DeleteAllSecrets() const {
+    long SecretsManagerDatabase::DeleteAllSecrets() const {
 
         if (HasDatabase()) {
 
@@ -267,20 +267,18 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _secretCollection.delete_many({});
+                const auto result = _secretCollection.delete_many({});
                 session.commit_transaction();
-                log_debug << "Secrets deleted, count: " << delete_many_result->deleted_count();
+                log_debug << "Secrets deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            _memoryDb.DeleteAllSecrets();
         }
+        return _memoryDb.DeleteAllSecrets();
     }
 
 }// namespace AwsMock::Database

@@ -56,15 +56,4 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string EncryptRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const EncryptRequest &r) {
-        os << "EncryptRequest=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::KMS

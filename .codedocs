@@ -37,16 +37,16 @@
 #
 PROJECT_NAME           = awsmock
 INPUT                  = src/
-OUTPUT_DIRECTORY       = docs/html/
+#OUTPUT_DIRECTORY       = docs/html/
 FILE_PATTERNS          = *.h main.cpp
-EXTRACT_ALL            = YES
-EXTRACT_PRIVATE        = YES
-RECURSIVE              = YES
-VERBATIM_HEADERS       = NO
-GENERATE_HTML          = YES
-GENERATE_LATEX         = NO
-GENERATE_XML           = NO
-EXCLUDE_SYMBOLS        = _* plog*
-DOT_GRAPH_MAX_NODES    = 100
-HAVE_DOT               = YES
+#EXTRACT_ALL            = YES
+#EXTRACT_PRIVATE        = YES
+#RECURSIVE              = YES
+#VERBATIM_HEADERS       = NO
+#GENERATE_HTML          = YES
+#GENERATE_LATEX         = NO
+#GENERATE_XML           = NO
+#EXCLUDE_SYMBOLS        = _* plog*
+#DOT_GRAPH_MAX_NODES    = 100
+#HAVE_DOT               = YES
 

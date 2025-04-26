@@ -93,7 +93,7 @@ namespace AwsMock::Database::Entity::Transfer {
 
         // Protocols
         if (mResult.view().find("protocols") != mResult.view().end()) {
-            for (auto [value] = mResult.view()["protocols"].get_array(); auto &p: value) {
+            for (const bsoncxx::array::view jsonArray = mResult.view()["protocols"].get_array().value; auto &p: jsonArray) {
                 if (Protocol protocol = ProtocolFromString(bsoncxx::string::to_string(p.get_string().value)); std::ranges::find(protocols.begin(), protocols.end(), protocol) == protocols.end()) {
                     protocols.emplace_back(ProtocolFromString(bsoncxx::string::to_string(p.get_string().value)));
                 }
@@ -102,7 +102,7 @@ namespace AwsMock::Database::Entity::Transfer {
 
         // Ports
         if (mResult.view().find("ports") != mResult.view().end()) {
-            for (auto [value] = mResult.view()["ports"].get_array(); auto &p: value) {
+            for (const bsoncxx::array::view jsonArray = mResult.view()["ports"].get_array().value; auto &p: jsonArray) {
                 if (const int port = p.get_int32().value; std::ranges::find(ports.begin(), ports.end(), port) == ports.end()) {
                     ports.emplace_back(p.get_int32().value);
                 }

@@ -15,6 +15,7 @@
 #include <awsmock/dto/module/CleanInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ExportInfrastructureResponse.h>
+#include <awsmock/dto/module/ImportInfrastructureRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
@@ -47,7 +48,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()){};
 
         /**
          * @brief Return all list of all modules
@@ -96,9 +97,9 @@ namespace AwsMock::Service {
          * @par
          * The import file should be in MongoDB BSON format. Add SQS queue URLs will be adjusted according to the localhost/port coming from the configuration file.
          *
-         * @param jsonString infrastructure JSON string
+         * @param request infrastructure import request
          */
-        static void ImportInfrastructure(const std::string &jsonString);
+        static void ImportInfrastructure(const Dto::Module::ImportInfrastructureRequest &request);
 
         /**
          * @brief Cleans the current infrastructure.

@@ -7,9 +7,9 @@
 namespace AwsMock::Service {
     SQSServer::SQSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sqs") {
 
-        _monitoringPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.sqs.monitoring.period");
-        _resetPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.sqs.reset.period");
-        _counterPeriod = Core::Configuration::instance().GetValueInt("awsmock.modules.sqs.counter.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring.period");
+        _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset.period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.counter.period");
 
         // Check module active
         if (!IsActive("sqs")) {
