@@ -40,7 +40,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Max number of receivers
          */
-        int retries{};
+        long retries{};
 
       private:
 
@@ -48,7 +48,7 @@ namespace AwsMock::Dto::SQS {
             UpdateDqlRequest r;
             r.queueArn = v.at("prefix").as_string();
             r.targetArn = v.at("targetArn").as_string();
-            r.retries = static_cast<int>(v.at("retries").as_int64());
+            r.retries = v.at("retries").as_int64();
             return r;
         }
 

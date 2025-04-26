@@ -77,6 +77,7 @@ namespace AwsMock::Dto::SQS {
      * @endcode
      */
     struct UpdateMessageRequest final : Common::BaseCounter<UpdateMessageRequest> {
+
         /**
          * Message ID
          */

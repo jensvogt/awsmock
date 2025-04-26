@@ -148,7 +148,7 @@ namespace AwsMock::Service {
     void LambdaServer::CreateContainers() const {
         try {
 
-            // Get lambda list
+            // Get the lambda list
             const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
             if (lambdas.empty()) {
                 return;

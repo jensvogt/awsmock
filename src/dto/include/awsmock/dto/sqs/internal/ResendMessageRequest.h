@@ -15,6 +15,7 @@
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
+
     /**
      * @brief Update message request
      *

@@ -602,7 +602,7 @@ namespace AwsMock::Service {
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
-        std::string supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
+        auto supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::ofstream ofs(dockerFilename);
@@ -670,7 +670,7 @@ namespace AwsMock::Service {
 
     std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) {
         std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
-        Core::TarUtils::TarDirectory(tarFileName, codeDir + "/");
+        Core::TarUtils::TarDirectory(tarFileName, codeDir + Core::FileUtils::separator());
         log_debug << "Zipped TAR file written: " << tarFileName;
 
         return tarFileName;

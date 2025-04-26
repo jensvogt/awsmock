@@ -514,14 +514,10 @@ namespace AwsMock::Service {
                     log_debug << "S3 list bucket counters request";
 
                     // Build request
-                    std::string payload = Core::HttpUtils::GetBodyAsString(request);
-                    Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(payload);
-
-                    // Get object versions
+                    Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(clientCommand);
                     Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
-                    log_debug << s3Response;
 
-                    log_debug << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
+                    log_info << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
@@ -531,13 +527,10 @@ namespace AwsMock::Service {
                     log_debug << "S3 list object counters request";
 
                     // Build request
-                    std::string payload = Core::HttpUtils::GetBodyAsString(request);
-                    Dto::S3::ListObjectCounterRequest s3Request = Dto::S3::ListObjectCounterRequest::FromJson(payload);
-
-                    // Get object versions
+                    Dto::S3::ListObjectCounterRequest s3Request = Dto::S3::ListObjectCounterRequest::FromJson(clientCommand);
                     Dto::S3::ListObjectCounterResponse s3Response = _s3Service.ListObjectCounters(s3Request);
 
-                    log_info << "List object counters, count: " << s3Response.total;
+                    log_info << "List object counters, total: " << s3Response.total << ", count: " << s3Response.total;
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
