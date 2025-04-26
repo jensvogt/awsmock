@@ -43,8 +43,10 @@ namespace AwsMock::Database {
         }
 
         void TearDown() override {
-            _sqsDatabase.DeleteAllQueues();
-            _sqsDatabase.DeleteAllMessages();
+            long count = _sqsDatabase.DeleteAllQueues();
+            log_info << "Deleting all queues, count: " << count;
+            count = _sqsDatabase.DeleteAllMessages();
+            log_info << "Deleting all messages, count: " << count;
         }
 
         std::string _region, _queueUrl, _queueArn, _dlqueueUrl, _dlqueueArn;
@@ -55,10 +57,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueCreateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.CreateQueue(queue);
+        const Entity::SQS::Queue result = _sqsDatabase.CreateQueue(queue);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -68,11 +75,16 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueUrlExistsTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        bool result = _sqsDatabase.QueueUrlExists(_region, _queueUrl);
+        const bool result = _sqsDatabase.QueueUrlExists(_region, _queueUrl);
 
         // assert
         EXPECT_TRUE(result);
@@ -81,11 +93,16 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueArnExistsTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        bool result = _sqsDatabase.QueueArnExists(_queueArn);
+        const bool result = _sqsDatabase.QueueArnExists(_queueArn);
 
         // assert
         EXPECT_TRUE(result);
@@ -94,11 +111,16 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueByIdTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.GetQueueById(queue.oid);
+        const Entity::SQS::Queue result = _sqsDatabase.GetQueueById(queue.oid);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -108,11 +130,16 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueByArnTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.GetQueueByArn(queue.queueArn);
+        const Entity::SQS::Queue result = _sqsDatabase.GetQueueByArn(queue.queueArn);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -122,11 +149,16 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueByUrlTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_region, _queueUrl);
+        const Entity::SQS::Queue result = _sqsDatabase.GetQueueByUrl(_region, _queueUrl);
 
         // assert
         EXPECT_TRUE(result.name == QUEUE_NAME);
@@ -136,11 +168,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueListTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        Entity::SQS::QueueList result = _sqsDatabase.ListQueues(queue.region);
+        const Entity::SQS::QueueList result = _sqsDatabase.ListQueues(queue.region);
 
         // assert
         EXPECT_EQ(result.size(), 1);
@@ -150,13 +186,17 @@ namespace AwsMock::Database {
 
         // arrange
         for (int i = 0; i < 10; i++) {
-            std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
-            Entity::SQS::Queue queue = {.region = _region, .name = name, .owner = OWNER, .queueUrl = _queueUrl};
+            const std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
+            Entity::SQS::Queue queue;
+            queue.region = _region;
+            queue.name = name;
+            queue.owner = OWNER;
+            queue.queueUrl = _queueUrl;
             _sqsDatabase.CreateQueue(queue);
         }
 
         // act
-        Entity::SQS::QueueList result = _sqsDatabase.ListQueues({}, 5, 0, {}, _region);
+        const Entity::SQS::QueueList result = _sqsDatabase.ListQueues({}, 5, 0, {}, _region);
 
         // assert
         EXPECT_EQ(result.size(), 5);
@@ -168,7 +208,11 @@ namespace AwsMock::Database {
         // arrange
         for (int i = 0; i < 10; i++) {
             const std::string name = std::string(QUEUE_NAME) + "_" + std::to_string(i);
-            Entity::SQS::Queue queue = {.region = _region, .name = name, .owner = OWNER, .queueUrl = _queueUrl};
+            Entity::SQS::Queue queue;
+            queue.region = _region;
+            queue.name = name;
+            queue.owner = OWNER;
+            queue.queueUrl = _queueUrl;
             _sqsDatabase.CreateQueue(queue);
         }
 
@@ -184,13 +228,20 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueuePurgeTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
 
         // act
-        _sqsDatabase.PurgeQueue(queue.queueArn);
+        const long count = _sqsDatabase.PurgeQueue(queue.queueArn);
+        EXPECT_TRUE(count > 0);
         const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
@@ -201,7 +252,12 @@ namespace AwsMock::Database {
 
         // arrange
         const std::string _queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
@@ -216,7 +272,11 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueCountTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         _sqsDatabase.CreateQueue(queue);
 
         // act
@@ -229,11 +289,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueCountTotalTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         _sqsDatabase.CreateQueue(queue);
 
         // act
-        long result = _sqsDatabase.CountQueues();
+        const long result = _sqsDatabase.CountQueues();
 
         // assert
         EXPECT_EQ(1, result);
@@ -242,12 +306,17 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, QueueDeleteTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         queue = _sqsDatabase.CreateQueue(queue);
 
         // act
-        _sqsDatabase.DeleteQueue(queue);
-        bool result = _sqsDatabase.QueueExists(queue.region, queue.queueUrl);
+        const long count = _sqsDatabase.DeleteQueue(queue);
+        EXPECT_TRUE(count > 0);
+        const bool result = _sqsDatabase.QueueExists(queue.region, queue.queueUrl);
 
         // assert
         EXPECT_FALSE(result);
@@ -256,12 +325,18 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCreateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
 
         // act
-        Entity::SQS::Message result = _sqsDatabase.CreateMessage(message);
+        const Entity::SQS::Message result = _sqsDatabase.CreateMessage(message);
 
         // assert
         EXPECT_FALSE(result.oid.empty());
@@ -271,13 +346,20 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageExistsTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY, .messageId = "10bdf54e6f7"};
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
+        message.messageId = "10bdf54e6f7";
         message = _sqsDatabase.CreateMessage(message);
 
         // act
-        bool result = _sqsDatabase.MessageExists(message.receiptHandle);
+        const bool result = _sqsDatabase.MessageExists(message.receiptHandle);
 
         // assert
         EXPECT_TRUE(result);
@@ -286,13 +368,19 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageGetByIdTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.region = _region, .name = QUEUE_NAME, .owner = OWNER, .queueUrl = _queueUrl};
+        Entity::SQS::Queue queue;
+        queue.region = _region;
+        queue.name = QUEUE_NAME;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         message = _sqsDatabase.CreateMessage(message);
 
         // act
-        Entity::SQS::Message result = _sqsDatabase.GetMessageById(message.oid);
+        const Entity::SQS::Message result = _sqsDatabase.GetMessageById(message.oid);
 
         // assert
         EXPECT_TRUE(message.oid == result.oid);
@@ -301,9 +389,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageReceiveTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
 
         // act
@@ -317,13 +411,19 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCountTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME)};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
 
         // act
-        long result = _sqsDatabase.CountMessages(queue.queueArn);
+        const long result = _sqsDatabase.CountMessages(queue.queueArn);
 
         // assert
         EXPECT_EQ(1, result);
@@ -332,13 +432,19 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageCountStatusTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME)};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
 
         // act
-        long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+        const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -347,17 +453,24 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageResetTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(queue.queueArn, 1, 1, "", -1, messageList);
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
         // act
-        _sqsDatabase.ResetMessages(queue.queueArn, 1);
-        long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+        const long count = _sqsDatabase.ResetMessages(queue.queueArn, 1);
+        EXPECT_TRUE(count > 0);
+        const long result = _sqsDatabase.CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
 
         // assert
         EXPECT_EQ(1, result);
@@ -368,12 +481,20 @@ namespace AwsMock::Database {
         // arrange
         Entity::SQS::QueueAttribute queueAttribute;
         queueAttribute.delaySeconds = 1;
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = _queueArn, .attributes = queueAttribute};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = _queueArn;
+        queue.attributes = queueAttribute;
         queue = _sqsDatabase.CreateQueue(queue);
 
         system_clock::time_point reset = system_clock::now();
         reset += std::chrono::seconds(queueAttribute.delaySeconds);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY, .status = Entity::SQS::MessageStatus::DELAYED, .reset = reset};
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
+        message.status = Entity::SQS::MessageStatus::DELAYED;
+        message.reset = reset;
         _sqsDatabase.CreateMessage(message);
 
         Entity::SQS::MessageList messageList;
@@ -393,9 +514,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageGetByReceiptHandleTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME)};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(queue.queueArn, 30, 3, "", -1, messageList);
@@ -411,9 +538,16 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageUpdateTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME)};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY, .receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler()};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
+        message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
         message = _sqsDatabase.CreateMessage(message);
 
         // act
@@ -428,9 +562,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageDeleteTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME)};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
         Entity::SQS::MessageList messageList;
         _sqsDatabase.ReceiveMessages(queue.queueArn, 30, 3, "", -1, messageList);
@@ -448,9 +588,15 @@ namespace AwsMock::Database {
     TEST_F(SQSDatabaseTest, MessageDeleteQueueTest) {
 
         // arrange
-        Entity::SQS::Queue queue = {.owner = OWNER, .queueUrl = _queueUrl, .queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME)};
+        Entity::SQS::Queue queue;
+        queue.owner = OWNER;
+        queue.queueUrl = _queueUrl;
+        queue.queueArn = Core::AwsUtils::CreateSQSQueueArn(_region, ACCOUNT_ID, QUEUE_NAME);
         queue = _sqsDatabase.CreateQueue(queue);
-        Entity::SQS::Message message = {.queueArn = queue.queueArn, .body = BODY};
+
+        Entity::SQS::Message message;
+        message.queueArn = queue.queueArn;
+        message.body = BODY;
         _sqsDatabase.CreateMessage(message);
 
         // act

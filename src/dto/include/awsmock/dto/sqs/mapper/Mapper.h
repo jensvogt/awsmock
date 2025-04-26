@@ -75,7 +75,7 @@ namespace AwsMock::Dto::SQS {
          * @return MessageAttributeList
          * @see Database::Entity::SQS::MessageAttributeList
          */
-        static MessageAttributeList map(const Database::Entity::SQS::MessageAttributeList &messageAttributes);
+        static std::map<std::string, MessageAttribute> map(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes);
 
         static std::vector<std::string> excludedAttributeNames;
     };

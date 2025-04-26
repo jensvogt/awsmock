@@ -11,7 +11,7 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
-        const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
 
         // Create an entity and set ARN
         Database::Entity::Lambda::Lambda lambdaEntity = {};

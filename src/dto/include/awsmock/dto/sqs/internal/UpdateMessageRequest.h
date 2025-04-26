@@ -86,7 +86,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attributes (user attributes)
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
       private:
 

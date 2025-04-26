@@ -10,7 +10,7 @@ namespace AwsMock::Service {
 
         log_debug << "Start creating lambda function, oid: " << functionId;
 
-        // Make local copy
+        // Make a local copy
         Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(functionId);
 
         // Create a new instance
@@ -21,6 +21,8 @@ namespace AwsMock::Service {
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
         lambdaEntity.stateReason = "Activated";
         lambdaEntity.codeSize = static_cast<long>(functionCode.size());
+        lambdaEntity.averageRuntime = 0;
+        lambdaEntity.invocations = 0;
         lambdaEntity = Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
 
         log_info << "Lambda function installed: " << lambdaEntity.function << " status: " << LambdaStateToString(lambdaEntity.state);

@@ -615,17 +615,14 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
             log_trace << "Got message: " << message.ToString();
 
-            // Reset all userAttributes
-            const Database::Entity::SQS::MessageAttribute messageAttribute = {
-                    .attributeName = "VisibilityTimeout",
-                    .attributeValue = std::to_string(request.visibilityTimeout),
-                    .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER};
-            message.messageAttributes.push_back(messageAttribute);
+            // Set as attribute
+            message.attributes["VisibilityTimeout"] = std::to_string(request.visibilityTimeout);
             message.reset = system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
             log_trace << "Message updated: " << message.ToString();
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1101,12 +1098,10 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
 
             // Update attributes
-            const auto deleted = std::erase_if(message.messageAttributes,
-                                               [request](const auto &item) {
-                                                   return item.attributeName == request.name;
-                                               });
+            message.attributes.erase(request.name);
             message = _sqsDatabase.UpdateMessage(message);
-            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name << ", deleted: " << deleted;
+            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

@@ -16,19 +16,18 @@ namespace AwsMock::Database::Entity::SQS {
         return messageAttributeDoc;
     }
 
-    std::string MessageAttribute::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
+    void MessageAttribute::FromDocument(const view_or_value<view, value> &object) {
 
-    std::string MessageAttribute::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
+        try {
 
-    std::ostream &operator<<(std::ostream &os, const MessageAttribute &m) {
-        os << "MessageAttribute=" << m.ToJson();
-        return os;
+            attributeName = Core::Bson::BsonUtils::GetStringValue(object, "attributeName");
+            attributeValue = Core::Bson::BsonUtils::GetStringValue(object, "attributeValue");
+            attributeType = MessageAttributeTypeFromString(Core::Bson::BsonUtils::GetStringValue(object, "attributeType"));
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
 }// namespace AwsMock::Database::Entity::SQS

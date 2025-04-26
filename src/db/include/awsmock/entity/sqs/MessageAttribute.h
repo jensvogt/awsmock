@@ -17,15 +17,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::SQS {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     enum MessageAttributeType {
         STRING,
@@ -56,7 +50,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MessageAttribute {
+    struct MessageAttribute final : Common::BaseEntity<MessageAttribute> {
 
         /**
          * Message attribute name
@@ -81,30 +75,38 @@ namespace AwsMock::Database::Entity::SQS {
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the DTO to a JSON string representation.
+         * @brief Converts the entity to a MongoDB document
          *
-         * @return DTO as JSON string
+         * @return entity as MongoDB document.
          */
-        [[nodiscard]] std::string ToJson() const;
+        void FromDocument(const view_or_value<view, value> &object);
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param m message attribute
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
+        friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
+            MessageAttribute r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.attributeName = v.at("attributeName").as_string();
+            r.attributeValue = v.at("attributeValue").as_string();
+            r.attributeType = MessageAttributeTypeFromString(v.at("attributeType").as_string().data());
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"attributeName", obj.attributeName},
+                    {"attributeValue", obj.attributeValue},
+                    {"attributeType", MessageAttributeTypeToString(obj.attributeType)},
+            };
+        }
     };
 
-    typedef std::vector<MessageAttribute> MessageAttributeList;
+    typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
 }// namespace AwsMock::Database::Entity::SQS
 

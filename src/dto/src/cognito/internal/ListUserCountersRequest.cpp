@@ -2,16 +2,17 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/ListUserPoolCountersRequest.h>
+#include <awsmock/dto/cognito/internal/ListUserCountersRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    void ListUserPoolCountersRequest::FromJson(const std::string &payload) {
+    void ListUserCountersRequest::FromJson(const std::string &payload) {
 
         try {
 
             const value documentValue = bsoncxx::from_json(payload);
             region = Core::Bson::BsonUtils::GetStringValue(documentValue, "region");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(documentValue, "userPoolId");
             prefix = Core::Bson::BsonUtils::GetStringValue(documentValue, "prefix");
             pageSize = Core::Bson::BsonUtils::GetIntValue(documentValue, "pageSize");
             pageIndex = Core::Bson::BsonUtils::GetIntValue(documentValue, "pageIndex");
@@ -31,12 +32,13 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolCountersRequest::ToJson() const {
+    std::string ListUserCountersRequest::ToJson() const {
 
         try {
 
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+            Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
             Core::Bson::BsonUtils::SetStringValue(document, "prefix", prefix);
             Core::Bson::BsonUtils::SetIntValue(document, "pageSize", pageSize);
             Core::Bson::BsonUtils::SetIntValue(document, "pageIndex", pageIndex);

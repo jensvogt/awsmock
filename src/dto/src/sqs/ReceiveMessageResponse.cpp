@@ -48,7 +48,7 @@ namespace AwsMock::Dto::SQS {
                     messageArray.append(messageDocument);
                 }
 
-                // Add message array
+                // Add the message array
                 rootDocument.append(kvp("Messages", messageArray));
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
@@ -85,10 +85,10 @@ namespace AwsMock::Dto::SQS {
 
             // Message attributes
             boost::property_tree::ptree messageAttributesTree;
-            for (const auto &at: it.messageAttributes) {
+            for (const auto &val: it.messageAttributes | std::views::values) {
                 boost::property_tree::ptree attributeTree;
-                attributeTree.put("DataType", at.attributeType);
-                attributeTree.put("StringValue", at.attributeValue);
+                attributeTree.put("DataType", val.attributeType);
+                attributeTree.put("StringValue", val.attributeValue);
                 messageAttributesTree.push_back(std::make_pair("", attributeTree));
             }
             messageTree.push_back(std::make_pair("MessageAttributes", messageAttributesTree));

@@ -17,6 +17,7 @@
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>
@@ -30,7 +31,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Message {
+    struct Message final : Common::BaseEntity<Message> {
 
         /**
          * ID
@@ -65,7 +66,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Send retries
          */
-        int retries = 0;
+        long retries = 0;
 
         /**
          * Message size
@@ -121,9 +122,9 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * List of message attributes.
          *
-         * These are the user contributed message attributes.
+         * These are the user-contributed message attributes.
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
         /**
          * Content type
@@ -152,7 +153,7 @@ namespace AwsMock::Database::Entity::SQS {
          * @brief Returns the given attribute as integer
          *
          * @param key attribute key
-         * @return true if attribute with the given key exists
+         * @return true if the attribute with the given key exists
          */
         int GetIntAttribute(const std::string &key);
 
@@ -178,28 +179,59 @@ namespace AwsMock::Database::Entity::SQS {
          */
         void FromDocument(const std::optional<view> &mResult);
 
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
+            Message r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.oid = v.at("oid").as_string();
+            r.queueName = v.at("queueName").as_string();
+            r.queueArn = v.at("queueArn").as_string();
+            r.body = v.at("body").as_string();
+            r.status = MessageStatusFromString(v.at("status").as_string().data());
+            r.reset = Core::DateTimeUtils::FromISO8601(v.at("reset").as_string().data());
+            r.retries = v.at("retries").as_int64();
+            r.size = v.at("score").as_int64();
+            r.visibilityTimeout = v.at("visibilityTimeout").as_int64();
+            r.messageId = v.at("messageId").as_bool();
+            r.receiptHandle = v.at("receiptHandle").as_string();
+            r.md5Body = v.at("md5Body").as_string();
+            r.md5MessageAttributes = v.at("md5MessageAttributes").as_string();
+            r.md5SystemAttributes = v.at("md5SystemAttributes").as_string();
+            r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param m message
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Message &m);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Message const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"oid", obj.oid},
+                    {"queueName", obj.queueName},
+                    {"queueArn", obj.queueArn},
+                    {"body", obj.body},
+                    {"status", MessageStatusToString(obj.status)},
+                    {"reset", Core::DateTimeUtils::ToISO8601(obj.reset)},
+                    {"retries", obj.retries},
+                    {"size", obj.size},
+                    {"visibilityTimeout", obj.visibilityTimeout},
+                    {"messageId", obj.messageId},
+                    {"receiptHandle", obj.receiptHandle},
+                    {"md5Body", obj.md5Body},
+                    {"md5MessageAttributes", obj.md5MessageAttributes},
+                    {"md5SystemAttributes", obj.md5SystemAttributes},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
     typedef std::vector<Message> MessageList;

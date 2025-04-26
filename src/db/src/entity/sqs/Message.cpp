@@ -27,14 +27,13 @@ namespace AwsMock::Database::Entity::SQS {
         return static_cast<int>(erase_if(attributes, [key](const std::pair<std::string, std::string> &attribute) {
             return attribute.first == key;
         }));
-        return -1;
     }
 
     view_or_value<view, value> Message::ToDocument() const {
 
-        auto messageAttributesDoc = array{};
-        for (const auto &messageAttribute: messageAttributes) {
-            messageAttributesDoc.append(messageAttribute.ToDocument());
+        auto messageAttributesDoc = document{};
+        for (const auto &[fst, snd]: messageAttributes) {
+            messageAttributesDoc.append(kvp(fst, snd.ToDocument()));
         }
 
         auto attributesDoc = document{};
@@ -88,13 +87,11 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Attributes
             if (mResult.value().find("messageAttributes") != mResult.value().end()) {
-                for (const bsoncxx::array::view attributesView{mResult.value()["messageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
-                    MessageAttribute attribute{
-                            .attributeName = bsoncxx::string::to_string(attributeElement["attributeName"].get_string().value),
-                            .attributeValue = bsoncxx::string::to_string(attributeElement["attributeValue"].get_string().value),
-                            .attributeType = MessageAttributeTypeFromString(bsoncxx::string::to_string(attributeElement["attributeType"].get_string().value)),
-                    };
-                    messageAttributes.push_back(attribute);
+                for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
+                    MessageAttribute attribute;
+                    std::string key = bsoncxx::string::to_string(a.key());
+                    attribute.FromDocument(messageAttributeObject);
+                    messageAttributes[key] = attribute;
                 }
             }
 
@@ -111,21 +108,6 @@ namespace AwsMock::Database::Entity::SQS {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-    }
-
-    std::string Message::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string Message::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Message &m) {
-        os << "Message=" << to_json(m.ToDocument());
-        return os;
     }
 
 }// namespace AwsMock::Database::Entity::SQS
