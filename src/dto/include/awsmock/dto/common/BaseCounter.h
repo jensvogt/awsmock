@@ -16,9 +16,13 @@
 #include <boost/version.hpp>
 
 // AwsMock includes
+#include "BaseClientCommand.h"
+
+
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Dto::Common {
+    class BaseClientCommand;
 
     /**
      * @brief Base Counter for the frontend
@@ -58,6 +62,7 @@ namespace AwsMock::Dto::Common {
          */
         [[nodiscard]] virtual std::string ToJson() const {
             std::stringstream ss;
+            //ss << boost::json::value_from(*dynamic_cast<const BaseCounter *>(this));
             ss << boost::json::value_from(*dynamic_cast<const T *>(this));
             return ss.str();
         }
@@ -68,7 +73,21 @@ namespace AwsMock::Dto::Common {
          * @param jsonString JSON string
          */
         static T FromJson(const std::string &jsonString) {
+            //boost::json::value_to<BaseCounter>(boost::json::parse(jsonString));
             return boost::json::value_to<T>(boost::json::parse(jsonString));
+        }
+
+        /**
+         * @brief Convert from JSON representation base inside client command
+         *
+         * @param clientCommand base client command
+         */
+        static T FromJson(const BaseClientCommand &clientCommand) {
+            T t = boost::json::value_to<T>(boost::json::parse(clientCommand.payload));
+            t.region = clientCommand.region;
+            t.user = clientCommand.user;
+            t.requestId = clientCommand.requestId;
+            return t;
         }
 
 #ifndef _WIN32
@@ -109,6 +128,24 @@ namespace AwsMock::Dto::Common {
          */
         template<class S>
         friend std::ostream &operator<<(std::ostream &os, const BaseCounter &i);
+
+      private:
+
+        friend BaseCounter tag_invoke(boost::json::value_to_tag<BaseCounter>, boost::json::value const &v) {
+            BaseCounter r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BaseCounter const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Common

@@ -13,17 +13,13 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
     using std::chrono::system_clock;
 
-    struct TopicCounter {
-
-        /**
-         * Topic URL
-         */
-        std::string topicUrl;
+    struct TopicCounter final : Common::BaseCounter<TopicCounter> {
 
         /**
          * Topic ARN
@@ -36,16 +32,6 @@ namespace AwsMock::Dto::SNS {
         std::string topicName;
 
         /**
-         * Created
-         */
-        system_clock::time_point created;
-
-        /**
-         * Modified
-         */
-        system_clock::time_point modified;
-
-        /**
          * Retention period
          */
         long retentionPeriod = 0;
@@ -56,21 +42,24 @@ namespace AwsMock::Dto::SNS {
         long maxMessageSize = 0;
 
         /**
-         * Total number of available message
+         * Total number of available messages
          */
         long availableMessages = 0;
 
         /**
-         * Total size of all message in the topic
+         * Total size of all messages in the topic
          */
         long size = 0;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
+         * Created
          */
-        [[nodiscard]] std::string ToJson() const;
+        system_clock::time_point created;
+
+        /**
+         * Modified
+         */
+        system_clock::time_point modified;
 
         /**
          * @brief Converts the DTO to a JSON representation.
@@ -79,22 +68,34 @@ namespace AwsMock::Dto::SNS {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TopicCounter &r);
+        friend TopicCounter tag_invoke(boost::json::value_to_tag<TopicCounter>, boost::json::value const &v) {
+            TopicCounter r;
+            r.topicArn = v.at("topicArn").as_string();
+            r.topicName = v.at("topicName").as_string();
+            r.retentionPeriod = v.at("retentionPeriod").as_int64();
+            r.maxMessageSize = v.at("maxMessageSize").as_int64();
+            r.availableMessages = v.at("availableMessages").as_int64();
+            r.size = v.at("size").as_int64();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TopicCounter const &obj) {
+            jv = {
+                    {"topicArn", obj.topicArn},
+                    {"topicName", obj.topicName},
+                    {"retentionPeriod", obj.retentionPeriod},
+                    {"maxMessageSize", obj.maxMessageSize},
+                    {"availableMessages", obj.availableMessages},
+                    {"size", obj.size},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
-
-    typedef std::vector<TopicCounter> TopicCounterList;
 
 }// namespace AwsMock::Dto::SNS
 

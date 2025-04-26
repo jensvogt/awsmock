@@ -57,6 +57,9 @@ COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
 COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
 COPY --from=build /usr/local/lib/* /usr/local/lib
+COPY --from=build /lib/x86_64-linux-gnu/libicudata.so.72 /lib/x86_64-linux-gnu/
+COPY --from=build /lib/x86_64-linux-gnu/libicui18n.so.72 /lib/x86_64-linux-gnu/
+COPY --from=build /lib/x86_64-linux-gnu/libicuuc.so.72 /lib/x86_64-linux-gnu/
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
