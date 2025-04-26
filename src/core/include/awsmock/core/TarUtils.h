@@ -29,6 +29,7 @@
 #include <archive_entry.h>
 
 // AwsMock includes
+#include <awsmock/core/FileUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 

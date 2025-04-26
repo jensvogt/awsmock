@@ -266,14 +266,18 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        const std::string level = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level");
+        const auto level = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level");
         AwsMock::Core::LogStream::SetSeverity(level);
     }
 
     // Set the log file
     if (AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.dir") &&
         AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.prefix")) {
-        AwsMock::Core::LogStream::AddFile();
+        auto logDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
+        auto prefix = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
+        int size = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-size");
+        int count = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-count");
+        AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
     }
 
 #ifdef WIN32

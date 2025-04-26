@@ -19,7 +19,7 @@
       }
     },
     "dockerized": false,
-    "magic-file": "/usr/local/awsmocket/etc/magic.mgc",
+    "magic-file": "/usr/local/awsmock/etc/magic.mgc",
     "autoload": {
       "active": true,
       "file": "/usr/local/awsmock/init/init.json",
@@ -40,7 +40,7 @@
     "modules": {
       "s3": {
         "active": true,
-        "data-dir": "/usr/local/awsmockdata/s3",
+        "data-dir": "/usr/local/awsmock/data/s3",
         "monitoring": {
           "period": "900"
         },
@@ -82,7 +82,7 @@
       "lambda": {
         "active": true,
         "lifetime": 3600,
-        "data-dir": "/usr/local/awsmockdata/lambda",
+        "data-dir": "/usr/local/awsmock/data/lambda",
         "monitoring": {
           "period": 300
         },
@@ -110,7 +110,7 @@
       "transfer": {
         "active": true,
         "bucket": "transfer-server",
-        "data-dir": "/usr/local/awsmockdata/transfer",
+        "data-dir": "/usr/local/awsmock/data/transfer",
         "monitoring": {
           "period": 300
         },
