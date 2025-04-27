@@ -419,7 +419,7 @@ namespace AwsMock::Service {
         // Get database object
         Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-        const std::string dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
         // Get all file parts
@@ -448,7 +448,7 @@ namespace AwsMock::Service {
             object.size = fileSize;
             object.md5sum = md5sum;
             object.internalName = filename;
-            object.contentType = Core::FileUtils::GetContentType(outFile);
+            object.contentType = Core::FileUtils::GetContentType(outFile, record);
             object = _database.UpdateObject(object);
 
             // Calculate the hashes asynchronously
