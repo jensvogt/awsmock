@@ -361,7 +361,7 @@ namespace AwsMock::Database {
          * @param maxRetries maximal number of retries
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) const;
+        void ReceiveMessages(const std::string &queueArn, long visibility, long maxResult, const std::string &dlQueueArn, long maxRetries, Entity::SQS::MessageList &messageList) const;
 
         /**
          * @brief Reset expired resources

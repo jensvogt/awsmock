@@ -23,7 +23,7 @@ namespace AwsMock::Dto::SQS {
             UpdateLengthAndBytes(context, fst);
 
             // Encoded data type
-            UpdateLengthAndBytes(context, MessageAttributeDataTypeToString(snd.type));
+            UpdateLengthAndBytes(context, MessageAttributeDataTypeToString(snd.dataType));
 
             // Encoded value
             if (!snd.stringValue.empty()) {
@@ -61,12 +61,12 @@ namespace AwsMock::Dto::SQS {
     void MessageAttribute::FromDocument(const view_or_value<view, value> &jsonObject) {
 
         try {
-            for (const auto &element: jsonObject.view()) {
-                std::string name = bsoncxx::string::to_string(element.key());
-                view value = element[name].get_document().value;
-                type = MessageAttributeDataTypeFromString(bsoncxx::string::to_string(value["DataType"].get_string().value));
-                if (type == STRING || type == NUMBER) {
-                    stringValue = Core::Bson::BsonUtils::GetStringValue(value, "StringValue");
+            stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+            dataType = MessageAttributeDataTypeFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "DataType"));
+
+            if (jsonObject.view().find("StringListValues") != jsonObject.view().end()) {
+                for (const bsoncxx::array::view jsonStringListArray = jsonObject.view()["StringListValues"].get_array().value; const auto &element: jsonStringListArray) {
+                    stringListValues.push_back(bsoncxx::string::to_string(element.get_string().value));
                 }
             }
         } catch (bsoncxx::exception &e) {
@@ -79,43 +79,17 @@ namespace AwsMock::Dto::SQS {
 
         try {
             document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "name", name);
             Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
-            Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
-            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
-            return document.extract();
+            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(dataType));
 
-        } catch (bsoncxx::exception &e) {
-            log_error << e.what();
-            throw Core::JsonException(e.what());
-        }
-    }
-
-    /*void MessageAttribute::FromJson(const view_or_value<view, value> &jsonObject) {
-
-        FromDocument(jsonObject);
-                try {
-            for (const auto &element: jsonObject) {
-                std::string name = bsoncxx::string::to_string(element.key());
-                view value = element[name].get_document().value;
-                type = MessageAttributeDataTypeFromString(bsoncxx::string::to_string(value["DataType"].get_string().value));
-                if (type == STRING || type == NUMBER) {
-                    stringValue = Core::Bson::BsonUtils::GetStringValue(value, "StringValue");
+            // String list values
+            if (!stringListValues.empty()) {
+                array stringListArrayJson;
+                for (const auto &stringListValue: stringListValues) {
+                    stringListArrayJson.append(stringListValue);
                 }
+                document.append(kvp("StringListValues", stringListArrayJson));
             }
-        } catch (bsoncxx::exception &e) {
-            log_error << e.what();
-            throw Core::JsonException(e.what());
-        }
-    }
-
-    view_or_value<view, value> MessageAttribute::ToJson() const {
-
-        try {
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
-            Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
-            Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
             return document.extract();
 
         } catch (bsoncxx::exception &e) {
@@ -123,5 +97,5 @@ namespace AwsMock::Dto::SQS {
             throw Core::JsonException(e.what());
         }
     }
-*/
+
 }// namespace AwsMock::Dto::SQS

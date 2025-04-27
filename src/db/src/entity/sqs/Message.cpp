@@ -90,7 +90,7 @@ namespace AwsMock::Database::Entity::SQS {
                 for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(a.key());
-                    attribute.FromDocument(messageAttributeObject);
+                    attribute.FromDocument(a.get_document().value);
                     messageAttributes[key] = attribute;
                 }
             }

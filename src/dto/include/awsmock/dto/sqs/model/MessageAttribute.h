@@ -19,11 +19,6 @@ namespace AwsMock::Dto::SQS {
     struct MessageAttribute final : Common::BaseCounter<MessageAttribute> {
 
         /**
-         * Message attribute name
-         */
-        std::string name{};
-
-        /**
          * Message attribute string value
          */
         std::string stringValue = {};
@@ -31,7 +26,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attribute number value
          */
-        long numberValue = -1;
+        std::vector<std::string> stringListValues = {};
 
         /**
          * Message attribute binary value
@@ -41,7 +36,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Logical data type
          */
-        MessageAttributeDataType type{};
+        MessageAttributeDataType dataType{};
 
         /**
          * @brief Returns the MD5 sum of all message attributes (user attributes).
@@ -90,11 +85,10 @@ namespace AwsMock::Dto::SQS {
             r.region = v.at("region").as_string();
             r.user = v.at("user").as_string();
             r.requestId = v.at("requestId").as_string();
-            r.name = v.at("name").as_string();
             r.stringValue = v.at("stringValue").as_string();
-            r.numberValue = v.at("numberValue").as_int64();
+            r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("stringListValues"));
             //r.binaryValue = v.at("binaryValue").as_uint64();
-            r.type = MessageAttributeDataTypeFromString(v.at("type").as_string().data());
+            r.dataType = MessageAttributeDataTypeFromString(v.at("dataType").as_string().data());
             return r;
         }
 
@@ -103,10 +97,9 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"name", obj.name},
                     {"stringValue", obj.stringValue},
-                    {"numberValue", obj.numberValue},
-                    {"type", MessageAttributeDataTypeToString(obj.type)},
+                    {"stringListValues", boost::json::value_from(obj.stringListValues)},
+                    {"dataType", MessageAttributeDataTypeToString(obj.dataType)},
             };
         }
     };

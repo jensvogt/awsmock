@@ -875,8 +875,7 @@ namespace AwsMock::Service {
         // Check input parameter
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
@@ -885,8 +884,8 @@ namespace AwsMock::Service {
 
             // Check re-drive policy
             std::string dlQueueArn{};
-            int maxRetries = -1;
-            const int visibilityTimeout = queue.attributes.visibilityTimeout;
+            long maxRetries = -1;
+            const long visibilityTimeout = queue.attributes.visibilityTimeout;
             if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
                 dlQueueArn = queue.attributes.redrivePolicy.deadLetterTargetArn;
                 maxRetries = queue.attributes.redrivePolicy.maxReceiveCount;
@@ -989,16 +988,9 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
-            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(
-                    request.queueArn,
-                    request.prefix,
-                    request.pageSize,
-                    request.pageIndex,
-                    Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            return Dto::SQS::Mapper::map(messages, total);
 
-            Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
-            log_info << "SQS list message counters response: " << listMessagesResponse.ToJson();
-            return listMessagesResponse;
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

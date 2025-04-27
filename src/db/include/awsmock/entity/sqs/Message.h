@@ -142,10 +142,10 @@ namespace AwsMock::Database::Entity::SQS {
         system_clock::time_point modified;
 
         /**
-         * @brief Checks for the existence of a attribute with the given key.
+         * @brief Checks for the existence of an attribute with the given key.
          *
          * @param key attribute key
-         * @return true if attribute with the given key exists
+         * @return true if an attribute with the given key exists
          */
         bool HasAttribute(const std::string &key);
 

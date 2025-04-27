@@ -1447,7 +1447,7 @@ namespace AwsMock::FtpServer {
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
         // Get content type
-        std::string contentType = Core::FileUtils::GetContentType(fileName);
+        std::string contentType = Core::FileUtils::GetContentType(fileName, key);
         long contentLength = Core::FileUtils::FileSize(fileName);
 
         Dto::S3::PutObjectRequest request = {

@@ -22,11 +22,7 @@ namespace AwsMock::Dto::SQS {
                 for (const view attributesView = document.view()["MessageAttributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
-                    view value = attributesView[key].get_document().view();
-                    attribute.type = MessageAttributeDataTypeFromString(bsoncxx::string::to_string(value["DataType"].get_string().value));
-                    if (attribute.type == STRING || attribute.type == NUMBER) {
-                        attribute.stringValue = Core::Bson::BsonUtils::GetStringValue(value, "StringValue");
-                    }
+                    attribute.FromDocument(attributeElement.get_document().value);
                     messageAttributes[key] = attribute;
                 }
             }

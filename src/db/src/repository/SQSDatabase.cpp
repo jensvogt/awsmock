@@ -741,7 +741,7 @@ namespace AwsMock::Database {
         return messageList;
     }
 
-    void SQSDatabase::ReceiveMessages(const std::string &queueArn, const int visibility, const int maxResult, const std::string &dlQueueArn, const int maxRetries, Entity::SQS::MessageList &messageList) const {
+    void SQSDatabase::ReceiveMessages(const std::string &queueArn, const long visibility, const long maxResult, const std::string &dlQueueArn, const long maxRetries, Entity::SQS::MessageList &messageList) const {
 
         const auto reset = system_clock::now() + std::chrono::seconds(visibility);
 
@@ -779,7 +779,7 @@ namespace AwsMock::Database {
                         document setQuery;
                         setQuery.append(kvp("queueArn", dlQueueArn));
                         setQuery.append(kvp("queueUrl", dlqQueueUrl));
-                        setQuery.append(kvp("dlqQueueName", dlqQueueName));
+                        setQuery.append(kvp("queueName", dlqQueueName));
                         setQuery.append(kvp("receiptHandle", ""));
                         setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
 

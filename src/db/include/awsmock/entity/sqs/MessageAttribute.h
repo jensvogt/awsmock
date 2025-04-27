@@ -23,13 +23,17 @@ namespace AwsMock::Database::Entity::SQS {
 
     enum MessageAttributeType {
         STRING,
-        NUMBER,
-        BINARY
+        STRING_LIST,
+        BINARY,
+        BINARY_LIST,
+        UNKNOWN
     };
     static std::map<MessageAttributeType, std::string> MessageAttributeTypeNames{
             {STRING, "String"},
-            {NUMBER, "Number"},
+            {STRING_LIST, "StringList"},
             {BINARY, "Binary"},
+            {BINARY_LIST, "BinaryList"},
+            {UNKNOWN, "Unknown"},
     };
 
     [[maybe_unused]] static std::string MessageAttributeTypeToString(MessageAttributeType messageAttributeType) {
@@ -42,7 +46,7 @@ namespace AwsMock::Database::Entity::SQS {
                 return fst;
             }
         }
-        return STRING;
+        return UNKNOWN;
     }
 
     /**
@@ -53,19 +57,31 @@ namespace AwsMock::Database::Entity::SQS {
     struct MessageAttribute final : Common::BaseEntity<MessageAttribute> {
 
         /**
-         * Message attribute name
+         * Attribute string value
          */
-        std::string attributeName;
+        std::string stringValue;
+
+        /**
+         * Attribute string list values
+         */
+        std::vector<std::string> stringListValues;
 
         /**
          * Message attribute value
          */
-        std::string attributeValue;
+        MessageAttributeType dataType = STRING;
 
         /**
-         * Message attribute value
+         * Attribute binary value
          */
-        MessageAttributeType attributeType;
+        // TODO: proper implementation of bytes
+        //std::vector<std::byte> binaryValue;
+
+        /**
+         * Attribute binary value list
+         */
+        // TODO: proper implementation of bytes
+        //std::vector<std::vector<std::byte>> binaryListValues;
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -88,9 +104,12 @@ namespace AwsMock::Database::Entity::SQS {
             r.region = v.at("region").as_string();
             r.user = v.at("user").as_string();
             r.requestId = v.at("requestId").as_string();
-            r.attributeName = v.at("attributeName").as_string();
-            r.attributeValue = v.at("attributeValue").as_string();
-            r.attributeType = MessageAttributeTypeFromString(v.at("attributeType").as_string().data());
+            r.stringValue = v.at("stringValue").as_string();
+            r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("stringValue"));
+            // TODO: proper implementation of bytes
+            //r.binaryValue = boost::json::value_to<std::vector<std::byte>>(v.at("binaryValue"));
+            //r.binaryListValues = boost::json::value_to<std::vector<std::vector<std::byte>>>(v.at("binaryListValues"));
+            r.dataType = MessageAttributeTypeFromString(v.at("attributeType").as_string().data());
             return r;
         }
 
@@ -99,9 +118,12 @@ namespace AwsMock::Database::Entity::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"attributeName", obj.attributeName},
-                    {"attributeValue", obj.attributeValue},
-                    {"attributeType", MessageAttributeTypeToString(obj.attributeType)},
+                    {"stringValue", obj.stringValue},
+                    {"stringListValue", boost::json::value_from(obj.stringListValues)},
+                    // TODO: proper implementation of bytes
+                    //{"binaryValue", boost::json::value_from(obj.binaryValue)},
+                    //{"binaryListValues", boost::json::value_from(obj.binaryListValues)},
+                    {"dataType", MessageAttributeTypeToString(obj.dataType)},
             };
         }
     };

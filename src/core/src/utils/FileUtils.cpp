@@ -406,8 +406,8 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string FileUtils::GetContentType(const std::string &path) {
-        if (const std::string extension = boost::filesystem::path(path).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
+    std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
+        if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
         return GetContentTypeMagicFile(path);
@@ -552,6 +552,11 @@ namespace AwsMock::Core {
         out << decoded;
         out.close();
         MoveTo(outFilepath, filePath);
+    }
+
+    void FileUtils::RemoveLastBytes(const std::string &filename, const long size) {
+        const std::filesystem::path p(filename);
+        std::filesystem::resize_file(p, std::filesystem::file_size(p) - size);
     }
 
 }// namespace AwsMock::Core

@@ -415,18 +415,17 @@ namespace AwsMock::Service {
 
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         for (int i = 1; i <= attributeCount / 3; i++) {
-            std::string attributeName = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
-            std::string attributeType = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
+            std::string name = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
+            std::string dataTape = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
 
-            std::string attributeValue;
-            if (attributeType == "String" || attributeType == "Number") {
-                attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
+            std::string stringValue;
+            if (dataTape == "String" || dataTape == "Number") {
+                stringValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
             }
             Dto::SQS::MessageAttribute messageAttribute;
-            messageAttribute.name = attributeName;
-            messageAttribute.stringValue = attributeValue;
-            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(attributeType);
-            messageAttributes[attributeName] = messageAttribute;
+            messageAttribute.stringValue = stringValue;
+            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(dataTape);
+            messageAttributes[name] = messageAttribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;

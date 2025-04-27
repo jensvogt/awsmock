@@ -6,8 +6,6 @@
 
 namespace AwsMock::Dto::SQS {
 
-    //    std::vector<std::string> Mapper::excludedAttributeNames = {"contentType", "id", "timestamp"};
-
     Database::Entity::SQS::Message Mapper::map(const SendMessageRequest &request) {
 
         Database::Entity::SQS::Message messageEntity;
@@ -17,9 +15,9 @@ namespace AwsMock::Dto::SQS {
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Database::Entity::SQS::MessageAttribute attribute;
-            attribute.attributeName = fst;
-            attribute.attributeValue = snd.stringValue;
-            attribute.attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type));
+            attribute.stringValue = snd.stringValue;
+            attribute.stringListValues = snd.stringListValues;
+            attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
             messageEntity.messageAttributes[fst] = attribute;
         }
         return messageEntity;
@@ -65,22 +63,22 @@ namespace AwsMock::Dto::SQS {
         Database::Entity::SQS::MessageAttributeList messageAttributeList{};
         for (const auto &[fst, snd]: messageAttributes) {
             Database::Entity::SQS::MessageAttribute messageAttribute;
-            messageAttribute.attributeName = fst;
-            messageAttribute.attributeValue = snd.stringValue;
-            messageAttribute.attributeType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type));
+            messageAttribute.stringValue = fst;
+            messageAttribute.stringListValues = snd.stringListValues;
+            messageAttribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
             messageAttributeList[fst] = messageAttribute;
         }
         return messageAttributeList;
     }
 
     std::map<std::string, MessageAttribute> Mapper::map(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes) {
-        MessageAttributeList messageAttributeList{};
+        std::map<std::string, MessageAttribute> messageAttributeList{};
         if (!messageAttributes.empty()) {
             for (const auto &[fst, snd]: messageAttributes) {
                 MessageAttribute messageAttribute;
-                messageAttribute.name = fst;
-                messageAttribute.type = MessageAttributeDataTypeFromString(Database::Entity::SQS::MessageAttributeTypeToString(snd.attributeType));
-                messageAttribute.stringValue = snd.attributeValue;
+                messageAttribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SQS::MessageAttributeTypeToString(snd.dataType));
+                messageAttribute.stringValue = snd.stringValue;
+                messageAttribute.stringListValues = snd.stringListValues;
                 messageAttributeList[fst] = messageAttribute;
             }
         }

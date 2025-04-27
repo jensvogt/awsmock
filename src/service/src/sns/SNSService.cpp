@@ -652,11 +652,9 @@ namespace AwsMock::Service {
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Dto::SQS::MessageAttribute messageAttribute;
-            messageAttribute.name = fst;
             messageAttribute.stringValue = snd.stringValue;
-            messageAttribute.numberValue = snd.numberValue;
             messageAttribute.binaryValue = snd.binaryValue;
-            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type));
+            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type));
             sendMessageRequest.messageAttributes[fst] = messageAttribute;
         }
 
