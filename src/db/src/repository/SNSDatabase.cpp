@@ -761,8 +761,7 @@ namespace AwsMock::Database {
 
             try {
                 session.start_transaction();
-                const auto result = messageCollection.delete_many(
-                        make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
+                const auto result = messageCollection.delete_many(make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
                 if (static_cast<long>(result->deleted_count()) > 0) {
                     log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
@@ -780,7 +779,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SNSDatabase::DeleteAllMessages() const {
+    long SNSDatabase::DeleteAllMessages() const {
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -790,13 +789,14 @@ namespace AwsMock::Database {
 
                 // Adjust all topic message counters
                 AdjustAllMessageCounters();
+                return result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else {
-            _memoryDb.DeleteAllMessages();
         }
+        return _memoryDb.DeleteAllMessages();
     }
 
     void SNSDatabase::AdjustAllMessageCounters() const {
