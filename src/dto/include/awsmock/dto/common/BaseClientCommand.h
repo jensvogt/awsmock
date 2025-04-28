@@ -5,6 +5,9 @@
 #ifndef AWSMOCK_DTO_BASE_CLIENT_COMMAND_H
 #define AWSMOCK_DTO_BASE_CLIENT_COMMAND_H
 
+// C++ standard includes
+#include <map>
+
 // Boost includes
 #include <boost/beast/http/verb.hpp>
 

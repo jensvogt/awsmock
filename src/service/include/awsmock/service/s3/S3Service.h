@@ -15,8 +15,6 @@
 #endif
 
 // Boost includes
-//#include <boost/coroutine/all.hpp>
-#include <boost/iostreams/copy.hpp>
 #include <boost/thread/thread.hpp>
 
 // AwsMock includes

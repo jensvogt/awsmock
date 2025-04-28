@@ -27,6 +27,7 @@
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
+#include <awsmock/dto/cognito/model/UserPoolCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -54,6 +55,14 @@ namespace AwsMock::Dto::Cognito {
          * @return vector of UserPool DTOs
          */
         static std::vector<UserPool> map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities);
+
+        /**
+         * @brief Maps a list of user pool entities to a list of user pool DTOs
+         *
+         * @param userPoolEntities list of user pool entities
+         * @return vector of UserPool counter DTOs
+         */
+        static std::vector<UserPoolCounter> mapCounter(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities);
 
         /**
          * @brief Maps a user entity to a user DTO
@@ -120,7 +129,7 @@ namespace AwsMock::Dto::Cognito {
          * @return UserPoolClient
          * @see CreateUserPoolClientRequest
          */
-        static Database::Entity::Cognito::UserPoolClient map(const Dto::Cognito::CreateUserPoolClientRequest &request);
+        static Database::Entity::Cognito::UserPoolClient map(const CreateUserPoolClientRequest &request);
 
         /**
          * @brief Maps a user pool client entity  to an DTO

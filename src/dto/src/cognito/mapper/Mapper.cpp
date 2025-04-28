@@ -124,6 +124,23 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDtos;
     }
 
+    std::vector<UserPoolCounter> Mapper::mapCounter(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities) {
+        std::vector<UserPoolCounter> userPoolCounterDtos;
+        for (const auto &userPoolEntity: userPoolEntities) {
+            UserPoolCounter userPoolCounterDto;
+                userPoolCounterDto.id = userPoolEntity.userPoolId,
+                userPoolCounterDto.region = userPoolEntity.region,
+                userPoolCounterDto.name = userPoolEntity.name,
+                userPoolCounterDto.userPoolId = userPoolEntity.userPoolId,
+                userPoolCounterDto.arn = userPoolEntity.arn,
+                userPoolCounterDto.domain = userPoolEntity.domain.domain,
+                userPoolCounterDto.created = userPoolEntity.created,
+                userPoolCounterDto.modified = userPoolEntity.modified;
+            userPoolCounterDtos.emplace_back(userPoolCounterDto);
+        }
+        return userPoolCounterDtos;
+    }
+
     User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
         User userDto = {
                 .region = userEntity.region,
