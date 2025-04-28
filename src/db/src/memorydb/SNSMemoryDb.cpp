@@ -370,10 +370,11 @@ namespace AwsMock::Database {
         log_debug << "Old resources deleted, timeout: " << timeout << " count: " << count;
     }
 
-    void SNSMemoryDb::DeleteAllMessages() {
+    long SNSMemoryDb::DeleteAllMessages() {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
-
+        const long deleted = _messages.size();
         log_debug << "All resources deleted, count: " << _messages.size();
         _messages.clear();
+        return deleted;
     }
 }// namespace AwsMock::Database

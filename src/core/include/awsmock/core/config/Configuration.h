@@ -260,7 +260,7 @@ namespace AwsMock::Core {
         //     value = ReplaceEnvironmentVariables(value);
         // }
         _treeConfiguration.put<T>(key, value);
-        std::cerr << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue << std::endl;
+        log_debug << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
 
     template<class T>
@@ -282,23 +282,23 @@ namespace AwsMock::Core {
             array.push_back(std::make_pair("", child));
         }
         _treeConfiguration.add_child(key, array);
-        std::cerr << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue << std::endl;
+        log_debug << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
 
     template<class T>
     void Configuration::SetValue(const std::string &key, const T &value) {
         if (!HasProperty(key)) {
-            std::cerr << "Property not found, key: " << key << std::endl;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         _treeConfiguration.get_child(key).put_value<T>(value);
-        std::cerr << "Value set, key: " << key << ", value: " << _treeConfiguration.get<T>(key) << std::endl;
+        log_debug << "Value set, key: " << key << ", value: " << _treeConfiguration.get<T>(key);
     }
 
     template<class T>
     T Configuration::GetValue(const std::string &key) const {
         if (!HasProperty(key)) {
-            std::cerr << "Property not found, key: " << key << std::endl;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         return _treeConfiguration.get_child(key).get_value<T>();
@@ -307,12 +307,14 @@ namespace AwsMock::Core {
     template<class T>
     std::vector<T> Configuration::GetValueArray(const std::string &key) const {
         if (!HasProperty(key)) {
-            std::cerr << "Property not found, key: " << key;
+            log_error << "Property not found, key: " << key;
             throw CoreException("Property not found, key: " + key);
         }
         std::vector<std::string> r;
-        for (const auto &val: _treeConfiguration.get_child(key) | std::views::values)
+        for (const auto &val: _treeConfiguration.get_child(key) | std::views::values) {
             r.push_back(val.get_value<std::string>());
+        }
+        log_debug << "Value aray set, key: " << key << ", count: " << r.size();
         return r;
     }
 

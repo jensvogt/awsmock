@@ -21,13 +21,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Total number of queues
          */
-        long total;
+        long total{};
 
       private:
 
         friend ListQueueCountersResponse tag_invoke(boost::json::value_to_tag<ListQueueCountersResponse>, boost::json::value const &v) {
             ListQueueCountersResponse r;
-            r.region = v.at("region").as_string();
             r.user = v.at("user").as_string();
             r.requestId = v.at("requestId").as_string();
             r.total = v.at("total").as_int64();

@@ -2,23 +2,23 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/ListUserCountersResponse.h>
+#include <awsmock/dto/cognito/internal/ListUserPoolCountersResponse.h>
 
 namespace AwsMock::Dto::Cognito {
 
-    std::string ListUserCountersResponse::ToJson() const {
+    std::string ListUserPoolCountersResponse::ToJson() const {
 
         try {
 
             document document;
             Core::Bson::BsonUtils::SetLongValue(document, "total", total);
 
-            if (!users.empty()) {
+            if (!userPools.empty()) {
                 array jsonArray;
-                for (const auto &user: users) {
-                    jsonArray.append(user.ToDocument());
+                for (const auto &userPool: userPools) {
+                    jsonArray.append(userPool.ToDocument());
                 }
-                document.append(kvp("users", jsonArray));
+                document.append(kvp("userPools", jsonArray));
             }
             return Core::Bson::BsonUtils::ToJsonString(document);
 

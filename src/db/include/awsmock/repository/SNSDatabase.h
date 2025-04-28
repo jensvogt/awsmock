@@ -361,9 +361,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes a resources.
          *
+         * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        void DeleteAllMessages() const;
+        long DeleteAllMessages() const;
 
         /**
          * @brief Adjust all message counters

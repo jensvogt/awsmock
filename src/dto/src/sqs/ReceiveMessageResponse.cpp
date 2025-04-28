@@ -26,12 +26,21 @@ namespace AwsMock::Dto::SQS {
 
                     // Message attributes, first converted to DTO, then to document
                     document messageAttributesDocument;
-                    MessageAttributeList messageAttributeListDto = Mapper::map(message.messageAttributes);
+                    std::map<std::string, MessageAttribute> messageAttributeListDto = Mapper::map(message.messageAttributes);
                     for (const auto &[fst, snd]: messageAttributeListDto) {
+
                         document messageAttributeDocument;
                         Core::Bson::BsonUtils::SetStringValue(messageAttributeDocument, "StringValue", snd.stringValue);
-                        Core::Bson::BsonUtils::SetLongValue(messageAttributeDocument, "NumberValue", snd.numberValue);
-                        Core::Bson::BsonUtils::SetStringValue(messageAttributeDocument, "DataType", MessageAttributeDataTypeToString(snd.type));
+                        Core::Bson::BsonUtils::SetStringValue(messageAttributeDocument, "DataType", MessageAttributeDataTypeToString(snd.dataType));
+
+                        // String list values
+                        if (!snd.stringListValues.empty()) {
+                            array stringListValuesArray;
+                            for (const auto &val: snd.stringListValues) {
+                                stringListValuesArray.append(val);
+                            }
+                            messageAttributeDocument.append(kvp("StringListValue", stringListValuesArray));
+                        }
                         messageAttributesDocument.append(kvp(fst, messageAttributeDocument));
                     }
                     messageDocument.append(kvp("MessageAttributes", messageAttributesDocument.extract()));
@@ -48,7 +57,7 @@ namespace AwsMock::Dto::SQS {
                     messageArray.append(messageDocument);
                 }
 
-                // Add message array
+                // Add the message array
                 rootDocument.append(kvp("Messages", messageArray));
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
@@ -85,10 +94,11 @@ namespace AwsMock::Dto::SQS {
 
             // Message attributes
             boost::property_tree::ptree messageAttributesTree;
-            for (const auto &at: it.messageAttributes) {
+            for (const auto &val: it.messageAttributes | std::views::values) {
                 boost::property_tree::ptree attributeTree;
-                attributeTree.put("DataType", at.attributeType);
-                attributeTree.put("StringValue", at.attributeValue);
+                attributeTree.put("DataType", val.dataType);
+                attributeTree.put("StringValue", val.stringValue);
+                //attributeTree.put("StringListValue", val.stringListValues);
                 messageAttributesTree.push_back(std::make_pair("", attributeTree));
             }
             messageTree.push_back(std::make_pair("MessageAttributes", messageAttributesTree));

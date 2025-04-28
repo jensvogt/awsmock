@@ -2,7 +2,7 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#include <awsmock/dto/cognito/ListUserPoolCountersRequest.h>
+#include <awsmock/dto/cognito/internal/ListUserPoolCountersRequest.h>
 
 namespace AwsMock::Dto::Cognito {
 

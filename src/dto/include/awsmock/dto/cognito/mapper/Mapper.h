@@ -22,6 +22,7 @@
 #include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
 #include <awsmock/dto/cognito/ListUsersInGroupResponse.h>
 #include <awsmock/dto/cognito/model/User.h>
+#include <awsmock/dto/cognito/model/UserCounter.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
@@ -68,7 +69,7 @@ namespace AwsMock::Dto::Cognito {
          * @param userEntities user entities
          * @return user DTOs
          */
-        static std::vector<User> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
+        static std::vector<UserCounter> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
 
         /**
          * @brief Maps a group entity to a group DTO
@@ -186,7 +187,7 @@ namespace AwsMock::Dto::Cognito {
         static DescribeUserPoolResponse map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool);
 
         /**
-         * @brief Converts a validity with validity units to seconds
+         * @brief Converts validity with validity units to seconds
          *
          * @param validity validity value
          * @param validityUnits validity unit

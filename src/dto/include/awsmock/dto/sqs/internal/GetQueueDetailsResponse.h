@@ -114,9 +114,6 @@ namespace AwsMock::Dto::SQS {
 
         friend GetQueueDetailsResponse tag_invoke(boost::json::value_to_tag<GetQueueDetailsResponse>, boost::json::value const &v) {
             GetQueueDetailsResponse r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.queueName = v.at("queueName").as_string();
             r.queueUrl = v.at("queueUrl").as_string();
             r.queueArn = v.at("queueArn").as_string();

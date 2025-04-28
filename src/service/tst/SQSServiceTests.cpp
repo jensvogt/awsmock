@@ -297,11 +297,10 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.DataType=String
         //
         Dto::SQS::MessageAttribute messageAttribute;
-        messageAttribute.name = "contentType";
         messageAttribute.stringValue = "application/json";
-        messageAttribute.type = Dto::SQS::MessageAttributeDataType::STRING;
+        messageAttribute.dataType = Dto::SQS::MessageAttributeDataType::STRING;
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
-        messageAttributes[messageAttribute.name] = messageAttribute;
+        messageAttributes["contentType"] = messageAttribute;
 
         // act
         const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
@@ -322,16 +321,16 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.DataType=Number
         //
         Dto::SQS::MessageAttribute messageAttribute1;
-        messageAttribute1.name = "contentType";
+        std::string name1 = "contentType";
         messageAttribute1.stringValue = "application/json";
-        messageAttribute1.type = Dto::SQS::MessageAttributeDataType::STRING;
+        messageAttribute1.dataType = Dto::SQS::MessageAttributeDataType::STRING;
         Dto::SQS::MessageAttribute messageAttribute2;
-        messageAttribute2.name = "contentType";
+        std::string name2 = "contentType";
         messageAttribute2.stringValue = "42";
-        messageAttribute2.type = Dto::SQS::MessageAttributeDataType::NUMBER;
+        messageAttribute2.dataType = Dto::SQS::MessageAttributeDataType::NUMBER;
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
-        messageAttributes[messageAttribute1.name] = messageAttribute1;
-        messageAttributes[messageAttribute2.name] = messageAttribute2;
+        messageAttributes[name1] = messageAttribute1;
+        messageAttributes[name2] = messageAttribute2;
 
         // act
         const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);

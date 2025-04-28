@@ -39,10 +39,14 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _snsDatabase.DeleteAllMessages();
-            _snsDatabase.DeleteAllTopics();
-            _sqsDatabase.DeleteAllMessages();
-            _sqsDatabase.DeleteAllQueues();
+            long deleted = _snsDatabase.DeleteAllMessages();
+            log_info << "SNS message deleted, count: " << deleted;
+            deleted = _snsDatabase.DeleteAllTopics();
+            log_info << "SNS topics deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllMessages();
+            log_info << "SQS message deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllQueues();
+            log_info << "SQS queues deleted, count: " << deleted;
         }
 
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);

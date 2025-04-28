@@ -1,4 +1,7 @@
 
+#include "awsmock/core/FileUtils.h"
+
+
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {
@@ -19,7 +22,7 @@ namespace AwsMock::Core {
         int foundTemplate = 0;
 
         if (!funcEnd) {
-            return std::string(func);
+            return {func};
         }
 
         for (const char *i = funcEnd - 1; i >= funcBegin; --i)// search backwards for the first space char
@@ -116,23 +119,11 @@ namespace AwsMock::Core {
         log_info << "Logging level set to " << severity;
     }
 
-    void LogStream::AddFile() {
-        if (Configuration::instance().HasValue("awsmock.logging.dir")) {
-            logDir = Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
-        }
-        if (Configuration::instance().HasValue("awsmock.logging.prefix")) {
-            logPrefix = Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
-        }
-        if (Configuration::instance().HasValue("awsmock.logging.file-size")) {
-            logSize = Configuration::instance().GetValue<long>("awsmock.logging.file-size");
-        }
-        if (Configuration::instance().HasValue("awsmock.logging.file-count")) {
-            logCount = Configuration::instance().GetValue<int>("awsmock.logging.file-count");
-        }
+    void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {
         file_sink = add_file_log(
-                boost::log::keywords::file_name = logDir + FileUtils::separator() + logPrefix + "-%N.log",
-                boost::log::keywords::rotation_size = logSize,
-                boost::log::keywords::max_files = logCount,
+                boost::log::keywords::file_name = dir + FileUtils::separator() + prefix + "-%N.log",
+                boost::log::keywords::rotation_size = size,
+                boost::log::keywords::max_files = count,
                 boost::log::keywords::format = &LogFormatter);
 
         log_info << "Start logging to file, dir:" << logDir << ", prefix: " << logPrefix << " size: " << logSize << " count: " << logCount;

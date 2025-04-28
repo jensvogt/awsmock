@@ -9,7 +9,9 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetPathParameter(const std::string &uri, const int index) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-
+        if (r->encoded_segments().empty()) {
+            return {};
+        }
         std::vector<std::string> seq;
         for (auto seg: r->encoded_segments()) {
             seq.push_back(seg.decode());
@@ -24,7 +26,7 @@ namespace AwsMock::Core {
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        if (!r->segments().size()) {
+        if (r->segments().empty()) {
             return {};
         }
 

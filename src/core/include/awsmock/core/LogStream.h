@@ -43,9 +43,6 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 
-// Awsmock includes
-#include <awsmock/core/config/Configuration.h>
-
 #define DEFAULT_LOG_SIZE (10 * 1024 * 1024)
 #define DEFAULT_LOG_COUNT 5
 
@@ -94,8 +91,13 @@ namespace AwsMock::Core {
          *
          * @par
          * The filename is constructed from <logDirectory>/<logPrefix>_nn.log
+         *
+         * @param dir log directory
+         * @param prefix log file name prefix
+         * @param size log size
+         * @param count log count
          */
-        static void AddFile();
+        static void AddFile(const std::string &dir, const std::string &prefix, long size = DEFAULT_LOG_SIZE, int count = DEFAULT_LOG_COUNT);
 
       private:
 

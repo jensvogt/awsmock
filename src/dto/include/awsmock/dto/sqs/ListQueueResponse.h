@@ -13,6 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/entity/sqs/Queue.h>
 
 namespace AwsMock::Dto::SQS {
@@ -35,7 +36,7 @@ namespace AwsMock::Dto::SQS {
         std::string nextToken;
 
         /**
-         * Total number of queue
+         * Total number of queues
          */
         long total;
 

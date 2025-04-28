@@ -8,6 +8,9 @@
 #ifndef WIN32
 #include <dirent.h>
 #endif
+#include "awsmock/core/FileUtils.h"
+
+
 #include <boost/filesystem/directory.hpp>
 #include <boost/filesystem/file_status.hpp>
 #include <boost/range/iterator_range_core.hpp>
@@ -212,45 +215,20 @@ namespace AwsMock::FtpServer {
             return false;
 
         bool can_open_dir(false);
-#ifdef WIN32
         const boost::filesystem::path p(path_);
         return is_directory(boost::filesystem::directory_entry(p));
-#else
-        DIR *dp = opendir(path_.c_str());
-        if (dp != nullptr) {
-            can_open_dir = true;
-            closedir(dp);
-        }
-        return can_open_dir;
-#endif
     }
 
     std::map<std::string, FileStatus> dirContent(const std::string &path) {
         std::map<std::string, FileStatus> content;
         log_debug << "Get directory content, path: " << path;
-#ifdef WIN32
-        // TODO: Check Linux/macOS
         if (const boost::filesystem::path p(path); is_directory(boost::filesystem::directory_entry(p))) {
             for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(p), {})) {
                 std::string tmp = entry.path().filename().string();
                 content.emplace(std::string(entry.path().filename().string()), FileStatus(entry.path().string()));
             }
         }
-#else
-        DIR *dp = opendir(path.c_str());
-        dirent *dirp = nullptr;
-        if (dp == nullptr) {
-            log_error << "Error opening directory: " << strerror(errno) << ", returning empty dir";
-            return content;
-        }
-
-        while ((dirp = readdir(dp)) != nullptr) {
-            content.emplace(std::string(dirp->d_name), FileStatus(path + "/" + std::string(dirp->d_name)));
-            log_debug << "Adding file, path: " << path << "/" << std::string(dirp->d_name);
-        }
-        closedir(dp);
         log_debug << "Found directory content, path: " << path << " count: " << content.size();
-#endif
         return content;
     }
 

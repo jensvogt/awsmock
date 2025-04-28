@@ -11,7 +11,7 @@ namespace AwsMock::Core {
         // Logging
         if (!SystemUtils::GetEnvironmentVariableValue("AWSMOCK_TEST_LOG").empty()) {
             LogStream::Initialize();
-            LogStream::AddFile();
+            LogStream::AddFile("/tmp", "awsmocktest", 1024 * 1024, 5);
             LogStream::SetSeverity("debug");
         } else {
             LogStream::Initialize();

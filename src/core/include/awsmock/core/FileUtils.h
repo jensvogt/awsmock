@@ -252,22 +252,6 @@ namespace AwsMock::Core {
         static void DeleteFile(const std::string &fileName);
 
         /**
-         * @brief Unzip the given file to the given directory.
-         *
-         * @param zipFile zip file to decompress.
-         * @param dirName output directory.
-         */
-        static void UnzipFiles(const std::string &zipFile, const std::string &dirName);
-
-        /**
-         * @brief Unzip the given file to the given directory.
-         *
-         * @param zipFile zip file to decompress.
-         * @param dirName directory to zip.
-         */
-        static void ZipFiles(const std::string &zipFile, const std::string &dirName);
-
-        /**
          * @brief Read a whole file into a string
          *
          * @param fileName name of the file
@@ -300,15 +284,11 @@ namespace AwsMock::Core {
         /**
          * @brief Get the Mime type by extension
          *
-         * @par
-         * First it tries to get the file type from the extension of the s3Key. If the file type cannot be determined, use the
-         * libmagic file type determination.
-         *
          * @param path absolute file path
-         * @param s3Key S3 key
+         * @param realPath real file path
          * @return content type, as mime type
          */
-        static std::string GetContentType(const std::string &path, const std::string &s3Key);
+        static std::string GetContentType(const std::string &path, const std::string &realPath);
 
         /**
          * @brief Get the Mime type using libmagic from a string
@@ -322,7 +302,7 @@ namespace AwsMock::Core {
          * @brief Checks whether the file is base64 encoded.
          *
          * @param filePath file path
-         * @return true if file is base64 encoded
+         * @return true if the file is base64 encoded
          */
         static bool IsBase64(const std::string &filePath);
 
@@ -339,6 +319,14 @@ namespace AwsMock::Core {
          * @return file path separator
          */
         static std::string SetFileSeparator(std::string &filePath);
+
+        /**
+         * @brief Remove the last n bytes from the file
+         *
+         * @param filename name of the file
+         * @param size number of bytes to remove
+         */
+        static void RemoveLastBytes(const std::string &filename, long size);
 
         /**
          * @brief File path separator

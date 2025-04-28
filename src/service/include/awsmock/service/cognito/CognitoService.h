@@ -49,12 +49,8 @@
 #include <awsmock/dto/cognito/InitiateAuthResponse.h>
 #include <awsmock/dto/cognito/ListGroupsRequest.h>
 #include <awsmock/dto/cognito/ListGroupsResponse.h>
-#include <awsmock/dto/cognito/ListUserCountersRequest.h>
-#include <awsmock/dto/cognito/ListUserCountersResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolClientsRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolClientsResponse.h>
-#include <awsmock/dto/cognito/ListUserPoolCountersRequest.h>
-#include <awsmock/dto/cognito/ListUserPoolCountersResponse.h>
 #include <awsmock/dto/cognito/ListUserPoolRequest.h>
 #include <awsmock/dto/cognito/ListUserPoolResponse.h>
 #include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
@@ -69,6 +65,10 @@
 #include <awsmock/dto/cognito/UpdateUserPoolDomainRequest.h>
 #include <awsmock/dto/cognito/UpdateUserPoolDomainResponse.h>
 #include <awsmock/dto/cognito/UpdateUserPoolRequest.h>
+#include <awsmock/dto/cognito/internal/ListUserCountersRequest.h>
+#include <awsmock/dto/cognito/internal/ListUserCountersResponse.h>
+#include <awsmock/dto/cognito/internal/ListUserPoolCountersRequest.h>
+#include <awsmock/dto/cognito/internal/ListUserPoolCountersResponse.h>
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/repository/CognitoDatabase.h>

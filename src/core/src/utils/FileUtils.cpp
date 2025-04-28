@@ -406,8 +406,8 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string FileUtils::GetContentType(const std::string &path, const std::string &s3Key) {
-        if (const std::string extension = boost::filesystem::path(s3Key).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
+    std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
+        if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
         return GetContentTypeMagicFile(path);
@@ -420,7 +420,7 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
         if (!FileExists(magicFile)) {
             log_error << "Magic database not found, path: " << magicFile;

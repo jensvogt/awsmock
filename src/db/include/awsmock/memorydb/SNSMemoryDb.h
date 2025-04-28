@@ -281,19 +281,20 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes a resources.
          *
+         * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        void DeleteAllMessages();
+        long DeleteAllMessages();
 
       private:
 
         /**
-         * SNS topic vector, when running without database
+         * SNS topic vector when running without a database
          */
         std::map<std::string, Entity::SNS::Topic> _topics{};
 
         /**
-         * SNS message vector, when running without database
+         * SNS message vector when running without a database
          */
         std::map<std::string, Entity::SNS::Message> _messages{};
 
