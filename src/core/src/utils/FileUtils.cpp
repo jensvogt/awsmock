@@ -559,4 +559,34 @@ namespace AwsMock::Core {
         std::filesystem::resize_file(p, std::filesystem::file_size(p) - size);
     }
 
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long count = StreamCopier(ifs, ofs);
+        ifs.close();
+        ofs.close();
+        return count;
+    }
+
+    long FileUtils::StreamCopier(std::istream &is, std::ostream &os) {
+        is.seekg(0, std::ios::end);
+        long count = is.tellg();
+        is.seekg(0, std::ios::beg);
+        return StreamCopier(is, os, count);
+    }
+
+    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
+        char buffer[BUFFER_LEN];
+        while(count > BUFFER_LEN)
+        {
+            istream.read(buffer, BUFFER_LEN);
+            ostream.write(buffer, BUFFER_LEN);
+            count -= BUFFER_LEN;
+        }
+
+        istream.read(buffer, count);
+        ostream.write(buffer, count);
+        return count;
+    }
+
 }// namespace AwsMock::Core

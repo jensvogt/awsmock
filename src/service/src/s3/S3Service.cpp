@@ -382,12 +382,9 @@ namespace AwsMock::Service {
         long start = request.min;
         long length = request.max - request.min + 1;
         const std::string destFile = uploadDir + Core::FileUtils::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
+
 #if __APPLE__
-        std::istreambuf_iterator<char> source = open(sourceFile.c_str(), O_RDONLY, 0);
-        const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
-        const long copied = sendfile(dest, source, start, reinterpret_cast<off_t *>(&length), nullptr, 0);
-        close(source);
-        close(dest);
+        long copied = Core::FileUtils::StreamCopier(sourceFile, destFile);
 #elif __linux__
         const int source = open(sourceFile.c_str(), O_RDONLY, 0);
         const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
