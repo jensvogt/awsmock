@@ -46,7 +46,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/iostreams/copy.hpp>
 
-
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
@@ -327,6 +326,34 @@ namespace AwsMock::Core {
          * @param size number of bytes to remove
          */
         static void RemoveLastBytes(const std::string &filename, long size);
+
+        /**
+         * @brief Copies a file from source to destination.
+         *
+         * @param inputFile input filename
+         * @param outputFile output filename
+         * @return number of bytes copied
+         */
+        static long StreamCopier(const std::string &inputFile, const std::string &outputFile);
+
+        /**
+         * @brief Copies all from an input stream to an output stream.
+         *
+         * @param istream input stream
+         * @param ostream output stream
+         * @return number of bytes copied
+         */
+        static long StreamCopier(std::istream &istream, std::ostream &ostream);
+
+        /**
+         * @brief Copies maxSize bytes from an input stream to an output stream.
+         *
+         * @param istream input stream
+         * @param ostream output stream
+         * @param maxSize number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(std::istream &istream, std::ostream &ostream, long maxSize);
 
         /**
          * @brief File path separator

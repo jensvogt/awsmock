@@ -46,13 +46,13 @@ include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_
 if (NOT WIN32)
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
-            ssl crypto archive magic)
+            boost_json ssl crypto archive magic)
 endif ()
 
 # Static library
 add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 if (NOT WIN32)
     target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
-            boost_locale ssl crypto archive magic)
+            boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

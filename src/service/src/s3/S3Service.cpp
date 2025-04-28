@@ -357,9 +357,9 @@ namespace AwsMock::Service {
 
         std::string fileName = uploadDir + Core::FileUtils::separator() + updateId + "-" + std::to_string(part);
         std::ofstream ofs(fileName, std::ios::binary);
-        std::copy(std::istream_iterator<unsigned char>(stream), std::istream_iterator<unsigned char>(), std::ostream_iterator<unsigned char>(ofs));
+        long count = Core::FileUtils::StreamCopier(stream, ofs);
         ofs.close();
-        log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir;
+        log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir << " count: " << count;
 
         // Get md5sum as ETag
         std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
@@ -382,12 +382,9 @@ namespace AwsMock::Service {
         long start = request.min;
         long length = request.max - request.min + 1;
         const std::string destFile = uploadDir + Core::FileUtils::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
+
 #if __APPLE__
-        std::istreambuf_iterator<char> source = open(sourceFile.c_str(), O_RDONLY, 0);
-        const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
-        const long copied = sendfile(dest, source, start, reinterpret_cast<off_t *>(&length), nullptr, 0);
-        close(source);
-        close(dest);
+        long copied = Core::FileUtils::StreamCopier(sourceFile, destFile);
 #elif __linux__
         const int source = open(sourceFile.c_str(), O_RDONLY, 0);
         const int dest = open(destFile.c_str(), O_WRONLY | O_CREAT, 0644);
@@ -1181,11 +1178,9 @@ namespace AwsMock::Service {
 
         // Write the file in chunks
         std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
-        std::istreambuf_iterator begin_source(stream);
-        std::istreambuf_iterator<char> end_source;
-        std::ostreambuf_iterator begin_dest(ofs);
-        std::copy(begin_source, end_source, begin_dest);
+        long count = Core::FileUtils::StreamCopier(stream, ofs);
         ofs.close();
+        log_debug << "File copied, count: " << count;
 
         // Check file encoding
         if (Core::FileUtils::IsBase64(filePath)) {
@@ -1194,16 +1189,12 @@ namespace AwsMock::Service {
         }
 
         // Remove chunk trailer
-        long fileSize = Core::FileUtils::FileSize(filePath);
-        if (request.contentLength < fileSize) {
-            Core::FileUtils::RemoveLastBytes(filePath, fileSize - request.contentLength);
+        if (request.contentLength < count) {
+            Core::FileUtils::RemoveLastBytes(filePath, count - request.contentLength);
         }
 
         // Get content type
-        std::string contentType = request.contentType;
-        if (contentType.empty()) {
-            contentType = Core::FileUtils::GetContentType(filePath, request.key);
-        }
+        std::string contentType = request.contentType.empty() ? Core::FileUtils::GetContentType(filePath, request.key) : request.contentType;
 
         // Create entity
         Database::Entity::S3::Object object = {

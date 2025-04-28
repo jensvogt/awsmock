@@ -799,7 +799,7 @@ namespace AwsMock::Database {
 
                         document setQuery;
                         setQuery.append(kvp("reset", bsoncxx::types::b_date(reset)));
-                        setQuery.append(kvp("retries", result.retries));
+                        setQuery.append(kvp("retries", static_cast<bsoncxx::types::b_int64>(result.retries)));
                         setQuery.append(kvp("receiptHandle", result.receiptHandle));
                         setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)));
 
@@ -890,7 +890,7 @@ namespace AwsMock::Database {
 
                 document filterQuery;
                 filterQuery.append(kvp("queueArn", queueArn));
-                filterQuery.append(kvp("retries", make_document(kvp("$gt", redrivePolicy.maxReceiveCount))));
+                filterQuery.append(kvp("retries", make_document(kvp("$gt", static_cast<bsoncxx::types::b_int64>(redrivePolicy.maxReceiveCount)))));
 
                 document setQuery;
                 setQuery.append(kvp("retries", 0));
