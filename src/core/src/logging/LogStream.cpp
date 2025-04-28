@@ -104,7 +104,7 @@ namespace AwsMock::Core {
 
         console_sink = boost::log::add_console_log(std::cout);
         console_sink->set_formatter(&LogFormatter);
-        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::trace);
 
         boost::log::add_common_attributes();
     }

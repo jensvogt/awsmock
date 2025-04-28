@@ -78,7 +78,7 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp src/cognito/AdminRemoveUserFromGroupRequest.cpp
         src/cognito/AdminEnableUserRequest.cpp src/cognito/AdminDisableUserRequest.cpp src/cognito/ResponseToAuthChallengeRequest.cpp
         src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp src/cognito/AdminGetUserRequest.cpp
-        src/cognito/AdminGetUserResponse.cpp src/cognito/internal/ListUserPoolCountersRequest.cpp src/cognito/internal/ListUserPoolCountersResponse.cpp)
+        src/cognito/AdminGetUserResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
         src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
         src/transfer/model/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp

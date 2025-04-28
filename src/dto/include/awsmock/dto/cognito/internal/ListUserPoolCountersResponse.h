@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/HttpUtils.h>
-#include <awsmock/dto/cognito/model/UserPool.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/cognito/model/UserPoolCounter.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -21,24 +19,38 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolCountersResponse final : Common::BaseDto<ListUserPoolCountersResponse> {
+    struct ListUserPoolCountersResponse final : Common::BaseCounter<ListUserPoolCountersResponse> {
 
         /**
          * User pool entities
          */
-        std::vector<UserPool> userPools;
+        std::vector<UserPoolCounter> userPoolCounters;
 
         /**
          * Total number of user pools
          */
         long total;
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return user pools json string
-         */
-        std::string ToJson() const override;
+    private:
+
+        friend ListUserPoolCountersResponse tag_invoke(boost::json::value_to_tag<ListUserPoolCountersResponse>, boost::json::value const &v) {
+            ListUserPoolCountersResponse r;
+            r.region = v.at("region").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.total = v.at("total").as_int64();
+            r.userPoolCounters = boost::json::value_to<std::vector<UserPoolCounter>>(v.at("userPools"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolCountersResponse const &obj) {
+            jv = {
+                {"region", obj.region},
+                {"user", obj.user},
+                {"requestId", obj.requestId},
+                {"total", obj.total},
+                {"userPoolCounters", boost::json::value_from(obj.userPoolCounters)},
+        };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

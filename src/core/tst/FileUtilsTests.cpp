@@ -145,6 +145,20 @@ namespace AwsMock::Core {
         EXPECT_TRUE(FileUtils::FileExists(fileName));
         EXPECT_EQ(100, result.size());
     }
+/*
+    TEST_F(FileUtilsTest, StreamCopierTest) {
+
+        // arrange
+        const std::string fileName1 = FileUtils::CreateTempFile(tempDir, "txt", 100);
+        const std::string fileName2 = tempDir + FileUtils::separator() + "testFile.txt";
+        // act
+        std::string result;
+        EXPECT_NO_THROW({ result = FileUtils::StreamCopier(fileName1, filename2); });
+
+        // assert
+        EXPECT_TRUE(FileUtils::FileExists(fileName2));
+        EXPECT_EQ(100, result);
+    }*/
 
     TEST_F(FileUtilsTest, StripChunkSignatureTest) {
 
