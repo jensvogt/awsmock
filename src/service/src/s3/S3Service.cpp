@@ -432,7 +432,9 @@ namespace AwsMock::Service {
             try {
                 fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
                 log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
-            } catch (Core::JsonException &exc) { log_error << "Append to binary file failed, error: " << exc.message(); }
+            } catch (Core::JsonException &exc) {
+                log_error << "Append to binary file failed, error: " << exc.message();
+            }
 
             // Get file size, MD5 sum
             const std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
@@ -444,18 +446,8 @@ namespace AwsMock::Service {
             object.size = fileSize;
             object.md5sum = md5sum;
             object.internalName = filename;
-            object.contentType = Core::FileUtils::GetContentType(outFile);
+            object.contentType = Core::FileUtils::GetContentType(outFile, request.key);
             object = _database.UpdateObject(object);
-
-            // Calculate the hashes asynchronously
-            /*if (!request.checksumAlgorithm.empty()) {
-
-                S3HashCreator s3HashCreator;
-                const std::vector algorithms = {request.checksumAlgorithm};
-                boost::thread t(boost::ref(s3HashCreator), algorithms, object);
-                t.detach();
-                log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-            }*/
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(uploadDir);
@@ -512,9 +504,9 @@ namespace AwsMock::Service {
         log_trace << "Put object request, username: " << username << ", filename: " << filename;
 
         // Get environment
-        std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        std::string userHomeDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
-        std::string transferBucket = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
+        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string userHomeDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const std::string transferBucket = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
 
         // Build metadata
         std::map<std::string, std::string> metadata;
@@ -527,7 +519,7 @@ namespace AwsMock::Service {
         request.bucket = transferBucket;
         request.owner = username;
         request.key = Core::StringUtils::StripBeginning(filename, userHomeDir + Core::FileUtils::separator());
-        request.contentType = Core::FileUtils::GetContentType(filename);
+        request.contentType = Core::FileUtils::GetContentType(filename, request.key);
         request.contentLength = Core::FileUtils::FileSize(filename);
         request.metadata = metadata;
 
@@ -555,10 +547,10 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "touch_object");
         log_trace << "Touch object request: " << request.ToString();
 
-        // Check existence
+        // Check bucket existence
         CheckBucketExistence(request.region, request.bucket);
 
-        // Check existence
+        // Check object existence
         if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
             log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
             throw Core::NotFoundException("Bucket does not exist");
@@ -568,9 +560,10 @@ namespace AwsMock::Service {
             // Get the object
             const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-            // Check notification
+            // Check notifications
             CheckNotifications(object.region, object.bucket, object.key, object.size, "ObjectCreated");
             log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 touch object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
@@ -582,10 +575,10 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "update_object");
         log_trace << "Update object request: " << request.ToString();
 
-        // Check existence
+        // Check bucket existence
         CheckBucketExistence(request.region, request.bucket);
 
-        // Check existence
+        // Check object existence
         if (!_database.ObjectExists({.region = request.region, .bucket = request.bucket, .key = request.key})) {
             log_error << "Bucket does not exist, region: " << request.region + " bucket: " << request.bucket;
             throw Core::NotFoundException("Bucket does not exist");
@@ -614,10 +607,10 @@ namespace AwsMock::Service {
         const std::string dataS3Dir = dataDir + Core::FileUtils::separator() + "s3";
         Core::DirUtils::EnsureDirectory(dataS3Dir);
 
-        // Check existence
+        // Check bucket existence
         CheckBucketExistence(request.region, request.sourceBucket);
 
-        // Check existence of source key
+        // Check object existence of source key
         if (!_database.ObjectExists({.region = request.region, .bucket = request.sourceBucket, .key = request.sourceKey})) {
             log_error << "Source object does not exist, region: " << request.region + " bucket: " << request.sourceBucket << " key: " << request.sourceKey;
             throw Core::NotFoundException("Source object does not exist");
@@ -1218,7 +1211,7 @@ namespace AwsMock::Service {
         // Get content type
         std::string contentType = request.contentType;
         if (contentType.empty()) {
-            contentType = Core::FileUtils::GetContentType(filePath);
+            contentType = Core::FileUtils::GetContentType(filePath, request.key);
         }
 
         // Create entity

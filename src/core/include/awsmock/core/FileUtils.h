@@ -300,10 +300,15 @@ namespace AwsMock::Core {
         /**
          * @brief Get the Mime type by extension
          *
+         * @par
+         * First it tries to get the file type from the extension of the s3Key. If the file type cannot be determined, use the
+         * libmagic file type determination.
+         *
          * @param path absolute file path
+         * @param s3Key S3 key
          * @return content type, as mime type
          */
-        static std::string GetContentType(const std::string &path);
+        static std::string GetContentType(const std::string &path, const std::string &s3Key);
 
         /**
          * @brief Get the Mime type using libmagic from a string

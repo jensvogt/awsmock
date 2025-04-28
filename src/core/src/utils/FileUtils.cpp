@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -348,7 +348,7 @@ namespace AwsMock::Core {
             return AcctName;
         }
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -406,8 +406,8 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string FileUtils::GetContentType(const std::string &path) {
-        if (const std::string extension = boost::filesystem::path(path).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
+    std::string FileUtils::GetContentType(const std::string &path, const std::string &s3Key) {
+        if (const std::string extension = boost::filesystem::path(s3Key).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
         return GetContentTypeMagicFile(path);

@@ -1452,14 +1452,14 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::SendCreateObjectRequest(const std::string &user, const std::string &fileName) const {
-        std::string key = GetKey(fileName);
+        const std::string key = GetKey(fileName);
         std::map<std::string, std::string> metadata;
         metadata["user-agent"] = _serverName;
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
         // Get content type
-        std::string contentType = Core::FileUtils::GetContentType(fileName);
-        long contentLength = Core::FileUtils::FileSize(fileName);
+        const std::string contentType = Core::FileUtils::GetContentType(fileName, key);
+        const long contentLength = Core::FileUtils::FileSize(fileName);
 
         Dto::S3::PutObjectRequest request = {
                 .region = _region,
@@ -1492,7 +1492,7 @@ namespace AwsMock::FtpServer {
 
     std::string FtpSession::GetKey(const std::string &path) const {
         std::string key = Core::StringUtils::StripBeginning(path, _transferDir);
-        if (!key.empty() && key[0] == '/') {
+        if (!key.empty() && Core::StringUtils::StartsWith(key, Core::FileUtils::separator())) {
             return key.substr(1);
         }
         return key;
