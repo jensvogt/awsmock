@@ -102,6 +102,7 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
+                    log_debug << "Got list user pool counters request, json: " << cognitoRequest.ToString();
 
                     Dto::Cognito::ListUserPoolCountersResponse serviceResponse = _cognitoService.ListUserPoolCounters(cognitoRequest);
                     log_info << "User pools counters listed, count: " << serviceResponse.userPoolCounters.size();
@@ -241,8 +242,7 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new tenplates
-                    //log_debug << "Got list user counters request: " << cognitoRequest.ToString();
+                    log_debug << "Got list user counters request: " << cognitoRequest.ToString();
 
                     Dto::Cognito::ListUserCountersResponse cognitoResponse = _cognitoService.ListUserCounters(cognitoRequest);
                     log_info << "User counters listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
