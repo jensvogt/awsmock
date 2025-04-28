@@ -9,12 +9,12 @@ namespace AwsMock::Database::Entity::SQS {
     view_or_value<view, value> QueueAttribute::ToDocument() const {
 
         view_or_value<view, value> queueAttributeDoc = make_document(
-                kvp("delaySeconds", delaySeconds),
-                kvp("maxMessageSize", maxMessageSize),
-                kvp("messageRetentionPeriod", messageRetentionPeriod),
+                kvp("delaySeconds", static_cast<bsoncxx::types::b_int64>(delaySeconds)),
+                kvp("maxMessageSize", static_cast<bsoncxx::types::b_int64>(maxMessageSize)),
+                kvp("messageRetentionPeriod", static_cast<bsoncxx::types::b_int64>(messageRetentionPeriod)),
                 kvp("policy", policy),
-                kvp("receiveMessageWaitTime", receiveMessageWaitTime),
-                kvp("visibilityTimeout", visibilityTimeout),
+                kvp("receiveMessageWaitTime", static_cast<bsoncxx::types::b_int64>(receiveMessageWaitTime)),
+                kvp("visibilityTimeout", static_cast<bsoncxx::types::b_int64>(visibilityTimeout)),
                 kvp("redrivePolicy", redrivePolicy.ToDocument()),
                 kvp("redriveAllowPolicy", redriveAllowPolicy),
                 kvp("approximateNumberOfMessages", static_cast<bsoncxx::types::b_int64>(approximateNumberOfMessages)),
