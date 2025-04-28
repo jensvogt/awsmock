@@ -10,10 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct AttributeCounter {
+    struct AttributeCounter final : Common::BaseCounter<AttributeCounter> {
 
         /**
          * Key
@@ -26,32 +27,27 @@ namespace AwsMock::Dto::SNS {
         std::string attributeValue;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AttributeCounter &r);
+        friend AttributeCounter tag_invoke(boost::json::value_to_tag<AttributeCounter>, boost::json::value const &v) {
+            AttributeCounter r;
+            r.attributeKey = v.at("attributeKey").as_string();
+            r.attributeValue = v.at("attributeValue").as_string();
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AttributeCounter const &obj) {
+            jv = {
+                    {"attributeKey", obj.attributeKey},
+                    {"attributeValue", obj.attributeValue},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

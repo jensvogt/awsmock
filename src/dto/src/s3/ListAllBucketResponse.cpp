@@ -16,7 +16,7 @@ namespace AwsMock::Dto::S3 {
         for (auto &it: bucketList) {
             boost::property_tree::ptree bucketTree;
             bucketTree.add("BucketRegion", it.region);
-            bucketTree.add("Name", it.name);
+            bucketTree.add("Name", it.bucketName);
             bucketTree.add("CreationDate", Core::DateTimeUtils::ToISO8601(it.created));
             bucketsTree.push_back(std::make_pair("Bucket", bucketTree));
         }
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::S3 {
         document rootDocument;
 
         // Get metadata
-        if (bucketList.empty()) {
+        if (!bucketList.empty()) {
             array jsonBucketArray;
             for (const auto &bucket: bucketList) {
                 jsonBucketArray.append(bucket.ToDocument());
@@ -38,17 +38,6 @@ namespace AwsMock::Dto::S3 {
         }
         Core::Bson::BsonUtils::SetLongValue(rootDocument, "total", total);
         return Core::Bson::BsonUtils::ToJsonString(rootDocument);
-    }
-
-    std::string ListAllBucketResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListAllBucketResponse &r) {
-        os << "ListAllBucketResponse=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::S3

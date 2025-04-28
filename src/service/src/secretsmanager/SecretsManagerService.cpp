@@ -9,7 +9,7 @@ namespace AwsMock::Service {
     SecretsManagerService::SecretsManagerService() : _database(Database::SecretsManagerDatabase::instance()) {
 
         // Initialize environment
-        _accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
 
         // Simulation of KMS key
         _kmsKey = "aGYlaHJGZk5FMjNXN05kJmpvWVpvem9GT1M+WE1qWlg=";

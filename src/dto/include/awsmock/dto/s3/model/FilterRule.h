@@ -9,16 +9,22 @@
 #include <map>
 #include <string>
 
+// Boost includes
+#include <boost/describe.hpp>
+#include <boost/json.hpp>
+#include <boost/mp11.hpp>
+#include <boost/version.hpp>
+
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::S3 {
 
     /**
-     * S3 name type for the filter rules
+     * @brief S3 name type for the filter rules
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -45,11 +51,11 @@ namespace AwsMock::Dto::S3 {
     }
 
     /**
-     * Filter rule for the S3 bucket notification to SQS queues
+     * @brief Filter rule for the S3 bucket notification to SQS queues
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct FilterRule {
+    struct FilterRule final : Common::BaseDto<FilterRule> {
 
         /**
          * Name
@@ -62,14 +68,14 @@ namespace AwsMock::Dto::S3 {
         std::string filterValue;
 
         /**
-         * Converts the DTO to a JSON object.
+         * @brief Converts the DTO to a JSON object.
          *
          * @return DTO as object.
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * Converts a JSON representation to s DTO.
+         * @brief Converts a JSON representation to s DTO.
          *
          * @param document JSON object.
          */
@@ -78,30 +84,27 @@ namespace AwsMock::Dto::S3 {
         /**
          * @brief Convert from an XML string
          *
-         * @param pt boost property tree
+         * @param pt boost a property tree
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
         /**
-         * Converts the DTO to a JSON string.
+         * @brief Convert to a JSON string
          *
-         * @return DTO as string.
+         * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
+        std::string ToJson() const override {
+            return ToJson2();
+        };
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const FilterRule &s);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, FilterRule const &obj) {
+            jv = {
+                    {"name", NameTypeToString(obj.name)},
+                    {"filterValue", obj.filterValue},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

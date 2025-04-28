@@ -34,7 +34,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, BasenameTest) {
 
         // arrange
-        const std::string fileName = tempDir + "/" + "example.gif";
+        const std::string fileName = tempDir + Core::FileUtils::separator() + "example.gif";
 
         // act
         const std::string result = FileUtils::GetBasename(fileName);
@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const std::string tempFile = FileUtils::CreateTempFile("txt", "This is a text file");
 
         // act
-        const std::string contentType = FileUtils::GetContentType(tempFile);
+        const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
         EXPECT_FALSE(contentType.empty());
@@ -179,7 +179,7 @@ namespace AwsMock::Core {
         const std::string tempFile = FileUtils::CreateTempFile("json", R"({"key":"value"})");
 
         // act
-        const std::string contentType = FileUtils::GetContentType(tempFile);
+        const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
         EXPECT_FALSE(contentType.empty());
@@ -192,7 +192,7 @@ namespace AwsMock::Core {
         const std::string tempFile = FileUtils::CreateTempFile("xml", "<ONIXMessage xmlns=¸\"http://www.editeur.org/onix/3.0/reference\" release=\"3.0\"><Header><Sender><SenderName>APA</SenderName><ContactName>Violetta Tatar</ContactName></Sender></Header>");
 
         // act
-        const std::string contentType = FileUtils::GetContentType(tempFile);
+        const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
         EXPECT_FALSE(contentType.empty());
@@ -228,7 +228,6 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetContentTypeJpgTest) {
 
         // arrange
-        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
 
         // act
         const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/9783911244381.jpg");
@@ -241,7 +240,6 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, GetContentTypeTifTest) {
 
         // arrange
-        const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
 
         // act
         const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/7337529778404.tif");

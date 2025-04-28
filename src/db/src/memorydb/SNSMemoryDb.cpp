@@ -147,7 +147,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::SNS::TopicList SNSMemoryDb::ExportTopics(const std::vector<SortColumn> &sortColumns) const {
 
         Entity::SNS::TopicList topicList;
         for (const auto &topic: _topics) {
@@ -370,10 +370,11 @@ namespace AwsMock::Database {
         log_debug << "Old resources deleted, timeout: " << timeout << " count: " << count;
     }
 
-    void SNSMemoryDb::DeleteAllMessages() {
+    long SNSMemoryDb::DeleteAllMessages() {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
-
+        const long deleted = _messages.size();
         log_debug << "All resources deleted, count: " << _messages.size();
         _messages.clear();
+        return deleted;
     }
 }// namespace AwsMock::Database

@@ -8,7 +8,7 @@
 // AwsMock includes
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
-#include <awsmock/dto/sqs/intern/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/entity/sqs/Message.h>
@@ -69,13 +69,13 @@ namespace AwsMock::Dto::SQS {
         static Database::Entity::SQS::MessageAttributeList map(const MessageAttributeList &messageAttributes);
 
         /**
-       * @brief Maps a SQS attribute entity to a attribute DTO
-       *
-       * @param messageAttributes list of message attributes
-       * @return MessageAttributeList
-       * @see Database::Entity::SQS::MessageAttributeList
-       */
-        static MessageAttributeList map(const Database::Entity::SQS::MessageAttributeList &messageAttributes);
+         * @brief Maps a SQS attribute entity to a attribute DTO
+         *
+         * @param messageAttributes list of message attributes
+         * @return MessageAttributeList
+         * @see Database::Entity::SQS::MessageAttributeList
+         */
+        static std::map<std::string, MessageAttribute> map(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes);
 
         static std::vector<std::string> excludedAttributeNames;
     };

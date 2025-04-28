@@ -109,10 +109,12 @@ namespace AwsMock::Database {
         log_debug << "Parameter deleted, count: " << count;
     }
 
-    void SSMMemoryDb::DeleteAllParameters() {
+    long SSMMemoryDb::DeleteAllParameters() {
         boost::mutex::scoped_lock lock(_parameterMutex);
+        const long deleted = _parameters.size();
         _parameters.clear();
-        log_debug << "All ssm parameters deleted";
+        log_debug << "All SSM parameters deleted, count: " << deleted;
+        return deleted;
     }
 
 }// namespace AwsMock::Database

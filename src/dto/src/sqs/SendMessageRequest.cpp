@@ -22,11 +22,7 @@ namespace AwsMock::Dto::SQS {
                 for (const view attributesView = document.view()["MessageAttributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
-                    view value = attributesView[key].get_document().view();
-                    attribute.type = MessageAttributeDataTypeFromString(bsoncxx::string::to_string(value["DataType"].get_string().value));
-                    if (attribute.type == STRING || attribute.type == NUMBER) {
-                        attribute.stringValue = Core::Bson::BsonUtils::GetStringValue(value, "StringValue");
-                    }
+                    attribute.FromDocument(attributeElement.get_document().value);
                     messageAttributes[key] = attribute;
                 }
             }
@@ -46,7 +42,7 @@ namespace AwsMock::Dto::SQS {
         }
     }
 
-    std::string SendMessageRequest::ToJson() {
+    std::string SendMessageRequest::ToJson() const {
 
         try {
             document rootDocument;
@@ -60,7 +56,7 @@ namespace AwsMock::Dto::SQS {
                 for (const auto &[fst, snd]: messageAttributes) {
                     jsonMessageAttribute.append(kvp(fst, snd.ToDocument()));
                 }
-                rootDocument.append(kvp("messageAttributes", jsonMessageAttribute));
+                rootDocument.append(kvp("MessageAttributes", jsonMessageAttribute));
             }
 
             if (!attributes.empty()) {
@@ -68,7 +64,7 @@ namespace AwsMock::Dto::SQS {
                 for (const auto &[fst, snd]: attributes) {
                     jsonAttributeObject.append(kvp(fst, snd));
                 }
-                rootDocument.append(kvp("attributes", jsonAttributeObject));
+                rootDocument.append(kvp("MessageSystemAttributes", jsonAttributeObject));
             }
             return Core::Bson::BsonUtils::ToJsonString(rootDocument);
 

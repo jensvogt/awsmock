@@ -12,9 +12,9 @@ namespace AwsMock::FtpServer {
           _ftpWorkingDirectory("/"), _serverName(std::move(serverName)), data_acceptor_(io_service) {
         // Environment
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _region = configuration.GetValueString("awsmock.region");
-        _bucket = configuration.GetValueString("awsmock.modules.transfer.bucket");
-        _transferDir = configuration.GetValueString("awsmock.modules.transfer.data-dir");
+        _region = configuration.GetValue<std::string>("awsmock.region");
+        _bucket = configuration.GetValue<std::string>("awsmock.modules.transfer.bucket");
+        _transferDir = configuration.GetValue<std::string>("awsmock.modules.transfer.data-dir");
 
         // S3 service
         _s3Service = std::make_shared<Service::S3Service>();
@@ -294,9 +294,9 @@ namespace AwsMock::FtpServer {
 
         // In case of a dockerized FTP server we need to use some special ports
         boost::asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
-            int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
-            int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
+            int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-max");
             int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port);
         } else {
@@ -333,7 +333,7 @@ namespace AwsMock::FtpServer {
 
         // Split address and port into bytes and get the port the OS chose for us
         boost::asio::ip::address_v4::bytes_type ip_bytes;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
         } else {
             ip_bytes = boost::asio::ip::make_address_v4("127.0.0.1").to_bytes();
@@ -483,9 +483,9 @@ namespace AwsMock::FtpServer {
         }
 
         boost::asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
-            const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.min");
-            const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv.max");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            const int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv.min");
+            const int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv.max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
@@ -550,9 +550,9 @@ namespace AwsMock::FtpServer {
         }
 
         boost::asio::ip::tcp::endpoint endpoint;
-        if (Core::Configuration::instance().GetValueBool("awsmock.dockerized")) {
-            const int minPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-min");
-            const int maxPort = Core::Configuration::instance().GetValueInt("awsmock.modules.transfer.ftp.pasv-max");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            const int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
+            const int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
@@ -1092,9 +1092,9 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::handleFtpCommandOPTS(const std::string &param) {
         std::string param_upper = param;
-        std::ranges::transform(param_upper,
-                               param_upper.begin(),
-                               [](const char c) { return static_cast<char>(std::toupper(static_cast<unsigned char>(c))); });
+        std::ranges::transform(param_upper, param_upper.begin(), [](const char c) {
+            return static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+        });
 
         if (param_upper == "UTF8 ON") {
             sendFtpMessage(FtpReplyCode::COMMAND_OK, "OK");
@@ -1112,94 +1112,88 @@ namespace AwsMock::FtpServer {
         auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
-        data_acceptor_.async_accept(*data_socket,
-                                    [data_socket, directory_content, me = shared_from_this()](auto ec) {
-                                        if (ec) {
-                                            me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
-                                            return;
-                                        }
-                                        // TODO: close acceptor after connect?
-                                        // TODO: get the data from S3 buckets/keys
-                                        // Create a Unix-like file list
-                                        std::stringstream stream;
-                                        // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
-                                        for (const auto &[fst, snd]: directory_content) {
-                                            const std::string &filename(fst);
-                                            const FileStatus &file_status(snd);
+        data_acceptor_.async_accept(*data_socket, [data_socket, directory_content, me = shared_from_this()](auto ec) {
+            if (ec) {
+                me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
+                return;
+            }
+            // TODO: close acceptor after connect?
+            // TODO: get the data from S3 buckets/keys
+            // Create a Unix-like file list
+            std::stringstream stream;
+            // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
+            for (const auto &[fst, snd]: directory_content) {
+                const std::string &filename(fst);
+                const FileStatus &file_status(snd);
 
-                                            stream << ((file_status.type() == FileType::Dir) ? 'd' : '-') << file_status.permissionString() << "   1 ";
-                                            stream << std::setw(10) << file_status.ownerString() << " " << std::setw(10)
-                                                   << file_status.groupString() << " ";
-                                            stream << std::setw(10) << file_status.fileSize() << " ";
-                                            stream << file_status.timeString() << " ";
-                                            stream << filename;
-                                            stream << "\r\n";
-                                        }
+                stream << (file_status.type() == FileType::Dir ? 'd' : '-') << file_status.permissionString() << "   1 ";
+                stream << std::setw(10) << file_status.ownerString() << " " << std::setw(10)
+                       << file_status.groupString() << " ";
+                stream << std::setw(10) << file_status.fileSize() << " ";
+                stream << file_status.timeString() << " ";
+                stream << filename;
+                stream << "\r\n";
+            }
 
-                                        // Copy the file list into a raw char vector
-                                        const std::string dir_listing_string = stream.str();
-                                        const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
-                                        dir_listing_rawdata->reserve(dir_listing_string.size());
-                                        std::ranges::copy(dir_listing_string,
-                                                          std::back_inserter(*dir_listing_rawdata));
+            // Copy the file list into a raw char vector
+            const std::string dir_listing_string = stream.str();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
+            dir_listing_rawdata->reserve(dir_listing_string.size());
+            std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
-                                        // Send the string out
-                                        me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-                                        me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
-                                    });
+            // Send the string out
+            me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
+        });
     }
 
     void FtpSession::sendNameList(const std::map<std::string, FileStatus> &directory_content) {
         auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
-        data_acceptor_.async_accept(*data_socket,
-                                    [data_socket, directory_content, me = shared_from_this()](auto ec) {
-                                        if (ec) {
-                                            me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
-                                            return;
-                                        }
+        data_acceptor_.async_accept(*data_socket, [data_socket, directory_content, me = shared_from_this()](auto ec) {
+            if (ec) {
+                me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
+                return;
+            }
 
-                                        // Create a file list
-                                        std::stringstream stream;
-                                        // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
-                                        for (const auto &key: directory_content | std::views::keys) {
-                                            stream << key;
-                                            stream << "\r\n";
-                                        }
+            // Create a file list
+            std::stringstream stream;
+            // NOLINT(misc-const-correctness) Reason: False detection, this cannot be made const
+            for (const auto &key: directory_content | std::views::keys) {
+                stream << key;
+                stream << "\r\n";
+            }
 
-                                        // Copy the file list into a raw char vector
-                                        const std::string dir_listing_string = stream.str();
-                                        const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
-                                        dir_listing_rawdata->reserve(dir_listing_string.size());
-                                        std::ranges::copy(dir_listing_string,
-                                                          std::back_inserter(*dir_listing_rawdata));
+            // Copy the file list into a raw char vector
+            const std::string dir_listing_string = stream.str();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
+            dir_listing_rawdata->reserve(dir_listing_string.size());
+            std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
-                                        // Send the string out
-                                        me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-                                        me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
-                                        // Nullpointer indicates end of transmission
-                                    });
+            // Send the string out
+            me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
+            // Nullpointer indicates the end of transmission
+        });
     }
 
     void FtpSession::sendFile(const std::shared_ptr<IoFile> &file) {
         auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);
         data_socket_weakptr_ = data_socket;
 
-        data_acceptor_.async_accept(*data_socket,
-                                    [data_socket, file, me = shared_from_this()](auto ec) {
-                                        if (ec) {
-                                            me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
-                                            return;
-                                        }
+        data_acceptor_.async_accept(*data_socket, [data_socket, file, me = shared_from_this()](auto ec) {
+            if (ec) {
+                me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
+                return;
+            }
 
-                                        // Start sending multiple buffers at once
-                                        me->readDataFromFileAndSend(file, data_socket);
-                                        me->readDataFromFileAndSend(file, data_socket);
-                                        me->readDataFromFileAndSend(file, data_socket);
-                                    });
-        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD,
-                                static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
+            // Start sending multiple buffers at once
+            me->readDataFromFileAndSend(file, data_socket);
+            me->readDataFromFileAndSend(file, data_socket);
+            me->readDataFromFileAndSend(file, data_socket);
+        });
+        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD, static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
     }
 
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
@@ -1295,14 +1289,13 @@ namespace AwsMock::FtpServer {
                                     });
     }
 
-    void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file,
-                                                         const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
+    void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
         const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
 
         async_read(*data_socket,
                    boost::asio::buffer(*buffer),
                    boost::asio::transfer_at_least(buffer->size()),
-                   [me = shared_from_this(), file, data_socket, buffer](const boost::beast::error_code ec, const std::size_t length) {
+                   [me = shared_from_this(), file, data_socket, buffer](const boost::beast::error_code &ec, const std::size_t length) {
                        buffer->resize(length);
                        if (ec) {
                            if (length > 0) {
@@ -1310,18 +1303,14 @@ namespace AwsMock::FtpServer {
                            }
                            me->endDataReceiving(file);
                        } else if (length > 0) {
-                           me->writeDataToFile(buffer,
-                                               file,
-                                               [me, file, data_socket]() {
-                                                   me->receiveDataFromSocketAndWriteToFile(file, data_socket);
-                                               });
+                           me->writeDataToFile(buffer, file, [me, file, data_socket]() {
+                               me->receiveDataFromSocketAndWriteToFile(file, data_socket);
+                           });
                        }
                    });
     }
 
-    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char>> &data,
-                                     const std::shared_ptr<IoFile> &file,
-                                     const std::function<void()> &fetch_more) {
+    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
         file_rw_strand_.post([me = shared_from_this(), data, file, fetch_more] {
             fetch_more();
             file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
@@ -1360,7 +1349,7 @@ namespace AwsMock::FtpServer {
     std::string FtpSession::toLocalPath(const std::string &ftp_path) const {
         assert(_logged_in_user);
 
-        // First make the ftp path absolute if it isn't already
+        // First, make the ftp path absolute if it isn't already
         const std::string absolute_ftp_path = toAbsoluteFtpPath(ftp_path);
 
         // Now map it to the local filesystem
@@ -1458,7 +1447,7 @@ namespace AwsMock::FtpServer {
         metadata["user-agent-id"] = _logged_in_user->_username + "@" + _serverName;
 
         // Get content type
-        std::string contentType = Core::FileUtils::GetContentType(fileName);
+        std::string contentType = Core::FileUtils::GetContentType(fileName, key);
         long contentLength = Core::FileUtils::FileSize(fileName);
 
         Dto::S3::PutObjectRequest request = {

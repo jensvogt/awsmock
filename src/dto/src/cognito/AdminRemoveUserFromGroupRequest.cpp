@@ -6,6 +6,22 @@
 
 namespace AwsMock::Dto::Cognito {
 
+    void AdminRemoveUserFromGroupRequest::FromJson(const std::string &payload) {
+
+        try {
+
+            const value document = bsoncxx::from_json(payload);
+            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+            groupName = Core::Bson::BsonUtils::GetStringValue(document, "GroupName");
+            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
+            userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string AdminRemoveUserFromGroupRequest::ToJson() const {
 
         try {
@@ -23,30 +39,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    void AdminRemoveUserFromGroupRequest::FromJson(const std::string &payload) {
-
-        try {
-
-            const value document = bsoncxx::from_json(payload);
-            region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
-            groupName = Core::Bson::BsonUtils::GetStringValue(document, "GroupName");
-            userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "UserPoolId");
-            userName = Core::Bson::BsonUtils::GetStringValue(document, "Username");
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    std::string AdminRemoveUserFromGroupRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const AdminRemoveUserFromGroupRequest &r) {
-        os << "AdminRemoveUserFromGroupRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

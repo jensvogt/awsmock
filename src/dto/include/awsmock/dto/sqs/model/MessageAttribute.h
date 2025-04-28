@@ -11,16 +11,12 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct MessageAttribute {
-
-        /**
-         * Message attribute name
-         */
-        std::string name;
+    struct MessageAttribute final : Common::BaseCounter<MessageAttribute> {
 
         /**
          * Message attribute string value
@@ -30,7 +26,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attribute number value
          */
-        long numberValue = -1;
+        std::vector<std::string> stringListValues = {};
 
         /**
          * Message attribute binary value
@@ -40,7 +36,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Logical data type
          */
-        MessageAttributeDataType type;
+        MessageAttributeDataType dataType{};
 
         /**
          * @brief Returns the MD5 sum of all message attributes (user attributes).
@@ -60,7 +56,7 @@ namespace AwsMock::Dto::SQS {
         static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
 
         /**
-         * @brief Returns an integer as byte array and fill it in the given byte array at position offset.
+         * @brief Returns an integer as a byte array and fill it in the given byte array at position offset.
          *
          * @param n integer value
          * @param bytes output byte array
@@ -68,6 +64,7 @@ namespace AwsMock::Dto::SQS {
         static void GetIntAsByteArray(size_t n, unsigned char *bytes);
 
         /**
+         * @brief Convert from JSON string
          * @brief Convert from JSON document
          *
          * @param jsonObject attribute object
@@ -81,43 +78,31 @@ namespace AwsMock::Dto::SQS {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * @brief Convert from JSON document
-         *
-         * @param jsonObject attribute object
-         */
-        void FromJson(const view_or_value<view, value> &jsonObject);
+      private:
 
-        /**
-         * @brief Convert from JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToJson() const;
+        friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
+            MessageAttribute r;
+            r.region = v.at("region").as_string();
+            r.user = v.at("user").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.stringValue = v.at("stringValue").as_string();
+            r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("stringListValues"));
+            //r.binaryValue = v.at("binaryValue").as_uint64();
+            r.dataType = MessageAttributeDataTypeFromString(v.at("dataType").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Name comparator
-         *
-         * @param other
-         * @return
-         */
-        bool operator<(const MessageAttribute &other) const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"stringValue", obj.stringValue},
+                    {"stringListValues", boost::json::value_from(obj.stringListValues)},
+                    {"dataType", MessageAttributeDataTypeToString(obj.dataType)},
+            };
+        }
     };
-
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;
 
 }// namespace AwsMock::Dto::SQS

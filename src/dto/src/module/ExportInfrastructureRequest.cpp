@@ -13,6 +13,7 @@ namespace AwsMock::Dto::Module {
             const value documentValue = bsoncxx::from_json(payload);
             includeObjects = Core::Bson::BsonUtils::GetBoolValue(documentValue, "includeObjects");
             prettyPrint = Core::Bson::BsonUtils::GetBoolValue(documentValue, "prettyPrint");
+            cleanFirst = Core::Bson::BsonUtils::GetBoolValue(documentValue, "cleanFirst");
 
             if (documentValue.find("modules") != documentValue.end()) {
                 Core::Bson::FromBsonStringArray(documentValue, "modules", &modules);
@@ -31,6 +32,7 @@ namespace AwsMock::Dto::Module {
             document rootDocument;
             Core::Bson::BsonUtils::SetBoolValue(rootDocument, "includeObjects", includeObjects);
             Core::Bson::BsonUtils::SetBoolValue(rootDocument, "prettyPrint", prettyPrint);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "cleanFirst", cleanFirst);
 
             if (!modules.empty()) {
                 array jsonArray;

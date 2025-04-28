@@ -6,6 +6,21 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    void ListEventSourceMappingsRequest::FromJson(const std::string &jsonString) {
+
+        try {
+            const value document = bsoncxx::from_json(jsonString);
+            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
+            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "EventSourceArn");
+            marker = Core::Bson::BsonUtils::GetStringValue(document, "Marker");
+            maxItems = Core::Bson::BsonUtils::GetIntValue(document, "MaxItems");
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     std::string ListEventSourceMappingsRequest::ToJson() const {
 
         try {
@@ -23,32 +38,6 @@ namespace AwsMock::Dto::Lambda {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }
-
-    void ListEventSourceMappingsRequest::FromJson(const std::string &jsonString) {
-
-        try {
-            const value document = bsoncxx::from_json(jsonString);
-            functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
-            eventSourceArn = Core::Bson::BsonUtils::GetStringValue(document, "EventSourceArn");
-            marker = Core::Bson::BsonUtils::GetStringValue(document, "Marker");
-            maxItems = Core::Bson::BsonUtils::GetIntValue(document, "MaxItems");
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    std::string ListEventSourceMappingsRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListEventSourceMappingsRequest &r) {
-        os << "ListEventSourceMappingsRequest=" << r.ToJson();
-        return os;
     }
 
 }// namespace AwsMock::Dto::Lambda

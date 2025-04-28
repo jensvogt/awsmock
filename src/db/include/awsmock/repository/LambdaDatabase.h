@@ -205,7 +205,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export a list of lambdas
@@ -213,7 +213,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return ölist of lambda entries
          */
-        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<Core::SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::Lambda::Lambda> ExportLambdas(const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of lambda functions with the given event source ARN attached.
@@ -234,9 +234,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing lambda functions
          *
+         * @return number of lambda object deleted
          * @throws DatabaseException
          */
-        void DeleteAllLambdas() const;
+        long DeleteAllLambdas() const;
 
       private:
 

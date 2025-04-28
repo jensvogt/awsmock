@@ -67,7 +67,7 @@ namespace AwsMock::Database {
         bool IsActive(const std::string &name);
 
         /**
-         * @brief Check existence of name
+         * @brief Check the existence of name
          *
          * @param name name name
          * @return created name
@@ -81,7 +81,7 @@ namespace AwsMock::Database {
          * @return module, if existing
          * @throws DatabaseException
          */
-        Entity::Module::Module GetModuleById(const bsoncxx::oid &oid);
+        Entity::Module::Module GetModuleById(const bsoncxx::oid &oid) const;
 
         /**
          * @brief Returns the module by userPoolId

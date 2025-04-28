@@ -9,6 +9,8 @@
 #include <awsmock/dto/dynamodb/DeleteItemRequest.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/PutItemRequest.h>
+#include <awsmock/dto/dynamodb/model/Item.h>
+#include <awsmock/dto/dynamodb/model/ItemCounter.h>
 #include <awsmock/entity/dynamodb/AttributeValue.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
@@ -64,6 +66,56 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::AttributeValue
          */
         static std::map<std::string, AttributeValue> map(const std::map<std::string, Database::Entity::DynamoDb::AttributeValue> &attributeValue);
+
+        /**
+         * @brief Maps a DynamoDB item attribute entity to an item attribute DTO.
+         *
+         * @param attributeValueEntity DynamoDb item entity
+         * @return Dynamodb item attribute DTO
+         * @see Dto::DynamoDb::AttributeValue
+         * @see Database::Entity::DynamoDb::AttributeValue
+         */
+        static AttributeValue map(const Database::Entity::DynamoDb::AttributeValue &attributeValueEntity);
+
+        /**
+         * @brief Maps a DynamoDB item entity to an item DTO.
+         *
+         * @param itemEntity DynamoDb item entity
+         * @return Dynamodb item DTO
+         * @see Dto::DynamoDb::Item
+         * @see Database::Entity::DynamoDb::Item
+         */
+        static Item map(const Database::Entity::DynamoDb::Item &itemEntity);
+
+        /**
+         * @brief Maps a list of DynamoDB item entities to an item DTO list.
+         *
+         * @param itemEntities DynamoDb item entity list
+         * @return Dynamodb item DTO list
+         * @see Dto::DynamoDb::Item
+         * @see Database::Entity::DynamoDb::Item
+         */
+        static std::vector<Item> map(const std::vector<Database::Entity::DynamoDb::Item> &itemEntities);
+
+        /**
+         * @brief Maps a DynamoDB item entity to an item counter DTO.
+         *
+         * @param itemEntity DynamoDb item entity
+         * @return Dynamodb item counter DTO
+         * @see Dto::DynamoDb::ItemCounter
+         * @see Database::Entity::DynamoDb::Item
+         */
+        static ItemCounter mapCounter(const Database::Entity::DynamoDb::Item &itemEntity);
+
+        /**
+         * @brief Maps a DynamoDB item entity list to an item counter DTO list.
+         *
+         * @param itemEntities DynamoDb item entity list
+         * @return Dynamodb item counter DTO list
+         * @see Dto::DynamoDb::ItemCounter
+         * @see Database::Entity::DynamoDb::Item
+         */
+        static std::vector<ItemCounter> mapCounter(const std::vector<Database::Entity::DynamoDb::Item> &itemEntities);
     };
 
 }// namespace AwsMock::Dto::DynamoDb

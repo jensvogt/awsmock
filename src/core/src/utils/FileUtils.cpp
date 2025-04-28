@@ -104,7 +104,7 @@ namespace AwsMock::Core {
     std::string FileUtils::GetTempFile(const std::string &dir, const std::string &extension) {
         DirUtils::EnsureDirectory(dir);
         const boost::filesystem::path temp = boost::filesystem::unique_path();
-        return dir + "/" + temp.string() + "." + extension;
+        return dir + separator() + temp.string() + "." + extension;
     }
 
     std::string FileUtils::GetParentPath(const std::string &fileName) {
@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -190,7 +190,7 @@ namespace AwsMock::Core {
             char buffer[BUFFER_LEN];
             FILE *src = fopen(it.c_str(), "rb");
 
-            int n;
+            size_t n;
             while ((n = fread(buffer, 1, BUFFER_LEN, src)) > 0) {
                 fwrite(buffer, 1, n, dest);
                 copied += n;
@@ -275,8 +275,8 @@ namespace AwsMock::Core {
 
 
         // Get the handle of the file object.
-        HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, nullptr,
-                                  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        const HANDLE hFile = CreateFile(TEXT(fileName.c_str()), GENERIC_READ, FILE_SHARE_READ, nullptr,
+                                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
         // Check GetLastError for CreateFile error code.
         if (hFile == INVALID_HANDLE_VALUE) {
@@ -348,7 +348,7 @@ namespace AwsMock::Core {
             return AcctName;
         }
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -388,13 +388,6 @@ namespace AwsMock::Core {
 #endif
     }
 
-    std::string FileUtils::GetContentType(const std::string &path) {
-        if (const std::string extension = boost::filesystem::path(path).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
-            return MimeTypes.at(extension);
-        }
-        return GetContentTypeMagicFile(path);
-    }
-
     std::string FileUtils::ReadFile(const std::string &fileName) {
         boost::filesystem::path pat(fileName);
 
@@ -413,34 +406,47 @@ namespace AwsMock::Core {
         return result;
     }
 
+    std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
+        if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
+            return MimeTypes.at(extension);
+        }
+        return GetContentTypeMagicFile(path);
+    }
+
     std::string FileUtils::GetContentTypeMagicFile(const std::string &path) {
 
         if (!FileExists(path)) {
+            log_error << "Target path not found, path: " << path;
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValueString("awsmock.magic-file");
+        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
-        // allocate magic cookie
+        if (!FileExists(magicFile)) {
+            log_error << "Magic database not found, path: " << magicFile;
+            return DEFAULT_MIME_TYPE;
+        }
+
+        // Allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
             log_error << "Could not open libmagic";
             return DEFAULT_MIME_TYPE;
         }
 
-        // load the default magic database (indicated by nullptr)
+        // Load the default magic database (indicated by nullptr)
         if (magic_load(magic, magicFile.c_str()) != 0) {
             log_error << "Could not load libmagic mime types, fileName: " << magicFile;
             return DEFAULT_MIME_TYPE;
         }
 
-        // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, magicFile.c_str()) != 0) {
+        // Compile the default magic database (indicated by nullptr)
+        /*if (magic_compile(magic, magicFile.c_str()) != 0) {
             log_error << "Could not compile libmagic";
             return DEFAULT_MIME_TYPE;
-        }
+        }*/
 
-        // get description of the filename argument
+        // Get a description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
         if (mime == nullptr) {
             log_error << "Could not get mime type";
@@ -461,7 +467,7 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValueString("awsmock.magic-file");
+        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
         // allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
@@ -546,6 +552,11 @@ namespace AwsMock::Core {
         out << decoded;
         out.close();
         MoveTo(outFilepath, filePath);
+    }
+
+    void FileUtils::RemoveLastBytes(const std::string &filename, const long size) {
+        const std::filesystem::path p(filename);
+        std::filesystem::resize_file(p, std::filesystem::file_size(p) - size);
     }
 
 }// namespace AwsMock::Core

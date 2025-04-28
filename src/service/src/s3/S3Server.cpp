@@ -10,9 +10,9 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.s3.monitoring.period");
-        _syncPeriod = configuration.GetValueInt("awsmock.modules.s3.sync.object.period");
-        _sizePeriod = configuration.GetValueInt("awsmock.modules.s3.sync.bucket.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.s3.monitoring.period");
+        _syncPeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.object.period");
+        _sizePeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.bucket.period");
 
         // Check module active
         if (!IsActive("s3")) {
@@ -34,10 +34,10 @@ namespace AwsMock::Service {
 
     void S3Server::SyncObjects() const {
 
-        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
-        const std::string s3DataDir = Core::Configuration::instance().GetValueString("awsmock.modules.s3.data-dir");
+        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
 
-        Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {
@@ -47,9 +47,9 @@ namespace AwsMock::Service {
         // Loop over buckets and do some maintenance work
         int filesDeleted = 0, objectsDeleted = 0;
         for (auto &bucket: buckets) {
-            // Get objects and delete object, where the file is not existing anymore
+            // Get objects and delete objects, where the file is not existing anymore, The files are identified by internal name.
             for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object: objects) {
-                if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
+                if (!Core::FileUtils::FileExists(s3DataDir + "/" + object.internalName)) {
                     _s3Database.DeleteObject(object);
                     log_debug << "Object deleted, internalName: " << object.internalName;
                     objectsDeleted++;
@@ -57,9 +57,10 @@ namespace AwsMock::Service {
             }
         }
 
-        // Loop over files and check database for internal name
+        // Loop over files and check the database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
+                log_debug << "Checking file, basename: " << Core::FileUtils::GetBasename(entry.path().string());
                 if (!_s3Database.ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::DeleteFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
@@ -71,9 +72,9 @@ namespace AwsMock::Service {
     }
 
     void S3Server::SyncBuckets() const {
-        const std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
 
-        Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Bucket synchronization starting, bucketCount: " << buckets.size();
 
         if (buckets.empty()) {

@@ -38,14 +38,19 @@ namespace AwsMock::Dto::Module {
         std::vector<std::string> modules;
 
         /**
-         * Include objects
+         * Include objects, default: false
          */
-        bool includeObjects;
+        bool includeObjects = false;
 
         /**
-         * Pretty print
+         * Pretty print, default: true
          */
-        bool prettyPrint;
+        bool prettyPrint = true;
+
+        /**
+         * Clean infrastructure first, default: false
+         */
+        bool cleanFirst = false;
 
         /**
          * Convert to a JSON string

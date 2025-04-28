@@ -31,10 +31,8 @@
 
 #ifdef _WIN32
 #define AWS_CMD "C:/Program Files/Amazon/AWSCLIV2/aws.exe"
-#elif __APPLE__
-#define AWS_CMD "/usr/local/bin/aws"
 #else
-#define AWS_CMD "/snap/bin/aws"
+#define AWS_CMD "/usr/local/bin/aws"
 #endif
 namespace AwsMock::AwsLocal {
 

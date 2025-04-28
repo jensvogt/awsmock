@@ -77,4 +77,58 @@ namespace AwsMock::Dto::DynamoDb {
         }
         return resultMap;
     }
+
+    // Attribute Value entity -> DTO
+    AttributeValue Mapper::map(const Database::Entity::DynamoDb::AttributeValue &attributeValueEntity) {
+        AttributeValue attributeValue;
+        attributeValue.stringValue = attributeValueEntity.stringValue;
+        attributeValue.stringSetValue = attributeValueEntity.stringSetValue;
+        attributeValue.numberValue = attributeValueEntity.numberValue;
+        attributeValue.numberSetValue = attributeValueEntity.numberSetValue;
+        attributeValue.nullValue = attributeValueEntity.nullValue;
+        attributeValue.boolValue = attributeValueEntity.boolValue;
+        return attributeValue;
+    }
+
+    // Attribute Value item -> DTO
+    Item Mapper::map(const Database::Entity::DynamoDb::Item &itemEntity) {
+        Item itemDto;
+        itemDto.oid = itemEntity.oid;
+        itemDto.tableName = itemEntity.tableName;
+        itemDto.created = itemEntity.created;
+        itemDto.modified = itemEntity.modified;
+        for (const auto &[fst, snd]: itemEntity.attributes) {
+            itemDto.attributes[fst] = map(snd);
+        }
+        return itemDto;
+    }
+
+    // Attribute value item list -> DTO list
+    std::vector<Item> Mapper::map(const std::vector<Database::Entity::DynamoDb::Item> &itemEntities) {
+        std::vector<Item> items;
+        for (const auto &i: itemEntities) {
+            items.emplace_back(map(i));
+        }
+        return items;
+    }
+
+    // Attribute Value item -> DTO
+    ItemCounter Mapper::mapCounter(const Database::Entity::DynamoDb::Item &itemEntity) {
+        ItemCounter itemCounterDto;
+        itemCounterDto.id = itemEntity.oid;
+        itemCounterDto.tableName = itemEntity.tableName;
+        //itemCounterDto.size = itemEntity.s;
+        itemCounterDto.created = itemEntity.created;
+        itemCounterDto.modified = itemEntity.modified;
+        return itemCounterDto;
+    }
+
+    // Attribute value item list -> DTO list
+    std::vector<ItemCounter> Mapper::mapCounter(const std::vector<Database::Entity::DynamoDb::Item> &itemEntities) {
+        std::vector<ItemCounter> itemCounters;
+        for (const auto &i: itemEntities) {
+            itemCounters.emplace_back(mapCounter(i));
+        }
+        return itemCounters;
+    }
 }// namespace AwsMock::Dto::DynamoDb

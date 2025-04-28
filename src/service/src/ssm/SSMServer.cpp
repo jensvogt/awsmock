@@ -10,8 +10,8 @@ namespace AwsMock::Service {
 
         // HTTP manager configuration
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.GetValueInt("awsmock.modules.ssm.worker.period");
-        _monitoringPeriod = configuration.GetValueInt("awsmock.modules.ssm.monitoring.period");
+        _workerPeriod = configuration.GetValue<int>("awsmock.modules.ssm.worker.period");
+        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.ssm.monitoring.period");
         log_debug << "SSM server initialized";
 
         // Check module active

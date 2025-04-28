@@ -85,19 +85,4 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string TopicConfiguration::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string TopicConfiguration::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const TopicConfiguration &r) {
-        os << "TopicConfiguration=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

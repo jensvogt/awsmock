@@ -24,10 +24,10 @@ namespace AwsMock::Dto::Lambda {
 
         try {
 
-            bsoncxx::builder::basic::document document;
+            document document;
 
             if (!functions.empty()) {
-                bsoncxx::builder::basic::array jsonArray;
+                array jsonArray;
                 for (const auto &function: functions) {
                     jsonArray.append(function.ToDocument());
                 }

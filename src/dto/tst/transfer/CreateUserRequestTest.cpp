@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Transfer {
 
         void SetUp() override {
             // General configuration
-            _region = _configuration.GetValueString("awsmock.region");
+            _region = _configuration.GetValue<std::string>("awsmock.region");
         }
 
         void TearDown() override {

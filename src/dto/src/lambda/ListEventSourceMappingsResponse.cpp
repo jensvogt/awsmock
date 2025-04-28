@@ -26,15 +26,4 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string ListEventSourceMappingsResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListEventSourceMappingsResponse &r) {
-        os << "ListEventSourceMappingsResponse=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::Lambda

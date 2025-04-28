@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::S3 {
 
     view_or_value<view, value> QueueNotification::ToDocument() const {
 
-        auto queueNotificationDoc = bsoncxx::builder::basic::document{};
+        auto queueNotificationDoc = document{};
         queueNotificationDoc.append(kvp("id", id));
         queueNotificationDoc.append(kvp("queueArn", queueArn));
 
@@ -30,7 +30,7 @@ namespace AwsMock::Database::Entity::S3 {
         }
         queueNotificationDoc.append(kvp("events", eventsDoc));
 
-        auto filterRulesDoc = bsoncxx::builder::basic::array{};
+        auto filterRulesDoc = array{};
         for (const auto &filterRule: filterRules) {
             filterRulesDoc.append(filterRule.ToDocument());
         }

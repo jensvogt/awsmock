@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Module {
          *
          * @return payload json string
          */
-        std::string ToJson();
+        std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

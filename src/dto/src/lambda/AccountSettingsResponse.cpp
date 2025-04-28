@@ -25,15 +25,4 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string AccountSettingsResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const AccountSettingsResponse &r) {
-        os << "AccountSettingsResponse=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::Lambda

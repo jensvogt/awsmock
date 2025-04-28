@@ -33,18 +33,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
-                case Dto::Common::SNSCommandType::LIST_TOPIC_COUNTERS: {
-
-                    Dto::SNS::ListTopicCountersRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-                    snsRequest.region = region;
-
-                    Dto::SNS::ListTopicCountersResponse snsResponse = _snsService.ListTopicCounters(snsRequest);
-
-                    log_info << "List topics";
-                    return SendOkResponse(request, snsResponse.ToJson());
-                }
-
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
 
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
@@ -209,21 +197,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
-                case Dto::Common::SNSCommandType::LIST_MESSAGE_COUNTERS: {
-
-                    Dto::SNS::ListMessageCountersRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-                    snsRequest.region = region;
-
-                    log_debug << "List message counters, payload: " << clientCommand.payload;
-                    log_debug << "List message counters, topicArn: " << snsRequest.topicArn;
-
-                    Dto::SNS::ListMessageCountersResponse snsResponse = _snsService.ListMessageCounters(snsRequest);
-
-                    log_info << "List message counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messages.size();
-                    return SendOkResponse(request, snsResponse.ToJson());
-                }
-
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
 
                     Dto::SNS::DeleteMessageRequest snsRequest;
@@ -235,36 +208,43 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, "{}");
                 }
 
+                case Dto::Common::SNSCommandType::LIST_TOPIC_COUNTERS: {
+
+                    Dto::SNS::ListTopicCountersRequest snsRequest = Dto::SNS::ListTopicCountersRequest::FromJson(clientCommand);
+                    Dto::SNS::ListTopicCountersResponse snsResponse = _snsService.ListTopicCounters(snsRequest);
+                    log_trace << "List topic counters, json: " << snsResponse.ToJson();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
+                case Dto::Common::SNSCommandType::LIST_MESSAGE_COUNTERS: {
+
+                    Dto::SNS::ListMessageCountersRequest snsRequest = Dto::SNS::ListMessageCountersRequest::FromJson(clientCommand);
+                    Dto::SNS::ListMessageCountersResponse snsResponse = _snsService.ListMessageCounters(snsRequest);
+                    log_trace << "List message counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messages.size();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 case Dto::Common::SNSCommandType::LIST_SUBSCRIPTION_COUNTERS: {
 
-                    Dto::SNS::ListSubscriptionCountersRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SNS::ListSubscriptionCountersRequest snsRequest = Dto::SNS::ListSubscriptionCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListSubscriptionCountersResponse snsResponse = _snsService.ListSubscriptionCounters(snsRequest);
-
-                    log_info << "List subscriptions counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.subscriptionCounters.size();
+                    log_trace << "List subscriptions counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.subscriptionCounters.size();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::LIST_ATTRIBUTE_COUNTERS: {
 
-                    Dto::SNS::ListAttributeCountersRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SNS::ListAttributeCountersRequest snsRequest = Dto::SNS::ListAttributeCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListAttributeCountersResponse snsResponse = _snsService.ListAttributeCounters(snsRequest);
-
-                    log_info << "List attributes counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.attributeCounters.size();
+                    log_trace << "List attributes counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.attributeCounters.size();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
                 case Dto::Common::SNSCommandType::LIST_TAG_COUNTERS: {
 
-                    Dto::SNS::ListTagCountersRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SNS::ListTagCountersRequest snsRequest = Dto::SNS::ListTagCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListTagCountersResponse snsResponse = _snsService.ListTagCounters(snsRequest);
-
-                    log_info << "List tags counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.tagCounters.size();
+                    log_trace << "List tags counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.tagCounters.size();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
@@ -277,6 +257,7 @@ namespace AwsMock::Service {
             }
 
         } catch (std::exception &e) {
+            log_error << "Exception, error: " << e.what();
             return SendInternalServerError(request, e.what());
         } catch (...) {
             log_error << "Unknown exception";

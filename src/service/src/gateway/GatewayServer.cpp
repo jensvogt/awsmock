@@ -10,9 +10,9 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _port = configuration.GetValueInt("awsmock.gateway.http.port");
-        _host = configuration.GetValueString("awsmock.gateway.http.host");
-        _address = configuration.GetValueString("awsmock.gateway.http.address");
+        _port = configuration.GetValue<int>("awsmock.gateway.http.port");
+        _host = configuration.GetValue<std::string>("awsmock.gateway.http.host");
+        _address = configuration.GetValue<std::string>("awsmock.gateway.http.address");
         log_debug << "Gateway server initialized";
 
         // Check module active

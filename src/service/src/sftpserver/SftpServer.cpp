@@ -1293,7 +1293,12 @@ static int process_close(sftp_client_message client_msg) {
         char filePath[PATH_MAX];
         char realFilePath[PATH_MAX];
         snprintf(filePath, PATH_MAX, "%s/%d", "/proc/self/fd", h->fd);
+#ifdef _WIN32
+        strncpy_s(realFilePath, reinterpret_cast<char const *>(std::filesystem::canonical(filePath).c_str()), PATH_MAX);
+        const int nBytes = strlen(realFilePath);
+#else
         const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
+#endif
         realFilePath[nBytes] = '\0';
         const auto p = new AwsMock::Service::S3Service();
         p->PutObject(currentUser, realFilePath, currentServerId);
@@ -1598,7 +1603,7 @@ static int process_realpath(sftp_client_message client_msg) {
 #else
     if (filename[0] == '\0' || filename[0] == '.') {
         path = static_cast<char *>(malloc(PATH_MAX));
-        strcpy(path, AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir").c_str());
+        strcpy(path, AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir").c_str());
         strcpy(path + strlen(path), "/");
         strcpy(path + strlen(path), currentUser);
     } else {
@@ -3216,7 +3221,7 @@ static int auth_password(ssh_session session, const char *user, const char *pass
         strcpy(currentUser, it->userName.c_str());
 
         // Set user home directory
-        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         userBasePath = static_cast<char *>(malloc(1024));
         strcpy(userBasePath, ftpBaseDir.c_str());
         strcpy(userBasePath + strlen(userBasePath), "/");
@@ -3365,7 +3370,7 @@ namespace AwsMock::Service {
         currentServerId = serverId.c_str();
 
         // Change working directory
-        const std::string ftpBaseDir = Core::Configuration::instance().GetValueString("awsmock.modules.transfer.data-dir");
+        const std::string ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
 #ifdef _WIN32
         int rc = _chdir(ftpBaseDir.c_str());
 #else
@@ -3385,7 +3390,7 @@ namespace AwsMock::Service {
             log_error << "SSH bind new failed";
             return;
         }
-        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str();
+        log_info << "SFTP server starting, endpoint: " << address.c_str() << ":" << port.c_str() << ", hostKey: " << hostKey;
 
         // Command line options
         ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT_STR, port.c_str());

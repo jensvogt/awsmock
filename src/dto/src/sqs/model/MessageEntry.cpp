@@ -38,7 +38,8 @@ namespace AwsMock::Dto::SQS {
                 array jsonMessageAttributeArray;
                 for (const auto &[fst, snd]: messageAttributes) {
                     document jsonAttribute;
-                    jsonAttribute.append(kvp(fst, snd.ToDocument()));
+                    // TODO: Fix me
+                    //jsonAttribute.append(kvp(fst, snd.ToDocument()));
                     jsonMessageAttributeArray.append(jsonAttribute);
                 }
                 rootDocument.append(kvp("messageAttributes", jsonMessageAttributeArray));
@@ -74,7 +75,8 @@ namespace AwsMock::Dto::SQS {
                 for (const bsoncxx::array::view attributesView{object.view()["MessageAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
-                    attribute.FromDocument(attributeElement.get_document().value);
+                    // TODO: Fix me
+                    //attribute.FromDocument(attributeElement.get_document().value);
                     messageAttributes[key] = attribute;
                 }
             }

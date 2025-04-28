@@ -36,8 +36,8 @@ namespace AwsMock::Database {
     };
 
     DatabaseBase::DatabaseBase() : _useDatabase(false) {
-        _useDatabase = Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
-        _name = Core::Configuration::instance().GetValueString("awsmock.mongodb.name");
+        _useDatabase = Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.active");
+        _name = Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.name");
     }
 
     mongocxx::database DatabaseBase::GetConnection() const {
@@ -46,7 +46,7 @@ namespace AwsMock::Database {
     }
 
     bool DatabaseBase::HasDatabase() {
-        return Core::Configuration::instance().GetValueBool("awsmock.mongodb.active");
+        return Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.active");
     }
 
     std::string DatabaseBase::GetDatabaseName() const {
@@ -56,7 +56,7 @@ namespace AwsMock::Database {
     void DatabaseBase::StartDatabase() {
 
         _useDatabase = true;
-        Core::Configuration::instance().SetValueBool("awsmock.mongodb.active", true);
+        Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", true);
 
         // Update module database
         const mongocxx::pool::entry _client = _pool->acquire();
@@ -67,7 +67,7 @@ namespace AwsMock::Database {
     void DatabaseBase::StopDatabase() {
 
         // Update module database
-        Core::Configuration::instance().SetValueBool("awsmock.mongodb.active", false);
+        Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", false);
         const mongocxx::pool::entry _client = _pool->acquire();
         (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
                                                make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
@@ -83,7 +83,9 @@ namespace AwsMock::Database {
 
             log_info << "Start creating indexes";
 
-            for (const auto &indexName: std::views::keys(indexDefinitions)) { CreateIndex(database, indexName); }
+            for (const auto &indexName: std::views::keys(indexDefinitions)) {
+                CreateIndex(database, indexName);
+            }
             log_info << "Finished creating indexes, count: " << indexDefinitions.size();
         }
     }
@@ -92,8 +94,11 @@ namespace AwsMock::Database {
 
         log_trace << "Start creating index, name: " << indexName;
         auto [collectionName, indexColumns] = indexDefinitions.at(indexName);
+
         document queryDoc;
-        for (const auto &[columns, direction]: indexColumns) { queryDoc.append(kvp(columns, direction)); }
+        for (const auto &[columns, direction]: indexColumns) {
+            queryDoc.append(kvp(columns, direction));
+        }
         document nameDoc;
         nameDoc.append(kvp("name", indexName));
 

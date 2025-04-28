@@ -14,7 +14,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -62,7 +62,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateTableResponse : Common::BaseRequest {
+    struct CreateTableResponse final : Common::BaseDto<CreateTableResponse> {
 
         /**
          * Region
@@ -148,25 +148,11 @@ namespace AwsMock::Dto::DynamoDb {
         void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-         * Creates a JSON string from the object.
+         * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateTableResponse &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::DynamoDb

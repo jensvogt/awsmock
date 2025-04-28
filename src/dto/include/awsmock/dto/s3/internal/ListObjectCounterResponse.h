@@ -15,7 +15,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListObjectCounterResponse {
+    struct ListObjectCounterResponse final : Common::BaseCounter<ListObjectCounterResponse> {
 
         /**
          * List of objects
@@ -27,26 +27,28 @@ namespace AwsMock::Dto::S3 {
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListObjectCounterResponse tag_invoke(boost::json::value_to_tag<ListObjectCounterResponse>, boost::json::value const &v) {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListObjectCounterResponse &r);
+            ListObjectCounterResponse r;
+            r.region = v.at("region").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.user = v.at("user").as_string();
+            r.total = v.at("total").as_int64();
+            r.objectCounters = boost::json::value_to<std::vector<ObjectCounter>>(v.at("objectCounters"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListObjectCounterResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"objectCounters", boost::json::value_from(obj.objectCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

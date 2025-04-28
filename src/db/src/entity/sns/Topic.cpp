@@ -47,7 +47,6 @@ namespace AwsMock::Database::Entity::SNS {
         document topicDoc;
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "region", region);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicName", topicName);
-        Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicUrl", topicUrl);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicArn", topicArn);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "targetArn", targetArn);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "messages", messages);
@@ -69,7 +68,6 @@ namespace AwsMock::Database::Entity::SNS {
             region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
             topicName = Core::Bson::BsonUtils::GetStringValue(mResult, "topicName");
             owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
-            topicUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "topicUrl");
             topicArn = Core::Bson::BsonUtils::GetStringValue(mResult, "topicArn");
             targetArn = Core::Bson::BsonUtils::GetStringValue(mResult, "targetArn");
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");

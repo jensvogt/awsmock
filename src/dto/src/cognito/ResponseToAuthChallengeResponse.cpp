@@ -32,14 +32,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string RespondToAuthChallengeResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const RespondToAuthChallengeResponse &r) {
-        os << "RespondToAuthChallengeResponse=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

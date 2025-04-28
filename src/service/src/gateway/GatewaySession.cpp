@@ -9,10 +9,10 @@ namespace AwsMock::Service {
     GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _queueLimit = configuration.GetValueInt("awsmock.gateway.http.max-queue");
-        _bodyLimit = configuration.GetValueInt("awsmock.gateway.http.max-body");
-        _timeout = configuration.GetValueInt("awsmock.gateway.http.timeout");
-        _verifySignature = configuration.GetValueBool("awsmock.aws.signature.verify");
+        _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
+        _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
+        _timeout = configuration.GetValue<int>("awsmock.gateway.http.timeout");
+        _verifySignature = configuration.GetValue<bool>("awsmock.aws.signature.verify");
     };
 
     void GatewaySession::Run() {
@@ -126,11 +126,15 @@ namespace AwsMock::Service {
         }
 
         std::shared_ptr<AbstractHandler> handler;
-        std::string region = Core::Configuration::instance().GetValueString("awsmock.region");
+        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
             handler = GatewayRouter::instance().GetHandler(target);
+            if (!handler) {
+                log_error << "Handler not found, target: " << target;
+                return Core::HttpUtils::BadRequest(request, "Handler not found");
+            }
             log_trace << "Handler found, name: " << handler->name();
 
         } else {
@@ -146,6 +150,10 @@ namespace AwsMock::Service {
 
             region = authKey.region;
             handler = GatewayRouter::instance().GetHandler(authKey.module);
+            if (!handler) {
+                log_error << "Handler not found, target: " << authKey.module;
+                return Core::HttpUtils::BadRequest(request, "Handler not found");
+            }
             log_trace << "Handler found, name: " << handler->name();
         }
 
@@ -261,7 +269,7 @@ namespace AwsMock::Service {
 
             if (Core::StringUtils::Contains(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), "Cognito")) {
                 authKeys.module = "cognito-idp";
-                authKeys.region = Core::Configuration::instance().GetValueString("awsmock.region");
+                authKeys.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
             }
 
             return authKeys;

@@ -10,12 +10,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/BucketCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListBucketCounterResponse {
+    struct ListBucketCounterResponse final : Common::BaseCounter<ListBucketCounterResponse> {
 
         /**
          * List of buckets
@@ -25,30 +25,31 @@ namespace AwsMock::Dto::S3 {
         /**
          * Total number of buckets
          */
-        long total = 0;
+        long long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListBucketCounterResponse tag_invoke(boost::json::value_to_tag<ListBucketCounterResponse>, boost::json::value const &v) {
+            ListBucketCounterResponse r;
+            r.region = v.at("region").as_string();
+            r.requestId = v.at("requestId").as_string();
+            r.user = v.at("user").as_string();
+            r.total = v.at("total").as_int64();
+            r.bucketCounters = boost::json::value_to<std::vector<BucketCounter>>(v.at("bucketCounters"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListBucketCounterResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListBucketCounterResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"bucketCounters", boost::json::value_from(obj.bucketCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3
 
-#endif// AWSMOCK_DTO_S3_LIST_ALL_BUCKET_RESPONSE_H
+#endif// AWSMOCK_DTO_S3_LIST_BUCKET_COUNTERS_RESPONSE_H

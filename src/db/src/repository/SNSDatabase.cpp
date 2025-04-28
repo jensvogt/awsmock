@@ -220,7 +220,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<Core::SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -247,8 +247,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     bsoncxx::builder::basic::document sort;
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -269,7 +269,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSDatabase::ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const {
+    Entity::SNS::TopicList SNSDatabase::ExportTopics(const std::vector<SortColumn> &sortColumns) const {
         if (HasDatabase()) {
             try {
                 mongocxx::options::find opts;
@@ -282,8 +282,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     bsoncxx::builder::basic::document sort;
-                    for (const auto &[column, sortDirection]: sortColumns) {
-                        sort.append(kvp(column, sortDirection));
+                    for (const auto sortColumn: sortColumns) {
+                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -604,7 +604,7 @@ namespace AwsMock::Database {
                                                        const std::string &topicArn,
                                                        int pageSize,
                                                        int pageIndex,
-                                                       const std::vector<Core::SortColumn> &sortColumns) const {
+                                                       const std::vector<SortColumn> &sortColumns) const {
         if (HasDatabase()) {
             Entity::SNS::MessageList messageList;
 
@@ -628,8 +628,8 @@ namespace AwsMock::Database {
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 bsoncxx::builder::basic::document sort;
-                for (const auto &[column, sortDirection]: sortColumns) {
-                    sort.append(kvp(column, sortDirection));
+                for (const auto sortColumn: sortColumns) {
+                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -761,8 +761,7 @@ namespace AwsMock::Database {
 
             try {
                 session.start_transaction();
-                const auto result = messageCollection.delete_many(
-                        make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
+                const auto result = messageCollection.delete_many(make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
                 if (static_cast<long>(result->deleted_count()) > 0) {
                     log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
@@ -780,7 +779,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void SNSDatabase::DeleteAllMessages() const {
+    long SNSDatabase::DeleteAllMessages() const {
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -790,13 +789,14 @@ namespace AwsMock::Database {
 
                 // Adjust all topic message counters
                 AdjustAllMessageCounters();
+                return result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        } else {
-            _memoryDb.DeleteAllMessages();
         }
+        return _memoryDb.DeleteAllMessages();
     }
 
     void SNSDatabase::AdjustAllMessageCounters() const {

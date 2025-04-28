@@ -13,9 +13,9 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/SortColumn.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -140,7 +140,7 @@ namespace AwsMock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ExportTopics(const std::vector<Core::SortColumn> &sortColumns) const;
+        Entity::SNS::TopicList ExportTopics(const std::vector<SortColumn> &sortColumns) const;
 
         /**
          * @brief Counts the number of topics
@@ -281,19 +281,20 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes a resources.
          *
+         * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        void DeleteAllMessages();
+        long DeleteAllMessages();
 
       private:
 
         /**
-         * SNS topic vector, when running without database
+         * SNS topic vector when running without a database
          */
         std::map<std::string, Entity::SNS::Topic> _topics{};
 
         /**
-         * SNS message vector, when running without database
+         * SNS message vector when running without a database
          */
         std::map<std::string, Entity::SNS::Message> _messages{};
 

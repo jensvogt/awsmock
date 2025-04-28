@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
@@ -64,7 +64,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct CreateFunctionResponse : Common::BaseRequest {
+    struct CreateFunctionResponse final : Common::BaseDto<CreateFunctionResponse> {
 
         /**
          * Name of the function
@@ -142,25 +142,11 @@ namespace AwsMock::Dto::Lambda {
         std::string dockerContainerId;
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateFunctionResponse &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

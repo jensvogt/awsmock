@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UpdateUserPoolDomainResponse : Common::BaseRequest {
+    struct UpdateUserPoolDomainResponse : Common::BaseDto<UpdateUserPoolDomainResponse> {
 
         /**
          * User pool ID
@@ -48,21 +48,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UpdateUserPoolDomainResponse &i);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Cognito

@@ -23,15 +23,4 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-    std::string ScheduledKeyDeletionResponse::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ScheduledKeyDeletionResponse &r) {
-        os << "ScheduledKeyDeletionResponse=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::KMS

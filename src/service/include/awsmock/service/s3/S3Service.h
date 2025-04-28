@@ -97,7 +97,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -316,7 +316,7 @@ namespace AwsMock::Service {
          *
          * @param request delete object request
          */
-        void DeleteObject(const Dto::S3::DeleteObjectRequest &request);
+        void DeleteObject(const Dto::S3::DeleteObjectRequest &request) const;
 
         /**
          * @brief Delete objects
@@ -324,7 +324,7 @@ namespace AwsMock::Service {
          * @param request delete objects request
          * @return DeleteObjectsResponse
          */
-        Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request);
+        Dto::S3::DeleteObjectsResponse DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) const;
 
         /**
          * @brief Adds a bucket notification configuration
@@ -457,7 +457,7 @@ namespace AwsMock::Service {
          * @param key S3 object key
          * @param internalName S3 internal name
          */
-        void DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName);
+        static void DeleteObject(const std::string &bucket, const std::string &key, const std::string &internalName);
 
         /**
          * @brief Deletes a bucket

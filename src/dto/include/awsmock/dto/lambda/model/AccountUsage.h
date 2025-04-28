@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseRequest.h>
+#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountUsage : Common::BaseRequest {
+    struct AccountUsage final : Common::BaseDto<AccountUsage> {
 
         /**
          * Function count
@@ -52,21 +52,7 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return JSON object
          */
-        std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AccountUsage &r);
+        std::string ToJson() const override;
     };
 
 }// namespace AwsMock::Dto::Lambda

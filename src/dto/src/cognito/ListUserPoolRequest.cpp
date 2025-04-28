@@ -17,7 +17,7 @@ namespace AwsMock::Dto::Cognito {
             if (document.find("sortColumns") != document.end()) {
 
                 for (const bsoncxx::array::view arrayView{document["sortColumns"].get_array().value}; const bsoncxx::array::element &element: arrayView) {
-                    Core::SortColumn sortColumn;
+                    Database::SortColumn sortColumn;
                     sortColumn.FromDocument(element.get_document());
                     sortColumns.emplace_back(sortColumn);
                 }
@@ -45,14 +45,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string ListUserPoolRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ListUserPoolRequest &r) {
-        os << "ListUserPoolRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

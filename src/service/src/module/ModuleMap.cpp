@@ -6,7 +6,6 @@
 
 namespace AwsMock::Service {
 
-
     ModuleMap::ModuleMap() = default;
 
     void ModuleMap::AddModule(const std::string &name, const std::shared_ptr<AbstractServer> &server) {
@@ -17,8 +16,8 @@ namespace AwsMock::Service {
         return moduleMap[name];
     }
 
-    bool ModuleMap::HasModule(const std::string &name) {
-        return moduleMap.find(name) != moduleMap.end();
+    bool ModuleMap::HasModule(const std::string &name) const {
+        return moduleMap.contains(name);
     }
 
     std::map<std::string, std::shared_ptr<AbstractServer>> ModuleMap::GetModuleMap() {

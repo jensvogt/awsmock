@@ -6,7 +6,7 @@
 
 namespace AwsMock::Dto::Module {
 
-    std::string ExportInfrastructureResponse::ToJson() {
+    std::string ExportInfrastructureResponse::ToJson() const {
 
         try {
 

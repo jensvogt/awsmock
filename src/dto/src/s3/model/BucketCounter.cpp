@@ -24,20 +24,4 @@ namespace AwsMock::Dto::S3 {
             throw Core::JsonException(exc.what());
         }
     }
-
-    std::string BucketCounter::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string BucketCounter::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const BucketCounter &c) {
-        os << "BucketCounter=" << c.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

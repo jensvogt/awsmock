@@ -29,8 +29,8 @@ namespace AwsMock::Core {
         const std::string queueName = parts[5];
         parts.clear();
 
-        const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string port = Configuration::instance().GetValueString("awsmock.gateway.http.port");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
         const std::string hostname = SystemUtils::GetHostName();
 
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
@@ -38,7 +38,7 @@ namespace AwsMock::Core {
 
     std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl) {
         const std::string queueName = queueUrl.substr(queueUrl.rfind('/') + 1);
-        const std::string accountId = Configuration::instance().GetValueString("awsmock.access.account-id");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -157,9 +157,9 @@ namespace AwsMock::Core {
     }
 
     void AwsUtils::AddAuthorizationHeader(http::request<http::dynamic_body> &request, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
-        const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string accessKeyId = Configuration::instance().GetValueString("awsmock.access.key-id");
-        const std::string secretAccessKey = Configuration::instance().GetValueString("awsmock.access.secret-access-key");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accessKeyId = Configuration::instance().GetValue<std::string>("awsmock.access.key-id");
+        const std::string secretAccessKey = Configuration::instance().GetValue<std::string>("awsmock.access.secret-access-key");
 
         // Mandatory headers
         request.set(http::field::host, Core::SystemUtils::GetHostName());
@@ -191,9 +191,9 @@ namespace AwsMock::Core {
     }
 
     void AwsUtils::AddAuthorizationHeader(const std::string &method, const std::string &path, std::map<std::string, std::string> &headers, const std::string &module, const std::string &contentType, const std::string &signedHeaders, const std::string &payload) {
-        const std::string region = Configuration::instance().GetValueString("awsmock.region");
-        const std::string accessKeyId = Configuration::instance().GetValueString("awsmock.access.key-id");
-        const std::string secretAccessKey = Configuration::instance().GetValueString("awsmock.access.secret-access-key");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accessKeyId = Configuration::instance().GetValue<std::string>("awsmock.access.key-id");
+        const std::string secretAccessKey = Configuration::instance().GetValue<std::string>("awsmock.access.secret-access-key");
 
         // Mandatory headers
         if (!headers.contains("Host")) {

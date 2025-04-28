@@ -11,13 +11,13 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
-        const std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+        const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
 
-        // Create entity and set ARN
+        // Create an entity and set ARN
         Database::Entity::Lambda::Lambda lambdaEntity = {};
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
-        // Create response, if inactive
+        // Create a response, if inactive
         if (lambdaEntity.state == Database::Entity::Lambda::LambdaState::Inactive) {
             Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
             log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
@@ -48,7 +48,7 @@ namespace AwsMock::Service {
             lambdaEntity.code.zipFile = GetLambdaCodePath(lambdaEntity);
         }
 
-        // Create response, if inactive
+        // Create a response, if inactive
         if (lambdaEntity.state == Database::Entity::Lambda::Inactive) {
             Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
             log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
         // Find idle instance
         if (std::string instanceId = FindIdleInstance(lambdaEntity); instanceId.empty()) {
 
-            // Create lambda function asynchronously
+            // Create the lambda function asynchronously
             LambdaCreator lambdaCreator;
             instanceId = Core::StringUtils::GenerateRandomHexString(8);
             boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
@@ -463,7 +463,7 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        std::string accountId = Core::Configuration::instance().GetValueString("awsmock.access.account-id");
+        std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
         // Get the lambda entity
@@ -654,7 +654,7 @@ namespace AwsMock::Service {
         }
 
         // Load code
-        const std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
+        const std::string lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
 
         // Create lambda function asynchronously
@@ -835,11 +835,11 @@ namespace AwsMock::Service {
     }
 
     std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {
-        return Core::Configuration::instance().GetValueBool("awsmock.dockerized") ? instance.containerName : "localhost";
+        return Core::Configuration::instance().GetValue<bool>("awsmock.dockerized") ? instance.containerName : "localhost";
     }
 
     int LambdaService::GetContainerPort(const Database::Entity::Lambda::Instance &instance) {
-        return Core::Configuration::instance().GetValueBool("awsmock.dockerized") ? 8080 : instance.hostPort;
+        return Core::Configuration::instance().GetValue<bool>("awsmock.dockerized") ? 8080 : instance.hostPort;
     }
 
     void LambdaService::WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) {
@@ -850,8 +850,8 @@ namespace AwsMock::Service {
     }
 
     std::string LambdaService::GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda) {
-        const std::string lambdaDir = Core::Configuration::instance().GetValueString("awsmock.modules.lambda.data-dir");
-        return lambdaDir + "/" + lambda.function + "-" + lambda.dockerTag + ".b64";
+        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        return lambdaDir + Core::FileUtils::separator() + lambda.function + "-" + lambda.dockerTag + ".b64";
     }
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {

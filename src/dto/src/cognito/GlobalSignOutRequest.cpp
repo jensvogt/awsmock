@@ -35,14 +35,4 @@ namespace AwsMock::Dto::Cognito {
         }
     }
 
-    std::string GlobalSignOutRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const GlobalSignOutRequest &r) {
-        os << "GlobalSignOutRequest=" << r.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Dto::Cognito

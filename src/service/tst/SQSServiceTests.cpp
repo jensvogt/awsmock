@@ -91,7 +91,9 @@ namespace AwsMock::Service {
         // arrange
         Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
-        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest = {.region = REGION, .queueArn = "notExist"};
+        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
+        getQueueDetailsRequest.region = REGION;
+        getQueueDetailsRequest.queueArn = "notExist";
 
         // act
         EXPECT_THROW({
@@ -111,7 +113,9 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
-        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest = {.region = REGION, .queueArn = queueResponse.queueArn};
+        Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
+        getQueueDetailsRequest.region = REGION;
+        getQueueDetailsRequest.queueArn = queueResponse.queueArn;
 
         // act
         Dto::SQS::GetQueueDetailsResponse response = _service.GetQueueDetails(getQueueDetailsRequest);
@@ -145,33 +149,34 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
-        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest = {.region = REGION};
+        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest;
+        listQueueCountersRequest.region = REGION;
 
         // act
-        auto [queueCounters, total] = _service.ListQueueCounters(listQueueCountersRequest);
+        Dto::SQS::ListQueueCountersResponse response = _service.ListQueueCounters(listQueueCountersRequest);
 
         // assert
-        EXPECT_EQ(1, total);
-        EXPECT_EQ(1, queueCounters.at(0).available);
+        EXPECT_EQ(1, response.total);
+        EXPECT_EQ(1, response.queueCounters.at(0).available);
     }
 
     TEST_F(SQSServiceTest, QueueListTagsTest) {
 
     // arrange
     std:
-        std::map<std::string, std::string> tags = {{"version", "1.0"}};
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER, .tags = tags};
+        std::map<std::string, std::string> inputTags = {{"version", "1.0"}};
+        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER, .tags = inputTags};
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::ListQueueTagsRequest listQueueTagsRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl};
 
         // act
-        Dto::SQS::ListQueueTagsResponse listQueueTagsResponse = _service.ListQueueTags(listQueueTagsRequest);
+        auto [tags, total] = _service.ListQueueTags(listQueueTagsRequest);
 
         // assert
-        EXPECT_EQ(1, listQueueTagsResponse.total);
-        EXPECT_EQ(1, listQueueTagsResponse.tags.size());
-        EXPECT_TRUE(listQueueTagsResponse.tags["version"] == "1.0");
+        EXPECT_EQ(1, total);
+        EXPECT_EQ(1, tags.size());
+        EXPECT_TRUE(tags["version"] == "1.0");
     }
 
     TEST_F(SQSServiceTest, QueueDeleteTest) {
@@ -291,9 +296,11 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.StringValue=application/json
         // MessageAttribute.1.Value.DataType=String
         //
-        const Dto::SQS::MessageAttribute messageAttribute = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING};
+        Dto::SQS::MessageAttribute messageAttribute;
+        messageAttribute.stringValue = "application/json";
+        messageAttribute.dataType = Dto::SQS::MessageAttributeDataType::STRING;
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
-        messageAttributes[messageAttribute.name] = messageAttribute;
+        messageAttributes["contentType"] = messageAttribute;
 
         // act
         const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
@@ -313,11 +320,17 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.StringValue=42
         // MessageAttribute.2.Value.DataType=Number
         //
-        const Dto::SQS::MessageAttribute messageAttribute1 = {.name = "contentType", .stringValue = "application/json", .type = Dto::SQS::MessageAttributeDataType::STRING};
-        const Dto::SQS::MessageAttribute messageAttribute2 = {.name = "contentLength", .stringValue = "42", .type = Dto::SQS::MessageAttributeDataType::NUMBER};
+        Dto::SQS::MessageAttribute messageAttribute1;
+        std::string name1 = "contentType";
+        messageAttribute1.stringValue = "application/json";
+        messageAttribute1.dataType = Dto::SQS::MessageAttributeDataType::STRING;
+        Dto::SQS::MessageAttribute messageAttribute2;
+        std::string name2 = "contentType";
+        messageAttribute2.stringValue = "42";
+        messageAttribute2.dataType = Dto::SQS::MessageAttributeDataType::NUMBER;
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
-        messageAttributes[messageAttribute1.name] = messageAttribute1;
-        messageAttributes[messageAttribute2.name] = messageAttribute2;
+        messageAttributes[name1] = messageAttribute1;
+        messageAttributes[name2] = messageAttribute2;
 
         // act
         const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);

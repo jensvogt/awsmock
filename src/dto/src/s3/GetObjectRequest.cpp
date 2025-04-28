@@ -24,15 +24,4 @@ namespace AwsMock::Dto::S3 {
         }
     }
 
-    std::string GetObjectRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const GetObjectRequest &r) {
-        os << "GetObjectRequest=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::S3

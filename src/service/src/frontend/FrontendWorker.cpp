@@ -14,7 +14,7 @@ namespace AwsMock::Service::Frontend {
 
     void FrontendWorker::Accept() {
 
-        int timeout = Core::Configuration::instance().GetValueInt("awsmock.frontend.timeout");
+        int timeout = Core::Configuration::instance().GetValue<int>("awsmock.frontend.timeout");
 
         // Clean up any previous connection.
         beast::error_code ec = _socket.close(ec);

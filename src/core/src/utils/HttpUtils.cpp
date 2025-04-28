@@ -9,7 +9,9 @@ namespace AwsMock::Core {
     std::string HttpUtils::GetPathParameter(const std::string &uri, const int index) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-
+        if (r->encoded_segments().empty()) {
+            return {};
+        }
         std::vector<std::string> seq;
         for (auto seg: r->encoded_segments()) {
             seq.push_back(seg.decode());
@@ -24,7 +26,7 @@ namespace AwsMock::Core {
     std::vector<std::string> HttpUtils::GetPathParameters(const std::string &uri) {
 
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        if (!r->segments().size()) {
+        if (r->segments().empty()) {
             return {};
         }
 
@@ -42,7 +44,7 @@ namespace AwsMock::Core {
 
     std::string HttpUtils::GetQueryString(const std::string &uri) {
         boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        return r->path();
+        return r->query();
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
@@ -292,6 +294,9 @@ namespace AwsMock::Core {
     }
 
     std::string HttpUtils::GetContentType(const http::request<http::dynamic_body> &request) {
+        if (!HasHeader(request, "Content-Type")) {
+            return "application/octet-stream";
+        }
         std::string ct = request.base()[http::field::content_type];
         if (ct.contains("json")) {
             return "application/json";

@@ -48,16 +48,4 @@ namespace AwsMock::Dto::KMS {
         }
     }
 
-
-    std::string DescribeKeyRequest::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const DescribeKeyRequest &r) {
-        os << "DescribeKeyRequest=" << r.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Dto::KMS

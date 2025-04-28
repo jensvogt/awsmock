@@ -2,8 +2,6 @@
 // Created by vogje01 on 12/18/23.
 //
 
-#include <awsmock/dto/sqs/ReceiveMessageRequest.h>
-#include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 #ifndef AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H
 #define AWMOCK_DTO_SQS_MESSAGE_ATTRBUTE_TEST_H
 
@@ -12,6 +10,8 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include <awsmock/dto/sqs/ReceiveMessageRequest.h>
+#include <awsmock/dto/sqs/ReceiveMessageResponse.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 // Test includes
@@ -36,9 +36,15 @@ namespace AwsMock::Dto::SQS {
     TEST_F(MessageAttributeTest, AttributeMd5Test) {
 
         // arrange
+        MessageAttribute attribute1;
+        attribute1.stringValue = "my_attribute_value_1";
+        attribute1.dataType = STRING;
+        MessageAttribute attribute2;
+        attribute2.stringValue = "my_attribute_value_2";
+        attribute2.dataType = STRING;
         MessageAttributeList messageAttributes;
-        messageAttributes["my_attribute_name_1"] = {.stringValue = "my_attribute_value_1", .type = STRING};
-        messageAttributes["my_attribute_name_2"] = {.stringValue = "my_attribute_value_2", .type = STRING};
+        messageAttributes["my_attribute_name_1"] = attribute1;
+        messageAttributes["my_attribute_name_2"] = attribute2;
         ReceiveMessageResponse response;
         response.messageAttributes = messageAttributes;
 
@@ -53,9 +59,15 @@ namespace AwsMock::Dto::SQS {
     TEST_F(MessageAttributeTest, AttributeMd51Test) {
 
         // arrange
+        MessageAttribute attribute1;
+        attribute1.stringValue = "application/json";
+        attribute1.dataType = STRING;
+        MessageAttribute attribute2;
+        attribute2.stringValue = "[{\"verarbeitungsschritt\":\"PARSEN\",\"internalId\":\"92e236b3-63ed-4582-820c-a308a4176c41\",\"queueName\":\"produktmeldung-retry-queue\"},{\"verarbeitungsschritt\":\"ZERLEGEN\",\"internalId\":\"ftpuser1/pim-3719_23012025133759888.xml\",\"queueName\":\"originalmeldung-retry-queue\"}]";
+        attribute2.dataType = STRING;
         MessageAttributeList messageAttributes;
-        messageAttributes["contentType"] = {.stringValue = "application/json", .type = STRING};
-        messageAttributes["retryContext"] = {.stringValue = "[{\"verarbeitungsschritt\":\"PARSEN\",\"internalId\":\"92e236b3-63ed-4582-820c-a308a4176c41\",\"queueName\":\"produktmeldung-retry-queue\"},{\"verarbeitungsschritt\":\"ZERLEGEN\",\"internalId\":\"ftpuser1/pim-3719_23012025133759888.xml\",\"queueName\":\"originalmeldung-retry-queue\"}]", .type = STRING};
+        messageAttributes["contentType"] = attribute1;
+        messageAttributes["retryContext"] = attribute2;
         ReceiveMessageResponse response;
         response.messageAttributes = messageAttributes;
 
@@ -70,10 +82,19 @@ namespace AwsMock::Dto::SQS {
     TEST_F(MessageAttributeTest, AttributeMd52Test) {
 
         // arrange
+        MessageAttribute attribute1;
+        attribute1.stringValue = "application/json";
+        attribute1.dataType = STRING;
+        MessageAttribute attribute2;
+        attribute2.stringValue = "1737825223262";
+        attribute2.dataType = STRING;
+        MessageAttribute attribute3;
+        attribute3.stringValue = "614a11ff-a4e8-af80-4923-e321ff0fd401";
+        attribute3.dataType = STRING;
         MessageAttributeList messageAttributes;
-        messageAttributes["contentType"] = {.stringValue = "application/json", .type = STRING};
-        messageAttributes["timestamp"] = {.stringValue = "1737825223262", .type = STRING};
-        messageAttributes["id"] = {.stringValue = "614a11ff-a4e8-af80-4923-e321ff0fd401", .type = STRING};
+        messageAttributes["contentType"] = attribute1;
+        messageAttributes["timestamp"] = attribute2;
+        messageAttributes["id"] = attribute3;
         ReceiveMessageResponse response;
         response.messageAttributes = messageAttributes;
 

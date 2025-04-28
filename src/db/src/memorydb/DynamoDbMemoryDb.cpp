@@ -266,12 +266,13 @@ namespace AwsMock::Database {
         log_debug << "DynamoDB items deleted, tableName: " << tableName << " count: " << count;
     }
 
-    void DynamoDbMemoryDb::DeleteAllItems() {
+    long DynamoDbMemoryDb::DeleteAllItems() {
         boost::mutex::scoped_lock lock(_itemMutex);
 
+        long count = _items.size();
         log_debug << "DynamoDB items deleted, count: " << _items.size();
-
         _items.clear();
+        return count;
     }
 
 }// namespace AwsMock::Database

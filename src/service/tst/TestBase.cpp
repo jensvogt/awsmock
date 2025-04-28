@@ -9,9 +9,9 @@ namespace AwsMock::Service {
     void TestBase::StartGateway() {
 
         // Define endpoint. This is the endpoint of the SQS server, not the gateway
-        const std::string _port = _configuration.GetValueString("awsmock.gateway.http.port");
-        const std::string _host = _configuration.GetValueString("awsmock.gateway.http.host");
-        const std::string _address = _configuration.GetValueString("awsmock.gateway.http.address");
+        const std::string _port = _configuration.GetValue<std::string>("awsmock.gateway.http.port");
+        const std::string _host = _configuration.GetValue<std::string>("awsmock.gateway.http.host");
+        const std::string _address = _configuration.GetValue<std::string>("awsmock.gateway.http.address");
 
         // Set test config
         _endpoint = "http://" + _host + ":" + _port;
@@ -26,8 +26,8 @@ namespace AwsMock::Service {
     void TestBase::StartGateway(const int port) {
 
         // Define endpoint. This is the endpoint of the SQS server, not the gateway
-        _configuration.SetValueInt("awsmock.gateway.http.port", port + 1);
-        _configuration.SetValueString("awsmock.gateway.http.host", "localhost");
+        _configuration.SetValue<int>("awsmock.gateway.http.port", port + 1);
+        _configuration.SetValue<std::string>("awsmock.gateway.http.host", "localhost");
 
         // Start the gateway
         StartGateway();
