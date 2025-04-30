@@ -89,7 +89,7 @@ namespace AwsMock::FtpServer {
                                      log_debug << "Control connection closed by client.";
                                  }
 
-                                 // Close the data connection, if it is open
+                                 // Close the data connection if it is open
                                  {
                                      boost::beast::error_code ec_;
                                      me->data_acceptor_.close(ec_);
@@ -274,12 +274,12 @@ namespace AwsMock::FtpServer {
     // Transfer parameter commands
 
     void FtpSession::handleFtpCommandPORT(const std::string & /*param*/) {
-        sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND,
-                       "FTP active mode is not supported by this manager");
+        sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "FTP active mode is not supported by this manager");
     }
 
     void FtpSession::handleFtpCommandPASV(const std::string & /*param*/) {
         if (!_logged_in_user) {
+            log_error << "Not logged in";
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
@@ -292,7 +292,7 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        // In case of a dockerized FTP server we need to use some special ports
+        // In the case of a dockerized FTP server, we need to use some special ports
         boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
             int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");

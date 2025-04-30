@@ -30,15 +30,17 @@ namespace AwsMock::FtpServer {
         const std::lock_guard database_lock(database_mutex_);
 
         if (isUsernameAnonymousUser(username)) {
+            log_info << "Anonymous user logged in";
             return anonymous_user_;
         }
         if (const auto user_it = database_.find(username); user_it == database_.end()) {
+            log_warning << "User not found userName: " << username;
             return nullptr;
         } else {
             if (user_it->second->password_ == password)
                 return user_it->second;
-            else
-                return nullptr;
+            log_warning << "Wrong password, userName: " << username << ", password: " << password << ", expected: " << user_it->second->password_;
+            return nullptr;
         }
     }
 

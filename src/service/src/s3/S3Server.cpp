@@ -60,7 +60,6 @@ namespace AwsMock::Service {
         // Loop over files and check the database for internal name
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
-                log_debug << "Checking file, basename: " << Core::FileUtils::GetBasename(entry.path().string());
                 if (!_s3Database.ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
                     Core::FileUtils::DeleteFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
