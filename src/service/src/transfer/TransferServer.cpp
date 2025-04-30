@@ -72,9 +72,9 @@ namespace AwsMock::Service {
     void TransferServer::StartFtpServer(Database::Entity::Transfer::Transfer &server) {
 
         // Get base dir
-        const std::string baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.port");
-        const std::string address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.ftp.address");
+        const auto address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.ftp.address");
 
         // Create a transfer manager thread
         _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address);
@@ -104,10 +104,10 @@ namespace AwsMock::Service {
     void TransferServer::StartSftpServer(Database::Entity::Transfer::Transfer &server) {
 
         // Get base dir
-        const std::string baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.sftp.port");
-        const std::string address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.address");
-        const std::string hostKey = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.host-key");
+        const auto address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.address");
+        const auto hostKey = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.host-key");
 
         SftpServer _sftpServer;
 

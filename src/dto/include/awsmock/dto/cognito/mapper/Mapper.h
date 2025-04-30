@@ -24,10 +24,10 @@
 #include <awsmock/dto/cognito/model/User.h>
 #include <awsmock/dto/cognito/model/UserCounter.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
+#include <awsmock/dto/cognito/model/UserPoolCounter.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
-#include <awsmock/dto/cognito/model/UserPoolCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 

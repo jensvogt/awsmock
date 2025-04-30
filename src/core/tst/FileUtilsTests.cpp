@@ -145,7 +145,7 @@ namespace AwsMock::Core {
         EXPECT_TRUE(FileUtils::FileExists(fileName));
         EXPECT_EQ(100, result.size());
     }
-/*
+    /*
     TEST_F(FileUtilsTest, StreamCopierTest) {
 
         // arrange

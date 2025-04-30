@@ -31,7 +31,7 @@ namespace AwsMock::Dto::Cognito {
          */
         long total;
 
-    private:
+      private:
 
         friend ListUserPoolCountersResponse tag_invoke(boost::json::value_to_tag<ListUserPoolCountersResponse>, boost::json::value const &v) {
             ListUserPoolCountersResponse r;
@@ -44,12 +44,12 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolCountersResponse const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"total", obj.total},
-                {"userPoolCounters", boost::json::value_from(obj.userPoolCounters)},
-        };
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"userPoolCounters", boost::json::value_from(obj.userPoolCounters)},
+            };
         }
     };
 
