@@ -95,7 +95,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -230,7 +230,7 @@ namespace AwsMock::Service {
         Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const;
 
         /**
-         * @brief Get object
+         * @brief Get an object
          *
          * @param request put object request
          * @return GetObjectResponse
@@ -238,7 +238,7 @@ namespace AwsMock::Service {
         Dto::S3::GetObjectResponse GetObject(const Dto::S3::GetObjectRequest &request) const;
 
         /**
-         * @brief Put object
+         * @brief Put an object
          *
          * @param request put object request
          * @param stream input stream
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
         Dto::S3::PutObjectResponse PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const;
 
         /**
-         * @brief Put object, reading a file path
+         * @brief Put an object, reading a file path
          *
          * @param username
          * @param filename input file
@@ -256,7 +256,7 @@ namespace AwsMock::Service {
         void PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const;
 
         /**
-         * @brief Touch object
+         * @brief Touch an object
          *
          * @par
          * This method re-triggers the event notification, like lambda trigger etc.
@@ -267,7 +267,7 @@ namespace AwsMock::Service {
         void TouchObject(const Dto::S3::TouchObjectRequest &request) const;
 
         /**
-         * @brief Touch object
+         * @brief Update an object
          *
          * @par
          * This method re-triggers the event notification, like lambda trigger etc.
@@ -278,7 +278,7 @@ namespace AwsMock::Service {
         void UpdateObject(const Dto::S3::UpdateObjectRequest &request) const;
 
         /**
-         * @brief Copy object
+         * @brief Copy an object
          *
          * @param request copy object request
          * @return PutObjectResponse
@@ -286,7 +286,7 @@ namespace AwsMock::Service {
         Dto::S3::CopyObjectResponse CopyObject(const Dto::S3::CopyObjectRequest &request) const;
 
         /**
-         * @brief Move object
+         * @brief Move an object
          *
          * @param request move object request
          * @return PutObjectResponse
