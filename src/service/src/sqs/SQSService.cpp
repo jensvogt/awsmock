@@ -929,14 +929,11 @@ namespace AwsMock::Service {
             Dto::SQS::ReceiveMessageResponse response;
             response.requestId = request.requestId;
             if (!messageList.empty()) {
-                // Update queue
-                queue.attributes.approximateNumberOfMessagesNotVisible += static_cast<long>(messageList.size());
-                queue = _sqsDatabase.UpdateQueue(queue);
                 response.messageList = messageList;
             }
             log_debug << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
-
             return response;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

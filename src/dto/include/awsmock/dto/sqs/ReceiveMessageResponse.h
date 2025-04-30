@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 #include <awsmock/entity/sqs/Message.h>
 

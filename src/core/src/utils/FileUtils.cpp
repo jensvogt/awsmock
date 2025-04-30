@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -348,7 +348,7 @@ namespace AwsMock::Core {
             return AcctName;
         }
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -568,23 +568,38 @@ namespace AwsMock::Core {
         return count;
     }
 
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long count) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long copied = StreamCopier(ifs, ofs, count);
+        ifs.close();
+        ofs.close();
+        return copied;
+    }
+
     long FileUtils::StreamCopier(std::istream &is, std::ostream &os) {
         is.seekg(0, std::ios::end);
-        long count = is.tellg();
+        const long count = is.tellg();
         is.seekg(0, std::ios::beg);
         return StreamCopier(is, os, count);
     }
 
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
-        char buffer[BUFFER_LEN];
-        while (count > BUFFER_LEN) {
-            istream.read(buffer, BUFFER_LEN);
-            ostream.write(buffer, BUFFER_LEN);
-            count -= BUFFER_LEN;
+        if (int bufSize = BUFFER_LEN; count < bufSize) {
+            bufSize = count;
+            char buffer[bufSize];
+            istream.read(buffer, bufSize);
+            ostream.write(buffer, bufSize);
+        } else {
+            char buffer[bufSize];
+            while (count > bufSize) {
+                istream.read(buffer, bufSize);
+                ostream.write(buffer, bufSize);
+                count -= bufSize;
+            }
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
         }
-
-        istream.read(buffer, count);
-        ostream.write(buffer, count);
         return count;
     }
 
