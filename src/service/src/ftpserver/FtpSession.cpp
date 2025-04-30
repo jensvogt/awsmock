@@ -1334,14 +1334,13 @@ namespace AwsMock::FtpServer {
     ////////////////////////////////////////////////////////
     // Helpers
     ////////////////////////////////////////////////////////
-
     std::string FtpSession::toAbsoluteFtpPath(const std::string &rel_or_abs_ftp_path) const {
         std::string absolute_ftp_path;
 
-        if (!rel_or_abs_ftp_path.empty() && rel_or_abs_ftp_path[0] == Core::SystemUtils::GetRootDir()[0]) {
+        if (!rel_or_abs_ftp_path.empty() && (rel_or_abs_ftp_path[0] == '/')) {
             absolute_ftp_path = rel_or_abs_ftp_path;
         } else {
-            absolute_ftp_path = cleanPath(_ftpWorkingDirectory + Core::FileUtils::separator() + rel_or_abs_ftp_path, false, '/');
+            absolute_ftp_path = cleanPath(_ftpWorkingDirectory + "/" + rel_or_abs_ftp_path, false, '/');
         }
 
         return absolute_ftp_path;
@@ -1354,7 +1353,7 @@ namespace AwsMock::FtpServer {
         const std::string absolute_ftp_path = toAbsoluteFtpPath(ftp_path);
 
         // Now map it to the local filesystem
-        return cleanPathNative(_logged_in_user->local_root_path_ + Core::FileUtils::separator() + absolute_ftp_path);
+        return cleanPathNative(_logged_in_user->local_root_path_ + "/" + absolute_ftp_path);
     }
 
     std::string FtpSession::createQuotedFtpPath(const std::string &unquoted_ftp_path) {
@@ -1422,10 +1421,11 @@ namespace AwsMock::FtpServer {
             absolute_new_working_dir = cleanPath(param, false, '/');
         } else {
             // Make the path absolute
-            absolute_new_working_dir = cleanPath(_ftpWorkingDirectory + Core::FileUtils::separator() + param, false, '/');
+            absolute_new_working_dir = cleanPath(_ftpWorkingDirectory + "/" + param, false, '/');
         }
 
         const auto local_path = toLocalPath(absolute_new_working_dir);
+        log_debug << "Checking file status on file, path: " << local_path;
         const FileStatus file_status(local_path);
 
         if (!file_status.isOk()) {

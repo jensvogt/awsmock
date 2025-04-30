@@ -73,8 +73,8 @@ COPY --from=build /lib/x86_64-linux-gnu/libicuuc.so.72 /lib/x86_64-linux-gnu/
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
 RUN ln -s /usr/local/awsmock/bin/awslocal /usr/bin/awslocal || true
-RUN ln -s /usr/local/awsmock/bin/awslocal /usr/bin/awsmockctl || true
-RUN ln -s /usr/local/awsmock/bin/awslocal /usr/bin/awsmockmgr || true
+RUN ln -s /usr/local/awsmock/bin/awsmockctl /usr/bin/awsmockctl || true
+RUN ln -s /usr/local/awsmock/bin/awsmockmgr /usr/bin/awsmockmgr || true
 
 # Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
