@@ -29,9 +29,9 @@
 #include <awsmock/controller/Controller.h>
 
 #ifdef _WIN32
-#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.j́son"
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #endif
 
 // Allowed actions
@@ -134,7 +134,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        AwsMock::Core::LogStream::SetSeverity("info");
+        AwsMock::Core::LogStream::SetSeverity("warn");
     }
 
     // Set the log file

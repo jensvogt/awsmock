@@ -104,7 +104,7 @@ namespace AwsMock::Core {
 
         console_sink = boost::log::add_console_log(std::cout);
         console_sink->set_formatter(&LogFormatter);
-        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::trace);
+        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
 
         boost::log::add_common_attributes();
     }
@@ -116,7 +116,6 @@ namespace AwsMock::Core {
         if (file_sink) {
             file_sink->set_filter(boost::log::trivial::severity >= lvl);
         }
-        log_info << "Logging level set to " << severity;
     }
 
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {

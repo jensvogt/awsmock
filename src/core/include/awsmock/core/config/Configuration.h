@@ -260,7 +260,7 @@ namespace AwsMock::Core {
         //     value = ReplaceEnvironmentVariables(value);
         // }
         _treeConfiguration.put<T>(key, value);
-        log_debug << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
+        log_trace << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
 
     template<class T>
