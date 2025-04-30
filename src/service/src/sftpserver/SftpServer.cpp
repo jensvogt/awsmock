@@ -1500,7 +1500,7 @@ static int process_readdir(const sftp_client_message client_msg) {
         if (dentry != nullptr) {
             char long_path[PATH_MAX];
             sftp_attributes_struct attr{};
-            struct stat st{};
+            struct stat st {};
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
                 log_error << "Dandle string length exceed max length!";
@@ -1631,7 +1631,7 @@ static int process_lstat(sftp_client_message client_msg) {
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
     sftp_attributes_struct attr{};
-    struct stat st{};
+    struct stat st {};
 
     log_debug << "Processing lstat, incoming: " << filename;
     filename = FtpFileNameToRealPath(const_cast<char *>(filename));
@@ -1667,7 +1667,7 @@ static int process_stat(sftp_client_message client_msg) {
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
     sftp_attributes_struct attr{};
-    struct stat st{};
+    struct stat st {};
 
     filename = FtpFileNameToRealPath(filename);
     log_debug << "Processing stat: " << filename;
@@ -1875,7 +1875,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st{};
+    struct statvfs st {};
 
     log_debug << "processing extended statvfs: " << path;
 
