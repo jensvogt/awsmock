@@ -844,7 +844,10 @@ namespace AwsMock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         // Get bucket
-        if (const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket); !bucketEntity.IsVersioned()) { throw Core::NotFoundException("Bucket is not versioned"); }
+        if (const Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(request.region, request.bucket); !bucketEntity.IsVersioned()) {
+            log_error << "Bucket is not versioning";
+            throw Core::NotFoundException("Bucket is not versioned");
+        }
 
         Dto::S3::ListObjectVersionsResponse response;
         try {

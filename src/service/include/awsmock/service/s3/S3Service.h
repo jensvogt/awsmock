@@ -95,7 +95,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -357,7 +357,7 @@ namespace AwsMock::Service {
          *
          * @param request bucket delete request.
          */
-        static void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
+        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
 
       private:
 
@@ -460,12 +460,12 @@ namespace AwsMock::Service {
         /**
          * @brief Deletes a bucket
          *
-         * <p>This method is recursive, if the bucket contains objects, also all
-         * object are removed </p>
+         * @par
+         * This method is recursive, if the bucket contains objects, also all objects are removed.
          *
          * @param bucket S3 bucket name
          */
-        static static void DeleteBucket(const std::string &bucket);
+        void DeleteBucket(const std::string &bucket);
 
         /**
          * @brief Save a versioned S3 object.
