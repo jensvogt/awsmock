@@ -80,7 +80,7 @@ namespace AwsMock::Service {
         void StopTransferServer(Database::Entity::Transfer::Transfer &server);
 
         /**
-         * @brief Start all transfer servers, if they are not existing
+         * @brief Start all transfer servers if they are not existing
          */
         void StartTransferServers();
 

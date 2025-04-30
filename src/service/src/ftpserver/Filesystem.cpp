@@ -31,7 +31,7 @@ namespace AwsMock::FtpServer {
     FileStatus::FileStatus(const std::string &path) : path_(path), file_status_{} {
         const int error_code = stat(path.c_str(), &file_status_);
         if (error_code) {
-            //log_error << "Cannot stat, file: " << path_ << " error: " << error_code;
+            log_error << "Cannot stat, file: " << path_ << " error: " << error_code;
         }
         is_ok_ = (error_code == 0);
     }
@@ -284,8 +284,8 @@ namespace AwsMock::FtpServer {
                 else
                     this_component = path.substr(start, end - start);
 
-                // The components-stack that will increase and shrink depending on the folders and .. elements in the splitted path
-                if (this_component.empty() || (this_component == ".")) {
+                // The components-stack that will increase and shrink depending on the folders and .. elements in the split path
+                if (this_component.empty() || this_component == ".") {
                 } else if (this_component == "..") {
                     if (!absolute_root.empty()) {
                         if (!components.empty()) {
@@ -306,8 +306,7 @@ namespace AwsMock::FtpServer {
 
                 if (end == std::string::npos)
                     break;
-                else
-                    start = end + 1;
+                start = end + 1;
 
             } while (start < path.size());
 
@@ -331,7 +330,7 @@ namespace AwsMock::FtpServer {
 
             path_ss << *comp_it;
 
-            comp_it++;
+            ++comp_it;
         }
 
         return path_ss.str();

@@ -192,7 +192,7 @@ namespace AwsMock::FtpServer {
             // Close command socket
             command_write_strand_.wrap([me = shared_from_this()]() { me->command_socket_.close(); });
         } else {
-            // Wait for next command
+            // Wait for the next command
             readFtpCommand();
         }
     }
@@ -1341,7 +1341,7 @@ namespace AwsMock::FtpServer {
         if (!rel_or_abs_ftp_path.empty() && rel_or_abs_ftp_path[0] == Core::SystemUtils::GetRootDir()[0]) {
             absolute_ftp_path = rel_or_abs_ftp_path;
         } else {
-            absolute_ftp_path = cleanPath(_ftpWorkingDirectory + Core::FileUtils::separator() + rel_or_abs_ftp_path, false, '/');
+            absolute_ftp_path = cleanPath(_ftpWorkingDirectory + "/" + rel_or_abs_ftp_path, false, '/');
         }
 
         return absolute_ftp_path;
@@ -1354,7 +1354,7 @@ namespace AwsMock::FtpServer {
         const std::string absolute_ftp_path = toAbsoluteFtpPath(ftp_path);
 
         // Now map it to the local filesystem
-        return cleanPathNative(_logged_in_user->local_root_path_ + Core::FileUtils::separator() + absolute_ftp_path);
+        return cleanPathNative(_logged_in_user->local_root_path_ + "/" + absolute_ftp_path);
     }
 
     std::string FtpSession::createQuotedFtpPath(const std::string &unquoted_ftp_path) {
@@ -1407,12 +1407,11 @@ namespace AwsMock::FtpServer {
         if (!_logged_in_user) {
             return {FtpReplyCode::NOT_LOGGED_IN, "Not logged in"};
         }
-        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
-            return {FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied"};
-        }
-
         if (param.empty()) {
             return {FtpReplyCode::SYNTAX_ERROR_PARAMETERS, "No path given"};
+        }
+        if (static_cast<int>(_logged_in_user->permissions_ & Permission::DirList) == 0) {
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Permission denied"};
         }
 
         std::string absolute_new_working_dir;
@@ -1422,20 +1421,20 @@ namespace AwsMock::FtpServer {
             absolute_new_working_dir = cleanPath(param, false, '/');
         } else {
             // Make the path absolute
-            absolute_new_working_dir = cleanPath(_ftpWorkingDirectory + Core::FileUtils::separator() + param, false, '/');
+            absolute_new_working_dir = cleanPath(_ftpWorkingDirectory + "/" + param, false, '/');
         }
 
         const auto local_path = toLocalPath(absolute_new_working_dir);
-        const FileStatus file_status(local_path);
+        const auto file_status = FileStatus(local_path);
 
         if (!file_status.isOk()) {
-            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource does not exist or permission denied."};
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed to change directory: The given resource does not exist or permission denied."};
         }
         if (file_status.type() != FileType::Dir) {
-            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: The given resource is not a directory."};
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed to change directory: The given resource is not a directory."};
         }
         if (!file_status.canOpenDir()) {
-            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed ot change directory: Permission denied."};
+            return {FtpReplyCode::ACTION_NOT_TAKEN, "Failed to change directory: Permission denied."};
         }
         _ftpWorkingDirectory = absolute_new_working_dir;
         return {FtpReplyCode::FILE_ACTION_COMPLETED, "Working directory changed to " + _ftpWorkingDirectory};

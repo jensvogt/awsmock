@@ -120,8 +120,6 @@ namespace AwsMock::Service {
 
             // Add user
             SftpServer::AddUser(user.userName, user.password, homeDir);
-
-            // Ensure the home directory exists
             log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
         }
 

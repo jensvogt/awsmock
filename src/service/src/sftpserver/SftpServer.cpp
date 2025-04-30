@@ -3352,14 +3352,14 @@ namespace AwsMock::Service {
         currentServerId = serverId.c_str();
 
         // Change working directory
-        const std::string ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
 #ifdef _WIN32
         int rc = _chdir(ftpBaseDir.c_str());
 #else
         int rc = chdir(ftpBaseDir.c_str());
 #endif
         if (rc < 0) {
-            log_error << "Could not change to base path, basPath:" << ftpBaseDir;
+            log_error << "Could not change to base path, basePath:" << ftpBaseDir;
             return;
         }
         if (rc = ssh_init(); rc < 0) {

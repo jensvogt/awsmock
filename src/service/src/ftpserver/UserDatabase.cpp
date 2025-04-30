@@ -44,9 +44,9 @@ namespace AwsMock::FtpServer {
         }
     }
 
-    bool UserDatabase::isUsernameAnonymousUser(const std::string &username) const// NOLINT(readability-convert-member-functions-to-static) Reason: I don't want to break the API. Otherwise this is a good finding and should be accepted.
+    bool UserDatabase::isUsernameAnonymousUser(const std::string &username) const// NOLINT(readability-convert-member-functions-to-static) Reason: I don't want to break the API. Otherwise, this is a good finding and should be accepted.
     {
-        return (username.empty() || username == "ftp" || username == "anonymous");
+        return username.empty() || username == "ftp" || username == "anonymous";
     }
 
 }// namespace AwsMock::FtpServer

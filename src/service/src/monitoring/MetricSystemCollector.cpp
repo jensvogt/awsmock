@@ -56,9 +56,15 @@ namespace AwsMock::Monitoring {
                 double percentUserCpu = static_cast<double>(userCpu - _lastAwsmockUserCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
                 double percentSystemCpu = static_cast<double>(systemCpu - _lastAwsmockSysCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
                 double percentTotalCpu = percentUserCpu + percentSystemCpu;
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percentUserCpu);
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percentSystemCpu);
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percentTotalCpu);
+                if (!std::isnan(percentUserCpu)) {
+                    MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percentUserCpu);
+                }
+                if (!std::isnan(percentSystemCpu)) {
+                    MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percentSystemCpu);
+                }
+                if (!std::isnan(percentTotalCpu)) {
+                    MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percentTotalCpu);
+                }
                 log_trace << "AwsMock CPU collector, total: " << percentTotalCpu << ", system: " << percentSystemCpu << ", user: " << percentUserCpu;
             }
             _lastAwsmockUserCPU = userCpu;
@@ -74,15 +80,21 @@ namespace AwsMock::Monitoring {
 
         if (now - _lastTotalTime > 0) {
             const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastTotalSysCPU + (timeSample.tms_utime - _lastTotalUserCPU)) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+            if (!std::isnan(totalPercent)) {
+                MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+            }
             log_trace << "Total CPU: " << totalPercent;
 
             const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastTotalUserCPU) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
+            if (!std::isnan(totalPercent)) {
+                MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
+            }
             log_trace << "User CPU: " << userPercent;
 
             const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastTotalSysCPU) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
+            if (!std::isnan(totalPercent)) {
+                MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
+            }
             log_trace << "System CPU: " << systemPercent;
         }
         _lastTotalTime = now;
