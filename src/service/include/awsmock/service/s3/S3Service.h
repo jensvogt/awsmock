@@ -95,7 +95,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -259,7 +259,7 @@ namespace AwsMock::Service {
          * @brief Touch an object
          *
          * @par
-         * This method re-triggers the event notification, like lambda trigger etc.
+         * This method re-triggers the event notification, like lambda triggers, etc.
          *
          * @param request touch object request
          * @see TouchObjectRequest
@@ -475,8 +475,7 @@ namespace AwsMock::Service {
          * @param stream input stream
          * @return file name
          */
-        Dto::S3::PutObjectResponse
-        SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
+        Dto::S3::PutObjectResponse SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const;
 
         /**
          * @brief Save an un-versioned S3 object.
@@ -487,8 +486,7 @@ namespace AwsMock::Service {
          * @param size input stream size
          * @return file name
          */
-        Dto::S3::PutObjectResponse
-        SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
+        Dto::S3::PutObjectResponse SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const;
 
         /**
          * @brief Adds the queue notification configuration to the provided bucket.
