@@ -95,7 +95,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()){};
+        explicit S3Service() : _database(Database::S3Database::instance()) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -350,14 +350,14 @@ namespace AwsMock::Service {
          * @see AwsMock::Dto::S3::ListObjectVersionsRequest
          * @see AwsMock::Dto::S3::ListObjectVersionsResponse
          */
-        Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const;
+        [[nodiscard]] Dto::S3::ListObjectVersionsResponse ListObjectVersions(const Dto::S3::ListObjectVersionsRequest &request) const;
 
         /**
          * @brief Delete a bucket
          *
          * @param request bucket delete request.
          */
-        static void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
+        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
 
       private:
 
@@ -465,7 +465,7 @@ namespace AwsMock::Service {
          *
          * @param bucket S3 bucket name
          */
-        static static void DeleteBucket(const std::string &bucket);
+        void DeleteBucket(const std::string &bucket);
 
         /**
          * @brief Save a versioned S3 object.
