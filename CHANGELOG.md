@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/jensvogt/awsmock/compare/v1.2.0...v1.2.1) (2025-05-01)
+
+
+### Bug Fixes
+
+* **1164-sftp-on-windows:** add dir permissions ([3f3703d](https://github.com/jensvogt/awsmock/commit/3f3703d7efbc9f6187a6ac79e00c752eeaadd9fd))
+
 ## [1.2.0](https://github.com/jensvogt/awsmock/compare/v1.1.0...v1.2.0) (2025-03-05)
 
 
