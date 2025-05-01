@@ -357,7 +357,7 @@ namespace AwsMock::Service {
          *
          * @param request bucket delete request.
          */
-        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
+        static void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
 
       private:
 
@@ -465,7 +465,7 @@ namespace AwsMock::Service {
          *
          * @param bucket S3 bucket name
          */
-        void DeleteBucket(const std::string &bucket);
+        static static void DeleteBucket(const std::string &bucket);
 
         /**
          * @brief Save a versioned S3 object.
