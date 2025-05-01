@@ -180,6 +180,18 @@ namespace AwsMock::Database {
         Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
 
         /**
+         * @brief Updates a bucket
+         *
+         * @param region AWS region
+         * @param bucket bucket entity
+         * @param keys number of keys
+         * @param size bucket size
+         * @return created bucket entity
+         * @throws DatabaseException
+         */
+        void UpdateBucketCounter(const std::string &region, const std::string &bucket, long keys, long size);
+
+        /**
          * @brief List all objects.
          *
          * @param prefix S3 key prefix

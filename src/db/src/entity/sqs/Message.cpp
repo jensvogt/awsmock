@@ -2,6 +2,9 @@
 // Created by vogje01 on 24/09/2023.
 //
 
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/entity/sqs/Message.h>
 
 namespace AwsMock::Database::Entity::SQS {
@@ -47,7 +50,7 @@ namespace AwsMock::Database::Entity::SQS {
         messageDoc.append(kvp("queueName", queueName));
         messageDoc.append(kvp("body", body));
         messageDoc.append(kvp("status", MessageStatusToString(status)));
-        messageDoc.append(kvp("retries", bsoncxx::types::b_int32(retries)));
+        messageDoc.append(kvp("retries", bsoncxx::types::b_int64(retries)));
         messageDoc.append(kvp("size", bsoncxx::types::b_int64(size)));
         messageDoc.append(kvp("messageId", messageId));
         messageDoc.append(kvp("receiptHandle", receiptHandle));
@@ -103,6 +106,10 @@ namespace AwsMock::Database::Entity::SQS {
                     attributes.emplace(key, value);
                 }
             }
+
+            // Calculate md5 of the message attributes
+            md5Body = SqsUtils::CreateMd5OfMessageBody(body);
+            md5MessageAttributes = SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
 
         } catch (std::exception &exc) {
             log_error << exc.what();

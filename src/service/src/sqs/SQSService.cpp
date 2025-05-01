@@ -2,6 +2,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/service/sqs/SQSService.h>
 
 namespace AwsMock::Service {
@@ -792,8 +795,6 @@ namespace AwsMock::Service {
             } else {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
-            // Set attributes
-            // request.attributes
 
             // Set parameters
             message.queueArn = queue.queueArn;
@@ -804,7 +805,7 @@ namespace AwsMock::Service {
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
-            message.md5MessageAttributes = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
+            message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
 
             // Update database
             queue.attributes.approximateNumberOfMessages++;
@@ -812,7 +813,7 @@ namespace AwsMock::Service {
             message = _sqsDatabase.CreateMessage(message);
             log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
 
-            // Find Lambdas with this as event source
+            // Find Lambdas with this as an event source
             CheckLambdaNotifications(queue.queueArn, message);
             log_debug << "Send message, queueArn: " << queue.queueArn << " messageId: " << request.messageId;
 
@@ -929,7 +930,7 @@ namespace AwsMock::Service {
             Dto::SQS::ReceiveMessageResponse response;
             response.requestId = request.requestId;
             if (!messageList.empty()) {
-                response.messageList = messageList;
+                response.messageList = Dto::SQS::Mapper::map(messageList);
             }
             log_debug << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
             return response;

@@ -40,8 +40,10 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllObjects();
-            _database.DeleteAllBuckets();
+            long count = _database.DeleteAllObjects();
+            log_info << "Database objects deleted: " << count << std::endl;
+            count = _database.DeleteAllBuckets();
+            log_info << "Database buckets deleted: " << count << std::endl;
             Core::FileUtils::DeleteFile(testFile);
         }
 

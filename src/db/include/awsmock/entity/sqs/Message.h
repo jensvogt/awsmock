@@ -94,7 +94,7 @@ namespace AwsMock::Database::Entity::SQS {
         std::string md5Body;
 
         /**
-         * MD5 sum sqs user attributes
+         * MD5 sum of SQS message attributes
          */
         std::string md5MessageAttributes;
 

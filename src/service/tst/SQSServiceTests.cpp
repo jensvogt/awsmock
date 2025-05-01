@@ -13,6 +13,9 @@
 #include <awsmock/service/sqs/SQSService.h>
 
 // AwsMOck includes
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
@@ -262,7 +265,11 @@ namespace AwsMock::Service {
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
-        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .maxMessages = 10, .waitTimeSeconds = 1};
+        Dto::SQS::ReceiveMessageRequest receiveRequest;
+        receiveRequest.region = REGION;
+        receiveRequest.queueUrl = queueUrl;
+        receiveRequest.maxMessages = 10;
+        receiveRequest.waitTimeSeconds = 1;
         Dto::SQS::ReceiveMessageResponse receiveResponse = _service.ReceiveMessages(receiveRequest);
 
         // assert
@@ -296,14 +303,14 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.StringValue=application/json
         // MessageAttribute.1.Value.DataType=String
         //
-        Dto::SQS::MessageAttribute messageAttribute;
+        Database::Entity::SQS::MessageAttribute messageAttribute;
         messageAttribute.stringValue = "application/json";
-        messageAttribute.dataType = Dto::SQS::MessageAttributeDataType::STRING;
-        std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
+        messageAttribute.dataType = Database::Entity::SQS::MessageAttributeType::STRING;
+        std::map<std::string, Database::Entity::SQS::MessageAttribute> messageAttributes;
         messageAttributes["contentType"] = messageAttribute;
 
         // act
-        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+        const std::string md5sum = Database::SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -320,20 +327,20 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.StringValue=42
         // MessageAttribute.2.Value.DataType=Number
         //
-        Dto::SQS::MessageAttribute messageAttribute1;
+        Database::Entity::SQS::MessageAttribute messageAttribute1;
         std::string name1 = "contentType";
         messageAttribute1.stringValue = "application/json";
-        messageAttribute1.dataType = Dto::SQS::MessageAttributeDataType::STRING;
-        Dto::SQS::MessageAttribute messageAttribute2;
+        messageAttribute1.dataType = Database::Entity::SQS::MessageAttributeType::STRING;
+        Database::Entity::SQS::MessageAttribute messageAttribute2;
         std::string name2 = "contentType";
         messageAttribute2.stringValue = "42";
-        messageAttribute2.dataType = Dto::SQS::MessageAttributeDataType::NUMBER;
-        std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
+        messageAttribute2.dataType = Database::Entity::SQS::MessageAttributeType::STRING;
+        std::map<std::string, Database::Entity::SQS::MessageAttribute> messageAttributes;
         messageAttributes[name1] = messageAttribute1;
         messageAttributes[name2] = messageAttribute2;
 
         // act
-        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+        const std::string md5sum = Database::SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

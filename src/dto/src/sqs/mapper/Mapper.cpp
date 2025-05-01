@@ -59,6 +59,28 @@ namespace AwsMock::Dto::SQS {
         return listMessageCountersResponse;
     }
 
+    Message Mapper::map(const Database::Entity::SQS::Message &messageEntity) {
+
+        Message messageDto;
+        messageDto.messageId = messageEntity.messageId;
+        messageDto.receiptHandle = messageEntity.receiptHandle;
+        messageDto.body = messageEntity.body;
+        messageDto.attributes = messageEntity.attributes;
+        messageDto.messageAttributes = map(messageEntity.messageAttributes);
+        messageDto.md5OfBody = messageEntity.md5Body;
+        messageDto.md5OfMessageAttributes = messageEntity.md5MessageAttributes;
+        return messageDto;
+    }
+
+    std::vector<Message> Mapper::map(const std::vector<Database::Entity::SQS::Message> &messageEntities) {
+
+        std::vector<Message> messageDtos;
+        for (const auto &messageEntity: messageEntities) {
+            messageDtos.emplace_back(map(messageEntity));
+        }
+        return messageDtos;
+    }
+
     Database::Entity::SQS::MessageAttributeList Mapper::map(const std::map<std::string, MessageAttribute> &messageAttributes) {
         Database::Entity::SQS::MessageAttributeList messageAttributeList{};
         for (const auto &[fst, snd]: messageAttributes) {

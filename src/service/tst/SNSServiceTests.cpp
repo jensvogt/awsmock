@@ -231,7 +231,11 @@ namespace AwsMock::Service {
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
         // act
-        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region = REGION, .queueUrl = resultQueueUrl, .queueName = QUEUE, .maxMessages = 10, .waitTimeSeconds = 5};
+        Dto::SQS::ReceiveMessageRequest receiveRequest;
+        receiveRequest.region = REGION;
+        receiveRequest.queueUrl = resultQueueUrl;
+        receiveRequest.maxMessages = 10;
+        receiveRequest.waitTimeSeconds = 5;
         Dto::SQS::ReceiveMessageResponse receiveResponse = _sqsService.ReceiveMessages(receiveRequest);
 
         // assert

@@ -337,6 +337,17 @@ namespace AwsMock::Core {
         static long StreamCopier(const std::string &inputFile, const std::string &outputFile);
 
         /**
+         * @brief Copies a part of a file from source to destination.
+         *
+         * @param inputFile input filename
+         * @param outputFile output filename
+         * @param start bytes from the beginning of the file
+         * @param length number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(const std::string &inputFile, const std::string &outputFile, long start, long length);
+
+        /**
          * @brief Copies a file from source to destination.
          *
          * @param inputFile input filename
@@ -364,6 +375,17 @@ namespace AwsMock::Core {
          * @return number of bytes copied
          */
         static long StreamCopier(std::istream &istream, std::ostream &ostream, long count);
+
+        /**
+         * @brief Copies maxSize bytes from an input stream to an output stream.
+         *
+         * @param istream input stream
+         * @param ostream output stream
+         * @param start number of bytes from the beginning of the file
+         * @param count number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count);
 
         /**
          * @brief File path separator

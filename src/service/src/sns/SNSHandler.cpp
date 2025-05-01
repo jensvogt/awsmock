@@ -251,7 +251,6 @@ namespace AwsMock::Service {
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";
-                    Core::HttpUtils::DumpRequest(request);
                     return SendBadRequestError(request, "Unknown method");
                 }
             }

@@ -6,6 +6,8 @@
 #define AWSMOCK_MANAGER_H
 
 // Boost includes
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/thread.hpp>
 
 // AwsMock includes
@@ -101,6 +103,11 @@ namespace AwsMock::Manager {
         static void EnsureModuleExisting(const std::string &key);
 
         /**
+         * Create a shared memory segment for monitoring
+         */
+        void CreateSharedMemorySegment();
+
+        /**
          * Thread group
          */
         boost::thread_group _threadGroup;
@@ -109,6 +116,8 @@ namespace AwsMock::Manager {
          * MongoDB connection pool
          */
         Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
+
+        std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 
         /**
          * Running flag

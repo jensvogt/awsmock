@@ -78,7 +78,7 @@ namespace AwsMock::Database::Entity::SQS {
         //std::vector<std::byte> binaryValue;
 
         /**
-         * Attribute binary value list
+         * Attribute a binary value list
          */
         // TODO: proper implementation of bytes
         //std::vector<std::vector<std::byte>> binaryListValues;

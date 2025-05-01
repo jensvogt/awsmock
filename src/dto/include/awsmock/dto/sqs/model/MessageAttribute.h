@@ -39,31 +39,6 @@ namespace AwsMock::Dto::SQS {
         MessageAttributeDataType dataType{};
 
         /**
-         * @brief Returns the MD5 sum of all message attributes (user attributes).
-         *
-         * @param attributes vector of message attributes
-         * @return MD5 sum of message attributes string
-         * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html
-         */
-        static std::string GetMd5Attributes(const std::map<std::string, MessageAttribute> &attributes);
-
-        /**
-         * @brief Update the MD5 hash with a given value
-         *
-         * @param context MD5 hash model
-         * @param str string to append
-         */
-        static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
-
-        /**
-         * @brief Returns an integer as a byte array and fill it in the given byte array at position offset.
-         *
-         * @param n integer value
-         * @param bytes output byte array
-         */
-        static void GetIntAsByteArray(size_t n, unsigned char *bytes);
-
-        /**
          * @brief Convert from JSON string
          * @brief Convert from JSON document
          *
@@ -82,9 +57,6 @@ namespace AwsMock::Dto::SQS {
 
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
             MessageAttribute r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.stringValue = v.at("stringValue").as_string();
             r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("stringListValues"));
             //r.binaryValue = v.at("binaryValue").as_uint64();
@@ -94,12 +66,9 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"stringValue", obj.stringValue},
-                    {"stringListValues", boost::json::value_from(obj.stringListValues)},
-                    {"dataType", MessageAttributeDataTypeToString(obj.dataType)},
+                    {"StringValue", obj.stringValue},
+                    {"StringListValues", boost::json::value_from(obj.stringListValues)},
+                    {"DataType", MessageAttributeDataTypeToString(obj.dataType)},
             };
         }
     };

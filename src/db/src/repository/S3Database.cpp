@@ -10,7 +10,50 @@ namespace AwsMock::Database {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {}
+
+    /*inline MonitoringMap *initializeMonitoringMap(boost::interprocess::managed_shared_memory &segment) {
+        SharedMemoryAllocator allocator(segment.get_segment_manager());
+        return segment.construct<MonitoringMap>(SHARED_MEMORY_NAME)(std::less<MonitoringKey>(), allocator);
+    }*/
+    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {
+        /*boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, SHARED_MEMORY_NAME);
+
+        MonitoringMap *monitoringMap = initializeMonitoringMap(segment);
+
+        // Initialize with empty buckets
+        for (int i = 0; i < INITIAL_BUCKET_COUNT; ++i) {
+            MonitoringValue counter = {
+                    .keys = 0,
+                    .size = 0,
+                    .modified = system_clock::now()};
+            monitoringMap->insert({DEFAULT_BUCKET_NAME, counter});
+        }*/
+        /*
+        // Open the already created shared memory object.
+        boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, "Monitoring");
+
+        // Note that map<Key, MappedType>'s value_type is std::pair<const Key, MappedType>, so the allocator must allocate that pair.
+        typedef int KeyType;
+        typedef float MappedType;
+        typedef std::pair<std::string, BucketMonitoringCounter> ValueType;
+
+        // Alias an STL compatible allocator of for the map. This allocator will allow placing containers in managed shared memory segments
+        typedef boost::interprocess::allocator<std::pair<std::string, BucketMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager> ShmemAllocator;
+
+        // Alias a map of ints that uses the previous STL-like allocator. Note that the third parameter argument is the ordering function
+        // of the map, just like with std::map, used to compare the keys.
+        typedef boost::container::map<std::string, BucketMonitoringCounter, std::less<>, ShmemAllocator> MyMap;
+
+        //Initialize the shared memory STL-compatible allocator
+        ShmemAllocator alloc_inst(segment.get_segment_manager());
+        MyMap *mymap = segment.construct<MyMap>("Monitoring")(std::less<std::string>(), alloc_inst);
+
+        //Insert data in the map
+        for (int i = 0; i < 100; ++i) {
+            BucketMonitoringCounter c = {.keys = 0, .size = 0, .modified = system_clock::now()};
+            mymap->insert(std::pair<std::string, BucketMonitoringCounter>("Bucket", c));
+        }*/
+    }
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) const {
 
@@ -327,6 +370,45 @@ namespace AwsMock::Database {
             }
         }
         return _memoryDb.UpdateBucket(bucket);
+    }
+
+    void S3Database::UpdateBucketCounter(const std::string &region, const std::string &bucket, long keys, long size) const {
+
+        if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+
+                document filterQuery;
+                filterQuery.append(kvp("region", region));
+                filterQuery.append(kvp("name", bucket));
+
+                document setQuery;
+                setQuery.append(kvp("keys", static_cast<bsoncxx::types::b_int64>(keys)));
+                setQuery.append(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                log_trace << "Bucket counter updated";
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        _memoryDb.UpdateBucketCounter(region, bucket, keys, size);
     }
 
     Entity::S3::Bucket S3Database::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const {

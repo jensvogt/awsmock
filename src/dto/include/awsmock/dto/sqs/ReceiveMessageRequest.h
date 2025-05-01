@@ -10,7 +10,15 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+
+#define DEFAULT_WAIT_TIME 10
+#define DEFAULT_MAX_MESSAGES 10
+#define DEFAULT_VISIBILITY_TIMEOUT 40
+#define DEFAULT_ATTRIBUTE_NAMES "All"
+#define DEFAULT_MESSAGE_ATTRIBUTE_NAMES "All"
+#define DEFAULT_MESSAGE_SYSTEM_ATTRIBUTE_NAMES "All"
 
 namespace AwsMock::Dto::SQS {
 
@@ -38,12 +46,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ReceiveMessageRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct ReceiveMessageRequest final : Common::BaseCounter<ReceiveMessageRequest> {
 
         /**
          * Queue URL
@@ -51,72 +54,62 @@ namespace AwsMock::Dto::SQS {
         std::string queueUrl;
 
         /**
-         * Queue name
-         */
-        std::string queueName;
-
-        /**
          * Maximal number of resources
          */
-        int maxMessages = 10;
+        long maxMessages = DEFAULT_MAX_MESSAGES;
 
         /**
          * Visibility
          */
-        int visibilityTimeout = 15;
+        long visibilityTimeout = DEFAULT_VISIBILITY_TIMEOUT;
 
         /**
          * Wait time in seconds
          */
-        int waitTimeSeconds = 10;
+        long waitTimeSeconds = DEFAULT_WAIT_TIME;
 
         /**
          * List of attribute names
          */
-        std::vector<std::string> attributeNames = {"All"};
+        std::vector<std::string> attributeNames = {DEFAULT_ATTRIBUTE_NAMES};
+
+        /**
+         * List of system attribute names
+         */
+        std::vector<std::string> systemAttributeNames = {DEFAULT_MESSAGE_SYSTEM_ATTRIBUTE_NAMES};
 
         /**
          * List of message attribute names
          */
-        std::vector<std::string> messageAttributeNames = {"All"};
+        std::vector<std::string> messageAttributeNames = {DEFAULT_MESSAGE_ATTRIBUTE_NAMES};
 
-        /**
-         * Resource
-         */
-        std::string resource = "SQS";
+      private:
 
-        /**
-         * Resource
-         */
-        std::string requestId;
+        friend ReceiveMessageRequest tag_invoke(boost::json::value_to_tag<ReceiveMessageRequest>, boost::json::value const &v) {
+            ReceiveMessageRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            r.maxMessages = Core::Json::GetLongValue(v, "MaxNumberOfMessages", DEFAULT_MAX_MESSAGES);
+            r.visibilityTimeout = Core::Json::GetLongValue(v, "VisibilityTimeout", DEFAULT_VISIBILITY_TIMEOUT);
+            r.waitTimeSeconds = Core::Json::GetLongValue(v, "WaitTimeSeconds", DEFAULT_WAIT_TIME);
+            r.attributeNames = Core::Json::GetStringArrayValue(v, "AttributeNames", DEFAULT_ATTRIBUTE_NAMES);
+            r.systemAttributeNames = Core::Json::GetStringArrayValue(v, "MessageSystemAttributeNames", DEFAULT_MESSAGE_SYSTEM_ATTRIBUTE_NAMES);
+            r.messageAttributeNames = Core::Json::GetStringArrayValue(v, "MessageAttributeNames", DEFAULT_MESSAGE_ATTRIBUTE_NAMES);
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ReceiveMessageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ReceiveMessageRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"maxMessages", obj.maxMessages},
+                    {"visibilityTimeout", obj.visibilityTimeout},
+                    {"waitTimeSeconds", obj.waitTimeSeconds},
+                    {"attributeNames", boost::json::value_from(obj.attributeNames)},
+                    {"messageAttributeNames", boost::json::value_from(obj.messageAttributeNames)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "model/Message.h"
+
+
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 #include <awsmock/entity/sqs/Message.h>
 
@@ -20,7 +23,7 @@ namespace AwsMock::Dto::SQS {
      * Example:
      * @code{.json}
      * {
-     *   "resources": [
+     *   "Messages": [
      *      {
      *         "Attributes": {
      *            "string" : "string"
@@ -46,39 +49,12 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ReceiveMessageResponse {
+    struct ReceiveMessageResponse final : Common::BaseCounter<ReceiveMessageResponse> {
 
         /**
          * Message list
          */
-        Database::Entity::SQS::MessageList messageList;
-
-        /**
-         * Resource
-         */
-        std::string resource = "SQS";
-
-        /**
-         * Resource
-         */
-        std::string requestId;
-
-        /**
-         * List of attribute
-         */
-        std::map<std::string, std::string> attributes;
-
-        /**
-         * List of message attribute names
-         */
-        std::map<std::string, MessageAttribute> messageAttributes;
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        std::vector<Message> messageList;
 
         /**
          * @brief Convert to XML representation
@@ -87,19 +63,22 @@ namespace AwsMock::Dto::SQS {
          */
         [[nodiscard]] std::string ToXml() const;
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, ReceiveMessageResponse &r);
+        friend ReceiveMessageResponse tag_invoke(boost::json::value_to_tag<ReceiveMessageResponse>, boost::json::value const &v) {
+            ReceiveMessageResponse r;
+            r.messageList = boost::json::value_to<std::vector<Message>>(v.at("messageList"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ReceiveMessageResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Messages", boost::json::value_from(obj.messageList)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -84,11 +84,11 @@ namespace AwsMock::Service {
                         s3Request.versionId = versionId;
                     }
 
-                    // Get range
+                    // Get the range
                     long size;
                     GetRange(request, s3Request.min, s3Request.max, size);
 
-                    // Get object
+                    // Get the object
                     Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
                     std::map<std::string, std::string> headerMap;

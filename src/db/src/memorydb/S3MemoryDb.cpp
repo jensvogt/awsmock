@@ -188,6 +188,20 @@ namespace AwsMock::Database {
         return _buckets[it->first];
     }
 
+    void S3MemoryDb::UpdateBucketCounter(const std::string &region, const std::string &bucket, const long keys, const long size) {
+
+        boost::mutex::scoped_lock lock(_bucketMutex);
+
+        const auto it = std::ranges::find_if(_buckets,
+                                             [region, bucket](const std::pair<std::string, Entity::S3::Bucket> &b) {
+                                                 return b.second.region == region && b.second.name == bucket;
+                                             });
+        if (it != _buckets.end()) {
+            it->second.keys = keys;
+            it->second.size = size;
+        }
+    }
+
     void S3MemoryDb::DeleteBucket(const Entity::S3::Bucket &bucket) {
         boost::mutex::scoped_lock lock(_bucketMutex);
 

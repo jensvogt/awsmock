@@ -116,6 +116,12 @@ namespace AwsMock::Manager {
         }
     }
 
+    void Manager::CreateSharedMemorySegment() {
+
+        // Create a managed shared memory segment.
+        // shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::create_only, "Monitoring", 65536);
+    }
+
     void Manager::Run() {
 
         // Set the running flag
@@ -133,6 +139,9 @@ namespace AwsMock::Manager {
             ios.stop();
         });
         log_info << "Signal handler installed";
+
+        // Create a shared memory segment for monitoring
+        CreateSharedMemorySegment();
 
         Core::PeriodicScheduler scheduler(ios);
         auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);

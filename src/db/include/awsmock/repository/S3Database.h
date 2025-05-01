@@ -9,6 +9,12 @@
 #include <string>
 #include <vector>
 
+// Boost includes
+#include <boost/container/map.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -23,6 +29,23 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
+    struct BucketMonitoringCounter {
+        long keys;
+        long size;
+        system_clock::time_point modified;
+    };
+
+    // Type definitions moved to class scope for better organization
+    using MonitoringValue = BucketMonitoringCounter;
+    using MonitoringKey = std::string;
+    using MonitoringPair = std::pair<MonitoringKey, MonitoringValue>;
+    using SharedMemoryAllocator = boost::interprocess::allocator<MonitoringPair, boost::interprocess::managed_shared_memory::segment_manager>;
+    using MonitoringMap = boost::container::map<MonitoringKey, MonitoringValue, std::less<>, SharedMemoryAllocator>;
+
+    static constexpr const char *SHARED_MEMORY_NAME = "Monitoring";
+    static constexpr const char *DEFAULT_BUCKET_NAME = "Bucket";
+    static constexpr int INITIAL_BUCKET_COUNT = 100;
+
 
     /**
      * @brief S3 MongoDB database.
@@ -176,6 +199,18 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::S3::Bucket UpdateBucket(Entity::S3::Bucket &bucket) const;
+
+        /**
+         * @brief Updates a bucket
+         *
+         * @param region AWS region
+         * @param bucket bucket entity
+         * @param keys number of keys
+         * @param size bucket size
+         * @return created bucket entity
+         * @throws DatabaseException
+         */
+        void UpdateBucketCounter(const std::string &region, const std::string &bucket, long keys, long size) const;
 
         /**
          * @brief Returns the total bucket size.

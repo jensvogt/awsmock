@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -348,7 +348,7 @@ namespace AwsMock::Core {
             return AcctName;
         }
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -568,6 +568,15 @@ namespace AwsMock::Core {
         return count;
     }
 
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long start, long length) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long count = StreamCopier(ifs, ofs, start, length);
+        ifs.close();
+        ofs.close();
+        return count;
+    }
+
     long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long count) {
         std::ifstream ifs(inputFile, std::ios::binary);
         std::ofstream ofs(outputFile, std::ios::binary);
@@ -585,22 +594,48 @@ namespace AwsMock::Core {
     }
 
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
-        if (int bufSize = BUFFER_LEN; count < bufSize) {
-            bufSize = count;
-            char buffer[bufSize];
-            istream.read(buffer, bufSize);
-            ostream.write(buffer, bufSize);
+        long copied = 0;
+        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
+            char buffer[count];
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied = count;
         } else {
             char buffer[bufSize];
             while (count > bufSize) {
                 istream.read(buffer, bufSize);
                 ostream.write(buffer, bufSize);
                 count -= bufSize;
+                copied += bufSize;
             }
             istream.read(buffer, count);
             ostream.write(buffer, count);
+            copied += count;
         }
-        return count;
+        return copied;
+    }
+
+    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count) {
+        long copied = 0;
+        istream.seekg(start, std::ios::beg);
+        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
+            char buffer[count];
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied = count;
+        } else {
+            char buffer[bufSize];
+            while (count > bufSize) {
+                istream.read(buffer, bufSize);
+                ostream.write(buffer, bufSize);
+                count -= bufSize;
+                copied += bufSize;
+            }
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied += count;
+        }
+        return copied;
     }
 
 }// namespace AwsMock::Core

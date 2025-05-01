@@ -176,9 +176,8 @@ namespace AwsMock::Service {
     Dto::S3::GetObjectResponse S3Service::GetObject(const Dto::S3::GetObjectRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_object");
-        // TODO:: Fix for new tenplates
-        //log_trace << "Get object request, s3Request: " << request.ToString();
-        const std::string s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        log_trace << "Get object request, s3Request: " << request.ToJson();
+        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
 
         // Check existence
         CheckBucketExistence(request.region, request.bucket);
@@ -379,10 +378,12 @@ namespace AwsMock::Service {
         const std::string uploadDir = GetMultipartUploadDirectory(request.uploadId);
         log_trace << "Using uploadDir: " << uploadDir;
 
+        long start = request.min;
         long length = request.max - request.min + 1;
         const std::string destFile = uploadDir + Core::FileUtils::separator() + request.uploadId + "-" + std::to_string(request.partNumber);
 
-        long copied = Core::FileUtils::StreamCopier(sourceFile, destFile, length);
+        // Copy part of the file
+        long copied = Core::FileUtils::StreamCopier(sourceFile, destFile, start, length);
 
         // Get md5sum as ETag
         Dto::S3::UploadPartCopyResponse response;
@@ -1020,7 +1021,7 @@ namespace AwsMock::Service {
                 sortColumn.sortDirection = sc.sortDirection;
                 sortColumns.push_back(sortColumn);
             }
-            Database::Entity::S3::ObjectList objectList = _database.ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, sortColumns);
+            const Database::Entity::S3::ObjectList objectList = _database.ListObjects(s3Request.region, s3Request.prefix, s3Request.bucket, s3Request.pageSize, s3Request.pageIndex, sortColumns);
 
             Dto::S3::ListObjectCounterResponse listAllObjectResponse;
             listAllObjectResponse.total = _database.ObjectCount(s3Request.region, s3Request.prefix, s3Request.bucket);
@@ -1240,13 +1241,10 @@ namespace AwsMock::Service {
         std::string fileName = Core::AwsUtils::CreateS3FileName();
         std::string filePath = dataS3Dir + Core::FileUtils::separator() + fileName;
 
-        std::ofstream ofs(filePath, std::ios::out | std::ios::trunc | std::ios::binary);
-        ofs << stream.rdbuf();
+        std::ofstream ofs(filePath, std::ios::binary | std::ios::trunc);
+        long count = Core::FileUtils::StreamCopier(stream, ofs, request.contentLength);
         ofs.close();
-
-        // Get size
-        long size = Core::FileUtils::FileSize(filePath);
-        log_debug << "File received, filePath: " << filePath << " size: " << size;
+        log_debug << "File received, filePath: " << filePath << " size: " << count;
 
         Database::Entity::S3::Object object;
 
@@ -1257,36 +1255,33 @@ namespace AwsMock::Service {
             // Version ID
             std::string versionId = Core::AwsUtils::CreateS3VersionId();
 
-            // Create new version of new object
+            // Create a new version of the object
             object = {
                     .region = request.region,
                     .bucket = request.bucket,
                     .key = request.key,
                     .owner = request.owner,
-                    .size = size,
+                    .size = count,
                     .contentType = request.contentType,
                     .metadata = request.metadata,
                     .internalName = fileName,
                     .versionId = versionId,
             };
 
-            // Checksums
+            // Meta data
             object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
             log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << " md5: " << object.md5sum;
-
-            // Create a new version in the database
-            object = _database.CreateObject(object);
-            log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
-
-            // Checksums
             if (!request.checksumAlgorithm.empty()) {
                 S3HashCreator s3HashCreator;
                 std::vector algorithms = {request.checksumAlgorithm};
                 boost::thread t(boost::ref(s3HashCreator), algorithms, object);
                 t.detach();
-                //Core::TaskPool::instance().Add<std::string, S3HashCreator>("s3-hashing", S3HashCreator({request.checksumAlgorithm}, object));
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
             }
+
+            // Create a new version in the database
+            object = _database.CreateObject(object);
+            log_debug << "Database updated, bucket: " << object.bucket << " key: " << object.key;
 
             // Check encryption
             CheckEncryption(bucket, object);
@@ -1295,22 +1290,11 @@ namespace AwsMock::Service {
             // Check notification
             CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
             log_debug << "Put object succeeded, bucket: " << request.bucket << " key: " << request.key;
+
         } else {
 
             // Delete the local file
             Core::FileUtils::DeleteFile(filePath);
-        }
-
-        // Meta data
-        object.md5sum = Core::Crypto::GetMd5FromFile(filePath);
-        log_debug << "Checksum, bucket: " << request.bucket << " key: " << request.key << "md5: " << object.md5sum;
-        if (request.checksumAlgorithm == "SHA1") {
-            object.sha1sum = Core::Crypto::GetSha1FromFile(filePath);
-            log_debug << "Checksum SHA1, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum;
-        }
-        if (request.checksumAlgorithm == "SHA256") {
-            object.sha256sum = Core::Crypto::GetSha256FromFile(filePath);
-            log_debug << "Checksum SHA256, bucket: " << request.bucket << " key: " << request.key << " sha256: " << object.sha256sum;
         }
 
         // Adjust bucket counters
@@ -1321,7 +1305,7 @@ namespace AwsMock::Service {
                 .key = request.key,
                 .etag = object.md5sum,
                 .md5Sum = object.md5sum,
-                .contentLength = size,
+                .contentLength = count,
                 .sha1Sum = object.sha1sum,
                 .sha256sum = object.sha256sum,
                 .metadata = request.metadata,
@@ -1430,11 +1414,10 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::AdjustBucketCounters(const std::string &region, const std::string &bucketName) const {
-        Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(region, bucketName);
-        bucket.keys = _database.GetBucketObjectCount(region, bucketName);
-        bucket.size = _database.GetBucketSize(region, bucketName);
-        bucket = _database.UpdateBucket(bucket);
+    void S3Service::AdjustBucketCounters(const std::string &region, const std::string &bucket) const {
+        long keys = _database.GetBucketObjectCount(region, bucket);
+        long size = _database.GetBucketSize(region, bucket);
+        _database.UpdateBucketCounter(region, bucket, keys, size);
     }
 
     void S3Service::CheckBucketExistence(const std::string &region, const std::string &name) {
