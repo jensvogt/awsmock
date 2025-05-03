@@ -107,10 +107,6 @@ namespace AwsMock::Database::Entity::SQS {
                 }
             }
 
-            // Calculate md5 of the message attributes
-            md5Body = SqsUtils::CreateMd5OfMessageBody(body);
-            md5MessageAttributes = SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
-
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());

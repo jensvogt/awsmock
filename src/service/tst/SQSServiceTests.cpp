@@ -194,7 +194,9 @@ namespace AwsMock::Service {
         deleteRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
-        EXPECT_NO_THROW({ _service.DeleteQueue(deleteRequest); });
+        EXPECT_NO_THROW({
+            Dto::SQS::DeleteQueueResponse response = _service.DeleteQueue(deleteRequest);
+        });
 
         // assert
         EXPECT_EQ(0, _database.ListQueues(REGION).size());

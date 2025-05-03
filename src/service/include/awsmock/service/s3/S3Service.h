@@ -513,6 +513,15 @@ namespace AwsMock::Service {
         static void PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
 
         /**
+         * @brief Adds the lambda notification configuration to the provided bucket.
+         *
+         * @param contentType content type from AWS S3.
+         * @param filePath file path
+         * @param s3Key S3 key
+         */
+        static std::string SanitizeContentType(const std::string &contentType, const std::string &filePath, const std::string &s3Key);
+
+        /**
          * Database connection
          */
         Database::S3Database &_database;

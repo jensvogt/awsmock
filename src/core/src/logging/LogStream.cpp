@@ -131,6 +131,6 @@ namespace AwsMock::Core {
                 boost::log::keywords::max_files = count));
 
         be->scan_for_files();
-        log_info << "Start logging to file, dir:" << logDir << ", prefix: " << logPrefix << " size: " << logSize << " count: " << logCount;
+        log_info << "Start logging to file, dir:" << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
 }// namespace AwsMock::Core

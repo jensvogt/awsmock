@@ -124,11 +124,6 @@ namespace AwsMock::Manager {
         std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 
         /**
-         * Global shared memory segment
-         */
-        std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
-
-        /**
          * Running flag
          */
         bool _running = false;

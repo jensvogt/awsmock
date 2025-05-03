@@ -23,8 +23,8 @@ namespace AwsMock::Service {
         }
 
         // Initialize shared memory
-        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
-        s3CounterMap = segment.find<Database::S3CounterMapType>(Database::S3_COUNTER_MAP_NAME).first;
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _s3CounterMap = _segment.find<Database::S3CounterMapType>(Database::S3_COUNTER_MAP_NAME).first;
 
         // Start S3 monitoring counters updates
         scheduler.AddTask("s3-counter-updates", [this] { UpdateCounter(); }, _counterPeriod);
@@ -76,10 +76,10 @@ namespace AwsMock::Service {
     void S3Server::UpdateCounter() {
         log_trace << "S3 Monitoring starting";
 
-        if (s3CounterMap) {
+        if (_s3CounterMap) {
             long totalKeys = 0;
             long totalSize = 0;
-            for (auto const &[key, val]: *s3CounterMap) {
+            for (auto const &[key, val]: *_s3CounterMap) {
 
                 std::string labelValue = key;
                 Core::StringUtils::Replace(labelValue, "-", "_");
@@ -91,9 +91,9 @@ namespace AwsMock::Service {
                 totalSize += val.size;
                 _s3Database.UpdateBucketCounter(key, val.keys, val.size);
             }
-            _metricService.SetGauge(S3_BUCKET_COUNT, static_cast<double>(s3CounterMap->size()));
+            _metricService.SetGauge(S3_BUCKET_COUNT, static_cast<double>(_s3CounterMap->size()));
             _metricService.SetGauge(S3_OBJECT_COUNT, static_cast<double>(totalKeys));
         }
-        log_debug << "S3 monitoring finished, freeShmSize: " << segment.get_free_memory();
+        log_debug << "S3 monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
 }// namespace AwsMock::Service

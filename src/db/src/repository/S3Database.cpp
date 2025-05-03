@@ -10,12 +10,12 @@ namespace AwsMock::Database {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()), s3CounterMap(nullptr) {
+    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()), _s3CounterMap(nullptr) {
 
-        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
-        s3CounterMap = segment.find<S3CounterMapType>(S3_COUNTER_MAP_NAME).first;
-        if (!s3CounterMap) {
-            s3CounterMap = segment.construct<S3CounterMapType>(S3_COUNTER_MAP_NAME)(std::less<std::string>(), segment.get_segment_manager());
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _s3CounterMap = _segment.find<S3CounterMapType>(S3_COUNTER_MAP_NAME).first;
+        if (!_s3CounterMap) {
+            _s3CounterMap = _segment.construct<S3CounterMapType>(S3_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
         }
 
         // Initialize the counters
@@ -23,9 +23,9 @@ namespace AwsMock::Database {
             BucketMonitoringCounter counter;
             counter.keys = GetBucketObjectCount(bucket.region, bucket.name);
             counter.size = GetBucketSize(bucket.region, bucket.name);
-            s3CounterMap->insert_or_assign(bucket.arn, counter);
+            _s3CounterMap->insert_or_assign(bucket.arn, counter);
         }
-        log_debug << "Bucket counters initialized" << s3CounterMap->size();
+        log_debug << "Bucket counters initialized" << _s3CounterMap->size();
     }
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) const {
@@ -80,7 +80,7 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        s3CounterMap->insert_or_assign(bucket.arn, BucketMonitoringCounter{.keys = 0, .size = 0});
+        _s3CounterMap->insert_or_assign(bucket.arn, BucketMonitoringCounter{.keys = 0, .size = 0});
 
         return bucket;
     }
@@ -189,6 +189,8 @@ namespace AwsMock::Database {
             for (auto bucketCursor = _bucketCollection.find(query.extract(), opts); const auto &bucket: bucketCursor) {
                 Entity::S3::Bucket result;
                 result.FromDocument(bucket);
+                result.keys = (*_s3CounterMap)[result.arn].keys;
+                result.size = (*_s3CounterMap)[result.arn].size;
                 bucketList.push_back(result);
             }
 
@@ -318,7 +320,7 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        s3CounterMap->insert_or_assign(bucket.arn, BucketMonitoringCounter{.keys = 0, .size = 0});
+        _s3CounterMap->insert_or_assign(bucket.arn, BucketMonitoringCounter{.keys = 0, .size = 0});
 
         return purged;
     }
@@ -484,7 +486,7 @@ namespace AwsMock::Database {
         _memoryDb.DeleteBucket(bucket);
 
         // Erase counter
-        s3CounterMap->erase(bucket.arn);
+        _s3CounterMap->erase(bucket.arn);
     }
 
     long S3Database::DeleteAllBuckets() const {
@@ -515,7 +517,7 @@ namespace AwsMock::Database {
         }
 
         // Clear counters
-        s3CounterMap->clear();
+        _s3CounterMap->clear();
 
         return deleted;
     }
@@ -602,8 +604,8 @@ namespace AwsMock::Database {
         }
 
         // Update counter
-        (*s3CounterMap)[object.bucketArn].keys++;
-        (*s3CounterMap)[object.bucketArn].size += object.size;
+        (*_s3CounterMap)[object.bucketArn].keys++;
+        (*_s3CounterMap)[object.bucketArn].size += object.size;
 
         return object;
     }
@@ -898,8 +900,8 @@ namespace AwsMock::Database {
         }
 
         // Update counter
-        (*s3CounterMap)[object.bucketArn].keys--;
-        (*s3CounterMap)[object.bucketArn].size -= object.size;
+        (*_s3CounterMap)[object.bucketArn].keys--;
+        (*_s3CounterMap)[object.bucketArn].size -= object.size;
     }
 
     void S3Database::DeleteObjects(const std::string &region, const std::string &bucketName, const std::vector<std::string> &keys) const {
@@ -946,8 +948,8 @@ namespace AwsMock::Database {
 
         // Update counter
         const Entity::S3::Bucket bucket = GetBucketByRegionName(region, bucketName);
-        (*s3CounterMap)[bucket.arn].keys = GetBucketObjectCount(region, bucketName);
-        (*s3CounterMap)[bucket.arn].size = GetBucketSize(region, bucketName);
+        (*_s3CounterMap)[bucket.arn].keys = GetBucketObjectCount(region, bucketName);
+        (*_s3CounterMap)[bucket.arn].size = GetBucketSize(region, bucketName);
     }
 
     long S3Database::DeleteAllObjects() const {
@@ -978,9 +980,9 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        for (const auto &key: *s3CounterMap | std::views::keys) {
-            (*s3CounterMap)[key].keys = 0;
-            (*s3CounterMap)[key].size = 0;
+        for (const auto &key: *_s3CounterMap | std::views::keys) {
+            (*_s3CounterMap)[key].keys = 0;
+            (*_s3CounterMap)[key].size = 0;
         }
         return deleted;
     }

@@ -207,16 +207,16 @@ namespace AwsMock::Service {
             // Check decryption
             CheckDecryption(bucketEntity, object, filename);
 
-            Dto::S3::GetObjectResponse response = {
-                    .bucket = object.bucket,
-                    .key = object.key,
-                    .size = object.size,
-                    .filename = filename,
-                    .contentType = object.contentType,
-                    .metadata = object.metadata,
-                    .md5sum = object.md5sum,
-                    .created = object.created,
-                    .modified = object.modified};
+            Dto::S3::GetObjectResponse response;
+            response.bucket = object.bucket;
+            response.key = object.key;
+            response.size = object.size;
+            response.filename = filename;
+            response.contentType = object.contentType;
+            response.metadata = object.metadata;
+            response.md5sum = object.md5sum;
+            response.created = object.created;
+            response.modified = object.modified;
             log_trace << "S3 get object response: " << response.ToString();
             log_debug << "Object returned, bucket: " << request.bucket << ", key: " << request.key << ", size: " << response.size;
             return response;
@@ -333,9 +333,13 @@ namespace AwsMock::Service {
         const std::string uploadDir = GetMultipartUploadDirectory(uploadId);
         Core::DirUtils::EnsureDirectory(uploadDir);
 
+        // Get the bucket
+        const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
+
         // Create database object
         Database::Entity::S3::Object object = {.region = request.region,
                                                .bucket = request.bucket,
+                                               .bucketArn = bucket.arn,
                                                .key = request.key,
                                                .owner = request.user,
                                                .metadata = request.metadata};
@@ -1174,7 +1178,7 @@ namespace AwsMock::Service {
         }
 
         // Get content type
-        std::string contentType = request.contentType.empty() ? Core::FileUtils::GetContentType(filePath, request.key) : request.contentType;
+        std::string contentType = SanitizeContentType(request.contentType, filePath, request.key);
 
         // Create entity
         Database::Entity::S3::Object object = {
@@ -1426,5 +1430,13 @@ namespace AwsMock::Service {
             log_warning << "Bucket exists already, region: " << region << " name: " << name;
             throw Core::NotFoundException("Bucket exists already, region: " + region + " name: " + name);
         }
+    }
+
+    std::string S3Service::SanitizeContentType(const std::string &contentType, const std::string &filePath, const std::string &s3Key) {
+        std::string sContentType = contentType;
+        if (contentType.empty() || contentType == "application/octet-stream" || contentType == "binary/octet-stream") {
+            sContentType = Core::FileUtils::GetContentType(filePath, s3Key);
+        }
+        return sContentType;
     }
 }// namespace AwsMock::Service

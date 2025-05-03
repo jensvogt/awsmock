@@ -397,18 +397,6 @@ namespace AwsMock::Database {
          */
         long DeleteAllMessages() const;
 
-        /**
-         * @brief Adjust all message counters
-         */
-        void AdjustAllMessageCounters() const;
-
-        /**
-         * @brief Adjust message counters for a single topic
-         *
-         * @param topicArn AWS topic ARN
-         */
-        void AdjustMessageCounters(const std::string &topicArn) const;
-
       private:
 
         /**
@@ -434,12 +422,12 @@ namespace AwsMock::Database {
         /**
          * Shared memory segment
          */
-        boost::interprocess::managed_shared_memory segment;
+        boost::interprocess::managed_shared_memory _segment;
 
         /**
          * Map of monitoring counters
          */
-        SnsCounterMapType *snsCounterMap;
+        SnsCounterMapType *_snsCounterMap;
     };
 
 }// namespace AwsMock::Database

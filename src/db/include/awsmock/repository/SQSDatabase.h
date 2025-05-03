@@ -537,12 +537,12 @@ namespace AwsMock::Database {
         /**
          * Shared memory segment
          */
-        boost::interprocess::managed_shared_memory segment;
+        boost::interprocess::managed_shared_memory _segment;
 
         /**
          * Map of monitoring counters
          */
-        SqsCounterMapType *sqsCounterMap;
+        SqsCounterMapType *_sqsCounterMap;
     };
 
 }// namespace AwsMock::Database

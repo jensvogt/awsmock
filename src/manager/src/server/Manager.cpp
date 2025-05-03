@@ -118,9 +118,13 @@ namespace AwsMock::Manager {
 
     void Manager::CreateSharedMemorySegment() {
 
+        // As Awsmock is not running under root set shared memory permissions
+        boost::interprocess::permissions unrestricted_permissions;
+        unrestricted_permissions.set_unrestricted();
+
         // Create a managed shared memory segment.
         boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_SEGMENT_NAME);
-        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, 65536);
+        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, 65536, nullptr, unrestricted_permissions);
     }
 
     void Manager::Run() {

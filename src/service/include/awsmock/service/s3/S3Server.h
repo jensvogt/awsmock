@@ -81,12 +81,12 @@ namespace AwsMock::Service {
         /**
          * Shared memory segment
          */
-        boost::interprocess::managed_shared_memory segment;
+        boost::interprocess::managed_shared_memory _segment;
 
         /**
          * Counter map in a shared memory segment
          */
-        Database::S3CounterMapType *s3CounterMap{};
+        Database::S3CounterMapType *_s3CounterMap{};
     };
 
 }// namespace AwsMock::Service

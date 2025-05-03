@@ -24,7 +24,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSServer : public AbstractServer {
+    class SNSServer final : public AbstractServer {
 
       public:
 
@@ -39,11 +39,6 @@ namespace AwsMock::Service {
          * @brief Delete resources, which are over the retention period.
          */
         void DeleteOldMessages() const;
-
-        /**
-         * @brief Synchronizes the topic available messages counters.
-         */
-        void SynchronizeCounters() const;
 
         /**
          * @brief Update counters
@@ -86,12 +81,12 @@ namespace AwsMock::Service {
         /**
          * Shared memory segment
          */
-        boost::interprocess::managed_shared_memory segment;
+        boost::interprocess::managed_shared_memory _segment;
 
         /**
          * Counter map in a shared memory segment
          */
-        Database::SnsCounterMapType *snsCounterMap{};
+        Database::SnsCounterMapType *_snsCounterMap{};
     };
 
 }// namespace AwsMock::Service

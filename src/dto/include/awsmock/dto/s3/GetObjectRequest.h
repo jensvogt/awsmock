@@ -9,13 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/common/BaseDto.h"
-
-
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -24,12 +19,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetObjectRequest : Common::BaseDto<GetObjectRequest> {
-
-        /**
-         * AWS region name
-         */
-        std::string region;
+    struct GetObjectRequest final : Common::BaseCounter<GetObjectRequest> {
 
         /**
          * Bucket
@@ -56,12 +46,30 @@ namespace AwsMock::Dto::S3 {
          */
         long max;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend GetObjectRequest tag_invoke(boost::json::value_to_tag<GetObjectRequest>, boost::json::value const &v) {
+            GetObjectRequest r;
+            r.bucket = v.at("bucket").as_string();
+            r.key = v.at("key").as_string();
+            r.versionId = v.at("versionId").as_string();
+            r.min = v.at("min").as_int64();
+            r.max = v.at("max").as_int64();
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetObjectRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"key", obj.key},
+                    {"versionId", obj.versionId},
+                    {"min", obj.min},
+                    {"max", obj.max},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

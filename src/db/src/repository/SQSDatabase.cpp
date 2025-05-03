@@ -9,10 +9,10 @@ namespace AwsMock::Database {
 
     SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {
 
-        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
-        sqsCounterMap = segment.find<SqsCounterMapType>(SQS_COUNTER_MAP_NAME).first;
-        if (!sqsCounterMap) {
-            sqsCounterMap = segment.construct<SqsCounterMapType>(SQS_COUNTER_MAP_NAME)(std::less<std::string>(), segment.get_segment_manager());
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _sqsCounterMap = _segment.find<SqsCounterMapType>(SQS_COUNTER_MAP_NAME).first;
+        if (!_sqsCounterMap) {
+            _sqsCounterMap = _segment.construct<SqsCounterMapType>(SQS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
         }
 
         // Initialize the counters
@@ -23,9 +23,9 @@ namespace AwsMock::Database {
             counter.delayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
             counter.messages = CountMessages(queue.queueArn);
             counter.size = GetQueueSize(queue.queueArn);
-            sqsCounterMap->insert_or_assign(queue.queueArn, counter);
+            _sqsCounterMap->insert_or_assign(queue.queueArn, counter);
         }
-        log_debug << "SQS queues counters initialized" << sqsCounterMap->size();
+        log_debug << "SQS queues counters initialized" << _sqsCounterMap->size();
     }
 
     bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) const {
@@ -260,6 +260,9 @@ namespace AwsMock::Database {
             for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
+                result.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[result.queueArn].messages;
+                result.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[result.queueArn].invisible;
+                result.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[result.queueArn].delayed;
                 queueList.push_back(result);
             }
             log_trace << "Got queue list, size: " << queueList.size();
@@ -364,11 +367,11 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*sqsCounterMap)[queueArn].size = 0;
-        (*sqsCounterMap)[queueArn].messages = 0;
-        (*sqsCounterMap)[queueArn].initial = 0;
-        (*sqsCounterMap)[queueArn].invisible = 0;
-        (*sqsCounterMap)[queueArn].delayed = 0;
+        (*_sqsCounterMap)[queueArn].size = 0;
+        (*_sqsCounterMap)[queueArn].messages = 0;
+        (*_sqsCounterMap)[queueArn].initial = 0;
+        (*_sqsCounterMap)[queueArn].invisible = 0;
+        (*_sqsCounterMap)[queueArn].delayed = 0;
         return purged;
     }
 
@@ -538,7 +541,7 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        sqsCounterMap->erase(queue.queueArn);
+        _sqsCounterMap->erase(queue.queueArn);
         return deleted;
     }
 
@@ -569,7 +572,7 @@ namespace AwsMock::Database {
         }
 
         // Clear the counter-map
-        sqsCounterMap->clear();
+        _sqsCounterMap->clear();
 
         return deleted;
     }
@@ -601,9 +604,9 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*sqsCounterMap)[message.queueArn].messages++;
-        (*sqsCounterMap)[message.queueArn].initial++;
-        (*sqsCounterMap)[message.queueArn].size += message.size;
+        (*_sqsCounterMap)[message.queueArn].messages++;
+        (*_sqsCounterMap)[message.queueArn].initial++;
+        (*_sqsCounterMap)[message.queueArn].size += message.size;
 
         return message;
     }
@@ -865,8 +868,8 @@ namespace AwsMock::Database {
 
                         messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
                         log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
-                        (*sqsCounterMap)[queueArn].initial--;
-                        (*sqsCounterMap)[dlQueueArn].initial++;
+                        (*_sqsCounterMap)[queueArn].initial--;
+                        (*_sqsCounterMap)[dlQueueArn].initial++;
 
                     } else {
 
@@ -887,8 +890,8 @@ namespace AwsMock::Database {
 
                         messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
-                        (*sqsCounterMap)[queueArn].initial--;
-                        (*sqsCounterMap)[queueArn].invisible++;
+                        (*_sqsCounterMap)[queueArn].initial--;
+                        (*_sqsCounterMap)[queueArn].invisible++;
                     }
                 }
 
@@ -950,8 +953,8 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*sqsCounterMap)[queueArn].initial += updated;
-        (*sqsCounterMap)[queueArn].invisible -= updated;
+        (*_sqsCounterMap)[queueArn].initial += updated;
+        (*_sqsCounterMap)[queueArn].invisible -= updated;
 
         return updated;
     }
@@ -1037,8 +1040,8 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*sqsCounterMap)[queueArn].delayed -= updated;
-        (*sqsCounterMap)[queueArn].initial += updated;
+        (*_sqsCounterMap)[queueArn].delayed -= updated;
+        (*_sqsCounterMap)[queueArn].initial += updated;
 
         return updated;
     }
@@ -1085,8 +1088,8 @@ namespace AwsMock::Database {
             updated = _memoryDb.RedriveMessages(originalQueue, dlqQueue);
         }
 
-        (*sqsCounterMap)[originalQueue.queueArn].initial += updated;
-        (*sqsCounterMap)[dlqQueue.queueArn].initial -= updated;
+        (*_sqsCounterMap)[originalQueue.queueArn].initial += updated;
+        (*_sqsCounterMap)[dlqQueue.queueArn].initial -= updated;
         return updated;
     }
 
@@ -1129,7 +1132,7 @@ namespace AwsMock::Database {
         counter.delayed = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::DELAYED);
         counter.messages = CountMessages(queueArn);
         counter.size = GetQueueSize(queueArn);
-        sqsCounterMap->insert_or_assign(queueArn, counter);
+        _sqsCounterMap->insert_or_assign(queueArn, counter);
         return deleted;
     }
 
@@ -1280,11 +1283,11 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*sqsCounterMap)[queueArn].messages = 0;
-        (*sqsCounterMap)[queueArn].initial = 0;
-        (*sqsCounterMap)[queueArn].invisible = 0;
-        (*sqsCounterMap)[queueArn].delayed = 0;
-        (*sqsCounterMap)[queueArn].size = 0;
+        (*_sqsCounterMap)[queueArn].messages = 0;
+        (*_sqsCounterMap)[queueArn].initial = 0;
+        (*_sqsCounterMap)[queueArn].invisible = 0;
+        (*_sqsCounterMap)[queueArn].delayed = 0;
+        (*_sqsCounterMap)[queueArn].size = 0;
 
         return deleted;
     }
@@ -1317,14 +1320,14 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*sqsCounterMap)[message.queueArn].size -= message.size;
-        (*sqsCounterMap)[message.queueArn].messages -= deleted;
+        (*_sqsCounterMap)[message.queueArn].size -= message.size;
+        (*_sqsCounterMap)[message.queueArn].messages -= deleted;
         if (message.status == Entity::SQS::MessageStatus::INITIAL) {
-            (*sqsCounterMap)[message.queueArn].initial -= deleted;
+            (*_sqsCounterMap)[message.queueArn].initial -= deleted;
         } else if (message.status == Entity::SQS::MessageStatus::DELAYED) {
-            (*sqsCounterMap)[message.queueArn].delayed -= deleted;
+            (*_sqsCounterMap)[message.queueArn].delayed -= deleted;
         } else if (message.status == Entity::SQS::MessageStatus::INVISIBLE) {
-            (*sqsCounterMap)[message.queueArn].invisible -= deleted;
+            (*_sqsCounterMap)[message.queueArn].invisible -= deleted;
         }
         return deleted;
     }
@@ -1344,17 +1347,17 @@ namespace AwsMock::Database {
                 const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
                 session.commit_transaction();
 
-                if (findResult) {
+                if (!findResult->empty()) {
                     Entity::SQS::Message message;
                     message.FromDocument(findResult->view());
-                    (*sqsCounterMap)[message.queueArn].size -= message.size;
-                    (*sqsCounterMap)[message.queueArn].messages--;
+                    (*_sqsCounterMap)[message.queueArn].size -= message.size;
+                    (*_sqsCounterMap)[message.queueArn].messages--;
                     if (message.status == Entity::SQS::MessageStatus::INITIAL) {
-                        (*sqsCounterMap)[message.queueArn].initial--;
+                        (*_sqsCounterMap)[message.queueArn].initial--;
                     } else if (message.status == Entity::SQS::MessageStatus::DELAYED) {
-                        (*sqsCounterMap)[message.queueArn].delayed--;
+                        (*_sqsCounterMap)[message.queueArn].delayed--;
                     } else if (message.status == Entity::SQS::MessageStatus::INVISIBLE) {
-                        (*sqsCounterMap)[message.queueArn].invisible--;
+                        (*_sqsCounterMap)[message.queueArn].invisible--;
                     }
                 }
                 log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << result->deleted_count();
@@ -1398,12 +1401,12 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        for (const auto &key: *sqsCounterMap | std::views::keys) {
-            (*sqsCounterMap)[key].messages = 0;
-            (*sqsCounterMap)[key].initial = 0;
-            (*sqsCounterMap)[key].invisible = 0;
-            (*sqsCounterMap)[key].delayed = 0;
-            (*sqsCounterMap)[key].size = 0;
+        for (const auto &key: *_sqsCounterMap | std::views::keys) {
+            (*_sqsCounterMap)[key].messages = 0;
+            (*_sqsCounterMap)[key].initial = 0;
+            (*_sqsCounterMap)[key].invisible = 0;
+            (*_sqsCounterMap)[key].delayed = 0;
+            (*_sqsCounterMap)[key].size = 0;
         }
         return deleted;
     }

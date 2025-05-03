@@ -7,10 +7,10 @@
 namespace AwsMock::Database {
     SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
 
-        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
-        snsCounterMap = segment.find<SnsCounterMapType>(SNS_COUNTER_MAP_NAME).first;
-        if (!snsCounterMap) {
-            snsCounterMap = segment.construct<SnsCounterMapType>(SNS_COUNTER_MAP_NAME)(std::less<std::string>(), segment.get_segment_manager());
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _snsCounterMap = _segment.find<SnsCounterMapType>(SNS_COUNTER_MAP_NAME).first;
+        if (!_snsCounterMap) {
+            _snsCounterMap = _segment.construct<SnsCounterMapType>(SNS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
         }
 
         // Initialize the counters
@@ -21,9 +21,9 @@ namespace AwsMock::Database {
             counter.send = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
             counter.messages = CountMessages(topic.topicArn);
             counter.size = GetTopicSize(topic.topicArn);
-            snsCounterMap->insert_or_assign(topic.topicArn, counter);
+            _snsCounterMap->insert_or_assign(topic.topicArn, counter);
         }
-        log_debug << "SNS queues counters initialized" << snsCounterMap->size();
+        log_debug << "SNS queues counters initialized" << _snsCounterMap->size();
     }
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {
@@ -206,22 +206,22 @@ namespace AwsMock::Database {
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
+
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-                if (region.empty()) {
-                    for (auto queueCursor = _topicCollection.find({}); auto topic: queueCursor) {
-                        Entity::SNS::Topic result;
-                        result.FromDocument(topic);
-                        topicList.push_back(result);
-                    }
-                } else {
-                    for (auto queueCursor = _topicCollection.find(make_document(kvp("region", region))); auto topic:
-                                                                                                         queueCursor) {
-                        Entity::SNS::Topic result;
-                        result.FromDocument(topic);
-                        topicList.push_back(result);
-                    }
+
+                document query = {};
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+
+                for (auto queueCursor = _topicCollection.find(query.extract()); const auto topic: queueCursor) {
+                    Entity::SNS::Topic result;
+                    result.FromDocument(topic);
+                    result.messages = (*_snsCounterMap)[result.topicArn].messages;
+                    result.size = (*_snsCounterMap)[result.topicArn].size;
+                    topicList.push_back(result);
                 }
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
@@ -455,11 +455,11 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*snsCounterMap)[topic.topicArn].size = 0;
-        (*snsCounterMap)[topic.topicArn].messages = 0;
-        (*snsCounterMap)[topic.topicArn].initial = 0;
-        (*snsCounterMap)[topic.topicArn].send = 0;
-        (*snsCounterMap)[topic.topicArn].resend = 0;
+        (*_snsCounterMap)[topic.topicArn].size = 0;
+        (*_snsCounterMap)[topic.topicArn].messages = 0;
+        (*_snsCounterMap)[topic.topicArn].initial = 0;
+        (*_snsCounterMap)[topic.topicArn].send = 0;
+        (*_snsCounterMap)[topic.topicArn].resend = 0;
 
         return purged;
     }
@@ -508,7 +508,7 @@ namespace AwsMock::Database {
         }
 
         // Update counter-map
-        snsCounterMap->erase(topic.topicArn);
+        _snsCounterMap->erase(topic.topicArn);
     }
 
     long SNSDatabase::DeleteAllTopics() const {
@@ -536,7 +536,7 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        snsCounterMap->clear();
+        _snsCounterMap->clear();
         return deleted;
     }
 
@@ -579,9 +579,9 @@ namespace AwsMock::Database {
         }
 
         // Update counter map
-        (*snsCounterMap)[message.topicArn].size += message.size;
-        (*snsCounterMap)[message.topicArn].messages++;
-        (*snsCounterMap)[message.topicArn].initial++;
+        (*_snsCounterMap)[message.topicArn].size += message.size;
+        (*_snsCounterMap)[message.topicArn].messages++;
+        (*_snsCounterMap)[message.topicArn].initial++;
         return message;
     }
 
@@ -765,14 +765,14 @@ namespace AwsMock::Database {
         }
 
         // Update counter-map
-        (*snsCounterMap)[message.topicArn].size -= message.size;
-        (*snsCounterMap)[message.topicArn].messages--;
+        (*_snsCounterMap)[message.topicArn].size -= message.size;
+        (*_snsCounterMap)[message.topicArn].messages--;
         if (message.status == Entity::SNS::MessageStatus::INITIAL) {
-            (*snsCounterMap)[message.topicArn].initial--;
+            (*_snsCounterMap)[message.topicArn].initial--;
         } else if (message.status == Entity::SNS::MessageStatus::SEND) {
-            (*snsCounterMap)[message.topicArn].send--;
+            (*_snsCounterMap)[message.topicArn].send--;
         } else if (message.status == Entity::SNS::MessageStatus::RESEND) {
-            (*snsCounterMap)[message.topicArn].resend--;
+            (*_snsCounterMap)[message.topicArn].resend--;
         }
     }
 
@@ -815,9 +815,6 @@ namespace AwsMock::Database {
                 log_debug << "Messages deleted, count: " << result->result().deleted_count();
                 session.commit_transaction();
 
-                // Adjust all topic message counters
-                //AdjustMessageCounters(topicArn);
-
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
@@ -845,9 +842,6 @@ namespace AwsMock::Database {
                     log_debug << "Old messages deleted, timeout: " << timeout << " count: " << static_cast<long>(result->deleted_count());
                 }
 
-                // Adjust all topic message counters
-                //AdjustAllMessageCounters();
-
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
@@ -867,9 +861,6 @@ namespace AwsMock::Database {
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
                 const auto result = _messageCollection.delete_many({});
                 log_debug << "All resources deleted, count: " << result->deleted_count();
-
-                // Adjust all topic message counters
-                //AdjustAllMessageCounters();
                 deleted = result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
@@ -881,49 +872,11 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        (*snsCounterMap)[_messageCollectionName].size = 0;
-        (*snsCounterMap)[_messageCollectionName].messages = 0;
-        (*snsCounterMap)[_messageCollectionName].initial = 0;
-        (*snsCounterMap)[_messageCollectionName].send = 0;
-        (*snsCounterMap)[_messageCollectionName].resend = 0;
+        (*_snsCounterMap)[_messageCollectionName].size = 0;
+        (*_snsCounterMap)[_messageCollectionName].messages = 0;
+        (*_snsCounterMap)[_messageCollectionName].initial = 0;
+        (*_snsCounterMap)[_messageCollectionName].send = 0;
+        (*_snsCounterMap)[_messageCollectionName].resend = 0;
         return deleted;
-    }
-
-    void SNSDatabase::AdjustAllMessageCounters() const {
-        /*if (HasDatabase()) {
-            const Entity::SNS::TopicList topicList = ListTopics();
-            log_trace << "SNS adjust counter starting, count: " << topicList.size();
-
-            // Loop over topics and synchronize counters
-            for (auto &topic: topicList) {
-                AdjustMessageCounters(topic.topicArn);
-            }
-        }*/
-    }
-
-    void SNSDatabase::AdjustMessageCounters(const std::string &topicArn) const {
-        /*if (HasDatabase()) {
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto topicCollection = (*client)[_databaseName][_topicCollectionName];
-            auto session = client->start_session();
-
-            try {
-                const long total = CountMessages(topicArn);
-                const long size = GetTopicSize(topicArn);
-
-                session.start_transaction();
-                topicCollection.update_one(make_document(kvp("topicArn", topicArn)),
-                                           make_document(kvp("$set",
-                                                             make_document(
-                                                                     kvp("size", bsoncxx::types::b_int64(size)),
-                                                                     kvp("attributes.availableMessages", bsoncxx::types::b_int64(total))))));
-                log_debug << topicArn << " total: " << total;
-                session.commit_transaction();
-            } catch (const mongocxx::exception &exc) {
-                session.abort_transaction();
-                log_error << "Database exception " << exc.what();
-                throw Core::DatabaseException(exc.what());
-            }
-        }*/
     }
 }// namespace AwsMock::Database

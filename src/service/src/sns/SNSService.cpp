@@ -97,10 +97,6 @@ namespace AwsMock::Service {
             // Update database
             const long deleted = _snsDatabase.PurgeTopic(topic);
             log_debug << "SNS topic prune, deleted: " << deleted;
-
-            // Adjust topic counters
-            //AdjustTopicCounters(topic);
-
             return deleted;
 
         } catch (bsoncxx::exception &ex) {
@@ -179,9 +175,6 @@ namespace AwsMock::Service {
 
             // Check subscriptions
             CheckSubscriptions(request);
-
-            // Adjust message counters
-            //AdjustTopicCounters(topic);
 
             return {.messageId = message.messageId, .requestId = request.requestId};
 

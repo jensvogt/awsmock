@@ -19,8 +19,8 @@ namespace AwsMock::Service {
         log_info << "SQS server starting";
 
         // Initialize shared memory
-        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
-        sqsCounterMap = segment.find<Database::SqsCounterMapType>(Database::SQS_COUNTER_MAP_NAME).first;
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _sqsCounterMap = _segment.find<Database::SqsCounterMapType>(Database::SQS_COUNTER_MAP_NAME).first;
 
         // Start SQS monitoring update counters
         scheduler.AddTask("monitoring-sqs-counters", [this] { this->UpdateCounter(); }, _counterPeriod);
@@ -104,10 +104,10 @@ namespace AwsMock::Service {
 
         log_trace << "SQS counter update starting";
 
-        if (sqsCounterMap) {
+        if (_sqsCounterMap) {
             long totalMessages = 0;
             long totalSize = 0;
-            for (auto const &[key, val]: *sqsCounterMap) {
+            for (auto const &[key, val]: *_sqsCounterMap) {
 
                 std::string labelValue = key;
                 Core::StringUtils::Replace(labelValue, "-", "_");
@@ -119,10 +119,10 @@ namespace AwsMock::Service {
                 totalSize += val.size;
                 _sqsDatabase.UpdateQueueCounter(key, val.messages, val.size, val.initial, val.invisible, val.delayed);
             }
-            _metricService.SetGauge(SQS_QUEUE_COUNT, static_cast<double>(sqsCounterMap->size()));
+            _metricService.SetGauge(SQS_QUEUE_COUNT, static_cast<double>(_sqsCounterMap->size()));
             _metricService.SetGauge(SQS_MESSAGE_COUNT, static_cast<double>(totalMessages));
         }
-        log_debug << "SQS monitoring finished, freeShmSize: " << segment.get_free_memory();
+        log_debug << "SQS monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
 
     void SQSServer::CollectWaitingTimeStatistics() const {
