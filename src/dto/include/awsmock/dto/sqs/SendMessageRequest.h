@@ -95,7 +95,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Delay seconds
          */
-        long delaySeconds;
+        long delaySeconds{};
 
         /**
          * Attributes (system attributes)

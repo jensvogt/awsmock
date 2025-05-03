@@ -10,18 +10,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct TagQueueRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct TagQueueRequest final : Common::BaseCounter<TagQueueRequest> {
 
         /**
          * Queue URL
@@ -33,36 +28,27 @@ namespace AwsMock::Dto::SQS {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend TagQueueRequest tag_invoke(boost::json::value_to_tag<TagQueueRequest>, boost::json::value const &v) {
+            TagQueueRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TagQueueRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TagQueueRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
-
-    typedef std::map<std::string, std::string> TagList;
 
 }// namespace AwsMock::Dto::SQS
 

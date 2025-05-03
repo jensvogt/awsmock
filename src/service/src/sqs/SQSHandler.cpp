@@ -50,14 +50,11 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
 
-                    Dto::SQS::SetQueueAttributesRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
-                    Dto::SQS::SetQueueAttributesResponse sqsResponse = _sqsService.SetQueueAttributes(sqsRequest);
+                    Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
+                    _sqsService.SetQueueAttributes(sqsRequest);
                     log_info << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl;
 
-                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_URL: {

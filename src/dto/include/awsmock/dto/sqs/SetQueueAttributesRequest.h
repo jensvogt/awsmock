@@ -10,19 +10,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct SetQueueAttributesRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct SetQueueAttributesRequest final : Common::BaseCounter<SetQueueAttributesRequest> {
 
         /**
          * Queue URL
@@ -34,43 +28,26 @@ namespace AwsMock::Dto::SQS {
          */
         std::map<std::string, std::string> attributes;
 
-        /**
-         * Resource
-         */
-        std::string resource = "SQS";
+      private:
 
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+        friend SetQueueAttributesRequest tag_invoke(boost::json::value_to_tag<SetQueueAttributesRequest>, boost::json::value const &v) {
+            SetQueueAttributesRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            if (Core::Json::AttributeExists(v, "Attributes")) {
+                r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("Attributes"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const SetQueueAttributesRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SetQueueAttributesRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

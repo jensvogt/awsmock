@@ -49,7 +49,7 @@ namespace AwsMock::Manager {
                         importRequest.cleanFirst = false;
                         importRequest.infrastructure = infrastructure;
                         Service::ModuleService::ImportInfrastructure(importRequest);
-                        log_info << "Loaded infrastructure from " << file;
+                        log_info << "Loaded infrastructure, filename: " << file;
                     }
                 }
             } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
@@ -60,7 +60,7 @@ namespace AwsMock::Manager {
                     importRequest.cleanFirst = false;
                     importRequest.infrastructure = infrastructure;
                     Service::ModuleService::ImportInfrastructure(importRequest);
-                    log_info << "Loaded infrastructure from " << autoLoadFile;
+                    log_info << "Loaded infrastructure, filename: " << autoLoadFile;
                 }
             }
         }

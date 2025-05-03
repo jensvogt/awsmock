@@ -9,10 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -21,55 +20,29 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PurgeQueueRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct PurgeQueueRequest final : Common::BaseCounter<PurgeQueueRequest> {
 
         /**
          * Queue URL
          */
         std::string queueUrl;
 
-        /**
-         * Resource
-         */
-        std::string resource = "Unknown resource";
+      private:
 
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+        friend PurgeQueueRequest tag_invoke(boost::json::value_to_tag<PurgeQueueRequest>, boost::json::value const &v) {
+            PurgeQueueRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PurgeQueueRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PurgeQueueRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

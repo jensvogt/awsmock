@@ -548,7 +548,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
+    void SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "set_queue_attributes");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
@@ -594,7 +594,6 @@ namespace AwsMock::Service {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
-        return {.resource = "sqs", .requestId = request.requestId};
     }
 
     void SQSService::SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {

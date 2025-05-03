@@ -25,6 +25,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             Core::Bson::BsonUtils::SetStringValue(itemDoc, "oid", oid);
             Core::Bson::BsonUtils::SetStringValue(itemDoc, "region", region);
             Core::Bson::BsonUtils::SetStringValue(itemDoc, "tableName", tableName);
+            Core::Bson::BsonUtils::SetLongValue(itemDoc, "size", size);
             Core::Bson::BsonUtils::SetDateValue(itemDoc, "created", created);
             Core::Bson::BsonUtils::SetDateValue(itemDoc, "modified", modified);
             Core::Bson::BsonUtils::SetDocumentValue(itemDoc, "attributes", attributesDoc);
@@ -44,6 +45,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
             region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
             tableName = Core::Bson::BsonUtils::GetStringValue(mResult, "tableName");
+            size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
@@ -90,6 +92,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
                     AttributeValue attribute;
                     attribute.FromDocument(mResult.view()[key].get_document().value);
                     attributes.emplace(key, attribute);
+                    size += static_cast<long>(attribute.ToString().size());
                 }
             }
             return *this;
