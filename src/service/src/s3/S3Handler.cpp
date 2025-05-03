@@ -271,7 +271,6 @@ namespace AwsMock::Service {
                     std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
                     bool chunked = Core::HttpUtils::HasHeaderValue(request, "Content-Encoding", "aws-chunked");
 
-                    Core::HttpUtils::DumpHeaders(request);
                     // S3 put object request
                     Dto::S3::PutObjectRequest putObjectRequest;
                     putObjectRequest.region = clientCommand.region;

@@ -157,16 +157,6 @@ namespace AwsMock::Controller {
             }
             CleanObjects(modules);
 
-        } else if (std::ranges::find(_commands, "show-ftp-users") != _commands.end()) {
-
-            if (_commands.size() != 2) {
-                std::cerr << "ServerId missing!";
-                return;
-            }
-
-            std::string serverId = _commands[1];
-            ShowFtpUsers(serverId);
-
         } else if (std::ranges::find(_commands, "ping") != _commands.end()) {
             PingManager();
         }
@@ -182,7 +172,7 @@ namespace AwsMock::Controller {
             return;
         }
 
-        std::vector<Dto::Module::Module> modules = Dto::Module::Module::FromJsonList(response.body);
+        const std::vector<Dto::Module::Module> modules = Dto::Module::Module::FromJsonList(response.body);
         std::cout << "Modules:" << std::endl;
         for (auto const &module: modules) {
             std::string sport = module.port > 0 ? std::to_string(module.port) : "";

@@ -65,7 +65,6 @@ void ShowHelp(const boost::program_options::options_description &desc) {
               << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
               << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
               << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
-              << std::left << std::setw(leftIndent) << "  show-ftp-users [serverId]" << ": shows the current ftp users of the given server." << std::endl
               << std::left << std::setw(leftIndent) << "  ping" << ": ping the manager." << std::endl
               << "\nExport options:\n"
               << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl

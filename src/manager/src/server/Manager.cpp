@@ -52,7 +52,7 @@ namespace AwsMock::Manager {
                         log_info << "Loaded infrastructure from " << file;
                     }
                 }
-            } else if (const std::string autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
+            } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
                     Dto::Module::Infrastructure infrastructure;
                     infrastructure.FromJson(jsonString);
