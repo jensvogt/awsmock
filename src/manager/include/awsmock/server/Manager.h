@@ -118,6 +118,8 @@ namespace AwsMock::Manager {
          */
         Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
 
+        std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
+
         /**
          * Global shared memory segment
          */
