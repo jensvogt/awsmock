@@ -18,25 +18,25 @@ namespace AwsMock::Service {
         }
         log_info << "SQS server starting";
 
+        // Initialize shared memory
+        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        sqsCounterMap = segment.find<Database::SqsCounterMapType>(Database::SQS_COUNTER_MAP_NAME).first;
+
         // Start SQS monitoring update counters
-        scheduler.AddTask("monitoring-sqs-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-sqs-counters", [this] { this->UpdateCounter(); }, _counterPeriod);
         scheduler.AddTask("monitoring-sqs-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod);
 
         // Start reset messages task
         scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod);
-        scheduler.AddTask("sqs-relocate-messages", [this] { this->RelocateMessages(); }, _resetPeriod);
+        //TODO: Check relocation scheme
+        //scheduler.AddTask("sqs-relocate-messages", [this] { this->RelocateMessages(); }, _resetPeriod);
         scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, _resetPeriod);
-        scheduler.AddTask("sqs-count-messages", [this] { this->AdjustCounters(); }, _counterPeriod);
+        //scheduler.AddTask("sqs-count-messages", [this] { this->AdjustCounters(); }, _counterPeriod);
 
         // Set running
         SetRunning();
 
         log_debug << "SQS server initialized";
-    }
-
-    void SQSServer::AdjustCounters() const {
-        _sqsDatabase.AdjustAllMessageCounters();
-        log_trace << "SQS adjust counter finished";
     }
 
     void SQSServer::ResetMessages() const {
@@ -52,7 +52,7 @@ namespace AwsMock::Service {
 
             if (const long messageCount = _sqsDatabase.CountMessages(queue.queueArn); messageCount > 0) {
 
-                // Check retention period
+                // Check the retention period
                 if (queue.attributes.messageRetentionPeriod > 0) {
                     queue.attributes.approximateNumberOfMessages -= _sqsDatabase.MessageRetention(queue.queueUrl, queue.attributes.messageRetentionPeriod);
                 }
@@ -65,32 +65,6 @@ namespace AwsMock::Service {
                 // Check delays
                 if (queue.attributes.delaySeconds > 0) {
                     queue.attributes.approximateNumberOfMessagesDelayed -= _sqsDatabase.ResetDelayedMessages(queue.queueUrl, queue.attributes.delaySeconds);
-                }
-
-                // Save results
-                queue = _sqsDatabase.UpdateQueue(queue);
-                log_trace << "Queue updated, queueName" << queue.name;
-            }
-        }
-        log_trace << "SQS reset messages finished, count: " << queueList.size();
-    }
-
-    void SQSServer::RelocateMessages() const {
-        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
-        log_trace << "SQS relocate messages starting, count: " << queueList.size();
-
-        if (queueList.empty()) {
-            return;
-        }
-
-        // Loop over queues and do some maintenance work
-        for (auto &queue: queueList) {
-
-            if (const long messageCount = _sqsDatabase.CountMessages(queue.queueArn); messageCount > 0) {
-
-                // Check retention period
-                if (queue.attributes.redrivePolicy.maxReceiveCount > 0) {
-                    queue.attributes.approximateNumberOfMessages -= _sqsDatabase.RelocateToDlqMessages(queue.queueUrl, queue.attributes.redrivePolicy);
                 }
 
                 // Save results
@@ -127,24 +101,28 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::UpdateCounter() const {
+
         log_trace << "SQS counter update starting";
 
-        // Get total counts
-        const long queues = _sqsDatabase.CountQueues();
-        const long messages = _sqsDatabase.CountMessages();
-        _metricService.SetGauge(SQS_QUEUE_COUNT, static_cast<double>(queues));
-        _metricService.SetGauge(SQS_MESSAGE_COUNT, static_cast<double>(messages));
+        if (sqsCounterMap) {
+            long totalMessages = 0;
+            long totalSize = 0;
+            for (auto const &[key, val]: *sqsCounterMap) {
 
-        // Count resources per queue
-        for (const auto &queue: _sqsDatabase.ListQueues()) {
+                std::string labelValue = key;
+                Core::StringUtils::Replace(labelValue, "-", "_");
 
-            std::string labelValue = queue.name;
-            Core::StringUtils::Replace(labelValue, "-", "_");
+                _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", labelValue, static_cast<double>(val.messages));
+                _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", labelValue, static_cast<double>(val.size));
 
-            _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "queue", labelValue, static_cast<double>(queue.attributes.approximateNumberOfMessages));
-            _metricService.SetGauge(SQS_QUEUE_SIZE, "queue", labelValue, static_cast<double>(queue.size));
+                totalMessages += val.messages;
+                totalSize += val.size;
+                _sqsDatabase.UpdateQueueCounter(key, val.messages, val.size, val.initial, val.invisible, val.delayed);
+            }
+            _metricService.SetGauge(SQS_QUEUE_COUNT, static_cast<double>(sqsCounterMap->size()));
+            _metricService.SetGauge(SQS_MESSAGE_COUNT, static_cast<double>(totalMessages));
         }
-        log_trace << "SQS counter update finished";
+        log_debug << "SQS monitoring finished, freeShmSize: " << segment.get_free_memory();
     }
 
     void SQSServer::CollectWaitingTimeStatistics() const {

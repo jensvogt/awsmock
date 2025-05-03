@@ -2,6 +2,9 @@
 // Created by vogje01 on 04/01/2023.
 //
 
+#include "awsmock/core/SharedMemoryUtils.h"
+
+
 #include <awsmock/service/s3/S3Server.h>
 
 namespace AwsMock::Service {
@@ -10,9 +13,8 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.s3.monitoring.period");
-        _syncPeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.object.period");
-        _sizePeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.bucket.period");
+        _syncPeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.period");
+        _counterPeriod = configuration.GetValue<int>("awsmock.modules.s3.counter.period");
 
         // Check module active
         if (!IsActive("s3")) {
@@ -20,22 +22,23 @@ namespace AwsMock::Service {
             return;
         }
 
+        // Initialize shared memory
+        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        s3CounterMap = segment.find<Database::S3CounterMapType>(Database::S3_COUNTER_MAP_NAME).first;
+
         // Start S3 monitoring counters updates
-        scheduler.AddTask("s3-monitoring-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("s3-counter-updates", [this] { UpdateCounter(); }, _counterPeriod);
 
         // Start synchronization of objects
         scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod);
-
-        // Start synchronization of buckets
-        scheduler.AddTask("s3-sync-buckets", [this] { SyncBuckets(); }, _syncPeriod);
 
         log_debug << "S3 server initialized";
     }
 
     void S3Server::SyncObjects() const {
 
-        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        const std::string s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
 
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
@@ -70,38 +73,27 @@ namespace AwsMock::Service {
         log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
     }
 
-    void S3Server::SyncBuckets() const {
-        const std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-
-        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
-        log_trace << "Bucket synchronization starting, bucketCount: " << buckets.size();
-
-        if (buckets.empty()) {
-            return;
-        }
-
-        // Loop over buckets and adjust bucket counters
-        for (auto &bucket: buckets) {
-            _s3Database.AdjustBucketCounters(region, bucket.name);
-        }
-        log_debug << "Bucket synchronized finished, bucketCount: " << buckets.size();
-    }
-
-    void S3Server::UpdateCounter() const {
+    void S3Server::UpdateCounter() {
         log_trace << "S3 Monitoring starting";
 
-        const long buckets = _s3Database.BucketCount();
-        const long objects = _s3Database.ObjectCount();
-        _metricService.SetGauge(S3_BUCKET_COUNT, static_cast<double>(buckets));
-        _metricService.SetGauge(S3_OBJECT_COUNT, static_cast<double>(objects));
+        if (s3CounterMap) {
+            long totalKeys = 0;
+            long totalSize = 0;
+            for (auto const &[key, val]: *s3CounterMap) {
 
-        // Count resources per topic
-        for (const auto &bucket: _s3Database.ListBuckets()) {
-            std::string labelValue = bucket.name;
-            Core::StringUtils::Replace(labelValue, "-", "_");
-            const long objectsPerBuckets = _s3Database.ObjectCount(bucket.region, bucket.name);
-            _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(objectsPerBuckets));
+                std::string labelValue = key;
+                Core::StringUtils::Replace(labelValue, "-", "_");
+
+                _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.keys));
+                _metricService.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.size));
+
+                totalKeys += val.keys;
+                totalSize += val.size;
+                _s3Database.UpdateBucketCounter(key, val.keys, val.size);
+            }
+            _metricService.SetGauge(S3_BUCKET_COUNT, static_cast<double>(s3CounterMap->size()));
+            _metricService.SetGauge(S3_OBJECT_COUNT, static_cast<double>(totalKeys));
         }
-        log_trace << "S3 monitoring finished";
+        log_debug << "S3 monitoring finished, freeShmSize: " << segment.get_free_memory();
     }
 }// namespace AwsMock::Service

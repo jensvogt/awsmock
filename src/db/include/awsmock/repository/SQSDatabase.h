@@ -8,6 +8,12 @@
 // C++ standard includes
 #include <string>
 
+// Boost includes
+#include <boost/container/map.hpp>
+#include <boost/container/string.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -15,7 +21,9 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -27,10 +35,21 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
     using std::chrono::system_clock;
+
+    struct QueueMonitoringCounter {
+        long initial{};
+        long invisible{};
+        long delayed{};
+        long messages{};
+        long size{};
+        system_clock::time_point modified = system_clock::now();
+    };
+
+    using SqsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, QueueMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using SqsCounterMapType = boost::container::map<std::string, QueueMonitoringCounter, std::less<std::string>, SqsShmAllocator>;
+
+    static constexpr auto SQS_COUNTER_MAP_NAME = "SqsQueueCounter";
 
     /**
      * @brief SQS MongoDB database.
@@ -215,6 +234,20 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SQS::Queue CreateOrUpdateQueue(Entity::SQS::Queue &queue) const;
+
+        /**
+         * @brief Updates the counters of a queue
+         *
+         * @param queueArn queue ARN
+         * @param messages number of keys
+         * @param size bucket size
+         * @param initial messages in status INITIAL
+         * @param invisible messages in status INVISIBLE
+         * @param delayed messages in status DELAYED
+         * @return created bucket entity
+         * @throws DatabaseException
+         */
+        void UpdateQueueCounter(const std::string &queueArn, long messages, long size, long initial, long invisible, long delayed) const;
 
         /**
          * @brief Count the number of queues for a given region.
@@ -480,18 +513,6 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] long DeleteAllMessages() const;
 
-        /**
-         * @brief Adjust all message counters
-         */
-        void AdjustAllMessageCounters() const;
-
-        /**
-         * @brief Adjust message counters for a single queue
-         *
-         * @param queueArn AWS queue ARN
-         */
-        void AdjustMessageCounters(const std::string &queueArn) const;
-
       private:
 
         /**
@@ -513,6 +534,15 @@ namespace AwsMock::Database {
          * SQS in-memory database
          */
         SQSMemoryDb &_memoryDb;
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory segment;
+
+        /**
+         * Map of monitoring counters
+         */
+        SqsCounterMapType *sqsCounterMap;
     };
 
 }// namespace AwsMock::Database

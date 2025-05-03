@@ -1451,14 +1451,14 @@ namespace AwsMock::FtpServer {
         std::string contentType = Core::FileUtils::GetContentType(fileName, key);
         long contentLength = Core::FileUtils::FileSize(fileName);
 
-        Dto::S3::PutObjectRequest request = {
-                .region = _region,
-                .bucket = _bucket,
-                .key = key,
-                .owner = user,
-                .contentType = contentType,
-                .contentLength = contentLength,
-                .metadata = metadata};
+        Dto::S3::PutObjectRequest request;
+        request.region = _region;
+        request.bucket = _bucket;
+        request.key = key;
+        request.owner = user;
+        request.contentType = contentType;
+        request.contentLength = contentLength;
+        request.metadata = metadata;
 
         std::ifstream ifs(fileName, std::ios::binary);
         _s3Service->PutObject(request, ifs);

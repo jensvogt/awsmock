@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/memorydb/SQSMemoryDb.h>
+#include <queue>
 
 namespace AwsMock::Database {
 
@@ -172,6 +173,21 @@ namespace AwsMock::Database {
         return _queues[it->first];
     }
 
+    void SQSMemoryDb::UpdateQueueCounter(const std::string &queueArn, const long keys, const long size, long initial, const long invisible, const long delayed) {
+        boost::mutex::scoped_lock lock(_sqsQueueMutex);
+
+        const auto it = std::ranges::find_if(_queues,
+                                             [queueArn](const std::pair<std::string, Entity::SQS::Queue> &queue) {
+                                                 return queue.second.queueArn == queueArn;
+                                             });
+        if (it != _queues.end()) {
+            it->second.size = size;
+            it->second.attributes.approximateNumberOfMessages = keys;
+            it->second.attributes.approximateNumberOfMessagesNotVisible = invisible;
+            it->second.attributes.approximateNumberOfMessagesDelayed = delayed;
+        }
+    }
+
     long SQSMemoryDb::CountQueues(const std::string &prefix, const std::string &region) const {
 
         long count = 0;
@@ -329,7 +345,7 @@ namespace AwsMock::Database {
         return messageList;
     }
 
-    void SQSMemoryDb::ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList) {
+    void SQSMemoryDb::ReceiveMessages(const std::string &queueArn, const long visibility, const long maxResult, const std::string &dlQueueArn, long maxRetries, Entity::SQS::MessageList &messageList) {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         const auto reset = system_clock::now() + std::chrono::seconds{visibility};
@@ -462,7 +478,7 @@ namespace AwsMock::Database {
         long count = 0;
         if (queueArn.empty()) {
 
-            count = _messages.size();
+            count = static_cast<long>(_messages.size());
 
         } else {
 
@@ -476,12 +492,11 @@ namespace AwsMock::Database {
         return count;
     }
 
-    long SQSMemoryDb::CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status) {
+    long SQSMemoryDb::CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) {
 
         long count = 0;
-
-        for (auto it = _messages.begin(); it != _messages.end(); ++it) {
-            if (it->second.queueArn == queueArn && it->second.status == status) {
+        for (auto &val: _messages | std::views::values) {
+            if (val.queueArn == queueArn && val.status == status) {
                 count++;
             }
         }
@@ -492,7 +507,7 @@ namespace AwsMock::Database {
     Entity::SQS::MessageWaitTime SQSMemoryDb::GetAverageMessageWaitingTime() {
 
         Entity::SQS::MessageWaitTime waitTime{};
-        for (Entity::SQS::QueueList queueList = ListQueues(); const auto &queue: queueList) {
+        for (const Entity::SQS::QueueList queueList = ListQueues(); const auto &queue: queueList) {
 
             // Extract map values
             std::vector<Entity::SQS::Message> filtered;

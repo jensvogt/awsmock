@@ -11,13 +11,13 @@
 
 // Boost includes
 #include <boost/container/map.hpp>
+#include <boost/container/string.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Bucket.h>
@@ -29,23 +29,17 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
+
     struct BucketMonitoringCounter {
-        long keys;
-        long size;
-        system_clock::time_point modified;
+        long keys{};
+        long size{};
+        system_clock::time_point modified = system_clock::now();
     };
 
-    // Type definitions moved to class scope for better organization
-    using MonitoringValue = BucketMonitoringCounter;
-    using MonitoringKey = std::string;
-    using MonitoringPair = std::pair<MonitoringKey, MonitoringValue>;
-    using SharedMemoryAllocator = boost::interprocess::allocator<MonitoringPair, boost::interprocess::managed_shared_memory::segment_manager>;
-    using MonitoringMap = boost::container::map<MonitoringKey, MonitoringValue, std::less<>, SharedMemoryAllocator>;
+    using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, BucketMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using S3CounterMapType = boost::container::map<std::string, BucketMonitoringCounter, std::less<std::string>, S3ShmAllocator>;
 
-    static constexpr const char *SHARED_MEMORY_NAME = "Monitoring";
-    static constexpr const char *DEFAULT_BUCKET_NAME = "Bucket";
-    static constexpr int INITIAL_BUCKET_COUNT = 100;
-
+    static constexpr auto S3_COUNTER_MAP_NAME = "S3BucketCounter";
 
     /**
      * @brief S3 MongoDB database.
@@ -77,7 +71,7 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const std::string &region, const std::string &name) const;
+        [[nodiscard]] bool BucketExists(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Bucket exists
@@ -203,14 +197,13 @@ namespace AwsMock::Database {
         /**
          * @brief Updates a bucket
          *
-         * @param region AWS region
-         * @param bucket bucket entity
+         * @param bucketArn bucker ARN
          * @param keys number of keys
          * @param size bucket size
          * @return created bucket entity
          * @throws DatabaseException
          */
-        void UpdateBucketCounter(const std::string &region, const std::string &bucket, long keys, long size) const;
+        void UpdateBucketCounter(const std::string &bucketArn, long keys, long size) const;
 
         /**
          * @brief Returns the total bucket size.
@@ -220,13 +213,6 @@ namespace AwsMock::Database {
          * @return bucket size in bytes
          */
         long GetBucketSize(const std::string &region, const std::string &bucket) const;
-
-        /**
-         * @brief Adjust the bucket counters
-         * @param region AWS region
-         * @param bucketName bucket name
-         */
-        void AdjustBucketCounters(const std::string &region, const std::string &bucketName) const;
 
         /**
          * @brief Create a new bucket or updated a existing bucket
@@ -349,7 +335,7 @@ namespace AwsMock::Database {
         Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
 
         /**
-         * @brief Gets an object from an bucket
+         * @brief Gets an object from a bucket
          *
          * @param oid object ID
          * @return S3 object
@@ -358,7 +344,7 @@ namespace AwsMock::Database {
         Entity::S3::Object GetObjectById(bsoncxx::oid oid) const;
 
         /**
-         * @brief Gets an object from an bucket
+         * @brief Gets an object from a bucket
          *
          * @param oid object ID
          * @return S3 object
@@ -374,14 +360,6 @@ namespace AwsMock::Database {
          * @return ObjectList
          */
         Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
-
-        // /**
-        //  * @brief List all objects.
-        //  *
-        //  * @param prefix S3 key prefix
-        //  * @return ObjectList
-        //  */
-        //Entity::S3::ObjectList ListObjects(const std::string &prefix = {});
 
         /**
          * @brief List all objects.
@@ -402,15 +380,15 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @param prefix key prefix
          * @param bucket bucket name
-         * @return number of object in bucket
+         * @return number of objects in bucket
          * @throws DatabaseException
          */
         long ObjectCount(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}) const;
 
         /**
-         * @brief Creates a bucket notification-
+         * @brief Creates a bucket notification
          *
-         * <p>In case of a wildcard notification all notifications are added.</p>
+         * <p>In case of a wildcard notification, all notifications are added.</p>
          *
          * @param bucket S3 bucket
          * @param bucketNotification bucket notification
@@ -453,16 +431,17 @@ namespace AwsMock::Database {
         /**
          * @brief Updates an existing object in the S3 object table
          *
-         * @param bucket bucket to delete from
+         * @param region AWS region
+         * @param bucketName bucket to delete from
          * @param keys vector of object keys
          * @throws DatabaseException
          */
-        void DeleteObjects(const std::string &bucket, const std::vector<std::string> &keys = {}) const;
+        void DeleteObjects(const std::string &region, const std::string &bucketName, const std::vector<std::string> &keys = {}) const;
 
         /**
          * @brief Deletes all objects
          *
-         * @retrun number of objects deleted.
+         * @return number of objects deleted.
          */
         long DeleteAllObjects() const;
 
@@ -492,6 +471,16 @@ namespace AwsMock::Database {
          * S3 in-memory database
          */
         S3MemoryDb &_memoryDb;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory segment;
+
+        /**
+         * Map of monitoring counters
+         */
+        S3CounterMapType *s3CounterMap;
     };
 
 }// namespace AwsMock::Database

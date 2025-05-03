@@ -82,6 +82,16 @@ namespace AwsMock::Service {
          * @brief SNS monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::SnsCounterMapType *snsCounterMap{};
     };
 
 }// namespace AwsMock::Service

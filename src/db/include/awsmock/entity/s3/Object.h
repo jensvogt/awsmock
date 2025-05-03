@@ -59,6 +59,11 @@ namespace AwsMock::Database::Entity::S3 {
         std::string bucket;
 
         /**
+         * Bucket ARN
+         */
+        std::string bucketArn;
+
+        /**
          * Object key
          */
         std::string key;

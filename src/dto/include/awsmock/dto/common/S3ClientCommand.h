@@ -195,6 +195,11 @@ namespace AwsMock::Dto::Common {
         std::string host;
 
         /**
+         * Content MD5 sum
+         */
+        std::string contentMd5;
+
+        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string

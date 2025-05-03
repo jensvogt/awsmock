@@ -513,14 +513,6 @@ namespace AwsMock::Service {
         static void PutLambdaNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::LambdaConfiguration> &lambdaConfigurations);
 
         /**
-         * @brief Adjusts the key counter in the bucket.
-         *
-         * @param region AWS region
-         * @param bucket name of the bucket
-         */
-        void AdjustBucketCounters(const std::string &region, const std::string &bucket) const;
-
-        /**
          * Database connection
          */
         Database::S3Database &_database;

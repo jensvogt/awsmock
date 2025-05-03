@@ -9,13 +9,21 @@
 #include <string>
 #include <vector>
 
+// Boost includes
+#include <boost/container/map.hpp>
+#include <boost/container/string.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
@@ -25,11 +33,21 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::builder::stream::document;
     using std::chrono::system_clock;
+
+    struct TopicMonitoringCounter {
+        long initial{};
+        long send{};
+        long resend{};
+        long messages{};
+        long size{};
+        system_clock::time_point modified = system_clock::now();
+    };
+
+    using SnsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, TopicMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using SnsCounterMapType = boost::container::map<std::string, TopicMonitoringCounter, std::less<std::string>, SnsShmAllocator>;
+
+    static constexpr auto SNS_COUNTER_MAP_NAME = "SnsBucketCounter";
 
     /**
      * @brief SNS MongoDB database.
@@ -215,7 +233,21 @@ namespace AwsMock::Database {
          * @param topicArn AWS topic ARN
          * @return total size of the topic
          */
-        long GetTopicSize(const std::string &topicArn) const;
+        [[nodiscard]] long GetTopicSize(const std::string &topicArn) const;
+
+        /**
+         * @brief Updates the counters of a topic
+         *
+         * @param topicArn topic ARN
+         * @param messages number of keys
+         * @param size bucket size
+         * @param initial messages in status INITIAL
+         * @param send messages in status SEND
+         * @param resend messages in status RESEND
+         * @return created bucket entity
+         * @throws DatabaseException
+         */
+        void UpdateTopicCounter(const std::string &topicArn, long messages, long size, long initial, long send, long resend) const;
 
         /**
          * @brief Deletes a topic.
@@ -233,10 +265,10 @@ namespace AwsMock::Database {
         long DeleteAllTopics() const;
 
         /**
-         * @brief Check existence of message
+         * @brief Check the existence of message
          *
          * @param messageId message ID
-         * @return true if message already exists
+         * @return true if the message already exists
          * @throws DatabaseException
          */
         bool MessageExists(const std::string &messageId) const;
@@ -269,7 +301,7 @@ namespace AwsMock::Database {
         [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid) const;
 
         /**
-         * @brief Count the number of message by ARN
+         * @brief Count the number of messages by ARN
          *
          * @param topicArn URL of the topic
          * @return number of available messages
@@ -285,13 +317,12 @@ namespace AwsMock::Database {
         long CountMessagesSize(const std::string &topicArn = {}) const;
 
         /**
-         * @brief Count the number of message by state
+         * @brief Count the number of messages by state
          *
-         * @param region AWS region
          * @param topicArn ARN of the topic
          * @param status message status
          */
-        long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) const;
+        long CountMessagesByStatus(const std::string &topicArn, Entity::SNS::MessageStatus status) const;
 
         /**
          * @brief Paged list all available messages
@@ -304,7 +335,7 @@ namespace AwsMock::Database {
          * @return list of SNS messages
          * @throws DatabaseException
          */
-        Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Updates an existing message
@@ -345,10 +376,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param topicArn topic ARN
-         * @param receipts vector of receipts
+         * @param messageIds vector of receipts
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts) const;
+        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const;
 
         /**
          * @brief Deletes old resources message.
@@ -399,6 +430,16 @@ namespace AwsMock::Database {
          * SNS in-memory database
          */
         SNSMemoryDb &_memoryDb;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory segment;
+
+        /**
+         * Map of monitoring counters
+         */
+        SnsCounterMapType *snsCounterMap;
     };
 
 }// namespace AwsMock::Database

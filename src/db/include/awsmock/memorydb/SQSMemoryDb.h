@@ -179,6 +179,20 @@ namespace AwsMock::Database {
         Entity::SQS::Queue UpdateQueue(Entity::SQS::Queue &queue);
 
         /**
+         * @brief Updates the counters of a queue
+         *
+         * @param queueArn queue ARN
+         * @param keys number of keys
+         * @param size bucket size
+         * @param initial messages in status INITIAL
+         * @param invisible messages in status INVISIBLE
+         * @param delayed messages in status DELAYED
+         * @return created bucket entity
+         * @throws DatabaseException
+         */
+        void UpdateQueueCounter(const std::string &queueArn, long keys, long size, long initial, long invisible, long delayed);
+
+        /**
          * @brief Count the number of queues for a given region.
          *
          * @param prefix queue name prefix
@@ -275,7 +289,7 @@ namespace AwsMock::Database {
          * @param maxRetries maximal number of retries
          * @param messageList message list
          */
-        void ReceiveMessages(const std::string &queueArn, int visibility, int maxResult, const std::string &dlQueueArn, int maxRetries, Entity::SQS::MessageList &messageList);
+        void ReceiveMessages(const std::string &queueArn, long visibility, long maxResult, const std::string &dlQueueArn, long maxRetries, Entity::SQS::MessageList &messageList);
 
         /**
          * @brief Reset expired resources
@@ -352,7 +366,7 @@ namespace AwsMock::Database {
          * @param queueArn ARN of the queue
          * @param status message state
          */
-        long CountMessagesByStatus(const std::string &queueArn, Entity::SQS::MessageStatus status);
+        long CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status);
 
         /**
          * @brief Returns the average waiting time for messages in the given queue

@@ -24,6 +24,7 @@ namespace AwsMock::Dto::Common {
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);
+        this->contentMd5 = Core::HttpUtils::GetHeaderValue(request, "Content-MD5");
 
         // Core values
         bucket = Core::AwsUtils::GetS3BucketName(request);

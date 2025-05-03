@@ -33,32 +33,15 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Adjust queue counters during startup.
-         *
-         * @par
-         * This is only done once per startup, do synchronize the current state of the messages to the queue counters. All following message
-         * operations (send, delete, purge etc.) will adjust the queue counters by itself.
-         */
-        void AdjustCounters() const;
-
-        /**
          * @brief Reset resources
          *
          * @par
-         * Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also the retry count in increased by one.
+         * Loops over all SQS queues and sets the state to INITIAL in case the visibilityTimeout timeout has been reached. Also, the retry count is increased by one.
          *
          * @par
          * Checks also the expiration date and removed the resources, which are older than the max retention period.
          */
         void ResetMessages() const;
-
-        /**
-         * @brief Reset resources
-         *
-         * @par
-         * Loops over all SQS queues and check the redrive policy for messages which needs to be sent to the DLQ.
-         */
-        void RelocateMessages() const;
 
         /**
          * @brief Collect waiting time statistics
@@ -102,6 +85,16 @@ namespace AwsMock::Service {
          * SQS adjust counter period
          */
         int _counterPeriod;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::SqsCounterMapType *sqsCounterMap{};
     };
 
 }// namespace AwsMock::Service

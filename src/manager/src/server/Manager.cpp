@@ -40,7 +40,7 @@ namespace AwsMock::Manager {
 
     void Manager::AutoLoad() {
         if (Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
-            if (const std::string autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
+            if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
                 for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
                     if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
                         Dto::Module::Infrastructure infrastructure;
@@ -119,7 +119,8 @@ namespace AwsMock::Manager {
     void Manager::CreateSharedMemorySegment() {
 
         // Create a managed shared memory segment.
-        // shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::create_only, "Monitoring", 65536);
+        boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_SEGMENT_NAME);
+        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, 65536);
     }
 
     void Manager::Run() {

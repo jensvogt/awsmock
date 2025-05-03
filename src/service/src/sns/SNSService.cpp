@@ -99,7 +99,7 @@ namespace AwsMock::Service {
             log_debug << "SNS topic prune, deleted: " << deleted;
 
             // Adjust topic counters
-            AdjustTopicCounters(topic);
+            //AdjustTopicCounters(topic);
 
             return deleted;
 
@@ -181,7 +181,7 @@ namespace AwsMock::Service {
             CheckSubscriptions(request);
 
             // Adjust message counters
-            AdjustTopicCounters(topic);
+            //AdjustTopicCounters(topic);
 
             return {.messageId = message.messageId, .requestId = request.requestId};
 
@@ -720,7 +720,7 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             // Adjust topic counters
-            AdjustTopicCounters(topic);
+            //AdjustTopicCounters(topic);
             log_trace << "SNS topic counter adjusted, topicArn: " << request.topicArn;
 
         } catch (bsoncxx::exception &ex) {

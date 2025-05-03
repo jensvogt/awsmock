@@ -2,6 +2,9 @@
 // Created by vogje01 on 5/10/24.
 //
 
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 
 namespace AwsMock::Dto::SQS {
@@ -67,8 +70,8 @@ namespace AwsMock::Dto::SQS {
         messageDto.body = messageEntity.body;
         messageDto.attributes = messageEntity.attributes;
         messageDto.messageAttributes = map(messageEntity.messageAttributes);
-        messageDto.md5OfBody = messageEntity.md5Body;
-        messageDto.md5OfMessageAttributes = messageEntity.md5MessageAttributes;
+        messageDto.md5OfBody = Database::SqsUtils::CreateMd5OfMessageBody(messageEntity.body);
+        messageDto.md5OfMessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(messageEntity.messageAttributes);
         return messageDto;
     }
 

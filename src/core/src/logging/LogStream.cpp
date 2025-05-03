@@ -120,11 +120,17 @@ namespace AwsMock::Core {
 
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {
         file_sink = add_file_log(
-                boost::log::keywords::file_name = dir + FileUtils::separator() + prefix + "-%N.log",
+                boost::log::keywords::file_name = dir + FileUtils::separator() + prefix + ".log",
                 boost::log::keywords::rotation_size = size,
-                boost::log::keywords::max_files = count,
+                boost::log::keywords::target_file_name = prefix + "_%N.log",
                 boost::log::keywords::format = &LogFormatter);
 
+        const auto be = file_sink->locked_backend();
+        be->set_file_collector(boost::log::sinks::file::make_collector(
+                boost::log::keywords::target = dir,
+                boost::log::keywords::max_files = count));
+
+        be->scan_for_files();
         log_info << "Start logging to file, dir:" << logDir << ", prefix: " << logPrefix << " size: " << logSize << " count: " << logCount;
     }
 }// namespace AwsMock::Core

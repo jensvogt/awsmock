@@ -436,13 +436,8 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
             const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
             const long count = _sqsDatabase.RedriveMessages(originalQueue, dqlQueue);
-
-            // Update queue counter
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
-            _sqsDatabase.AdjustMessageCounters(originalQueue.queueArn);
-            log_trace << "SQS queue counter updated, queueArn: " << request.queueArn;
-
             return count;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -808,8 +803,6 @@ namespace AwsMock::Service {
             message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
 
             // Update database
-            queue.attributes.approximateNumberOfMessages++;
-            queue = _sqsDatabase.UpdateQueue(queue);
             message = _sqsDatabase.CreateMessage(message);
             log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
 
@@ -1043,9 +1036,6 @@ namespace AwsMock::Service {
             // Check lambda notification
             CheckLambdaNotifications(request.queueArn, message);
 
-            // Adjust message counters
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
-
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1068,6 +1058,7 @@ namespace AwsMock::Service {
             // Delete from database
             const long deleted = _sqsDatabase.DeleteMessage(message);
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << " deleted: " << deleted;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

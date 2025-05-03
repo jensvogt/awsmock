@@ -12,6 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>
@@ -93,10 +94,10 @@ namespace AwsMock::Manager {
          * @par
          * Gateway and monitoring are a bit special, as they are not modules, but they still exists in the module database.
          */
-        void LoadModulesFromConfiguration();
+        static void LoadModulesFromConfiguration();
 
         /**
-         * @brief Ensures that the modules exists
+         * @brief Ensures that the module exists
          *
          * @param key module key
          */
@@ -117,6 +118,9 @@ namespace AwsMock::Manager {
          */
         Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
 
+        /**
+         * Global shared memory segment
+         */
         std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 
         /**

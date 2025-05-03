@@ -180,16 +180,15 @@ namespace AwsMock::Database {
         Entity::S3::Bucket UpdateBucket(const Entity::S3::Bucket &bucket);
 
         /**
-         * @brief Updates a bucket
+         * @brief Updates the counters of a bucket
          *
-         * @param region AWS region
-         * @param bucket bucket entity
+         * @param bucketArn bucker ARN
          * @param keys number of keys
          * @param size bucket size
          * @return created bucket entity
          * @throws DatabaseException
          */
-        void UpdateBucketCounter(const std::string &region, const std::string &bucket, long keys, long size);
+        void UpdateBucketCounter(const std::string &bucketArn, long keys, long size);
 
         /**
          * @brief List all objects.
@@ -197,7 +196,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &prefix = {}) const;
+        [[nodiscard]] Entity::S3::ObjectList ListObjects(const std::string &prefix = {}) const;
 
         /**
          * @brief Gets a list of versioned objects

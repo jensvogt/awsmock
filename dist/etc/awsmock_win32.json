@@ -41,16 +41,11 @@
       "s3": {
         "active": true,
         "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\s3",
-        "monitoring": {
-          "period": "900"
+        "counter": {
+          "period": 10
         },
         "sync": {
-          "object": {
-            "period": 3600
-          },
-          "bucket": {
-            "period": 300
-          }
+          "period": 3600
         }
       },
       "sqs": {
@@ -62,7 +57,7 @@
           "period": 30
         },
         "counter": {
-          "period": 30
+          "period": 10
         },
         "receive-poll": 1000
       },
@@ -76,7 +71,7 @@
           "period": 300
         },
         "counter": {
-          "period": 300
+          "period": 10
         }
       },
       "lambda": {

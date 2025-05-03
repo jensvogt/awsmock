@@ -5,8 +5,25 @@
 #include <awsmock/repository/SNSDatabase.h>
 
 namespace AwsMock::Database {
-    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"),
-                                 _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
+    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
+
+        segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        snsCounterMap = segment.find<SnsCounterMapType>(SNS_COUNTER_MAP_NAME).first;
+        if (!snsCounterMap) {
+            snsCounterMap = segment.construct<SnsCounterMapType>(SNS_COUNTER_MAP_NAME)(std::less<std::string>(), segment.get_segment_manager());
+        }
+
+        // Initialize the counters
+        for (const auto &topic: ListTopics()) {
+            TopicMonitoringCounter counter;
+            counter.initial = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
+            counter.resend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
+            counter.send = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
+            counter.messages = CountMessages(topic.topicArn);
+            counter.size = GetTopicSize(topic.topicArn);
+            snsCounterMap->insert_or_assign(topic.topicArn, counter);
+        }
+        log_debug << "SNS queues counters initialized" << snsCounterMap->size();
     }
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {
@@ -55,17 +72,17 @@ namespace AwsMock::Database {
                 const auto result = _topicCollection.insert_one(topic.ToDocument());
                 session.commit_transaction();
                 log_trace << "Topic created, oid: " << result->inserted_id().get_oid().value.to_string();
-
                 topic.oid = result->inserted_id().get_oid().value.to_string();
-                return topic;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            topic = _memoryDb.CreateTopic(topic);
         }
-        return _memoryDb.CreateTopic(topic);
+        return topic;
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicById(bsoncxx::oid oid) const {
@@ -170,10 +187,7 @@ namespace AwsMock::Database {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
-                for (auto queueCursor = _topicCollection.find(
-                             make_document(kvp("subscriptions.subscriptionArn", subscriptionArn)));
-                     auto topic:
-                     queueCursor) {
+                for (auto queueCursor = _topicCollection.find(make_document(kvp("subscriptions.subscriptionArn", subscriptionArn))); const auto topic: queueCursor) {
                     Entity::SNS::Topic result;
                     result.FromDocument(topic);
                     topicList.push_back(result);
@@ -229,7 +243,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _queueCollection = (*client)[_databaseName][_topicCollectionName];
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
                 if (!prefix.empty()) {
                     query.append(kvp("topicName", make_document(kvp("$regex", "^" + prefix))));
                 }
@@ -246,9 +260,9 @@ namespace AwsMock::Database {
 
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
-                    bsoncxx::builder::basic::document sort;
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    document sort;
+                    for (const auto [column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -277,13 +291,13 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _queueCollection = (*client)[_databaseName][_topicCollectionName];
 
-                const bsoncxx::builder::basic::document query = {};
+                const document query = {};
 
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
-                    bsoncxx::builder::basic::document sort;
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    document sort;
+                    for (const auto [column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -345,6 +359,44 @@ namespace AwsMock::Database {
         return CreateTopic(topic);
     }
 
+    void SNSDatabase::UpdateTopicCounter(const std::string &topicArn, const long messages, const long size, const long initial, const long send, const long resend) const {
+
+        if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_topicCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+
+                document filterQuery;
+                filterQuery.append(kvp("topicArn", topicArn));
+
+                document setQuery;
+                setQuery.append(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
+                setQuery.append(kvp("messages", static_cast<bsoncxx::types::b_int64>(messages)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                log_trace << "SNS topic counter updated";
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        _memoryDb.UpdateTopicCounter(topicArn, messages, size, initial, send, resend);
+    }
+
     void SNSDatabase::ImportTopic(Entity::SNS::Topic &topic) const {
 
         topic.topicAttribute.availableMessages = 0;
@@ -379,6 +431,8 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::PurgeTopic(const Entity::SNS::Topic &topic) const {
+
+        long purged = 0;
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_messageCollectionName];
@@ -389,18 +443,25 @@ namespace AwsMock::Database {
                 const auto result = _topicCollection.delete_many(make_document(kvp("topicArn", topic.topicArn)));
                 log_debug << "Topic purge, count: " << result->deleted_count();
                 session.commit_transaction();
+                purged = result->deleted_count();
 
-                // Adjust all topic message counters
-                AdjustMessageCounters(topic.topicArn);
-
-                return result->deleted_count();
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            purged = _memoryDb.PurgeTopic(topic);
         }
-        return _memoryDb.PurgeTopic(topic);
+
+        // Update the counter-map
+        (*snsCounterMap)[topic.topicArn].size = 0;
+        (*snsCounterMap)[topic.topicArn].messages = 0;
+        (*snsCounterMap)[topic.topicArn].initial = 0;
+        (*snsCounterMap)[topic.topicArn].send = 0;
+        (*snsCounterMap)[topic.topicArn].resend = 0;
+
+        return purged;
     }
 
     long SNSDatabase::GetTopicSize(const std::string &topicArn) const {
@@ -445,9 +506,14 @@ namespace AwsMock::Database {
         } else {
             _memoryDb.DeleteTopic(topic);
         }
+
+        // Update counter-map
+        snsCounterMap->erase(topic.topicArn);
     }
 
     long SNSDatabase::DeleteAllTopics() const {
+
+        long deleted = 0;
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
@@ -458,15 +524,20 @@ namespace AwsMock::Database {
                 const auto result = _topicCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All topics deleted, count: " << result->deleted_count();
-                return result->deleted_count();
+                deleted = result->deleted_count();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         } else {
-            return _memoryDb.DeleteAllTopics();
+            deleted = _memoryDb.DeleteAllTopics();
         }
+
+        // Update the counter-map
+        snsCounterMap->clear();
+        return deleted;
     }
 
     bool SNSDatabase::MessageExists(const std::string &messageId) const {
@@ -496,19 +567,22 @@ namespace AwsMock::Database {
                 const auto result = _messageCollection.insert_one(message.ToDocument());
                 log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
-
-                // Adjust all topic message counters
-                AdjustMessageCounters(message.topicArn);
-
                 message.oid = result->inserted_id().get_oid().value.to_string();
-                return message;
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            message = _memoryDb.CreateMessage(message);
         }
-        return _memoryDb.CreateMessage(message);
+
+        // Update counter map
+        (*snsCounterMap)[message.topicArn].size += message.size;
+        (*snsCounterMap)[message.topicArn].messages++;
+        (*snsCounterMap)[message.topicArn].initial++;
+        return message;
     }
 
     Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) const {
@@ -552,25 +626,23 @@ namespace AwsMock::Database {
         return _memoryDb.CountMessages(topicArn);
     }
 
-    long SNSDatabase::CountMessagesByStatus(const std::string &region,
-                                            const std::string &topicArn,
-                                            Entity::SNS::MessageStatus status) const {
+    long SNSDatabase::CountMessagesByStatus(const std::string &topicArn, const Entity::SNS::MessageStatus status) const {
+
         if (HasDatabase()) {
             try {
+
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
-                const long count = _messageCollection.count_documents(make_document(
-                        kvp("region", region),
-                        kvp("topicArn", topicArn),
-                        kvp("status", MessageStatusToString(status))));
-                log_trace << "Count resources by state, region: " << region << " arn: " << topicArn << " result: " << count;
+                const long count = _messageCollection.count_documents(make_document(kvp("topicArn", topicArn), kvp("status", MessageStatusToString(status))));
+                log_trace << "Count resources by state, arn: " << topicArn << " result: " << count;
                 return count;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         }
-        return _memoryDb.CountMessagesByStatus(region, topicArn, status);
+        return _memoryDb.CountMessagesByStatus(topicArn, status);
     }
 
     long SNSDatabase::CountMessagesSize(const std::string &topicArn) const {
@@ -600,12 +672,10 @@ namespace AwsMock::Database {
         return _memoryDb.CountMessages(topicArn);
     }
 
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region,
-                                                       const std::string &topicArn,
-                                                       int pageSize,
-                                                       int pageIndex,
-                                                       const std::vector<SortColumn> &sortColumns) const {
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
+
         if (HasDatabase()) {
+
             Entity::SNS::MessageList messageList;
 
             auto client = ConnectionPool::instance().GetConnection();
@@ -618,7 +688,7 @@ namespace AwsMock::Database {
             if (pageIndex > 0) {
                 opts.skip(pageIndex * pageSize);
             }
-            bsoncxx::builder::basic::document query = {};
+            document query = {};
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }
@@ -627,9 +697,9 @@ namespace AwsMock::Database {
             }
             opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
-                bsoncxx::builder::basic::document sort;
-                for (const auto sortColumn: sortColumns) {
-                    sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                document sort;
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    sort.append(kvp(column, sortDirection));
                 }
                 opts.sort(sort.extract());
             }
@@ -657,10 +727,7 @@ namespace AwsMock::Database {
             try {
                 session.start_transaction();
                 message.modified = system_clock::now();
-                const auto mResult = _messageCollection.find_one_and_update(
-                        make_document(kvp("_id", bsoncxx::oid{message.oid})),
-                        message.ToDocument(),
-                        opts);
+                const auto mResult = _messageCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid{message.oid})), message.ToDocument(), opts);
                 log_trace << "Message updated, count: " << bsoncxx::to_json(mResult->view());
                 session.commit_transaction();
 
@@ -670,6 +737,7 @@ namespace AwsMock::Database {
 
                 message.FromDocument(mResult->view());
                 return message;
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
@@ -687,13 +755,24 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) const {
+
         if (HasDatabase()) {
+
             DeleteMessage(message.messageId);
 
-            // Adjust all topic message counters
-            AdjustMessageCounters(message.topicArn);
         } else {
             _memoryDb.DeleteMessage(message.messageId);
+        }
+
+        // Update counter-map
+        (*snsCounterMap)[message.topicArn].size -= message.size;
+        (*snsCounterMap)[message.topicArn].messages--;
+        if (message.status == Entity::SNS::MessageStatus::INITIAL) {
+            (*snsCounterMap)[message.topicArn].initial--;
+        } else if (message.status == Entity::SNS::MessageStatus::SEND) {
+            (*snsCounterMap)[message.topicArn].send--;
+        } else if (message.status == Entity::SNS::MessageStatus::RESEND) {
+            (*snsCounterMap)[message.topicArn].resend--;
         }
     }
 
@@ -718,36 +797,34 @@ namespace AwsMock::Database {
         }
     }
 
-    void SNSDatabase::DeleteMessages(const std::string &region,
-                                     const std::string &topicArn,
-                                     const std::vector<std::string> &receipts) const {
+    void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             auto session = client->start_session();
 
             array array{};
-            for (const auto &receipt: receipts) {
+            for (const auto &receipt: messageIds) {
                 array.append(receipt);
             }
 
             try {
+
                 session.start_transaction();
-                const auto result = _messageCollection.delete_many(make_document(kvp("region", region),
-                                                                                 kvp("topicArn", topicArn),
-                                                                                 kvp("messageId", make_document(kvp("$in", array)))));
+                const auto result = _messageCollection.delete_many(make_document(kvp("region", region), kvp("topicArn", topicArn), kvp("messageId", make_document(kvp("$in", array)))));
                 log_debug << "Messages deleted, count: " << result->result().deleted_count();
                 session.commit_transaction();
 
                 // Adjust all topic message counters
-                AdjustMessageCounters(topicArn);
+                //AdjustMessageCounters(topicArn);
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
         } else {
-            _memoryDb.DeleteMessages(region, topicArn, receipts);
+            _memoryDb.DeleteMessages(region, topicArn, messageIds);
         }
     }
 
@@ -760,6 +837,7 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
+
                 session.start_transaction();
                 const auto result = messageCollection.delete_many(make_document(kvp("created", make_document(kvp("$lt", bsoncxx::types::b_date(reset))))));
                 session.commit_transaction();
@@ -768,7 +846,8 @@ namespace AwsMock::Database {
                 }
 
                 // Adjust all topic message counters
-                AdjustAllMessageCounters();
+                //AdjustAllMessageCounters();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
@@ -780,6 +859,8 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::DeleteAllMessages() const {
+
+        long deleted = 0;
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -788,19 +869,28 @@ namespace AwsMock::Database {
                 log_debug << "All resources deleted, count: " << result->deleted_count();
 
                 // Adjust all topic message counters
-                AdjustAllMessageCounters();
-                return result->deleted_count();
+                //AdjustAllMessageCounters();
+                deleted = result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+        } else {
+            deleted = _memoryDb.DeleteAllMessages();
         }
-        return _memoryDb.DeleteAllMessages();
+
+        // Update the counter-map
+        (*snsCounterMap)[_messageCollectionName].size = 0;
+        (*snsCounterMap)[_messageCollectionName].messages = 0;
+        (*snsCounterMap)[_messageCollectionName].initial = 0;
+        (*snsCounterMap)[_messageCollectionName].send = 0;
+        (*snsCounterMap)[_messageCollectionName].resend = 0;
+        return deleted;
     }
 
     void SNSDatabase::AdjustAllMessageCounters() const {
-        if (HasDatabase()) {
+        /*if (HasDatabase()) {
             const Entity::SNS::TopicList topicList = ListTopics();
             log_trace << "SNS adjust counter starting, count: " << topicList.size();
 
@@ -808,18 +898,18 @@ namespace AwsMock::Database {
             for (auto &topic: topicList) {
                 AdjustMessageCounters(topic.topicArn);
             }
-        }
+        }*/
     }
 
     void SNSDatabase::AdjustMessageCounters(const std::string &topicArn) const {
-        if (HasDatabase()) {
+        /*if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             auto topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
             try {
-                long total = CountMessages(topicArn);
-                long size = GetTopicSize(topicArn);
+                const long total = CountMessages(topicArn);
+                const long size = GetTopicSize(topicArn);
 
                 session.start_transaction();
                 topicCollection.update_one(make_document(kvp("topicArn", topicArn)),
@@ -834,6 +924,6 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-        }
+        }*/
     }
 }// namespace AwsMock::Database
