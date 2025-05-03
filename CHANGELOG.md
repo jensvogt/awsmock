@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.2](https://github.com/jensvogt/awsmock/compare/v1.2.1...v1.2.2) (2025-05-03)
+
+
+### Bug Fixes
+
+* **1164-main-development:** fix tests ([7a6cd15](https://github.com/jensvogt/awsmock/commit/7a6cd15c4e5e8e7b65b59a8d4c2b2bebc79a8b13))
+* **1164-main-development:** fix tests ([2f8ecad](https://github.com/jensvogt/awsmock/commit/2f8ecadba9dceb5784c32ac223131fa41e7f1fae))
+* **1164-main-development:** SQS sendmessage with new JSON format ([ffcaf30](https://github.com/jensvogt/awsmock/commit/ffcaf30cf4af0292e603e3d1564494e2f6f81570))
+* **1164-main-development:** using shared memory for monitoring in order to improve performance ([47ccb2a](https://github.com/jensvogt/awsmock/commit/47ccb2a0e60a2fc61b68b6552d3a9f9b9bbe5355))
+* **1164-sftp-on-windows:** windows absolute path ([b30a1b5](https://github.com/jensvogt/awsmock/commit/b30a1b5373a3f0bb648bc2b2ceba1c699ba24d65))
+
 ## [1.2.1](https://github.com/jensvogt/awsmock/compare/v1.2.0...v1.2.1) (2025-05-01)
 
 
