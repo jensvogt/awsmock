@@ -114,7 +114,10 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest sendMessageRequest;
+        sendMessageRequest.region = REGION;
+        sendMessageRequest.queueUrl = queueResponse.queueUrl;
+        sendMessageRequest.body = BODY;
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
         Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
         getQueueDetailsRequest.region = REGION;
@@ -150,7 +153,10 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest sendMessageRequest;
+        sendMessageRequest.region = REGION;
+        sendMessageRequest.queueUrl = queueResponse.queueUrl;
+        sendMessageRequest.body = BODY;
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
         Dto::SQS::ListQueueCountersRequest listQueueCountersRequest;
         listQueueCountersRequest.region = REGION;
@@ -212,7 +218,9 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest request = {.queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest request;
+        request.queueUrl = queueUrl;
+        request.body = BODY;
         request.region = REGION;
         request.requestId = Core::StringUtils::CreateRandomUuid();
 
@@ -223,7 +231,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response.messageId.empty());
         EXPECT_TRUE(response.md5Body == BODY_MD5);
         EXPECT_TRUE(response.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response.md5SystemAttributes.empty());
+        EXPECT_TRUE(response.md5MessageSystemAttributes.empty());
     }
 
     TEST_F(SQSServiceTest, MessagesCreateTest) {
@@ -236,9 +244,15 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest request1 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest request1;
+        request1.region = REGION;
+        request1.queueUrl = queueUrl;
+        request1.body = BODY;
         request1.requestId = Core::StringUtils::CreateRandomUuid();
-        Dto::SQS::SendMessageRequest request2 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest request2;
+        request2.region = REGION;
+        request2.queueUrl = queueUrl;
+        request2.body = BODY;
         request2.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
@@ -249,11 +263,11 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response1.messageId.empty());
         EXPECT_TRUE(response1.md5Body == BODY_MD5);
         EXPECT_TRUE(response1.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response1.md5SystemAttributes.empty());
+        EXPECT_TRUE(response1.md5MessageSystemAttributes.empty());
         EXPECT_FALSE(response2.messageId.empty());
         EXPECT_TRUE(response2.md5Body == BODY_MD5);
         EXPECT_TRUE(response2.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response2.md5SystemAttributes.empty());
+        EXPECT_TRUE(response2.md5MessageSystemAttributes.empty());
     }
 
     TEST_F(SQSServiceTest, MessageReceiveTest) {
@@ -263,7 +277,10 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .body = BODY, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest msgRequest;
+        msgRequest.region = REGION;
+        msgRequest.queueUrl = queueUrl;
+        msgRequest.body = BODY;
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
@@ -285,11 +302,14 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest msgRequest;
+        msgRequest.region = REGION;
+        msgRequest.queueUrl = queueUrl;
+        msgRequest.body = BODY;
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
-        Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl = queueUrl, .receiptHandle = msgResponse.receiptHandle};
+        Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl = queueUrl};
         Dto::SQS::DeleteMessageResponse delResponse;
         EXPECT_NO_FATAL_FAILURE({ _service.DeleteMessage(delRequest); });
 
