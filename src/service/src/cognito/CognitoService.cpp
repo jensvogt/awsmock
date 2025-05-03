@@ -104,7 +104,7 @@ namespace AwsMock::Service {
             const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list counters, count: " << userPools.size();
             Dto::Cognito::ListUserPoolCountersResponse response;
-            response.userPools = Dto::Cognito::Mapper::map(userPools);
+            response.userPoolCounters = Dto::Cognito::Mapper::mapCounter(userPools);
             response.total = total;
             return response;
         } catch (bsoncxx::exception &exc) {

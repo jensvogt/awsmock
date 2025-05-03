@@ -55,6 +55,16 @@ namespace AwsMock::Core {
         static std::string GetHomeDir();
 
         /**
+         * @brief Returns the root directory for the current machine
+         *
+         * @par
+         * On Linux and macOS this will return "/", on Windows "C:\".
+         *
+         * @return absolute path of the root directory.
+         */
+        static std::string GetRootDir();
+
+        /**
          * @brief Returns the DNS host name of the server
          *
          * @return host name of the server

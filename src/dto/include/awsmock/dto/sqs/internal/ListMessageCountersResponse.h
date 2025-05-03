@@ -27,9 +27,6 @@ namespace AwsMock::Dto::SQS {
 
         friend ListMessageCountersResponse tag_invoke(boost::json::value_to_tag<ListMessageCountersResponse>, boost::json::value const &v) {
             ListMessageCountersResponse r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.total = v.at("total").as_int64();
             r.messages = boost::json::value_to<std::vector<MessageCounter>>(v.at("messages"));
             return r;

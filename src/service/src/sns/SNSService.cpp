@@ -97,10 +97,6 @@ namespace AwsMock::Service {
             // Update database
             const long deleted = _snsDatabase.PurgeTopic(topic);
             log_debug << "SNS topic prune, deleted: " << deleted;
-
-            // Adjust topic counters
-            AdjustTopicCounters(topic);
-
             return deleted;
 
         } catch (bsoncxx::exception &ex) {
@@ -179,9 +175,6 @@ namespace AwsMock::Service {
 
             // Check subscriptions
             CheckSubscriptions(request);
-
-            // Adjust message counters
-            AdjustTopicCounters(topic);
 
             return {.messageId = message.messageId, .requestId = request.requestId};
 
@@ -652,11 +645,9 @@ namespace AwsMock::Service {
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Dto::SQS::MessageAttribute messageAttribute;
-            messageAttribute.name = fst;
             messageAttribute.stringValue = snd.stringValue;
-            messageAttribute.numberValue = snd.numberValue;
             messageAttribute.binaryValue = snd.binaryValue;
-            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type));
+            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type));
             sendMessageRequest.messageAttributes[fst] = messageAttribute;
         }
 
@@ -722,7 +713,7 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             // Adjust topic counters
-            AdjustTopicCounters(topic);
+            //AdjustTopicCounters(topic);
             log_trace << "SNS topic counter adjusted, topicArn: " << request.topicArn;
 
         } catch (bsoncxx::exception &ex) {

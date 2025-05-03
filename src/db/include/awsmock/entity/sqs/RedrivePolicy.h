@@ -11,15 +11,16 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
     /**
-     * SQS queue re-drive policy entity
+     * @brief SQS queue re-drive policy entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RedrivePolicy {
+    struct RedrivePolicy final : Common::BaseEntity<RedrivePolicy> {
 
         /**
          * Dead letter queue target ARN
@@ -27,23 +28,9 @@ namespace AwsMock::Database::Entity::SQS {
         std::string deadLetterTargetArn;
 
         /**
-         * Maximal number of retries, before the message will be send to the DQL
+         * Maximal number of retries before the message will be sent to the DQL
          */
-        int maxReceiveCount = 0;
-
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param jsonString json input stream
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        long maxReceiveCount = 0;
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -59,21 +46,21 @@ namespace AwsMock::Database::Entity::SQS {
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param r redrive policy
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const RedrivePolicy &r);
+        friend RedrivePolicy tag_invoke(boost::json::value_to_tag<RedrivePolicy>, boost::json::value const &v) {
+            RedrivePolicy r;
+            r.deadLetterTargetArn = v.at("deadLetterTargetArn").as_string();
+            r.maxReceiveCount = v.at("maxReceiveCount").as_int64();
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RedrivePolicy const &obj) {
+            jv = {
+                    {"deadLetterTargetArn", obj.deadLetterTargetArn},
+                    {"maxReceiveCount", obj.maxReceiveCount},
+            };
+        }
     };
 
 }// namespace AwsMock::Database::Entity::SQS

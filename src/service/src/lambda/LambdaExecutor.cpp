@@ -34,7 +34,8 @@ namespace AwsMock::Service {
             const long deleted = Database::SQSDatabase::instance().DeleteMessage(receiptHandle);
             log_info << "SQS messages deleted, count: " << deleted;
         }
-        log_info << "Lambda invocation finished, lambda: " << functionName << " output: " << response.body;
+        log_debug << "Lambda invocation finished, lambda: " << functionName << " output: " << response.body;
+        log_info << "Lambda invocation finished, lambda: " << functionName;
     }
 
 }// namespace AwsMock::Service

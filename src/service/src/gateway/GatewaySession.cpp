@@ -126,7 +126,7 @@ namespace AwsMock::Service {
         }
 
         std::shared_ptr<AbstractHandler> handler;
-        std::string region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");

@@ -145,6 +145,20 @@ namespace AwsMock::Core {
         EXPECT_TRUE(FileUtils::FileExists(fileName));
         EXPECT_EQ(100, result.size());
     }
+    /*
+    TEST_F(FileUtilsTest, StreamCopierTest) {
+
+        // arrange
+        const std::string fileName1 = FileUtils::CreateTempFile(tempDir, "txt", 100);
+        const std::string fileName2 = tempDir + FileUtils::separator() + "testFile.txt";
+        // act
+        std::string result;
+        EXPECT_NO_THROW({ result = FileUtils::StreamCopier(fileName1, filename2); });
+
+        // assert
+        EXPECT_TRUE(FileUtils::FileExists(fileName2));
+        EXPECT_EQ(100, result);
+    }*/
 
     TEST_F(FileUtilsTest, StripChunkSignatureTest) {
 
@@ -166,7 +180,7 @@ namespace AwsMock::Core {
         const std::string tempFile = FileUtils::CreateTempFile("txt", "This is a text file");
 
         // act
-        const std::string contentType = FileUtils::GetContentType(tempFile);
+        const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
         EXPECT_FALSE(contentType.empty());
@@ -179,7 +193,7 @@ namespace AwsMock::Core {
         const std::string tempFile = FileUtils::CreateTempFile("json", R"({"key":"value"})");
 
         // act
-        const std::string contentType = FileUtils::GetContentType(tempFile);
+        const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
         EXPECT_FALSE(contentType.empty());
@@ -192,7 +206,7 @@ namespace AwsMock::Core {
         const std::string tempFile = FileUtils::CreateTempFile("xml", "<ONIXMessage xmlns=¸\"http://www.editeur.org/onix/3.0/reference\" release=\"3.0\"><Header><Sender><SenderName>APA</SenderName><ContactName>Violetta Tatar</ContactName></Sender></Header>");
 
         // act
-        const std::string contentType = FileUtils::GetContentType(tempFile);
+        const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
         EXPECT_FALSE(contentType.empty());

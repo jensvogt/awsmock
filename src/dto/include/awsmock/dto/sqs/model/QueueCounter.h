@@ -54,12 +54,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Visibility timeout
          */
-        int visibilityTimeout{};
+        long visibilityTimeout{};
 
         /**
          * Message delay
          */
-        int delay{};
+        long delay{};
 
         /**
          * Retention period
@@ -72,7 +72,7 @@ namespace AwsMock::Dto::SQS {
         long maxMessageSize{};
 
         /**
-         * Total size of message in the queue
+         * Total size of all messages in the queue
          */
         long size{};
 

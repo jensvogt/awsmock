@@ -124,6 +124,23 @@ namespace AwsMock::Dto::Cognito {
         return userPoolDtos;
     }
 
+    std::vector<UserPoolCounter> Mapper::mapCounter(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities) {
+        std::vector<UserPoolCounter> userPoolCounterDtos;
+        for (const auto &userPoolEntity: userPoolEntities) {
+            UserPoolCounter userPoolCounterDto;
+            userPoolCounterDto.id = userPoolEntity.userPoolId,
+            userPoolCounterDto.region = userPoolEntity.region,
+            userPoolCounterDto.name = userPoolEntity.name,
+            userPoolCounterDto.userPoolId = userPoolEntity.userPoolId,
+            userPoolCounterDto.arn = userPoolEntity.arn,
+            userPoolCounterDto.domain = userPoolEntity.domain.domain,
+            userPoolCounterDto.created = userPoolEntity.created,
+            userPoolCounterDto.modified = userPoolEntity.modified;
+            userPoolCounterDtos.emplace_back(userPoolCounterDto);
+        }
+        return userPoolCounterDtos;
+    }
+
     User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
         User userDto = {
                 .region = userEntity.region,
@@ -141,18 +158,18 @@ namespace AwsMock::Dto::Cognito {
         return userDto;
     }
 
-    std::vector<User> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
-        std::vector<User> userDtos;
+    std::vector<UserCounter> Mapper::map(const std::vector<Database::Entity::Cognito::User> &userEntities) {
+        std::vector<UserCounter> userDtos;
         for (const auto &userEntity: userEntities) {
-            User userDto = {
-                    .region = userEntity.region,
-                    .userPoolId = userEntity.userPoolId,
-                    .userName = userEntity.userName,
-                    .enabled = userEntity.enabled,
-                    .userStatus = userEntity.userStatus,
-                    .password = userEntity.password,
-                    .created = userEntity.created,
-                    .modified = userEntity.modified};
+            UserCounter userDto;
+            userDto.region = userEntity.region;
+            userDto.userPoolId = userEntity.userPoolId;
+            userDto.userName = userEntity.userName;
+            userDto.enabled = userEntity.enabled;
+            userDto.userStatus = userEntity.userStatus;
+            userDto.password = userEntity.password;
+            userDto.created = userEntity.created;
+            userDto.modified = userEntity.modified;
 
             for (const auto &group: userEntity.groups) {
                 userDto.groups.emplace_back(map(group));

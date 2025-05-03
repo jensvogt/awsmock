@@ -2,6 +2,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/service/sqs/SQSService.h>
 
 namespace AwsMock::Service {
@@ -62,16 +65,17 @@ namespace AwsMock::Service {
             attributes.queueArn = queueArn;
 
             // Update database
-            Database::Entity::SQS::Queue queue = {
-                    .region = request.region,
-                    .name = request.queueName,
-                    .owner = request.owner,
-                    .queueUrl = queueUrl,
-                    .queueArn = queueArn,
-                    .attributes = attributes,
-                    .tags = request.tags};
+            Database::Entity::SQS::Queue queue;
+            queue.region = request.region;
+            queue.name = request.queueName;
+            queue.owner = request.owner;
+            queue.queueUrl = queueUrl;
+            queue.queueArn = queueArn;
+            queue.attributes = attributes;
+            queue.tags = request.tags;
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << queue.ToString();
+
             Dto::SQS::CreateQueueResponse response = {
                     .region = queue.region,
                     .name = queue.name,
@@ -432,13 +436,8 @@ namespace AwsMock::Service {
             const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
             const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
             const long count = _sqsDatabase.RedriveMessages(originalQueue, dqlQueue);
-
-            // Update queue counter
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
-            _sqsDatabase.AdjustMessageCounters(originalQueue.queueArn);
-            log_trace << "SQS queue counter updated, queueArn: " << request.queueArn;
-
             return count;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -614,17 +613,14 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
             log_trace << "Got message: " << message.ToString();
 
-            // Reset all userAttributes
-            const Database::Entity::SQS::MessageAttribute messageAttribute = {
-                    .attributeName = "VisibilityTimeout",
-                    .attributeValue = std::to_string(request.visibilityTimeout),
-                    .attributeType = Database::Entity::SQS::MessageAttributeType::NUMBER};
-            message.messageAttributes.push_back(messageAttribute);
+            // Set as attribute
+            message.attributes["VisibilityTimeout"] = std::to_string(request.visibilityTimeout);
             message.reset = system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
             log_trace << "Message updated: " << message.ToString();
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -750,7 +746,10 @@ namespace AwsMock::Service {
             log_debug << "Messages deleted, queue: " << request.queueUrl << " count:" << deleted;
 
             // Update database
-            deleted = _sqsDatabase.DeleteQueue({.region = request.region, .queueUrl = request.queueUrl});
+            Database::Entity::SQS::Queue queue;
+            queue.region = request.region;
+            queue.queueUrl = request.queueUrl;
+            deleted = _sqsDatabase.DeleteQueue(queue);
             log_debug << "Queue deleted, queue: " << request.queueUrl << " count:" << deleted;
 
             return {.region = request.region, .queueUrl = request.queueUrl, .requestId = request.requestId};
@@ -791,8 +790,6 @@ namespace AwsMock::Service {
             } else {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
-            // Set attributes
-            // request.attributes
 
             // Set parameters
             message.queueArn = queue.queueArn;
@@ -803,15 +800,13 @@ namespace AwsMock::Service {
             message.messageId = Core::AwsUtils::CreateMessageId();
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
-            message.md5MessageAttributes = Dto::SQS::MessageAttribute::GetMd5Attributes(request.messageAttributes);
+            message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
 
             // Update database
-            queue.attributes.approximateNumberOfMessages++;
-            queue = _sqsDatabase.UpdateQueue(queue);
             message = _sqsDatabase.CreateMessage(message);
             log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
 
-            // Find Lambdas with this as event source
+            // Find Lambdas with this as an event source
             CheckLambdaNotifications(queue.queueArn, message);
             log_debug << "Send message, queueArn: " << queue.queueArn << " messageId: " << request.messageId;
 
@@ -874,8 +869,7 @@ namespace AwsMock::Service {
         // Check input parameter
         if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
@@ -884,8 +878,8 @@ namespace AwsMock::Service {
 
             // Check re-drive policy
             std::string dlQueueArn{};
-            int maxRetries = -1;
-            const int visibilityTimeout = queue.attributes.visibilityTimeout;
+            long maxRetries = -1;
+            const long visibilityTimeout = queue.attributes.visibilityTimeout;
             if (!queue.attributes.redrivePolicy.deadLetterTargetArn.empty()) {
                 dlQueueArn = queue.attributes.redrivePolicy.deadLetterTargetArn;
                 maxRetries = queue.attributes.redrivePolicy.maxReceiveCount;
@@ -929,14 +923,11 @@ namespace AwsMock::Service {
             Dto::SQS::ReceiveMessageResponse response;
             response.requestId = request.requestId;
             if (!messageList.empty()) {
-                // Update queue
-                queue.attributes.approximateNumberOfMessagesNotVisible += static_cast<long>(messageList.size());
-                queue = _sqsDatabase.UpdateQueue(queue);
-                response.messageList = messageList;
+                response.messageList = Dto::SQS::Mapper::map(messageList);
             }
             log_debug << "Messages received, count: " << messageList.size() << " queue: " << queue.name;
-
             return response;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -988,16 +979,9 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
-            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(
-                    request.queueArn,
-                    request.prefix,
-                    request.pageSize,
-                    request.pageIndex,
-                    Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            return Dto::SQS::Mapper::map(messages, total);
 
-            Dto::SQS::ListMessageCountersResponse listMessagesResponse = Dto::SQS::Mapper::map(messages, total);
-            log_trace << "SQS list messages response: " << listMessagesResponse.ToJson();
-            return listMessagesResponse;
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1052,9 +1036,6 @@ namespace AwsMock::Service {
             // Check lambda notification
             CheckLambdaNotifications(request.queueArn, message);
 
-            // Adjust message counters
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
-
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1077,6 +1058,7 @@ namespace AwsMock::Service {
             // Delete from database
             const long deleted = _sqsDatabase.DeleteMessage(message);
             log_debug << "Message deleted, receiptHandle: " << request.receiptHandle << " deleted: " << deleted;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -1097,12 +1079,10 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
 
             // Update attributes
-            const auto deleted = std::erase_if(message.messageAttributes,
-                                               [request](const auto &item) {
-                                                   return item.attributeName == request.name;
-                                               });
+            message.attributes.erase(request.name);
             message = _sqsDatabase.UpdateMessage(message);
-            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name << ", deleted: " << deleted;
+            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());

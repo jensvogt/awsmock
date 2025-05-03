@@ -25,21 +25,31 @@ namespace AwsMock::Core::Json {
         boost::system::error_code ec;
         boost::json::value result = boost::json::parse(jsonString, ec);
         if (ec) {
-            throw JsonException("JSON exceptoion, error: " + ec.message());
+            throw JsonException("JSON exception, error: " + ec.message());
         }
         return result;
     }
 
-    inline std::string GetStringValue(boost::json::value &value, const std::string &name) {
-        return std::string(value.at("name").as_string().c_str());
+    inline bool AttributeExists(const boost::json::value &value, const std::string &name) {
+        return value.as_object().if_contains(name);
     }
 
-    inline int GetIntValue(boost::json::value &value, const std::string &name) {
-        return static_cast<int>(value.at("name").as_int64());
+    inline std::string GetStringValue(const boost::json::value &value, const std::string &name) {
+        if (AttributeExists(value, name)) {
+            return value.at(name).as_string().data();
+        }
+        return {};
     }
 
-    inline long GetLongValue(boost::json::value &value, const std::string &name) {
-        return value.at("name").as_int64();
+    inline long GetLongValue(const boost::json::value &value, const std::string &name, const long defaultValue = 0) {
+        if (AttributeExists(value, name)) {
+            return value.at(name).as_int64();
+        }
+        return defaultValue;
+    }
+
+    inline int GetIntValue(const boost::json::value &value, const std::string &name, const int defaultValue = 0) {
+        return static_cast<int>(GetLongValue(value, name, defaultValue));
     }
 
     inline bool GetBoolValue(boost::json::value &value, const std::string &name) {
@@ -54,9 +64,17 @@ namespace AwsMock::Core::Json {
         return value.at("name").as_double();
     }
 
+    inline std::vector<std::string> GetStringArrayValue(const boost::json::value &value, const std::string &name, const std::string &defaultValue = {}) {
+        if (AttributeExists(value, name)) {
+            return boost::json::value_to<std::vector<std::string>>(value.at(name));
+        }
+        return {defaultValue};
+    }
+
     inline bool findObject(boost::json::value &value, const std::string &name) {
         return value.as_object().if_contains(name);
     }
+
     /*
     inline bool FindBsonObject(const view &value, const std::string &name) {
         return value.find(name) != value.end();

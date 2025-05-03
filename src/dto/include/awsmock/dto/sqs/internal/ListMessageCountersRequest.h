@@ -28,12 +28,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Page size
          */
-        int pageSize = 10;
+        long pageSize = 10;
 
         /**
          * Page index
          */
-        int pageIndex = 0;
+        long pageIndex = 0;
 
         /**
          * Sort column
@@ -46,8 +46,8 @@ namespace AwsMock::Dto::SQS {
             ListMessageCountersRequest r;
             r.queueArn = v.at("queueArn").as_string();
             r.prefix = v.at("prefix").as_string();
-            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
-            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
+            r.pageSize = v.at("pageSize").as_int64();
+            r.pageIndex = v.at("pageIndex").as_int64();
             r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }

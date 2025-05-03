@@ -70,7 +70,7 @@ namespace AwsMock::Service {
          *
          * @param server transfer manager entity
          */
-        void StartSftpServer(Database::Entity::Transfer::Transfer &server);
+        static void StartSftpServer(Database::Entity::Transfer::Transfer &server);
 
         /**
          * @brief Stops a single transfer manager

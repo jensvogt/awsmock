@@ -32,12 +32,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Page size
          */
-        int pageSize;
+        long pageSize;
 
         /**
          * Page index
          */
-        int pageIndex;
+        long pageIndex;
 
         /**
          * Sort column
@@ -49,8 +49,8 @@ namespace AwsMock::Dto::SQS {
         friend ListQueueTagCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueTagCountersRequest>, boost::json::value const &v) {
             ListQueueTagCountersRequest r;
             r.prefix = v.at("prefix").as_string();
-            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
-            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
+            r.pageSize = v.at("pageSize").as_int64();
+            r.pageIndex = v.at("pageIndex").as_int64();
             r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }

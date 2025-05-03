@@ -43,9 +43,6 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 
-// Awsmock includes
-#include <awsmock/core/config/Configuration.h>
-
 #define DEFAULT_LOG_SIZE (10 * 1024 * 1024)
 #define DEFAULT_LOG_COUNT 5
 
@@ -94,8 +91,13 @@ namespace AwsMock::Core {
          *
          * @par
          * The filename is constructed from <logDirectory>/<logPrefix>_nn.log
+         *
+         * @param dir log directory
+         * @param prefix log file name prefix
+         * @param size log size
+         * @param count log count
          */
-        static void AddFile();
+        static void AddFile(const std::string &dir, const std::string &prefix, long size = DEFAULT_LOG_SIZE, int count = DEFAULT_LOG_COUNT);
 
       private:
 
@@ -133,7 +135,7 @@ namespace AwsMock::Core {
 }// namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
-#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+macos __FILE__, __LINE__macos #define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)

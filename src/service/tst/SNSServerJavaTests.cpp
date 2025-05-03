@@ -50,10 +50,14 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _snsDatabase.DeleteAllMessages();
-            _snsDatabase.DeleteAllTopics();
-            _sqsDatabase.DeleteAllMessages();
-            _sqsDatabase.DeleteAllQueues();
+            long count = _snsDatabase.DeleteAllMessages();
+            log_info << "SNS message deleted, count: " << count;
+            count = _snsDatabase.DeleteAllTopics();
+            log_info << "SNS topics deleted, count: " << count;
+            count = _sqsDatabase.DeleteAllMessages();
+            log_info << "SQS messages deleted, count: " << count;
+            count = _sqsDatabase.DeleteAllQueues();
+            log_info << "SQS queues deleted, count: " << count;
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {

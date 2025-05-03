@@ -13,7 +13,7 @@ namespace AwsMock::Manager {
         log_trace << "Manager monitoring starting";
 
         Monitoring::MetricService &metricService = Monitoring::MetricService::instance();
-        for (ModuleList modules = _moduleDatabase.ListModules(); const auto &module: modules) {
+        for (const ModuleList modules = _moduleDatabase.ListModules(); const auto &module: modules) {
             if (module.status == ModuleStatus::ACTIVE && module.state == ModuleState::RUNNING) {
                 metricService.SetGauge(MODULE_UPDOWN_GAUGE, "module", module.name, 0.0);
             } else if (module.status == ModuleStatus::ACTIVE && module.state == ModuleState::STOPPED) {

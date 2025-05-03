@@ -37,7 +37,8 @@ namespace AwsMock::Database {
         }
 
         void TearDown() override {
-            _snsDatabase.DeleteAllTopics();
+            const long count = _snsDatabase.DeleteAllTopics();
+            log_info << "Topics deleted, count: " << count;
             _snsDatabase.DeleteAllMessages();
         }
 

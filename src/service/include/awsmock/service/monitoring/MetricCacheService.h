@@ -107,55 +107,6 @@ namespace AwsMock::Monitoring {
       private:
 
         /**
-         * @brief Adds a counter to the map.
-         *
-         * @param name name of the counter
-         */
-        void AddCounter(const std::string &name);
-
-        /**
-         * @brief Adds a counter to the map.
-         *
-         * @param name name of the counter
-         * @param labelName label name of the counter
-         * @param labelValue label value of the counter
-         */
-        void AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue);
-
-        /**
-         * @brief Adds a counter to the map.
-         *
-         * @param name name of the counter
-         */
-        void DoAddCounter(const std::string &name);
-
-        /**
-         * @brief Check whether a counter exists
-         *
-         * @param name name of the counter.
-         * @return true if counter exists.
-         */
-        [[nodiscard]] bool CounterExists(const std::string &name) const;
-
-        /**
-         * @brief Check whether a counter exists
-         *
-         * @param name name of the counter.
-         * @param labelName label name of the counter
-         * @param labelValue label value of the counter
-         * @return true if counter exists.
-         */
-        [[nodiscard]] bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
-
-        /**
-         * @brief Get a specific metric
-         *
-         * @param name name of the metric
-         * @return metric if existing.
-         */
-        [[nodiscard]] prometheus::Family<prometheus::Counter> *GetCounter(const std::string &name) const;
-
-        /**
          * @brief Returns the cache primary key
          *
          * @param name name of the counter.

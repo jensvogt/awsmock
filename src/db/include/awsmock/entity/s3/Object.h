@@ -59,6 +59,11 @@ namespace AwsMock::Database::Entity::S3 {
         std::string bucket;
 
         /**
+         * Bucket ARN
+         */
+        std::string bucketArn;
+
+        /**
          * Object key
          */
         std::string key;
@@ -156,7 +161,7 @@ namespace AwsMock::Database::Entity::S3 {
         friend std::ostream &operator<<(std::ostream &os, const Object &object);
     };
 
-    typedef struct Object Object;
+    typedef Object Object;
     typedef std::vector<Object> ObjectList;
 
 }// namespace AwsMock::Database::Entity::S3

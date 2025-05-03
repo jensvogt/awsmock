@@ -22,7 +22,9 @@
 #include <awsmock/dto/cognito/ListUsersInGroupRequest.h>
 #include <awsmock/dto/cognito/ListUsersInGroupResponse.h>
 #include <awsmock/dto/cognito/model/User.h>
+#include <awsmock/dto/cognito/model/UserCounter.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
+#include <awsmock/dto/cognito/model/UserPoolCounter.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
@@ -55,6 +57,14 @@ namespace AwsMock::Dto::Cognito {
         static std::vector<UserPool> map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities);
 
         /**
+         * @brief Maps a list of user pool entities to a list of user pool DTOs
+         *
+         * @param userPoolEntities list of user pool entities
+         * @return vector of UserPool counter DTOs
+         */
+        static std::vector<UserPoolCounter> mapCounter(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities);
+
+        /**
          * @brief Maps a user entity to a user DTO
          *
          * @param userEntity user entity
@@ -68,7 +78,7 @@ namespace AwsMock::Dto::Cognito {
          * @param userEntities user entities
          * @return user DTOs
          */
-        static std::vector<User> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
+        static std::vector<UserCounter> map(const std::vector<Database::Entity::Cognito::User> &userEntities);
 
         /**
          * @brief Maps a group entity to a group DTO
@@ -119,7 +129,7 @@ namespace AwsMock::Dto::Cognito {
          * @return UserPoolClient
          * @see CreateUserPoolClientRequest
          */
-        static Database::Entity::Cognito::UserPoolClient map(const Dto::Cognito::CreateUserPoolClientRequest &request);
+        static Database::Entity::Cognito::UserPoolClient map(const CreateUserPoolClientRequest &request);
 
         /**
          * @brief Maps a user pool client entity  to an DTO
@@ -186,7 +196,7 @@ namespace AwsMock::Dto::Cognito {
         static DescribeUserPoolResponse map(const DescribeUserPoolRequest &request, const Database::Entity::Cognito::UserPool &userPool);
 
         /**
-         * @brief Converts a validity with validity units to seconds
+         * @brief Converts validity with validity units to seconds
          *
          * @param validity validity value
          * @param validityUnits validity unit

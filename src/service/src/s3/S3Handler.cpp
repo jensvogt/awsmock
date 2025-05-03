@@ -84,11 +84,11 @@ namespace AwsMock::Service {
                         s3Request.versionId = versionId;
                     }
 
-                    // Get range
+                    // Get the range
                     long size;
                     GetRange(request, s3Request.min, s3Request.max, size);
 
-                    // Get object
+                    // Get the object
                     Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
                     std::map<std::string, std::string> headerMap;
@@ -269,23 +269,27 @@ namespace AwsMock::Service {
 
                     // Checksum/chunked encoding
                     std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
+                    bool chunked = Core::HttpUtils::HasHeaderValue(request, "Content-Encoding", "aws-chunked");
 
                     // S3 put object request
-                    Dto::S3::PutObjectRequest putObjectRequest = {
-                            .region = clientCommand.region,
-                            .bucket = clientCommand.bucket,
-                            .key = clientCommand.key,
-                            .owner = clientCommand.user,
-                            .md5Sum = request["Content-MD5"],
-                            .contentType = clientCommand.contentType,
-                            .checksumAlgorithm = checksumAlgorithm,
-                            .metadata = metadata};
+                    Dto::S3::PutObjectRequest putObjectRequest;
+                    putObjectRequest.region = clientCommand.region;
+                    putObjectRequest.bucket = clientCommand.bucket;
+                    putObjectRequest.key = clientCommand.key;
+                    putObjectRequest.owner = clientCommand.user;
+                    putObjectRequest.md5Sum = clientCommand.contentMd5;
+                    putObjectRequest.contentType = clientCommand.contentType;
+                    putObjectRequest.checksumAlgorithm = checksumAlgorithm;
+                    putObjectRequest.metadata = metadata;
 
                     boost::beast::net::streambuf sb;
                     putObjectRequest.contentLength = PrepareBody(request, sb);
                     std::istream stream(&sb);
-                    log_debug << "ContentLength: " << putObjectRequest.contentLength << " contentType: " << putObjectRequest.contentType;
 
+                    // If chunked, we take the content length from the decoded content length header field.
+                    if (chunked) {
+                        putObjectRequest.contentLength = std::stol(Core::HttpUtils::GetHeaderValue(request, "x-amz-decoded-content-length"));
+                    }
                     Dto::S3::PutObjectResponse putObjectResponse = _s3Service.PutObject(putObjectRequest, stream);
 
                     log_info << "Put object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key << " size: " << putObjectResponse.contentLength;
@@ -511,33 +515,18 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::LIST_BUCKET_COUNTERS: {
 
                     // Get object request
-                    log_debug << "S3 list bucket counters request";
-
-                    // Build request
-                    std::string payload = Core::HttpUtils::GetBodyAsString(request);
-                    Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(payload);
-
-                    // Get object versions
+                    Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(clientCommand);
                     Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
-                    log_debug << s3Response;
-
-                    log_debug << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
+                    log_info << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
                 case Dto::Common::S3CommandType::LIST_OBJECT_COUNTERS: {
 
                     // Get object request
-                    log_debug << "S3 list object counters request";
-
-                    // Build request
-                    std::string payload = Core::HttpUtils::GetBodyAsString(request);
-                    Dto::S3::ListObjectCounterRequest s3Request = Dto::S3::ListObjectCounterRequest::FromJson(payload);
-
-                    // Get object versions
+                    Dto::S3::ListObjectCounterRequest s3Request = Dto::S3::ListObjectCounterRequest::FromJson(clientCommand);
                     Dto::S3::ListObjectCounterResponse s3Response = _s3Service.ListObjectCounters(s3Request);
-
-                    log_info << "List object counters, count: " << s3Response.total;
+                    log_info << "List object counters, total: " << s3Response.total << ", count: " << s3Response.total;
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
@@ -546,8 +535,6 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::GetBucketRequest s3Request = Dto::S3::GetBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
-
-                    // Get object versions
                     Dto::S3::GetBucketResponse s3Response = _s3Service.GetBucket(s3Request);
 
                     log_info << "Get bucket, name: " << s3Request.bucketName;
@@ -559,8 +546,6 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
-
-                    // Purge bucket
                     _s3Service.PurgeBucket(s3Request);
 
                     log_info << "Purge bucket, name: " << s3Request.bucketName;
@@ -571,12 +556,12 @@ namespace AwsMock::Service {
                     log_debug << "S3 update bucket request";
 
                     // Build request
-                    auto [bucket] = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
+                    Dto::S3::UpdateBucketRequest s3Request = Dto::S3::UpdateBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
 
                     // Get object versions
-                    //Dto::S3::GetBucketResponse s3Response = _s3Service.UpdateBucket(s3Request);
+                    //Dto::S3::UpdateBucketResponse s3Response = _s3Service.UpdateBucket(s3Request);
 
-                    log_info << "Update bucket, name: " << bucket.bucketName;
+                    //log_info << "Update bucket, name: " << bucket.bucketName;
                     return SendOkResponse(request, {});
                 }
 
@@ -584,10 +569,7 @@ namespace AwsMock::Service {
                     log_debug << "S3 get object counter request";
 
                     // Build request
-                    Dto::S3::GetObjectCounterRequest s3Request;
-                    s3Request.FromJson(clientCommand.payload);
-
-                    // Get object versions
+                    Dto::S3::GetObjectCounterRequest s3Request = Dto::S3::GetObjectCounterRequest::FromJson(clientCommand);
                     Dto::S3::GetObjectCounterResponse s3Response = _s3Service.GetObjectCounters(s3Request);
 
                     log_info << "Get object counter, name: " << s3Request.oid;
@@ -598,8 +580,7 @@ namespace AwsMock::Service {
                     log_debug << "S3 touch object";
 
                     // Build request
-                    Dto::S3::TouchObjectRequest s3Request;
-                    s3Request.FromJson(clientCommand.payload);
+                    Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
 
                     // Get object versions
                     _s3Service.TouchObject(s3Request);
@@ -612,8 +593,7 @@ namespace AwsMock::Service {
                     log_debug << "S3 update object";
 
                     // Build request
-                    Dto::S3::UpdateObjectRequest s3Request;
-                    s3Request.FromJson(clientCommand.payload);
+                    Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
 
                     // Get object versions
                     _s3Service.UpdateObject(s3Request);
@@ -783,7 +763,7 @@ namespace AwsMock::Service {
 
         if (Core::HttpUtils::HasHeaderValue(request, "content-encoding", "aws-chunked")) {
 
-            // Get decoded length from header
+            // Get decoded length from the header.
             const long decodedContentLength = std::stol(Core::HttpUtils::GetHeaderValue(request, "x-amz-decoded-content-length"));
 
             // Skip first line, AWS bug in binary chunk encoding

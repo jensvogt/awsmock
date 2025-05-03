@@ -94,11 +94,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
 
-                    Dto::SQS::ListQueueCountersRequest sqsRequest = Dto::SQS::ListQueueCountersRequest::FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-                    sqsRequest.user = clientCommand.user;
-                    sqsRequest.requestId = clientCommand.requestId;
-
+                    Dto::SQS::ListQueueCountersRequest sqsRequest = Dto::SQS::ListQueueCountersRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
                     log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
                     return SendOkResponse(request, sqsResponse.ToJson());
@@ -157,9 +153,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS: {
 
-                    Dto::SQS::ListQueueAttributeCountersRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::ListQueueAttributeCountersRequest sqsRequest = Dto::SQS::ListQueueAttributeCountersRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueueAttributeCountersResponse sqsResponse = _sqsService.ListQueueAttributeCounters(sqsRequest);
 
                     log_info << "List attributes counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.attributeCounters.size();
@@ -168,9 +162,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS: {
 
-                    Dto::SQS::ListLambdaTriggerCountersRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::ListLambdaTriggerCountersRequest sqsRequest = Dto::SQS::ListLambdaTriggerCountersRequest::FromJson(clientCommand);
                     Dto::SQS::ListLambdaTriggerCountersResponse sqsResponse = _sqsService.ListLambdaTriggerCounters(sqsRequest);
 
                     log_info << "List lambda trigger counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.lambdaTriggerCounters.size();
@@ -179,9 +171,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_TAG_COUNTERS: {
 
-                    Dto::SQS::ListQueueTagCountersRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::ListQueueTagCountersRequest sqsRequest = Dto::SQS::ListQueueTagCountersRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueueTagCountersResponse sqsResponse = _sqsService.ListTagCounters(sqsRequest);
 
                     log_info << "List tags counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.tagCounters.size();
@@ -243,15 +233,12 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::RECEIVE_MESSAGE: {
 
-                    Dto::SQS::ReceiveMessageRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::ReceiveMessageRequest sqsRequest = Dto::SQS::ReceiveMessageRequest::FromJson(clientCommand);
                     Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
                     log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;
 
                     // Send response
-                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::CHANGE_MESSAGE_VISIBILITY: {
@@ -425,18 +412,17 @@ namespace AwsMock::Service {
 
         std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
         for (int i = 1; i <= attributeCount / 3; i++) {
-            std::string attributeName = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
-            std::string attributeType = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
+            std::string name = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Name");
+            std::string dataTape = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.DataType");
 
-            std::string attributeValue;
-            if (attributeType == "String" || attributeType == "Number") {
-                attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
+            std::string stringValue;
+            if (dataTape == "String" || dataTape == "Number") {
+                stringValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttribute." + std::to_string(i) + ".Value.StringValue");
             }
             Dto::SQS::MessageAttribute messageAttribute;
-            messageAttribute.name = attributeName;
-            messageAttribute.stringValue = attributeValue;
-            messageAttribute.type = Dto::SQS::MessageAttributeDataTypeFromString(attributeType);
-            messageAttributes[attributeName] = messageAttribute;
+            messageAttribute.stringValue = stringValue;
+            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(dataTape);
+            messageAttributes[name] = messageAttribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;

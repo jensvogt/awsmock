@@ -46,7 +46,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/iostreams/copy.hpp>
 
-
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
@@ -252,22 +251,6 @@ namespace AwsMock::Core {
         static void DeleteFile(const std::string &fileName);
 
         /**
-         * @brief Unzip the given file to the given directory.
-         *
-         * @param zipFile zip file to decompress.
-         * @param dirName output directory.
-         */
-        static void UnzipFiles(const std::string &zipFile, const std::string &dirName);
-
-        /**
-         * @brief Unzip the given file to the given directory.
-         *
-         * @param zipFile zip file to decompress.
-         * @param dirName directory to zip.
-         */
-        static void ZipFiles(const std::string &zipFile, const std::string &dirName);
-
-        /**
          * @brief Read a whole file into a string
          *
          * @param fileName name of the file
@@ -301,9 +284,10 @@ namespace AwsMock::Core {
          * @brief Get the Mime type by extension
          *
          * @param path absolute file path
+         * @param realPath real file path
          * @return content type, as mime type
          */
-        static std::string GetContentType(const std::string &path);
+        static std::string GetContentType(const std::string &path, const std::string &realPath);
 
         /**
          * @brief Get the Mime type using libmagic from a string
@@ -317,7 +301,7 @@ namespace AwsMock::Core {
          * @brief Checks whether the file is base64 encoded.
          *
          * @param filePath file path
-         * @return true if file is base64 encoded
+         * @return true if the file is base64 encoded
          */
         static bool IsBase64(const std::string &filePath);
 
@@ -334,6 +318,74 @@ namespace AwsMock::Core {
          * @return file path separator
          */
         static std::string SetFileSeparator(std::string &filePath);
+
+        /**
+         * @brief Remove the last n bytes from the file
+         *
+         * @param filename name of the file
+         * @param size number of bytes to remove
+         */
+        static void RemoveLastBytes(const std::string &filename, long size);
+
+        /**
+         * @brief Copies a file from source to destination.
+         *
+         * @param inputFile input filename
+         * @param outputFile output filename
+         * @return number of bytes copied
+         */
+        static long StreamCopier(const std::string &inputFile, const std::string &outputFile);
+
+        /**
+         * @brief Copies a part of a file from source to destination.
+         *
+         * @param inputFile input filename
+         * @param outputFile output filename
+         * @param start bytes from the beginning of the file
+         * @param length number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(const std::string &inputFile, const std::string &outputFile, long start, long length);
+
+        /**
+         * @brief Copies a file from source to destination.
+         *
+         * @param inputFile input filename
+         * @param outputFile output filename
+         * @param count number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(const std::string &inputFile, const std::string &outputFile, long count);
+
+        /**
+         * @brief Copies all from an input stream to an output stream.
+         *
+         * @param is input stream
+         * @param os output stream
+         * @return number of bytes copied
+         */
+        static long StreamCopier(std::istream &is, std::ostream &os);
+
+        /**
+         * @brief Copies maxSize bytes from an input stream to an output stream.
+         *
+         * @param istream input stream
+         * @param ostream output stream
+         * @param count number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(std::istream &istream, std::ostream &ostream, long count);
+
+        /**
+         * @brief Copies maxSize bytes from an input stream to an output stream.
+         *
+         * @param istream input stream
+         * @param ostream output stream
+         * @param start number of bytes from the beginning of the file
+         * @param count number of bytes to copy
+         * @return number of bytes copied
+         */
+        static long StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count);
 
         /**
          * @brief File path separator

@@ -166,7 +166,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, 0, &stat_source.st_size, nullptr, 0);
 
@@ -177,7 +177,7 @@ namespace AwsMock::Core {
         const int dest = open(outFile.c_str(), O_WRONLY | O_CREAT, 0644);
         for (auto &it: files) {
             const int source = open(it.c_str(), O_RDONLY, 0);
-            struct stat stat_source {};
+            struct stat stat_source{};
             fstat(source, &stat_source);
             copied += sendfile(dest, source, nullptr, stat_source.st_size);
 
@@ -348,7 +348,7 @@ namespace AwsMock::Core {
             return AcctName;
         }
 #else
-        struct stat info {};
+        struct stat info{};
         stat(fileName.c_str(), &info);
         if (const passwd *pw = getpwuid(info.st_uid)) {
             return pw->pw_name;
@@ -406,8 +406,8 @@ namespace AwsMock::Core {
         return result;
     }
 
-    std::string FileUtils::GetContentType(const std::string &path) {
-        if (const std::string extension = boost::filesystem::path(path).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
+    std::string FileUtils::GetContentType(const std::string &path, const std::string &realPath) {
+        if (const std::string extension = boost::filesystem::path(realPath).extension().string(); !extension.empty() && MimeTypes.contains(extension)) {
             return MimeTypes.at(extension);
         }
         return GetContentTypeMagicFile(path);
@@ -420,7 +420,7 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
         if (!FileExists(magicFile)) {
             log_error << "Magic database not found, path: " << magicFile;
@@ -552,6 +552,90 @@ namespace AwsMock::Core {
         out << decoded;
         out.close();
         MoveTo(outFilepath, filePath);
+    }
+
+    void FileUtils::RemoveLastBytes(const std::string &filename, const long size) {
+        const std::filesystem::path p(filename);
+        std::filesystem::resize_file(p, std::filesystem::file_size(p) - size);
+    }
+
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long count = StreamCopier(ifs, ofs);
+        ifs.close();
+        ofs.close();
+        return count;
+    }
+
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long start, long length) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long count = StreamCopier(ifs, ofs, start, length);
+        ifs.close();
+        ofs.close();
+        return count;
+    }
+
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long count) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long copied = StreamCopier(ifs, ofs, count);
+        ifs.close();
+        ofs.close();
+        return copied;
+    }
+
+    long FileUtils::StreamCopier(std::istream &is, std::ostream &os) {
+        is.seekg(0, std::ios::end);
+        const long count = is.tellg();
+        is.seekg(0, std::ios::beg);
+        return StreamCopier(is, os, count);
+    }
+
+    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
+        long copied = 0;
+        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
+            char buffer[count];
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied = count;
+        } else {
+            char buffer[bufSize];
+            while (count > bufSize) {
+                istream.read(buffer, bufSize);
+                ostream.write(buffer, bufSize);
+                count -= bufSize;
+                copied += bufSize;
+            }
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied += count;
+        }
+        return copied;
+    }
+
+    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count) {
+        long copied = 0;
+        istream.seekg(start, std::ios::beg);
+        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
+            char buffer[count];
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied = count;
+        } else {
+            char buffer[bufSize];
+            while (count > bufSize) {
+                istream.read(buffer, bufSize);
+                ostream.write(buffer, bufSize);
+                count -= bufSize;
+                copied += bufSize;
+            }
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied += count;
+        }
+        return copied;
     }
 
 }// namespace AwsMock::Core

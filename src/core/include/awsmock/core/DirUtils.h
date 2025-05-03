@@ -92,7 +92,7 @@ namespace AwsMock::Core {
          * @brief Checks the existence of a directory
          *
          * @param dirName name of the directory.
-         * @return true, if directory exists otherwise false.
+         * @return true, if the directory exists otherwise false.
          */
         static bool DirectoryExists(const std::string &dirName);
 
@@ -139,7 +139,7 @@ namespace AwsMock::Core {
         static bool IsDirectory(const std::string &dirName);
 
         /**
-         * @brief Get list of files
+         * @brief Get a list of files
          *
          * @param dirName name of the directory
          * @param recursive recursively list files

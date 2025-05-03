@@ -63,7 +63,7 @@ namespace AwsMock::Service {
          * @param modules list of modules
          * @return updated module list
          */
-        Dto::Module::Module::ModuleList StartModules(Dto::Module::Module::ModuleList &modules) const;
+        Dto::Module::Module::ModuleList StartModules(const Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Stops one or several modules

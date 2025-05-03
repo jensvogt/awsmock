@@ -39,10 +39,14 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _snsDatabase.DeleteAllMessages();
-            _snsDatabase.DeleteAllTopics();
-            _sqsDatabase.DeleteAllMessages();
-            _sqsDatabase.DeleteAllQueues();
+            long deleted = _snsDatabase.DeleteAllMessages();
+            log_info << "SNS message deleted, count: " << deleted;
+            deleted = _snsDatabase.DeleteAllTopics();
+            log_info << "SNS topics deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllMessages();
+            log_info << "SQS message deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllQueues();
+            log_info << "SQS queues deleted, count: " << deleted;
         }
 
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
@@ -227,7 +231,11 @@ namespace AwsMock::Service {
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
         // act
-        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region = REGION, .queueUrl = resultQueueUrl, .queueName = QUEUE, .maxMessages = 10, .waitTimeSeconds = 5};
+        Dto::SQS::ReceiveMessageRequest receiveRequest;
+        receiveRequest.region = REGION;
+        receiveRequest.queueUrl = resultQueueUrl;
+        receiveRequest.maxMessages = 10;
+        receiveRequest.waitTimeSeconds = 5;
         Dto::SQS::ReceiveMessageResponse receiveResponse = _sqsService.ReceiveMessages(receiveRequest);
 
         // assert

@@ -63,7 +63,21 @@ struct sftp_handle {
 };
 //#endif
 
-void sftp_set_error(sftp_session sftp, int errnum) {
+static char *FtpFileNameToRealPath(const char *filename) {
+    const auto realFilename = static_cast<char *>(malloc(strlen(userBasePath) + strlen(filename) + 1));
+    strcpy(realFilename, userBasePath);
+    if (filename[0] != '\0' && filename[0] != '.') {
+        if (strncmp(filename, userBasePath, strlen(userBasePath)) != 0) {
+            strcpy(realFilename + strlen(realFilename), filename);
+        } else {
+            strcpy(realFilename, filename);
+        }
+    }
+    realFilename[strlen(realFilename)] = '\0';
+    return realFilename;
+}
+
+void sftp_set_error(const sftp_session sftp, int errnum) {
     if (sftp != nullptr) {
         sftp->errnum = errnum;
     }
@@ -84,7 +98,7 @@ static const char *ssh_str_error(int u_errno) {
     }
 }
 
-static void stat_to_filexfer_attrib(const struct stat *z_st, struct sftp_attributes_struct *z_attr) {
+static void stat_to_filexfer_attrib(const struct stat *z_st, sftp_attributes_struct *z_attr) {
     z_attr->flags = 0 | static_cast<uint32_t>(SSH_FILEXFER_ATTR_SIZE);
     z_attr->size = z_st->st_size;
 
@@ -382,11 +396,7 @@ static int realloc_buffer(ssh_buffer_struct *buffer, uint32_t needed) {
             return -1;
         }
         memcpy(newBuffer, buffer->data, buffer->used);
-#if defined(_WIN32) || defined(__APPLE__)
         memset(buffer->data, 0, buffer->used);
-#else
-        explicit_bzero(buffer->data, buffer->used);
-#endif
         SAFE_FREE(buffer->data);
     } else {
         newBuffer = static_cast<uint8_t *>(realloc(buffer->data, needed));
@@ -420,11 +430,7 @@ static void buffer_shift(ssh_buffer buffer) {
 
     if (buffer->secure) {
         void *ptr = buffer->data + buffer->used;
-#if defined(_WIN32) || defined(__APPLE__)
         memset(ptr, 0, burn_pos);
-#else
-        explicit_bzero(ptr, burn_pos);
-#endif
     }
 
     buffer_verify(buffer);
@@ -1451,7 +1457,7 @@ static int readdir_long_name(char *z_file_name, struct stat *z_st, char *z_long_
     return SSH_OK;
 }
 
-static int process_readdir(sftp_client_message client_msg) {
+static int process_readdir(const sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
     const ssh_string handle = client_msg->handle;
     const struct sftp_handle *h = nullptr;
@@ -1494,7 +1500,7 @@ static int process_readdir(sftp_client_message client_msg) {
         if (dentry != nullptr) {
             char long_path[PATH_MAX];
             sftp_attributes_struct attr{};
-            struct stat st {};
+            struct stat st{};
 
             if (strlen(dentry->d_name) + srclen + 1 >= PATH_MAX) {
                 log_error << "Dandle string length exceed max length!";
@@ -1601,14 +1607,7 @@ static int process_realpath(sftp_client_message client_msg) {
 #ifdef _WIN32
     // TODO: fix me
 #else
-    if (filename[0] == '\0' || filename[0] == '.') {
-        path = static_cast<char *>(malloc(PATH_MAX));
-        strcpy(path, AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir").c_str());
-        strcpy(path + strlen(path), "/");
-        strcpy(path + strlen(path), currentUser);
-    } else {
-        path = realpath(filename, nullptr);
-    }
+    path = FtpFileNameToRealPath(filename);
 #endif
     if (path == nullptr) {
         const int saved_errno = errno;
@@ -1626,14 +1625,17 @@ static int process_realpath(sftp_client_message client_msg) {
     return SSH_OK;
 }
 
+
 static int process_lstat(sftp_client_message client_msg) {
 
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
     sftp_attributes_struct attr{};
-    struct stat st;
+    struct stat st{};
 
-    log_debug << "Processing lstat: " << filename;
+    log_debug << "Processing lstat, incoming: " << filename;
+    filename = FtpFileNameToRealPath(const_cast<char *>(filename));
+    log_debug << "Processing lstat, realPath: " << filename;
 
     if (filename == nullptr) {
         log_error << "File name error, filename: " << filename;
@@ -1644,10 +1646,11 @@ static int process_lstat(sftp_client_message client_msg) {
 #ifdef _WIN32
     // TODO: fix me
 #else
-    if (const int rv = lstat(filename, &st); rv < 0) {
+    const int rv = lstat(filename, &st);
+    if (rv < 0) {
         int status = SSH_FX_OK;
         const int saved_errno = errno;
-        log_error << "lstat failed: " << strerror(saved_errno) << ", filename:" << filename;
+        log_error << "lstat failed: " << strerror(saved_errno) << ", filename: " << filename;
         status = unix_errno_to_ssh_stat(saved_errno);
         sftp_reply_status(client_msg, status, nullptr);
         ret = SSH_ERROR;
@@ -1663,9 +1666,10 @@ static int process_lstat(sftp_client_message client_msg) {
 static int process_stat(sftp_client_message client_msg) {
     int ret = SSH_OK;
     const char *filename = sftp_client_message_get_filename(client_msg);
-    sftp_attributes_struct attr;
-    struct stat st;
+    sftp_attributes_struct attr{};
+    struct stat st{};
 
+    filename = FtpFileNameToRealPath(filename);
     log_debug << "Processing stat: " << filename;
 
     if (filename == nullptr) {
@@ -1871,7 +1875,7 @@ static int process_extended_statvfs(sftp_client_message client_msg) {
     // TODO: fix me
 #else
 
-    struct statvfs st {};
+    struct statvfs st{};
 
     log_debug << "processing extended statvfs: " << path;
 
@@ -2083,7 +2087,8 @@ static int dispatch_sftp_request(sftp_client_message sftp_msg) {
     sftp_server_message_callback handler = nullptr;
     const uint8_t type = sftp_client_message_get_type(sftp_msg);
 
-    log_trace << "Dispatch request, type: " << std::to_string(type) << ", name: " << message_handlers[type].name;
+    if (message_handlers[type].name)
+        log_trace << "Dispatch request, type: " << std::to_string(type) << ", name: " << message_handlers[type].name;
 
     for (int i = 0; message_handlers[i].cb != nullptr; i++) {
         if (type == message_handlers[i].type) {
@@ -2534,8 +2539,8 @@ static sftp_attributes sftp_parse_attr_4(sftp_session sftp, ssh_buffer buf, int 
             attr->extended_count = ntohl(attr->extended_count);
 
             while (attr->extended_count &&
-                   (attr->extended_type = awsmock_ssh_buffer_get_ssh_string(buf)) &&
-                   (attr->extended_data = awsmock_ssh_buffer_get_ssh_string(buf))) {
+                   ((attr->extended_type = awsmock_ssh_buffer_get_ssh_string(buf))) &&
+                   ((attr->extended_data = awsmock_ssh_buffer_get_ssh_string(buf)))) {
                 attr->extended_count--;
             }
 
@@ -3058,44 +3063,28 @@ cleanup:
                 case 'b':
                     o.byte = va_arg(ap_copy, uint8_t *);
                     if (buffer->secure) {
-#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.byte, 0, sizeof(uint8_t));
-#else
-                        explicit_bzero(o.byte, sizeof(uint8_t));
-#endif
                         break;
                     }
                     break;
                 case 'w':
                     o.word = va_arg(ap_copy, uint16_t *);
                     if (buffer->secure) {
-#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.word, 0, sizeof(uint16_t));
-#else
-                        explicit_bzero(o.word, sizeof(uint16_t));
-#endif
                         break;
                     }
                     break;
                 case 'd':
                     o.dword = va_arg(ap_copy, uint32_t *);
                     if (buffer->secure) {
-#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.dword, 0, sizeof(uint32_t));
-#else
-                        explicit_bzero(o.dword, sizeof(uint32_t));
-#endif
                         break;
                     }
                     break;
                 case 'q':
                     o.qword = va_arg(ap_copy, uint64_t *);
                     if (buffer->secure) {
-#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.qword, 0, sizeof(uint64_t));
-#else
-                        explicit_bzero(o.qword, sizeof(uint64_t));
-#endif
                         break;
                     }
                     break;
@@ -3113,11 +3102,7 @@ cleanup:
                 case 's':
                     o.cstring = va_arg(ap_copy, char **);
                     if (buffer->secure) {
-#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.cstring, 0, strlen(*o.cstring));
-#else
-                        explicit_bzero(*o.cstring, strlen(*o.cstring));
-#endif
                     }
                     SAFE_FREE(*o.cstring);
                     break;
@@ -3125,11 +3110,7 @@ cleanup:
                     len = va_arg(ap_copy, size_t);
                     o.data = va_arg(ap_copy, void **);
                     if (buffer->secure) {
-#if defined(_WIN32) || defined(__APPLE__)
                         memset(o.data, 0, len);
-#else
-                        explicit_bzero(*o.data, len);
-#endif
                     }
                     SAFE_FREE(*o.data);
                     break;
@@ -3220,11 +3201,11 @@ static int auth_password(ssh_session session, const char *user, const char *pass
         currentUser = static_cast<char *>(malloc(128));
         strcpy(currentUser, it->userName.c_str());
 
-        // Set user home directory
+        // Set the user home directory
         const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         userBasePath = static_cast<char *>(malloc(1024));
         strcpy(userBasePath, ftpBaseDir.c_str());
-        strcpy(userBasePath + strlen(userBasePath), "/");
+        strcpy(userBasePath + strlen(userBasePath), AwsMock::Core::FileUtils::separator().c_str());
         strcpy(userBasePath + strlen(userBasePath), currentUser);
         log_info << "SFTP user authenticated, userName: " << user << ", homeDir: " << userBasePath;
         return SSH_AUTH_SUCCESS;
@@ -3334,7 +3315,8 @@ static void handle_session(const ssh_event &event, const ssh_session &session) {
             ssh_channel_close(sdata.channel);
         }
 
-        // If child process's stdout/stderr has been registered with the event, or the child process hasn't started yet, continue.
+        // If the child process's stdout/stderr has been registered with the event,
+        // or the child process hasn't started yet, continue.
         if (cdata.event != nullptr) {
             log_debug << "SFTP Event: " << cdata.event;
             continue;

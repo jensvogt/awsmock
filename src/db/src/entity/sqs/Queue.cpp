@@ -64,19 +64,4 @@ namespace AwsMock::Database::Entity::SQS {
         return *this;
     }
 
-    std::string Queue::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string Queue::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Queue &q) {
-        os << "Queue=" << to_json(q.ToDocument());
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::SQS

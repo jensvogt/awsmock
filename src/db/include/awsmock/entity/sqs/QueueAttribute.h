@@ -10,30 +10,31 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
     /**
-     * SQS queue attribute entity
+     * @brief SQS queue attribute entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueAttribute {
+    struct QueueAttribute final : Common::BaseEntity<QueueAttribute> {
 
         /**
          * Delay seconds
          *
          * <p>The length of time, in seconds, for which the delivery of all resources in the queue is delayed. Valid values: An integer from 0 to 900 (15 minutes). Default: 0.<p>
          */
-        int delaySeconds = 0;
+        long delaySeconds = 0;
 
         /**
          * Max message size (256kB).
          *
          * <p> The limit of how many bytes a message can contain before Amazon SQS rejects it. Valid values: An integer from 1,024 bytes (1 KiB) up to 262,144 bytes (256 KiB). Default: 262,144 (256 KiB).</p>
          */
-        int maxMessageSize = 262144;
+        long maxMessageSize = 262144;
 
         /**
          * Max retention period (4d).
@@ -42,21 +43,21 @@ namespace AwsMock::Database::Entity::SQS {
          * change a queue's attributes, the change can take up to 60 seconds for most of the attributes to propagate throughout the Amazon SQS system. Changes made to the MessageRetentionPeriod attribute can take
          * up to 15 minutes and will impact existing resources in the queue potentially causing them to be expired and deleted if the MessageRetentionPeriod is reduced below the age of existing resources.</p>
          */
-        int messageRetentionPeriod = 345600;
+        long messageRetentionPeriod = 345600;
 
         /**
          * Receive message timeout.
          *
          * <p>The length of time, in seconds, for which a ReceiveMessage action waits for a message to arrive. Valid values: An integer from 0 to 20 (seconds). Default: 0.</p>
          */
-        int receiveMessageWaitTime = 20;
+        long receiveMessageWaitTime = 20;
 
         /**
          * Visibility timeout.
          *
          * <p>The visibility timeout for the queue, in seconds. Valid values: An integer from 0 to 43,200 (12 hours). Default: 30. For more information about the visibility timeout, see Visibility Timeout in the Amazon SQS Developer Guide.</p>
          */
-        int visibilityTimeout = 30;
+        long visibilityTimeout = 30;
 
         /**
          * Policy
@@ -130,21 +131,44 @@ namespace AwsMock::Database::Entity::SQS {
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @param os output stream
-         * @param r queue attribute
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const QueueAttribute &r);
+        friend QueueAttribute tag_invoke(boost::json::value_to_tag<QueueAttribute>, boost::json::value const &v) {
+            QueueAttribute r;
+            r.queueArn = v.at("queueArn").as_string();
+            r.delaySeconds = v.at("delaySeconds").as_int64();
+            r.maxMessageSize = v.at("maxMessageSize").as_int64();
+            r.messageRetentionPeriod = v.at("messageRetentionPeriod").as_int64();
+            r.receiveMessageWaitTime = v.at("receiveMessageWaitTime").as_int64();
+            r.visibilityTimeout = v.at("visibilityTimeout").as_int64();
+            r.policy = v.at("policy").as_string();
+            r.redrivePolicy = boost::json::value_to<RedrivePolicy>(v.at("redrivePolicy"));
+            r.redriveAllowPolicy = v.at("redriveAllowPolicy").as_string();
+            r.approximateNumberOfMessages = v.at("approximateNumberOfMessages").as_int64();
+            r.approximateNumberOfMessagesDelayed = v.at("approximateNumberOfMessagesDelayed").as_int64();
+            r.approximateNumberOfMessagesNotVisible = v.at("approximateNumberOfMessagesNotVisible").as_int64();
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueueAttribute const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueArn", obj.queueArn},
+                    {"delaySeconds", obj.delaySeconds},
+                    {"maxMessageSize", obj.maxMessageSize},
+                    {"messageRetentionPeriod", obj.messageRetentionPeriod},
+                    {"receiveMessageWaitTime", obj.receiveMessageWaitTime},
+                    {"visibilityTimeout", obj.visibilityTimeout},
+                    {"policy", obj.policy},
+                    {"redrivePolicy", boost::json::value_from(obj.redrivePolicy)},
+                    {"redriveAllowPolicy", obj.redriveAllowPolicy},
+                    {"approximateNumberOfMessages", obj.approximateNumberOfMessages},
+                    {"approximateNumberOfMessagesDelayed", obj.approximateNumberOfMessagesDelayed},
+                    {"approximateNumberOfMessagesNotVisible", obj.approximateNumberOfMessagesNotVisible},
+            };
+        }
     };
 
 }// namespace AwsMock::Database::Entity::SQS

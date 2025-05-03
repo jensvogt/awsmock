@@ -54,7 +54,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attributes
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
         /**
          * MD5 sum
@@ -96,7 +96,7 @@ namespace AwsMock::Dto::SQS {
             r.size = v.at("size").as_int64();
             r.retries = v.at("retries").as_int64();
             r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
-            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("attributes"));
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;

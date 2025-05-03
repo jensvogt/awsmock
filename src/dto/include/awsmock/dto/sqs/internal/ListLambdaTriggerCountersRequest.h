@@ -46,9 +46,6 @@ namespace AwsMock::Dto::SQS {
 
         friend ListLambdaTriggerCountersRequest tag_invoke(boost::json::value_to_tag<ListLambdaTriggerCountersRequest>, boost::json::value const &v) {
             ListLambdaTriggerCountersRequest r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
             r.queueArn = v.at("queueArn").as_string();
             r.prefix = v.at("prefix").as_string();
             r.pageSize = v.at("pageSize").as_int64();
