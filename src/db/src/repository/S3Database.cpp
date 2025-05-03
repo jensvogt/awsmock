@@ -828,7 +828,7 @@ namespace AwsMock::Database {
         return _memoryDb.ObjectCount(region, bucket);
     }
 
-    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const int pageSize, const int pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::S3::ObjectList objectList;
         if (HasDatabase()) {

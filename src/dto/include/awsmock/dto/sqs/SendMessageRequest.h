@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/core/JsonUtils.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
@@ -77,27 +80,12 @@ namespace AwsMock::Dto::SQS {
      * }
      * @endcode
      */
-    struct SendMessageRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct SendMessageRequest final : Common::BaseCounter<SendMessageRequest> {
 
         /**
          * Queue URL
          */
         std::string queueUrl;
-
-        /**
-         * Queue ARN
-         */
-        std::string queueArn;
-
-        /**
-         * Queue name
-         */
-        std::string queueName;
 
         /**
          * Message body
@@ -107,70 +95,46 @@ namespace AwsMock::Dto::SQS {
         /**
          * Delay seconds
          */
-        int delaySeconds;
+        long delaySeconds;
 
         /**
          * Attributes (system attributes)
          */
-        std::map<std::string, std::string> attributes;
+        std::map<std::string, MessageAttribute> messageSystemAttributes;
 
         /**
          * Message attributes (user attributes)
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
-        /**
-         * Message ID
-         */
-        std::string messageId;
+      private:
 
-        /**
-         * Sender ID
-         */
-        std::string senderId;
+        friend SendMessageRequest tag_invoke(boost::json::value_to_tag<SendMessageRequest>, boost::json::value const &v) {
+            SendMessageRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            r.body = Core::Json::GetStringValue(v, "MessageBody");
+            r.delaySeconds = Core::Json::GetLongValue(v, "DelaySeconds");
+            if (Core::Json::AttributeExists(v, "MessageSystemAttributes")) {
+                r.messageSystemAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageSystemAttributes"));
+            }
+            if (Core::Json::AttributeExists(v, "MessageAttributes")) {
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
+            }
+            return r;
+        }
 
-        /**
-         * MD5 of request body
-         */
-        std::string md5sum;
-
-        /**
-         * Content type (can only be XML, JSON, TXT)
-         */
-        std::string contentType;
-
-        /**
-         * Request ID
-         */
-        std::string requestId;
-
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, SendMessageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SendMessageRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"body", obj.body},
+                    {"delaySeconds", obj.delaySeconds},
+                    {"messageSystemAttributes", boost::json::value_from(obj.messageSystemAttributes)},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

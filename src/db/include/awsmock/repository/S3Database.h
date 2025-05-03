@@ -372,7 +372,7 @@ namespace AwsMock::Database {
          * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Counts the number of keys in a bucket

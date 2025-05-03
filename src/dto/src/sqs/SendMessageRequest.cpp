@@ -5,7 +5,7 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 
 namespace AwsMock::Dto::SQS {
-
+    /*
     void SendMessageRequest::FromJson(const std::string &jsonString) {
 
         try {
@@ -83,6 +83,6 @@ namespace AwsMock::Dto::SQS {
     std::ostream &operator<<(std::ostream &os, SendMessageRequest &r) {
         os << "SendMessageRequest=" << r.ToJson();
         return os;
-    }
+    }*/
 
 }// namespace AwsMock::Dto::SQS

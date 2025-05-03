@@ -12,9 +12,7 @@ namespace AwsMock::Dto::SQS {
     Database::Entity::SQS::Message Mapper::map(const SendMessageRequest &request) {
 
         Database::Entity::SQS::Message messageEntity;
-        messageEntity.body = request.body,
-        messageEntity.size = static_cast<long>(request.body.length()),
-        messageEntity.contentType = request.contentType;
+        messageEntity.body = request.body;
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Database::Entity::SQS::MessageAttribute attribute;
@@ -23,18 +21,23 @@ namespace AwsMock::Dto::SQS {
             attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
             messageEntity.messageAttributes[fst] = attribute;
         }
+        for (const auto &[fst, snd]: request.messageSystemAttributes) {
+            Database::Entity::SQS::MessageAttribute attribute;
+            attribute.stringValue = snd.stringValue;
+            attribute.stringListValues = snd.stringListValues;
+            attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
+            messageEntity.messageSystemAttributes[fst] = attribute;
+        }
         return messageEntity;
     }
 
     SendMessageResponse Mapper::map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity) {
 
         SendMessageResponse response;
-        response.queueUrl = request.queueUrl,
         response.messageId = messageEntity.messageId,
-        response.receiptHandle = messageEntity.receiptHandle,
         response.md5Body = messageEntity.md5Body,
         response.md5MessageAttributes = messageEntity.md5MessageAttributes,
-        response.md5SystemAttributes = messageEntity.md5SystemAttributes,
+        response.md5MessageSystemAttributes = messageEntity.md5MessageSystemAttributes,
         response.requestId = request.requestId;
         return response;
     }

@@ -5,7 +5,7 @@
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 
 namespace AwsMock::Dto::SQS {
-
+    /*
     std::string SendMessageResponse::ToJson() const {
 
         try {
@@ -87,6 +87,6 @@ namespace AwsMock::Dto::SQS {
     std::ostream &operator<<(std::ostream &os, const SendMessageResponse &r) {
         os << "SendMessageResponse={" + r.ToJson();
         return os;
-    }
+    }*/
 
 }// namespace AwsMock::Dto::SQS

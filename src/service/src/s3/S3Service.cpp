@@ -1127,7 +1127,10 @@ namespace AwsMock::Service {
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
 
         const SQSService _sqsService;
-        const Dto::SQS::SendMessageRequest request = {.region = region, .queueUrl = queueUrl, .queueArn = queueNotification.queueArn, .body = eventNotification.ToJson()};
+        Dto::SQS::SendMessageRequest request;
+        request.region = region;
+        request.queueUrl = queueUrl;
+        request.body = eventNotification.ToJson();
         const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(request);
         log_debug << "SQS message request send, messageId: " << response.messageId;
     }

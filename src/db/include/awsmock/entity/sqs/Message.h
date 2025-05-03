@@ -101,7 +101,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * MD5 sum sqs system attributes
          */
-        std::string md5SystemAttributes;
+        std::string md5MessageSystemAttributes;
 
         /**
          * Attributes
@@ -118,6 +118,13 @@ namespace AwsMock::Database::Entity::SQS {
          * - SequenceNumber
          */
         std::map<std::string, std::string> attributes;
+
+        /**
+         * List of message attributes.
+         *
+         * These are the user-contributed message attributes.
+         */
+        std::map<std::string, MessageAttribute> messageSystemAttributes;
 
         /**
          * List of message attributes.
@@ -199,7 +206,7 @@ namespace AwsMock::Database::Entity::SQS {
             r.receiptHandle = v.at("receiptHandle").as_string();
             r.md5Body = v.at("md5Body").as_string();
             r.md5MessageAttributes = v.at("md5MessageAttributes").as_string();
-            r.md5SystemAttributes = v.at("md5SystemAttributes").as_string();
+            r.md5MessageSystemAttributes = v.at("md5MessageSystemAttributes").as_string();
             r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
             r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
@@ -225,7 +232,7 @@ namespace AwsMock::Database::Entity::SQS {
                     {"receiptHandle", obj.receiptHandle},
                     {"md5Body", obj.md5Body},
                     {"md5MessageAttributes", obj.md5MessageAttributes},
-                    {"md5SystemAttributes", obj.md5SystemAttributes},
+                    {"md5MessageSystemAttributes", obj.md5MessageSystemAttributes},
                     {"attributes", boost::json::value_from(obj.attributes)},
                     {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},

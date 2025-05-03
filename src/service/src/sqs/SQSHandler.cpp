@@ -204,14 +204,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE: {
 
-                    Dto::SQS::SendMessageRequest sqsRequest;
-                    sqsRequest.region = clientCommand.region;
-                    sqsRequest.messageId = Core::AwsUtils::CreateRequestId();
-                    sqsRequest.senderId = clientCommand.user;
-                    sqsRequest.contentType = clientCommand.contentType;
-                    sqsRequest.FromJson(clientCommand.payload);
-
-                    // Call service
+                    Dto::SQS::SendMessageRequest sqsRequest = Dto::SQS::SendMessageRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
                     log_info << "Send message, queueUrl: " << sqsRequest.queueUrl;
 

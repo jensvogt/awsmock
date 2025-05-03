@@ -634,14 +634,11 @@ namespace AwsMock::Service {
                 .timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now())};
 
         // Wrap it in a SQS message request
-        Dto::SQS::SendMessageRequest sendMessageRequest = {
-                .region = request.region,
-                .queueUrl = sqsQueue.queueUrl,
-                .queueArn = sqsQueue.queueArn,
-                .body = sqsNotificationRequest.ToJson(),
-                .messageId = Core::AwsUtils::CreateMessageId(),
-                .requestId = Core::AwsUtils::CreateRequestId(),
-        };
+        Dto::SQS::SendMessageRequest sendMessageRequest;
+        sendMessageRequest.region = request.region;
+        sendMessageRequest.queueUrl = sqsQueue.queueUrl;
+        sendMessageRequest.body = sqsNotificationRequest.ToJson();
+        sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Dto::SQS::MessageAttribute messageAttribute;
