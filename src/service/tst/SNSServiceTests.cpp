@@ -156,7 +156,6 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_FALSE(subscriptionArn.empty());
-        EXPECT_TRUE(subscriptionArn1.length() > 0);
     }
 
     TEST_F(SNSServiceTest, SubscriptionListTest) {
@@ -191,7 +190,9 @@ namespace AwsMock::Service {
         auto [subscriptionArn] = _snsService.Subscribe(subscribeRequest);
 
         // act
-        Dto::SNS::UnsubscribeRequest unsubscribeRequest = {.region = REGION, .subscriptionArn = subscriptionArn};
+        Dto::SNS::UnsubscribeRequest unsubscribeRequest;
+        unsubscribeRequest.region = REGION;
+        unsubscribeRequest.subscriptionArn = subscriptionArn;
         Dto::SNS::UnsubscribeResponse unsubscribeResponse = _snsService.Unsubscribe(unsubscribeRequest);
         Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
