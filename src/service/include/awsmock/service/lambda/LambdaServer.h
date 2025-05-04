@@ -71,7 +71,7 @@ namespace AwsMock::Service {
          * @brief Creates the lambda docker/podman containers
          *
          * @par
-         * For each lambda function the container will be created, if not existing already
+         * For each lambda function, the container will be created, if not existing already
          */
         void CreateContainers() const;
 
@@ -79,7 +79,7 @@ namespace AwsMock::Service {
          * @brief Remove expired lambda functions
          *
          * @par
-         * Loops over all lambda functions and removes the lambda container, when the lambdas are expired.
+         * Loops over all lambda functions and removes the lambda container when the lambdas are expired.
          */
         void RemoveExpiredLambdas() const;
 

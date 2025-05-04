@@ -507,7 +507,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, statusCode: " << statusCode << " body: " << body;
+            log_warning << "Start container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
         log_debug << "Docker container started, id: " << id;
@@ -541,7 +541,7 @@ namespace AwsMock::Service {
 
     void ContainerService::RestartDockerContainer(const std::string &id) const {
         if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/restart"); statusCode != http::status::no_content) {
-            log_warning << "Restart container failed, statusCode: " << statusCode << " body: " << body;
+            log_warning << "Restart container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
         log_debug << "Docker container restarted, id: " << id;
@@ -569,7 +569,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::delete_, "/containers/" + containerId + "?force=true"); statusCode != http::status::no_content) {
-            log_warning << "Delete container failed, statusCode: " << statusCode << " body: " << body;
+            log_warning << "Delete container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
         log_debug << "Docker container deleted, id: " << containerId;
@@ -587,7 +587,7 @@ namespace AwsMock::Service {
 
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/prune");
         if (statusCode != http::status::ok) {
-            log_warning << "Prune containers failed, statusCode: " << statusCode << " body: " << body;
+            log_warning << "Prune containers failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
 

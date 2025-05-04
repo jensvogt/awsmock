@@ -108,7 +108,10 @@ namespace AwsMock::Service {
         const Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
 
         // act
-        EXPECT_NO_THROW({ _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn); });
+        EXPECT_NO_THROW({
+            auto [requestId] = _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn);
+            EXPECT_FALSE(requestId.empty());
+        });
 
         // assert
         EXPECT_EQ(0, _snsDatabase.ListTopics(REGION).size());
