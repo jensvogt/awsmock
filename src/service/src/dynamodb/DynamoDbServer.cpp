@@ -57,7 +57,7 @@ namespace AwsMock::Service {
             log_trace << "CreateContainer, containerName: " << _containerName << " id: " << response.id;
         }
 
-        // Start docker container, in case it is not already running.
+        // Start the docker container, in case it is not already running.
         if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); container.state != "running") {
             _containerService.StartDockerContainer(container.id);
             _containerService.WaitForContainer(container.id);

@@ -24,10 +24,13 @@ port can be pinged.
 
 ## Start an example
 
-IN order to start one of the examples, you need to change directory to the given example root directory. Depending on
+Start awsmock as a docker container using
+
+```docker-compose up ./docker```
+In order to start one of the examples, you need to change the directory to the given example root directory. Depending
+on
 your installation directory this will be either ```/usr/shares/awsmock/samples/s3```
-or ```/usr/local shares/awsmock/samples/s3```
-for the S3 samples.
+or ```/usr/local shares/awsmock/samples/s3``` for the S3 samples.
 
 Start the example with one of the supplied bash scripts:
 

@@ -2,22 +2,24 @@ services:
 
   # MongoDB
   mongodb:
-    container_name: awsmock-mongodb
+    container_name: mongodb
     image: mongo:latest
     environment:
       - MONGO_INITDB_DATABASE=admin
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
+    command:
+      - --quiet
+      - --logpath
+      - /var/log/mongodb/mongod.log
     ports:
       - "27017:27017"
-    volumes:
-      - dbdata:/data/db
     networks:
-      - "local"
+      - local
 
   # AwsMock
   awsmock:
-    container_name: pim-awsmock
+    container_name: awsmock
     hostname: awsmock
     image: jensvogt/awsmock:latest
     depends_on:
@@ -25,12 +27,13 @@ services:
     networks:
       - local
     ports:
-      - 20-22:20-22
-      - 4566-4567:4566-4567
-      - 6000-6100:6000-6100
+      - "2121:2121"
+      - "2222:2222"
+      - "4566-4567:4566-4567"
+      - "6000-6100:6000-6100"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./etc/awsmock.yml:/usr/local/awsmock/etc/awsmock.yml
+      - ./etc/awsmock.json:/usr/local/awsmock/etc/awsmock.json
       - ./init:/usr/local/awsmock/init
       - ./lambda:/usr/local/awsmock/data/lambda
     restart: on-failure
@@ -38,23 +41,7 @@ services:
       test: [ "CMD", "awsmockctl", "ping" ]
       interval: 60s
       timeout: 1s
-      retries: 15
-
-  dynamodb-local:
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
-    networks:
-      - "local"
-
-# Volumes
-volumes:
-  dbdata:
+      retries: 10
 
 # Networks
 networks:

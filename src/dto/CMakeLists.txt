@@ -31,16 +31,21 @@ set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp 
         src/sns/UpdateSubscriptionResponse.cpp src/sns/model/MessageAttribute.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
-        src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp
-        src/s3/CreateBucketConstraint.cpp src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp src/s3/ListAllBucketResponse.cpp
-        src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
-        src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp src/s3/ListObjectVersionsRequest.cpp
-        src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp src/s3/PutBucketNotificationConfigurationRequest.cpp
-        src/s3/PutBucketNotificationConfigurationResponse.cpp src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
-        src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
-        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
-        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp)
+        src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
+        src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
+        src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
+        src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp
+        src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
+        src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp
+        src/s3/ListObjectVersionsRequest.cpp src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp
+        src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
+        src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
+        src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp
+        src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
+        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
+        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp
+        src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
+        src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -87,8 +92,7 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp
         src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp
         src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
-        src/dynamodb/mapper/Mapper.cpp
-        src/dynamodb/GetItemKey.cpp)
+        src/dynamodb/mapper/Mapper.cpp src/dynamodb/GetItemKey.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
         src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
         src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp
@@ -99,14 +103,16 @@ set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/k
         src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp
         src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp)
-set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp
-        src/ssm/GetParameterResponse.cpp src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
+set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
+        src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
+        src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
         src/ssm/DescribeParametersResponse.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
         src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
         src/module/ImportInfrastructureRequest.cpp)
-set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp src/monitoring/GetMultiCountersResponse.cpp)
+set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp
+        src/monitoring/GetMultiCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}

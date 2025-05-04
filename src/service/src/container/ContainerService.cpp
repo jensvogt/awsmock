@@ -677,9 +677,9 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::GetNetworkName() {
-        if (Core::Configuration::instance().GetValue<bool>("awsmock.docker.active")) {
-            return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-mode");
+        if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
+            return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
         }
-        return Core::Configuration::instance().GetValue<std::string>("awsmock.podman.network-mode");
+        return Core::Configuration::instance().GetValue<std::string>("awsmock.podman.network-name");
     }
 }// namespace AwsMock::Service
