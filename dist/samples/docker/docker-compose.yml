@@ -46,4 +46,6 @@ services:
 # Networks
 networks:
   local:
-    driver: "bridge"
+    name: local
+    driver: bridge
+

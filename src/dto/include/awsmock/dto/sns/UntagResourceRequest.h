@@ -7,20 +7,14 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
 
 // Awsmock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct UntagResourceRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct UntagResourceRequest final : Common::BaseCounter<UntagResourceRequest> {
 
         /**
          * Resource ARN (topic ARN)
@@ -32,26 +26,24 @@ namespace AwsMock::Dto::SNS {
          */
         std::vector<std::string> tags;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend UntagResourceRequest tag_invoke(boost::json::value_to_tag<UntagResourceRequest>, boost::json::value const &v) {
+            UntagResourceRequest r;
+            r.resourceArn = Core::Json::GetStringValue(v, "ResourceArn");
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::vector<std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UntagResourceRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UntagResourceRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"resourceArn", obj.resourceArn},
+                    {"tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

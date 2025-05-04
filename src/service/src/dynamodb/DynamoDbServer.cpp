@@ -26,8 +26,9 @@ namespace AwsMock::Service {
         }
         log_info << "DynamoDb server starting";
 
-        // Create a local network, if it is not existing yet
+        // Create a local network if it is not existing yet
         CreateLocalNetwork();
+
         // Start DynamoDb docker image
         StartLocalDynamoDb();
 

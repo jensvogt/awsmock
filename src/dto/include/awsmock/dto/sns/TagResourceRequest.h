@@ -10,17 +10,13 @@
 #include <string>
 
 // Awsmock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct TagResourceRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct TagResourceRequest final : Common::BaseCounter<TagResourceRequest> {
 
         /**
          * Resource ARN (topic ARN)
@@ -32,26 +28,26 @@ namespace AwsMock::Dto::SNS {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend TagResourceRequest tag_invoke(boost::json::value_to_tag<TagResourceRequest>, boost::json::value const &v) {
+            TagResourceRequest r;
+            r.resourceArn = Core::Json::GetStringValue(v, "ResourceArn");
+            if (Core::Json::AttributeExists(v, "tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TagResourceRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TagResourceRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"resourceArn", obj.resourceArn},
+                    {"tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
     typedef std::map<std::string, std::string> TagList;

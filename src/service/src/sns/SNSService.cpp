@@ -283,8 +283,7 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("Subscription ARN missing");
             }
 
-            // Create new subscription
-
+            // Create a new subscription
             for (Database::Entity::SNS::TopicList topics = _snsDatabase.GetTopicsBySubscriptionArn(request.subscriptionArn); auto &topic: topics) {
 
                 // Remove subscription
@@ -293,12 +292,16 @@ namespace AwsMock::Service {
                 });
                 log_debug << "Subscription removed, count" << count;
 
-                // Save to database
+                // Save to the database
                 topic = _snsDatabase.UpdateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToString();
             }
-
-            return {.subscriptionArn = request.subscriptionArn};
+            Dto::SNS::UnsubscribeResponse response;
+            response.requestId = request.requestId;
+            response.subscriptionArn = request.subscriptionArn;
+            response.region = request.region;
+            response.user = request.user;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.what();
@@ -351,7 +354,7 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionCountersResponse response;
-            response.total = topic.subscriptions.size();
+            response.total = static_cast<long>(topic.subscriptions.size());
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
                 const std::string id = subscriptionArn.substr(subscriptionArn.rfind(':') + 1);
                 Dto::SNS::SubscriptionCounter subscription;
@@ -573,7 +576,10 @@ namespace AwsMock::Service {
             topic = _snsDatabase.UpdateTopic(topic);
             log_debug << "SNS tags updated, count: " << topic.tags.size();
 
-            constexpr Dto::SNS::TagResourceResponse response;
+            Dto::SNS::TagResourceResponse response;
+            response.region = topic.region;
+            response.user = request.user;
+            response.requestId = request.requestId;
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -601,15 +607,18 @@ namespace AwsMock::Service {
             // Set tags and update database
             int count = 0;
             for (const auto &it: request.tags) {
-                count += std::erase_if(topic.tags, [it](const auto &item) {
+                count += static_cast<int>(std::erase_if(topic.tags, [it](const auto &item) {
                     auto const &[key, value] = item;
                     return key == it;
-                });
+                }));
             }
             topic = _snsDatabase.UpdateTopic(topic);
             log_debug << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
 
-            constexpr Dto::SNS::UntagResourceResponse response;
+            Dto::SNS::UntagResourceResponse response;
+            response.region = topic.region;
+            response.user = request.user;
+            response.requestId = request.requestId;
             return response;
 
         } catch (bsoncxx::exception &ex) {

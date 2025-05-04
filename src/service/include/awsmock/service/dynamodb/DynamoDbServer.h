@@ -56,19 +56,17 @@ namespace AwsMock::Service {
         /**
          * @brief Start the local DynamoDB container.
          *
-         * <p>
+         * @par
          * If the AWS DynamoDb docker image does not already exist, it will be downloaded. Otherwise, the local docker
          * image will be started as a container.
-         * </p>
          */
         void StartLocalDynamoDb() const;
 
         /**
          * @brief Stop the local DynamoDB container.
          *
-         * <p>
+         * @par
          * The AWS DynamoDb docker container will be stopped.
-         * </p>
          */
         void StopLocalDynamoDb() const;
 
@@ -80,19 +78,21 @@ namespace AwsMock::Service {
         /**
          * @brief Synchronize tables.
          *
-         * Loops over all DynamoDB tables an updates the MongoDB backend.
+         * @par
+         * Loops over all DynamoDB tables and updates the MongoDB backend.
          */
         void SynchronizeTables() const;
 
         /**
          * @brief Synchronize items.
          *
-         * Loops over all DynamoDB table items an updates the MongoDB backend.
+         * @par
+         * Loops over all DynamoDB table items and updates the MongoDB backend.
          */
         void SynchronizeItems() const;
 
         /**
-         * Docker module
+         * Container module (either docker or podman)
          */
         ContainerService &_containerService;
 

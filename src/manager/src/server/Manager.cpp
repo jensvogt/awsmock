@@ -16,8 +16,8 @@ namespace AwsMock::Manager {
         InitializeDatabase();
         std::string boostVersion = BOOST_LIB_VERSION;
         Core::StringUtils::Replace(boostVersion, "_", ".");
-        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << " pid: " << Core::SystemUtils::GetPid()
-                 << " loglevel: " << Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level") << " boost version: " << boostVersion;
+        log_info << "Starting " << Core::Configuration::GetAppName() << " " << Core::Configuration::GetVersion() << ", pid: " << Core::SystemUtils::GetPid()
+                 << ", loglevel: " << Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level") << ", boost: " << boostVersion;
         log_info << "Configuration file: " << Core::Configuration::instance().GetFilename();
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     }
@@ -118,13 +118,16 @@ namespace AwsMock::Manager {
 
     void Manager::CreateSharedMemorySegment() {
 
+        // Get shared memory size from the configuration file
+        long shmSize = Core::Configuration::instance().GetValue<long>("awsmock.shm-size");
+
         // As Awsmock is not running under root set shared memory permissions
         boost::interprocess::permissions unrestricted_permissions;
         unrestricted_permissions.set_unrestricted();
 
         // Create a managed shared memory segment.
         boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_SEGMENT_NAME);
-        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, 65536, nullptr, unrestricted_permissions);
+        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, shmSize, nullptr, unrestricted_permissions);
     }
 
     void Manager::Run() {

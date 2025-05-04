@@ -22,7 +22,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * Subscription id
          */
-        std::string id = Core::StringUtils::CreateRandomUuid();
+        std::string id;
 
         /**
          * Topic ARN
@@ -60,16 +60,18 @@ namespace AwsMock::Dto::SNS {
 
         friend SubscriptionCounter tag_invoke(boost::json::value_to_tag<SubscriptionCounter>, boost::json::value const &v) {
             SubscriptionCounter r;
-            r.topicArn = v.at("topicArn").as_string();
-            r.protocol = v.at("protocol").as_string();
-            r.subscriptionArn = v.at("subscriptionArn").as_string();
-            r.endpoint = v.at("endpoint").as_string();
-            r.owner = v.at("owner").as_string();
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.protocol = Core::Json::GetStringValue(v, "protocol");
+            r.subscriptionArn = Core::Json::GetStringValue(v, "subscriptionArn");
+            r.endpoint = Core::Json::GetStringValue(v, "endpoint");
+            r.owner = Core::Json::GetStringValue(v, "owner");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SubscriptionCounter const &obj) {
             jv = {
+                    {"id", obj.id},
                     {"topicArn", obj.topicArn},
                     {"protocol", obj.protocol},
                     {"subscriptionArn", obj.subscriptionArn},
