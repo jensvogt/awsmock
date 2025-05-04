@@ -128,12 +128,16 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
 
         // act
-        Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
-        auto [subscriptionArn] = _snsService.Subscribe(subscribeRequest);
+        Dto::SNS::SubscribeRequest subscribeRequest;
+        subscribeRequest.region = REGION;
+        subscribeRequest.topicArn = topicResponse.topicArn;
+        subscribeRequest.protocol = "sqs";
+        subscribeRequest.endpoint = queueResponse.queueArn;
+        Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
         // assert
-        EXPECT_FALSE(subscriptionArn.empty());
+        EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
         EXPECT_EQ(1, response.topicList[0].subscriptions.size());
     }
 
@@ -146,16 +150,20 @@ namespace AwsMock::Service {
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
-        Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
-        auto [subscriptionArn] = _snsService.Subscribe(subscribeRequest);
+        Dto::SNS::SubscribeRequest subscribeRequest;
+        subscribeRequest.region = REGION;
+        subscribeRequest.topicArn = topicResponse.topicArn;
+        subscribeRequest.protocol = "sqs";
+        subscribeRequest.endpoint = queueResponse.queueArn;
+        Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
-        Dto::SNS::UpdateSubscriptionRequest updateRequest = {.topicArn = topicResponse.topicArn, .subscriptionArn = subscriptionArn, .protocol = "SQS", .endpoint = "foobar", .owner = "bar"};
+        Dto::SNS::UpdateSubscriptionRequest updateRequest = {.topicArn = topicResponse.topicArn, .subscriptionArn = subscribeResponse.subscriptionArn, .protocol = "SQS", .endpoint = "foobar", .owner = "bar"};
 
         // act
         auto [subscriptionArn1] = _snsService.UpdateSubscription(updateRequest);
 
         // assert
-        EXPECT_FALSE(subscriptionArn.empty());
+        EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
     }
 
     TEST_F(SNSServiceTest, SubscriptionListTest) {
@@ -167,8 +175,12 @@ namespace AwsMock::Service {
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
-        Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
-        auto [subscriptionArn] = _snsService.Subscribe(subscribeRequest);
+        Dto::SNS::SubscribeRequest subscribeRequest;
+        subscribeRequest.region = REGION;
+        subscribeRequest.topicArn = topicResponse.topicArn;
+        subscribeRequest.protocol = "sqs";
+        subscribeRequest.endpoint = queueResponse.queueArn;
+        Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::ListSubscriptionsByTopicRequest listRequest = {.region = REGION, .topicArn = topicResponse.topicArn};
 
         // act
@@ -186,18 +198,22 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
 
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
-        Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
-        auto [subscriptionArn] = _snsService.Subscribe(subscribeRequest);
+        Dto::SNS::SubscribeRequest subscribeRequest;
+        subscribeRequest.region = REGION;
+        subscribeRequest.topicArn = topicResponse.topicArn;
+        subscribeRequest.protocol = "sqs";
+        subscribeRequest.endpoint = queueResponse.queueArn;
+        Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
 
         // act
         Dto::SNS::UnsubscribeRequest unsubscribeRequest;
         unsubscribeRequest.region = REGION;
-        unsubscribeRequest.subscriptionArn = subscriptionArn;
+        unsubscribeRequest.subscriptionArn = subscribeResponse.subscriptionArn;
         Dto::SNS::UnsubscribeResponse unsubscribeResponse = _snsService.Unsubscribe(unsubscribeRequest);
         Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
         // assert
-        EXPECT_FALSE(subscriptionArn.empty());
+        EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
         EXPECT_EQ(0, response.topicList[0].subscriptions.size());
     }
 
@@ -229,7 +245,11 @@ namespace AwsMock::Service {
         auto [queueUrl] = _sqsService.GetQueueUrl(queueUrlRequest);
         std::string resultQueueUrl = queueUrl;
 
-        Dto::SNS::SubscribeRequest subscribeRequest = {.region = REGION, .topicArn = topicResponse.topicArn, .protocol = "sqs", .endpoint = queueResponse.queueArn, .owner = OWNER};
+        Dto::SNS::SubscribeRequest subscribeRequest;
+        subscribeRequest.region = REGION;
+        subscribeRequest.topicArn = topicResponse.topicArn;
+        subscribeRequest.protocol = "sqs";
+        subscribeRequest.endpoint = queueResponse.queueArn;
         Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::PublishRequest request = {.region = REGION, .topicArn = topicResponse.topicArn, .message = BODY};
         Dto::SNS::PublishResponse response = _snsService.Publish(request);

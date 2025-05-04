@@ -76,13 +76,16 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::SUBSCRIBE: {
 
-                    std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
-                    std::string protocol = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Protocol");
-                    std::string endpoint = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Endpoint");
+                    Dto::SNS::SubscribeRequest snsRequest;
+                    snsRequest.region = clientCommand.region;
+                    snsRequest.user = clientCommand.user;
+                    snsRequest.requestId = clientCommand.requestId;
+                    snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
+                    snsRequest.protocol = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Protocol");
+                    snsRequest.endpoint = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Endpoint");
+                    Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe(snsRequest);
 
-                    Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe({.region = clientCommand.region, .topicArn = topicArn, .protocol = protocol, .endpoint = endpoint, .owner = clientCommand.user});
-
-                    log_info << "Subscribed to topic, topicArn: " << topicArn;
+                    log_info << "Subscribed to topic, topicArn: " << snsRequest.topicArn;
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 

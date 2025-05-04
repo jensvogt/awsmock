@@ -203,7 +203,7 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("SNS topic does not exists");
             }
 
-            // Create new subscription
+            // Create a new subscription
             const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
@@ -213,12 +213,17 @@ namespace AwsMock::Service {
                 // Add subscription
                 topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
 
-                // Save to database
+                // Save to the database
                 topic = _snsDatabase.UpdateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToString();
             }
 
-            return {.subscriptionArn = subscriptionArn};
+            Dto::SNS::SubscribeResponse response;
+            response.requestId = request.requestId;
+            response.subscriptionArn = subscriptionArn;
+            response.region = request.region;
+            response.user = request.user;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.what();

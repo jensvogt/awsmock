@@ -6,17 +6,15 @@
 #define AWSMOCK_DTO_SNS_SUBSCRIBE_REQUEST_H
 
 // C++ standard includes
-#include <sstream>
 #include <string>
+
+// Awsmock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct SubscribeRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct SubscribeRequest final : Common::BaseCounter<SubscribeRequest> {
 
         /**
          * Topic ARN
@@ -34,23 +32,32 @@ namespace AwsMock::Dto::SNS {
         std::string endpoint;
 
         /**
-         * Owner
+         * Return a subscription ARN flag
          */
-        std::string owner;
+        bool returnSubscriptionArn = true;
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const SubscribeRequest &r);
+        friend SubscribeRequest tag_invoke(boost::json::value_to_tag<SubscribeRequest>, boost::json::value const &v) {
+            SubscribeRequest r;
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.protocol = Core::Json::GetStringValue(v, "protocol");
+            r.endpoint = Core::Json::GetStringValue(v, "endpoint");
+            r.returnSubscriptionArn = Core::Json::GetBoolValue(v, "returnSubscriptionArn");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SubscribeRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"protocol", obj.protocol},
+                    {"endpoint", obj.endpoint},
+                    {"returnSubscriptionArn", obj.returnSubscriptionArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS
