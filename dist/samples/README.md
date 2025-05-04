@@ -22,19 +22,26 @@ The following AwsMock modules are covered:
 if your AwsMock manager runs in a docker container, make sure the docker container is reachable from the host, and the
 port can be pinged.
 
-## Start an example
+## Start an AwsMock as docker container
 
-Start awsmock as a docker container using
-
-```docker-compose up ./docker```
-In order to start one of the examples, you need to change the directory to the given example root directory. Depending
-on
-your installation directory this will be either ```/usr/shares/awsmock/samples/s3```
-or ```/usr/local shares/awsmock/samples/s3``` for the S3 samples.
-
-Start the example with one of the supplied bash scripts:
+Start awsmock as a docker container using:
 
 ```
-/usr/shares/awsmock/samples/s3
+cd docker
+docker-compose up -d
+```
+
+This will start the docker container as well as a mongodb instance. The configuration will be taken from
+```docker/etc/awsmock.json```. If you need to customize the behaviour of AwsMock, make the necessary changes in this
+configuration file.
+
+## Start an example
+
+To start one of the examples, you need to switch into the container and change the directory to the given example root
+directory. Start the example with one of the supplied bash scripts:
+
+```
+docker exec -it <container-id> bash
+cd /usr/local/awsmock/samples/s3
 ./create-bucket.sh
 ``` 
