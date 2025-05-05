@@ -8,15 +8,15 @@
 // C++ standard includes
 #include <string>
 
-// AwsMOck includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct SubscribeResponse {
+    struct SubscribeResponse final : Common::BaseCounter<SubscribeResponse> {
 
         /**
          * @brief Subscription ARN
@@ -28,28 +28,37 @@ namespace AwsMock::Dto::SNS {
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                boost::property_tree::ptree root;
+                root.add("SubscribeResponse.SubscribeResult.SubscriptionArn", subscriptionArn);
+                root.add("SubscribeResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+                return Core::XmlUtils::ToXmlString(root);
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const SubscribeResponse &r);
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        };
+
+      private:
+
+        friend SubscribeResponse tag_invoke(boost::json::value_to_tag<SubscribeResponse>, boost::json::value const &v) {
+            SubscribeResponse r;
+            r.subscriptionArn = Core::Json::GetStringValue(v, "subscriptionArn");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SubscribeResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"subscriptionArn", obj.subscriptionArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

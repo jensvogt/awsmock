@@ -25,12 +25,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Message {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct Message final : Common::BaseCounter<Message> {
 
         /**
          * Message ID
@@ -63,9 +58,14 @@ namespace AwsMock::Dto::SQS {
         MessageAttributeList messageAttributes;
 
         /**
-         * MD5 sum
+         * MD5 sum of the message body
          */
-        std::string md5Sum;
+        std::string md5OfBody;
+
+        /**
+         * MD5 sum of message attributes
+         */
+        std::string md5OfMessageAttributes;
 
         /**
          * Created time stamp
@@ -77,40 +77,37 @@ namespace AwsMock::Dto::SQS {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
+            Message r;
+            r.id = v.at("id").as_string();
+            r.messageId = v.at("messageId").as_string();
+            r.receiptHandle = v.at("receiptHandle").as_string();
+            r.body = v.at("body").as_string();
+            r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
+            r.md5OfBody = v.at("md5OfBody").as_string();
+            r.md5OfMessageAttributes = v.at("md5OfMessageAttributes").as_string();
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Message &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Message const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"MessageId", obj.messageId},
+                    {"ReceiptHandle", obj.receiptHandle},
+                    {"Body", obj.body},
+                    {"Attributes", boost::json::value_from(obj.attributes)},
+                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"MD5OfBody", obj.md5OfBody},
+                    {"MD5OfMessageAttributes", obj.md5OfMessageAttributes},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -168,6 +168,20 @@ namespace AwsMock::Database {
         long GetTopicSize(const std::string &topicArn) const;
 
         /**
+         * @brief Updates the counters of a topic
+         *
+         * @param topicArn topic ARN
+         * @param messages number of keys
+         * @param size bucket size
+         * @param initial messages in status INITIAL
+         * @param send messages in status SEND
+         * @param resend messages in status RESEND
+         * @return created bucket entity
+         * @throws DatabaseException
+         */
+        void UpdateTopicCounter(const std::string &topicArn, long messages, long size, long initial, long send, long resend);
+
+        /**
          * @brief Deletes a topic.
          *
          * @param topic topic entity
@@ -210,7 +224,7 @@ namespace AwsMock::Database {
         [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid);
 
         /**
-         * @brief Count the number of message by ARN
+         * @brief Count the number of messages by ARN
          *
          * @param topicArn ARN of the topic
          * @return number of available messages
@@ -236,13 +250,12 @@ namespace AwsMock::Database {
         Entity::SNS::Message UpdateMessage(Entity::SNS::Message &message);
 
         /**
-         * @brief Count the number of message by state
+         * @brief Count the number of messages by state
          *
-         * @param region AWS region
          * @param topicArn ARN of the topic
          * @param status message status
          */
-        long CountMessagesByStatus(const std::string &region, const std::string &topicArn, Entity::SNS::MessageStatus status) const;
+        long CountMessagesByStatus(const std::string &topicArn, Entity::SNS::MessageStatus status) const;
 
         /**
          * @brief Deletes a message.
@@ -265,10 +278,10 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param topicArn topic ARN
-         * @param receipts vector of receipts
+         * @param messageIds vector of receipts
          * @throws Core::DatabaseException
          */
-        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &receipts);
+        void DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds);
 
         /**
           * @brief Deletes old resources message.

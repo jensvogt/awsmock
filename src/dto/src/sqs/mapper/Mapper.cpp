@@ -2,6 +2,9 @@
 // Created by vogje01 on 5/10/24.
 //
 
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 
 namespace AwsMock::Dto::SQS {
@@ -9,9 +12,7 @@ namespace AwsMock::Dto::SQS {
     Database::Entity::SQS::Message Mapper::map(const SendMessageRequest &request) {
 
         Database::Entity::SQS::Message messageEntity;
-        messageEntity.body = request.body,
-        messageEntity.size = static_cast<long>(request.body.length()),
-        messageEntity.contentType = request.contentType;
+        messageEntity.body = request.body;
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Database::Entity::SQS::MessageAttribute attribute;
@@ -20,18 +21,23 @@ namespace AwsMock::Dto::SQS {
             attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
             messageEntity.messageAttributes[fst] = attribute;
         }
+        for (const auto &[fst, snd]: request.messageSystemAttributes) {
+            Database::Entity::SQS::MessageAttribute attribute;
+            attribute.stringValue = snd.stringValue;
+            attribute.stringListValues = snd.stringListValues;
+            attribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
+            messageEntity.messageSystemAttributes[fst] = attribute;
+        }
         return messageEntity;
     }
 
     SendMessageResponse Mapper::map(const SendMessageRequest &request, const Database::Entity::SQS::Message &messageEntity) {
 
         SendMessageResponse response;
-        response.queueUrl = request.queueUrl,
         response.messageId = messageEntity.messageId,
-        response.receiptHandle = messageEntity.receiptHandle,
         response.md5Body = messageEntity.md5Body,
         response.md5MessageAttributes = messageEntity.md5MessageAttributes,
-        response.md5SystemAttributes = messageEntity.md5SystemAttributes,
+        response.md5MessageSystemAttributes = messageEntity.md5MessageSystemAttributes,
         response.requestId = request.requestId;
         return response;
     }
@@ -57,6 +63,28 @@ namespace AwsMock::Dto::SQS {
             listMessageCountersResponse.messages.emplace_back(messageCounter);
         }
         return listMessageCountersResponse;
+    }
+
+    Message Mapper::map(const Database::Entity::SQS::Message &messageEntity) {
+
+        Message messageDto;
+        messageDto.messageId = messageEntity.messageId;
+        messageDto.receiptHandle = messageEntity.receiptHandle;
+        messageDto.body = messageEntity.body;
+        messageDto.attributes = messageEntity.attributes;
+        messageDto.messageAttributes = map(messageEntity.messageAttributes);
+        messageDto.md5OfBody = Database::SqsUtils::CreateMd5OfMessageBody(messageEntity.body);
+        messageDto.md5OfMessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(messageEntity.messageAttributes);
+        return messageDto;
+    }
+
+    std::vector<Message> Mapper::map(const std::vector<Database::Entity::SQS::Message> &messageEntities) {
+
+        std::vector<Message> messageDtos;
+        for (const auto &messageEntity: messageEntities) {
+            messageDtos.emplace_back(map(messageEntity));
+        }
+        return messageDtos;
     }
 
     Database::Entity::SQS::MessageAttributeList Mapper::map(const std::map<std::string, MessageAttribute> &messageAttributes) {

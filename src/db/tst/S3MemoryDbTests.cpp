@@ -39,8 +39,10 @@ namespace AwsMock::Database {
         }
 
         void TearDown() override {
-            _s3Database.DeleteAllBuckets();
-            _s3Database.DeleteAllObjects();
+            long count = _s3Database.DeleteAllBuckets();
+            log_debug << "S3 buckets deleted, count: " << count;
+            count = _s3Database.DeleteAllObjects();
+            log_debug << "S3 objects deleted, count: " << count;
         }
 
         std::string _region;
@@ -325,7 +327,7 @@ namespace AwsMock::Database {
         }
 
         // act
-        EXPECT_NO_THROW({ _s3Database.DeleteObjects(bucket.name, keys); });
+        EXPECT_NO_THROW({ _s3Database.DeleteObjects(_region, bucket.arn, keys); });
         const bool result = _s3Database.ObjectCount(bucket.region, bucket.name);
 
         // assert

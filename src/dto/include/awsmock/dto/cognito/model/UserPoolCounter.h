@@ -60,7 +60,7 @@ namespace AwsMock::Dto::Cognito {
          */
         system_clock::time_point modified;
 
-    private:
+      private:
 
         friend UserPoolCounter tag_invoke(boost::json::value_to_tag<UserPoolCounter>, boost::json::value const &v) {
             UserPoolCounter r;
@@ -77,18 +77,18 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserPoolCounter const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"id", obj.id},
-                {"name", obj.name},
-                {"userPoolId", obj.userPoolId},
-                {"arn", obj.arn},
-                {"domain", obj.domain},
-                {"userCount", obj.userCount},
-                {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-        };
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"id", obj.id},
+                    {"name", obj.name},
+                    {"userPoolId", obj.userPoolId},
+                    {"arn", obj.arn},
+                    {"domain", obj.domain},
+                    {"userCount", obj.userCount},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
         }
     };
 

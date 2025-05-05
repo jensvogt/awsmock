@@ -44,7 +44,9 @@ include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_
 
 # Shared library
 if (NOT WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/utils/SqsUtils.h
+            src/utils/SqsUtils.cpp)
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
 endif ()

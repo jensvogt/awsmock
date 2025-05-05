@@ -55,6 +55,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
         std::string tableName;
 
         /**
+         * Item size in bytes
+         */
+        long size{};
+
+        /**
          * Attributes
          */
         std::map<std::string, AttributeValue> attributes;
@@ -89,7 +94,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         Item FromDocument(const view_or_value<view, value> &mResult);
 
         /**
-         * @brief Converts the DynamoDB document to an MongoDb entity
+         * @brief Converts the DynamoDB document to a MongoDb entity
          *
          * @param mResult query result.
          */

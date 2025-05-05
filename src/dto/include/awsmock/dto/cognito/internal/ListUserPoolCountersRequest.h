@@ -41,7 +41,7 @@ namespace AwsMock::Dto::Cognito {
          */
         std::vector<Common::SortColumn> sortColumns;
 
-    private:
+      private:
 
         friend ListUserPoolCountersRequest tag_invoke(boost::json::value_to_tag<ListUserPoolCountersRequest>, boost::json::value const &v) {
             ListUserPoolCountersRequest r;
@@ -53,14 +53,14 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolCountersRequest const &obj) {
             jv = {
-                {"region", obj.region},
-                {"user", obj.user},
-                {"requestId", obj.requestId},
-                {"prefix", obj.prefix},
-                {"pageSize", obj.pageSize},
-                {"pageIndex", obj.pageIndex},
-                {"sortColumns", boost::json::value_from(obj.sortColumns)},
-        };
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"prefix", obj.prefix},
+                    {"pageSize", obj.pageSize},
+                    {"pageIndex", obj.pageIndex},
+                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
+            };
         }
     };
 

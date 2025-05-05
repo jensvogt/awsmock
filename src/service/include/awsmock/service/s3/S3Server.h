@@ -51,7 +51,7 @@ namespace AwsMock::Service {
         /**
          * Update counters
          */
-        void UpdateCounter() const;
+        void UpdateCounter();
 
         /**
          * Metric service
@@ -66,7 +66,7 @@ namespace AwsMock::Service {
         /**
          * Monitoring period
          */
-        int _monitoringPeriod;
+        int _monitoringPeriod{};
 
         /**
          * Worker directory object synchronization period
@@ -74,9 +74,19 @@ namespace AwsMock::Service {
         int _syncPeriod;
 
         /**
-         * Worker bucket size period
+         * S3 bucket counter period
          */
-        int _sizePeriod;
+        int _counterPeriod;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::S3CounterMapType *_s3CounterMap{};
     };
 
 }// namespace AwsMock::Service

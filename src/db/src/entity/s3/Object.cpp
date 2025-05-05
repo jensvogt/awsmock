@@ -16,6 +16,7 @@ namespace AwsMock::Database::Entity::S3 {
         view_or_value<view, value> objectDoc = make_document(
                 kvp("region", region),
                 kvp("bucket", bucket),
+                kvp("bucketArn", bucketArn),
                 kvp("key", key),
                 kvp("owner", owner),
                 kvp("size", static_cast<bsoncxx::types::b_int64>(size)),
@@ -36,6 +37,7 @@ namespace AwsMock::Database::Entity::S3 {
         oid = Core::Bson::BsonUtils::GetOidValue(mResult.value()["_id"]);
         region = Core::Bson::BsonUtils::GetStringValue(mResult.value()["region"]);
         bucket = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucket"]);
+        bucketArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucketArn"]);
         key = Core::Bson::BsonUtils::GetStringValue(mResult.value()["key"]);
         owner = Core::Bson::BsonUtils::GetStringValue(mResult.value()["owner"]);
         size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);

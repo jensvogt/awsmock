@@ -13,6 +13,9 @@
 #include <awsmock/service/sqs/SQSService.h>
 
 // AwsMOck includes
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/core/TestUtils.h>
 
 #define REGION "eu-central-1"
@@ -111,7 +114,10 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest sendMessageRequest;
+        sendMessageRequest.region = REGION;
+        sendMessageRequest.queueUrl = queueResponse.queueUrl;
+        sendMessageRequest.body = BODY;
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
         Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
         getQueueDetailsRequest.region = REGION;
@@ -147,7 +153,10 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::SendMessageRequest sendMessageRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest sendMessageRequest;
+        sendMessageRequest.region = REGION;
+        sendMessageRequest.queueUrl = queueResponse.queueUrl;
+        sendMessageRequest.body = BODY;
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
         Dto::SQS::ListQueueCountersRequest listQueueCountersRequest;
         listQueueCountersRequest.region = REGION;
@@ -191,7 +200,9 @@ namespace AwsMock::Service {
         deleteRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
-        EXPECT_NO_THROW({ _service.DeleteQueue(deleteRequest); });
+        EXPECT_NO_THROW({
+            Dto::SQS::DeleteQueueResponse response = _service.DeleteQueue(deleteRequest);
+        });
 
         // assert
         EXPECT_EQ(0, _database.ListQueues(REGION).size());
@@ -207,7 +218,9 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest request = {.queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest request;
+        request.queueUrl = queueUrl;
+        request.body = BODY;
         request.region = REGION;
         request.requestId = Core::StringUtils::CreateRandomUuid();
 
@@ -218,7 +231,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response.messageId.empty());
         EXPECT_TRUE(response.md5Body == BODY_MD5);
         EXPECT_TRUE(response.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response.md5SystemAttributes.empty());
+        EXPECT_TRUE(response.md5MessageSystemAttributes.empty());
     }
 
     TEST_F(SQSServiceTest, MessagesCreateTest) {
@@ -231,9 +244,15 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest request1 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest request1;
+        request1.region = REGION;
+        request1.queueUrl = queueUrl;
+        request1.body = BODY;
         request1.requestId = Core::StringUtils::CreateRandomUuid();
-        Dto::SQS::SendMessageRequest request2 = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .messageId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest request2;
+        request2.region = REGION;
+        request2.queueUrl = queueUrl;
+        request2.body = BODY;
         request2.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
@@ -244,11 +263,11 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response1.messageId.empty());
         EXPECT_TRUE(response1.md5Body == BODY_MD5);
         EXPECT_TRUE(response1.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response1.md5SystemAttributes.empty());
+        EXPECT_TRUE(response1.md5MessageSystemAttributes.empty());
         EXPECT_FALSE(response2.messageId.empty());
         EXPECT_TRUE(response2.md5Body == BODY_MD5);
         EXPECT_TRUE(response2.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response2.md5SystemAttributes.empty());
+        EXPECT_TRUE(response2.md5MessageSystemAttributes.empty());
     }
 
     TEST_F(SQSServiceTest, MessageReceiveTest) {
@@ -258,11 +277,18 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .body = BODY, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest msgRequest;
+        msgRequest.region = REGION;
+        msgRequest.queueUrl = queueUrl;
+        msgRequest.body = BODY;
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
-        Dto::SQS::ReceiveMessageRequest receiveRequest = {.region = REGION, .queueUrl = queueUrl, .queueName = QUEUE, .maxMessages = 10, .waitTimeSeconds = 1};
+        Dto::SQS::ReceiveMessageRequest receiveRequest;
+        receiveRequest.region = REGION;
+        receiveRequest.queueUrl = queueUrl;
+        receiveRequest.maxMessages = 10;
+        receiveRequest.waitTimeSeconds = 1;
         Dto::SQS::ReceiveMessageResponse receiveResponse = _service.ReceiveMessages(receiveRequest);
 
         // assert
@@ -276,11 +302,14 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
-        Dto::SQS::SendMessageRequest msgRequest = {.region = REGION, .queueUrl = queueUrl, .body = BODY, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::SendMessageRequest msgRequest;
+        msgRequest.region = REGION;
+        msgRequest.queueUrl = queueUrl;
+        msgRequest.body = BODY;
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
         // act
-        Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl = queueUrl, .receiptHandle = msgResponse.receiptHandle};
+        Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl = queueUrl};
         Dto::SQS::DeleteMessageResponse delResponse;
         EXPECT_NO_FATAL_FAILURE({ _service.DeleteMessage(delRequest); });
 
@@ -296,14 +325,14 @@ namespace AwsMock::Service {
         // MessageAttribute.1.Value.StringValue=application/json
         // MessageAttribute.1.Value.DataType=String
         //
-        Dto::SQS::MessageAttribute messageAttribute;
+        Database::Entity::SQS::MessageAttribute messageAttribute;
         messageAttribute.stringValue = "application/json";
-        messageAttribute.dataType = Dto::SQS::MessageAttributeDataType::STRING;
-        std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
+        messageAttribute.dataType = Database::Entity::SQS::MessageAttributeType::STRING;
+        std::map<std::string, Database::Entity::SQS::MessageAttribute> messageAttributes;
         messageAttributes["contentType"] = messageAttribute;
 
         // act
-        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+        const std::string md5sum = Database::SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("6ed5f16969b625c8d900cbd5da557e9e" == md5sum);
@@ -320,20 +349,20 @@ namespace AwsMock::Service {
         // MessageAttribute.2.Value.StringValue=42
         // MessageAttribute.2.Value.DataType=Number
         //
-        Dto::SQS::MessageAttribute messageAttribute1;
+        Database::Entity::SQS::MessageAttribute messageAttribute1;
         std::string name1 = "contentType";
         messageAttribute1.stringValue = "application/json";
-        messageAttribute1.dataType = Dto::SQS::MessageAttributeDataType::STRING;
-        Dto::SQS::MessageAttribute messageAttribute2;
+        messageAttribute1.dataType = Database::Entity::SQS::MessageAttributeType::STRING;
+        Database::Entity::SQS::MessageAttribute messageAttribute2;
         std::string name2 = "contentType";
         messageAttribute2.stringValue = "42";
-        messageAttribute2.dataType = Dto::SQS::MessageAttributeDataType::NUMBER;
-        std::map<std::string, Dto::SQS::MessageAttribute> messageAttributes;
+        messageAttribute2.dataType = Database::Entity::SQS::MessageAttributeType::STRING;
+        std::map<std::string, Database::Entity::SQS::MessageAttribute> messageAttributes;
         messageAttributes[name1] = messageAttribute1;
         messageAttributes[name2] = messageAttribute2;
 
         // act
-        const std::string md5sum = Dto::SQS::MessageAttribute::GetMd5Attributes(messageAttributes);
+        const std::string md5sum = Database::SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
 
         // assert
         EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);

@@ -43,6 +43,7 @@
 #define S3_BUCKET_COUNT "s3_bucket_counter"
 #define S3_OBJECT_COUNT "s3_object_counter"
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_counter"
+#define S3_SIZE_BY_BUCKET_COUNT "s3_size_by_bucket_counter"
 #define S3_SERVICE_TIMER "s3_service_timer"
 #define S3_SERVICE_COUNTER "s3_service_counter"
 

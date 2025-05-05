@@ -106,7 +106,7 @@ namespace AwsMock::FtpServer {
 
         ftp_session->start();
 
-        auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
+        auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this] { --_openConnectionCount; });
 
         _acceptor.async_accept(new_session->getSocket(), [this, new_session](auto ec) {
             ++_openConnectionCount;

@@ -10,16 +10,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct PutObjectResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct PutObjectResponse final : Common::BaseCounter<PutObjectResponse> {
 
         /**
          * Bucket
@@ -30,6 +25,11 @@ namespace AwsMock::Dto::S3 {
          * Key
          */
         std::string key;
+
+        /**
+         * Version ID
+         */
+        std::string versionId;
 
         /**
          * ETag
@@ -47,6 +47,11 @@ namespace AwsMock::Dto::S3 {
         long contentLength;
 
         /**
+         * Content type
+         */
+        std::string contentType = {};
+
+        /**
          * Base64 encoded SHA1 checksum
          */
         std::string sha1Sum = {};
@@ -61,31 +66,40 @@ namespace AwsMock::Dto::S3 {
          */
         std::map<std::string, std::string> metadata;
 
-        /**
-         * Version ID
-         */
-        std::string versionId;
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend PutObjectResponse tag_invoke(boost::json::value_to_tag<PutObjectResponse>, boost::json::value const &v) {
+            PutObjectResponse r;
+            r.bucket = v.at("bucket").as_string();
+            r.key = v.at("key").as_string();
+            r.versionId = v.at("versionId").as_string();
+            r.etag = v.at("etag").as_string();
+            r.md5Sum = v.at("md5Sum").as_string();
+            r.contentLength = v.at("contentLength").as_int64();
+            r.contentType = v.at("contentType").as_string();
+            r.sha1Sum = v.at("sha1Sum").as_string();
+            r.sha256sum = v.at("sha256sum").as_string();
+            r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PutObjectResponse &p);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutObjectResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"key", obj.key},
+                    {"versionId", obj.versionId},
+                    {"etag", obj.etag},
+                    {"md5Sum", obj.md5Sum},
+                    {"contentLength", obj.contentLength},
+                    {"contentType", obj.contentType},
+                    {"sha1Sum", obj.sha1Sum},
+                    {"sha256sum", obj.sha256sum},
+                    {"metadata", boost::json::value_from(obj.metadata)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

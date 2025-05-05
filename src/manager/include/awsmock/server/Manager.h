@@ -6,10 +6,13 @@
 #define AWSMOCK_MANAGER_H
 
 // Boost includes
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 #include <awsmock/service/gateway/GatewayServer.h>
@@ -91,14 +94,19 @@ namespace AwsMock::Manager {
          * @par
          * Gateway and monitoring are a bit special, as they are not modules, but they still exists in the module database.
          */
-        void LoadModulesFromConfiguration();
+        static void LoadModulesFromConfiguration();
 
         /**
-         * @brief Ensures that the modules exists
+         * @brief Ensures that the module exists
          *
          * @param key module key
          */
         static void EnsureModuleExisting(const std::string &key);
+
+        /**
+         * Create a shared memory segment for monitoring
+         */
+        void CreateSharedMemorySegment();
 
         /**
          * Thread group
@@ -109,6 +117,11 @@ namespace AwsMock::Manager {
          * MongoDB connection pool
          */
         Database::ConnectionPool &_pool = Database::ConnectionPool::instance();
+
+        /**
+         * Global shared memory segment
+         */
+        std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 
         /**
          * Running flag

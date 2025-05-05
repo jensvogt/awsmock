@@ -98,11 +98,11 @@ namespace AwsMock::Core {
         Configuration::instance().SetValue<std::string>("awsmock.podman.socket", "/var/run/podman/podman.sock");
 
         // Write a file
-        Configuration::instance().WriteFile(TMP_PROPERTIES_FILE);
+        Configuration::instance().WriteFile(TMP_CONFIGURATION_FILE);
     }
 
     std::string TestUtils::GetTestConfigurationFilename() {
-        return TMP_PROPERTIES_FILE;
+        return TMP_CONFIGURATION_FILE;
     }
 
     Configuration &TestUtils::GetTestConfiguration(const bool withDatabase) {

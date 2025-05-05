@@ -27,8 +27,10 @@ namespace AwsMock::Dto::SNS {
 
         friend ListTagCountersResponse tag_invoke(boost::json::value_to_tag<ListTagCountersResponse>, boost::json::value const &v) {
             ListTagCountersResponse r;
-            r.total = v.at("total").as_int64();
-            r.tagCounters = boost::json::value_to<std::vector<TagCounter>>(v.at("tagCounters"));
+            r.total = Core::Json::GetLongValue(v, "total");
+            if (Core::Json::AttributeExists(v, "tagCounters")) {
+                r.tagCounters = boost::json::value_to<std::vector<TagCounter>>(v.at("tagCounters"));
+            }
             return r;
         }
 

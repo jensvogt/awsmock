@@ -35,10 +35,11 @@
 #endif
 
 #ifdef _WIN32
-#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.json"
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #endif
+#define DEFAULT_LOG_LEVEL "info"
 
 /**
  * Show help
@@ -71,6 +72,8 @@ int main(const int argc, char *argv[]) {
     desc.add_options()("host", boost::program_options::value<std::string>()->default_value(DEFAULT_HOST), "AWS host name");
     desc.add_options()("port", boost::program_options::value<int>()->default_value(DEFAULT_PORT), "AWS port");
     desc.add_options()("profile", boost::program_options::value<std::string>()->default_value(DEFAULT_PROFILE), "AWS profile");
+    desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "AwsMock configuration");
+    desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_LEVEL), "AwsMock log level");
     desc.add_options()("help", "produce help message");
 
     // Get command line options.
@@ -85,7 +88,7 @@ int main(const int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
 
-    // Show version
+    // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
                   << "AwsMock awslocal v" << AwsMock::Core::Configuration::GetVersion() << std::endl
@@ -99,6 +102,16 @@ int main(const int argc, char *argv[]) {
         configuration.SetFilename(vm["config"].as<std::string>());
     } else {
         configuration.SetFilename(DEFAULT_CONFIG_FILE);
+    }
+
+    // Set the log level
+    if (vm.contains("loglevel")) {
+        auto value = vm["loglevel"].as<std::string>();
+        AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
+        AwsMock::Core::LogStream::SetSeverity(value);
+    } else {
+        const auto level = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.level");
+        AwsMock::Core::LogStream::SetSeverity(level);
     }
 
     // Get commands.

@@ -194,7 +194,7 @@ int main(const int argc, char *argv[]) {
         return 0;
     }
 
-    // Show version
+    // Show the version
     if (vm.contains("version")) {
         std::cout << std::endl
                   << "AwsMock manager v" << AwsMock::Core::Configuration::GetVersion() << std::endl

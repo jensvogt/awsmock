@@ -43,7 +43,7 @@ namespace AwsMock::Service {
             }
         }
 
-        Core::Configuration _configuration = Core::Configuration(TMP_PROPERTIES_FILE);
+        Core::Configuration _configuration = Core::Configuration(TMP_CONFIGURATION_FILE);
         ContainerService _service = ContainerService();
     };
 
