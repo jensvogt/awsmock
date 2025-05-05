@@ -30,7 +30,7 @@ FROM debian:trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libssh-4 libquadmath0
+RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libssh-4 libquadmath0 curl unzip groff less
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -46,6 +46,16 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/init && \
     mkdir -p /usr/local/awsmock/log && \
     mkdir -p /usr/local/awsmock/frontend
+
+# Install AWS CLI (v2, latest)
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+ && unzip awscliv2.zip \
+ && ./aws/install \
+ && rm -rf awscliv2.zip aws
+
+# Just in case, ensure it's available at /usr/local/bin/aws
+RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
+RUN rm -rf /lib/x86_64-linux-gnu/libmagic* || true
 
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
@@ -63,6 +73,9 @@ COPY --from=build /lib/x86_64-linux-gnu/libicuuc.so.72 /lib/x86_64-linux-gnu/
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
+RUN ln -s /usr/local/awsmock/bin/awslocal /usr/bin/awslocal || true
+RUN ln -s /usr/local/awsmock/bin/awsmockctl /usr/bin/awsmockctl || true
+RUN ln -s /usr/local/awsmock/bin/awsmockmgr /usr/bin/awsmockmgr || true
 
 # Expose manager/awslocal ports
 EXPOSE 4566-4567 4566-4567
@@ -70,6 +83,8 @@ EXPOSE 4566-4567 4566-4567
 EXPOSE 9091 9091
 # FTP server ports
 EXPOSE 21 21
+EXPOSE 2121 2121
+EXPOSE 2222 2222
 # FTP passive mode ports
 EXPOSE 6000-6100 6000-6100
 

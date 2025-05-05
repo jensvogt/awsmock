@@ -12,7 +12,7 @@
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
 
-#define TMP_PROPERTIES_FILE "/tmp/awsmock.yml"
+#define TMP_CONFIGURATION_FILE "/tmp/awsmock.json"
 
 namespace AwsMock::Core {
 

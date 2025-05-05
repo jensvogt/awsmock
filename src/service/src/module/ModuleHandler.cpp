@@ -19,8 +19,8 @@ namespace AwsMock::Service {
             if (action == "get-config") {
 
                 Core::Configuration &configuration = Core::Configuration::instance();
-                std::string host = configuration.GetValue<std::string>("awsmock.gateway.http.host");
-                std::string address = configuration.GetValue<std::string>("awsmock.gateway.http.address");
+                auto host = configuration.GetValue<std::string>("awsmock.gateway.http.host");
+                auto address = configuration.GetValue<std::string>("awsmock.gateway.http.address");
                 int port = configuration.GetValue<int>("awsmock.gateway.http.port");
                 std::string endpoint = "http://" + host + ":" + std::to_string(port);
                 Dto::Module::GatewayConfig config = {

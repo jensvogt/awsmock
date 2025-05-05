@@ -30,6 +30,11 @@ namespace AwsMock::Core {
         return homeDir;
     }
 
+    std::string SystemUtils::GetRootDir() {
+        const boost::filesystem::path path;
+        return path.root_directory().string();
+    }
+
     std::string SystemUtils::GetHostName() {
         return boost::asio::ip::host_name();
     }

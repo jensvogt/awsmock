@@ -84,11 +84,11 @@ namespace AwsMock::Service {
                         s3Request.versionId = versionId;
                     }
 
-                    // Get range
+                    // Get the range
                     long size;
                     GetRange(request, s3Request.min, s3Request.max, size);
 
-                    // Get object
+                    // Get the object
                     Dto::S3::GetObjectResponse s3Response = _s3Service.GetObject(s3Request);
 
                     std::map<std::string, std::string> headerMap;
@@ -269,18 +269,18 @@ namespace AwsMock::Service {
 
                     // Checksum/chunked encoding
                     std::string checksumAlgorithm = Core::HttpUtils::GetHeaderValue(request, "x-amz-sdk-checksum-algorithm");
-                    bool chunked = Core::HttpUtils::HasHeader(request, "x-amz-trailer: x-amz-checksum-crc32");
+                    bool chunked = Core::HttpUtils::HasHeaderValue(request, "Content-Encoding", "aws-chunked");
 
                     // S3 put object request
-                    Dto::S3::PutObjectRequest putObjectRequest = {
-                            .region = clientCommand.region,
-                            .bucket = clientCommand.bucket,
-                            .key = clientCommand.key,
-                            .owner = clientCommand.user,
-                            .md5Sum = request["Content-MD5"],
-                            .contentType = clientCommand.contentType,
-                            .checksumAlgorithm = checksumAlgorithm,
-                            .metadata = metadata};
+                    Dto::S3::PutObjectRequest putObjectRequest;
+                    putObjectRequest.region = clientCommand.region;
+                    putObjectRequest.bucket = clientCommand.bucket;
+                    putObjectRequest.key = clientCommand.key;
+                    putObjectRequest.owner = clientCommand.user;
+                    putObjectRequest.md5Sum = clientCommand.contentMd5;
+                    putObjectRequest.contentType = clientCommand.contentType;
+                    putObjectRequest.checksumAlgorithm = checksumAlgorithm;
+                    putObjectRequest.metadata = metadata;
 
                     boost::beast::net::streambuf sb;
                     putObjectRequest.contentLength = PrepareBody(request, sb);

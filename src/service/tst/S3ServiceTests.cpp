@@ -40,8 +40,10 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllObjects();
-            _database.DeleteAllBuckets();
+            long count = _database.DeleteAllObjects();
+            log_info << "Database objects deleted: " << count << std::endl;
+            count = _database.DeleteAllBuckets();
+            log_info << "Database buckets deleted: " << count << std::endl;
             Core::FileUtils::DeleteFile(testFile);
         }
 
@@ -69,7 +71,10 @@ namespace AwsMock::Service {
         const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
         auto [location, arn] = _service.CreateBucket(createRequest);
         std::ifstream ifs(testFile);
-        Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::PutObjectRequest putRequest;
+        putRequest.region = REGION;
+        putRequest.bucket = BUCKET;
+        putRequest.key = KEY;
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
         const Dto::S3::ListBucketRequest listRequest = {.region = REGION, .name = BUCKET};
 
@@ -118,7 +123,10 @@ namespace AwsMock::Service {
         std::ifstream ifs(testFile);
 
         // act
-        Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::PutObjectRequest putRequest;
+        putRequest.region = REGION;
+        putRequest.bucket = BUCKET;
+        putRequest.key = KEY;
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // assert
@@ -132,7 +140,10 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
         Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
         std::ifstream ifs(testFile);
-        Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::PutObjectRequest putRequest;
+        putRequest.region = REGION;
+        putRequest.bucket = BUCKET;
+        putRequest.key = KEY;
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // act
@@ -153,7 +164,10 @@ namespace AwsMock::Service {
         Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
         Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
         std::ifstream ifs(testFile);
-        Dto::S3::PutObjectRequest putRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::PutObjectRequest putRequest;
+        putRequest.region = REGION;
+        putRequest.bucket = BUCKET;
+        putRequest.key = KEY;
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // act

@@ -21,10 +21,10 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
-#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                           \
-                             "VOLUME /home/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
-                             "WORKDIR /home/dynamodblocal\n"                                 \
-                             "EXPOSE 8000 8000\n"                                            \
+#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                                \
+                             "VOLUME /usr/local/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
+                             "WORKDIR /home/dynamodblocal\n"                                      \
+                             "EXPOSE 8000 8000\n"                                                 \
                              "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]\n"
 
 namespace AwsMock::Service {
@@ -46,21 +46,27 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * @brief Creates a local network.
+         *
+         * @par
+         * The lambda functions need to connect to a local bridged network, otherwise they cannot communicate with the awsmock manager.
+         */
+        void CreateLocalNetwork() const;
+
+        /**
          * @brief Start the local DynamoDB container.
          *
-         * <p>
-         * If the AWS DynamoDb docker image does not already exists, it will be downloaded. Otherwise the local docker
-         * image will be started as container.
-         * </p>
+         * @par
+         * If the AWS DynamoDb docker image does not already exist, it will be downloaded. Otherwise, the local docker
+         * image will be started as a container.
          */
         void StartLocalDynamoDb() const;
 
         /**
          * @brief Stop the local DynamoDB container.
          *
-         * <p>
+         * @par
          * The AWS DynamoDb docker container will be stopped.
-         * </p>
          */
         void StopLocalDynamoDb() const;
 
@@ -72,19 +78,21 @@ namespace AwsMock::Service {
         /**
          * @brief Synchronize tables.
          *
-         * Loops over all DynamoDB tables an updates the MongoDB backend.
+         * @par
+         * Loops over all DynamoDB tables and updates the MongoDB backend.
          */
         void SynchronizeTables() const;
 
         /**
          * @brief Synchronize items.
          *
-         * Loops over all DynamoDB table items an updates the MongoDB backend.
+         * @par
+         * Loops over all DynamoDB table items and updates the MongoDB backend.
          */
         void SynchronizeItems() const;
 
         /**
-         * Docker module
+         * Container module (either docker or podman)
          */
         ContainerService &_containerService;
 

@@ -29,9 +29,9 @@
 #include <awsmock/controller/Controller.h>
 
 #ifdef _WIN32
-#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.j́son"
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.yml"
+#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #endif
 
 // Allowed actions
@@ -65,7 +65,6 @@ void ShowHelp(const boost::program_options::options_description &desc) {
               << std::left << std::setw(leftIndent) << "  import" << ": imports the infrastructure from stdin." << std::endl
               << std::left << std::setw(leftIndent) << "  clean [modules]" << ": cleans the current infrastructure. Modules is a space separated list of module names." << std::endl
               << std::left << std::setw(leftIndent) << "  clean-objects [modules]" << ": cleans the objects from the module. Modules is a space separated list of module names." << std::endl
-              << std::left << std::setw(leftIndent) << "  show-ftp-users [serverId]" << ": shows the current ftp users of the given server." << std::endl
               << std::left << std::setw(leftIndent) << "  ping" << ": ping the manager." << std::endl
               << "\nExport options:\n"
               << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
@@ -134,7 +133,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Core::Configuration::instance().SetValue<std::string>("awsmock.logging.level", value);
         AwsMock::Core::LogStream::SetSeverity(value);
     } else {
-        AwsMock::Core::LogStream::SetSeverity("info");
+        AwsMock::Core::LogStream::SetSeverity("warn");
     }
 
     // Set the log file

@@ -37,8 +37,8 @@ namespace AwsMock::Dto::SNS {
 
         friend TagCounter tag_invoke(boost::json::value_to_tag<TagCounter>, boost::json::value const &v) {
             TagCounter r;
-            r.tagKey = v.at("tagKey").as_string();
-            r.tagValue = v.at("tagValue").as_string();
+            r.tagKey = Core::Json::GetStringValue(v, "tagKey");
+            r.tagValue = Core::Json::GetStringValue(v, "tagValue");
             return r;
         }
 

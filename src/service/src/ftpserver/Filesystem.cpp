@@ -263,7 +263,7 @@ namespace AwsMock::FtpServer {
         // Split the path
         std::list<std::string> components;
 
-        if (path.size() >= (absolute_root.size() + 1)) {
+        if (path.size() >= absolute_root.size() + 1) {
             size_t start = 0;
             size_t end = 0;
 
@@ -285,7 +285,8 @@ namespace AwsMock::FtpServer {
                     this_component = path.substr(start, end - start);
 
                 // The components-stack that will increase and shrink depending on the folders and .. elements in the splitted path
-                if (this_component.empty() || (this_component == ".")) {
+                if (this_component.empty() || this_component == ".") {
+                    // Intentionally empty
                 } else if (this_component == "..") {
                     if (!absolute_root.empty()) {
                         if (!components.empty()) {
@@ -306,8 +307,7 @@ namespace AwsMock::FtpServer {
 
                 if (end == std::string::npos)
                     break;
-                else
-                    start = end + 1;
+                start = end + 1;
 
             } while (start < path.size());
 
@@ -320,8 +320,9 @@ namespace AwsMock::FtpServer {
         std::stringstream path_ss;
         path_ss << absolute_root;
 
+        // The Windows drive must be followed by a separator. When referencing a network drive.
         if (windows_path && !absolute_root.empty()) {
-            path_ss << output_separator;// The windows drive must be followed by a separator. When referencing a network drive.
+            path_ss << output_separator;
         }
 
         auto comp_it = components.begin();
@@ -331,9 +332,10 @@ namespace AwsMock::FtpServer {
 
             path_ss << *comp_it;
 
-            comp_it++;
+            ++comp_it;
         }
 
+        log_debug << "CleanPath finished, path: " << path_ss.str();
         return path_ss.str();
     }
 

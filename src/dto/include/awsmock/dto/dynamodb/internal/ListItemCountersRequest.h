@@ -6,11 +6,10 @@
 #define AWSMOCK_DTO_DYNAMODB_LIST_ITEM_COUNTERS_REQUEST_H
 
 // C++ standard includes
-#include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
@@ -36,12 +35,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Page size
          */
-        int pageSize = 10;
+        long pageSize = 10;
 
         /**
          * Page index
          */
-        int pageIndex = 0;
+        long pageIndex = 0;
 
         /**
          * Page index
@@ -52,19 +51,13 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend ListItemCountersRequest tag_invoke(boost::json::value_to_tag<ListItemCountersRequest>, boost::json::value const &v) {
             ListItemCountersRequest r;
-            r.tableName = v.at("tableName").as_string();
-            r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-
-            // Sort columns
-            for (const auto &sc: v.at("sortColumns").as_array()) {
-                Common::SortColumn sortColumn;
-                sortColumn.column = sc.at("column").as_string();
-                sortColumn.sortDirection = sc.at("sortDirection").as_int64();
-                r.sortColumns.emplace_back(sortColumn);
+            r.tableName = Core::Json::GetStringValue(v, "tableName");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             }
-
             return r;
         }
 

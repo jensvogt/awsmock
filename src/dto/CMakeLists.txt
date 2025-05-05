@@ -8,43 +8,44 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
         src/common/MonitoringClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
-        src/sqs/SendMessageRequest.cpp src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp
-        src/sqs/SendMessageRequest.cpp src/sqs/SendMessageResponse.cpp src/sqs/TagQueueRequest.cpp
-        src/sqs/GetQueueUrlRequest.cpp src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp
-        src/sqs/SetQueueAttributesRequest.cpp src/sqs/SetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
-        src/sqs/ReceiveMessageRequest.cpp src/sqs/ReceiveMessageResponse.cpp src/sqs/PurgeQueueRequest.cpp
+        src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
+        src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
         src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp src/sqs/DeleteMessageRequest.cpp
-        src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/SqsCommonRequest.cpp
-        src/sqs/DeleteQueueResponse.cpp src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp
-        src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp
-        src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp
-        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp
-        src/sqs/ListQueueTagsRequest.cpp src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
-        src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/model/Message.cpp
-        src/sqs/mapper/Mapper.cpp src/sqs/UntagQueueRequest.cpp
-        src/sqs/DeleteAttributeRequest.cpp src/sqs/RedriveMessagesRequest.cpp
-)
-set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp src/sns/SubscribeRequest.cpp src/sns/SubscribeResponse.cpp src/sns/CreateTopicRequest.cpp
-        src/sns/UnsubscribeRequest.cpp src/sns/UnsubscribeResponse.cpp src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
-        src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp src/sns/TagResourceRequest.cpp src/sns/TagResourceResponse.cpp src/sns/GetTopicAttributesRequest.cpp
-        src/sns/GetTopicAttributesResponse.cpp src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp src/sns/model/Subscription.cpp
-        src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp src/sns/ListMessagesResponse.cpp src/sns/mapper/Mapper.cpp src/sns/GetTopicDetailsRequest.cpp
-        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp
-        src/sns/PurgeTopicRequest.cpp
-        src/sns/UntagResourceRequest.cpp src/sns/UntagResourceResponse.cpp
-        src/sns/UpdateSubscriptionRequest.cpp src/sns/UpdateSubscriptionResponse.cpp src/sns/model/MessageAttribute.cpp)
-set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp src/s3/PutObjectRequest.cpp src/s3/PutObjectResponse.cpp
-        src/s3/GetObjectRequest.cpp src/s3/GetObjectResponse.cpp src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
-        src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp
-        src/s3/CreateBucketConstraint.cpp src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp src/s3/ListAllBucketResponse.cpp
-        src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
-        src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp src/s3/ListObjectVersionsRequest.cpp
-        src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp src/s3/PutBucketNotificationConfigurationRequest.cpp
-        src/s3/PutBucketNotificationConfigurationResponse.cpp src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
-        src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
-        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
-        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp)
+        src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp
+        src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
+        src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp
+        src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp
+        src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
+        src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
+        src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp src/sqs/DeleteAttributeRequest.cpp)
+set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp
+        src/sns/CreateTopicRequest.cpp
+        src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
+        src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp
+        src/sns/GetTopicAttributesRequest.cpp src/sns/GetTopicAttributesResponse.cpp
+        src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp
+        src/sns/model/Subscription.cpp src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp
+        src/sns/ListMessagesResponse.cpp src/sns/mapper/Mapper.cpp src/sns/GetTopicDetailsRequest.cpp
+        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp src/sns/PurgeTopicRequest.cpp
+        src/sns/UpdateSubscriptionRequest.cpp
+        src/sns/UpdateSubscriptionResponse.cpp src/sns/model/MessageAttribute.cpp)
+set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
+        src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
+        src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
+        src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
+        src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
+        src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp
+        src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
+        src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp
+        src/s3/ListObjectVersionsRequest.cpp src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp
+        src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
+        src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
+        src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp
+        src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
+        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
+        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp
+        src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
+        src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
         src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
@@ -91,8 +92,7 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp
         src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp
         src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
-        src/dynamodb/mapper/Mapper.cpp
-        src/dynamodb/GetItemKey.cpp)
+        src/dynamodb/mapper/Mapper.cpp src/dynamodb/GetItemKey.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
         src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
         src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp
@@ -103,14 +103,16 @@ set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/k
         src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp
         src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp)
-set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp
-        src/ssm/GetParameterResponse.cpp src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
+set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
+        src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
+        src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
         src/ssm/DescribeParametersResponse.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
         src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
         src/module/ImportInfrastructureRequest.cpp)
-set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp src/monitoring/GetMultiCountersResponse.cpp)
+set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp
+        src/monitoring/GetMultiCountersResponse.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}

@@ -24,7 +24,7 @@ namespace AwsMock::Service {
         return moduleNamesResponse;
     }
 
-    Dto::Module::Module::ModuleList ModuleService::StartModules(Dto::Module::Module::ModuleList &modules) const {
+    Dto::Module::Module::ModuleList ModuleService::StartModules(const Dto::Module::Module::ModuleList &modules) const {
 
         ModuleMap moduleMap = ModuleMap::instance();
         for (auto const &m: modules) {
@@ -153,7 +153,7 @@ namespace AwsMock::Service {
 
         Dto::Module::Infrastructure infrastructure = request.infrastructure;
 
-        // Check clean flag
+        // Check the clean flag
         if (request.cleanFirst) {
             Dto::Module::CleanInfrastructureRequest cleanRequest;
             cleanRequest.modules.emplace_back("All");
@@ -364,7 +364,7 @@ namespace AwsMock::Service {
             } else if (m == "sqs") {
                 count += Database::SQSDatabase::instance().DeleteAllMessages();
             } else if (m == "sns") {
-                Database::SNSDatabase::instance().DeleteAllMessages();
+                count += Database::SNSDatabase::instance().DeleteAllMessages();
             } else if (m == "lambda") {
                 count += Database::LambdaDatabase::instance().DeleteAllLambdas();
             } else if (m == "cognito") {
@@ -372,15 +372,15 @@ namespace AwsMock::Service {
                 Database::CognitoDatabase::instance().DeleteAllUserPools();
                 Database::CognitoDatabase::instance().DeleteAllGroups();
             } else if (m == "dynamodb") {
-                Database::DynamoDbDatabase::instance().DeleteAllItems();
+                count += Database::DynamoDbDatabase::instance().DeleteAllItems();
             } else if (m == "secretsmanager") {
-                Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
+                count += Database::SecretsManagerDatabase::instance().DeleteAllSecrets();
             } else if (m == "kms") {
                 count += Database::KMSDatabase::instance().DeleteAllKeys();
             } else if (m == "ssm") {
                 count += Database::SSMDatabase::instance().DeleteAllParameters();
             } else if (m == "transfer") {
-                Database::S3Database::instance().DeleteObjects("transfer-server");
+                Database::S3Database::instance().DeleteObjects("eu-central-1", "transfer-server");
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
             }
         }

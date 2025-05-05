@@ -9,6 +9,10 @@
 #include <sstream>
 #include <string>
 
+// AwsMock includes
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+
 namespace AwsMock::Dto::SNS {
 
     /**
@@ -16,31 +20,29 @@ namespace AwsMock::Dto::SNS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UnsubscribeRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct UnsubscribeRequest final : Common::BaseCounter<UnsubscribeRequest> {
 
         /**
          * Subscription ARN
          */
         std::string subscriptionArn;
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UnsubscribeRequest &r);
+        friend UnsubscribeRequest tag_invoke(boost::json::value_to_tag<UnsubscribeRequest>, boost::json::value const &v) {
+            UnsubscribeRequest r;
+            r.subscriptionArn = Core::Json::GetStringValue(v, "ResourceArn");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UnsubscribeRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"subscriptionArn", obj.subscriptionArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

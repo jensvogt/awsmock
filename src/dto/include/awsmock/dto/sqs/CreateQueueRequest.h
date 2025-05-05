@@ -12,7 +12,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
-#include <awsmock/dto/sqs/SqsCommonRequest.h>
 #include <awsmock/dto/sqs/model/QueueAttribute.h>
 
 namespace AwsMock::Dto::SQS {

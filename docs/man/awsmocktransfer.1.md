@@ -21,12 +21,17 @@ interface for users to interact with their files securely. Whether you’re look
 enhance your data access capabilities, the AWS Transfer API simplifies the process and extends the versatility of
 your cloud storage infrastructure.
 
-The SQS module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
-corresponding man page ```awslocal(1)```.
+The TransferManager module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command
+see the corresponding man page ```awslocal(1)```.
 
-Currently only IPv4 is supported, so if you need to connect to the transfer server using a Linux/MacOS FTP client, make
+Currently only IPv4 is supported, so if you need to connect to the transfer server using a Linux/macOS FTP client, make
 sure you set the host to ```127.0.0.1```, instead of ```localhost```, because sometimes on some Linux machines
 ```localhost``` is resolved to the IPv6 address.
+
+AwsMOck transfer manager supports FTP and SFTP. Usually ```awsmock``` is running as normal user, and the default
+configuration file configures the ports to be 2121 for FTP and 2222 for SFTP. If ouy need to use the standard ports
+(21 for FTP and 22 for SFTP), you need to run the ```awsmockmgr``` as root user. AwsMock transfer manager does not
+support FTP over TLS (as filezilla is using it).
 
 ## COMMANDS
 
@@ -128,5 +133,6 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```, ```awsmockkms(1)``````
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```,
+```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```,
+```awsmocksqs(1)```, ```awsmockkms(1)```

@@ -10,17 +10,12 @@
 #include <vector>
 
 // Awsmock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct UntagQueueRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct UntagQueueRequest final : Common::BaseCounter<UntagQueueRequest> {
 
         /**
          * Queue Url
@@ -32,35 +27,27 @@ namespace AwsMock::Dto::SQS {
          */
         std::vector<std::string> tags;
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend UntagQueueRequest tag_invoke(boost::json::value_to_tag<UntagQueueRequest>, boost::json::value const &v) {
+            UntagQueueRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::vector<std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UntagQueueRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UntagQueueRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
-
-}// namespace AwsMock::Dto::SQS
+};// namespace AwsMock::Dto::SQS
 
 #endif// AWSMOCK_DTO_SQS_UNTAG_QUEUE_REQUEST_H

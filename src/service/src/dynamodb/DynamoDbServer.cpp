@@ -26,6 +26,9 @@ namespace AwsMock::Service {
         }
         log_info << "DynamoDb server starting";
 
+        // Create a local network if it is not existing yet
+        CreateLocalNetwork();
+
         // Start DynamoDb docker image
         StartLocalDynamoDb();
 
@@ -38,6 +41,21 @@ namespace AwsMock::Service {
 
         // Set running
         SetRunning();
+    }
+
+    void DynamoDbServer::CreateLocalNetwork() const {
+        log_debug << "Create networks, name: local";
+
+        if (!_containerService.NetworkExists("local")) {
+            Dto::Docker::CreateNetworkRequest request;
+            request.name = "local";
+            request.driver = "bridge";
+
+            auto [id, warning] = _containerService.CreateNetwork(request);
+            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << id;
+        } else {
+            log_debug << "Docker network exists already, name: local";
+        }
     }
 
     void DynamoDbServer::StartLocalDynamoDb() const {
@@ -57,7 +75,7 @@ namespace AwsMock::Service {
             log_trace << "CreateContainer, containerName: " << _containerName << " id: " << response.id;
         }
 
-        // Start docker container, in case it is not already running.
+        // Start the docker container, in case it is not already running.
         if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); container.state != "running") {
             _containerService.StartDockerContainer(container.id);
             _containerService.WaitForContainer(container.id);

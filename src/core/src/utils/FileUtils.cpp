@@ -440,12 +440,6 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        // Compile the default magic database (indicated by nullptr)
-        /*if (magic_compile(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not compile libmagic";
-            return DEFAULT_MIME_TYPE;
-        }*/
-
         // Get a description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
         if (mime == nullptr) {
@@ -467,28 +461,22 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
-        // allocate magic cookie
+        // Allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
             log_error << "Could not open libmagic";
             return DEFAULT_MIME_TYPE;
         }
 
-        // load the default magic database (indicated by nullptr)
+        // Load the default magic database (indicated by nullptr)
         if (magic_load(magic, magicFile.c_str()) != 0) {
             log_error << "Could not load libmagic mime types, fileName: " << magicFile;
             return DEFAULT_MIME_TYPE;
         }
 
-        // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not compile libmagic";
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // get description of the filename argument
+        // Get the description of the filename argument
         const char *mime = magic_buffer(magic, content.data(), content.size());
         if (mime == nullptr) {
             log_error << "Could not get mime type";
@@ -568,25 +556,74 @@ namespace AwsMock::Core {
         return count;
     }
 
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long start, long length) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long count = StreamCopier(ifs, ofs, start, length);
+        ifs.close();
+        ofs.close();
+        return count;
+    }
+
+    long FileUtils::StreamCopier(const std::string &inputFile, const std::string &outputFile, long count) {
+        std::ifstream ifs(inputFile, std::ios::binary);
+        std::ofstream ofs(outputFile, std::ios::binary);
+        long copied = StreamCopier(ifs, ofs, count);
+        ifs.close();
+        ofs.close();
+        return copied;
+    }
+
     long FileUtils::StreamCopier(std::istream &is, std::ostream &os) {
         is.seekg(0, std::ios::end);
-        long count = is.tellg();
+        const long count = is.tellg();
         is.seekg(0, std::ios::beg);
         return StreamCopier(is, os, count);
     }
 
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
-        char buffer[BUFFER_LEN];
-        while(count > BUFFER_LEN)
-        {
-            istream.read(buffer, BUFFER_LEN);
-            ostream.write(buffer, BUFFER_LEN);
-            count -= BUFFER_LEN;
+        long copied = 0;
+        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
+            char buffer[count];
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied = count;
+        } else {
+            char buffer[bufSize];
+            while (count > bufSize) {
+                istream.read(buffer, bufSize);
+                ostream.write(buffer, bufSize);
+                count -= bufSize;
+                copied += bufSize;
+            }
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied += count;
         }
+        return copied;
+    }
 
-        istream.read(buffer, count);
-        ostream.write(buffer, count);
-        return count;
+    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count) {
+        long copied = 0;
+        istream.seekg(start, std::ios::beg);
+        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
+            char buffer[count];
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied = count;
+        } else {
+            char buffer[bufSize];
+            while (count > bufSize) {
+                istream.read(buffer, bufSize);
+                ostream.write(buffer, bufSize);
+                count -= bufSize;
+                copied += bufSize;
+            }
+            istream.read(buffer, count);
+            ostream.write(buffer, count);
+            copied += count;
+        }
+        return copied;
     }
 
 }// namespace AwsMock::Core

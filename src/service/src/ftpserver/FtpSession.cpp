@@ -7,9 +7,9 @@ namespace AwsMock::FtpServer {
                            std::string serverName,
                            const std::function<void()> &completion_handler)
         : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service),
-          command_socket_(io_service), command_write_strand_(io_service),
-          data_buffer_strand_(io_service), file_rw_strand_(io_service),
-          _ftpWorkingDirectory("/"), _serverName(std::move(serverName)), data_acceptor_(io_service) {
+          command_socket_(io_service), command_write_strand_(io_service), data_type_binary_(true),
+          data_acceptor_(io_service), data_buffer_strand_(io_service),
+          file_rw_strand_(io_service), _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
         // Environment
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValue<std::string>("awsmock.region");
@@ -89,7 +89,7 @@ namespace AwsMock::FtpServer {
                                      log_debug << "Control connection closed by client.";
                                  }
 
-                                 // Close the data connection, if it is open
+                                 // Close the data connection if it is open
                                  {
                                      boost::beast::error_code ec_;
                                      me->data_acceptor_.close(ec_);
@@ -274,12 +274,12 @@ namespace AwsMock::FtpServer {
     // Transfer parameter commands
 
     void FtpSession::handleFtpCommandPORT(const std::string & /*param*/) {
-        sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND,
-                       "FTP active mode is not supported by this manager");
+        sendFtpMessage(FtpReplyCode::SYNTAX_ERROR_UNRECOGNIZED_COMMAND, "FTP active mode is not supported by this manager");
     }
 
     void FtpSession::handleFtpCommandPASV(const std::string & /*param*/) {
         if (!_logged_in_user) {
+            log_error << "Not logged in";
             sendFtpMessage(FtpReplyCode::NOT_LOGGED_IN, "Not logged in");
             return;
         }
@@ -292,7 +292,7 @@ namespace AwsMock::FtpServer {
             }
         }
 
-        // In case of a dockerized FTP server we need to use some special ports
+        // In the case of a dockerized FTP server, we need to use some special ports
         boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
             int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
@@ -1114,6 +1114,7 @@ namespace AwsMock::FtpServer {
 
         data_acceptor_.async_accept(*data_socket, [data_socket, directory_content, me = shared_from_this()](auto ec) {
             if (ec) {
+                log_error << "Error sending directory listing, error: " << ec.message();
                 me->sendFtpMessage(FtpReplyCode::TRANSFER_ABORTED, "Data transfer aborted");
                 return;
             }
@@ -1333,7 +1334,6 @@ namespace AwsMock::FtpServer {
     ////////////////////////////////////////////////////////
     // Helpers
     ////////////////////////////////////////////////////////
-
     std::string FtpSession::toAbsoluteFtpPath(const std::string &rel_or_abs_ftp_path) const {
         std::string absolute_ftp_path;
 
@@ -1425,6 +1425,7 @@ namespace AwsMock::FtpServer {
         }
 
         const auto local_path = toLocalPath(absolute_new_working_dir);
+        log_debug << "Checking file status on file, path: " << local_path;
         const FileStatus file_status(local_path);
 
         if (!file_status.isOk()) {
@@ -1450,14 +1451,14 @@ namespace AwsMock::FtpServer {
         std::string contentType = Core::FileUtils::GetContentType(fileName, key);
         long contentLength = Core::FileUtils::FileSize(fileName);
 
-        Dto::S3::PutObjectRequest request = {
-                .region = _region,
-                .bucket = _bucket,
-                .key = key,
-                .owner = user,
-                .contentType = contentType,
-                .contentLength = contentLength,
-                .metadata = metadata};
+        Dto::S3::PutObjectRequest request;
+        request.region = _region;
+        request.bucket = _bucket;
+        request.key = key;
+        request.owner = user;
+        request.contentType = contentType;
+        request.contentLength = contentLength;
+        request.metadata = metadata;
 
         std::ifstream ifs(fileName, std::ios::binary);
         _s3Service->PutObject(request, ifs);

@@ -26,7 +26,6 @@ namespace AwsMock::AwsLocal {
         std::string out, err;
         command.emplace_back("--endpoint");
         command.emplace_back(_baseUrl);
-        std::cout << "CMD: " << AWS_CMD << "  " << boost::algorithm::join(command, " ") << std::endl;
         Core::SystemUtils::RunShellCommand(AWS_CMD, command, out, err);
         if (!out.empty()) {
             std::cout << out;
@@ -39,6 +38,10 @@ namespace AwsMock::AwsLocal {
     void AwsLocal::ReadAwsConfigFile() {
 
         const std::string fileName = Core::SystemUtils::GetHomeDir() + "/.aws/config";
+        if (!Core::FileUtils::FileExists(fileName)) {
+            log_error << "In order to use profiles, you need to provide a ~/.aws/config file";
+            return;
+        }
         boost::property_tree::ptree pt;
         read_ini(fileName, pt);
         if (pt.get_optional<std::string>(_profile + ".endpoint_url").is_initialized()) {
