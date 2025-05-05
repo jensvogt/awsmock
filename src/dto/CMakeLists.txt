@@ -26,7 +26,7 @@ set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp
         src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp
         src/sns/model/Subscription.cpp src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp
         src/sns/ListMessagesResponse.cpp src/sns/mapper/Mapper.cpp src/sns/GetTopicDetailsRequest.cpp
-        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp src/sns/PurgeTopicRequest.cpp
+        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp
         src/sns/model/MessageAttribute.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
