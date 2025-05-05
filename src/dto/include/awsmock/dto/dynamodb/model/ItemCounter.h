@@ -61,7 +61,7 @@ namespace AwsMock::Dto::DynamoDb {
             ItemCounter r;
             r.tableName = v.at("tableName").as_string();
             r.id = v.at("id").as_string();
-            r.size = v.at("pageSize").as_int64();
+            r.size = v.at("size").as_int64();
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 

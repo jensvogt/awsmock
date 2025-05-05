@@ -440,12 +440,6 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        // Compile the default magic database (indicated by nullptr)
-        /*if (magic_compile(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not compile libmagic";
-            return DEFAULT_MIME_TYPE;
-        }*/
-
         // Get a description of the filename argument
         const char *mime = magic_file(magic, path.c_str());
         if (mime == nullptr) {
@@ -467,28 +461,22 @@ namespace AwsMock::Core {
             return DEFAULT_MIME_TYPE;
         }
 
-        const std::string magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
+        const auto magicFile = Configuration::instance().GetValue<std::string>("awsmock.magic-file");
 
-        // allocate magic cookie
+        // Allocate magic cookie
         magic_set *const magic = magic_open(MAGIC_MIME_TYPE);
         if (magic == nullptr) {
             log_error << "Could not open libmagic";
             return DEFAULT_MIME_TYPE;
         }
 
-        // load the default magic database (indicated by nullptr)
+        // Load the default magic database (indicated by nullptr)
         if (magic_load(magic, magicFile.c_str()) != 0) {
             log_error << "Could not load libmagic mime types, fileName: " << magicFile;
             return DEFAULT_MIME_TYPE;
         }
 
-        // compile the default magic database (indicated by nullptr)
-        if (magic_compile(magic, magicFile.c_str()) != 0) {
-            log_error << "Could not compile libmagic";
-            return DEFAULT_MIME_TYPE;
-        }
-
-        // get description of the filename argument
+        // Get the description of the filename argument
         const char *mime = magic_buffer(magic, content.data(), content.size());
         if (mime == nullptr) {
             log_error << "Could not get mime type";

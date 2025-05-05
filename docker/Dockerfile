@@ -55,6 +55,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 
 # Just in case, ensure it's available at /usr/local/bin/aws
 RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
+RUN rm -rf /lib/x86_64-linux-gnu/libmagic* || true
 
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/

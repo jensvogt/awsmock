@@ -6,45 +6,51 @@
 #define AWSMOCK_DTO_SNS_UNTAG_RESOURCE_RESPONSE_H
 
 // C++ standard includes
-#include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct UntagResourceResponse {
-
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+    struct UntagResourceResponse final : Common::BaseCounter<UntagResourceResponse> {
 
         /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        static std::string ToXml() {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UntagResourceResponse &r);
+                boost::property_tree::ptree root;
+                root.add("UntagResourceResponse.UntagResourceResult", "");
+                root.add("UntagResourceResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+                return Core::XmlUtils::ToXmlString(root);
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend UntagResourceResponse tag_invoke(boost::json::value_to_tag<UntagResourceResponse>, boost::json::value const &v) {
+            UntagResourceResponse r;
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UntagResourceResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

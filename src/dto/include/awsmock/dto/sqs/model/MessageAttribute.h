@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/MessageAttributeDataType.h>
 
@@ -57,10 +58,11 @@ namespace AwsMock::Dto::SQS {
 
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
             MessageAttribute r;
-            r.stringValue = v.at("stringValue").as_string();
-            r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("stringListValues"));
-            //r.binaryValue = v.at("binaryValue").as_uint64();
-            r.dataType = MessageAttributeDataTypeFromString(v.at("dataType").as_string().data());
+            r.dataType = MessageAttributeDataTypeFromString(Core::Json::GetStringValue(v, "DataType"));
+            r.stringValue = Core::Json::GetStringValue(v, "StringValue");
+            if (Core::Json::AttributeExists(v, "StringListValues")) {
+                r.stringListValues = boost::json::value_to<std::vector<std::string>>(v.at("StringListValues"));
+            }
             return r;
         }
 

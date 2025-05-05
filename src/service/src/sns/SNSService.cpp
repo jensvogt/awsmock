@@ -203,7 +203,7 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("SNS topic does not exists");
             }
 
-            // Create new subscription
+            // Create a new subscription
             const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
@@ -213,12 +213,17 @@ namespace AwsMock::Service {
                 // Add subscription
                 topic.subscriptions.push_back({.protocol = request.protocol, .endpoint = request.endpoint, .subscriptionArn = subscriptionArn});
 
-                // Save to database
+                // Save to the database
                 topic = _snsDatabase.UpdateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToString();
             }
 
-            return {.subscriptionArn = subscriptionArn};
+            Dto::SNS::SubscribeResponse response;
+            response.requestId = request.requestId;
+            response.subscriptionArn = subscriptionArn;
+            response.region = request.region;
+            response.user = request.user;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.what();
@@ -283,8 +288,7 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("Subscription ARN missing");
             }
 
-            // Create new subscription
-
+            // Create a new subscription
             for (Database::Entity::SNS::TopicList topics = _snsDatabase.GetTopicsBySubscriptionArn(request.subscriptionArn); auto &topic: topics) {
 
                 // Remove subscription
@@ -293,12 +297,16 @@ namespace AwsMock::Service {
                 });
                 log_debug << "Subscription removed, count" << count;
 
-                // Save to database
+                // Save to the database
                 topic = _snsDatabase.UpdateTopic(topic);
                 log_debug << "Subscription added, topic: " << topic.ToString();
             }
-
-            return {.subscriptionArn = request.subscriptionArn};
+            Dto::SNS::UnsubscribeResponse response;
+            response.requestId = request.requestId;
+            response.subscriptionArn = request.subscriptionArn;
+            response.region = request.region;
+            response.user = request.user;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.what();
@@ -351,7 +359,7 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             Dto::SNS::ListSubscriptionCountersResponse response;
-            response.total = topic.subscriptions.size();
+            response.total = static_cast<long>(topic.subscriptions.size());
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
                 const std::string id = subscriptionArn.substr(subscriptionArn.rfind(':') + 1);
                 Dto::SNS::SubscriptionCounter subscription;
@@ -573,7 +581,10 @@ namespace AwsMock::Service {
             topic = _snsDatabase.UpdateTopic(topic);
             log_debug << "SNS tags updated, count: " << topic.tags.size();
 
-            constexpr Dto::SNS::TagResourceResponse response;
+            Dto::SNS::TagResourceResponse response;
+            response.region = topic.region;
+            response.user = request.user;
+            response.requestId = request.requestId;
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -601,15 +612,18 @@ namespace AwsMock::Service {
             // Set tags and update database
             int count = 0;
             for (const auto &it: request.tags) {
-                count += std::erase_if(topic.tags, [it](const auto &item) {
+                count += static_cast<int>(std::erase_if(topic.tags, [it](const auto &item) {
                     auto const &[key, value] = item;
                     return key == it;
-                });
+                }));
             }
             topic = _snsDatabase.UpdateTopic(topic);
             log_debug << "SNS tags updated, topicArn: " << topic.topicArn << " count: " << count;
 
-            constexpr Dto::SNS::UntagResourceResponse response;
+            Dto::SNS::UntagResourceResponse response;
+            response.region = topic.region;
+            response.user = request.user;
+            response.requestId = request.requestId;
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -634,14 +648,11 @@ namespace AwsMock::Service {
                 .timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now())};
 
         // Wrap it in a SQS message request
-        Dto::SQS::SendMessageRequest sendMessageRequest = {
-                .region = request.region,
-                .queueUrl = sqsQueue.queueUrl,
-                .queueArn = sqsQueue.queueArn,
-                .body = sqsNotificationRequest.ToJson(),
-                .messageId = Core::AwsUtils::CreateMessageId(),
-                .requestId = Core::AwsUtils::CreateRequestId(),
-        };
+        Dto::SQS::SendMessageRequest sendMessageRequest;
+        sendMessageRequest.region = request.region;
+        sendMessageRequest.queueUrl = sqsQueue.queueUrl;
+        sendMessageRequest.body = sqsNotificationRequest.ToJson();
+        sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
         for (const auto &[fst, snd]: request.messageAttributes) {
             Dto::SQS::MessageAttribute messageAttribute;
@@ -653,6 +664,70 @@ namespace AwsMock::Service {
 
         const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
         log_trace << "SNS SendMessage response: " << response.ToString();
+    }
+
+    void SNSService::SendHttpMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
+        namespace beast = boost::beast;
+        namespace http = beast::http;
+        namespace net = boost::asio;
+        using tcp = boost::asio::ip::tcp;
+
+        try {
+            log_debug << "Sending HTTP message to: " << subscription.endpoint;
+
+            // Parse URI (e.g., http://host:port/path)
+            const std::string &url = subscription.endpoint;
+            const std::string protocol_prefix = "http://";
+            if (!Core::StringUtils::StartsWith(url, protocol_prefix)) {
+                log_warning << "Unsupported protocol in endpoint: " << url;
+                return;
+            }
+
+            std::string host_port_path = url.substr(protocol_prefix.size());
+            auto path_pos = host_port_path.find('/');
+            std::string host_port = path_pos == std::string::npos ? host_port_path : host_port_path.substr(0, path_pos);
+            std::string path = path_pos == std::string::npos ? "/" : host_port_path.substr(path_pos);
+
+            std::string host;
+            std::string port = "80";
+            if (auto colon_pos = host_port.find(':'); colon_pos != std::string::npos) {
+                host = host_port.substr(0, colon_pos);
+                port = host_port.substr(colon_pos + 1);
+            } else {
+                host = host_port;
+            }
+
+            net::io_context ioc;
+            tcp::resolver resolver(ioc);
+            beast::tcp_stream stream(ioc);
+
+            auto const results = resolver.resolve(host, port);
+            stream.connect(results);
+
+            http::request<http::string_body> req{http::verb::post, path, 11};
+            req.set(http::field::host, host);
+            req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+            req.set(http::field::content_type, "application/json");
+
+            // Basic payload
+            const std::string body = R"({"Type":"Notification","Message":")" + request.message + R"("})";
+            req.body() = body;
+            req.prepare_payload();
+
+            http::write(stream, req);
+
+            beast::flat_buffer buffer;
+            http::response<http::string_body> res;
+            http::read(stream, buffer, res);
+
+            log_debug << "HTTP Response: " << res.result_int() << " - " << res.body();
+
+            beast::error_code ec;
+            stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+
+        } catch (const std::exception &ex) {
+            log_error << "Failed to send HTTP message to: " << subscription.endpoint << ", error: " << ex.what();
+        }
     }
 
     Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) const {

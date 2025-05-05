@@ -35,37 +35,19 @@ namespace AwsMock::Dto::DynamoDb {
       private:
 
         friend ListTableCountersResponse tag_invoke(boost::json::value_to_tag<ListTableCountersResponse>, boost::json::value const &v) {
-
             ListTableCountersResponse r;
-            r.region = v.at("region").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.user = v.at("user").as_string();
             r.total = v.at("total").as_int64();
-
-            // Table counters
-            if (v.as_object().contains("tableCounters")) {
-                for (const auto &o: v.at("tableCounters").as_array()) {
-                    r.tableCounters.emplace_back(boost::json::value_to<TableCounter>(o));
-                }
-            }
+            r.tableCounters = boost::json::value_to<std::vector<TableCounter>>(v.at("tableCounters"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTableCountersResponse const &obj) {
-
-            // Table counters
-            boost::json::array tableCounters;
-            if (!obj.tableCounters.empty()) {
-                for (const auto &o: obj.tableCounters) {
-                    tableCounters.emplace_back(boost::json::value_from(o));
-                }
-            }
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"total", obj.total},
-                    {"tableCounters", tableCounters},
+                    {"tableCounters", boost::json::value_from(obj.tableCounters)},
             };
         }
     };

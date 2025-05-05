@@ -548,7 +548,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SetQueueAttributesResponse SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
+    void SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "set_queue_attributes");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
@@ -594,7 +594,6 @@ namespace AwsMock::Service {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
         }
-        return {.resource = "sqs", .requestId = request.requestId};
     }
 
     void SQSService::SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
@@ -781,7 +780,7 @@ namespace AwsMock::Service {
             message.attributes["ApproximateFirstReceivedTimestamp"] = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now()));
             message.attributes["ApproximateReceivedCount"] = std::to_string(0);
             message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
-            message.attributes["SenderId"] = request.senderId;
+            message.attributes["SenderId"] = request.user;
 
             // Set delay
             if (queue.attributes.delaySeconds > 0) {
@@ -801,14 +800,15 @@ namespace AwsMock::Service {
             message.receiptHandle = Core::AwsUtils::CreateSqsReceiptHandler();
             message.md5Body = Core::Crypto::GetMd5FromString(request.body);
             message.md5MessageAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageAttributes);
+            message.md5MessageSystemAttributes = Database::SqsUtils::CreateMd5OfMessageAttributes(message.messageSystemAttributes);
 
             // Update database
             message = _sqsDatabase.CreateMessage(message);
-            log_debug << "Message send, queueName: " << queue.name << " messageId: " << request.messageId;
+            log_debug << "Message send, queueName: " << queue.name;
 
             // Find Lambdas with this as an event source
             CheckLambdaNotifications(queue.queueArn, message);
-            log_debug << "Send message, queueArn: " << queue.queueArn << " messageId: " << request.messageId;
+            log_debug << "Send message, queueArn: " << queue.queueArn;
 
             return Dto::SQS::Mapper::map(request, message);
         } catch (Core::DatabaseException &ex) {
@@ -836,11 +836,10 @@ namespace AwsMock::Service {
                 Dto::SQS::SendMessageRequest entryRequest;
                 entryRequest.region = request.region;
                 entryRequest.queueUrl = request.queueUrl;
-                entryRequest.attributes = entry.attributes;
+                // TODO: fix when batch request is new JSON
+                //entryRequest.messageSystemAttributes = entry.messageSystemAttributes;
                 entryRequest.messageAttributes = entry.messageAttributes;
                 entryRequest.body = entry.body;
-                entryRequest.md5sum = entry.md5Sum;
-                entryRequest.messageId = entry.messageId;
                 try {
                     Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
                     Dto::SQS::MessageSuccessful s = {
@@ -848,7 +847,7 @@ namespace AwsMock::Service {
                             .messageId = response.messageId,
                             .md5Body = response.md5Body,
                             .md5MessageAttributes = response.md5MessageAttributes,
-                            .md5SystemAttributes = response.md5SystemAttributes};
+                            .md5SystemAttributes = response.md5MessageSystemAttributes};
                     sqsResponse.successful.emplace_back(s);
                 } catch (Core::DatabaseException &exc) {
                     Dto::SQS::MessageFailed f = {.id = Core::StringUtils::CreateRandomUuid(), .message = exc.message(), .senderFault = false};

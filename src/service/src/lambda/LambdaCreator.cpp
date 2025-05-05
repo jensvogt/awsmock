@@ -121,7 +121,7 @@ namespace AwsMock::Service {
         const auto tempDir = Core::Configuration::instance().GetValue<std::string>("awsmock.temp-dir");
 
         // Decode the Base64 file
-        const std::string zipFile = tempDir + "/zipfile.zip";
+        const std::string zipFile = tempDir + Core::FileUtils::separator() + Core::StringUtils::GenerateRandomHexString(8) + ".zip";
         Core::Crypto::Base64Decode(functionCode, zipFile);
 
         try {
@@ -141,6 +141,10 @@ namespace AwsMock::Service {
                 // Decompress the Python/C/go code
                 Core::TarUtils::Unzip(zipFile, codeDir);
             }
+
+            // Cleanup
+            Core::FileUtils::DeleteFile(zipFile);
+
             log_debug << "ZIP file unpacked, dir: " << codeDir;
             return codeDir;
 

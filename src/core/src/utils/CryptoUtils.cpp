@@ -521,12 +521,21 @@ namespace AwsMock::Core {
             output.clear();
             output.reserve(input.size() * 1.3334);
             output.assign(ItBinaryT(input.begin()), ItBinaryT(input.end()));
-            output.erase(output.end() - (pad_chars < 2 ? pad_chars : 2), output.end());
+            if (pad_chars < 2)
+                output.erase(output.end() - pad_chars, output.end());
+            else
+                output.erase(output.end() - 2, output.end());
         } catch (std::exception const &) {
             output.clear();
         }
-        std::ofstream ofs(filename);
+        if (output.empty()) {
+            log_error << "Empty ZIP file, filename: " << filename;
+            return;
+        }
+        log_debug << "Writing base64 decoded file, filename: " << filename << ", size: " << output.size();
+        std::ofstream ofs(filename, std::ios::out | std::ios::binary | std::ios::trunc);
         ofs << output;
+        ofs.flush();
         ofs.close();
     }
 #endif

@@ -28,6 +28,18 @@ namespace AwsMock::Core {
         void TearDown() override {
             DirUtils::DeleteDirectory(tempDir);
         }
+
+        static std::string GetImagePath(const std::string &imageFileName) {
+            char cwd[256];
+
+            const char *result = getcwd(cwd, sizeof(cwd));
+            EXPECT_TRUE(result != nullptr);
+
+            std::stringstream ss;
+            ss << cwd << FileUtils::separator() << "src" << FileUtils::separator() << "core" << FileUtils::separator() << "tst" << FileUtils::separator() << "resources" << FileUtils::separator() << "images" << FileUtils::separator() << imageFileName;
+
+            return ss.str();
+        }
         std::string tempDir;
     };
 
@@ -236,7 +248,7 @@ namespace AwsMock::Core {
 
         // assert
         EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "text/plain");
+        EXPECT_TRUE(contentType == "text/xml");
     }
 
     TEST_F(FileUtilsTest, GetContentTypeJpgTest) {
@@ -244,7 +256,8 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/9783911244381.jpg");
+        const std::string tmp = GetImagePath("9783911244381.jpg");
+        const std::string contentType = FileUtils::GetContentTypeMagicFile(GetImagePath("9783911244381.jpg"));
 
         // assert
         EXPECT_FALSE(contentType.empty());
@@ -256,7 +269,8 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const std::string contentType = FileUtils::GetContentTypeMagicFile("./resources/images/7337529778404.tif");
+        const std::string tmp = GetImagePath("9783911244381.jpg");
+        const std::string contentType = FileUtils::GetContentTypeMagicFile(GetImagePath("7337529778404.tif"));
 
         // assert
         EXPECT_FALSE(contentType.empty());

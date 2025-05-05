@@ -29,7 +29,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminAddUserToGroupRequest : Common::BaseDto<AdminAddUserToGroupRequest> {
+    struct AdminAddUserToGroupRequest final : Common::BaseDto<AdminAddUserToGroupRequest> {
 
         /**
          * Name of the group

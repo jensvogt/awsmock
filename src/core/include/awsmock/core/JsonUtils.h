@@ -52,15 +52,15 @@ namespace AwsMock::Core::Json {
         return static_cast<int>(GetLongValue(value, name, defaultValue));
     }
 
-    inline bool GetBoolValue(boost::json::value &value, const std::string &name) {
+    inline bool GetBoolValue(const boost::json::value &value, const std::string &name) {
         return value.at("name").as_bool();
     }
 
-    inline float GetFloatValue(boost::json::value &value, const std::string &name) {
+    inline float GetFloatValue(const boost::json::value &value, const std::string &name) {
         return static_cast<float>(value.at("name").as_double());
     }
 
-    inline double GetDoubleValue(boost::json::value &value, const std::string &name) {
+    inline double GetDoubleValue(const boost::json::value &value, const std::string &name) {
         return value.at("name").as_double();
     }
 

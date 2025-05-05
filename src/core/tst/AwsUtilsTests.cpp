@@ -19,7 +19,7 @@ namespace AwsMock::Core {
       public:
 
         void SetUp() override {
-            Configuration::instance().SetFilename(TMP_PROPERTIES_FILE);
+            Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
             _region = Configuration::instance().GetValue<std::string>("awsmock.region");
             _accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             _port = Configuration::instance().GetValue<int>("awsmock.gateway.http.port");

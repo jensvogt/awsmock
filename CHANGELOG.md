@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.2.3](https://github.com/jensvogt/awsmock/compare/v1.2.2...v1.2.3) (2025-05-04)
+
+
+### Bug Fixes
+
+* **1164-main-development:** add HTTP to SNS subscriptions ([bf84159](https://github.com/jensvogt/awsmock/commit/bf841599858eec85fcc044ac177cbde8600c1af4))
+* **1164-main-development:** add HTTP to SNS subscriptions ([6f07d7e](https://github.com/jensvogt/awsmock/commit/6f07d7e8d788326ee73e6c9def4d52c55c3071e1))
+* **1164-main-development:** add HTTP to SNS subscriptions ([3a31699](https://github.com/jensvogt/awsmock/commit/3a316995c3b79cb16cd6be4b55b74a7dfa87162a))
+* **1164-main-development:** add local network ([2a58aff](https://github.com/jensvogt/awsmock/commit/2a58affc825eb668e6656866429e3938592e01c9))
+* **1164-main-development:** fix dynamodb setup ([2104b67](https://github.com/jensvogt/awsmock/commit/2104b67a1024798428e6b0779234cb2f729e96ec))
+* **1164-main-development:** fix dynamodb setup ([cd165e9](https://github.com/jensvogt/awsmock/commit/cd165e9cd4310c0b97d881f3359915adc26ec0f5))
+* **1164-main-development:** fix dynamodb tables ([d3e3e38](https://github.com/jensvogt/awsmock/commit/d3e3e38d0cbc3823c53658d3c3565993df5510a7))
+
+## [1.2.2](https://github.com/jensvogt/awsmock/compare/v1.2.1...v1.2.2) (2025-05-03)
+
+
+### Bug Fixes
+
+* **1164-main-development:** fix tests ([7a6cd15](https://github.com/jensvogt/awsmock/commit/7a6cd15c4e5e8e7b65b59a8d4c2b2bebc79a8b13))
+* **1164-main-development:** fix tests ([2f8ecad](https://github.com/jensvogt/awsmock/commit/2f8ecadba9dceb5784c32ac223131fa41e7f1fae))
+* **1164-main-development:** SQS sendmessage with new JSON format ([ffcaf30](https://github.com/jensvogt/awsmock/commit/ffcaf30cf4af0292e603e3d1564494e2f6f81570))
+* **1164-main-development:** using shared memory for monitoring in order to improve performance ([47ccb2a](https://github.com/jensvogt/awsmock/commit/47ccb2a0e60a2fc61b68b6552d3a9f9b9bbe5355))
+* **1164-sftp-on-windows:** windows absolute path ([b30a1b5](https://github.com/jensvogt/awsmock/commit/b30a1b5373a3f0bb648bc2b2ceba1c699ba24d65))
+
 ## [1.2.1](https://github.com/jensvogt/awsmock/compare/v1.2.0...v1.2.1) (2025-05-01)
 
 

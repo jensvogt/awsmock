@@ -56,7 +56,7 @@ namespace AwsMock::Database::Entity::SQS {
         messageDoc.append(kvp("receiptHandle", receiptHandle));
         messageDoc.append(kvp("md5Body", md5Body));
         messageDoc.append(kvp("md5MessageAttributes", md5MessageAttributes));
-        messageDoc.append(kvp("md5SystemAttributes", md5SystemAttributes));
+        messageDoc.append(kvp("md5MessageSystemAttributes", md5MessageSystemAttributes));
         messageDoc.append(kvp("contentType", contentType));
         messageDoc.append(kvp("attributes", attributesDoc));
         messageDoc.append(kvp("messageAttributes", messageAttributesDoc));
@@ -81,7 +81,7 @@ namespace AwsMock::Database::Entity::SQS {
             receiptHandle = Core::Bson::BsonUtils::GetStringValue(mResult, "receiptHandle");
             md5Body = Core::Bson::BsonUtils::GetStringValue(mResult, "md5Body");
             md5MessageAttributes = Core::Bson::BsonUtils::GetStringValue(mResult, "md5MessageAttributes");
-            md5SystemAttributes = Core::Bson::BsonUtils::GetStringValue(mResult, "md5SystemAttributes");
+            md5MessageSystemAttributes = Core::Bson::BsonUtils::GetStringValue(mResult, "md5MessageSystemAttributes");
             contentType = Core::Bson::BsonUtils::GetStringValue(mResult, "contentType");
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             reset = MongoUtils::GetDatetime(mResult, "reset");

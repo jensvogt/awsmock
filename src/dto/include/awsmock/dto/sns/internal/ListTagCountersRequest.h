@@ -17,11 +17,6 @@ namespace AwsMock::Dto::SNS {
     struct ListTagCountersRequest final : Common::BaseCounter<ListTagCountersRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
          * TopicArn
          */
         std::string topicArn;
@@ -34,12 +29,12 @@ namespace AwsMock::Dto::SNS {
         /**
          * Page size
          */
-        int pageSize;
+        long pageSize;
 
         /**
          * Page index
          */
-        int pageIndex;
+        long pageIndex;
 
         /**
          * Sort column
@@ -50,15 +45,19 @@ namespace AwsMock::Dto::SNS {
 
         friend ListTagCountersRequest tag_invoke(boost::json::value_to_tag<ListTagCountersRequest>, boost::json::value const &v) {
             ListTagCountersRequest r;
-            r.prefix = v.at("prefix").as_string();
-            r.pageSize = static_cast<int>(v.at("pageSize").as_int64());
-            r.pageIndex = static_cast<int>(v.at("pageIndex").as_int64());
-            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTagCountersRequest const &obj) {
             jv = {
+                    {"topicArn", obj.topicArn},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},

@@ -10,6 +10,7 @@
     },
     "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\",
     "temp-dir": "C:\\Program Files (x86)\\awsmock\\tmp\\",
+    "shm-size": 65536,
     "json": {
       "pretty": false
     },

@@ -117,7 +117,7 @@ namespace AwsMock::Dto::DynamoDb {
         ItemCounter itemCounterDto;
         itemCounterDto.id = itemEntity.oid;
         itemCounterDto.tableName = itemEntity.tableName;
-        //itemCounterDto.size = itemEntity.s;
+        itemCounterDto.size = itemEntity.size;
         itemCounterDto.created = itemEntity.created;
         itemCounterDto.modified = itemEntity.modified;
         return itemCounterDto;

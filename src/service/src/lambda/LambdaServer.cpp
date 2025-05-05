@@ -39,7 +39,7 @@ namespace AwsMock::Service {
         scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _monitoringPeriod;
 
-        // Start delete old message task
+        // Start the delete old message task
         scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
         log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
 
