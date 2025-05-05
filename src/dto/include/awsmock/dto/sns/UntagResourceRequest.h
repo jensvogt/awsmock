@@ -26,6 +26,8 @@ namespace AwsMock::Dto::SNS {
          */
         std::vector<std::string> tags;
 
+      private:
+
         friend UntagResourceRequest tag_invoke(boost::json::value_to_tag<UntagResourceRequest>, boost::json::value const &v) {
             UntagResourceRequest r;
             r.resourceArn = Core::Json::GetStringValue(v, "ResourceArn");

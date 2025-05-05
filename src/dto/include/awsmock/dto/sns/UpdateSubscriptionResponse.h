@@ -9,38 +9,34 @@
 #include <string>
 
 // AwsMOck includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct UpdateSubscriptionResponse {
+    struct UpdateSubscriptionResponse final : Common::BaseCounter<UpdateSubscriptionResponse> {
 
         /**
          * @brief Subscription ARN
          */
         std::string subscriptionArn;
 
-        /**
-         * @brief Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend UpdateSubscriptionResponse tag_invoke(boost::json::value_to_tag<UpdateSubscriptionResponse>, boost::json::value const &v) {
+            UpdateSubscriptionResponse r;
+            r.subscriptionArn = Core::Json::GetStringValue(v, "subscriptionArn");
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UpdateSubscriptionResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateSubscriptionResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"subscriptionArn", obj.subscriptionArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS
