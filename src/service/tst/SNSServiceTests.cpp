@@ -157,13 +157,18 @@ namespace AwsMock::Service {
         subscribeRequest.endpoint = queueResponse.queueArn;
         Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
         Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
-        Dto::SNS::UpdateSubscriptionRequest updateRequest = {.topicArn = topicResponse.topicArn, .subscriptionArn = subscribeResponse.subscriptionArn, .protocol = "SQS", .endpoint = "foobar", .owner = "bar"};
+        Dto::SNS::UpdateSubscriptionRequest updateRequest;
+        updateRequest.topicArn = topicResponse.topicArn;
+        updateRequest.subscriptionArn = subscribeResponse.subscriptionArn;
+        updateRequest.protocol = "SQS";
+        updateRequest.endpoint = "foobar";
+        updateRequest.owner = "bar";
 
         // act
-        auto [subscriptionArn1] = _snsService.UpdateSubscription(updateRequest);
+        Dto::SNS::UpdateSubscriptionResponse result = _snsService.UpdateSubscription(updateRequest);
 
         // assert
-        EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
+        EXPECT_FALSE(result.subscriptionArn.empty());
     }
 
     TEST_F(SNSServiceTest, SubscriptionListTest) {
