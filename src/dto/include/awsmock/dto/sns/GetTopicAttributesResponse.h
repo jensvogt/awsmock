@@ -9,19 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct GetTopicAttributesResponse {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct GetTopicAttributesResponse final : Common::BaseCounter<GetTopicAttributesResponse> {
 
         /**
          * Name
@@ -44,37 +38,65 @@ namespace AwsMock::Dto::SNS {
         std::string displayName;
 
         /**
-         * Request ID
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
-
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetTopicAttributesResponse &r);
+                boost::property_tree::ptree root;
+
+                boost::property_tree::ptree attributesArray;
+                boost::property_tree::ptree attributesElement1;
+                attributesElement1.put("key", "TopicArn");
+                attributesElement1.put("value", topicArn);
+                attributesArray.push_back(std::make_pair("entry", attributesElement1));
+
+                boost::property_tree::ptree attributesElement2;
+                attributesElement2.put("key", "Owner");
+                attributesElement2.put("value", owner);
+                attributesArray.push_back(std::make_pair("entry", attributesElement2));
+
+                boost::property_tree::ptree attributesElement3;
+                attributesElement3.put("key", "DisplayName");
+                attributesElement3.put("value", displayName);
+                attributesArray.push_back(std::make_pair("entry", attributesElement3));
+
+                root.add_child("GetTopicAttributesResponse.GetTopicAttributesResult.Attributes", attributesArray);
+                root.add("GetTopicAttributesResponse.ResponseMetadata.RequestId", requestId);
+
+                return Core::XmlUtils::ToXmlString(root);
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend GetTopicAttributesResponse tag_invoke(boost::json::value_to_tag<GetTopicAttributesResponse>, boost::json::value const &v) {
+            GetTopicAttributesResponse r;
+            r.topicName = Core::Json::GetStringValue(v, "TopicName");
+            r.topicArn = Core::Json::GetStringValue(v, "TopicArn");
+            r.owner = Core::Json::GetStringValue(v, "Owner");
+            r.displayName = Core::Json::GetStringValue(v, "DisplayName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetTopicAttributesResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicName", obj.topicName},
+                    {"topicArn", obj.topicArn},
+                    {"owner", obj.owner},
+                    {"displayName", obj.displayName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS
