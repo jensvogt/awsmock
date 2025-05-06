@@ -18,10 +18,9 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
         src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
         src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp src/sqs/DeleteAttributeRequest.cpp)
-set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp
+set(SNS_SOURCES
         src/sns/CreateTopicRequest.cpp
-        src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
-        src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp
+        src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp
         src/sns/GetTopicAttributesRequest.cpp src/sns/GetTopicAttributesResponse.cpp
         src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp
         src/sns/model/Subscription.cpp src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp

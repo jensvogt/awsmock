@@ -1140,9 +1140,12 @@ namespace AwsMock::Service {
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
 
         const SNSService _snsService;
-        const Dto::SNS::PublishRequest request = {.region = region, .targetArn = topicNotification.topicArn, .message = eventNotification.ToJson()};
-        auto [messageId, requestId] = _snsService.Publish(request);
-        log_debug << "SNS message request send, messageId: " << messageId;
+        Dto::SNS::PublishRequest request;
+        request.region = region;
+        request.targetArn = topicNotification.topicArn;
+        request.message = eventNotification.ToJson();
+        Dto::SNS::PublishResponse response = _snsService.Publish(request);
+        log_debug << "SNS message request send, messageId: " << response.messageId;
     }
 
     void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const {

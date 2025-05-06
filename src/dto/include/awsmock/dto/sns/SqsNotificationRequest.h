@@ -2,17 +2,16 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SNS_SQSNOTIFICAITONREQUEST_H
-#define AWSMOCK_DTO_SNS_SQSNOTIFICAITONREQUEST_H
+#ifndef AWSMOCK_DTO_SNS_SQS_NOTIFICATION_REQUEST_H
+#define AWSMOCK_DTO_SNS_SQS_NOTIFICATION_REQUEST_H
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
-#include "model/MessageAttribute.h"
-
-
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/sns/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -40,7 +39,7 @@ namespace AwsMock::Dto::SNS {
      * }
      * @endcode
      */
-    struct SqsNotificationRequest {
+    struct SqsNotificationRequest final : Common::BaseCounter<SqsNotificationRequest> {
 
         /**
          * Notification type
@@ -65,7 +64,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * Send time stamp
          */
-        long timestamp;
+        long timestamp{};
 
         /**
          * Signature
@@ -90,30 +89,43 @@ namespace AwsMock::Dto::SNS {
         /**
          * Attributes
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend SqsNotificationRequest tag_invoke(boost::json::value_to_tag<SqsNotificationRequest>, boost::json::value const &v) {
+            SqsNotificationRequest r;
+            r.type = Core::Json::GetStringValue(v, "Type");
+            r.messageId = Core::Json::GetStringValue(v, "MessageId");
+            r.message = Core::Json::GetStringValue(v, "Message");
+            r.timestamp = Core::Json::GetLongValue(v, "Timestamp");
+            r.signature = Core::Json::GetStringValue(v, "Signature");
+            r.signatureVersion = Core::Json::GetStringValue(v, "SignatureVersion");
+            r.signingCertURL = Core::Json::GetStringValue(v, "SigningCertURL");
+            r.unsubscribeURL = Core::Json::GetStringValue(v, "UnsubscribeURL");
+            if (Core::Json::AttributeExists(v, "MessageAttributes")) {
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const SqsNotificationRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SqsNotificationRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"type", obj.type},
+                    {"messageId", obj.messageId},
+                    {"timestamp", obj.timestamp},
+                    {"signature", obj.signature},
+                    {"signatureVersion", obj.signatureVersion},
+                    {"signingCertURL", obj.signingCertURL},
+                    {"unsubscribeURL", obj.unsubscribeURL},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS
 
-#endif// AWSMOCK_DTO_SNS_SQSNOTIFICAITONREQUEST_H
+#endif// AWSMOCK_DTO_SNS_SQS_NOTIFICATION_REQUEST_H

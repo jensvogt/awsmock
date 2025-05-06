@@ -79,9 +79,7 @@ namespace AwsMock::Service {
         const Dto::SNS::ListTopicsResponse response = _snsService.ListTopics(REGION);
 
         // assert
-        EXPECT_EQ(1, response.topicList.size());
-        EXPECT_TRUE(response.topicList.front().region == REGION);
-        EXPECT_TRUE(response.topicList.front().topicName == TOPIC);
+        EXPECT_EQ(1, response.topics.size());
     }
 
     TEST_F(SNSServiceTest, TopicPurgeTest) {
@@ -89,10 +87,14 @@ namespace AwsMock::Service {
         // arrange
         const Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
         const Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-        const Dto::SNS::PublishRequest request = {.region = REGION, .topicArn = topicResponse.topicArn, .message = BODY};
-        const auto [messageId, requestId] = _snsService.Publish(request);
-        EXPECT_TRUE(messageId.length() > 1);
-        const Dto::SNS::PurgeTopicRequest purgeRequest = {.topicArn = topicResponse.topicArn};
+        Dto::SNS::PublishRequest request;
+        request.region = REGION;
+        request.topicArn = topicResponse.topicArn;
+        request.message = BODY;
+        Dto::SNS::PublishResponse response = _snsService.Publish(request);
+        EXPECT_TRUE(response.messageId.length() > 1);
+        Dto::SNS::PurgeTopicRequest purgeRequest;
+        purgeRequest.topicArn = topicResponse.topicArn;
 
         // act
         long count = _snsService.PurgeTopic(purgeRequest);
@@ -138,7 +140,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
-        EXPECT_EQ(1, response.topicList[0].subscriptions.size());
+        EXPECT_EQ(1, response.topics[0].size());
     }
 
     TEST_F(SNSServiceTest, SubscriptionUpdateTest) {
@@ -219,7 +221,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
-        EXPECT_EQ(0, response.topicList[0].subscriptions.size());
+        EXPECT_EQ(0, response.topics[0].size());
     }
 
     TEST_F(SNSServiceTest, PublishMessageTest) {
@@ -227,7 +229,10 @@ namespace AwsMock::Service {
         // arrange
         Dto::SNS::CreateTopicRequest topicRequest = {.region = REGION, .topicName = TOPIC, .owner = OWNER};
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(topicRequest);
-        Dto::SNS::PublishRequest request = {.region = REGION, .topicArn = topicResponse.topicArn, .message = BODY};
+        Dto::SNS::PublishRequest request;
+        request.region = REGION;
+        request.topicArn = topicResponse.topicArn;
+        request.message = BODY;
 
         // act
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
@@ -256,7 +261,10 @@ namespace AwsMock::Service {
         subscribeRequest.protocol = "sqs";
         subscribeRequest.endpoint = queueResponse.queueArn;
         Dto::SNS::SubscribeResponse subscribeResponse = _snsService.Subscribe(subscribeRequest);
-        Dto::SNS::PublishRequest request = {.region = REGION, .topicArn = topicResponse.topicArn, .message = BODY};
+        Dto::SNS::PublishRequest request;
+        request.region = REGION;
+        request.topicArn = topicResponse.topicArn;
+        request.message = BODY;
         Dto::SNS::PublishResponse response = _snsService.Publish(request);
 
         // act
