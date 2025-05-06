@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_SNS_MAPPER_H
 
 // AwsMock includes
-#include <awsmock/dto/sns/ListMessagesRequest.h>
-#include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListMessagesRequest.h>
+#include <awsmock/dto/sns/internal/ListMessagesResponse.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
 #include <awsmock/dto/sns/model/Message.h>

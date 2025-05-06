@@ -16,7 +16,7 @@ namespace AwsMock::Dto::SNS {
             message.messageId = entity.messageId;
             message.created = entity.created;
             message.modified = entity.modified;
-            response.messageList.emplace_back(entity);
+            response.messages.emplace_back(message);
         }
         return response;
     }

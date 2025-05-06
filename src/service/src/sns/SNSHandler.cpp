@@ -18,7 +18,10 @@ namespace AwsMock::Service {
                     std::string name = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Name");
                     log_debug << "Topic name: " << name;
 
-                    Dto::SNS::CreateTopicRequest snsRequest = {.region = clientCommand.region, .topicName = name, .owner = clientCommand.user};
+                    Dto::SNS::CreateTopicRequest snsRequest;
+                    snsRequest.region = clientCommand.region;
+                    snsRequest.topicName = name;
+                    snsRequest.owner = clientCommand.user;
                     Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
 
                     log_info << "Topic created, name: " << name;
@@ -37,7 +40,10 @@ namespace AwsMock::Service {
 
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
 
-                    Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes({.region = clientCommand.region, .topicArn = topicArn});
+                    Dto::SNS::GetTopicAttributesRequest snsRequest;
+                    snsRequest.region = clientCommand.region;
+                    snsRequest.topicArn = topicArn;
+                    Dto::SNS::GetTopicAttributesResponse snsResponse = _snsService.GetTopicAttributes(snsRequest);
 
                     log_info << "Get topic attributes, topicArn" << topicArn;
                     return SendOkResponse(request, snsResponse.ToXml());
@@ -92,9 +98,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::UPDATE_SUBSCRIPTION: {
 
-                    Dto::SNS::UpdateSubscriptionRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SNS::UpdateSubscriptionRequest snsRequest = Dto::SNS::UpdateSubscriptionRequest::FromJson(clientCommand.payload);
                     Dto::SNS::UpdateSubscriptionResponse snsResponse = _snsService.UpdateSubscription(snsRequest);
 
                     log_info << "Subscription updated, topicArn: " << snsRequest.topicArn << " subscriptionArn: " << snsResponse.subscriptionArn;
@@ -118,7 +122,10 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC: {
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
 
-                    Dto::SNS::ListSubscriptionsByTopicResponse snsResponse = _snsService.ListSubscriptionsByTopic({.region = clientCommand.region, .topicArn = topicArn});
+                    Dto::SNS::ListSubscriptionsByTopicRequest snsRequest;
+                    snsRequest.region = clientCommand.region;
+                    snsRequest.topicArn = topicArn;
+                    Dto::SNS::ListSubscriptionsByTopicResponse snsResponse = _snsService.ListSubscriptionsByTopic(snsRequest);
                     log_info << "List subscriptions by topic, topicArn: " << topicArn << " count: " << snsResponse.subscriptions.size();
                     std::map<std::string, std::string> headers;
                     headers["Content-Type"] = "application/xml";
@@ -207,7 +214,7 @@ namespace AwsMock::Service {
 
                     Dto::SNS::ListMessagesResponse snsResponse = _snsService.ListMessages(snsRequest);
 
-                    log_info << "List messages, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messageList.size();
+                    log_info << "List messages, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messages.size();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
