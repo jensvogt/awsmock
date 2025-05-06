@@ -263,11 +263,16 @@ namespace AwsMock::Service {
             topic.subscriptions.at(index).endpoint = request.endpoint;
             topic.subscriptions.at(index).protocol = request.protocol;
 
-            // Save to database
+            // Save to the database
             topic = _snsDatabase.UpdateTopic(topic);
             log_debug << "Subscription updated, topic: " << topic.ToString();
 
-            return {.subscriptionArn = request.subscriptionArn};
+            Dto::SNS::UpdateSubscriptionResponse response;
+            response.requestId = request.requestId;
+            response.subscriptionArn = request.subscriptionArn;
+            response.region = request.region;
+            response.user = request.user;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS subscription failed, message: " << ex.what();
