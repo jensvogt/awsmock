@@ -48,7 +48,11 @@ namespace AwsMock::Service {
         try {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
-            auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
+            // TODO: Write mapper
+            Dto::SNS::ListTopicsResponse listTopicsResponse;
+            for (const auto &it: topicList) {
+                listTopicsResponse.topics.emplace_back(it.topicArn);
+            }
             log_trace << "SNS list topics response: " << listTopicsResponse.ToXml();
 
             return listTopicsResponse;
@@ -176,7 +180,12 @@ namespace AwsMock::Service {
             // Check subscriptions
             CheckSubscriptions(request);
 
-            return {.messageId = message.messageId, .requestId = request.requestId};
+            Dto::SNS::PublishResponse response;
+            response.requestId = request.requestId;
+            response.messageId = messageId;
+            response.region = request.region;
+            response.messageId = message.messageId;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS create message failed, message: " << ex.what();
@@ -645,12 +654,12 @@ namespace AwsMock::Service {
         log_debug << "Found queue, queueUrl: " << sqsQueue.name;
 
         // Create a SQS notification request
-        const Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
-                .type = "Notification",
-                .messageId = Core::AwsUtils::CreateMessageId(),
-                .topicArn = request.topicArn,
-                .message = request.message,
-                .timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now())};
+        Dto::SNS::SqsNotificationRequest sqsNotificationRequest;
+        sqsNotificationRequest.type = "Notification";
+        sqsNotificationRequest.messageId = Core::AwsUtils::CreateMessageId();
+        sqsNotificationRequest.topicArn = request.topicArn;
+        sqsNotificationRequest.message = request.message;
+        sqsNotificationRequest.timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now());
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest;

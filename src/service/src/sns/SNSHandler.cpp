@@ -56,12 +56,13 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PUBLISH: {
 
-                    std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
-                    std::string targetArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TargetArn");
-                    std::string message = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Message");
-                    std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes = GetMessageAttributes(clientCommand.payload);
-
-                    Dto::SNS::PublishRequest snsRequest = {.region = clientCommand.region, .topicArn = topicArn, .targetArn = targetArn, .message = message, .messageAttributes = messageAttributes, .requestId = clientCommand.requestId};
+                    Dto::SNS::PublishRequest snsRequest;
+                    snsRequest.region = clientCommand.region;
+                    snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
+                    snsRequest.targetArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TargetArn");
+                    snsRequest.message = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Message");
+                    snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
+                    snsRequest.requestId = clientCommand.requestId;
                     Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
                     log_trace << "SNS PUBLISH, request: " << snsRequest.ToString();
 
@@ -70,7 +71,7 @@ namespace AwsMock::Service {
                     headers["Content-Length"] = std::to_string(snsResponse.ToXml().length());
                     headers["amz-sdk-invocation-id"] = snsResponse.requestId;
 
-                    log_info << "Message published, topic: " << topicArn;
+                    log_info << "Message published, topic: " << snsRequest.topicArn;
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
@@ -292,7 +293,11 @@ namespace AwsMock::Service {
             if (Core::StringUtils::StartsWith(attributeType, "String") || Core::StringUtils::StartsWith(attributeType, "Number")) {
                 attributeValue = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
             }
-            messageAttributes[attributeName] = {.name = attributeName, .stringValue = attributeValue, .type = Dto::SNS::MessageAttributeDataTypeFromString(attributeType)};
+            Dto::SNS::MessageAttribute attribute;
+            attribute.name = attributeName;
+            attribute.stringValue = attributeValue;
+            attribute.type = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
+            messageAttributes[attributeName] = attribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;

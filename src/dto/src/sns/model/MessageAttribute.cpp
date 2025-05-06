@@ -44,7 +44,7 @@ namespace AwsMock::Dto::SNS {
         return output;
     }
 
-    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, const bool includeContentType) {
+    std::string MessageAttribute::GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes) {
 
         EVP_MD_CTX *context = EVP_MD_CTX_new();
         const EVP_MD *md = EVP_md5();
@@ -56,9 +56,6 @@ namespace AwsMock::Dto::SNS {
         for (const auto &[fst, snd]: attributes) {
 
             log_debug << "MD5sum, attribute: " << fst;
-            if (fst == "contentType" && !includeContentType) {
-                continue;
-            }
 
             // Encoded name
             UpdateLengthAndBytes(context, fst);
@@ -134,14 +131,4 @@ namespace AwsMock::Dto::SNS {
         }
     }
 
-    std::string MessageAttribute::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const MessageAttribute &r) {
-        os << "MessageAttribute=" << to_json(r.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Dto::SNS

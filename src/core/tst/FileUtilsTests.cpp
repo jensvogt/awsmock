@@ -46,7 +46,7 @@ namespace AwsMock::Core {
     TEST_F(FileUtilsTest, BasenameTest) {
 
         // arrange
-        const std::string fileName = tempDir + Core::FileUtils::separator() + "example.gif";
+        const std::string fileName = tempDir + FileUtils::separator() + "example.gif";
 
         // act
         const std::string result = FileUtils::GetBasename(fileName);
@@ -256,8 +256,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const std::string tmp = GetImagePath("9783911244381.jpg");
-        const std::string contentType = FileUtils::GetContentTypeMagicFile(GetImagePath("9783911244381.jpg"));
+        const std::string contentType = FileUtils::GetContentTypeMagicFile("/tmp/9783911244381.jpg");
 
         // assert
         EXPECT_FALSE(contentType.empty());
