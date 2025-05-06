@@ -494,7 +494,7 @@ namespace AwsMock::Service {
 
                     Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
-                    log_info << "Create multi-part upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    log_info << "Created multi-part upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     return SendOkResponse(request, result.ToXml());
                 }
 
