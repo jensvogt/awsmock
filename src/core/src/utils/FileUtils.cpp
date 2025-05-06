@@ -583,18 +583,17 @@ namespace AwsMock::Core {
 
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long count) {
         long copied = 0;
-        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
-            char buffer[count];
+        char buffer[BUFFER_LEN];
+        if (count < BUFFER_LEN) {
             istream.read(buffer, count);
             ostream.write(buffer, count);
             copied = count;
         } else {
-            char buffer[bufSize];
-            while (count > bufSize) {
-                istream.read(buffer, bufSize);
-                ostream.write(buffer, bufSize);
-                count -= bufSize;
-                copied += bufSize;
+            while (count > BUFFER_LEN) {
+                istream.read(buffer, BUFFER_LEN);
+                ostream.write(buffer, BUFFER_LEN);
+                count -= BUFFER_LEN;
+                copied += BUFFER_LEN;
             }
             istream.read(buffer, count);
             ostream.write(buffer, count);
@@ -606,18 +605,17 @@ namespace AwsMock::Core {
     long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count) {
         long copied = 0;
         istream.seekg(start, std::ios::beg);
-        if (constexpr long bufSize = BUFFER_LEN; count < bufSize) {
-            char buffer[count];
+        char buffer[BUFFER_LEN];
+        if (count < BUFFER_LEN) {
             istream.read(buffer, count);
             ostream.write(buffer, count);
             copied = count;
         } else {
-            char buffer[bufSize];
-            while (count > bufSize) {
-                istream.read(buffer, bufSize);
-                ostream.write(buffer, bufSize);
-                count -= bufSize;
-                copied += bufSize;
+            while (count > BUFFER_LEN) {
+                istream.read(buffer, BUFFER_LEN);
+                ostream.write(buffer, BUFFER_LEN);
+                count -= BUFFER_LEN;
+                copied += BUFFER_LEN;
             }
             istream.read(buffer, count);
             ostream.write(buffer, count);
