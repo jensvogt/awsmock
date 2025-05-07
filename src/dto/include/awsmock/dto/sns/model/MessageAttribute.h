@@ -10,12 +10,13 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sns/model/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct MessageAttribute {
+    struct MessageAttribute final : Common::BaseCounter<MessageAttribute> {
 
         /**
          * Message attribute name
@@ -40,77 +41,72 @@ namespace AwsMock::Dto::SNS {
         /**
          * Logical data type
          */
-        MessageAttributeDataType type;
+        MessageAttributeDataType type = STRING;
 
         /**
-         * @brief Returns the MD5 sum of all attributes (system attributes).
+         * @brief Convert from a BSON string
          *
-         * @param attributes map of attributes
-         * @return MD5 sum of attributes string
+         * @param jsonObject BSON attribute object
          */
-        static std::string GetMd5Attributes(const std::map<std::string, std::string> &attributes);
+        void FromDocument(const view_or_value<view, value> &jsonObject) {
+
+            try {
+                name = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Name");
+                stringValue = Core::Bson::BsonUtils::GetStringValue(jsonObject, "StringValue");
+
+                if (!stringValue.empty()) {
+                    type = STRING;
+                }
+                numberValue = Core::Bson::BsonUtils::GetLongValue(jsonObject, "NumberValue");
+                if (numberValue > 0) {
+                    type = NUMBER;
+                }
+            } catch (bsoncxx::exception &e) {
+                log_error << e.what();
+                throw Core::JsonException(e.what());
+            }
+        }
 
         /**
-         * @brief Returns the MD5 sum of all message attributes (user attributes).
+         * @brief Convert from a BSON object
          *
-         * @param attributes vector of message attributes
-         * @param includeContentType if true contentType is included
-         * @return MD5 sum of message attributes string
+         * @return BSON object
          */
-        static std::string GetMd5MessageAttributes(const std::map<std::string, MessageAttribute> &attributes, bool includeContentType);
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Update the MD5 hash with a given value
-         *
-         * @param context MD5 hash model
-         * @param str string to append
-         */
-        static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
+            try {
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+                Core::Bson::BsonUtils::SetStringValue(document, "StringValue", stringValue);
+                Core::Bson::BsonUtils::SetLongValue(document, "NumberValue", numberValue);
+                Core::Bson::BsonUtils::SetStringValue(document, "DataType", MessageAttributeDataTypeToString(type));
+                return document.extract();
 
-        /**
-         * @brief Returns an integer as byte array and fill it in the given byte array at position offset.
-         *
-         * @param n integer value
-         * @param bytes output byte array
-         */
-        static void GetIntAsByteArray(size_t n, unsigned char *bytes);
+            } catch (bsoncxx::exception &e) {
+                log_error << e.what();
+                throw Core::JsonException(e.what());
+            }
+        }
 
-        /**
-         * @brief Convert from JSON string
-         *
-         * @param attributeObject attribute object
-         */
-        void FromDocument(const view_or_value<view, value> &attributeObject);
+      private:
 
+        friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
+            MessageAttribute r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.stringValue = Core::Json::GetStringValue(v, "StringValue");
+            r.numberValue = Core::Json::GetLongValue(v, "NumberValue");
+            r.type = MessageAttributeDataTypeFromString(Core::Json::GetStringValue(v, "NumberValue"));
+            return r;
+        }
 
-        /**
-         * @brief Convert from JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Name comparator
-         *
-         * @param other
-         * @return
-         */
-        bool operator<(const MessageAttribute &other) const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageAttribute const &obj) {
+            jv = {
+                    {"name", obj.name},
+                    {"stringValue", obj.stringValue},
+                    {"numberValue", obj.numberValue},
+                    {"type", MessageAttributeDataTypeToString(obj.type)},
+            };
+        }
     };
 
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;

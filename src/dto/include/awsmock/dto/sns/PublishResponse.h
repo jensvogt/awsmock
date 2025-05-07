@@ -9,13 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct PublishResponse {
+    struct PublishResponse final : Common::BaseCounter<PublishResponse> {
 
         /**
          * Message ID
@@ -23,37 +23,34 @@ namespace AwsMock::Dto::SNS {
         std::string messageId;
 
         /**
-         * Request ID
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
-
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            boost::property_tree::ptree root;
+            root.add("PublishResponse.PublishResult.MessageId", messageId);
+            root.add("PublishResponse.ResponseMetadata.RequestId", requestId);
+            return Core::XmlUtils::ToXmlString(root);
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PublishResponse &r);
+      private:
+
+        friend PublishResponse tag_invoke(boost::json::value_to_tag<PublishResponse>, boost::json::value const &v) {
+            PublishResponse r;
+            r.messageId = Core::Json::GetStringValue(v, "MessageId");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PublishResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"messageId", obj.messageId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

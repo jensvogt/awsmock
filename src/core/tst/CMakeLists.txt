@@ -13,3 +13,10 @@ target_link_libraries(${BINARY} awsmockcore mongocxx bsoncxx boost_filesystem bo
 
 add_test(NAME ${BINARY} COMMAND ${BINARY} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources/images/7337529778404.tif DESTINATION /tmp)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources/images/9783911244381.jpg DESTINATION /tmp)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources/lambda/java-basic-1.0-SNAPSHOT.jar DESTINATION /tmp)
+
+file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS /tmp/**.ttf    # adapt these to your needs
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/**.svg
+)

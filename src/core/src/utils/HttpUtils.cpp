@@ -134,7 +134,9 @@ namespace AwsMock::Core {
         std::string value = def;
         if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
             if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
-                value = p->value.decode();
+                boost::urls::encoding_opts opts;
+                opts.space_as_plus = true;
+                value = p->value.decode(opts);
                 log_debug << "Query parameter found, name: " << name << " value: " << value;
             }
         }

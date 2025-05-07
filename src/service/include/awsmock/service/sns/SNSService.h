@@ -19,10 +19,6 @@
 #include <awsmock/dto/sns/DeleteTopicResponse.h>
 #include <awsmock/dto/sns/GetTopicAttributesRequest.h>
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
-#include <awsmock/dto/sns/GetTopicDetailsRequest.h>
-#include <awsmock/dto/sns/GetTopicDetailsResponse.h>
-#include <awsmock/dto/sns/ListMessagesRequest.h>
-#include <awsmock/dto/sns/ListMessagesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
@@ -40,10 +36,14 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
+#include <awsmock/dto/sns/internal/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sns/internal/ListMessagesRequest.h>
+#include <awsmock/dto/sns/internal/ListMessagesResponse.h>
 #include <awsmock/dto/sns/internal/ListSubscriptionCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListSubscriptionCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListTagCountersRequest.h>

@@ -18,16 +18,9 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
         src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
         src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp src/sqs/DeleteAttributeRequest.cpp)
-set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp
-        src/sns/CreateTopicRequest.cpp
-        src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
-        src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp
-        src/sns/GetTopicAttributesRequest.cpp src/sns/GetTopicAttributesResponse.cpp
-        src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp
-        src/sns/model/Subscription.cpp src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp
-        src/sns/ListMessagesResponse.cpp src/sns/mapper/Mapper.cpp src/sns/GetTopicDetailsRequest.cpp
-        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp
-        src/sns/model/MessageAttribute.cpp)
+set(SNS_SOURCES
+        src/sns/mapper/Mapper.cpp
+)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
         src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp

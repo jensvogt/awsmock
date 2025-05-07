@@ -14,25 +14,33 @@ namespace AwsMock::Service {
 
         // Check existence
         if (_snsDatabase.TopicExists(request.region, request.topicName)) {
+
             log_warning << "SNS topic '" + request.topicName + "' exists already";
             const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByName(request.region, request.topicName);
             log_debug << "Got topic: " << topic.topicArn;
-            return {
-                    .region = topic.region,
-                    .name = topic.topicName,
-                    .owner = topic.owner,
-                    .topicArn = topic.topicArn};
+
+            Dto::SNS::CreateTopicResponse response;
+            response.region = topic.region,
+            response.topicName = topic.topicName,
+            response.owner = topic.owner,
+            response.topicArn = topic.topicArn;
+            return response;
         }
 
         try {
             // Update database
-            const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             const std::string topicArn = Core::AwsUtils::CreateSNSTopicArn(request.region, accountId, request.topicName);
             Database::Entity::SNS::Topic topic = {.region = request.region, .topicName = request.topicName, .owner = request.owner, .topicArn = topicArn};
             topic = _snsDatabase.CreateTopic(topic);
             log_trace << "SNS topic created: " << topic.ToString();
 
-            return {.region = topic.region, .name = topic.topicName, .owner = topic.owner, .topicArn = topic.topicArn};
+            Dto::SNS::CreateTopicResponse response;
+            response.region = topic.region,
+            response.topicName = topic.topicName,
+            response.owner = topic.owner,
+            response.topicArn = topic.topicArn;
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SNS create topic failed, message: " << exc.message();
@@ -48,7 +56,11 @@ namespace AwsMock::Service {
         try {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
-            auto listTopicsResponse = Dto::SNS::ListTopicsResponse(topicList);
+            // TODO: Write mapper
+            Dto::SNS::ListTopicsResponse listTopicsResponse;
+            for (const auto &it: topicList) {
+                listTopicsResponse.topics.emplace_back(it.topicArn);
+            }
             log_trace << "SNS list topics response: " << listTopicsResponse.ToXml();
 
             return listTopicsResponse;
@@ -176,7 +188,12 @@ namespace AwsMock::Service {
             // Check subscriptions
             CheckSubscriptions(request);
 
-            return {.messageId = message.messageId, .requestId = request.requestId};
+            Dto::SNS::PublishResponse response;
+            response.requestId = request.requestId;
+            response.messageId = messageId;
+            response.region = request.region;
+            response.messageId = message.messageId;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS create message failed, message: " << ex.what();
@@ -336,7 +353,11 @@ namespace AwsMock::Service {
 
             Dto::SNS::ListSubscriptionsByTopicResponse response;
             for (const auto &[protocol, endpoint, subscriptionArn]: topic.subscriptions) {
-                Dto::SNS::Subscription subscription = {.topicArn = request.topicArn, .protocol = protocol, .subscriptionArn = subscriptionArn, .endpoint = endpoint};
+                Dto::SNS::Subscription subscription;
+                subscription.topicArn = request.topicArn;
+                subscription.protocol = protocol;
+                subscription.subscriptionArn = subscriptionArn;
+                subscription.endpoint = endpoint;
                 response.subscriptions.emplace_back(subscription);
                 response.nextToken = subscription.id;
             }
@@ -502,10 +523,11 @@ namespace AwsMock::Service {
             }
 
             const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-            return {
-                    .region = topic.region,
-                    .topicArn = topic.topicArn,
-                    .owner = topic.owner};
+            Dto::SNS::GetTopicAttributesResponse response;
+            response.region = topic.region;
+            response.topicArn = topic.topicArn;
+            response.owner = topic.owner;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS get topic attributes failed, message: " << ex.what();
@@ -530,16 +552,16 @@ namespace AwsMock::Service {
             const long messagesSize = _snsDatabase.CountMessagesSize(request.topicArn);
 
             const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-            return {
-                    .region = topic.region,
-                    .topicName = topic.topicName,
-                    .topicArn = topic.topicArn,
-                    .messageCount = messageCount,
-                    .size = messagesSize,
-                    .owner = topic.owner,
-                    .created = topic.created,
-                    .modified = topic.modified,
-            };
+            Dto::SNS::GetTopicDetailsResponse response;
+            response.region = topic.region;
+            response.topicName = topic.topicName;
+            response.topicArn = topic.topicArn;
+            response.messageCount = messageCount;
+            response.size = messagesSize;
+            response.owner = topic.owner;
+            response.created = topic.created;
+            response.modified = topic.modified;
+            return response;
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS get topic attributes failed, message: " << ex.what();
@@ -645,12 +667,12 @@ namespace AwsMock::Service {
         log_debug << "Found queue, queueUrl: " << sqsQueue.name;
 
         // Create a SQS notification request
-        const Dto::SNS::SqsNotificationRequest sqsNotificationRequest = {
-                .type = "Notification",
-                .messageId = Core::AwsUtils::CreateMessageId(),
-                .topicArn = request.topicArn,
-                .message = request.message,
-                .timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now())};
+        Dto::SNS::SqsNotificationRequest sqsNotificationRequest;
+        sqsNotificationRequest.type = "Notification";
+        sqsNotificationRequest.messageId = Core::AwsUtils::CreateMessageId();
+        sqsNotificationRequest.topicArn = request.topicArn;
+        sqsNotificationRequest.message = request.message;
+        sqsNotificationRequest.timestamp = Core::DateTimeUtils::UnixTimestamp(system_clock::now());
 
         // Wrap it in a SQS message request
         Dto::SQS::SendMessageRequest sendMessageRequest;
