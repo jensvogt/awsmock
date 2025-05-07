@@ -111,17 +111,18 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SqsNotificationRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"type", obj.type},
-                    {"messageId", obj.messageId},
-                    {"timestamp", obj.timestamp},
-                    {"signature", obj.signature},
-                    {"signatureVersion", obj.signatureVersion},
-                    {"signingCertURL", obj.signingCertURL},
-                    {"unsubscribeURL", obj.unsubscribeURL},
-                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Type", obj.type},
+                    {"MessageId", obj.messageId},
+                    {"Message", obj.message},
+                    {"Timestamp", obj.timestamp},
+                    {"Signature", obj.signature},
+                    {"SignatureVersion", obj.signatureVersion},
+                    {"SigningCertURL", obj.signingCertURL},
+                    {"UnsubscribeURL", obj.unsubscribeURL},
+                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
             };
         }
     };
