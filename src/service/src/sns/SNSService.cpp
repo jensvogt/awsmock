@@ -2,8 +2,10 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/utils/SqsUtils.h"
+
+
 #include <awsmock/service/sns/SNSService.h>
-#include <map>
 
 namespace AwsMock::Service {
 
@@ -186,7 +188,7 @@ namespace AwsMock::Service {
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions
-            CheckSubscriptions(request);
+            CheckSubscriptions(request, message);
 
             Dto::SNS::PublishResponse response;
             response.requestId = request.requestId;
@@ -569,7 +571,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request) const {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();
@@ -582,6 +584,16 @@ namespace AwsMock::Service {
 
                     SendSQSMessage(it, request);
                     log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
+
+                } else if (Core::StringUtils::ToLower(it.protocol) == HTTP_PROTOCOL) {
+
+                    SendHttpMessage(it, request);
+                    log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
+
+                } else if (Core::StringUtils::ToLower(it.protocol) == LAMBDA_ENDPOINT) {
+
+                    SendLambdaMessage(it, request, message);
+                    log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
                 }
             }
         }
@@ -750,11 +762,43 @@ namespace AwsMock::Service {
             log_debug << "HTTP Response: " << res.result_int() << " - " << res.body();
 
             beast::error_code ec;
-            stream.socket().shutdown(tcp::socket::shutdown_both, ec);
+            ec = stream.socket().shutdown(tcp::socket::shutdown_both, ec);
 
         } catch (const std::exception &ex) {
             log_error << "Failed to send HTTP message to: " << subscription.endpoint << ", error: " << ex.what();
         }
+    }
+
+    void SNSService::SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const {
+
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(subscription.endpoint);
+        log_debug << "Found lambda, lambdaArn: " << lambda.arn;
+        SendLambdaInvocationRequest(lambda, message, request.topicArn);
+    }
+
+    void SNSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SNS::Message &message, const std::string &eventSourceArn) const {
+        log_debug << "Invoke lambda function request, function: " << lambda.function;
+
+        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
+
+        // Create the event record
+        Dto::SNS::Record record;
+        record.region = lambda.region;
+        record.messageId = message.messageId;
+        record.receiptHandle = Core::AwsUtils::CreateSnsReceiptHandler();
+        record.body = message.message;
+        record.messageAttributes = Dto::SNS::Mapper::map(message.messageAttributes);
+        record.md5Sum = Database::SqsUtils::CreateMd5OfMessageBody(message.message);
+        record.eventSource = "aws:sns";
+        record.eventSourceArn = eventSourceArn;
+
+        Dto::SNS::EventNotification eventNotification;
+        eventNotification.records.emplace_back(record);
+        log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
+
+        _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), record.receiptHandle);
+        log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 
     Dto::SNS::ListMessagesResponse SNSService::ListMessages(const Dto::SNS::ListMessagesRequest &request) const {
