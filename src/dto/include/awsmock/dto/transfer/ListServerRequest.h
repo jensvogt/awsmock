@@ -24,12 +24,12 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Maximal number of results
          */
-        long maxResults;
+        long maxResults = 0;
 
         /**
          * Token
          */
-        std::string nextToken;
+        std::string nextToken{};
 
       private:
 

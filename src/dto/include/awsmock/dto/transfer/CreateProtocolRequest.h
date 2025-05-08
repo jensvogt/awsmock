@@ -9,18 +9,18 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/Protocol.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct CreateProtocolRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    /**
+     * @brief Creates a new protocol request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct CreateProtocolRequest final : Common::BaseCounter<CreateProtocolRequest> {
 
         /**
          * Server ID
@@ -35,35 +35,28 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Port
          */
-        int port;
+        long port{};
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param body json input stream
-         */
-        void FromJson(const std::string &body);
+        friend CreateProtocolRequest tag_invoke(boost::json::value_to_tag<CreateProtocolRequest>, boost::json::value const &v) {
+            CreateProtocolRequest r;
+            r.serverId = Core::Json::GetStringValue(v, "ServerId");
+            r.protocol = ProtocolTypeFromString(Core::Json::GetStringValue(v, "Protocol"));
+            r.port = Core::Json::GetLongValue(v, "Port");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateProtocolRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateProtocolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+                    {"Protocol", ProtocolTypeToString(obj.protocol)},
+                    {"Port", obj.port},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

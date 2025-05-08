@@ -10,12 +10,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/transfer/model/Server.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListServerCountersResponse {
+    struct ListServerCountersResponse final : Common::BaseCounter<ListServerCountersResponse> {
 
         /**
          * List of buckets
@@ -27,26 +27,24 @@ namespace AwsMock::Dto::Transfer {
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListServerCountersResponse tag_invoke(boost::json::value_to_tag<ListServerCountersResponse>, boost::json::value const &v) {
+            ListServerCountersResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.transferServers = boost::json::value_to<std::vector<Server>>(v.at("protocolCounters"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListServerCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListServerCountersResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"transferServers", boost::json::value_from(obj.transferServers)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer
