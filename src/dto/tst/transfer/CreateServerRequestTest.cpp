@@ -13,6 +13,9 @@
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 
 // Test includes
+#include "awsmock/dto/transfer/model/Tag.h"
+
+
 #include <awsmock/core/TestUtils.h>
 
 #define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\", \"Protocols\" : [ \"FTP\", \"SFTP\" ] }"
@@ -32,12 +35,13 @@ namespace AwsMock::Dto::Transfer {
             _identityProviderDetails.invocationRole = "invocationRole";
             _identityProviderDetails.sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD;
             _identityProviderDetails.url = "url";
+            _tags["version"] = "1.0";
         }
 
         std::string _region;
         std::vector<ProtocolType> _protocols = {ProtocolTypeFromString("FTP"), ProtocolTypeFromString("SFTP")};
         IdentityProviderDetails _identityProviderDetails;
-        std::map<std::string, std::string> _tags = {{"version", "1.0"}};
+        std::map<std::string, std::string> _tags;
     };
 
     TEST_F(CreateServerRequestTest, ToStringTest) {

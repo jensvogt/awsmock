@@ -9,12 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/User.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListUserCountersResponse {
+    struct ListUserCountersResponse final : Common::BaseCounter<ListUserCountersResponse> {
 
         /**
          * List of attribute counters
@@ -26,26 +27,24 @@ namespace AwsMock::Dto::Transfer {
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListUserCountersResponse tag_invoke(boost::json::value_to_tag<ListUserCountersResponse>, boost::json::value const &v) {
+            ListUserCountersResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.userCounters = boost::json::value_to<std::vector<User>>(v.at("userCounters"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListUserCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserCountersResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"userCounters", boost::json::value_from(obj.userCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

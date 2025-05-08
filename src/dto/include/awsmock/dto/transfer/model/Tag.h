@@ -10,12 +10,12 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct Tag {
+    struct Tag final : Common::BaseCounter<Tag> {
 
         /**
          * Key
@@ -27,26 +27,24 @@ namespace AwsMock::Dto::Transfer {
          */
         std::string value;
 
-        /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend Tag tag_invoke(boost::json::value_to_tag<Tag>, boost::json::value const &v) {
+            Tag r;
+            r.key = Core::Json::GetStringValue(v, "Key");
+            r.value = Core::Json::GetStringValue(v, "Value");
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Tag &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Tag const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Key", obj.key},
+                    {"Value", obj.value},
+            };
+        }
     };
 
     typedef std::vector<Tag> TagList;

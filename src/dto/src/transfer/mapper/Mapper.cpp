@@ -12,11 +12,11 @@ namespace AwsMock::Dto::Transfer {
         response.serverId = request.serverId;
 
         for (const auto &u: userList) {
-            User user = {
-                    .userName = u.userName,
-                    .arn = u.arn,
-                    .homeDirectory = u.homeDirectory,
-                    .password = u.password};
+            User user;
+            user.userName = u.userName;
+            user.arn = u.arn;
+            user.homeDirectory = u.homeDirectory;
+            user.password = u.password;
             response.users.emplace_back(user);
         }
         return response;

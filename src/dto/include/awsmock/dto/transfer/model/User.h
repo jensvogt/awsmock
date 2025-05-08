@@ -10,7 +10,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
@@ -36,12 +38,7 @@ namespace AwsMock::Dto::Transfer {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct User {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct User final : Common::BaseCounter<User> {
 
         /**
          * User name
@@ -61,7 +58,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Ssh public key count
          */
-        int sshPublicKeyCount;
+        long sshPublicKeyCount = 0;
 
         /**
          * Home directory
@@ -78,43 +75,74 @@ namespace AwsMock::Dto::Transfer {
          *
          * @return DTO as string
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
+                Core::Bson::BsonUtils::SetStringValue(document, "Role", role);
+                Core::Bson::BsonUtils::SetStringValue(document, "UserName", userName);
+                Core::Bson::BsonUtils::SetStringValue(document, "HomeDirectory", homeDirectory);
+                Core::Bson::BsonUtils::SetStringValue(document, "Password", password);
+                Core::Bson::BsonUtils::SetIntValue(document, "SshPublicKeyCount", sshPublicKeyCount);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Converts a JSON string to a user
          *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * @brief Converts a JSON string to a list of users
-         *
-         * @param jsonString JSON string
-         * @return list of users
-         */
-        static std::vector<User> FromJsonList(const std::string &jsonString);
+            try {
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+                region = Core::Bson::BsonUtils::GetStringValue(document, "Region");
+                arn = Core::Bson::BsonUtils::GetStringValue(document, "Arn");
+                role = Core::Bson::BsonUtils::GetStringValue(document, "Role");
+                userName = Core::Bson::BsonUtils::GetStringValue(document, "UserName");
+                password = Core::Bson::BsonUtils::GetStringValue(document, "Password");
+                homeDirectory = Core::Bson::BsonUtils::GetStringValue(document, "HomeDirectory");
+                sshPublicKeyCount = Core::Bson::BsonUtils::GetIntValue(document, "SshPublicKeyCount");
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const User &r);
+      private:
+
+        friend User tag_invoke(boost::json::value_to_tag<User>, boost::json::value const &v) {
+            User r;
+            r.arn = Core::Json::GetStringValue(v, "Arn");
+            r.userName = Core::Json::GetStringValue(v, "UserName");
+            r.role = Core::Json::GetStringValue(v, "Role");
+            r.sshPublicKeyCount = Core::Json::GetLongValue(v, "SshPublicKeyCount");
+            r.homeDirectory = Core::Json::GetStringValue(v, "HomeDirectory");
+            r.password = Core::Json::GetStringValue(v, "Password");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, User const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Arn", obj.arn},
+                    {"UserName", obj.userName},
+                    {"Role", obj.role},
+                    {"SshPublicKeyCount", obj.sshPublicKeyCount},
+                    {"HomeDirectory", obj.homeDirectory},
+                    {"Password", obj.password},
+            };
+        }
     };
 
     typedef std::vector<User> UserList;

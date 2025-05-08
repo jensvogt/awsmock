@@ -26,7 +26,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Next token ID
          */
-        std::string nextToken;
+        std::string nextToken{};
 
         /**
          * Server list
@@ -37,7 +37,9 @@ namespace AwsMock::Dto::Transfer {
 
         friend ListServerResponse tag_invoke(boost::json::value_to_tag<ListServerResponse>, boost::json::value const &v) {
             ListServerResponse r;
-            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            if (!r.nextToken.empty()) {
+                r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            }
             return r;
         }
 
@@ -47,6 +49,7 @@ namespace AwsMock::Dto::Transfer {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"NextToken", obj.nextToken},
+                    {"Servers", boost::json::value_from(obj.servers)},
             };
         }
     };
