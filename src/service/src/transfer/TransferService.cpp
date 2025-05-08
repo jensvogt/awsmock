@@ -68,7 +68,7 @@ namespace AwsMock::Service {
         }
 
         // Add user
-        std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         std::string userArn = Core::AwsUtils::CreateTransferUserArn(request.region, accountId, transferEntity.serverId, request.userName);
         Database::Entity::Transfer::User user = {
                 .userName = request.userName,
@@ -116,16 +116,16 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_servers");
 
         try {
-            std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region);
+            const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region);
 
             auto response = Dto::Transfer::ListServerResponse();
             response.nextToken = Core::StringUtils::CreateRandomUuid();
             for (const auto &s: servers) {
-                Dto::Transfer::Server server = {
-                        .arn = s.arn,
-                        .serverId = s.serverId,
-                        .state = ServerStateToString(s.state),
-                        .userCount = static_cast<int>(s.users.size())};
+                Dto::Transfer::Server server;
+                server.arn = s.arn;
+                server.serverId = s.serverId;
+                server.state = ServerStateToString(s.state);
+                server.userCount = static_cast<int>(s.users.size());
                 response.servers.emplace_back(server);
             }
 
@@ -142,21 +142,20 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server_counters");
 
         try {
-            std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
+            const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
 
             auto response = Dto::Transfer::ListServerCountersResponse();
             response.total = _transferDatabase.CountServers(request.region);
             for (const auto &s: servers) {
-                Dto::Transfer::Server server = {
-                        .region = request.region,
-                        .arn = s.arn,
-                        .serverId = s.serverId,
-                        .state = ServerStateToString(s.state),
-                        .userCount = static_cast<int>(s.users.size()),
-                        .lastStarted = s.lastStarted,
-                        .created = s.created,
-                        .modified = s.modified,
-                };
+                Dto::Transfer::Server server;
+                server.region = request.region;
+                server.arn = s.arn;
+                server.serverId = s.serverId;
+                server.state = ServerStateToString(s.state);
+                server.userCount = static_cast<int>(s.users.size());
+                server.lastStarted = s.lastStarted;
+                server.created = s.created;
+                server.modified = s.modified;
                 response.transferServers.emplace_back(server);
             }
 
@@ -182,22 +181,19 @@ namespace AwsMock::Service {
             Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
 
             auto response = Dto::Transfer::GetServerDetailsResponse();
-            response.server = {
-                    .region = server.region,
-                    .arn = server.arn,
-                    .serverId = server.serverId,
-                    .state = ServerStateToString(server.state),
-                    .userCount = static_cast<int>(server.users.size()),
-                    .ports = server.ports,
-                    .concurrency = server.concurrency,
-                    .lastStarted = server.lastStarted,
-                    .created = server.created,
-                    .modified = server.modified,
-            };
+            response.server.region = server.region;
+            response.server.arn = server.arn;
+            response.server.serverId = server.serverId;
+            response.server.state = ServerStateToString(server.state);
+            response.server.userCount = static_cast<int>(server.users.size());
+            response.server.ports = server.ports;
+            response.server.concurrency = server.concurrency;
+            response.server.lastStarted = server.lastStarted;
+            response.server.created = server.created;
+            response.server.modified = server.modified;
 
             log_trace << "Transfer server list outcome: " + response.ToJson();
             return response;
-
         } catch (bsoncxx::exception &ex) {
             log_error << "Transfer server list request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());

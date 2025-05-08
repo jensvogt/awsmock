@@ -27,11 +27,16 @@ namespace AwsMock::Dto::Transfer {
         void SetUp() override {
             // General configuration
             _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+            _identityProviderDetails.directoryId = "directoryId";
+            _identityProviderDetails.function = "function";
+            _identityProviderDetails.invocationRole = "invocationRole";
+            _identityProviderDetails.sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD;
+            _identityProviderDetails.url = "url";
         }
 
         std::string _region;
         std::vector<ProtocolType> _protocols = {ProtocolTypeFromString("FTP"), ProtocolTypeFromString("SFTP")};
-        IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD, .url = "url"};
+        IdentityProviderDetails _identityProviderDetails;
         std::map<std::string, std::string> _tags = {{"version", "1.0"}};
     };
 
