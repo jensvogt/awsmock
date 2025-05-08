@@ -210,7 +210,6 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-
                 document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
@@ -234,7 +233,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -261,7 +260,7 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto [column, sortDirection]: sortColumns) {
+                    for (const auto &[column, sortDirection]: sortColumns) {
                         sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
@@ -296,7 +295,7 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto [column, sortDirection]: sortColumns) {
+                    for (const auto &[column, sortDirection]: sortColumns) {
                         sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
@@ -380,6 +379,7 @@ namespace AwsMock::Database {
                 document setQuery;
                 setQuery.append(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
                 setQuery.append(kvp("messages", static_cast<bsoncxx::types::b_int64>(messages)));
+                setQuery.append(kvp("attributes.availableMessages", static_cast<bsoncxx::types::b_int64>(messages)));
 
                 document updateQuery;
                 updateQuery.append(kvp("$set", setQuery));
@@ -610,7 +610,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
                 if (!topicArn.empty()) {
                     query.append(kvp("topicArn", topicArn));
                 }

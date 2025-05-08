@@ -10,18 +10,18 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/Server.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListServerResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    /**
+     * @brief List transfer servers response
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct ListServerResponse final : Common::BaseCounter<ListServerResponse> {
 
         /**
          * Next token ID
@@ -33,26 +33,22 @@ namespace AwsMock::Dto::Transfer {
          */
         std::vector<Server> servers;
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListServerResponse tag_invoke(boost::json::value_to_tag<ListServerResponse>, boost::json::value const &v) {
+            ListServerResponse r;
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListServerResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListServerResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"NextToken", obj.nextToken},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

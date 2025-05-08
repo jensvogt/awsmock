@@ -38,8 +38,9 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.ListServers") {
 
-                Dto::Transfer::ListServerRequest transferRequest = {.region = region};
+                Dto::Transfer::ListServerRequest transferRequest;
                 transferRequest.FromJson(body);
+                transferRequest.region = region;
                 Dto::Transfer::ListServerResponse transferResponse = _transferService.ListServers(transferRequest);
                 return SendOkResponse(request, transferResponse.ToJson());
             }

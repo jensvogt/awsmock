@@ -51,12 +51,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::GET_TOPIC_DETAILS: {
 
-                    Dto::SNS::GetTopicDetailsRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SNS::GetTopicDetailsRequest snsRequest = Dto::SNS::GetTopicDetailsRequest::FromJson(clientCommand);
                     Dto::SNS::GetTopicDetailsResponse snsResponse = _snsService.GetTopicDetails(snsRequest);
 
-                    log_info << "Get topic details, topicArn" << snsRequest.topicArn;
+                    log_info << "Get topic details, topicArn" << snsRequest.topicArn << " " << snsResponse.ToJson();
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 

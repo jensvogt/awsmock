@@ -413,7 +413,8 @@ namespace AwsMock::Controller {
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "show-ftp-users");
 
-        const Dto::Transfer::Server server = {.serverId = serverId};
+        Dto::Transfer::Server server;
+        server.serverId = serverId;
 
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", server.ToJson(), headers);
         if (response.statusCode != boost::beast::http::status::ok) {
