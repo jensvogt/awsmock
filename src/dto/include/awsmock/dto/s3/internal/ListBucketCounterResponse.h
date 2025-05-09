@@ -10,6 +10,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/BucketCounter.h>
 
@@ -31,10 +32,7 @@ namespace AwsMock::Dto::S3 {
 
         friend ListBucketCounterResponse tag_invoke(boost::json::value_to_tag<ListBucketCounterResponse>, boost::json::value const &v) {
             ListBucketCounterResponse r;
-            r.region = v.at("region").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.user = v.at("user").as_string();
-            r.total = v.at("total").as_int64();
+            r.total = Core::Json::GetLongValue(v, "total");
             r.bucketCounters = boost::json::value_to<std::vector<BucketCounter>>(v.at("bucketCounters"));
             return r;
         }

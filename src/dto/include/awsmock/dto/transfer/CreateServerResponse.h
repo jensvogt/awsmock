@@ -9,17 +9,16 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/core/JsonUtils.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct CreateServerResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct CreateServerResponse final : Common::BaseCounter<CreateServerResponse> {
 
         /**
          * Server ID
@@ -31,28 +30,25 @@ namespace AwsMock::Dto::Transfer {
          */
         std::string arn;
 
-        /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend CreateServerResponse tag_invoke(boost::json::value_to_tag<CreateServerResponse>, boost::json::value const &v) {
+            CreateServerResponse r;
+            r.serverId = Core::Json::GetStringValue(v, "Domain");
+            r.arn = Core::Json::GetStringValue(v, "Arn");
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateServerResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateServerResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ServerId", obj.serverId},
+                    {"ServerId", obj.serverId},
+                    {"Arn", obj.arn}};
+        }
     };
-
 }// namespace AwsMock::Dto::Transfer
 
 #endif// AWSMOCK_DTO_TRANSFER_CREATE_SERVER_RESPONSE_H

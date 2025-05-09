@@ -39,7 +39,8 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllTransfers();
+            const long count = _database.DeleteAllTransfers();
+            log_debug << "Transfer servers deleted, count: " << count;
         }
         Database::TransferDatabase &_database = Database::TransferDatabase::instance();
     };

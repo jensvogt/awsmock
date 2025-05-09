@@ -79,6 +79,7 @@ namespace AwsMock::Dto::SNS {
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"topicName", obj.topicName},
+                    {"topicArn", obj.topicArn},
                     {"messageCount", obj.messageCount},
                     {"size", obj.size},
                     {"owner", obj.owner},

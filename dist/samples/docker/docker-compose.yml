@@ -27,10 +27,10 @@ services:
     networks:
       - local
     ports:
-      - "2121:2121"
-      - "2222:2222"
-      - "4566-4567:4566-4567"
-      - "6000-6100:6000-6100"
+      - "2121:2121" # FTP
+      - "2222:2222" # SFTP
+      - "4566-4567:4566-4567" # Manager, Frontend
+      - "6000-6100:6000-6100" # FTP passive mode
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./etc/awsmock.json:/usr/local/awsmock/etc/awsmock.json

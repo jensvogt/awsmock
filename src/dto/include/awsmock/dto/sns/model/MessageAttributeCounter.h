@@ -69,7 +69,7 @@ namespace AwsMock::Dto::SNS {
         static void UpdateLengthAndBytes(EVP_MD_CTX *context, const std::string &str);
 
         /**
-         * @brief Returns an integer as byte array and fill it in the given byte array at position offset.
+         * @brief Returns an integer as a byte array and fill it in the given byte array at position offset.
          *
          * @param n integer value
          * @param bytes output byte array

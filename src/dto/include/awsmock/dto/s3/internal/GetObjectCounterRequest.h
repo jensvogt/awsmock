@@ -9,9 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -31,8 +30,8 @@ namespace AwsMock::Dto::S3 {
 
         friend GetObjectCounterRequest tag_invoke(boost::json::value_to_tag<GetObjectCounterRequest>, boost::json::value const &v) {
             GetObjectCounterRequest r;
-            r.region = v.at("region").as_string();
-            r.oid = v.at("oid").as_string();
+            r.region = Core::Json::GetStringValue(v, "region");
+            r.oid = Core::Json::GetStringValue(v, "oid");
             return r;
         }
 

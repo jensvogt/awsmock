@@ -13,6 +13,9 @@
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 
 // Test includes
+#include "awsmock/dto/transfer/model/Tag.h"
+
+
 #include <awsmock/core/TestUtils.h>
 
 #define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\", \"Protocols\" : [ \"FTP\", \"SFTP\" ] }"
@@ -27,18 +30,29 @@ namespace AwsMock::Dto::Transfer {
         void SetUp() override {
             // General configuration
             _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+            _identityProviderDetails.directoryId = "directoryId";
+            _identityProviderDetails.function = "function";
+            _identityProviderDetails.invocationRole = "invocationRole";
+            _identityProviderDetails.sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD;
+            _identityProviderDetails.url = "url";
+            _tags["version"] = "1.0";
         }
 
         std::string _region;
         std::vector<ProtocolType> _protocols = {ProtocolTypeFromString("FTP"), ProtocolTypeFromString("SFTP")};
-        IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD, .url = "url"};
-        std::map<std::string, std::string> _tags = {{"version", "1.0"}};
+        IdentityProviderDetails _identityProviderDetails;
+        std::map<std::string, std::string> _tags;
     };
 
     TEST_F(CreateServerRequestTest, ToStringTest) {
 
         // arrange
-        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        CreateServerRequest createRequest;
+        createRequest.region = _region;
+        createRequest.domain = "test.com";
+        createRequest.protocols = _protocols;
+        createRequest.tags = _tags;
+        createRequest.identityProviderDetails = _identityProviderDetails;
 
         // act
         const std::string stringRepresentation = createRequest.ToString();
@@ -51,7 +65,12 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerRequestTest, ToJsonTest) {
 
         // arrange
-        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        CreateServerRequest createRequest;
+        createRequest.region = _region;
+        createRequest.domain = "test.com";
+        createRequest.protocols = _protocols;
+        createRequest.tags = _tags;
+        createRequest.identityProviderDetails = _identityProviderDetails;
 
         // act
         const std::string jsonRepresentation = createRequest.ToJson();
