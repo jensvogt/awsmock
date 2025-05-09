@@ -47,7 +47,12 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerRequestTest, ToStringTest) {
 
         // arrange
-        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        CreateServerRequest createRequest;
+        createRequest.region = _region;
+        createRequest.domain = "test.com";
+        createRequest.protocols = _protocols;
+        createRequest.tags = _tags;
+        createRequest.identityProviderDetails = _identityProviderDetails;
 
         // act
         const std::string stringRepresentation = createRequest.ToString();
@@ -60,7 +65,12 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerRequestTest, ToJsonTest) {
 
         // arrange
-        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        CreateServerRequest createRequest;
+        createRequest.region = _region;
+        createRequest.domain = "test.com";
+        createRequest.protocols = _protocols;
+        createRequest.tags = _tags;
+        createRequest.identityProviderDetails = _identityProviderDetails;
 
         // act
         const std::string jsonRepresentation = createRequest.ToJson();
