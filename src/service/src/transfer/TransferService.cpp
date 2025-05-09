@@ -36,7 +36,10 @@ namespace AwsMock::Service {
         transferEntity = _transferDatabase.CreateTransfer(transferEntity);
 
         // Create response
-        Dto::Transfer::CreateServerResponse response{.region = transferEntity.region, .serverId = serverId, .arn = transferArn};
+        Dto::Transfer::CreateServerResponse response;
+        response.region = transferEntity.region;
+        response.serverId = serverId;
+        response.arn = transferArn;
         log_info << "Transfer manager created, address: " << listenAddress << " port: " << ftpPort;
 
         return response;

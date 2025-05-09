@@ -30,7 +30,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Protocol
          */
-        ProtocolType protocol;
+        ProtocolType protocol = ProtocolType::UNKNOWN;
 
         /**
          * Port

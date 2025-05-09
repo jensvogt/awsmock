@@ -42,7 +42,10 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerResponseTest, ToStringTest) {
 
         // arrange
-        const CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
+        CreateServerResponse createResponse;
+        createResponse.region = _region;
+        createResponse.serverId = "serverId";
+        createResponse.arn = "arn";
 
         // act
         const std::string stringRepresentation = createResponse.ToString();
@@ -55,7 +58,10 @@ namespace AwsMock::Dto::Transfer {
     TEST_F(CreateServerResponseTest, ToJsonTest) {
 
         // arrange
-        const CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
+        CreateServerResponse createResponse;
+        createResponse.region = _region;
+        createResponse.serverId = "serverId";
+        createResponse.arn = "arn";
 
         // act
         const std::string jsonRepresentation = createResponse.ToJson();
