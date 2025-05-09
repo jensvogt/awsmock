@@ -36,7 +36,6 @@ namespace AwsMock::Dto::Transfer {
         std::vector<std::string> _protocols = {"ftp", "sftp"};
         std::vector<Tag> _tags;
         Core::Configuration _configuration = Core::Configuration(TMP_CONFIGURATION_FILE);
-        boost::json::serializer()
     };
 
     TEST_F(CreateServerResponseTest, ToStringTest) {
