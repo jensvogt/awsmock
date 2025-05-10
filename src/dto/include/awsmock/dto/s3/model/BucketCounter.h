@@ -61,7 +61,23 @@ namespace AwsMock::Dto::S3 {
          *
          * @return BSON document
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
+                Core::Bson::BsonUtils::SetLongValue(document, "keys", keys);
+                Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+                Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
+                Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+                Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
       private:
 

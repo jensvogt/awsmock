@@ -27,15 +27,15 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
         src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
         src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp
-        src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
-        src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp
+        src/s3/DeleteBucketRequest.cpp
+        src/s3/CreateMultipartUploadRequest.cpp src/s3/CreateMultipartUploadResult.cpp
         src/s3/ListObjectVersionsRequest.cpp src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp
         src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
         src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
         src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp
         src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp
+        src/s3/UploadPartCopyResponse.cpp
         src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
         src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
