@@ -105,11 +105,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::TAG_QUEUE: {
 
-                    Dto::SQS::TagQueueRequest sqsRequest;
-
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::TagQueueRequest sqsRequest = Dto::SQS::TagQueueRequest::FromJson(clientCommand);
                     _sqsService.TagQueue(sqsRequest);
                     log_info << "Tag queue, queueUrl: " << sqsRequest.queueUrl;
 
@@ -118,10 +114,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::UNTAG_QUEUE: {
 
-                    Dto::SQS::UntagQueueRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::UntagQueueRequest sqsRequest = Dto::SQS::UntagQueueRequest::FromJson(clientCommand);
                     _sqsService.UntagQueue(sqsRequest);
                     log_info << "Untag queue, queueUrl: " << sqsRequest.queueUrl;
 
@@ -146,6 +139,8 @@ namespace AwsMock::Service {
 
                     Dto::SQS::ListQueueAttributeCountersRequest sqsRequest = Dto::SQS::ListQueueAttributeCountersRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueueAttributeCountersResponse sqsResponse = _sqsService.ListQueueAttributeCounters(sqsRequest);
+                    log_info << sqsRequest.ToString();
+                    log_info << sqsResponse.ToString();
 
                     log_info << "List attributes counters, queueArn: " << sqsRequest.queueArn << " count: " << sqsResponse.attributeCounters.size();
                     return SendOkResponse(request, sqsResponse.ToJson());
@@ -171,9 +166,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::UPDATE_DLQ: {
 
-                    Dto::SQS::UpdateDqlRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::UpdateDqlRequest sqsRequest = Dto::SQS::UpdateDqlRequest::FromJson(clientCommand);
                     _sqsService.UpdateDql(sqsRequest);
 
                     log_info << "Queue DQL subscription updated, queueArn: " << sqsRequest.queueArn;
@@ -264,9 +257,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::REDRIVE_MESSAGES: {
 
-                    Dto::SQS::RedriveMessagesRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::RedriveMessagesRequest sqsRequest = Dto::SQS::RedriveMessagesRequest::FromJson(clientCommand);
                     long count = _sqsService.RedriveMessages(sqsRequest);
                     log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count;
 
@@ -275,9 +266,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
 
-                    Dto::SQS::UpdateMessageRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
                     _sqsService.UpdateMessage(sqsRequest);
                     log_info << "Update message, messageId: " << sqsRequest.messageId;
 
@@ -286,9 +275,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::RESEND_MESSAGE: {
 
-                    Dto::SQS::ResendMessageRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
                     _sqsService.ResendMessage(sqsRequest);
                     log_info << "Resend message, messageId: " << sqsRequest.messageId;
 
@@ -342,6 +329,7 @@ namespace AwsMock::Service {
             }
 
         } catch (std::exception &e) {
+            log_error << e.what();
             return SendInternalServerError(request, e.what());
         } catch (...) {
             log_error << "Unknown exception";

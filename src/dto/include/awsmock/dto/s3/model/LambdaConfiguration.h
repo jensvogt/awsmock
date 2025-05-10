@@ -46,10 +46,10 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaConfiguration final : Common::BaseDto<LambdaConfiguration> {
+    struct LambdaConfiguration final : Common::BaseCounter<LambdaConfiguration> {
 
         /**
-         * ID, optional, if empty a random ID will be generated
+         * ID, optional, if empty, a random ID will be generated
          */
         std::string id;
 
@@ -89,9 +89,7 @@ namespace AwsMock::Dto::S3 {
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
-        std::string ToJson() const override {
-            return ToJson2();
-        }
+      private:
 
         friend LambdaConfiguration tag_invoke(boost::json::value_to_tag<LambdaConfiguration>, boost::json::value const &v) {
             LambdaConfiguration r;
@@ -112,8 +110,6 @@ namespace AwsMock::Dto::S3 {
             }
             return r;
         }
-
-      private:
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LambdaConfiguration const &obj) {
             jv = {

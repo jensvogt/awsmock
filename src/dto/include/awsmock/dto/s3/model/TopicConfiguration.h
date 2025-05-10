@@ -49,10 +49,10 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct TopicConfiguration : Common::BaseDto<TopicConfiguration> {
+    struct TopicConfiguration : Common::BaseCounter<TopicConfiguration> {
 
         /**
-         * ID, optional, if empty a random ID will be generated
+         * ID, optional, if empty, a random ID will be generated
          */
         std::string id;
 
@@ -92,11 +92,27 @@ namespace AwsMock::Dto::S3 {
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
-        std::string ToJson() const override {
-            return ToJson2();
-        }
-
       private:
+
+        friend TopicConfiguration tag_invoke(boost::json::value_to_tag<TopicConfiguration>, boost::json::value const &v) {
+            TopicConfiguration r;
+            r.id = v.at("id").as_string();
+            r.topicArn = v.at("topicArn").as_string();
+
+            // Filter rules
+            for (auto filterRules = v.at("filterRules").as_array(); const auto &filterRule: filterRules) {
+                FilterRule filterRuleDto;
+                filterRuleDto.filterValue = filterRule.at("filterValue").as_string();
+                filterRuleDto.name = NameTypeFromString(filterRule.at("name").as_string().data());
+                r.filterRules.push_back(filterRuleDto);
+            }
+
+            // Events
+            for (auto events = v.at("events").as_array(); const auto &event: events) {
+                r.events.push_back(EventTypeFromString(event.as_string().data()));
+            }
+            return r;
+        }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TopicConfiguration const &obj) {
             jv = {
