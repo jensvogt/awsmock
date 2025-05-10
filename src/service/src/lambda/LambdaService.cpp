@@ -1,6 +1,10 @@
 //
 // Created by vogje01 on 30/05/2023.
 //
+#include "awsmock/dto/s3/GetObjectRequest.h"
+
+
+#include <aws/s3/S3Client.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
@@ -29,7 +33,7 @@ namespace AwsMock::Service {
 
             lambdaEntity = _lambdaDatabase.GetLambdaByArn(lambdaArn);
             const std::string fileName = GetLambdaCodePath(lambdaEntity);
-            if (!Core::FileUtils::FileExists(fileName)) {
+            if (!Core::FileUtils::FileExists(fileName) || Core::FileUtils::FileSize(fileName) == 0) {
                 throw Core::ServiceException("Lambda base64 encoded code does not exists, fileName: " + fileName);
             }
             zippedCode = Core::FileUtils::ReadFile(fileName);
@@ -852,6 +856,13 @@ namespace AwsMock::Service {
     std::string LambdaService::GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda) {
         const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         return lambdaDir + Core::FileUtils::separator() + lambda.function + "-" + lambda.dockerTag + ".b64";
+    }
+
+    std::string LambdaService::GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const {
+        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+
+        const Database::Entity::S3::Object object = _s3Database.GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
+        return s3DataDir + Core::FileUtils::separator() + object.internalName;
     }
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {

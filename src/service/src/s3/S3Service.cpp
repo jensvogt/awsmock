@@ -349,23 +349,23 @@ namespace AwsMock::Service {
         return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};
     }
 
-    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId) {
+    std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, long length) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "upload_part");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "upload_part");
-        log_trace << "UploadPart request, part: " << part << " updateId: " << updateId;
+        log_trace << "UploadPart request, part: " << part << ", updateId: " << updateId;
 
         std::string uploadDir = GetMultipartUploadDirectory(updateId);
         log_trace << "Using uploadDir: " << uploadDir;
 
         std::string fileName = uploadDir + Core::FileUtils::separator() + updateId + "-" + std::to_string(part);
         std::ofstream ofs(fileName, std::ios::binary);
-        long count = Core::FileUtils::StreamCopier(stream, ofs);
+        long count = Core::FileUtils::StreamCopier(stream, ofs, length);
         ofs.close();
-        log_trace << "Part uploaded, part: " << part << " dir: " << uploadDir << " count: " << count;
+        log_trace << "Part uploaded, part: " << part << ", dir: " << uploadDir << ", count: " << count;
 
         // Get md5sum as ETag
         std::string eTag = Core::Crypto::GetMd5FromFile(fileName);
-        log_debug << "Upload part succeeded, part: " << part << " filename: " << fileName;
+        log_debug << "Upload part succeeded, part: " << part << ", filename: " << fileName << ", size: " << count;
         return eTag;
     }
 
@@ -1434,7 +1434,7 @@ namespace AwsMock::Service {
         // Check existence
         if (Database::S3Database::instance().BucketExists({.region = region, .name = name})) {
             log_warning << "Bucket exists already, region: " << region << " name: " << name;
-            throw Core::NotFoundException("Bucket exists already, region: " + region + " name: " + name);
+            throw Core::NotFoundException("Bucket exists already, region: " + region + ", name: " + name);
         }
     }
 

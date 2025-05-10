@@ -1,0 +1,4 @@
+{
+  "S3Bucket": "lambdas",
+  "S3Key": "s3-notification-cpp-lambda.zip"
+}

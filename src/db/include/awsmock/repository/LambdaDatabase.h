@@ -193,7 +193,7 @@ namespace AwsMock::Database {
          * @param region AWS region name
          * @return list of lambda functions
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {}) const;
+        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdas(const std::string &region = {}) const;
 
         /**
          * @brief Returns a list of lambda functions.
@@ -205,7 +205,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export a list of lambdas

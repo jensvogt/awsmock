@@ -409,7 +409,7 @@ namespace AwsMock::Service {
 
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
-            log_warning << "Create container failed, statusCode: " << statusCode << " body: " << body;
+            log_info << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return {};
         }
 

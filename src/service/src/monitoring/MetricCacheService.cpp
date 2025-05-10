@@ -31,7 +31,7 @@ namespace AwsMock::Monitoring {
         if (it != _metricCache.end()) {
             it->second.value += value;
             it->second.count++;
-            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > 1) {
+            if (duration_cast<seconds>(system_clock::now() - it->second.lastWritten).count() > _aggregationPeriod) {
                 _database.IncCounter(name, it->second.value / it->second.count, labelName, labelValue);
                 it->second.lastWritten = system_clock::now();
                 it->second.value = 0;
@@ -54,8 +54,8 @@ namespace AwsMock::Monitoring {
         if (it != _metricCache.end()) {
             it->second.value += value;
             it->second.count++;
-            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > 1) {
-                _database.SetGauge(name, it->second.value / it->second.count, labelName, labelValue);
+            if (duration_cast<seconds>(system_clock::now() - it->second.lastWritten).count() > _aggregationPeriod) {
+                _database.SetGauge(name, it->second.value / static_cast<double>(it->second.count), labelName, labelValue);
                 it->second.lastWritten = system_clock::now();
                 it->second.value = 0;
                 it->second.count = 0;

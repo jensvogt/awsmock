@@ -70,7 +70,7 @@ namespace AwsMock::Database {
         bool LambdaExists(const std::string &function);
 
         /**
-         * Check existence of lambda
+         * Check the existence of lambda
          *
          * @param arn AWS ARN
          * @return true if lambda exists
@@ -121,6 +121,24 @@ namespace AwsMock::Database {
          * @return total number of lambdas.
          */
         long LambdaCount(const std::string &region = {}) const;
+
+        /**
+         * @brief Sets the average runtime of a lambda instance
+         *
+         * @param oid lambda ID
+         * @param timestamp last update timestamp
+         * @throws DatabaseException
+         */
+        void SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp);
+
+        /**
+         * @brief Sets the average runtime of a lambda instance
+         *
+         * @param oid lambda ID
+         * @param millis lambda invocation runtime
+         * @throws DatabaseException
+         */
+        void SetAverageRuntime(const std::string &oid, long millis);
 
         /**
          * @brief Returns a list of lambda functions.
