@@ -173,6 +173,36 @@ namespace AwsMock::Service {
         return response;
     }
 
+    http::response<http::dynamic_body> AbstractHandler::SendNotFoundError(const http::request<http::dynamic_body> &request, const std::string &body, const std::map<std::string, std::string> &headers) {
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(http::status::not_found);
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+
+        // Body
+        if (!body.empty()) {
+            ostream(response.body()).write(body.c_str(), body.size());
+        }
+        response.prepare_payload();
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
+            }
+        }
+
+        // Send the response to the client
+        return response;
+    }
+
     http::response<http::dynamic_body> AbstractHandler::SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers) {
         log_debug << "Sending OK response, state: 200, filename: " << fileName << " min: " << min << " max: " << max << " size: " << size;
 

@@ -34,14 +34,14 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3Handler : public AbstractHandler {
+    class S3Handler final : public AbstractHandler {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler"){};
+        explicit S3Handler() : AbstractHandler("s3-handler") {};
 
         /**
          * @brief HTTP GET request.

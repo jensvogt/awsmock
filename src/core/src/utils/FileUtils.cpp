@@ -254,7 +254,7 @@ namespace AwsMock::Core {
     }
 
     bool FileUtils::FileExists(const std::string &fileName) {
-        return std::filesystem::exists(fileName);
+        return std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName);
     }
 
     std::string FileUtils::StripBasePath(const std::string &fileName) {
@@ -602,7 +602,7 @@ namespace AwsMock::Core {
         return copied;
     }
 
-    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count) {
+    long FileUtils::StreamCopier(std::istream &istream, std::ostream &ostream, const long start, long count) {
         long copied = 0;
         istream.seekg(start, std::ios::beg);
         char buffer[BUFFER_LEN];

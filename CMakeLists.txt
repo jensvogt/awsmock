@@ -33,6 +33,7 @@ if (WIN32)
 else ()
     option(BUILD_DOCUMENTATION "Create and install the HTML based API documentation (requires Doxygen and dot) " ON)
 endif ()
+option(BUILD_SAMPLES "Create and install the samples" OFF)
 
 # Current version
 file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER)
@@ -58,7 +59,16 @@ add_subdirectory(src/service)
 add_subdirectory(src/manager)
 add_subdirectory(src/controller)
 add_subdirectory(src/awslocal)
-add_subdirectory(docs)
+
+# Build documentation
+if (BUILD_DOCUMENTATION)
+    add_subdirectory(docs)
+endif (BUILD_DOCUMENTATION)
+
+# Build samples lambdas
+if (BUILD_SAMPLES)
+    #    add_subdirectory(src/samples/lambda/s3-notification-lambda)
+endif (BUILD_SAMPLES)
 
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
@@ -89,3 +99,4 @@ elseif (APPLE)
     install(FILES dist/macos/de.jensvogt.awsmock.plist DESTINATION /Library/LaunchDaemons)
     install(FILES dist/etc/magic_linux.mgc DESTINATION ${CMAKE_INSTALL_PREFIX}/etc RENAME magic.mgc)
 endif ()
+

@@ -1356,13 +1356,12 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
+                if (const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle))); !findResult->empty()) {
+                    message.FromDocument(findResult->view());
+                }
                 const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
                 session.commit_transaction();
 
-                if (!findResult->empty()) {
-                    message.FromDocument(findResult->view());
-                }
                 log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << result->deleted_count();
                 deleted = result->deleted_count();
 

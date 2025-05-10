@@ -26,10 +26,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
 
-                    Dto::SQS::PurgeQueueRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
                     long deleted = _sqsService.PurgeQueue(sqsRequest);
                     log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl << " count: " << deleted;
 
@@ -71,10 +68,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::GET_QUEUE_DETAILS: {
 
-                    Dto::SQS::GetQueueDetailsRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::GetQueueDetailsRequest sqsRequest = Dto::SQS::GetQueueDetailsRequest::FromJson(clientCommand);
                     Dto::SQS::GetQueueDetailsResponse sqsResponse = _sqsService.GetQueueDetails(sqsRequest);
                     log_info << "Get queue details, queueArn: " << sqsRequest.queueArn;
 
