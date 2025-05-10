@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/jensvogt/awsmock/compare/v1.2.3...v1.2.4) (2025-05-10)
+
+
+### Bug Fixes
+
+* **1181-dynamodb-tablesitems-missing-in-ui:** segfault in SQS database ([78bbc62](https://github.com/jensvogt/awsmock/commit/78bbc62251ecbf2674dc7ba47306234753f31435))
+
 ## [1.2.3](https://github.com/jensvogt/awsmock/compare/v1.2.2...v1.2.3) (2025-05-04)
 
 
