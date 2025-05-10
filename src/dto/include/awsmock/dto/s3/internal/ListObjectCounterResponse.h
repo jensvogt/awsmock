@@ -32,11 +32,10 @@ namespace AwsMock::Dto::S3 {
         friend ListObjectCounterResponse tag_invoke(boost::json::value_to_tag<ListObjectCounterResponse>, boost::json::value const &v) {
 
             ListObjectCounterResponse r;
-            r.region = v.at("region").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.user = v.at("user").as_string();
-            r.total = v.at("total").as_int64();
-            r.objectCounters = boost::json::value_to<std::vector<ObjectCounter>>(v.at("objectCounters"));
+            r.total = Core::Json::GetLongValue(v, "total");
+            if (Core::Json::AttributeExists(v, "objectCounters")) {
+                r.objectCounters = boost::json::value_to<std::vector<ObjectCounter>>(v.at("objectCounters"));
+            }
             return r;
         }
 

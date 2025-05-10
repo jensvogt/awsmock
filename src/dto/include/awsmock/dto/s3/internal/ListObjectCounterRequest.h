@@ -44,15 +44,18 @@ namespace AwsMock::Dto::S3 {
 
         friend ListObjectCounterRequest tag_invoke(boost::json::value_to_tag<ListObjectCounterRequest>, boost::json::value const &v) {
             ListObjectCounterRequest r;
-            r.bucket = v.at("bucket").as_string();
-            r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            }
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListObjectCounterRequest const &obj) {
+        friend void
+        tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListObjectCounterRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},

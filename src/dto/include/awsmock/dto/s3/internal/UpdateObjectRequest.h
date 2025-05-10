@@ -18,11 +18,6 @@ namespace AwsMock::Dto::S3 {
     struct UpdateObjectRequest final : Common::BaseCounter<UpdateObjectRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
          * Bucket
          */
         std::string bucket;
@@ -42,16 +37,16 @@ namespace AwsMock::Dto::S3 {
         friend UpdateObjectRequest tag_invoke(boost::json::value_to_tag<UpdateObjectRequest>, boost::json::value const &v) {
 
             UpdateObjectRequest r;
-            r.region = v.at("region").as_string();
-            r.bucket = v.at("bucket").as_string();
-            r.key = v.at("key").as_string();
-            r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.key = Core::Json::GetStringValue(v, "key");
+            if (Core::Json::AttributeExists(v, "metadata")) {
+                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateObjectRequest const &obj) {
             jv = {
-                    {"region", obj.region},
                     {"bucket", obj.bucket},
                     {"key", obj.key},
                     {"metadata", boost::json::value_from(obj.metadata)},

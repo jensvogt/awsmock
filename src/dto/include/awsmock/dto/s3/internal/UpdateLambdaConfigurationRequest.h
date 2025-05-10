@@ -37,11 +37,13 @@ namespace AwsMock::Dto::S3 {
         friend UpdateLambdaConfigurationRequest tag_invoke(boost::json::value_to_tag<UpdateLambdaConfigurationRequest>, boost::json::value const &v) {
 
             UpdateLambdaConfigurationRequest r;
-            r.region = v.at("region").as_string();
-            r.bucket = v.at("bucket").as_string();
+            r.region = Core::Json::GetStringValue(v, "region");
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
 
             // Lambda configuration
-            r.lambdaConfiguration = boost::json::value_to<LambdaConfiguration>(v.at("lambdaConfiguration"));
+            if (Core::Json::AttributeExists(v, "lambdaConfiguration")) {
+                r.lambdaConfiguration = boost::json::value_to<LambdaConfiguration>(v.at("lambdaConfiguration"));
+            }
 
             return r;
         }

@@ -22,8 +22,7 @@ namespace AwsMock::Dto::S3 {
                     .size = object.size,
                     .lastModified = object.modified,
             };
-            version.owner = {.id = object.owner};
-
+            version.owner.id = object.owner;
             response.versions.emplace_back(version);
         }
         return response;
