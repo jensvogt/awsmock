@@ -12,8 +12,7 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.CreateServer") {
 
-                Dto::Transfer::CreateServerRequest transferRequest;
-                transferRequest.FromJson(body);
+                Dto::Transfer::CreateServerRequest transferRequest = Dto::Transfer::CreateServerRequest::FromJson(body);
                 transferRequest.region = region;
                 Dto::Transfer::CreateServerResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
                 return SendOkResponse(request, transferResponse.ToJson());

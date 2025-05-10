@@ -1,10 +1,7 @@
 //
 // Created by vogje01 on 30/05/2023.
 //
-#include "awsmock/dto/s3/GetObjectRequest.h"
 
-
-#include <aws/s3/S3Client.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {

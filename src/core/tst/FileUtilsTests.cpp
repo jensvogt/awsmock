@@ -268,8 +268,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const std::string tmp = GetImagePath("9783911244381.jpg");
-        const std::string contentType = FileUtils::GetContentTypeMagicFile(GetImagePath("7337529778404.tif"));
+        const std::string contentType = FileUtils::GetContentTypeMagicFile("/tmp/7337529778404.tif");
 
         // assert
         EXPECT_FALSE(contentType.empty());

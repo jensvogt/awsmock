@@ -231,7 +231,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response.messageId.empty());
         EXPECT_TRUE(response.md5Body == BODY_MD5);
         EXPECT_TRUE(response.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response.md5MessageSystemAttributes.empty());
+        EXPECT_TRUE(response.md5MessageSystemAttributes == EMPTY_MD5);
     }
 
     TEST_F(SQSServiceTest, MessagesCreateTest) {
@@ -263,11 +263,11 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response1.messageId.empty());
         EXPECT_TRUE(response1.md5Body == BODY_MD5);
         EXPECT_TRUE(response1.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response1.md5MessageSystemAttributes.empty());
+        EXPECT_TRUE(response1.md5MessageSystemAttributes == EMPTY_MD5);
         EXPECT_FALSE(response2.messageId.empty());
         EXPECT_TRUE(response2.md5Body == BODY_MD5);
         EXPECT_TRUE(response2.md5MessageAttributes == EMPTY_MD5);
-        EXPECT_TRUE(response2.md5MessageSystemAttributes.empty());
+        EXPECT_TRUE(response2.md5MessageSystemAttributes == EMPTY_MD5);
     }
 
     TEST_F(SQSServiceTest, MessageReceiveTest) {
@@ -308,8 +308,17 @@ namespace AwsMock::Service {
         msgRequest.body = BODY;
         Dto::SQS::SendMessageResponse msgResponse = _service.SendMessage(msgRequest);
 
+        Dto::SQS::ReceiveMessageRequest receiveRequest;
+        receiveRequest.region = REGION;
+        receiveRequest.queueUrl = queueUrl;
+        receiveRequest.maxMessages = 10;
+        receiveRequest.waitTimeSeconds = 1;
+        Dto::SQS::ReceiveMessageResponse receiveResponse = _service.ReceiveMessages(receiveRequest);
+
         // act
-        Dto::SQS::DeleteMessageRequest delRequest = {.queueUrl = queueUrl};
+        Dto::SQS::DeleteMessageRequest delRequest;
+        delRequest.queueUrl = queueUrl;
+        delRequest.receiptHandle = receiveResponse.messageList[0].receiptHandle;
         Dto::SQS::DeleteMessageResponse delResponse;
         EXPECT_NO_FATAL_FAILURE({ _service.DeleteMessage(delRequest); });
 
@@ -365,7 +374,7 @@ namespace AwsMock::Service {
         const std::string md5sum = Database::SqsUtils::CreateMd5OfMessageAttributes(messageAttributes);
 
         // assert
-        EXPECT_TRUE("ebade6c58059dfd4bbf8cee9da7465fe" == md5sum);
+        EXPECT_TRUE("e555c73571247ca6f0c0078e86da8c96" == md5sum);
     }
 
 }// namespace AwsMock::Service

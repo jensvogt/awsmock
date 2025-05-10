@@ -18,9 +18,7 @@
 
 #include <awsmock/core/TestUtils.h>
 
-#define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\", \"Protocols\" : [ \"FTP\", \"SFTP\" ] }"
-#define CREATE_SERVER_REQUEST_TO_JSON "{ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\", \"Protocols\" : [ \"FTP\", \"SFTP\" ] }"
-#define CREATE_SERVER_REQUEST_FROM_JSON "{\"Domain\":\"test.com\",\"Region\":\"eu-central-1\", \"Protocols\":[\"ftp\", \"sftp\"], \"tags\":[{\"key\":\"value\"}]}"
+#define CREATE_SERVER_REQUEST_FROM_JSON "{\"Domain\":\"test.com\",\"region\":\"eu-central-1\", \"Protocols\":[\"ftp\", \"sftp\"], \"Tags\":{\"key\":\"value\"}}"
 
 namespace AwsMock::Dto::Transfer {
 
@@ -59,7 +57,10 @@ namespace AwsMock::Dto::Transfer {
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
-        EXPECT_TRUE(Core::StringUtils::Equals(stringRepresentation, CREATE_SERVER_REQUEST_TO_STRING));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "test.com"));
     }
 
     TEST_F(CreateServerRequestTest, ToJsonTest) {
@@ -77,17 +78,19 @@ namespace AwsMock::Dto::Transfer {
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
-        EXPECT_TRUE(Core::StringUtils::Equals(jsonRepresentation, CREATE_SERVER_REQUEST_TO_JSON));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "test.com"));
     }
 
     TEST_F(CreateServerRequestTest, FromJsonTest) {
 
         // arrange
-        CreateServerRequest createRequest;
         const std::string jsonRepresentation = CREATE_SERVER_REQUEST_FROM_JSON;
 
         // act
-        createRequest.FromJson(jsonRepresentation);
+        CreateServerRequest createRequest = CreateServerRequest::FromJson(jsonRepresentation);
 
         // assert
         EXPECT_TRUE(createRequest.region == _region);

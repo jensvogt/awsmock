@@ -284,10 +284,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
 
-                    Dto::SQS::DeleteMessageRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::DeleteMessageRequest sqsRequest = Dto::SQS::DeleteMessageRequest::FromJson(clientCommand);
                     _sqsService.DeleteMessage(sqsRequest);
                     log_info << "Delete message, queueUrl: " << sqsRequest.queueUrl;
 

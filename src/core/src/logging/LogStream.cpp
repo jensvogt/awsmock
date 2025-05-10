@@ -133,4 +133,5 @@ namespace AwsMock::Core {
         be->scan_for_files();
         log_info << "Start logging to file, dir:" << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
+
 }// namespace AwsMock::Core

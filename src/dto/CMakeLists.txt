@@ -10,9 +10,9 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
-        src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp src/sqs/DeleteMessageRequest.cpp
+        src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
         src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp
-        src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
+        src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
         src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp
         src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp
         src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp

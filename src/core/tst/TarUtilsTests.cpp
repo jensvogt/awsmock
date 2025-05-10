@@ -29,25 +29,13 @@ namespace AwsMock::Core {
         void TearDown() override {
             DirUtils::DeleteDirectory(tempDir);
         }
-
-        static std::string GetTarPath(const std::string &imageFileName) {
-            char cwd[256];
-
-            const char *result = getcwd(cwd, sizeof(cwd));
-            EXPECT_TRUE(result != nullptr);
-
-            std::stringstream ss;
-            ss << cwd << FileUtils::separator() << "src" << FileUtils::separator() << "core" << FileUtils::separator() << "tst" << FileUtils::separator() << "resources" << FileUtils::separator() << "lambda" << FileUtils::separator() << imageFileName;
-
-            return ss.str();
-        }
         std::string tempDir;
     };
 
     TEST_F(TarUtilsTest, UncompressTest) {
 
         // arrange
-        const std::string zipFileName = GetTarPath("java-basic-1.0-SNAPSHOT.jar");
+        const std::string zipFileName = "/tmp/java-basic-1.0-SNAPSHOT.jar";
 
         // act
         EXPECT_NO_THROW({ TarUtils::Unzip(zipFileName, tempDir); });

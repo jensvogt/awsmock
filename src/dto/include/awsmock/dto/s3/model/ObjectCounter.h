@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
@@ -31,11 +32,6 @@ namespace AwsMock::Dto::S3 {
         std::string oid;
 
         /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
          * Bucket name
          */
         std::string bucketName;
@@ -53,7 +49,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Object size in bytes
          */
-        long size;
+        long size{};
 
         /**
          * Internal file name
@@ -86,34 +82,19 @@ namespace AwsMock::Dto::S3 {
 
         friend ObjectCounter tag_invoke(boost::json::value_to_tag<ObjectCounter>, boost::json::value const &v) {
             ObjectCounter r;
-            r.region = v.at("region").as_string();
-            r.oid = v.at("oid").as_string();
-            r.bucketName = v.at("bucketName").as_string();
-            r.key = v.at("key").as_string();
-            r.contentType = v.at("contentType").as_string();
-            r.size = v.at("size").as_int64();
-            r.internalName = v.at("internalName").as_string();
+            r.oid = Core::Json::GetStringValue(v, "oid");
+            r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.contentType = Core::Json::GetStringValue(v, "contentType");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.internalName = Core::Json::GetStringValue(v, "internalName");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
-
-            // Metadata
-            if (v.as_object().contains("metadata")) {
-                for (const auto &m: v.at("metadata").as_object()) {
-                    r.metadata[m.key()] = m.value().as_string().data();
-                }
-            }
+            r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ObjectCounter const &obj) {
-
-            // Metadata
-            boost::json::object metadata;
-            if (!obj.metadata.empty()) {
-                for (const auto &[fst, snd]: obj.metadata) {
-                    metadata[fst] = snd;
-                }
-            }
             jv = {
                     {"region", obj.region},
                     {"oid", obj.oid},
@@ -122,7 +103,7 @@ namespace AwsMock::Dto::S3 {
                     {"contentType", obj.contentType},
                     {"size", obj.size},
                     {"internalName", obj.internalName},
-                    {"metadata", metadata},
+                    {"metadata", boost::json::value_from(obj.metadata)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

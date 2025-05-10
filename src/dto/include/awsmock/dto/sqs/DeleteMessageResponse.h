@@ -13,48 +13,40 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteMessageResponse {
-
-        /**
-         * Resource
-         */
-        std::string resource = "SQS";
-
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+    struct DeleteMessageResponse final : Common::BaseCounter<DeleteMessageResponse> {
 
         /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            // Root
+            boost::property_tree::ptree pt;
+            pt.put("DeleteMessageResponse.ResponseMetadata.RequestId", requestId);
+            pt.put("DeleteMessageResponse.ResponseMetadata.Resource", "sqs");
+            return Core::XmlUtils::ToXmlString(pt);
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageResponse &r);
+      private:
+
+        friend DeleteMessageResponse tag_invoke(boost::json::value_to_tag<DeleteMessageResponse>, boost::json::value const &v) {
+            DeleteMessageResponse r;
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMessageResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

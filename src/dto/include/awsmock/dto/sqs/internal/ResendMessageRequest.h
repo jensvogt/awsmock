@@ -43,8 +43,8 @@ namespace AwsMock::Dto::SQS {
 
         friend ResendMessageRequest tag_invoke(boost::json::value_to_tag<ResendMessageRequest>, boost::json::value const &v) {
             ResendMessageRequest r;
-            r.queueArn = v.at("queueArn").as_string();
-            r.messageId = v.at("messageId").as_string();
+            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.messageId = Core::Json::GetStringValue(v, "messageId");
             return r;
         }
 
@@ -53,6 +53,7 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
+                    {"queueArn", obj.queueArn},
                     {"messageId", obj.messageId},
             };
         }
