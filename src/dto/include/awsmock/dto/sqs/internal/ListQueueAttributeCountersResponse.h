@@ -32,7 +32,9 @@ namespace AwsMock::Dto::SQS {
         friend ListQueueAttributeCountersResponse tag_invoke(boost::json::value_to_tag<ListQueueAttributeCountersResponse>, boost::json::value const &v) {
             ListQueueAttributeCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
-            r.attributeCounters = boost::json::value_to<std::vector<AttributeCounter>>(v.at("attributeCounters"));
+            if (Core::Json::AttributeExists(v, "attributeCounters")) {
+                r.attributeCounters = boost::json::value_to<std::vector<AttributeCounter>>(v.at("attributeCounters"));
+            }
             return r;
         }
 

@@ -2,13 +2,36 @@
 // Created by vogje01 on 11/19/23.
 //
 
+#include "awsmock/core/SharedMemoryUtils.h"
+
+
 #include <awsmock/memorydb/SQSMemoryDb.h>
-#include <queue>
 
 namespace AwsMock::Database {
 
     boost::mutex SQSMemoryDb::_sqsQueueMutex;
     boost::mutex SQSMemoryDb::_sqsMessageMutex;
+
+    SQSMemoryDb::SQSMemoryDb() {
+
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _sqsCounterMap = _segment.find<SqsCounterMapType>(SQS_COUNTER_MAP_NAME).first;
+        if (!_sqsCounterMap) {
+            _sqsCounterMap = _segment.construct<SqsCounterMapType>(SQS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
+        }
+
+        // Initialize the counters
+        for (const auto &queue: ListQueues()) {
+            QueueMonitoringCounter counter;
+            counter.initial = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
+            counter.invisible = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE);
+            counter.delayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
+            counter.messages = CountMessages(queue.queueArn);
+            counter.size = GetQueueSize(queue.queueArn);
+            _sqsCounterMap->insert_or_assign(queue.queueArn, counter);
+        }
+        log_debug << "SQS queues counters initialized" << _sqsCounterMap->size();
+    }
 
     bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
@@ -116,11 +139,17 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) const {
+    Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) {
 
         Entity::SQS::QueueList queueList;
-        for (const auto &val: _queues | std::views::values) {
-            queueList.emplace_back(val);
+        for (auto &queue: _queues | std::views::values) {
+
+            queue.size = (*_sqsCounterMap)[queue.queueArn].size;
+            queue.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[queue.queueArn].messages;
+            queue.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[queue.queueArn].invisible;
+            queue.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[queue.queueArn].delayed;
+
+            queueList.emplace_back(queue);
         }
 
         log_trace << "Got queue list, size: " << queueList.size();
@@ -246,7 +275,6 @@ namespace AwsMock::Database {
         const std::string oid = Core::StringUtils::CreateRandomUuid();
         _messages[oid] = message;
         log_trace << "Message created, oid: " << oid;
-
         return GetMessageById(oid);
     }
 
@@ -380,7 +408,6 @@ namespace AwsMock::Database {
         boost::mutex::scoped_lock lock(_sqsMessageMutex);
 
         long count = 0;
-        auto now = system_clock::now();
         for (auto [fst, snd]: _messages) {
 
             if (snd.queueArn == queueArn && snd.status == Entity::SQS::MessageStatus::INVISIBLE && snd.reset < std::chrono::system_clock::now()) {

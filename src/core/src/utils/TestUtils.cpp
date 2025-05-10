@@ -8,14 +8,12 @@ namespace AwsMock::Core {
 
     void TestUtils::CreateTestConfigurationFile(const bool withDatabase) {
 
+        LogStream::Initialize();
+        LogStream::SetSeverity("info");
+
         // Logging
         if (!SystemUtils::GetEnvironmentVariableValue("AWSMOCK_TEST_LOG").empty()) {
-            LogStream::Initialize();
             LogStream::AddFile("/tmp", "awsmocktest", 1024 * 1024, 5);
-            LogStream::SetSeverity("debug");
-        } else {
-            LogStream::Initialize();
-            LogStream::SetSeverity("none");
         }
 
         constexpr int port = 14566;
@@ -83,7 +81,7 @@ namespace AwsMock::Core {
         Configuration::instance().SetValue<std::string>("awsmock.docker.socket", "/var/run/docker.sock");
 
         // Logging
-        Configuration::instance().SetValue<std::string>("awsmock.logging.level", "debug");
+        Configuration::instance().SetValue<std::string>("awsmock.logging.level", "error");
         Configuration::instance().SetValue<std::string>("awsmock.logging.prefix", "/tmp/awsmock-test.log");
         Configuration::instance().SetValue<long>("awsmock.logging.file-size", 1024 * 1024);
         Configuration::instance().SetValue<int>("awsmock.logging.file-count", 5);

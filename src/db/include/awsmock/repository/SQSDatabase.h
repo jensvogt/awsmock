@@ -36,7 +36,7 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
-
+    /*
     struct QueueMonitoringCounter {
         long initial{};
         long invisible{};
@@ -50,7 +50,7 @@ namespace AwsMock::Database {
     using SqsCounterMapType = boost::container::map<std::string, QueueMonitoringCounter, std::less<std::string>, SqsShmAllocator>;
 
     static constexpr auto SQS_COUNTER_MAP_NAME = "SqsQueueCounter";
-
+*/
     /**
      * @brief SQS MongoDB database.
      *

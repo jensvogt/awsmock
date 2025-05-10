@@ -45,10 +45,14 @@ namespace AwsMock::Dto::Transfer {
         friend CreateServerRequest tag_invoke(boost::json::value_to_tag<CreateServerRequest>, boost::json::value const &v) {
             CreateServerRequest r;
             r.domain = Core::Json::GetStringValue(v, "Domain");
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
-            r.identityProviderDetails = boost::json::value_to<IdentityProviderDetails>(v.at("IdentityProviderDetails"));
-            if (Core::Json::AttributeExists(v, "Protocol")) {
-                for (const auto &p: v.at("Protocol").as_array()) {
+            if (Core::Json::AttributeExists(v, "Tags") && !v.at("Tags").is_null()) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
+            if (Core::Json::AttributeExists(v, "IdentityProviderDetails") && !v.at("IdentityProviderDetails").is_null()) {
+                r.identityProviderDetails = boost::json::value_to<IdentityProviderDetails>(v.at("IdentityProviderDetails"));
+            }
+            if (Core::Json::AttributeExists(v, "Protocols")) {
+                for (const auto &p: v.at("Protocols").as_array()) {
                     r.protocols.emplace_back(ProtocolTypeFromString(p.as_string().data()));
                 }
             }

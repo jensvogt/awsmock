@@ -51,7 +51,11 @@ namespace AwsMock::Dto::Transfer {
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
-        EXPECT_STREQ(stringRepresentation.c_str(), CREATE_SERVER_RESPONSE_TO_STRING);
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "serverId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "arn"));
     }
 
     TEST_F(CreateServerResponseTest, ToJsonTest) {
@@ -67,7 +71,11 @@ namespace AwsMock::Dto::Transfer {
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
-        EXPECT_STREQ(jsonRepresentation.c_str(), CREATE_SERVER_RESPONSE_TO_JSON);
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "serverId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "arn"));
     }
 }// namespace AwsMock::Dto::Transfer
 

@@ -39,7 +39,8 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllKeys();
+            const long count = _database.DeleteAllKeys();
+            log_error << "KMS keys deleted, count: " << count;
         }
 
         boost::thread _thread;

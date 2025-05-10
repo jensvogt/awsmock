@@ -348,7 +348,7 @@ namespace AwsMock::Service {
     Dto::Docker::InspectContainerResponse ContainerService::InspectContainer(const std::string &containerId) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        Dto::Docker::InspectContainerResponse inspectContainerResponse = {};
+        Dto::Docker::InspectContainerResponse inspectContainerResponse{};
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json");
         if (statusCode != http::status::ok) {
             log_warning << "Get container by name failed, state: " << statusCode;

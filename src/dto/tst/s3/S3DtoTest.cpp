@@ -50,7 +50,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         const std::string jsonResult = request.ToJson();
-        const GetObjectCounterRequest result = request.FromJson(jsonResult);
+        const GetObjectCounterRequest result = GetObjectCounterRequest::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
@@ -79,7 +79,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         const std::string jsonResult = response.ToJson();
-        const GetObjectCounterResponse result = response.FromJson(jsonResult);
+        const GetObjectCounterResponse result = GetObjectCounterResponse::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
@@ -106,7 +106,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         std::string jsonResult = request.ToJson();
-        ListBucketCounterRequest result = request.FromJson(jsonResult);
+        ListBucketCounterRequest result = ListBucketCounterRequest::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
@@ -134,7 +134,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         std::string jsonResult = response.ToJson();
-        ListBucketCounterResponse result = response.FromJson(jsonResult);
+        ListBucketCounterResponse result = ListBucketCounterResponse::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
@@ -164,7 +164,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         std::string jsonResult = request.ToJson();
-        ListObjectCounterRequest result = request.FromJson(jsonResult);
+        ListObjectCounterRequest result = ListObjectCounterRequest::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
@@ -192,7 +192,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         std::string jsonResult = response.ToJson();
-        ListObjectCounterResponse result = response.FromJson(jsonResult);
+        ListObjectCounterResponse result = ListObjectCounterResponse::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
@@ -215,7 +215,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         std::string jsonResult = request.ToJson();
-        UpdateObjectRequest result = request.FromJson(jsonResult);
+        UpdateObjectRequest result = UpdateObjectRequest::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.bucket == "bucket");
@@ -246,7 +246,7 @@ namespace AwsMock::Dto::S3 {
 
         // act
         std::string jsonResult = request.ToJson();
-        UpdateLambdaConfigurationRequest result = request.FromJson(jsonResult);
+        UpdateLambdaConfigurationRequest result = UpdateLambdaConfigurationRequest::FromJson(jsonResult);
 
         // assert
         EXPECT_TRUE(result.region == "region");
