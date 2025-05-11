@@ -127,7 +127,12 @@ namespace AwsMock::Database::Entity::Transfer {
         std::vector<int> ports = {2121, 2222};
 
         /**
-         * Listen address
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
+         * Listener address
          */
         std::string listenAddress = "0.0.0.0";
 
@@ -144,13 +149,13 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Last modification date
          */
-        system_clock::time_point modified;
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * @brief Checks whether a user exists already.
          *
          * @param userName name of the user
-         * @return true if transfer manager with the given user exists.
+         * @return true if the transfer manager with the given user exists.
          */
         bool HasUser(const std::string &userName);
 
@@ -158,7 +163,7 @@ namespace AwsMock::Database::Entity::Transfer {
          * @brief Return a user.
          *
          * @param userName name of the user
-         * @return true if transfer manager with the given user exists.
+         * @return true if the transfer manager with the given user exists.
          */
         User GetUser(const std::string &userName);
 
@@ -166,7 +171,7 @@ namespace AwsMock::Database::Entity::Transfer {
          * @brief Checks whether a protocol exists already.
          *
          * @param p name of the protocol
-         * @return true if transfer manager with the given protocol exists.
+         * @return true if the transfer manager with the given protocol exists.
          */
         bool HasProtocol(const std::string &p);
 
@@ -174,7 +179,7 @@ namespace AwsMock::Database::Entity::Transfer {
          * @brief Checks whether a protocol exists already.
          *
          * @param p protocol
-         * @return true if transfer manager with the given protocol exists.
+         * @return true if the transfer manager with the given protocol exists.
          */
         bool HasProtocol(const Protocol &p);
 

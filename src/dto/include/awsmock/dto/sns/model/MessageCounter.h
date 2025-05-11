@@ -50,6 +50,11 @@ namespace AwsMock::Dto::SNS {
         std::vector<MessageAttributeCounter> messageAttributes;
 
         /**
+         * Last sent time
+         */
+        system_clock::time_point lastSend;
+
+        /**
          * Creation time
          */
         system_clock::time_point created;
@@ -70,12 +75,14 @@ namespace AwsMock::Dto::SNS {
 
         friend MessageCounter tag_invoke(boost::json::value_to_tag<MessageCounter>, boost::json::value const &v) {
             MessageCounter r;
-            r.topicArn = v.at("topicArn").as_string();
-            r.messageId = v.at("messageId").as_string();
-            r.message = v.at("message").as_string();
-            r.size = v.at("size").as_int64();
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.messageId = Core::Json::GetStringValue(v, "messageId");
+            r.message = Core::Json::GetStringValue(v, "message");
+            r.contentType = Core::Json::GetStringValue(v, "contentType");
+            r.size = Core::Json::GetLongValue(v, "size");
             r.messageSatus = MessageStatusFromString(v.at("messageStatus").as_string().data());
             r.messageAttributes = boost::json::value_to<std::vector<MessageAttributeCounter>>(v.at("messageAttributes"));
+            r.lastSend = Core::DateTimeUtils::FromISO8601(v.at("lastSend").as_string().data());
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
@@ -83,12 +90,17 @@ namespace AwsMock::Dto::SNS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageCounter const &obj) {
             jv = {
+                    {"region", obj.region},
+                    {"requestId", obj.requestId},
+                    {"user", obj.user},
+                    {"contentType", obj.contentType},
                     {"topicArn", obj.topicArn},
                     {"messageId", obj.messageId},
                     {"message", obj.message},
                     {"size", obj.size},
                     {"messageStatus", MessageStatusToString(obj.messageSatus)},
                     {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"lastSend", Core::DateTimeUtils::ToISO8601(obj.lastSend)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

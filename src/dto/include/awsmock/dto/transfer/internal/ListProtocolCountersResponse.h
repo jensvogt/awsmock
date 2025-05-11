@@ -52,7 +52,7 @@ namespace AwsMock::Dto::Transfer {
         friend ProtocolCounter tag_invoke(boost::json::value_to_tag<ProtocolCounter>, boost::json::value const &v) {
             ProtocolCounter r;
             r.port = Core::Json::GetLongValue(v, "port");
-            r.protocol = ProtocolTypeFromString(Core::Json::GetStringValue(v, "protocolCounters"));
+            r.protocol = ProtocolTypeFromString(Core::Json::GetStringValue(v, "protocol"));
             return r;
         }
 
@@ -67,7 +67,7 @@ namespace AwsMock::Dto::Transfer {
         }
     };
 
-    struct ListProtocolCountersResponse final : Common::BaseCounter<ProtocolCounter> {
+    struct ListProtocolCountersResponse final : Common::BaseCounter<ListProtocolCountersResponse> {
 
         /**
          * List of attribute counters

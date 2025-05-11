@@ -2,8 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_TRANSFER_LIST_USER_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_TRANSFER_LIST_USER_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_TRANSFER_LIST_TAG_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_TRANSFER_LIST_TAG_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -16,7 +16,7 @@
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ListUserCountersRequest final : Common::BaseCounter<ListUserCountersRequest> {
+    struct ListTagCountersRequest final : Common::BaseCounter<ListTagCountersRequest> {
 
         /**
          * Server ID
@@ -45,8 +45,8 @@ namespace AwsMock::Dto::Transfer {
 
       private:
 
-        friend ListUserCountersRequest tag_invoke(boost::json::value_to_tag<ListUserCountersRequest>, boost::json::value const &v) {
-            ListUserCountersRequest r;
+        friend ListTagCountersRequest tag_invoke(boost::json::value_to_tag<ListTagCountersRequest>, boost::json::value const &v) {
+            ListTagCountersRequest r;
             r.serverId = Core::Json::GetStringValue(v, "serverId");
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
@@ -57,7 +57,7 @@ namespace AwsMock::Dto::Transfer {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserCountersRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTagCountersRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
@@ -73,4 +73,4 @@ namespace AwsMock::Dto::Transfer {
 
 }// namespace AwsMock::Dto::Transfer
 
-#endif// AWSMOCK_DTO_TRANSFER_LIST_USER_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_TRANSFER_LIST_TAG_COUNTERS_REQUEST_H

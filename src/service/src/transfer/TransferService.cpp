@@ -2,6 +2,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/dto/transfer/model/Tag.h"
+
+
 #include <awsmock/service/transfer/TransferService.h>
 
 namespace AwsMock::Service {
@@ -263,13 +266,47 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Transfer::ListTagCountersResponse TransferService::ListTagCounters(const Dto::Transfer::ListTagCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_tag_counters");
+
+        try {
+            std::vector<Database::SortColumn> sortColumns;
+            for (const auto &s: request.sortColumns) {
+                Database::SortColumn sortColumn;
+                sortColumn.column = request.sortColumns[0].column;
+                sortColumn.sortDirection = request.sortColumns[0].sortDirection;
+                sortColumns.emplace_back(sortColumn);
+            }
+
+            Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
+
+            Dto::Transfer::ListTagCountersResponse response;
+            response.total = static_cast<long>(server.tags.size());
+
+            int index = 0;
+            for (const auto &[fst, snd]: server.tags) {
+                if (index >= request.pageIndex * request.pageSize && index < (request.pageIndex + 1) * request.pageSize) {
+                    response.tagCounters[fst] = snd;
+                }
+                index++;
+            }
+
+            log_trace << "Transfer tag list result: " << response.ToJson();
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "Transfer tag list request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::Transfer::ListProtocolCountersResponse TransferService::ListProtocolCounters(const Dto::Transfer::ListProtocolCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_protocol_counters");
 
         try {
             const Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
 
-            auto response = Dto::Transfer::ListProtocolCountersResponse();
+            Dto::Transfer::ListProtocolCountersResponse response;
             response.total = static_cast<long>(server.protocols.size());
             for (int i = 0; i < server.protocols.size(); i++) {
                 Dto::Transfer::ProtocolCounter protocolDto;

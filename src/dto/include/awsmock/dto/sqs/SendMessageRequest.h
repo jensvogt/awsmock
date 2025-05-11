@@ -98,6 +98,11 @@ namespace AwsMock::Dto::SQS {
         long delaySeconds{};
 
         /**
+         * Content type
+         */
+        std::string contentType{};
+
+        /**
          * Attributes (system attributes)
          */
         std::map<std::string, MessageAttribute> messageSystemAttributes;
@@ -113,6 +118,7 @@ namespace AwsMock::Dto::SQS {
             SendMessageRequest r;
             r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
             r.body = Core::Json::GetStringValue(v, "MessageBody");
+            r.contentType = Core::Json::GetStringValue(v, "ContentType");
             r.delaySeconds = Core::Json::GetLongValue(v, "DelaySeconds");
             if (Core::Json::AttributeExists(v, "MessageSystemAttributes")) {
                 r.messageSystemAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageSystemAttributes"));
@@ -130,6 +136,7 @@ namespace AwsMock::Dto::SQS {
                     {"requestId", obj.requestId},
                     {"queueUrl", obj.queueUrl},
                     {"body", obj.body},
+                    {"contentType", obj.contentType},
                     {"delaySeconds", obj.delaySeconds},
                     {"messageSystemAttributes", boost::json::value_from(obj.messageSystemAttributes)},
                     {"messageAttributes", boost::json::value_from(obj.messageAttributes)},

@@ -7,36 +7,36 @@
 namespace AwsMock::Database::Entity::Lambda {
 
     bool Tags::HasTag(const std::string &key) {
-        return find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+        return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
                    return t.first == key;
                }) != tags.end();
     }
 
     std::string Tags::GetTagValue(const std::string &key) {
-        auto it = find_if(tags.begin(), tags.end(), [key](const std::pair<std::string, std::string> &t) {
+        const auto it = std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
             return t.first == key;
         });
         return it->second;
     }
 
-    void Tags::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Tags::FromDocument(const std::optional<view> &mResult) {
 
         std::vector<std::string> keys;
-        std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](bsoncxx::document::element ele) {
+        std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](const bsoncxx::document::element &ele) {
             return bsoncxx::string::to_string(ele.key());
         });
 
         for (auto &it: keys) {
-            tags.emplace_back(it, Core::Bson::BsonUtils::GetStringValue(mResult, it));
+            tags[it] = Core::Bson::BsonUtils::GetStringValue(mResult, it);
         }
     }
 
     view_or_value<view, value> Tags::ToDocument() const {
 
         // Convert environment to document
-        auto tagDoc = bsoncxx::builder::basic::array{};
-        for (const auto &tag: tags) {
-            tagDoc.append(make_document(kvp(tag.first, tag.second)));
+        auto tagDoc = array{};
+        for (const auto &[fst, snd]: tags) {
+            tagDoc.append(make_document(kvp(fst, snd)));
         }
         return make_document(kvp("Tags", tagDoc));
     }

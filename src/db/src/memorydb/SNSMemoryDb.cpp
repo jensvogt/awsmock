@@ -341,6 +341,19 @@ namespace AwsMock::Database {
         return _messages[it->first];
     }
 
+    void SNSMemoryDb::SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) {
+        boost::mutex::scoped_lock lock(_snsMessageMutex);
+
+        message.modified = system_clock::now();
+
+        std::string oid = message.oid;
+        const auto it =
+                std::ranges::find_if(_messages, [oid](const std::pair<std::string, Entity::SNS::Message> &message) {
+                    return message.second.oid == oid;
+                });
+        _messages[it->first].status = status;
+    }
+
     void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {
         DeleteMessage(message.messageId);
     }

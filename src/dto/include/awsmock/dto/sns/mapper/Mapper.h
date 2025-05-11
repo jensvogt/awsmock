@@ -69,6 +69,30 @@ namespace AwsMock::Dto::SNS {
         static ListMessageCountersResponse map(const ListMessageCountersRequest &request, const std::vector<Database::Entity::SNS::Message> &messageEntities);
 
         /**
+         * @brief Maps an SNS message entity list to a message DTO
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param messageEntity message entity
+         * @return Message DTO
+         * @see Database::Entity::SNS::Message
+         * @see Message
+         */
+        static Message map(const Database::Entity::SNS::Message &messageEntity);
+
+        /**
+         * @brief Maps an SNS message DTO list to message entity
+         *
+         * Some values will be pulled over from the request.
+         *
+         * @param messageDto message DTO
+         * @return Message entity
+         * @see Database::Entity::SNS::Message
+         * @see Message
+         */
+        static Database::Entity::SNS::Message map(const Message &messageDto);
+
+        /**
          * @brief Maps a single SNS message attribute DTO to a message attribute entity
          *
          * Some values will be pulled over from the request.

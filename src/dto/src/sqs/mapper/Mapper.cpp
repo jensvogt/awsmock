@@ -52,6 +52,7 @@ namespace AwsMock::Dto::SQS {
             messageCounter.messageId = message.messageId;
             messageCounter.id = message.oid;
             messageCounter.body = message.body;
+            messageCounter.contentType = message.contentType;
             messageCounter.receiptHandle = message.receiptHandle;
             messageCounter.md5Sum = message.md5Body;
             messageCounter.retries = message.retries;
