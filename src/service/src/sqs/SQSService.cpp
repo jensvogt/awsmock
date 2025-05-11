@@ -792,6 +792,7 @@ namespace AwsMock::Service {
             // Set parameters
             message.queueArn = queue.queueArn;
             message.queueName = queue.name;
+            message.contentType = request.contentType;
             message.size = static_cast<long>(request.body.size());
             message.created = system_clock::now();
             message.modified = system_clock::now();
@@ -870,7 +871,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
-        long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
+        const long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 

@@ -60,8 +60,11 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PUBLISH: {
 
+                    Core::HttpUtils::DumpRequest(request);
                     Dto::SNS::PublishRequest snsRequest;
                     snsRequest.region = clientCommand.region;
+                    snsRequest.user = clientCommand.user;
+                    snsRequest.contentType = clientCommand.contentType;
                     snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
                     snsRequest.targetArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TargetArn");
                     snsRequest.message = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Message");
@@ -203,13 +206,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::LIST_MESSAGES: {
 
-                    Dto::SNS::ListMessagesRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-                    snsRequest.region = region;
-
-                    log_debug << "List messages, payload: " << clientCommand.payload;
-                    log_debug << "List messages, topicArn: " << snsRequest.topicArn;
-
+                    Dto::SNS::ListMessagesRequest snsRequest = Dto::SNS::ListMessagesRequest::FromJson(clientCommand);
                     Dto::SNS::ListMessagesResponse snsResponse = _snsService.ListMessages(snsRequest);
 
                     log_info << "List messages, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.messages.size();
@@ -218,9 +215,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
 
-                    Dto::SNS::DeleteMessageRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
                     _snsService.DeleteMessage(snsRequest);
 
                     log_info << "Message deleted, messageId: " << snsRequest.messageId;

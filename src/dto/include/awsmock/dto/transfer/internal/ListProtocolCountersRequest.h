@@ -55,7 +55,10 @@ namespace AwsMock::Dto::Transfer {
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
-            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            }
+
             return r;
         }
 

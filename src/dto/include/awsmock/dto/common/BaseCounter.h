@@ -55,6 +55,11 @@ namespace AwsMock::Dto::Common {
         std::string user{};
 
         /**
+         * Content type
+         */
+        std::string contentType{};
+
+        /**
          * @brief Convert to JSON representation
          *
          * @return JSON string
@@ -104,6 +109,7 @@ namespace AwsMock::Dto::Common {
             t.region = clientCommand.region;
             t.user = clientCommand.user;
             t.requestId = clientCommand.requestId;
+            t.contentType = clientCommand.contentType;
             return t;
         }
 

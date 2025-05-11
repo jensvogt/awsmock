@@ -356,6 +356,14 @@ namespace AwsMock::Database {
         Entity::SNS::Message CreateOrUpdateMessage(Entity::SNS::Message &message) const;
 
         /**
+         * @brief Sets the message status
+         *
+         * @param message SNS message
+         * @param status new status
+         */
+        void SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const;
+
+        /**
          * @brief Deletes a message.
          *
          * @param message message to delete

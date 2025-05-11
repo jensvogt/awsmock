@@ -26,12 +26,15 @@
 #include <awsmock/dto/transfer/internal/ListProtocolCountersResponse.h>
 #include <awsmock/dto/transfer/internal/ListServerCountersRequest.h>
 #include <awsmock/dto/transfer/internal/ListServerCountersResponse.h>
+#include <awsmock/dto/transfer/internal/ListTagCountersRequest.h>
+#include <awsmock/dto/transfer/internal/ListTagCountersResponse.h>
 #include <awsmock/dto/transfer/internal/ListUserCountersRequest.h>
 #include <awsmock/dto/transfer/internal/ListUserCountersResponse.h>
 #include <awsmock/dto/transfer/mapper/Mapper.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
+
 #define TRANSFER_DEFAULT_FTP_PORT 21
 
 namespace AwsMock::Service {
@@ -111,6 +114,15 @@ namespace AwsMock::Service {
          * @see Dto::Transfer::ListUserCountersResponse
          */
         Dto::Transfer::ListUserCountersResponse ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const;
+
+        /**
+         * @brief Returns a list of available tag counters
+         *
+         * @param request list tag counters request
+         * @return ListTagCountersResponse
+         * @see Dto::Transfer::ListTagCountersResponse
+         */
+        Dto::Transfer::ListTagCountersResponse ListTagCounters(const Dto::Transfer::ListTagCountersRequest &request) const;
 
         /**
          * @brief Returns a list of available protocol counters for a server

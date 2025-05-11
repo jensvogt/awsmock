@@ -59,6 +59,7 @@
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
+#include <awsmock/utils/SqsUtils.h>
 
 #define SQS_PROTOCOL "sqs"
 #define HTTP_PROTOCOL "http"
@@ -281,7 +282,7 @@ namespace AwsMock::Service {
          * @param request SNS publish request
          * @param message SNS message entity
          */
-        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const;
+        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message) const;
 
         /**
          * @brief Send a SNS message to an SQS topic

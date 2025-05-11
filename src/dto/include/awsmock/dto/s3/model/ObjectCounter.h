@@ -135,10 +135,18 @@ namespace AwsMock::Dto::S3 {
                     {"contentType", obj.contentType},
                     {"size", obj.size},
                     {"internalName", obj.internalName},
-                    {"metadata", boost::json::value_from(obj.metadata)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
+
+            // Convert from map to key/value vector
+            if (!obj.metadata.empty()) {
+                boost::json::array metadataArray;
+                for (const auto &[fst, snd]: obj.metadata) {
+                    metadataArray.push_back(boost::json::object{{"key", fst}, {"value", snd}});
+                }
+                jv.as_object()["metadata"] = metadataArray;
+            }
         }
     };
 

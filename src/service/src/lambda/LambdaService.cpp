@@ -563,7 +563,7 @@ namespace AwsMock::Service {
         response.accountLimit.codeSizeUnzipped = 50 * 1024 * 1024L;
         response.accountLimit.codeSizeZipped = 50 * 1024 * 1024L;
 
-        // 1000 concurrent executions (which is irrelevant in AwsMock environment)
+        // 1000 concurrent executions (that are irrelevant in AwsMock environment)
         response.accountLimit.concurrentExecutions = 1000;
 
         // 75 GB
@@ -605,7 +605,7 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Lambda function updated, function: " << lambdaEntity.function;
 
-        // Create response (which is actually the request)
+        // Create a response (which is actually the request)
         Dto::Lambda::CreateEventSourceMappingsResponse response;
         response.functionName = request.functionName;
         response.eventSourceArn = request.eventSourceArn;
