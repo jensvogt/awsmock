@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.5](https://github.com/jensvogt/awsmock/compare/v1.2.4...v1.2.5) (2025-05-11)
+
+
+### Bug Fixes
+
+* **1181-dynamodb-tablesitems-missing-in-ui:** add transfer server tags, fix S3 metadata in frontend ([1a41367](https://github.com/jensvogt/awsmock/commit/1a413673c669eeab8769cef281578f26c0ed1a71))
+
 ## [1.2.4](https://github.com/jensvogt/awsmock/compare/v1.2.3...v1.2.4) (2025-05-10)
 
 
