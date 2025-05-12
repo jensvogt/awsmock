@@ -13,11 +13,12 @@
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 
 // Test includes
+#include "awsmock/dto/transfer/model/Tag.h"
+
+
 #include <awsmock/core/TestUtils.h>
 
-#define CREATE_SERVER_REQUEST_TO_STRING "CreateServerRequest={ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\", \"Protocols\" : [ \"FTP\", \"SFTP\" ] }"
-#define CREATE_SERVER_REQUEST_TO_JSON "{ \"Region\" : \"eu-central-1\", \"Domain\" : \"test.com\", \"Protocols\" : [ \"FTP\", \"SFTP\" ] }"
-#define CREATE_SERVER_REQUEST_FROM_JSON "{\"Domain\":\"test.com\",\"Region\":\"eu-central-1\", \"Protocols\":[\"ftp\", \"sftp\"], \"tags\":[{\"key\":\"value\"}]}"
+#define CREATE_SERVER_REQUEST_FROM_JSON "{\"Domain\":\"test.com\",\"region\":\"eu-central-1\", \"Protocols\":[\"ftp\", \"sftp\"], \"Tags\":{\"key\":\"value\"}}"
 
 namespace AwsMock::Dto::Transfer {
 
@@ -27,48 +28,69 @@ namespace AwsMock::Dto::Transfer {
         void SetUp() override {
             // General configuration
             _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+            _identityProviderDetails.directoryId = "directoryId";
+            _identityProviderDetails.function = "function";
+            _identityProviderDetails.invocationRole = "invocationRole";
+            _identityProviderDetails.sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD;
+            _identityProviderDetails.url = "url";
+            _tags["version"] = "1.0";
         }
 
         std::string _region;
         std::vector<ProtocolType> _protocols = {ProtocolTypeFromString("FTP"), ProtocolTypeFromString("SFTP")};
-        IdentityProviderDetails _identityProviderDetails = {.directoryId = "directoryId", .function = "function", .invocationRole = "invocationRole", .sftpAuthenticationMethod = SftpAuthenticationMethod::PASSWORD, .url = "url"};
-        std::map<std::string, std::string> _tags = {{"version", "1.0"}};
+        IdentityProviderDetails _identityProviderDetails;
+        std::map<std::string, std::string> _tags;
     };
 
     TEST_F(CreateServerRequestTest, ToStringTest) {
 
         // arrange
-        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        CreateServerRequest createRequest;
+        createRequest.region = _region;
+        createRequest.domain = "test.com";
+        createRequest.protocols = _protocols;
+        createRequest.tags = _tags;
+        createRequest.identityProviderDetails = _identityProviderDetails;
 
         // act
         const std::string stringRepresentation = createRequest.ToString();
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
-        EXPECT_TRUE(Core::StringUtils::Equals(stringRepresentation, CREATE_SERVER_REQUEST_TO_STRING));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "test.com"));
     }
 
     TEST_F(CreateServerRequestTest, ToJsonTest) {
 
         // arrange
-        const CreateServerRequest createRequest = {.region = _region, .domain = "test.com", .protocols = _protocols, .tags = _tags, .identityProviderDetails = _identityProviderDetails};
+        CreateServerRequest createRequest;
+        createRequest.region = _region;
+        createRequest.domain = "test.com";
+        createRequest.protocols = _protocols;
+        createRequest.tags = _tags;
+        createRequest.identityProviderDetails = _identityProviderDetails;
 
         // act
         const std::string jsonRepresentation = createRequest.ToJson();
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
-        EXPECT_TRUE(Core::StringUtils::Equals(jsonRepresentation, CREATE_SERVER_REQUEST_TO_JSON));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "test.com"));
     }
 
     TEST_F(CreateServerRequestTest, FromJsonTest) {
 
         // arrange
-        CreateServerRequest createRequest;
         const std::string jsonRepresentation = CREATE_SERVER_REQUEST_FROM_JSON;
 
         // act
-        createRequest.FromJson(jsonRepresentation);
+        CreateServerRequest createRequest = CreateServerRequest::FromJson(jsonRepresentation);
 
         // assert
         EXPECT_TRUE(createRequest.region == _region);

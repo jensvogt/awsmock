@@ -10,6 +10,7 @@ if (WIN32)
     target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
             libssl.lib libcrypto.lib archive_static.lib libmagic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
+            bsoncxx-v_noabi-rhs-x64-v143-md.lib mongocxx-v_noabi-rhs-x64-v143-md.lib bson-1.0.lib mongoc-1.0.lib
             "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-s-x64-1_88.lib>"
             "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-sgd-x64-1_88.lib>"
             "$<$<CONFIG:RELEASE>:libboost_url-vc143-mt-s-x64-1_88.lib>"

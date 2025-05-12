@@ -195,7 +195,6 @@ namespace AwsMock::Service {
 
         try {
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
-            const long size = _sqsDatabase.CountMessageSize(request.queueArn);
 
             Dto::SQS::GetQueueDetailsResponse sqsResponse;
             sqsResponse.messageCount = _sqsDatabase.CountMessages(request.queueArn);
@@ -208,7 +207,7 @@ namespace AwsMock::Service {
             sqsResponse.visibilityTimeout = queue.attributes.visibilityTimeout;
             sqsResponse.delay = queue.attributes.delaySeconds;
             sqsResponse.owner = queue.owner;
-            sqsResponse.size = size;
+            sqsResponse.size = queue.size;
             sqsResponse.available = queue.attributes.approximateNumberOfMessages;
             sqsResponse.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
             sqsResponse.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
@@ -793,6 +792,7 @@ namespace AwsMock::Service {
             // Set parameters
             message.queueArn = queue.queueArn;
             message.queueName = queue.name;
+            message.contentType = request.contentType;
             message.size = static_cast<long>(request.body.size());
             message.created = system_clock::now();
             message.modified = system_clock::now();
@@ -871,7 +871,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
-        long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
+        const long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
         try {
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
 

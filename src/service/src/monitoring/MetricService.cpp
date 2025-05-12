@@ -22,10 +22,8 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name) {
-        if (_prometheus) {
-            boost::mutex::scoped_lock lock(_counterMutex);
-            DoAddCounter(name);
-        }
+        boost::mutex::scoped_lock lock(_counterMutex);
+        DoAddCounter(name);
     }
 
     void MetricService::DoAddCounter(const std::string &name) {
@@ -40,13 +38,11 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        if (_prometheus) {
-            boost::mutex::scoped_lock lock(_counterMutex);
-            try {
-                if (GetCounter(name) == nullptr) { DoAddCounter(name); }
-                if (!GetCounter(name)->Has({{labelName, labelValue}})) { GetCounter(name)->Add({{labelName, labelValue}}); }
-            } catch (std::exception &e) { log_error << e.what(); }
-        }
+        boost::mutex::scoped_lock lock(_counterMutex);
+        try {
+            if (GetCounter(name) == nullptr) { DoAddCounter(name); }
+            if (!GetCounter(name)->Has({{labelName, labelValue}})) { GetCounter(name)->Add({{labelName, labelValue}}); }
+        } catch (std::exception &e) { log_error << e.what(); }
     }
 
     bool MetricService::CounterExists(const std::string &name) const { return _counterMap.contains(name); }
@@ -102,20 +98,16 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricService::AddGauge(const std::string &name) {
-        if (_prometheus) {
-            boost::mutex::scoped_lock lock(_gaugeMutex);
-            DoAddGauge(name);
-        }
+        boost::mutex::scoped_lock lock(_gaugeMutex);
+        DoAddGauge(name);
     }
 
     void MetricService::AddGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
-        if (_prometheus) {
-            boost::mutex::scoped_lock lock(_gaugeMutex);
-            try {
-                if (!GaugeExists(name)) { DoAddGauge(name); }
-                if (!GaugeExists(name, labelName, labelValue)) { GetGauge(name)->Add({{labelName, labelValue}}); }
-            } catch (std::exception &e) { log_error << e.what(); }
-        }
+        boost::mutex::scoped_lock lock(_gaugeMutex);
+        try {
+            if (!GaugeExists(name)) { DoAddGauge(name); }
+            if (!GaugeExists(name, labelName, labelValue)) { GetGauge(name)->Add({{labelName, labelValue}}); }
+        } catch (std::exception &e) { log_error << e.what(); }
     }
 
     void MetricService::DoAddGauge(const std::string &name) {

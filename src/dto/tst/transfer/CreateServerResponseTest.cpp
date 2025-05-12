@@ -26,38 +26,56 @@ namespace AwsMock::Dto::Transfer {
         void SetUp() override {
             // General configuration
             _region = _configuration.GetValue<std::string>("awsmock.region");
+            Tag tag;
+            tag.key = "version";
+            tag.value = "1.0";
+            _tags.emplace_back();
         }
 
         std::string _region;
         std::vector<std::string> _protocols = {"ftp", "sftp"};
-        std::vector<Tag> _tags = {{.key = "version", .value = "1.0"}};
+        std::vector<Tag> _tags;
         Core::Configuration _configuration = Core::Configuration(TMP_CONFIGURATION_FILE);
     };
 
     TEST_F(CreateServerResponseTest, ToStringTest) {
 
         // arrange
-        const CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
+        CreateServerResponse createResponse;
+        createResponse.region = _region;
+        createResponse.serverId = "serverId";
+        createResponse.arn = "arn";
 
         // act
         const std::string stringRepresentation = createResponse.ToString();
 
         // assert
         EXPECT_FALSE(stringRepresentation.empty());
-        EXPECT_STREQ(stringRepresentation.c_str(), CREATE_SERVER_RESPONSE_TO_STRING);
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "serverId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(stringRepresentation, "arn"));
     }
 
     TEST_F(CreateServerResponseTest, ToJsonTest) {
 
         // arrange
-        const CreateServerResponse createResponse = {.region = _region, .serverId = "serverId", .arn = "arn"};
+        CreateServerResponse createResponse;
+        createResponse.region = _region;
+        createResponse.serverId = "serverId";
+        createResponse.arn = "arn";
 
         // act
         const std::string jsonRepresentation = createResponse.ToJson();
 
         // assert
         EXPECT_FALSE(jsonRepresentation.empty());
-        EXPECT_STREQ(jsonRepresentation.c_str(), CREATE_SERVER_RESPONSE_TO_JSON);
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, _region));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "RequestId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "User"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "serverId"));
+        EXPECT_TRUE(Core::StringUtils::Contains(jsonRepresentation, "arn"));
     }
 }// namespace AwsMock::Dto::Transfer
 

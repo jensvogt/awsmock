@@ -92,8 +92,10 @@ namespace AwsMock::Dto::SQS {
 
         friend UpdateMessageRequest tag_invoke(boost::json::value_to_tag<UpdateMessageRequest>, boost::json::value const &v) {
             UpdateMessageRequest r;
-            r.messageId = v.at("messageId").as_string();
-            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
+            r.messageId = Core::Json::GetStringValue(v, "messageId");
+            if (Core::Json::AttributeExists(v, "messageAttributes")) {
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
+            }
             return r;
         }
 

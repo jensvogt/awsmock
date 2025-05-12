@@ -35,9 +35,8 @@ namespace AwsMock::Dto::S3 {
 
         friend TouchObjectRequest tag_invoke(boost::json::value_to_tag<TouchObjectRequest>, boost::json::value const &v) {
             TouchObjectRequest r;
-            r.region = v.at("region").as_string();
-            r.bucket = v.at("bucket").as_string();
-            r.key = v.at("key").as_string();
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.key = Core::Json::GetStringValue(v, "key");
             return r;
         }
 

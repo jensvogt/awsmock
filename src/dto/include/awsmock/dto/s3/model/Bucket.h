@@ -17,8 +17,10 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/ObjectVersion.h>
@@ -34,12 +36,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Bucket final : Common::BaseDto<Bucket> {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct Bucket final : Common::BaseCounter<Bucket> {
 
         /**
          * Bucket name
@@ -59,12 +56,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Number of objects keys
          */
-        long keys;
+        long keys = 0;
 
         /**
          * Bucket size in bytes
          */
-        long size;
+        long size = 0;
 
         /**
          * Version status
@@ -110,17 +107,18 @@ namespace AwsMock::Dto::S3 {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override {
-            return ToJson2();
-        };
-
       private:
 
+        friend Bucket tag_invoke(boost::json::value_to_tag<Bucket>, boost::json::value const &v) {
+            Bucket r;
+            r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            r.owner = Core::Json::GetStringValue(v, "Owner");
+            r.arn = Core::Json::GetStringValue(v, "Arn");
+            r.keys = Core::Json::GetLongValue(v, "Keys");
+            r.size = Core::Json::GetLongValue(v, "Size");
+            r.versionStatus = Core::Json::GetStringValue(v, "VersionStatus");
+            return r;
+        }
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Bucket const &obj) {
             jv = {
                     {"region", obj.region},

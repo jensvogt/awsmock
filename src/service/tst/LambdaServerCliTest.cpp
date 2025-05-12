@@ -9,6 +9,9 @@
 #include <gtest/gtest.h>
 
 // AwsMock includes
+#include "TestBase.h"
+
+
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
@@ -19,7 +22,7 @@
 #define OWNER "test-owner"
 #define ACCOUNT_ID "000000000000"
 #define FUNCTION_NAME std::string("test-function")
-#define FUNCTION_FILE std::string("data/lambda/java-basic-1.0-SNAPSHOT.jar")
+#define FUNCTION_FILE std::string("/tmp/java-basic-1.0-SNAPSHOT.jar")
 #define ROLE std::string("arn:aws:iam::000000000000:role/lambda-role")
 #define CODE std::string("S3Bucket=lambdaBucket,S3Key=lambdaKey")
 #define RUNTIME std::string("java11")
@@ -27,11 +30,12 @@
 namespace AwsMock::Service {
 
     /**
-   * AwsMock lambda integration test.
-   *
-   * <p>In order to run the test the AWS test lambdas should be installed in /usr/local/lib. See https://github.com/awsdocs/aws-lambda-developer-guide/tree/main/sample-apps/java-basic for details.</p>
-   */
-    class LambdaServerCliTest : public ::testing::Test {
+     * @brief AwsMock lambda integration test.
+     *
+     * @par
+     * To run the test, the AWS test lambdas should be installed in /usr/local/lib. See https://github.com/awsdocs/aws-lambda-developer-guide/tree/main/sample-apps/java-basic for details.
+     */
+    class LambdaServerCliTest : public testing::Test, public TestBase {
 
       protected:
 
@@ -43,36 +47,52 @@ namespace AwsMock::Service {
                 return;
             }
 
-            // Define endpoint
-            const std::string _port = _configuration.GetValue<std::string>("awsmock.modules.lambda.port");
-            const std::string _host = _configuration.GetValue<std::string>("awsmock.modules.lambda.host");
-            _configuration.SetValue<std::string>("awsmock.service.gateway.http.port", _port);
-            _accountId = _configuration.GetValue<std::string>("awsmock.access.account-id");
-            _endpoint = "http://" + _host + ":" + _port;
+            // Start the gateway server
+            StartGateway();
 
-            // Start HTTP manager
-            _gatewayServer = std::make_shared<GatewayServer>(_ios);
+            // Create Lambda bucket
+            Dto::S3::CreateBucketRequest request;
+            request.region = REGION;
+            request.owner = OWNER;
+            request.name = "lambdaBucket";
+            Dto::S3::CreateBucketResponse response = _s3Service.CreateBucket(request);
+
+            // General configuration
+            _region = GetRegion();
+            _endpoint = GetEndpoint();
         }
 
         void TearDown() override {
+
             try {
+
+                // Delete lambda function
                 Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest = {.functionName = FUNCTION_NAME, .qualifier = "latest"};
-                _lambdaService.DeleteFunction({.functionName = FUNCTION_NAME, .qualifier = "latest"});
+                _lambdaService.DeleteFunction({.region = REGION, .functionName = FUNCTION_NAME, .qualifier = "latest"});
+
+                // Delete all S3 objects
+                long count = _s3Database.DeleteAllObjects();
+                log_debug << "S3 objects deleted, count: " << count;
+                count = _s3Database.DeleteAllBuckets();
+                log_debug << "S3 buckets deleted, count: " << count;
+
             } catch (Core::ServiceException &ex) {
                 // Do nothing
             }
         }
 
-        std::string _endpoint, _accountId;
+        std::string _endpoint, _region;
         boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::Configuration::instance();
-        Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
+        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+        Database::S3Database &_s3Database = Database::S3Database::instance();
         LambdaService _lambdaService;
         S3Service _s3Service;
         std::shared_ptr<GatewayServer> _gatewayServer;
     };
 
-    /*TEST_F(LambdaServerCliTest, LambdaCreateTest) {
+    /*
+    TEST_F(LambdaServerCliTest, LambdaCreateTest) {
 
         // check lambda examples
         if (!Core::FileUtils::FileExists(FUNCTION_FILE)) {
@@ -83,20 +103,21 @@ namespace AwsMock::Service {
 
         // arrange
         std::ifstream input_file(FUNCTION_FILE, std::ios::binary);
-        Dto::S3::PutObjectRequest request = {.region = REGION, .bucket = "lambdaBucket", .key = "lambdaKey"};
-        _s3Service.PutObject(request, input_file, false);
+        Dto::S3::PutObjectRequest request;
+        request.region = REGION;
+        request.bucket = "lambdaBucket";
+        request.key = "lambdaKey";
+        _s3Service.PutObject(request, input_file);
 
         // act
-        Core::ExecResult createResult = Core::TestUtils::SendCliCommand("aws lambda create-function --function-name " + FUNCTION_NAME + " --role " + ROLE + " --code " + CODE + " --runtime " + RUNTIME + " --endpoint " + _endpoint);
-        EXPECT_EQ(0, createResult.status);
-        Database::Entity::Lambda::LambdaList lambdaList = _database.ListLambdas();
+        std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"lambda", "create-function", "--function-name", FUNCTION_NAME, "--role", ROLE, "--code", CODE, "--runtime", RUNTIME, "--endpoint", _endpoint});
+        Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
 
         // assert
-        EXPECT_EQ(0, createResult.status);
         EXPECT_EQ(1, lambdaList.size());
-    }
+    }*/
 
-    TEST_F(LambdaServerCliTest, LambdaListTest) {
+    /*TEST_F(LambdaServerCliTest, LambdaListTest) {
 
         // check lambda examples
         if (!Core::FileUtils::FileExists(FUNCTION_FILE)) {

@@ -40,15 +40,15 @@ namespace AwsMock::Dto::SQS {
         /**
          * Max number of receivers
          */
-        long retries{};
+        long retries = 0;
 
       private:
 
         friend UpdateDqlRequest tag_invoke(boost::json::value_to_tag<UpdateDqlRequest>, boost::json::value const &v) {
             UpdateDqlRequest r;
-            r.queueArn = v.at("prefix").as_string();
-            r.targetArn = v.at("targetArn").as_string();
-            r.retries = v.at("retries").as_int64();
+            r.queueArn = Core::Json::GetStringValue(v, "prefix");
+            r.targetArn = Core::Json::GetStringValue(v, "targetArn");
+            r.retries = Core::Json::GetLongValue(v, "retries");
             return r;
         }
 

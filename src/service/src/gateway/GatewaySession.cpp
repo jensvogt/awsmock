@@ -59,17 +59,8 @@ namespace AwsMock::Service {
             HandleContinueRequest(_stream);
         }
 
-        //Core::HttpUtils::DumpHeaders(_parser.get().get());
-
-        // Read the rest of the request.
-        // if (boost::beast::iequals(_parser->get()[http::field::transfer_encoding], "chunked")) {
-        //     boost::beast::error_code Ev;
-        //     PrintChunkedBody(std::cerr, _stream, _buffer, Ev);
-        // } else {
+        // Read from the stream
         read(_stream, _buffer, *_parser, ev);
-        //}
-        // Read the rest of the request.
-        //        read(_stream, _buffer, *_parser, ev);
 
         // Send the response
         QueueWrite(HandleRequest(_parser->release()));
@@ -93,8 +84,7 @@ namespace AwsMock::Service {
 
     // Return a response for the given request.
     //
-    // The concrete type of the response message (which depends on the
-    // request), is type-erased in message_generator.
+    // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
     template<class Body, class Allocator>
     http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
 

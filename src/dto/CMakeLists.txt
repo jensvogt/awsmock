@@ -10,39 +10,32 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
-        src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp src/sqs/DeleteMessageRequest.cpp
+        src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp
         src/sqs/DeleteMessageBatchEntry.cpp src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp
-        src/sqs/DeleteMessageResponse.cpp src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
+        src/sqs/model/EventNotification.cpp src/sqs/model/EventRecord.cpp
         src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp src/sqs/model/MessageEntry.cpp
         src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp src/sqs/ListQueueArnsResponse.cpp
         src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
         src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
         src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp src/sqs/DeleteAttributeRequest.cpp)
-set(SNS_SOURCES src/sns/SqsNotificationRequest.cpp
-        src/sns/CreateTopicRequest.cpp
-        src/sns/CreateTopicResponse.cpp src/sns/DeleteTopicResponse.cpp src/sns/ListTopicsResponse.cpp
-        src/sns/PublishRequest.cpp src/sns/PublishResponse.cpp
-        src/sns/GetTopicAttributesRequest.cpp src/sns/GetTopicAttributesResponse.cpp
-        src/sns/ListSubscriptionsByTopicRequest.cpp src/sns/ListSubscriptionsByTopicResponse.cpp
-        src/sns/model/Subscription.cpp src/sns/model/Message.cpp src/sns/ListMessagesRequest.cpp
-        src/sns/ListMessagesResponse.cpp src/sns/mapper/Mapper.cpp src/sns/GetTopicDetailsRequest.cpp
-        src/sns/GetTopicDetailsResponse.cpp src/sns/DeleteMessageRequest.cpp
-        src/sns/model/MessageAttribute.cpp)
+set(SNS_SOURCES
+        src/sns/mapper/Mapper.cpp
+)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
         src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
         src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
         src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
-        src/s3/ListAllBucketResponse.cpp src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp
-        src/s3/ListAllBucketResponse.cpp src/s3/DeleteBucketRequest.cpp src/s3/model/Content.cpp
-        src/s3/CreateMultipartUploadRequest.cpp src/s3/model/Owner.cpp src/s3/CreateMultipartUploadResult.cpp
+        src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp
+        src/s3/DeleteBucketRequest.cpp
+        src/s3/CreateMultipartUploadRequest.cpp src/s3/CreateMultipartUploadResult.cpp
         src/s3/ListObjectVersionsRequest.cpp src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp
         src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
         src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
         src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp
         src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/model/BucketCounter.cpp src/s3/model/ObjectCounter.cpp
+        src/s3/UploadPartCopyResponse.cpp
         src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
         src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
@@ -79,18 +72,18 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/AdminEnableUserRequest.cpp src/cognito/AdminDisableUserRequest.cpp src/cognito/ResponseToAuthChallengeRequest.cpp
         src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp src/cognito/AdminGetUserRequest.cpp
         src/cognito/AdminGetUserResponse.cpp)
-set(TRANSFER_SOURCES src/transfer/model/Tag.cpp src/transfer/CreateServerRequest.cpp src/transfer/CreateServerResponse.cpp src/transfer/ListUsersRequest.cpp
-        src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp
-        src/transfer/model/IdentityProviderDetails.cpp src/transfer/ListServerRequest.cpp src/transfer/ListServerResponse.cpp src/transfer/model/Server.cpp
-        src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp src/transfer/model/User.cpp src/transfer/mapper/Mapper.cpp src/transfer/internal/ListServerCountersRequest.cpp
-        src/transfer/internal/ListServerCountersResponse.cpp src/transfer/GetServerDetailsRequest.cpp src/transfer/GetServerDetailsResponse.cpp src/transfer/internal/ListUserCountersRequest.cpp
-        src/transfer/internal/ListUserCountersResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/model/IdentityProviderDetails.cpp src/transfer/internal/ListProtocolCountersRequest.cpp
-        src/transfer/internal/ListProtocolCountersResponse.cpp src/transfer/DeleteProtocolRequest.cpp src/transfer/CreateProtocolRequest.cpp)
-set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp src/dynamodb/DeleteTableResponse.cpp
-        src/dynamodb/model/ProvisionedThroughput.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
-        src/dynamodb/GetItemRequest.cpp src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp src/dynamodb/QueryRequest.cpp
-        src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp
-        src/dynamodb/DescribeTableRequest.cpp src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
+set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp
+        src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp
+        src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp
+        src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp src/transfer/GetServerDetailsResponse.cpp
+        src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
+set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp
+        src/dynamodb/DeleteTableResponse.cpp src/dynamodb/model/ProvisionedThroughput.cpp src/dynamodb/ListTableRequest.cpp
+        src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp src/dynamodb/GetItemRequest.cpp
+        src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp
+        src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp
+        src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp src/dynamodb/DescribeTableRequest.cpp
+        src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
         src/dynamodb/mapper/Mapper.cpp src/dynamodb/GetItemKey.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
         src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp

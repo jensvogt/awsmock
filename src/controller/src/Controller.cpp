@@ -408,24 +408,6 @@ namespace AwsMock::Controller {
         }
     }
 
-    void AwsMockCtl::ShowFtpUsers(const std::string &serverId) const {
-
-        std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "show-ftp-users");
-
-        const Dto::Transfer::Server server = {.serverId = serverId};
-
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", server.ToJson(), headers);
-        if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
-            return;
-        }
-
-        for (const std::vector<Dto::Transfer::User> users = Dto::Transfer::User::FromJsonList(response.body); const auto &user: users) {
-            std::cout << "FTP user: " << user.userName << " password: " << user.password << std::endl;
-        }
-    }
-
     void AwsMockCtl::AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) const {
         headers["User"] = _user;
         headers["Region"] = _region;

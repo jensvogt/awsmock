@@ -15,6 +15,12 @@
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
+
+    /**
+     * @brief SQS Lambda notification event record
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct Record {
         /**
          * Region

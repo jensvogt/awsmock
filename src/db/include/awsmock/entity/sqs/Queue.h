@@ -95,7 +95,7 @@ namespace AwsMock::Database::Entity::SQS {
         /**
          * Last modification date
          */
-        system_clock::time_point modified;
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * @brief Converts the entity to a MongoDB document

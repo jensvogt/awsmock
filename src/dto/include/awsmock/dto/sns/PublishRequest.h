@@ -13,12 +13,7 @@
 
 namespace AwsMock::Dto::SNS {
 
-    struct PublishRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct PublishRequest final : Common::BaseCounter<PublishRequest> {
 
         /**
          * Topic ARN
@@ -40,31 +35,30 @@ namespace AwsMock::Dto::SNS {
          */
         std::map<std::string, MessageAttribute> messageAttributes;
 
-        /**
-         * Request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend PublishRequest tag_invoke(boost::json::value_to_tag<PublishRequest>, boost::json::value const &v) {
+            PublishRequest r;
+            r.topicArn = Core::Json::GetStringValue(v, "TopicArn");
+            r.targetArn = Core::Json::GetStringValue(v, "TargetArn");
+            r.message = Core::Json::GetStringValue(v, "Message");
+            if (Core::Json::AttributeExists(v, "MessageAttributes")) {
+                r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PublishRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PublishRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"targetArn", obj.targetArn},
+                    {"message", obj.message},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

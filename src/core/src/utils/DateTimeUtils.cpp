@@ -4,6 +4,7 @@
 
 #include <awsmock/core/DateTimeUtils.h>
 #include <boost/chrono/duration.hpp>
+#include <boost/chrono/system_clocks.hpp>
 #include <boost/system/detail/enable_if.hpp>
 
 namespace AwsMock::Core {
@@ -122,7 +123,7 @@ namespace AwsMock::Core {
 #if __APPLE__
         return system_clock::time_point{std::chrono::time_point_cast<std::chrono::milliseconds>(system_clock::now())};
 #else
-        return system_clock::time_point{std::chrono::time_point_cast<std::chrono::milliseconds>(system_clock::now())};
+        return system_clock::now();
 #endif
     }
 

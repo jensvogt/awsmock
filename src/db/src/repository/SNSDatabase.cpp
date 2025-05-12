@@ -2,6 +2,9 @@
 // Created by vogje01 on 29/05/2023.
 //
 
+#include "../../../dto/include/awsmock/dto/sns/model/MessageStatus.h"
+
+
 #include <awsmock/repository/SNSDatabase.h>
 
 namespace AwsMock::Database {
@@ -210,7 +213,6 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-
                 document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
@@ -234,7 +236,7 @@ namespace AwsMock::Database {
         return topicList;
     }
 
-    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const int pageSize, const int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
+    Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -261,7 +263,7 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto [column, sortDirection]: sortColumns) {
+                    for (const auto &[column, sortDirection]: sortColumns) {
                         sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
@@ -296,7 +298,7 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto [column, sortDirection]: sortColumns) {
+                    for (const auto &[column, sortDirection]: sortColumns) {
                         sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
@@ -380,6 +382,7 @@ namespace AwsMock::Database {
                 document setQuery;
                 setQuery.append(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
                 setQuery.append(kvp("messages", static_cast<bsoncxx::types::b_int64>(messages)));
+                setQuery.append(kvp("attributes.availableMessages", static_cast<bsoncxx::types::b_int64>(messages)));
 
                 document updateQuery;
                 updateQuery.append(kvp("$set", setQuery));
@@ -410,7 +413,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
 
                 if (!region.empty()) {
                     query.append(kvp("region", region));
@@ -422,6 +425,7 @@ namespace AwsMock::Database {
                 const long count = _topicCollection.count_documents(query.extract());
                 log_trace << "Count topics, result: " << count;
                 return count;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "SNS Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
@@ -610,7 +614,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
 
-                bsoncxx::builder::basic::document query = {};
+                document query = {};
                 if (!topicArn.empty()) {
                     query.append(kvp("topicArn", topicArn));
                 }
@@ -752,6 +756,45 @@ namespace AwsMock::Database {
             return UpdateMessage(message);
         }
         return CreateMessage(message);
+    }
+
+    void SNSDatabase::SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                document filterQuery;
+                filterQuery.append(kvp("_id", bsoncxx::oid{message.oid}));
+
+                document setQuery;
+                setQuery.append(kvp("status", Entity::SNS::MessageStatusToString(status)));
+                setQuery.append(kvp("modified", bsoncxx::types::b_date(system_clock::now())));
+                if (status == Entity::SNS::MessageStatus::SEND || status == Entity::SNS::MessageStatus::RESEND) {
+                    setQuery.append(kvp("lastSend", bsoncxx::types::b_date(system_clock::now())));
+                }
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                session.start_transaction();
+                _messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                session.commit_transaction();
+                log_trace << "SNS message status updated, oid: " << message.oid << ", status: " << MessageStatusToString(status);
+
+            } catch (mongocxx::exception::system_error &e) {
+                session.abort_transaction();
+                log_error << "Set SNS message status failed, error: " << e.what();
+            }
+
+        } else {
+
+            _memoryDb.SetMessageStatus(message, status);
+        }
     }
 
     void SNSDatabase::DeleteMessage(const Entity::SNS::Message &message) const {

@@ -9,18 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteMessageRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct DeleteMessageRequest final : Common::BaseCounter<DeleteMessageRequest> {
 
         /**
          * Queue URL
@@ -32,43 +25,24 @@ namespace AwsMock::Dto::SQS {
          */
         std::string receiptHandle;
 
-        /**
-         * Resource
-         */
-        std::string resource = "SQS";
+      private:
 
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+        friend DeleteMessageRequest tag_invoke(boost::json::value_to_tag<DeleteMessageRequest>, boost::json::value const &v) {
+            DeleteMessageRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            r.receiptHandle = Core::Json::GetStringValue(v, "ReceiptHandle");
+            return r;
+        }
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMessageRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"queueUrl", obj.queueUrl},
+                    {"receiptHandle", obj.receiptHandle},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

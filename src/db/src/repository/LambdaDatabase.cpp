@@ -279,7 +279,6 @@ namespace AwsMock::Database {
     }
 
     void LambdaDatabase::SetLastInvocation(const std::string &oid, const system_clock::time_point &lastInvocation) const {
-
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -296,6 +295,9 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set last invocation failed, error: " << e.what();
             }
+        } else {
+
+            _memoryDb.SetLastInvocation(oid, lastInvocation);
         }
     }
 
@@ -325,7 +327,7 @@ namespace AwsMock::Database {
 
         } else {
 
-            //  _memoryDb.SetInstanceStatus(containerId, status);
+            _memoryDb.SetAverageRuntime(oid, millis);
         }
     }
 

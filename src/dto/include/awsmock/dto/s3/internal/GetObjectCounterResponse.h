@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/ObjectCounter.h>
 
@@ -26,9 +25,6 @@ namespace AwsMock::Dto::S3 {
 
         friend GetObjectCounterResponse tag_invoke(boost::json::value_to_tag<GetObjectCounterResponse>, boost::json::value const &v) {
             GetObjectCounterResponse r;
-            r.region = v.at("region").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.user = v.at("user").as_string();
             r.objectCounter = boost::json::value_to<ObjectCounter>(v.at("objectCounter"));
             return r;
         }

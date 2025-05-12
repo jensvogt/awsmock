@@ -9,29 +9,19 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct CreateTopicResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct CreateTopicResponse final : Common::BaseCounter<CreateTopicResponse> {
 
         /**
          * Name
          */
-        std::string name;
-
-        /**
-         * Owner
-         */
-        std::string owner;
+        std::string topicName;
 
         /**
          * Topic ARN
@@ -39,37 +29,52 @@ namespace AwsMock::Dto::SNS {
         std::string topicArn;
 
         /**
-         * Request ID
+         * Owner
          */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
-
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        std::string owner;
 
         /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateTopicResponse &r);
+                boost::property_tree::ptree root;
+                root.add("CreateTopicResponse.CreateTopicResult.TopicArn", topicArn);
+                root.add("CreateTopicResponse.CreateTopicResult.Name", topicName);
+                root.add("CreateTopicResponse.CreateTopicResult.Owner", owner);
+                root.add("CreateTopicResponse.ResponseMetadata.RequestId", requestId);
+                return Core::XmlUtils::ToXmlString(root);
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend CreateTopicResponse tag_invoke(boost::json::value_to_tag<CreateTopicResponse>, boost::json::value const &v) {
+            CreateTopicResponse r;
+            r.topicName = Core::Json::GetStringValue(v, "topicName");
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.owner = Core::Json::GetStringValue(v, "owner");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateTopicResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicName", obj.topicName},
+                    {"topicArn", obj.topicArn},
+                    {"owner", obj.owner},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

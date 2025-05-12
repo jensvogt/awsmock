@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/entity/transfer/Transfer.h>
+#include <boost/json/object.hpp>
 
 namespace AwsMock::Database::Entity::Transfer {
 
@@ -75,6 +76,15 @@ namespace AwsMock::Database::Entity::Transfer {
             transferDoc.append(kvp("ports", portsArray));
         }
 
+        // Tags
+        if (!tags.empty()) {
+            document tagsDocument;
+            for (const auto &[fst, snd]: tags) {
+                tagsDocument.append(kvp(fst, snd));
+            }
+            transferDoc.append(kvp("tags", tagsDocument));
+        }
+
         return transferDoc.extract();
     }
 
@@ -118,6 +128,15 @@ namespace AwsMock::Database::Entity::Transfer {
                         .homeDirectory = bsoncxx::string::to_string(userElement["homeDirectory"].get_string().value),
                         .arn = bsoncxx::string::to_string(userElement["arn"].get_string().value)};
                 users.push_back(user);
+            }
+        }
+
+        // Tags
+        if (mResult.view().find("tags") != mResult.view().end()) {
+            for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagsElement: tagsView) {
+                std::string key = bsoncxx::string::to_string(tagsElement.key());
+                std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
+                tags.emplace(key, value);
             }
         }
     }

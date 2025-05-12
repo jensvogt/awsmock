@@ -1,37 +1,19 @@
 #!/bin/bash
 
+alias awslocal="aws --region eu-central-1 --endpoint http://localhost:4566 --profile awsmock"
+
 # Create topic
-topicarn=$(aws sns create-topic \
---name test-topic \
---region eu-central-1 \
---endpoint http://localhost:4566 \
---profile awsmock | jq -r '.TopicArn')
+topicarn=$(awslocal sns create-topic --name test-topic | jq -r '.TopicArn')
 
 # Create SQS queue
-queueurl=$(aws sqs create-queue \
---queue-name test-queue \
---region eu-central-1 \
---endpoint http://localhost:4566 \
---profile awsmock | jq -r '.QueueUrl')
+queueurl=$(awslocal sqs create-queue --queue-name test-queue | jq -r '.QueueUrl')
+queuearn=$(awslocal sqs get-queue-attributes --queue-url $queueurl --attribute-names QueueArn | jq -r '.Attributes.QueueArn')
 
 # Create subscription
-subscriptionarn=$(aws sns subscribe \
---topic-arn $topicarn \
---protocol sqs \
---notification-endpoint $queueurl \
---region eu-central-1 \
---endpoint http://localhost:4566 \
---profile awsmock | jq -r '.SubscriptionArn')
+subscriptionarn=$(awslocal sns subscribe --topic-arn $topicarn --protocol sqs --notification-endpoint queuearn | jq -r '.SubscriptionArn')
 
 # Unsubscribe topic
-aws sns unsubscribe \
---subscription-arn $subscriptionarn \
---region eu-central-1 \
---endpoint http://localhost:4566 \
---profile awsmock
+awslocal sns unsubscribe --subscription-arn $subscriptionarn
 
-aws sns list-subscriptions-by-topic \
---topic-arn $topicarn \
---region eu-central-1 \
---endpoint http://localhost:4566 \
---profile awsmock
+# List subscriptions
+awslocal sns list-subscriptions-by-topic --topic-arn $topicarn

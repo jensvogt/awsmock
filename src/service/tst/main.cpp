@@ -22,17 +22,26 @@
 #define TEST_CONTAINER_VERSION std::string("latest")
 #define TEST_CONTAINER_NAME std::string("awsmock-test")
 
-class TestEnvironment final : public ::testing::Environment {
+class TestEnvironment final : public testing::Environment {
 
   public:
 
-    // Initialise a test configuration.
+    // Initialize a test configuration.
     void SetUp() override {
 
         AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
         AwsMock::Database::TestUtils::CreateServices();
+        AwsMock::Core::LogStream::SetSeverity("error");
 
-        // Create docker service
+        // As Awsmock is not running under root set shared memory permissions
+        boost::interprocess::permissions unrestricted_permissions;
+        unrestricted_permissions.set_unrestricted();
+
+        // Create a managed shared memory segment.
+        boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_SEGMENT_NAME);
+        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, 65000, nullptr, unrestricted_permissions);
+
+        // Create a docker service
         dockerService = AwsMock::Service::ContainerService::instance();
 
         // Check image
@@ -45,9 +54,7 @@ class TestEnvironment final : public ::testing::Environment {
             AwsMock::Dto::Docker::CreateContainerResponse response = dockerService.CreateContainer(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION, TEST_CONTAINER_NAME, 10100, 10100);
         }
 
-        // Get docker container
-
-        // Start docker container, in case it is not already running.
+        // Start the docker container, in case it is not already running.
         if (const AwsMock::Dto::Docker::Container container = dockerService.GetFirstContainerByImageName(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION); container.state != "running") {
             dockerService.StartDockerContainer(container.id);
             log_info << "Test docker container started";
@@ -65,6 +72,11 @@ class TestEnvironment final : public ::testing::Environment {
      * Docker service
      */
     AwsMock::Service::ContainerService dockerService;
+
+    /**
+     * Global shared memory segment
+     */
+    std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 };
 
 int main(int argc, char **argv) {

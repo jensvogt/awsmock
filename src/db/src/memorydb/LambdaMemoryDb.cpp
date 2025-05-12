@@ -176,6 +176,43 @@ namespace AwsMock::Database {
         }
     }
 
+    void LambdaMemoryDb::SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp) {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        // Find by OID
+        const auto it = std::ranges::find_if(_lambdas,
+                                             [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                                                 return lambda.first == oid;
+                                             });
+
+        if (it == _lambdas.end()) {
+            log_error << "Set last invocation failed, oid: " << oid;
+            throw Core::DatabaseException("Set last invocation failed, oid: " + oid);
+        }
+
+        // Set average runtime
+        it->second.lastInvocation = timestamp;
+    }
+
+    void LambdaMemoryDb::SetAverageRuntime(const std::string &oid, const long millis) {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        // Find by OID
+        const auto it = std::ranges::find_if(_lambdas,
+                                             [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
+                                                 return lambda.first == oid;
+                                             });
+
+        if (it == _lambdas.end()) {
+            log_error << "Set average runtime failed, oid: " << oid;
+            throw Core::DatabaseException("Set average runtime failed, oid: " + oid);
+        }
+
+        // Set average runtime
+        it->second.invocations++;
+        it->second.averageRuntime = (it->second.averageRuntime + millis) / it->second.invocations;
+    }
+
     void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 

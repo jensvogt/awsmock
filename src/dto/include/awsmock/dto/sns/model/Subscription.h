@@ -10,24 +10,22 @@
 #include <vector>
 
 // AwsMock includes
+#include "MessageAttribute.h"
+#include "awsmock/core/JsonUtils.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
-    struct Subscription {
+    struct Subscription final : Common::BaseCounter<Subscription> {
 
         /**
          * Subscription id
          */
         std::string id = Core::StringUtils::CreateRandomUuid();
-
-        /**
-         * AWS region
-         */
-        std::string region;
 
         /**
          * Topic ARN
@@ -55,32 +53,55 @@ namespace AwsMock::Dto::SNS {
         std::string owner;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Subscription &r);
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+                Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+                Core::Bson::BsonUtils::SetStringValue(document, "topicArn", topicArn);
+                Core::Bson::BsonUtils::SetStringValue(document, "protocol", protocol);
+                Core::Bson::BsonUtils::SetStringValue(document, "subscriptionArn", subscriptionArn);
+                Core::Bson::BsonUtils::SetStringValue(document, "endpoint", endpoint);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend Subscription tag_invoke(boost::json::value_to_tag<Subscription>, boost::json::value const &v) {
+            Subscription r;
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.protocol = Core::Json::GetStringValue(v, "protocol");
+            r.subscriptionArn = Core::Json::GetStringValue(v, "subscriptionArn");
+            r.endpoint = Core::Json::GetStringValue(v, "endpoint");
+            r.owner = Core::Json::GetStringValue(v, "owner");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Subscription const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"id", obj.id},
+                    {"topicArn", obj.topicArn},
+                    {"protocol", obj.protocol},
+                    {"subscriptionArn", obj.subscriptionArn},
+                    {"endpoint", obj.endpoint},
+                    {"owner", obj.owner},
+            };
+        }
     };
 
     typedef std::vector<Subscription> SubscriptionsList;

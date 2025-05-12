@@ -32,12 +32,12 @@ namespace AwsMock::Dto::SQS {
         /**
          * Page size
          */
-        long pageSize;
+        long pageSize = 10;
 
         /**
          * Page index
          */
-        long pageIndex;
+        long pageIndex = 0;
 
         /**
          * Sort column
@@ -48,10 +48,13 @@ namespace AwsMock::Dto::SQS {
 
         friend ListQueueTagCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueTagCountersRequest>, boost::json::value const &v) {
             ListQueueTagCountersRequest r;
-            r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            }
             return r;
         }
 
@@ -60,6 +63,7 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
+                    {"queueArn", obj.queueArn},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},

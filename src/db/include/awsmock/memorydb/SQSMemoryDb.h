@@ -9,22 +9,38 @@
 #include <string>
 
 // Boost includes
+#include <boost/container/map.hpp>
+#include <boost/container/string.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include "awsmock/utils/SortColumn.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
+
+    struct QueueMonitoringCounter {
+        long initial{};
+        long invisible{};
+        long delayed{};
+        long messages{};
+        long size{};
+        system_clock::time_point modified = system_clock::now();
+    };
+
+    using SqsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, QueueMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using SqsCounterMapType = boost::container::map<std::string, QueueMonitoringCounter, std::less<std::string>, SqsShmAllocator>;
+
+    static constexpr auto SQS_COUNTER_MAP_NAME = "SqsQueueCounter";
 
     /**
      * @brief SQS in-memory database.
@@ -38,7 +54,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        SQSMemoryDb() = default;
+        explicit SQSMemoryDb();
 
         /**
          * @brief Singleton instance
@@ -102,7 +118,7 @@ namespace AwsMock::Database {
          * @return List of SQS queues
          * @throws DatabaseException
          */
-        Entity::SQS::QueueList ListQueues(const std::string &region = {}) const;
+        Entity::SQS::QueueList ListQueues(const std::string &region = {});
 
         /**
          * @brief List available queues, using paging
@@ -436,6 +452,16 @@ namespace AwsMock::Database {
          * Message mutex
          */
         static boost::mutex _sqsMessageMutex;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Map of monitoring counters
+         */
+        SqsCounterMapType *_sqsCounterMap;
     };
 
 }// namespace AwsMock::Database

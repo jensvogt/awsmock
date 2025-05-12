@@ -30,8 +30,10 @@ namespace AwsMock::Dto::SQS {
 
         friend ListLambdaTriggerCountersResponse tag_invoke(boost::json::value_to_tag<ListLambdaTriggerCountersResponse>, boost::json::value const &v) {
             ListLambdaTriggerCountersResponse r;
-            r.total = v.at("total").as_int64();
-            r.lambdaTriggerCounters = boost::json::value_to<std::vector<LambdaTriggerCounter>>(v.at("lambdaTriggerCounters"));
+            r.total = Core::Json::GetLongValue(v, "total");
+            if (Core::Json::AttributeExists(v, "lambdaTriggerCounters")) {
+                r.lambdaTriggerCounters = boost::json::value_to<std::vector<LambdaTriggerCounter>>(v.at("lambdaTriggerCounters"));
+            }
             return r;
         }
 
