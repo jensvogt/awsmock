@@ -97,13 +97,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::LIST_USER_POOL_COUNTERS: {
-                    Dto::Cognito::ListUserPoolCountersRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    log_debug << "Got list user pool counters request, json: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::ListUserPoolCountersRequest cognitoRequest = Dto::Cognito::ListUserPoolCountersRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserPoolCountersResponse serviceResponse = _cognitoService.ListUserPoolCounters(cognitoRequest);
                     log_info << "User pools counters listed, count: " << serviceResponse.userPoolCounters.size();
 
@@ -237,13 +232,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::LIST_USER_COUNTERS: {
-                    Dto::Cognito::ListUserCountersRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    log_debug << "Got list user counters request: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::ListUserCountersRequest cognitoRequest = Dto::Cognito::ListUserCountersRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserCountersResponse cognitoResponse = _cognitoService.ListUserCounters(cognitoRequest);
                     log_info << "User counters listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
 
@@ -347,15 +337,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_CONFIRM_SIGN_UP: {
-                    Dto::Cognito::AdminConfirmUserRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new tenplates
-                    //log_debug << "Got confirm sign up request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::AdminConfirmUserRequest cognitoRequest = Dto::Cognito::AdminConfirmUserRequest::FromJson(clientCommand);
                     _cognitoService.ConfirmUser(cognitoRequest);
                     log_info << "User confirmed, userPoolId: " << cognitoRequest.userPoolId << " userName: " << cognitoRequest.userName;
 
@@ -456,14 +439,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_DISABLE_USER: {
-                    Dto::Cognito::AdminDisableUserRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new tenplates
-                    //log_debug << "Got admin disable user request, json: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::AdminDisableUserRequest cognitoRequest = Dto::Cognito::AdminDisableUserRequest::FromJson(clientCommand);
                     _cognitoService.AdminDisableUser(cognitoRequest);
                     log_info << "User disabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
 
@@ -471,14 +448,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_DELETE_USER: {
-                    Dto::Cognito::AdminDeleteUserRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new tenplates
-                    // log_debug << "Got admin delete user request, json: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::AdminDeleteUserRequest cognitoRequest = Dto::Cognito::AdminDeleteUserRequest::FromJson(clientCommand);
                     _cognitoService.AdminDeleteUser(cognitoRequest);
                     log_info << "User deleted, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
 
@@ -486,15 +457,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_ADD_USER_TO_GROUP: {
-                    Dto::Cognito::AdminAddUserToGroupRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new tenplates
-                    //log_debug << "Add user to group request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::AdminAddUserToGroupRequest cognitoRequest = Dto::Cognito::AdminAddUserToGroupRequest::FromJson(clientCommand);
                     _cognitoService.AdminAddUserToGroup(cognitoRequest);
                     log_info << "Add user to group, userPoolId: " << cognitoRequest.userPoolId;
 

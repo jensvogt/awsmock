@@ -9,9 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -29,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminAddUserToGroupRequest final : Common::BaseDto<AdminAddUserToGroupRequest> {
+    struct AdminAddUserToGroupRequest final : Common::BaseCounter<AdminAddUserToGroupRequest> {
 
         /**
          * Name of the group
@@ -46,19 +45,26 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string userPoolId;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend AdminAddUserToGroupRequest tag_invoke(boost::json::value_to_tag<AdminAddUserToGroupRequest>, boost::json::value const &v) {
+            AdminAddUserToGroupRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.groupName = Core::Json::GetStringValue(v, "groupName");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminAddUserToGroupRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", obj.userPoolId},
+                    {"groupName", obj.groupName},
+                    {"userName", obj.userName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

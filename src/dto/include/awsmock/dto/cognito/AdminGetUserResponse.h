@@ -61,9 +61,9 @@ namespace AwsMock::Dto::Cognito {
         Database::Entity::Cognito::UserStatus userStatus;
 
         /**
-         * User userAttributes list
+         * User attributes list
          */
-        UserAttributeList userAttributes;
+        std::vector<UserAttribute> userAttributes;
 
         /**
          * Created

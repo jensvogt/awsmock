@@ -18,9 +18,7 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
         src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp src/sqs/model/DeleteMessageBatchResultEntry.cpp
         src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp src/sqs/DeleteAttributeRequest.cpp)
-set(SNS_SOURCES
-        src/sns/mapper/Mapper.cpp
-)
+set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
         src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
@@ -55,28 +53,26 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/intern/ListLambdaEnvironmentCountersResponse.cpp src/lambda/intern/AddFunctionEnvironmentRequest.cpp src/lambda/intern/DeleteFunctionEnvironmentRequest.cpp
         src/lambda/intern/UpdateFunctionEnvironmentRequest.cpp src/lambda/intern/StartFunctionRequest.cpp src/lambda/intern/StopFunctionRequest.cpp src/lambda/intern/DeleteImageRequest.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp src/cognito/model/Group.cpp src/cognito/CreateGroupRequest.cpp
-        src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/model/UserAttribute.cpp src/cognito/DeleteUserPoolRequest.cpp
-        src/cognito/AdminCreateUserRequest.cpp src/common/CognitoClientCommand.cpp src/cognito/AdminCreateUserResponse.cpp src/cognito/AdminDeleteUserRequest.cpp
-        src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/UserPool.cpp
-        src/cognito/model/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp
-        src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp src/cognito/CreateGroupResponse.cpp src/cognito/ListGroupRequest.cpp
-        src/cognito/ListGroupsResponse.cpp src/cognito/model/UserPoolClient.cpp src/cognito/AdminAddUserToGroupRequest.cpp src/cognito/CreateUserPoolClientRequest.cpp
-        src/cognito/CreateUserPoolClientResponse.cpp src/cognito/DescribeUserPoolRequest.cpp src/cognito/DescribeUserPoolResponse.cpp src/cognito/model/User.cpp
-        src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp
-        src/cognito/model/AuthenticationResult.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp
-        src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DeleteUserPoolClientRequest.cpp
-        src/cognito/DescribeUserPoolClientRequest.cpp src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp
-        src/cognito/UpdateUserPoolClientRequest.cpp src/cognito/model/TokenValidityUnits.cpp src/cognito/UpdateUserPoolDomainRequest.cpp
-        src/cognito/AdminConfirmUserRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp src/cognito/DescribeUserPoolDomainRequest.cpp
-        src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp src/cognito/AdminRemoveUserFromGroupRequest.cpp
-        src/cognito/AdminEnableUserRequest.cpp src/cognito/AdminDisableUserRequest.cpp src/cognito/ResponseToAuthChallengeRequest.cpp
-        src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp src/cognito/AdminGetUserRequest.cpp
-        src/cognito/AdminGetUserResponse.cpp)
-set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp
-        src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp src/transfer/CreateUserResponse.cpp
-        src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp src/transfer/StopServerRequest.cpp
-        src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp src/transfer/GetServerDetailsResponse.cpp
-        src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
+        src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/DeleteUserPoolRequest.cpp src/common/CognitoClientCommand.cpp
+        src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp src/cognito/model/LambdaConfig.cpp
+        src/cognito/model/CustomEmailSender.cpp src/cognito/model/UserPool.cpp src/cognito/model/CustomSmsSender.cpp src/cognito/PreTokenGenerationConfig.cpp
+        src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp
+        src/cognito/CreateGroupResponse.cpp src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp src/cognito/model/UserPoolClient.cpp
+        src/cognito/CreateUserPoolClientRequest.cpp src/cognito/CreateUserPoolClientResponse.cpp src/cognito/DescribeUserPoolRequest.cpp
+        src/cognito/DescribeUserPoolResponse.cpp src/cognito/model/User.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
+        src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/model/AuthenticationResult.cpp src/cognito/InitiateAuthRequest.cpp
+        src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp
+        src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DeleteUserPoolClientRequest.cpp src/cognito/DescribeUserPoolClientRequest.cpp
+        src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
+        src/cognito/model/TokenValidityUnits.cpp src/cognito/UpdateUserPoolDomainRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp
+        src/cognito/DescribeUserPoolDomainRequest.cpp src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp
+        src/cognito/AdminRemoveUserFromGroupRequest.cpp src/cognito/AdminEnableUserRequest.cpp
+        src/cognito/ResponseToAuthChallengeRequest.cpp src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp
+        src/cognito/AdminGetUserRequest.cpp src/cognito/AdminGetUserResponse.cpp)
+set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
+        src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
+        src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
+        src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp
         src/dynamodb/DeleteTableResponse.cpp src/dynamodb/model/ProvisionedThroughput.cpp src/dynamodb/ListTableRequest.cpp
         src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp src/dynamodb/GetItemRequest.cpp
@@ -85,8 +81,9 @@ set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTabl
         src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp src/dynamodb/DescribeTableRequest.cpp
         src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
         src/dynamodb/mapper/Mapper.cpp src/dynamodb/GetItemKey.cpp)
-set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp src/secretsmanager/DeleteSecretRequest.cpp
-        src/secretsmanager/DeleteSecretResponse.cpp src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
+set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp
+        src/secretsmanager/DeleteSecretRequest.cpp src/secretsmanager/DeleteSecretResponse.cpp
+        src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
         src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp
         src/secretsmanager/model/VersionIdsToStages.cpp src/secretsmanager/UpdateSecretRequest.cpp src/secretsmanager/UpdateSecretResponse.cpp src/secretsmanager/model/SecretTags.cpp
         src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/model/Filter.cpp src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/model/RotationRules.cpp
