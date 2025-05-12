@@ -82,7 +82,7 @@ namespace AwsMock::Service {
             for (auto const &[key, val]: *_s3CounterMap) {
 
                 std::string labelValue = key;
-                Core::StringUtils::Replace(labelValue, "-", "_");
+
 
                 _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.keys));
                 _metricService.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.size));
