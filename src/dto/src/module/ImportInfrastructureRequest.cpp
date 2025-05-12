@@ -14,11 +14,9 @@ namespace AwsMock::Dto::Module {
             includeObjects = Core::Bson::BsonUtils::GetBoolValue(documentValue, "includeObjects");
             cleanFirst = Core::Bson::BsonUtils::GetBoolValue(documentValue, "cleanFirst");
 
-            /*            if (documentValue.find("modules") != documentValue.end()) {
-                Core::Bson::FromBsonStringArray(documentValue, "modules", &modules);
-            }*/
+            // Infrastructure object
             if (documentValue.find("infrastructure") != documentValue.end()) {
-                infrastructure.FromJson(std::string(documentValue.view()["infrastructure"].get_string().value));
+                infrastructure.FromDocument(documentValue["infrastructure"].get_document().value);
             }
 
         } catch (bsoncxx::exception &exc) {
