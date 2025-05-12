@@ -76,9 +76,9 @@ namespace AwsMock::Monitoring {
          * @param name of the counter
          * @param labelName name of the label
          * @param labelValue label value of the counter
-         * @param value value for the incrementation (default: 1), can be negative
+         * @param value value for the incrementation (default: 1); can be negative
          */
-        void IncrementCounter(const std::string &name, const std::string &labelName, std::string &labelValue, int value = 1);
+        void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
 
         /**
          * @brief Clears a counter.
@@ -112,7 +112,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        void SetGauge(const std::string &name, const std::string &labelName, std::string &labelValue, double value);
+        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
 
       private:
 

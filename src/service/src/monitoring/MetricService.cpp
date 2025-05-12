@@ -87,11 +87,13 @@ namespace AwsMock::Monitoring {
         log_trace << "Counter incremented, name: " << name;
     }
 
-    void MetricService::IncrementCounter(const std::string &name, const std::string &labelName, std::string &labelValue, const int value) {
+    void MetricService::IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, const int value) {
         if (_prometheus) {
             if (!CounterExists(name, labelName, labelValue)) { AddCounter(name, labelName, labelValue); }
             const auto counter = GetCounter(name);
-            counter->Add({{labelName, labelValue}}).Increment(value);
+            std::string lv = labelValue;
+            Core::StringUtils::Replace(lv, "-", "_");
+            counter->Add({{labelName, lv}}).Increment(value);
         }
         _metricCacheService.IncrementCounter(name, value, labelName, labelValue);
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
@@ -136,11 +138,13 @@ namespace AwsMock::Monitoring {
         log_trace << "Gauge value set, name: " << name;
     }
 
-    void MetricService::SetGauge(const std::string &name, const std::string &labelName, std::string &labelValue, const double value) {
+    void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {
 
         if (_prometheus) {
             if (!GaugeExists(name, labelName, labelValue)) { AddGauge(name, labelName, labelValue); }
-            _gaugeMap[name]->Add({{labelName, labelValue}}).Set(value);
+            std::string lv = labelValue;
+            Core::StringUtils::Replace(lv, "-", "_");
+            _gaugeMap[name]->Add({{labelName, lv}}).Set(value);
         }
         _metricCacheService.SetGauge(name, value, labelName, labelValue);
         log_trace << "Gauge value set, name: " << name;
