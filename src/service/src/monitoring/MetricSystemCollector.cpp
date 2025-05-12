@@ -169,23 +169,23 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        if (const long diff = std::chrono::duration_cast<milliseconds>(system_clock::now() - _startTime).count(); diff > 0) {
+        if (const long diff = std::chrono::duration_cast<microseconds>(system_clock::now() - _startTime).count(); diff > 0) {
 
             // User CPU
-            long millies = r_usage.ru_utime.tv_sec * 1000000 + r_usage.ru_utime.tv_usec;
-            double percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
+            long micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec;
+            double percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
             MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
-            millies = r_usage.ru_stime.tv_sec * 1000000 + r_usage.ru_stime.tv_usec;
-            percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
+            micros = r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
+            percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
             MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
-            millies = r_usage.ru_utime.tv_sec * 1000000 + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
-            percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
+            micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
+            percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
             MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }

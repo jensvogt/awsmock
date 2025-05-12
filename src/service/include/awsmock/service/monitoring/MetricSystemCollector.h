@@ -15,6 +15,7 @@
 #elif __APPLE__
 #include <mach/mach.h>
 #include <sys/resource.h>
+#define TO_MICROS 1000000
 #endif
 
 // C++ Standard includes
