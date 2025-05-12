@@ -36,12 +36,12 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Maximal number of results
          */
-        int pageSize{};
+        long pageSize{};
 
         /**
          * Page index
          */
-        int pageIndex{};
+        long pageIndex{};
 
         /**
          * Sort columns
@@ -52,11 +52,13 @@ namespace AwsMock::Dto::Cognito {
 
         friend ListUserCountersRequest tag_invoke(boost::json::value_to_tag<ListUserCountersRequest>, boost::json::value const &v) {
             ListUserCountersRequest r;
-            r.userPoolId = v.at("userPoolId").as_string();
-            r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
-            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            }
             return r;
         }
 

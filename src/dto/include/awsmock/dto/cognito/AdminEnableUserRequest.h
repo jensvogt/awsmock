@@ -9,12 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/MessageAction.h>
-#include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,7 +18,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminEnableUserRequest final : Common::BaseDto<AdminEnableUserRequest> {
+    struct AdminEnableUserRequest final : Common::BaseCounter<AdminEnableUserRequest> {
 
         /**
          * ID of the user pool
@@ -35,19 +30,24 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string userName;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend AdminEnableUserRequest tag_invoke(boost::json::value_to_tag<AdminEnableUserRequest>, boost::json::value const &v) {
+            AdminEnableUserRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminEnableUserRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", obj.userPoolId},
+                    {"userName", obj.userName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

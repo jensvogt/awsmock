@@ -18,7 +18,8 @@ namespace AwsMock::Monitoring {
 #ifdef __APPLE__
 
         GetThreadInfoMac();
-        GetCpuInfoMac();
+        GetCpuInfoAwsmockMac();
+        GetCpuInfoTotalMac();
         GetMemoryInfoMac();
 
 #elif __linux__
@@ -159,7 +160,7 @@ namespace AwsMock::Monitoring {
         log_trace << "Total Threads: " << numberOfThreads;
     }
 
-    void MetricSystemCollector::GetCpuInfoMac() {
+    void MetricSystemCollector::GetCpuInfoAwsmockMac() const {
 
         rusage r_usage{};
 
@@ -168,26 +169,48 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        if (const long diff = std::chrono::duration_cast<milliseconds>(system_clock::now() - _startTime).count(); diff > 0) {
+        if (const long diff = std::chrono::duration_cast<microseconds>(system_clock::now() - _startTime).count(); diff > 0) {
 
             // User CPU
-            long millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec;
-            double percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
+            long micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec;
+            double percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
             MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
-            millies = r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
-            percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
+            micros = r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
+            percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
             MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
-            millies = r_usage.ru_utime.tv_sec * 1000 + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * 1000 + r_usage.ru_stime.tv_usec;
-            percent = static_cast<double>(millies) / static_cast<double>(diff) * 100;
+            micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
+            percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
             MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }
+    }
+
+    void MetricSystemCollector::GetCpuInfoTotalMac() {
+
+        host_cpu_load_info_data_t cpuinfo;
+        mach_msg_type_number_t count = HOST_CPU_LOAD_INFO_COUNT;
+        if (host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, reinterpret_cast<host_info_t>(&cpuinfo), &count) == KERN_SUCCESS) {
+            unsigned long long totalTicks = 0;
+            for (const unsigned int cpu_tick: cpuinfo.cpu_ticks) {
+                totalTicks += cpu_tick;
+            }
+            CalculateCPULoadMac(cpuinfo.cpu_ticks[CPU_STATE_IDLE], totalTicks);
+        }
+    }
+
+    void MetricSystemCollector::CalculateCPULoadMac(const unsigned long long idleTicks, const unsigned long long totalTicks) {
+        const unsigned long long totalTicksSinceLastTime = totalTicks - _previousTotalTicks;
+        const unsigned long long idleTicksSinceLastTime = idleTicks - _previousIdleTicks;
+        const float totalPercent = 1.0f - (totalTicksSinceLastTime > 0 ? static_cast<float>(idleTicksSinceLastTime) / static_cast<float>(totalTicksSinceLastTime) : 0);
+        MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+        _previousTotalTicks = totalTicks;
+        _previousIdleTicks = idleTicks;
     }
 
     void MetricSystemCollector::GetMemoryInfoMac() {

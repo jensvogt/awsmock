@@ -7,11 +7,9 @@
 
 // C++ standard includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -21,7 +19,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserAttribute {
+    struct UserAttribute final : Common::BaseCounter<UserAttribute> {
 
         /**
          * User attribute name
@@ -38,38 +36,38 @@ namespace AwsMock::Dto::Cognito {
          *
          * @param document BSON object
          */
-        void FromDocument(const std::optional<view> &document);
+        void FromDocument(const std::optional<view> &document) {
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return user pools json string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Convert to a BSON document.
-         *
-         * @return user pools BSON document
-         */
-        view_or_value<view, value> ToDocument() const;
+                name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+                attributeValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UserAttribute &r);
+      private:
+
+        friend UserAttribute tag_invoke(boost::json::value_to_tag<UserAttribute>, boost::json::value const &v) {
+            UserAttribute r;
+            r.name = Core::Json::GetStringValue(v, "name");
+            r.attributeValue = Core::Json::GetStringValue(v, "attributeValue");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserAttribute const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"name", obj.name},
+                    {"attributeValue", obj.attributeValue},
+            };
+        }
     };
-
-    typedef std::vector<UserAttribute> UserAttributeList;
 
 }// namespace AwsMock::Dto::Cognito
 

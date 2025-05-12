@@ -9,12 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/cognito/model/MessageAction.h>
-#include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,7 +18,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminDeleteUserRequest final : Common::BaseDto<AdminDeleteUserRequest> {
+    struct AdminDeleteUserRequest final : Common::BaseCounter<AdminDeleteUserRequest> {
 
         /**
          * ID of the user pool
@@ -35,19 +30,24 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string userName;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend AdminDeleteUserRequest tag_invoke(boost::json::value_to_tag<AdminDeleteUserRequest>, boost::json::value const &v) {
+            AdminDeleteUserRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminDeleteUserRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", obj.userPoolId},
+                    {"userName", obj.userName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

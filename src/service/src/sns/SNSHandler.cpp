@@ -60,6 +60,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PUBLISH: {
 
+                    Core::HttpUtils::DumpRequest(request);
                     Dto::SNS::PublishRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
