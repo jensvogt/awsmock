@@ -66,9 +66,9 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
         src/cognito/model/TokenValidityUnits.cpp src/cognito/UpdateUserPoolDomainRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp
         src/cognito/DescribeUserPoolDomainRequest.cpp src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp
-        src/cognito/AdminRemoveUserFromGroupRequest.cpp src/cognito/AdminEnableUserRequest.cpp
+        src/cognito/AdminRemoveUserFromGroupRequest.cpp
         src/cognito/ResponseToAuthChallengeRequest.cpp src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp
-        src/cognito/AdminGetUserRequest.cpp src/cognito/AdminGetUserResponse.cpp)
+)
 set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
