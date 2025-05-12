@@ -110,7 +110,7 @@ namespace AwsMock::Service {
             for (auto const &[key, val]: *_sqsCounterMap) {
 
                 std::string labelValue = key;
-                Core::StringUtils::Replace(labelValue, "-", "_");
+
 
                 _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", labelValue, static_cast<double>(val.messages));
                 _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", labelValue, static_cast<double>(val.size));
