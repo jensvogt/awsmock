@@ -311,7 +311,7 @@ namespace AwsMock::Service {
         if (!infrastructure.kmsKeys.empty()) {
             Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
             for (auto &key: infrastructure.kmsKeys) {
-                _kmsDatabase.UpsertKey(key);
+                key = _kmsDatabase.UpsertKey(key);
             }
             log_info << "Secrets imported, count: " << infrastructure.secrets.size();
         }

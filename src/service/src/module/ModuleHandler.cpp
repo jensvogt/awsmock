@@ -36,7 +36,7 @@ namespace AwsMock::Service {
                         .accessId = configuration.GetValue<std::string>("awsmock.access.account-id"),
                         .clientId = configuration.GetValue<std::string>("awsmock.access.client-id"),
                         .dataDir = configuration.GetValue<std::string>("awsmock.data-dir"),
-                        .version = configuration.GetVersion(),
+                        .version = Core::Configuration::GetVersion(),
                         .databaseActive = configuration.GetValue<bool>("awsmock.mongodb.active")};
                 return SendOkResponse(request, config.ToJson());
             }
@@ -53,9 +53,7 @@ namespace AwsMock::Service {
             }
             if (action == "show-ftp-users") {
 
-                Dto::Transfer::Server server;
-                server.FromJson(payload);
-
+                Dto::Transfer::Server server = Dto::Transfer::Server::FromJson(payload);
                 Dto::Transfer::ListUsersRequest transferRequest = {.region = region, .serverId = server.serverId};
                 TransferService transferService;
                 Dto::Transfer::ListUsersResponse transferResponse = transferService.ListUsers(transferRequest);
@@ -105,9 +103,9 @@ namespace AwsMock::Service {
             }
             if (action == "import") {
 
-                Dto::Module::ImportInfrastructureRequest moduleRequest;
-                moduleRequest.FromJson(payload);
-                _moduleService.ImportInfrastructure(moduleRequest);
+                Dto::Module::ImportInfrastructureRequest infrastructureRequest;
+                infrastructureRequest.FromJson(payload);
+                ModuleService::ImportInfrastructure(infrastructureRequest);
                 return SendOkResponse(request);
             }
             if (action == "set-log-level") {
@@ -139,7 +137,7 @@ namespace AwsMock::Service {
                 moduleRequest.FromJson(payload);
 
                 // Get modules
-                Dto::Module::ExportInfrastructureResponse moduleResponse = _moduleService.ExportInfrastructure(moduleRequest);
+                Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
                 if (moduleResponse.ToJson().length() > 100000000) {
                     log_error << "Response > 10MB";
                     return SendBadRequestError(request, "Size > 100 MB.");
