@@ -118,9 +118,10 @@ namespace AwsMock::Database {
         }
     }
 
+    typedef boost::date_time::local_adjustor<boost::posix_time::ptime, +2, boost::posix_time::no_dst> eu_central;
     std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
-
+        using namespace std::literals;
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
@@ -128,14 +129,10 @@ namespace AwsMock::Database {
             try {
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
 #ifdef __APPLE__
-                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
                 const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
                 auto startUtc = bsoncxx::types::b_date(system_clock::time_point(startTime.time_since_epoch()));
                 const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
                 auto endUtc = bsoncxx::types::b_date(system_clock::time_point(endTime.time_since_epoch()));
-#elif __linux__
-                auto startUtc = bsoncxx::types::b_date(start);
-                auto endUtc = bsoncxx::types::b_date(end);
 #else
                 auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
                 auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));

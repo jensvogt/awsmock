@@ -11,23 +11,14 @@
 // MongoDB includes
 #include <bsoncxx/builder/basic/array.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
-#include <awsmock/entity/cognito/UserStatus.h>
 
 struct User;
 namespace AwsMock::Database::Entity::Cognito {
 
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
     using std::chrono::system_clock;
 
     /**
@@ -72,7 +63,7 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * Precedence
          */
-        int precedence;
+        long precedence{};
 
         /**
          * Creation date
@@ -96,7 +87,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @param mResult query result.
          */
-        void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a string representation.
