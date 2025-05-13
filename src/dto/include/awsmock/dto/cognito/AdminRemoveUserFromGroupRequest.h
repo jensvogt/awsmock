@@ -9,10 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -30,7 +27,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminRemoveUserFromGroupRequest final : Common::BaseDto<AdminRemoveUserFromGroupRequest> {
+    struct AdminRemoveUserFromGroupRequest final : Common::BaseCounter<AdminRemoveUserFromGroupRequest> {
 
         /**
          * Name of the group
@@ -47,19 +44,26 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string userPoolId;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend AdminRemoveUserFromGroupRequest tag_invoke(boost::json::value_to_tag<AdminRemoveUserFromGroupRequest>, boost::json::value const &v) {
+            AdminRemoveUserFromGroupRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminRemoveUserFromGroupRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", obj.userPoolId},
+                    {"userName", obj.userName},
+                    {"groupName", obj.groupName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
