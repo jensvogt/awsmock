@@ -54,18 +54,6 @@ namespace AwsMock::Monitoring {
         return nullptr;
     }
 
-    void MetricService::ClearCounter(const std::string &name) const {
-        boost::mutex::scoped_lock lock(_counterMutex);
-
-        if (CounterExists(name)) {
-            const auto counter = GetCounter(name);
-            counter->Add({{}}).Reset();
-            log_trace << "Counter cleared, name: " << name;
-            return;
-        }
-        log_error << "Counter not found, name: " << name;
-    }
-
     void MetricService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
         boost::mutex::scoped_lock lock(_counterMutex);
         if (CounterExists(name, labelName, labelValue)) {
@@ -75,16 +63,6 @@ namespace AwsMock::Monitoring {
             return;
         }
         log_error << "Counter not found, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
-    }
-
-    void MetricService::IncrementCounter(const std::string &name, const int value) {
-        if (_prometheus) {
-            if (!CounterExists(name)) { AddCounter(name); }
-            const auto counter = GetCounter(name);
-            counter->Add({}).Increment(value);
-        }
-        _metricCacheService.IncrementCounter(name, value);
-        log_trace << "Counter incremented, name: " << name;
     }
 
     void MetricService::IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, const int value) {
@@ -126,16 +104,6 @@ namespace AwsMock::Monitoring {
     prometheus::Family<prometheus::Gauge> *MetricService::GetGauge(const std::string &name) {
         if (const auto it = _gaugeMap.find(name); it != _gaugeMap.end()) { return it->second; }
         return nullptr;
-    }
-
-    void MetricService::SetGauge(const std::string &name, const double value) {
-        if (_prometheus) {
-            if (!GaugeExists(name)) { AddGauge(name); }
-            const auto gauge = GetGauge(name);
-            gauge->Add({}).Set(value);
-        }
-        _metricCacheService.SetGauge(name, value);
-        log_trace << "Gauge value set, name: " << name;
     }
 
     void MetricService::SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) {

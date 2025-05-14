@@ -119,8 +119,8 @@ namespace AwsMock::Service {
                 totalSize += val.size;
                 _sqsDatabase.UpdateQueueCounter(key, val.messages, val.size, val.initial, val.invisible, val.delayed);
             }
-            _metricService.SetGauge(SQS_QUEUE_COUNT, static_cast<double>(_sqsCounterMap->size()));
-            _metricService.SetGauge(SQS_MESSAGE_COUNT, static_cast<double>(totalMessages));
+            _metricService.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(_sqsCounterMap->size()));
+            _metricService.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
         }
         log_debug << "SQS monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }

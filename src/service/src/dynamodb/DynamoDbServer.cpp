@@ -209,8 +209,8 @@ namespace AwsMock::Service {
 
         const long tables = _dynamoDbDatabase.CountTables();
         const long items = _dynamoDbDatabase.CountItems();
-        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, static_cast<double>(tables));
-        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, static_cast<double>(items));
+        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables));
+        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(items));
 
         log_trace << "DynamoDb monitoring finished";
     }
