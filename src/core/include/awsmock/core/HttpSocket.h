@@ -12,6 +12,7 @@
 
 // Boost includes
 #include <boost/beast.hpp>
+#include <boost/exception/diagnostic_information.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -67,17 +68,17 @@ namespace AwsMock::Core {
          * @param method HTTP method
          * @param host HTTP host
          * @param port HTTP port
-         * @param filename name of the local file
-         * @param body message body
+         * @param path UTRL path
+         * @param filename name of the file to send
          * @param headers HTTP headers
          * @return HTTP response
          */
-        static HttpSocketResponse SendBinary(http::verb method, const std::string &host, int port, const std::string &filename, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+        static HttpSocketResponse SendBinary(http::verb method, const std::string &host, int port, const std::string &path, const std::string &filename = {}, const std::map<std::string, std::string> &headers = {});
 
       private:
 
         /**
-         * @brief Prepare HTTP message
+         * @brief Prepare an HTTP message
          *
          * @param method HTTP method
          * @param host host to connect to
@@ -88,7 +89,7 @@ namespace AwsMock::Core {
         static http::request<http::string_body> PrepareJsonMessage(http::verb method, const std::string &host, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-         * @brief Prepare HTTP message
+         * @brief Prepare an HTTP message
          *
          * @param method HTTP method
          * @param path URL path
