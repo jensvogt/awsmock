@@ -7,7 +7,7 @@
 
 #include <awsmock/service/monitoring/MetricService.h>
 
-#define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count() / 1000)
+#define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count())
 
 namespace AwsMock::Monitoring {
 
