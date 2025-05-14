@@ -122,15 +122,15 @@ namespace AwsMock::Core {
         file_sink = add_file_log(
                 boost::log::keywords::file_name = dir + FileUtils::separator() + prefix + ".log",
                 boost::log::keywords::rotation_size = size,
-                boost::log::keywords::target_file_name = prefix + "_%N.log",
+                boost::log::keywords::target_file_name = dir + FileUtils::separator() + prefix + "_%N.log",
                 boost::log::keywords::format = &LogFormatter);
 
-        const auto be = file_sink->locked_backend();
-        be->set_file_collector(boost::log::sinks::file::make_collector(
+        file_sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
                 boost::log::keywords::target = dir,
                 boost::log::keywords::max_files = count));
 
-        be->scan_for_files();
+        file_sink->locked_backend()->scan_for_files();
         log_info << "Start logging to file, dir:" << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
+
 }// namespace AwsMock::Core

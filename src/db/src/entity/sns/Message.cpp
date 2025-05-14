@@ -20,6 +20,7 @@ namespace AwsMock::Database::Entity::SNS {
                           kvp("targetArn", targetArn),
                           kvp("message", message),
                           kvp("messageId", messageId),
+                          kvp("contentType", contentType),
                           kvp("size", bsoncxx::types::b_int64(size)),
                           kvp("status", MessageStatusToString(status)),
                           kvp("messageAttribute", messageAttributesDoc));
@@ -40,6 +41,7 @@ namespace AwsMock::Database::Entity::SNS {
             status = MessageStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
             messageId = Core::Bson::BsonUtils::GetStringValue(mResult, "messageId");
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+            contentType = Core::Bson::BsonUtils::GetStringValue(mResult, "contentType");
             lastSend = Core::Bson::BsonUtils::GetDateValue(mResult, "lastSend");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");

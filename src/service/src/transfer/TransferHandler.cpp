@@ -12,8 +12,7 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.CreateServer") {
 
-                Dto::Transfer::CreateServerRequest transferRequest;
-                transferRequest.FromJson(body);
+                Dto::Transfer::CreateServerRequest transferRequest = Dto::Transfer::CreateServerRequest::FromJson(body);
                 transferRequest.region = region;
                 Dto::Transfer::CreateServerResponse transferResponse = _transferService.CreateTransferServer(transferRequest);
                 return SendOkResponse(request, transferResponse.ToJson());
@@ -49,8 +48,7 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.ListServerCounters") {
 
-                Dto::Transfer::ListServerCountersRequest transferRequest;
-                transferRequest.FromJson(body);
+                Dto::Transfer::ListServerCountersRequest transferRequest = Dto::Transfer::ListServerCountersRequest::FromJson(body);
                 transferRequest.region = region;
 
                 Dto::Transfer::ListServerCountersResponse transferResponse = _transferService.ListServerCounters(transferRequest);
@@ -59,8 +57,7 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.ListUserCounters") {
 
-                Dto::Transfer::ListUserCountersRequest transferRequest;
-                transferRequest.FromJson(body);
+                Dto::Transfer::ListUserCountersRequest transferRequest = Dto::Transfer::ListUserCountersRequest::FromJson(body);
                 transferRequest.region = region;
 
                 Dto::Transfer::ListUserCountersResponse transferResponse = _transferService.ListUserCounters(transferRequest);
@@ -69,11 +66,19 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.ListProtocolCounters") {
 
-                Dto::Transfer::ListProtocolCountersRequest transferRequest;
-                transferRequest.FromJson(body);
+                Dto::Transfer::ListProtocolCountersRequest transferRequest = Dto::Transfer::ListProtocolCountersRequest::FromJson(body);
                 transferRequest.region = region;
 
                 Dto::Transfer::ListProtocolCountersResponse transferResponse = _transferService.ListProtocolCounters(transferRequest);
+                return SendOkResponse(request, transferResponse.ToJson());
+            }
+
+            if (target == "TransferService.ListTagCounters") {
+
+                Dto::Transfer::ListTagCountersRequest transferRequest = Dto::Transfer::ListTagCountersRequest::FromJson(body);
+                transferRequest.region = region;
+
+                Dto::Transfer::ListTagCountersResponse transferResponse = _transferService.ListTagCounters(transferRequest);
                 std::string tmp = transferResponse.ToJson();
                 return SendOkResponse(request, transferResponse.ToJson());
             }

@@ -23,16 +23,15 @@ namespace AwsMock::Monitoring {
     void MetricCacheService::IncrementCounter(const std::string &name, const int value, const std::string &labelName, const std::string &labelValue) {
         boost::mutex::scoped_lock lock(_cacheMutex);
 
-        const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
-            auto const &[k, v] = item;
-            return k == GetId(name, labelName, labelValue);
+        const auto it = std::ranges::find_if(_metricCache, [name, labelName, labelValue](const auto &item) {
+            return item.first == GetId(name, labelName, labelValue);
         });
 
         if (it != _metricCache.end()) {
             it->second.value += value;
             it->second.count++;
-            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > 1) {
-                _database.IncCounter(name, it->second.value / it->second.count, labelName, labelValue);
+            if (duration_cast<seconds>(system_clock::now() - it->second.lastWritten).count() > _aggregationPeriod) {
+                _database.IncCounter(name, it->second.value, labelName, labelValue);
                 it->second.lastWritten = system_clock::now();
                 it->second.value = 0;
                 it->second.count = 0;
@@ -46,16 +45,15 @@ namespace AwsMock::Monitoring {
     void MetricCacheService::SetGauge(const std::string &name, const double value, const std::string &labelName, const std::string &labelValue) {
         boost::mutex::scoped_lock lock(_cacheMutex);
 
-        const auto it = std::ranges::find_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
-            auto const &[k, v] = item;
-            return k == GetId(name, labelName, labelValue);
+        const auto it = std::ranges::find_if(_metricCache, [name, labelName, labelValue](const auto &item) {
+            return item.first == GetId(name, labelName, labelValue);
         });
 
         if (it != _metricCache.end()) {
             it->second.value += value;
             it->second.count++;
-            if (duration_cast<minutes>(system_clock::now() - it->second.lastWritten).count() > 1) {
-                _database.SetGauge(name, it->second.value / it->second.count, labelName, labelValue);
+            if (duration_cast<seconds>(system_clock::now() - it->second.lastWritten).count() > _aggregationPeriod) {
+                _database.SetGauge(name, it->second.value / static_cast<double>(it->second.count), labelName, labelValue);
                 it->second.lastWritten = system_clock::now();
                 it->second.value = 0;
                 it->second.count = 0;

@@ -59,7 +59,6 @@
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/LambdaDatabase.h>
-#include <awsmock/repository/S3Database.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
@@ -76,24 +75,24 @@ namespace AwsMock::Service {
      * @brief Lambda service module. Handles all lambda related requests:
      *
      * <ul>
-     * <li>Create lambda function.</li>
-     * <li>Delete lambda function.</li>
+     * <li>Create a lambda function.</li>
+     * <li>Delete a lambda function.</li>
      * <li>List lambda function.</li>
      * <li>Create lambda function tags.</li>
      * <li>List lambda function tags.</li>
      * <li>Delete lambda function tags.</li>
-     * <li>Invoke lambda function with AWS S3 notification payload.</li>
-     * <li>Invoke lambda function with AWS SQS notification payload.</li>
+     * <li>Invoke a lambda function with AWS S3 notification payload.</li>
+     * <li>Invoke a lambda function with AWS SQS notification payload.</li>
      * </ul>
      *
-     * <p>
-     * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda invocation requests are queued and are send sequentially to the lambda function
-     * running as docker container. The incoming requests are posted to a Poco notification center. The target of the notification is the LambdaExecutor (@see AwsMock::Worker::LambdaExecutor).
-     * </p>
-     * <p>
-     * The execution command are send via HTTP to the docker image. RIE is using port 8080 for the REST invocation requests. This port is mapped to the docker host on a randomly chosen port,
+     * @par
+     * As the AWS lambda runtime environment (RIE) cannot handle several concurrent requests, the lambda function is run in a customized docker
+     * container (@see AwsMock::Worker::LambdaExecutor). Each invocation first checks the database for an idle instance of the lambda function.
+     * If no idle instance is found, the lambda creator will create a new instance of the docker container and start it with a random name.
+     *
+     * @par
+     * The execution commands are sent via HTTP to the docker image. RIE is using port 8080 for the REST invocation requests. This port is mapped to the docker host on a randomly chosen port,
      * between 32768 and 65536.
-     * </p>
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -104,7 +103,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()){};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -213,14 +212,14 @@ namespace AwsMock::Service {
         void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}) const;
 
         /**
-         * @brief Create a new tag for a lambda functions.
+         * @brief Create a new tag for a lambda function.
          *
          * @param request lambda create tag request
          */
         void CreateTag(const Dto::Lambda::CreateTagRequest &request) const;
 
         /**
-         * @brief Returns a list of tags for a ARN.
+         * @brief Returns a list of tags for an ARN.
          *
          * @param arn lambda function ARN
          * @return ListTagsResponse
@@ -430,9 +429,22 @@ namespace AwsMock::Service {
         static std::string GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
-         * lambda database connection
+         * @brief Get the lambda code from a S3 bucket and key
+         *
+         * @param lambda lambda entity
+         * @return lambda code size
+         */
+        std::string GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const;
+
+        /**
+         * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
+
+        /**
+         * Lambda database connection
+         */
+        Database::S3Database &_s3Database;
 
         /**
          * Mutex

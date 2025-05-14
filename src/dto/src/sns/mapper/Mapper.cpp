@@ -56,7 +56,9 @@ namespace AwsMock::Dto::SNS {
             message.messageId = entity.messageId;
             message.message = entity.message;
             message.size = entity.size;
+            message.contentType = entity.contentType;
             message.messageSatus = MessageStatusFromString(Database::Entity::SNS::MessageStatusToString(entity.status));
+            message.lastSend = entity.lastSend;
             message.created = entity.created;
             message.modified = entity.modified;
             for (const auto &[attributeName, attributeValue, attributeType]: entity.messageAttributes) {
@@ -69,6 +71,32 @@ namespace AwsMock::Dto::SNS {
             response.messages.emplace_back(message);
         }
         return response;
+    }
+
+    Message Mapper::map(const Database::Entity::SNS::Message &messageEntity) {
+        Message messageDto;
+        messageDto.region = messageEntity.region;
+        messageDto.messageId = messageEntity.messageId;
+        messageDto.topicArn = messageEntity.topicArn;
+        messageDto.message = messageEntity.message;
+        messageDto.contentType = messageEntity.contentType;
+        messageDto.messageAttributes = map(messageEntity.messageAttributes);
+        messageDto.created = messageEntity.created;
+        messageDto.modified = messageEntity.modified;
+        return messageDto;
+    }
+
+    Database::Entity::SNS::Message Mapper::map(const Message &messageDto) {
+        Database::Entity::SNS::Message messageEntity;
+        messageEntity.region = messageDto.region;
+        messageEntity.messageId = messageDto.messageId;
+        messageEntity.topicArn = messageDto.topicArn;
+        messageEntity.message = messageDto.message;
+        messageEntity.contentType = messageDto.contentType;
+        messageEntity.messageAttributes = map(messageDto.messageAttributes);
+        messageEntity.created = messageDto.created;
+        messageEntity.modified = messageDto.modified;
+        return messageEntity;
     }
 
     Database::Entity::SNS::MessageAttribute Mapper::map(const MessageAttribute &messageAttribute) {

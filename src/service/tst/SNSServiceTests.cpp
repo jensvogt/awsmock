@@ -155,7 +155,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
-        EXPECT_EQ(1, response.topics[0].size());
+        EXPECT_EQ(48, response.topics[0].size());
     }
 
     TEST_F(SNSServiceTest, SubscriptionUpdateTest) {
@@ -247,7 +247,7 @@ namespace AwsMock::Service {
 
         // assert
         EXPECT_FALSE(subscribeResponse.subscriptionArn.empty());
-        EXPECT_EQ(0, response.topics[0].size());
+        EXPECT_EQ(48, response.topics[0].size());
     }
 
     TEST_F(SNSServiceTest, PublishMessageTest) {

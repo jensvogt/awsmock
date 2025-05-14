@@ -39,13 +39,13 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Variables
          */
-        std::vector<std::pair<std::string, std::string>> tags;
+        std::map<std::string, std::string> tags;
 
         /**
-         * @brief Checks whether a tags with the given tags key exists.
+         * @brief Checks whether tags with the given tags key exist.
          *
          * @param key key of the tags
-         * @return true if tags with the given key exists.
+         * @return true if tags with the given key exist.
          */
         bool HasTag(const std::string &key);
 
@@ -62,7 +62,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(std::optional<bsoncxx::document::view> mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document

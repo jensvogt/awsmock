@@ -132,6 +132,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) const {
 
+        Entity::SQS::Queue queue;
         if (HasDatabase()) {
             Entity::SQS::Queue result;
 
@@ -144,9 +145,17 @@ namespace AwsMock::Database {
                 log_error << "Queue not found, queueArn: " << queueArn;
                 throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
             }
-            return result.FromDocument(mResult->view());
+            queue = result.FromDocument(mResult->view());
+        } else {
+            queue = _memoryDb.GetQueueByArn(queueArn);
         }
-        return _memoryDb.GetQueueByArn(queueArn);
+
+        // Update counters
+        queue.size = (*_sqsCounterMap)[queueArn].size;
+        queue.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[queueArn].messages;
+        queue.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[queueArn].invisible;
+        queue.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[queueArn].delayed;
+        return queue;
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByDlq(const std::string &dlqQueueArn) const {
@@ -260,6 +269,7 @@ namespace AwsMock::Database {
             for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
+                result.size = (*_sqsCounterMap)[result.queueArn].size;
                 result.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[result.queueArn].messages;
                 result.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[result.queueArn].invisible;
                 result.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[result.queueArn].delayed;
@@ -943,7 +953,7 @@ namespace AwsMock::Database {
 
                 session.commit_transaction();
                 log_debug << "Message reset, updated: " << result->modified_count() << " queueArn: " << queueArn;
-                updated = result->upserted_count();
+                updated = result->modified_count();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
@@ -1356,13 +1366,12 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)));
+                if (const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle))); !findResult->empty()) {
+                    message.FromDocument(findResult->view());
+                }
                 const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
                 session.commit_transaction();
 
-                if (!findResult->empty()) {
-                    message.FromDocument(findResult->view());
-                }
                 log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << result->deleted_count();
                 deleted = result->deleted_count();
 

@@ -107,6 +107,7 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
+                    {"contentType", obj.contentType},
                     {"messageId", obj.messageId},
                     {"id", obj.id},
                     {"receiptHandle", obj.receiptHandle},

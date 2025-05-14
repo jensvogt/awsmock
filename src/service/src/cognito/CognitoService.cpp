@@ -451,7 +451,16 @@ namespace AwsMock::Service {
         try {
 
             Database::Entity::Cognito::User user = _database.GetUserByUserName(request.region, request.userPoolId, request.userName);
-            Dto::Cognito::AdminGetUserResponse response = {.id = user.oid, .region = user.region, .userPoolId = user.userPoolId, .userName = user.userName, .password = user.password, .enabled = user.enabled, .userStatus = user.userStatus, .created = user.created, .modified = user.modified};
+            Dto::Cognito::AdminGetUserResponse response;
+            response.id = user.oid;
+            response.region = user.region;
+            response.userPoolId = user.userPoolId;
+            response.userName = user.userName;
+            response.password = user.password;
+            response.enabled = user.enabled;
+            response.userStatus = user.userStatus;
+            response.created = user.created;
+            response.modified = user.modified;
             log_trace << "Get admin user response: " + response.ToJson();
             return response;
 

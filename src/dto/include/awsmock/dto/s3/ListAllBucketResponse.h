@@ -26,7 +26,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListAllBucketResponse final : Common::BaseDto<ListAllBucketResponse> {
+    struct ListAllBucketResponse final : Common::BaseCounter<ListAllBucketResponse> {
 
         /**
          * List of buckets
@@ -43,16 +43,31 @@ namespace AwsMock::Dto::S3 {
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+            boost::property_tree::ptree root;
+            root.add("ListAllMyBucketsResult.Total", total);
+
+            boost::property_tree::ptree bucketsTree;
+            for (auto &it: bucketList) {
+                boost::property_tree::ptree bucketTree;
+                bucketTree.add("BucketRegion", it.region);
+                bucketTree.add("Name", it.bucketName);
+                bucketTree.add("CreationDate", Core::DateTimeUtils::ToISO8601(it.created));
+                bucketsTree.push_back(std::make_pair("Bucket", bucketTree));
+            }
+            root.add_child("ListAllMyBucketsResult.Buckets", bucketsTree);
+            return Core::XmlUtils::ToXmlString(root);
+        }
 
       private:
+
+        friend ListAllBucketResponse tag_invoke(boost::json::value_to_tag<ListAllBucketResponse>, boost::json::value const &v) {
+            ListAllBucketResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.bucketList = boost::json::value_to<std::vector<Bucket>>(v.at("buckets"));
+            return r;
+        }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListAllBucketResponse const &obj) {
             jv = {
@@ -61,9 +76,6 @@ namespace AwsMock::Dto::S3 {
             };
         }
     };
-
-    BOOST_DESCRIBE_STRUCT(ListAllBucketResponse, (Common::BaseDto<ListAllBucketResponse>), (total, bucketList))
-    using boost::describe::operators::operator<<;
 
 }// namespace AwsMock::Dto::S3
 

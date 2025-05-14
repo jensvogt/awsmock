@@ -13,41 +13,14 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/entity/sns/MessageAttribute.h>
+#include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::SNS {
 
     /**
-     * SNS message status
-     */
-    enum MessageStatus {
-        INITIAL,
-        SEND,
-        RESEND
-    };
-    static std::map<MessageStatus, std::string> MessageStatusNames{
-            {INITIAL, "INITIAL"},
-            {SEND, "SEND"},
-            {RESEND, "RESEND"},
-    };
-
-    [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
-        return MessageStatusNames[messageStatus];
-    }
-
-    [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatusString) {
-        for (auto &[fst, snd]: MessageStatusNames) {
-            if (snd == messageStatusString) {
-                return fst;
-            }
-        }
-        return INITIAL;
-    }
-
-    /**
-     * SNS message entity
+     * @brief SNS message entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -94,6 +67,11 @@ namespace AwsMock::Database::Entity::SNS {
         MessageAttributeList messageAttributes;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Message size
          */
         long size;
@@ -111,7 +89,7 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Last modified datetime
          */
-        system_clock::time_point modified;
+        system_clock::time_point modified = system_clock::now();
 
         /**
          * Converts the entity to a MongoDB document

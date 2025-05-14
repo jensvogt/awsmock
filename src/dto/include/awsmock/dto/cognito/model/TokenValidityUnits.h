@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -48,7 +48,7 @@ namespace AwsMock::Dto::Cognito {
         return days;
     }
 
-    struct TokenValidityUnits {
+    struct TokenValidityUnits final : Common::BaseCounter<TokenValidityUnits> {
 
         /**
          * Access token
@@ -66,18 +66,23 @@ namespace AwsMock::Dto::Cognito {
         ValidityUnits refreshToken = hours;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert from a JSON object
          *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
+
+            try {
+
+                accessToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "AccessToken"));
+                idToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "IdToken"));
+                refreshToken = ValidityUnitFromString(Core::Bson::BsonUtils::GetStringValue(document, "RefreshToken"));
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Convert to a JSON object
@@ -85,21 +90,42 @@ namespace AwsMock::Dto::Cognito {
          * @return JSON object
          * @throws JsonException
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TokenValidityUnits &r);
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "AccessToken", ValidityUnitToString(accessToken));
+                Core::Bson::BsonUtils::SetStringValue(document, "IdToken", ValidityUnitToString(idToken));
+                Core::Bson::BsonUtils::SetStringValue(document, "RefreshToken", ValidityUnitToString(refreshToken));
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend TokenValidityUnits tag_invoke(boost::json::value_to_tag<TokenValidityUnits>, boost::json::value const &v) {
+            TokenValidityUnits r;
+            r.accessToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "accessToken"));
+            r.idToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "idToken"));
+            r.refreshToken = ValidityUnitFromString(Core::Json::GetStringValue(v, "refreshToken"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TokenValidityUnits const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"accessToken", ValidityUnitToString(obj.accessToken)},
+                    {"idToken", ValidityUnitToString(obj.idToken)},
+                    {"refreshToken", ValidityUnitToString(obj.refreshToken)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

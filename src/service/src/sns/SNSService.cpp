@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/utils/SqsUtils.h"
+#include "awsmock/dto/dynamodb/mapper/Mapper.h"
 
 
 #include <awsmock/service/sns/SNSService.h>
@@ -81,9 +81,8 @@ namespace AwsMock::Service {
         try {
 
             const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
-            Dto::SNS::ListTopicCountersResponse listTopicResponse;
+            Dto::SNS::ListTopicCountersResponse listTopicResponse = Dto::SNS::Mapper::map(request, topicList);
             listTopicResponse.total = _snsDatabase.CountTopics(request.region, request.prefix);
-            listTopicResponse = Dto::SNS::Mapper::map(request, topicList);
             log_trace << "SNS list topic counters response: " << listTopicResponse.ToJson();
             return listTopicResponse;
 
@@ -169,14 +168,14 @@ namespace AwsMock::Service {
             Database::Entity::SNS::Topic topic = !request.topicArn.empty() ? _snsDatabase.GetTopicByArn(request.topicArn) : _snsDatabase.GetTopicByTargetArn(request.targetArn);
 
             // Update database
-            Database::Entity::SNS::Message message;
-            std::string messageId = Core::AwsUtils::CreateMessageId();
-            message = {.region = request.region,
-                       .topicArn = request.topicArn,
-                       .targetArn = request.targetArn,
-                       .message = request.message,
-                       .messageId = messageId,
-                       .size = static_cast<long>(request.message.length())};
+            //message = Dto::SNS::Mapper::map(request, topic);
+            Database::Entity::SNS::Message message = {.region = request.region,
+                                                      .topicArn = request.topicArn,
+                                                      .targetArn = request.targetArn,
+                                                      .message = request.message,
+                                                      .messageId = Core::AwsUtils::CreateMessageId(),
+                                                      .contentType = request.contentType,
+                                                      .size = static_cast<long>(request.message.length())};
 
             // Attributes
             for (const auto &[fst, snd]: request.messageAttributes) {
@@ -192,7 +191,7 @@ namespace AwsMock::Service {
 
             Dto::SNS::PublishResponse response;
             response.requestId = request.requestId;
-            response.messageId = messageId;
+            response.messageId = message.messageId;
             response.region = request.region;
             response.messageId = message.messageId;
             return response;
@@ -571,7 +570,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();
@@ -583,16 +582,19 @@ namespace AwsMock::Service {
                 if (Core::StringUtils::ToLower(it.protocol) == SQS_PROTOCOL) {
 
                     SendSQSMessage(it, request);
+                    _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
                     log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
 
                 } else if (Core::StringUtils::ToLower(it.protocol) == HTTP_PROTOCOL) {
 
                     SendHttpMessage(it, request);
+                    _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
                     log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
 
                 } else if (Core::StringUtils::ToLower(it.protocol) == LAMBDA_ENDPOINT) {
 
                     SendLambdaMessage(it, request, message);
+                    _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
                     log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
                 }
             }
@@ -691,6 +693,7 @@ namespace AwsMock::Service {
         sendMessageRequest.region = request.region;
         sendMessageRequest.queueUrl = sqsQueue.queueUrl;
         sendMessageRequest.body = sqsNotificationRequest.ToJson();
+        sendMessageRequest.contentType = "application/json";
         sendMessageRequest.requestId = Core::AwsUtils::CreateRequestId();
 
         for (const auto &[fst, snd]: request.messageAttributes) {
@@ -857,9 +860,6 @@ namespace AwsMock::Service {
             log_trace << "SNS message deleted, messageId: " << request.messageId;
 
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
-
-            // Adjust topic counters
-            //AdjustTopicCounters(topic);
             log_trace << "SNS topic counter adjusted, topicArn: " << request.topicArn;
 
         } catch (bsoncxx::exception &ex) {

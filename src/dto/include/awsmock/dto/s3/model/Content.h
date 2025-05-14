@@ -11,9 +11,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/Owner.h>
 
 namespace AwsMock::Dto::S3 {
@@ -25,12 +24,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Content {
-
-        /**
-         * Checksum algorithms
-         */
-        std::vector<std::string> checksumAlgorithms;
+    struct Content final : Common::BaseCounter<Content> {
 
         /**
          * ETag
@@ -53,6 +47,11 @@ namespace AwsMock::Dto::S3 {
         long size = 0;
 
         /**
+         * Checksum algorithms
+         */
+        std::vector<std::string> checksumAlgorithms;
+
+        /**
          * Storage class
          */
         std::string storageClass;
@@ -62,26 +61,35 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend Content tag_invoke(boost::json::value_to_tag<Content>, boost::json::value const &v) {
+            Content r;
+            r.etag = Core::Json::GetStringValue(v, "etag");
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.storageClass = Core::Json::GetStringValue(v, "storageClass");
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            if (Core::Json::AttributeExists(v, "owner")) {
+                r.owner = boost::json::value_to<Owner>(v.at("owner"));
+            }
+            if (Core::Json::AttributeExists(v, "checksumAlgorithms")) {
+                r.checksumAlgorithms = boost::json::value_to<std::vector<std::string>>(v.at("checksumAlgorithms"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Content &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Content const &obj) {
+            jv = {
+                    {"etag", obj.etag},
+                    {"key", obj.key},
+                    {"size", obj.size},
+                    {"storageClass", obj.storageClass},
+                    {"checksumAlgorithms", boost::json::value_from(obj.checksumAlgorithms)},
+                    {"owner", boost::json::value_from(obj.owner)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

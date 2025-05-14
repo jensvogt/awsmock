@@ -116,7 +116,9 @@ namespace AwsMock::Dto::S3 {
             r.arn = Core::Json::GetStringValue(v, "Arn");
             r.keys = Core::Json::GetLongValue(v, "Keys");
             r.size = Core::Json::GetLongValue(v, "Size");
-            r.versionStatus = Core::Json::GetLongValue(v, "Size");
+            r.versionStatus = Core::Json::GetStringValue(v, "VersionStatus");
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
             return r;
         }
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Bucket const &obj) {
