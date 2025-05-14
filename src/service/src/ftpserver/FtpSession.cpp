@@ -1194,7 +1194,7 @@ namespace AwsMock::FtpServer {
             me->readDataFromFileAndSend(file, data_socket);
             me->readDataFromFileAndSend(file, data_socket);
         });
-        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD, static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
+        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
     }
 
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
@@ -1465,7 +1465,7 @@ namespace AwsMock::FtpServer {
         ifs.close();
 
         _metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
-        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, static_cast<double>(Core::FileUtils::FileSize(fileName)));
+        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(fileName)));
         log_debug << "File uploaded, fileName: " << fileName;
     }
 

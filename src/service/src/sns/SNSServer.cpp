@@ -58,8 +58,8 @@ namespace AwsMock::Service {
                 totalSize += val.size;
                 _snsDatabase.UpdateTopicCounter(key, val.messages, val.size, val.initial, val.send, val.resend);
             }
-            _metricService.SetGauge(SNS_TOPIC_COUNT, static_cast<double>(_snsCounterMap->size()));
-            _metricService.SetGauge(SNS_MESSAGE_COUNT, static_cast<double>(totalMessages));
+            _metricService.SetGauge(SNS_TOPIC_COUNT, {}, {}, static_cast<double>(_snsCounterMap->size()));
+            _metricService.SetGauge(SNS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
         }
         log_debug << "SNS monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }

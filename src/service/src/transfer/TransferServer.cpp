@@ -184,7 +184,7 @@ namespace AwsMock::Service {
         log_trace << "Transfer monitoring starting";
 
         const long servers = _transferDatabase.CountServers();
-        _metricService.SetGauge(TRANSFER_SERVER_COUNT, static_cast<double>(servers));
+        _metricService.SetGauge(TRANSFER_SERVER_COUNT, {}, {}, static_cast<double>(servers));
 
         log_trace << "Transfer monitoring finished";
     }
