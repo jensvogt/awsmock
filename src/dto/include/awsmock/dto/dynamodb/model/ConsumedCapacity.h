@@ -12,17 +12,18 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     using std::chrono::system_clock;
 
     /**
-     * DynamoDB provisioned throughput
+     * @brief DynamoDB provisioned throughput
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ConsumedCapacity {
+    struct ConsumedCapacity final : Common::BaseCounter<ConsumedCapacity> {
 
         /**
          * Table name
@@ -32,43 +33,40 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Read capacity units
          */
-        int readCapacityUnits = 0;
+        long readCapacityUnits = 0;
 
         /**
          * Write capacity units
          */
-        int writeCapacityUnits = 0;
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] std::string ToJson() const;
+        long writeCapacityUnits = 0;
 
         /**
          * @brief Convert to a BSON document
          */
-        bsoncxx::document::view ToDocument() const;
+        view ToDocument() const;
 
         /**
          * @brief Convert from a BSON document
          */
-        void FromDocument(bsoncxx::document::view document);
+        void FromDocument(view document);
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ConsumedCapacity &r);
+        friend ConsumedCapacity tag_invoke(boost::json::value_to_tag<ConsumedCapacity>, boost::json::value const &v) {
+            ConsumedCapacity r;
+            r.tableName = Core::Json::GetStringValue(v, "tableName");
+            r.readCapacityUnits = Core::Json::GetLongValue(v, "readCapacityUnits");
+            r.writeCapacityUnits = Core::Json::GetLongValue(v, "writeCapacityUnits");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AttributeValue const &obj) {
+            jv = {
+                    {"tableName", obj.tableName},
+                    {"readCapacityUnits", obj.readCapacityUnits},
+                    {"writeCapacityUnits", obj.writeCapacityUnits},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

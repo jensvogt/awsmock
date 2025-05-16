@@ -132,6 +132,8 @@ namespace AwsMock::Dto::DynamoDb {
             }
         }
 
+      private:
+
         friend AttributeValue tag_invoke(boost::json::value_to_tag<AttributeValue>, boost::json::value const &v) {
             AttributeValue r;
             r.type = Core::Json::GetStringValue(v, "type");
