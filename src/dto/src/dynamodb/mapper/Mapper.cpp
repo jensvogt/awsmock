@@ -120,6 +120,12 @@ namespace AwsMock::Dto::DynamoDb {
         itemCounterDto.size = itemEntity.size;
         itemCounterDto.created = itemEntity.created;
         itemCounterDto.modified = itemEntity.modified;
+        for (const auto &[fst, snd]: itemEntity.attributes) {
+            itemCounterDto.attributes[fst] = map(snd);
+        }
+        for (const auto &[fst, snd]: itemEntity.keys) {
+            itemCounterDto.keys[fst] = map(snd);
+        }
         return itemCounterDto;
     }
 

@@ -61,6 +61,7 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::ListItemCountersRequest itemRequest = Dto::DynamoDb::ListItemCountersRequest::FromJson(clientCommand.payload);
                     Dto::DynamoDb::ListItemCountersResponse itemResponse = _dynamoDbService.ListItemCounters(itemRequest);
                     log_debug << "Item counters listed, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", count: " << itemResponse.total;
+                    log_info << "JSON: " << itemResponse.ToString();
                     return SendOkResponse(request, itemResponse.ToJson());
                 }
 
@@ -74,6 +75,7 @@ namespace AwsMock::Service {
                     tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
+                    log_debug << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
                     }
@@ -90,6 +92,7 @@ namespace AwsMock::Service {
                     tableRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
+                    log_debug << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
                     if (tableResponse.status == http::status::ok) {
                         return SendOkResponse(request, tableResponse.body, tableResponse.headers);
                     }

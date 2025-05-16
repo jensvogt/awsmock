@@ -36,7 +36,7 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend ListTableCountersResponse tag_invoke(boost::json::value_to_tag<ListTableCountersResponse>, boost::json::value const &v) {
             ListTableCountersResponse r;
-            r.total = v.at("total").as_int64();
+            r.total = Core::Json::GetLongValue(v, "total");
             r.tableCounters = boost::json::value_to<std::vector<TableCounter>>(v.at("tableCounters"));
             return r;
         }
