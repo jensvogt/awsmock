@@ -12,17 +12,18 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
     using std::chrono::system_clock;
 
     /**
-     * DynamoDB provisioned throughput
+     * @brief DynamoDB provisioned throughput
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ProvisionedThroughput {
+    struct ProvisionedThroughput final : Common::BaseCounter<ProvisionedThroughput> {
 
         /**
          * Read capacity units
@@ -50,42 +51,50 @@ namespace AwsMock::Dto::DynamoDb {
         long numberOfDecreasesToday = 0;
 
         /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return JSON object
+         * @brief Convert from a BSON document
          */
-        [[nodiscard]] std::string ToJson() const;
+        void FromDocument(view_or_value<view, value> document) {
+            readCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "ReadCapacityUnits");
+            writeCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "WriteCapacityUnits");
+            lastDecreaseDateTime = Core::Bson::BsonUtils::GetDateValue(document, "LastDecreaseDateTime");
+            lastIncreaseDateTime = Core::Bson::BsonUtils::GetDateValue(document, "LastIncreaseDateTime");
+            numberOfDecreasesToday = Core::Bson::BsonUtils::GetLongValue(document, "NumberOfDecreasesToday");
+        }
 
         /**
          * @brief Convert to a BSON document
          */
-        view_or_value<view, value> ToDocument() const;
+        view_or_value<view, value> ToDocument() const {
+            document document;
+            Core::Bson::BsonUtils::SetIntValue(document, "ReadCapacityUnits", readCapacityUnits);
+            Core::Bson::BsonUtils::SetIntValue(document, "WriteCapacityUnits", writeCapacityUnits);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastDecreaseDateTime", lastDecreaseDateTime);
+            Core::Bson::BsonUtils::SetDateValue(document, "LastIncreaseDateTime", lastIncreaseDateTime);
+            Core::Bson::BsonUtils::SetLongValue(document, "NumberOfDecreasesToday", numberOfDecreasesToday);
+            return document.extract();
+        }
 
-        /**
-         * @brief Convert from a BSON document
-         */
-        void FromDocument(view_or_value<view, value> document);
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string
-         */
-        std::string ToJson();
+        friend ProvisionedThroughput tag_invoke(boost::json::value_to_tag<ProvisionedThroughput>, boost::json::value const &v) {
+            ProvisionedThroughput r;
+            r.readCapacityUnits = Core::Json::GetLongValue(v, "readCapacityUnits");
+            r.writeCapacityUnits = Core::Json::GetLongValue(v, "writeCapacityUnits");
+            r.numberOfDecreasesToday = Core::Json::GetLongValue(v, "numberOfDecreasesToday");
+            r.lastDecreaseDateTime = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastDecreaseDateTime"));
+            r.lastIncreaseDateTime = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastIncreaseDateTime"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ProvisionedThroughput const &obj) {
+            jv = {
+                    {"readCapacityUnits", boost::json::value_from(obj.readCapacityUnits)},
+                    {"writeCapacityUnits", boost::json::value_from(obj.writeCapacityUnits)},
+                    {"numberOfDecreasesToday", boost::json::value_from(obj.numberOfDecreasesToday)},
+                    {"lastDecreaseDateTime", Core::DateTimeUtils::ToISO8601(obj.lastDecreaseDateTime)},
+                    {"lastIncreaseDateTime", Core::DateTimeUtils::ToISO8601(obj.lastIncreaseDateTime)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

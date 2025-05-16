@@ -8,7 +8,13 @@ namespace AwsMock::Monitoring {
 
     boost::mutex MetricCacheService::_cacheMutex;
 
-    MetricCacheService::MetricCacheService() : _aggregationPeriod(300), _database(Database::MonitoringDatabase::instance()) {}
+    MetricCacheService::MetricCacheService() : _database(Database::MonitoringDatabase::instance()) {
+        _aggregationPeriod = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.average");
+        if (_aggregationPeriod < 60) {
+            _aggregationPeriod = 60;
+        }
+        log_debug << "Metric cache service initialized, aggregation period: " << _aggregationPeriod << " seconds";
+    }
 
     void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         boost::mutex::scoped_lock lock(_cacheMutex);

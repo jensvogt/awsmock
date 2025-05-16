@@ -207,7 +207,8 @@
       "prometheus": false,
       "internal": true,
       "retention": 3,
-      "smooth": false
+      "smooth": false,
+      "average": 300
     },
     "mongodb": {
       "active": true,

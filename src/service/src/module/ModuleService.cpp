@@ -264,7 +264,9 @@ namespace AwsMock::Service {
             if (!infrastructure.dynamoDbTables.empty()) {
                 for (auto &table: infrastructure.dynamoDbTables) {
                     if (!_dynamoDbService.ExistTable(table.region, table.name)) {
-                        constexpr Dto::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = 1, .writeCapacityUnits = 1};
+                        Dto::DynamoDb::ProvisionedThroughput provisionedThroughput;
+                        provisionedThroughput.readCapacityUnits = 1;
+                        provisionedThroughput.writeCapacityUnits = 1;
                         Dto::DynamoDb::CreateTableRequest dynamoDbRequest;
                         dynamoDbRequest.region = table.region;
                         dynamoDbRequest.tableName = table.name;

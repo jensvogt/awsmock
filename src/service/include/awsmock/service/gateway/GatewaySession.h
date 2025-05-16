@@ -182,14 +182,14 @@ namespace AwsMock::Service {
         std::queue<http::message_generator> _response_queue;
 
         /**
-         * The parser is stored in an optional container so we can construct it from scratch it at the beginning of each new message.
+         * The parser is stored in an optional container, so we can construct it from scratch it at the beginning of each new message.
          */
         boost::optional<http::request_parser<http::dynamic_body>> _parser;
 
         /**
          * Metric service
          */
-        Monitoring::MetricService _metricService;
+        Monitoring::MetricService _metricService = Monitoring::MetricService::instance();
     };
 
 
@@ -206,7 +206,7 @@ namespace AwsMock::Service {
         // This string will hold the body of each chunk
         std::string chunk;
 
-        // Declare our chunk header callback  This is invoked
+        // Declare our chunk header callback. This is invoked
         // after each chunk header and also after the last chunk.
         auto header_cb = [&](const std::uint64_t size, const boost::string_view extensions, boost::beast::error_code &ev) {
             // Parse the chunk extensions so we can access them easily
