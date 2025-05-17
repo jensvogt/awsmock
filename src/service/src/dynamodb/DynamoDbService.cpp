@@ -288,7 +288,7 @@ namespace AwsMock::Service {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("PutItem");
-            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers); status == http::status::ok) {
+            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
 
                 putItemResponse.body = body;
                 putItemResponse.headers = outHeaders;
@@ -443,10 +443,11 @@ namespace AwsMock::Service {
 
     Dto::DynamoDb::DynamoDbResponse DynamoDbService::SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers) const {
         log_debug << "Sending DynamoDB container request, endpoint: " << _containerHost << ":" << _containerPort;
+        log_debug << "Body: " << body;
 
         const Core::HttpSocketResponse response = Core::HttpSocket::SendAuthorizedJson(http::verb::post, "dynamodb", _containerHost, _containerPort, "/", "content-type;host;x-amz-date;x-amz-security-token;x-amz-target", headers, body);
         if (response.statusCode != http::status::ok) {
-            log_error << "HTTP error, status: " << response.statusCode << " body: " << response.body;
+            log_error << "HTTP error, status: " << response.statusCode << ", responseBody: " << response.body << ", requestBody: " << body;
             throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(response.statusCode) + " reason: " + response.body);
         }
         return {.body = response.body, .headers = headers, .status = response.statusCode};

@@ -61,7 +61,6 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::ListItemCountersRequest itemRequest = Dto::DynamoDb::ListItemCountersRequest::FromJson(clientCommand.payload);
                     Dto::DynamoDb::ListItemCountersResponse itemResponse = _dynamoDbService.ListItemCounters(itemRequest);
                     log_debug << "Item counters listed, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", count: " << itemResponse.total;
-                    log_info << "JSON: " << itemResponse.ToString();
                     return SendOkResponse(request, itemResponse.ToJson());
                 }
 
@@ -118,18 +117,14 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
 
-                    Dto::DynamoDb::PutItemRequest itemRequest;
-                    itemRequest.FromJson(clientCommand.payload);
-                    itemRequest.region = clientCommand.region;
-                    itemRequest.requestId = clientCommand.requestId;
-                    itemRequest.user = clientCommand.user;
+                    Dto::DynamoDb::PutItemRequest itemRequest = Dto::DynamoDb::PutItemRequest::FromJson(clientCommand);
                     itemRequest.headers = clientCommand.headers;
 
                     Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
                     if (itemResponse.status == http::status::ok) {
-                        return SendOkResponse(request, itemResponse.body, itemResponse.headers);
+                        return SendOkResponse(request, itemResponse.ToJson(), itemResponse.headers);
                     }
-                    return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
+                    return SendInternalServerError(request, itemResponse.ToJson(), itemResponse.headers);
                 }
 
                 case Dto::Common::DynamoDbCommandType::QUERY: {

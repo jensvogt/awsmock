@@ -497,7 +497,7 @@ namespace AwsMock::Service {
 
         Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
 
-        // Get the hostname, the hostname is different from a manager running as Linux host and a manager running as docker container.
+        // Get the hostname; the hostname is different from a manager running as a Linux host and a manager running as docker container.
         std::string hostName = GetHostname(instance);
         int port = GetContainerPort(instance);
 
@@ -633,6 +633,25 @@ namespace AwsMock::Service {
         const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
         return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
+    }
+
+    Dto::Lambda::ListLambdaArnsResponse LambdaService::ListLambdaArns() const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_lambda_arns");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_lambda_arns");
+        log_trace << "List all queues ARNs request";
+
+        try {
+            const std::vector<Database::Entity::Lambda::Lambda> lambdaList = _lambdaDatabase.ListLambdas();
+            Dto::Lambda::ListLambdaArnsResponse listLambdaArnsResponse;
+            for (const auto &lambda: lambdaList) {
+                listLambdaArnsResponse.lambdaArns.emplace_back(lambda.arn);
+            }
+            log_trace << "Lambda create function ARN list response: " << listLambdaArnsResponse.ToJson();
+            return listLambdaArnsResponse;
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
     void LambdaService::StartFunction(const Dto::Lambda::StartFunctionRequest &request) const {

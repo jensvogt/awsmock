@@ -73,6 +73,19 @@ namespace AwsMock::Dto::DynamoDb {
             result.numberSetValue = snd.numberSetValue;
             result.boolValue = snd.boolValue;
             result.nullValue = snd.nullValue;
+            if (!snd.stringValue.empty()) {
+                result.type = "S";
+            } else if (!snd.numberValue.empty()) {
+                result.type = "N";
+            } else if (!snd.stringSetValue.empty()) {
+                result.type = "SS";
+            } else if (!snd.numberSetValue.empty()) {
+                result.type = "NS";
+            } else if (!snd.boolValue) {
+                result.type = "BOOL";
+            } else if (!snd.nullValue) {
+                result.type = "NULL";
+            }
             resultMap[fst] = result;
         }
         return resultMap;
@@ -87,6 +100,19 @@ namespace AwsMock::Dto::DynamoDb {
         attributeValue.numberSetValue = attributeValueEntity.numberSetValue;
         attributeValue.nullValue = attributeValueEntity.nullValue;
         attributeValue.boolValue = attributeValueEntity.boolValue;
+        if (!attributeValue.stringValue.empty()) {
+            attributeValue.type = "S";
+        } else if (!attributeValue.numberValue.empty()) {
+            attributeValue.type = "N";
+        } else if (!attributeValue.stringSetValue.empty()) {
+            attributeValue.type = "SS";
+        } else if (!attributeValue.numberSetValue.empty()) {
+            attributeValue.type = "NS";
+        } else if (!attributeValue.boolValue) {
+            attributeValue.type = "BOOL";
+        } else if (!attributeValue.nullValue) {
+            attributeValue.type = "NULL";
+        }
         return attributeValue;
     }
 
