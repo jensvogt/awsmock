@@ -133,4 +133,7 @@ namespace AwsMock::Core {
         log_info << "Start logging to file, dir:" << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
 
+    void LogStream::RemoveConsoleLogs() {
+        boost::log::core::get()->remove_sink(console_sink);
+    }
 }// namespace AwsMock::Core

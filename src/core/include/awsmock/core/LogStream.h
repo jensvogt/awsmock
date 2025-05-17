@@ -99,6 +99,11 @@ namespace AwsMock::Core {
          */
         static void AddFile(const std::string &dir, const std::string &prefix, long size = DEFAULT_LOG_SIZE, int count = DEFAULT_LOG_COUNT);
 
+        /**
+         * Removes the console log sink
+         */
+        static void RemoveConsoleLogs();
+
       private:
 
         /**

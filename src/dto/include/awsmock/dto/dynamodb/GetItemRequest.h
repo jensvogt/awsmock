@@ -10,6 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "model/ReturnConsumedCapacity.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseDto.h>
@@ -23,12 +26,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemRequest final : Common::BaseDto<GetItemRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct GetItemRequest final : Common::BaseCounter<GetItemRequest> {
 
         /**
          * Table name
@@ -39,6 +37,11 @@ namespace AwsMock::Dto::DynamoDb {
          * Keys
          */
         std::map<std::string, AttributeValue> keys;
+
+        /**
+         * Projection
+         */
+        std::vector<std::string> attributesToGet;
 
         /**
          * Projection exception
@@ -53,31 +56,56 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Return consumed capacity
          */
-        bool returnConsumedCapacity;
+        ReturnConsumedCapacityType returnConsumedCapacity;
 
         /**
          * Original HTTP request body
          */
-        std::string body;
+        //std::string body;
 
         /**
          * Original HTTP request headers
          */
-        std::map<std::string, std::string> headers;
+        //std::map<std::string, std::string> headers;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend GetItemRequest tag_invoke(boost::json::value_to_tag<GetItemRequest>, boost::json::value const &v) {
+            GetItemRequest r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            r.consistentRead = Core::Json::GetBoolValue(v, "ConsistentRead");
+            r.projectionExpression = Core::Json::GetStringValue(v, "ProjectionExpression");
+            r.returnConsumedCapacity = ReturnConsumedCapacityTypeFromString(Core::Json::GetStringValue(v, "ReturnConsumedCapacity"));
+
+            if (Core::Json::AttributeExists(v, "AttributesToGet")) {
+                r.attributesToGet = boost::json::value_to<std::vector<std::string>>(v.at("AttributesToGet"));
+            }
+
+            if (Core::Json::AttributeExists(v, "Key")) {
+                for (auto &attribute: v.at("Key").as_object()) {
+                    r.keys[attribute.key()] = boost::json::value_to<AttributeValue>(attribute.value());
+                }
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemRequest const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+                    {"ConsistentRead", obj.consistentRead},
+                    {"ReturnConsumedCapacity", ReturnConsumedCapacityTypeToString(obj.returnConsumedCapacity)},
+                    {"Key", boost::json::value_from(obj.keys)},
+            };
+            if (!obj.projectionExpression.empty()) {
+                jv.at("ProjectionExpression") = obj.projectionExpression;
+            } /*else if (!obj.attributesToGet.empty()) {
+                boost::json::array attributesToGetJson;
+                for (auto &a: obj.attributesToGet) {
+                    attributesToGetJson.emplace_back(a);
+                }
+                jv.at("AttributesToGet") = attributesToGetJson;
+            }*/
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

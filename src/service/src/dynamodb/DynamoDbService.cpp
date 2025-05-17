@@ -253,24 +253,20 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::GetItemResponse getItemResponse;
         try {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("GetItem");
-            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers); status == http::status::ok) {
-
-                getItemResponse.body = body;
-                getItemResponse.headers = outHeaders;
-                getItemResponse.status = status;
+            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
+                Dto::DynamoDb::GetItemResponse getItemResponse = Dto::DynamoDb::GetItemResponse::FromJson(body);
                 log_debug << "DynamoDb get item, name: " << request.tableName;
+                return getItemResponse;
             }
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd get item failed, , error: " + exc.message());
         }
-
-        return getItemResponse;
+        return {};
     }
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) const {
@@ -450,6 +446,7 @@ namespace AwsMock::Service {
             log_error << "HTTP error, status: " << response.statusCode << ", responseBody: " << response.body << ", requestBody: " << body;
             throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(response.statusCode) + " reason: " + response.body);
         }
+        log_debug << "Success, returnBody: " << response.body;
         return {.body = response.body, .headers = headers, .status = response.statusCode};
     }
 

@@ -100,19 +100,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::GET_ITEM: {
 
-                    Dto::DynamoDb::GetItemRequest itemRequest;
-                    itemRequest.FromJson(clientCommand.payload);
-                    itemRequest.region = clientCommand.region;
-                    itemRequest.requestId = clientCommand.requestId;
-                    itemRequest.user = clientCommand.user;
-                    itemRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::GetItemRequest itemRequest = Dto::DynamoDb::GetItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
-                    //itemResponse.headers["Content-Length"] = itemResponse.body.length();
-                    if (itemResponse.status == http::status::ok) {
-                        return SendOkResponse(request, itemResponse.body, itemResponse.headers);
-                    }
-                    return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
+                    log_debug << "Get item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", response: " << itemResponse.ToJson();
+                    return SendOkResponse(request, itemResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
@@ -195,7 +186,8 @@ namespace AwsMock::Service {
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
-        } catch (...) {
+        } catch (boost::exception &exc) {
+            log_error << diagnostic_information(exc);
             return SendInternalServerError(request, "Unknown exception");
         }
     }
