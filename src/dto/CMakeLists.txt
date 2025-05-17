@@ -73,7 +73,7 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
 set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp
         src/dynamodb/DeleteTableResponse.cpp src/dynamodb/ListTableRequest.cpp
         src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp src/dynamodb/GetItemRequest.cpp
-        src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp
+        src/dynamodb/GetItemResponse.cpp
         src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp
         src/dynamodb/DeleteItemResponse.cpp src/dynamodb/DescribeTableRequest.cpp
         src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp

@@ -135,34 +135,46 @@ namespace AwsMock::Dto::DynamoDb {
       private:
 
         friend AttributeValue tag_invoke(boost::json::value_to_tag<AttributeValue>, boost::json::value const &v) {
-            AttributeValue r;
-            r.type = Core::Json::GetStringValue(v, "type");
-            r.stringValue = Core::Json::GetStringValue(v, "stringValue");
-            r.numberValue = Core::Json::GetStringValue(v, "numberValue");
-            r.boolValue = std::make_shared<bool>(Core::Json::GetBoolValue(v, "boolValue"));
-            r.nullValue = std::make_shared<bool>(Core::Json::GetBoolValue(v, "nullValue"));
-            if (Core::Json::AttributeExists(v, "stringSetValue")) {
-                r.stringSetValue = boost::json::value_to<std::vector<std::string>>(v.at("stringSetValue"));
-            }
-            if (Core::Json::AttributeExists(v, "numberSetValue")) {
-                r.numberSetValue = boost::json::value_to<std::vector<std::string>>(v.at("numberSetValue"));
+            AttributeValue r = {};
+            if (Core::Json::AttributeExists(v, "S")) {
+                r.type = "S";
+                r.stringValue = Core::Json::GetStringValue(v, "S");
+            } else if (Core::Json::AttributeExists(v, "SS")) {
+                r.type = "SS";
+                if (Core::Json::AttributeExists(v, "SS")) {
+                    r.stringSetValue = boost::json::value_to<std::vector<std::string>>(v.at("SS"));
+                }
+            } else if (Core::Json::AttributeExists(v, "N")) {
+                r.type = "N";
+                r.numberValue = Core::Json::GetStringValue(v, "N");
+            } else if (Core::Json::AttributeExists(v, "NS")) {
+                r.type = "NS";
+                if (Core::Json::AttributeExists(v, "NS")) {
+                    r.numberSetValue = boost::json::value_to<std::vector<std::string>>(v.at("NS"));
+                }
+            } else if (Core::Json::AttributeExists(v, "BOOL")) {
+                r.type = "BOOL";
+                r.boolValue = std::make_shared<bool>(Core::Json::GetBoolValue(v, "BOOL"));
+            } else if (Core::Json::AttributeExists(v, "NULL")) {
+                r.type = "NULL";
+                r.nullValue = std::make_shared<bool>(Core::Json::GetBoolValue(v, "NULL"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AttributeValue const &obj) {
-            jv = {
-                    {"type", obj.type},
-                    {"stringValue", obj.stringValue},
-                    {"numberValue", obj.numberValue},
-                    {"stringSetValue", boost::json::value_from(obj.stringSetValue)},
-                    {"numberSetValue", boost::json::value_from(obj.numberSetValue)},
-            };
-            if (obj.boolValue) {
-                jv.at("boolValue") = *obj.boolValue;
-            }
-            if (obj.nullValue) {
-                jv.at("nullValue") = *obj.nullValue;
+            if (obj.type == "S") {
+                jv = {{"S", obj.stringValue}};
+            } else if (obj.type == "N") {
+                jv = {{"N", obj.numberValue}};
+            } else if (obj.type == "SS") {
+                jv = {{"SS", boost::json::value_from(obj.stringSetValue)}};
+            } else if (obj.type == "NS") {
+                jv = {{"SS", boost::json::value_from(obj.numberSetValue)}};
+            } else if (obj.type == "Bool" && obj.boolValue) {
+                jv = {{"BOOL", *obj.boolValue}};
+            } else if (obj.type == "Bool" && obj.nullValue) {
+                jv = {{"NULL", *obj.nullValue}};
             }
         }
     };
