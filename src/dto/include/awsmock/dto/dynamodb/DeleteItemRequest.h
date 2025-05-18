@@ -9,9 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/Key.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -21,12 +20,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteItemRequest final : Common::BaseDto<DeleteItemRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct DeleteItemRequest final : Common::BaseCounter<DeleteItemRequest> {
 
         /**
          * Table name
@@ -36,31 +30,28 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Item key
          */
-        Key key;
+        std::map<std::string, AttributeValue> keys;
 
-        /**
-         * Original HTTP request body
-         */
-        std::string body;
+      private:
 
-        /**
-         * Original HTTP request headers
-         */
-        std::map<std::string, std::string> headers;
+        friend DeleteItemRequest tag_invoke(boost::json::value_to_tag<DeleteItemRequest>, boost::json::value const &v) {
+            DeleteItemRequest r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            if (Core::Json::AttributeExists(v, "Key")) {
+                for (boost::json::object keyObject = v.at("Key").as_object(); const auto &key: keyObject) {
+                    const auto value = boost::json::value_to<AttributeValue>(key.value());
+                    r.keys[key.key()] = value;
+                }
+            }
+            return r;
+        }
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteItemRequest const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+                    {"Key", boost::json::value_from(obj.keys)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

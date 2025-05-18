@@ -70,13 +70,8 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
-set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp
-        src/dynamodb/DeleteTableResponse.cpp src/dynamodb/ListTableRequest.cpp
-        src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp
-        src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp
-        src/dynamodb/DeleteItemResponse.cpp src/dynamodb/DescribeTableRequest.cpp
-        src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp
-        src/dynamodb/mapper/Mapper.cpp src/dynamodb/GetItemKey.cpp)
+set(DYNAMODB_SOURCES
+        src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp
         src/secretsmanager/DeleteSecretRequest.cpp src/secretsmanager/DeleteSecretResponse.cpp
         src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp

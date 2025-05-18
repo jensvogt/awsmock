@@ -10,14 +10,10 @@
 #include <string>
 
 // AwsMock includes
-#include "model/ReturnConsumedCapacity.h"
-
-
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/dynamodb/GetItemKey.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
+#include <awsmock/dto/dynamodb/model/ReturnConsumedCapacity.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -51,22 +47,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Consistent read
          */
-        bool consistentRead;
+        bool consistentRead = false;
 
         /**
          * Return consumed capacity
          */
-        ReturnConsumedCapacityType returnConsumedCapacity;
-
-        /**
-         * Original HTTP request body
-         */
-        //std::string body;
-
-        /**
-         * Original HTTP request headers
-         */
-        //std::map<std::string, std::string> headers;
+        ReturnConsumedCapacityType returnConsumedCapacity = ReturnConsumedCapacityType::NONE;
 
       private:
 
@@ -98,13 +84,13 @@ namespace AwsMock::Dto::DynamoDb {
             };
             if (!obj.projectionExpression.empty()) {
                 jv.at("ProjectionExpression") = obj.projectionExpression;
-            } /*else if (!obj.attributesToGet.empty()) {
+            } else if (!obj.attributesToGet.empty()) {
                 boost::json::array attributesToGetJson;
                 for (auto &a: obj.attributesToGet) {
                     attributesToGetJson.emplace_back(a);
                 }
-                jv.at("AttributesToGet") = attributesToGetJson;
-            }*/
+                jv.as_object()["AttributesToGet"] = attributesToGetJson;
+            }
         }
     };
 

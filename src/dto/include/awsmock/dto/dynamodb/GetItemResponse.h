@@ -48,18 +48,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Original HTTP response body
          */
-        std::string tableName;
-
-        /**
-         * Original HTTP response body
-         */
         Item item;
 
       private:
 
         friend GetItemResponse tag_invoke(boost::json::value_to_tag<GetItemResponse>, boost::json::value const &v) {
             GetItemResponse r;
-            r.tableName = Core::Json::GetStringValue(v, "TableName");
             if (Core::Json::AttributeExists(v, "Item")) {
                 r.item = boost::json::value_to<Item>(v.at("Item"));
             }
@@ -67,13 +61,11 @@ namespace AwsMock::Dto::DynamoDb {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemResponse const &obj) {
-            jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
-                    {"TableName", obj.tableName},
-                    {"Item", boost::json::value_from(obj.item.attributes)},
-            };
+            boost::json::object itemJson;
+            for (const auto &[fst, snd]: obj.item.attributes) {
+                itemJson[fst] = boost::json::value_from(snd);
+            }
+            jv = {{"Item", boost::json::value_from(obj.item.attributes)}};
         }
     };
 

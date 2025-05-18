@@ -10,42 +10,19 @@
 #include <string>
 #include <vector>
 
-// Boost include<
-#include <boost/beast.hpp>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    namespace http = boost::beast::http;
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB list table response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableResponse final : Common::BaseDto<ListTableResponse> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListTableResponse final : Common::BaseCounter<ListTableResponse> {
 
         /**
          * Table names
@@ -57,40 +34,21 @@ namespace AwsMock::Dto::DynamoDb {
          */
         std::string lastEvaluatedTableName;
 
-        /**
-         * HTTP response body
-         */
-        std::string body;
+      private:
 
-        /**
-         * HTTP headers
-         */
-        std::map<std::string, std::string> headers;
+        friend ListTableResponse tag_invoke(boost::json::value_to_tag<ListTableResponse>, boost::json::value const &v) {
+            ListTableResponse r;
+            r.tableNames = Core::Json::GetStringArrayValue(v, "TableNames");
+            r.lastEvaluatedTableName = Core::Json::GetStringValue(v, "LastEvaluatedTableName");
+            return r;
+        }
 
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
-
-        /**
-         * @brief Scans the response and fills in the attributes
-         */
-        void ScanResponse();
-
-        /**
-         * Parse a JSON stream
-         *
-         * @param body JSON body
-         * @param headers HTTP headers
-         */
-        void FromJson(const std::string &body, const std::map<std::string, std::string> &headers);
-
-        /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTableResponse const &obj) {
+            jv = {
+                    {"tableNames", boost::json::value_from(obj.tableNames)},
+                    {"lastEvaluatedTableName", obj.lastEvaluatedTableName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -10,9 +10,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -21,46 +21,26 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteTableRequest final : Common::BaseDto<DeleteTableRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct DeleteTableRequest final : Common::BaseCounter<DeleteTableRequest> {
 
         /**
          * Table name
          */
         std::string tableName;
 
-        /**
-         * Original HTTP request body
-         */
-        std::string body;
+      private:
 
-        /**
-         * Original HTTP request headers
-         */
-        std::map<std::string, std::string> headers;
+        friend DeleteTableRequest tag_invoke(boost::json::value_to_tag<DeleteTableRequest>, boost::json::value const &v) {
+            DeleteTableRequest r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            return r;
+        }
 
-        /**
-         * @brief Prepares the request to be sent to the DynamoDB container
-         */
-        void PrepareRequest();
-
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteTableRequest const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

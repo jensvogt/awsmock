@@ -75,19 +75,11 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend Item tag_invoke(boost::json::value_to_tag<Item>, boost::json::value const &v) {
             Item r;
-            //            r.oid = Core::Json::GetStringValue(v, "oid");
-            //            r.tableName = Core::Json::GetStringValue(v, "tableName");
             r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "attributes");
-            //r.keys = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "keys");
-
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Item const &obj) {
-            // boost::json::object jv_obj;
-            // for (const auto &[fst, snd]: obj.attributes) {
-            //     jv_obj.at(fst) = boost::json::value_from(snd);
-            // }
             jv = {{"Item", boost::json::value_from(obj.attributes)}};
         }
     };
