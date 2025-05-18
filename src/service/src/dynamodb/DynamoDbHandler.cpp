@@ -16,36 +16,18 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::CREATE_TABLE: {
 
-                    Dto::DynamoDb::CreateTableRequest tableRequest;
-                    tableRequest.FromJson(clientCommand.payload);
-                    tableRequest.region = clientCommand.region;
-                    tableRequest.requestId = clientCommand.requestId;
-                    tableRequest.user = clientCommand.user;
-                    tableRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::CreateTableRequest tableRequest = Dto::DynamoDb::CreateTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::CreateTableResponse tableResponse = _dynamoDbService.CreateTable(tableRequest);
-                    if (tableResponse.status == http::status::ok) {
-                        return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    }
-                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     log_info << "Table created, name: " << tableRequest.tableName;
+                    return SendOkResponse(request, tableResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::LIST_TABLES: {
 
-                    Dto::DynamoDb::ListTableRequest tableRequest;
-                    tableRequest.FromJson(clientCommand.payload);
-                    tableRequest.region = clientCommand.region;
-                    tableRequest.requestId = clientCommand.requestId;
-                    tableRequest.user = clientCommand.user;
-                    tableRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::ListTableRequest tableRequest = Dto::DynamoDb::ListTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::ListTableResponse tableResponse = _dynamoDbService.ListTables(tableRequest);
-                    if (tableResponse.status == http::status::ok) {
-                        return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    }
-                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
                     log_info << "Table listed, region: " << tableRequest.region;
+                    return SendOkResponse(request, tableResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::LIST_TABLE_COUNTERS: {
@@ -66,113 +48,57 @@ namespace AwsMock::Service {
 
                 case Dto::Common::DynamoDbCommandType::DESCRIBE_TABLE: {
 
-                    Dto::DynamoDb::DescribeTableRequest tableRequest;
-                    tableRequest.FromJson(clientCommand.payload);
-                    tableRequest.region = clientCommand.region;
-                    tableRequest.requestId = clientCommand.requestId;
-                    tableRequest.user = clientCommand.user;
-                    tableRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::DescribeTableRequest tableRequest = Dto::DynamoDb::DescribeTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::DescribeTableResponse tableResponse = _dynamoDbService.DescribeTable(tableRequest);
-                    log_debug << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
-                    if (tableResponse.status == http::status::ok) {
-                        return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    }
-                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
+                    log_debug << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName << ", response: " << tableResponse;
+                    return SendOkResponse(request, tableResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::DELETE_TABLE: {
 
-                    Dto::DynamoDb::DeleteTableRequest tableRequest;
-                    tableRequest.FromJson(clientCommand.payload);
-                    tableRequest.region = clientCommand.region;
-                    tableRequest.requestId = clientCommand.requestId;
-                    tableRequest.user = clientCommand.user;
-                    tableRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::DeleteTableRequest tableRequest = Dto::DynamoDb::DeleteTableRequest::FromJson(clientCommand);
                     Dto::DynamoDb::DeleteTableResponse tableResponse = _dynamoDbService.DeleteTable(tableRequest);
-                    log_debug << "Describe table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
-                    if (tableResponse.status == http::status::ok) {
-                        return SendOkResponse(request, tableResponse.body, tableResponse.headers);
-                    }
-                    return SendInternalServerError(request, tableResponse.body, tableResponse.headers);
+                    log_debug << "Delete table, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
+                    return SendOkResponse(request, tableResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::GET_ITEM: {
 
-                    Dto::DynamoDb::GetItemRequest itemRequest;
-                    itemRequest.FromJson(clientCommand.payload);
-                    itemRequest.region = clientCommand.region;
-                    itemRequest.requestId = clientCommand.requestId;
-                    itemRequest.user = clientCommand.user;
-                    itemRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::GetItemRequest itemRequest = Dto::DynamoDb::GetItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::GetItemResponse itemResponse = _dynamoDbService.GetItem(itemRequest);
-                    //itemResponse.headers["Content-Length"] = itemResponse.body.length();
-                    if (itemResponse.status == http::status::ok) {
-                        return SendOkResponse(request, itemResponse.body, itemResponse.headers);
-                    }
-                    return SendInternalServerError(request, itemResponse.body, itemResponse.headers);
+                    log_debug << "Get item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", response: " << itemResponse;
+                    return SendOkResponse(request, itemResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::PUT_ITEM: {
 
                     Dto::DynamoDb::PutItemRequest itemRequest = Dto::DynamoDb::PutItemRequest::FromJson(clientCommand);
-                    itemRequest.headers = clientCommand.headers;
-
                     Dto::DynamoDb::PutItemResponse itemResponse = _dynamoDbService.PutItem(itemRequest);
-                    if (itemResponse.status == http::status::ok) {
-                        return SendOkResponse(request, itemResponse.ToJson(), itemResponse.headers);
-                    }
-                    return SendInternalServerError(request, itemResponse.ToJson(), itemResponse.headers);
+                    log_debug << "Put item, region: " << itemRequest.region << ", tableName: " << itemRequest.tableName << ", response: " << itemResponse;
+                    return SendOkResponse(request, itemResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::QUERY: {
 
-                    Dto::DynamoDb::QueryRequest queryRequest;
-                    queryRequest.FromJson(clientCommand.payload);
-                    queryRequest.region = clientCommand.region;
-                    queryRequest.requestId = clientCommand.requestId;
-                    queryRequest.user = clientCommand.user;
-                    queryRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::QueryRequest queryRequest = Dto::DynamoDb::QueryRequest::FromJson(clientCommand);
                     Dto::DynamoDb::QueryResponse queryResponse = _dynamoDbService.Query(queryRequest);
-                    if (queryResponse.status == http::status::ok) {
-                        return SendOkResponse(request, queryResponse.body, queryResponse.headers);
-                    }
-                    return SendInternalServerError(request, queryResponse.body, queryResponse.headers);
+                    log_debug << "Query, region: " << queryRequest.region << ", tableName: " << queryRequest.tableName << ", response: " << queryResponse.ToJson();
+                    return SendOkResponse(request, queryResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::SCAN: {
 
-                    Dto::DynamoDb::ScanRequest scanRequest;
-                    scanRequest.FromJson(clientCommand.payload);
-                    scanRequest.region = clientCommand.region;
-                    scanRequest.requestId = clientCommand.requestId;
-                    scanRequest.user = clientCommand.user;
-                    scanRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::ScanRequest scanRequest = Dto::DynamoDb::ScanRequest::FromJson(clientCommand);
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
-                    if (scanResponse.status == http::status::ok) {
-                        return SendOkResponse(request, scanResponse.body, scanResponse.headers);
-                    }
-                    return SendInternalServerError(request, scanResponse.body, scanResponse.headers);
+                    log_debug << "Scan, region: " << scanRequest.region << ", tableName: " << scanRequest.tableName << ", response: " << scanResponse.ToJson();
+                    return SendOkResponse(request, scanResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::DELETE_ITEM: {
 
-                    Dto::DynamoDb::DeleteItemRequest dynamoDbRequest;
-                    dynamoDbRequest.FromJson(clientCommand.payload);
-                    dynamoDbRequest.region = clientCommand.region;
-                    dynamoDbRequest.requestId = clientCommand.requestId;
-                    dynamoDbRequest.user = clientCommand.user;
-                    dynamoDbRequest.headers = clientCommand.headers;
-
+                    Dto::DynamoDb::DeleteItemRequest dynamoDbRequest = Dto::DynamoDb::DeleteItemRequest::FromJson(clientCommand);
                     Dto::DynamoDb::DeleteItemResponse dynamoDbResponse = _dynamoDbService.DeleteItem(dynamoDbRequest);
-                    if (dynamoDbResponse.status == http::status::ok) {
-                        return SendOkResponse(request, dynamoDbResponse.body, dynamoDbResponse.headers);
-                    }
-                    return SendInternalServerError(request, dynamoDbResponse.body, dynamoDbResponse.headers);
+                    return SendOkResponse(request, dynamoDbResponse.ToJson());
                 }
 
                 case Dto::Common::DynamoDbCommandType::UNKNOWN: {
@@ -186,6 +112,9 @@ namespace AwsMock::Service {
                 }
             }
 
+        } catch (Core::BadRequestException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
@@ -195,7 +124,8 @@ namespace AwsMock::Service {
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
-        } catch (...) {
+        } catch (boost::exception &exc) {
+            log_error << diagnostic_information(exc);
             return SendInternalServerError(request, "Unknown exception");
         }
     }

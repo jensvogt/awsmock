@@ -10,10 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -22,12 +20,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListTableRequest final : Common::BaseDto<ListTableRequest> {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct ListTableRequest final : Common::BaseCounter<ListTableRequest> {
 
         /**
          * The first table name that this operation will evaluate. Use the value that was returned for LastEvaluatedTableName
@@ -38,38 +31,26 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Limit, default is 100
          */
-        int limit = 100;
+        long limit = 100;
 
-        /**
-         * Original HTTP request body
-         */
-        std::string body;
+      private:
 
-        /**
-         * Original HTTP request headers
-         */
-        std::map<std::string, std::string> headers;
+        friend ListTableRequest tag_invoke(boost::json::value_to_tag<ListTableRequest>, boost::json::value const &v) {
+            ListTableRequest r;
+            r.exclusiveStartTableName = Core::Json::GetStringValue(v, "ExclusiveStartTableName");
+            r.limit = Core::Json::GetBoolValue(v, "Limit");
+            return r;
+        }
 
-        /**
-         * @brief Prepares the request to be sent to the DynamoDB container
-         */
-        void PrepareRequest();
-
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTableRequest const &obj) {
+            jv = {
+                    {"Limit", obj.limit},
+            };
+            if (!obj.exclusiveStartTableName.empty()) {
+                jv.as_object()["ExclusiveStartTableName"] = obj.exclusiveStartTableName;
+            }
+        }
     };
-
 }// namespace AwsMock::Dto::DynamoDb
 
 #endif// AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H

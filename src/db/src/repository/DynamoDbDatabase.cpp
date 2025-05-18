@@ -329,8 +329,8 @@ namespace AwsMock::Database {
                 }
 
                 // Add primary keys
-                for (const auto &fst: table.keySchemas | std::views::keys) {
-                    std::string keyName = fst;
+                for (const auto &k: table.keySchemas) {
+                    std::string keyName = k.at("AttributeName");
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
                     auto it = std::ranges::find_if(att,
                                                    [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
@@ -482,8 +482,8 @@ namespace AwsMock::Database {
                 }
 
                 // Add primary keys
-                for (const auto &key: table.keySchemas | std::views::keys) {
-                    const std::string &keyName = key;
+                for (const auto &key: table.keySchemas) {
+                    const std::string &keyName = key.at("AttributeName");
                     std::map<std::string, Entity::DynamoDb::AttributeValue> att = item.attributes;
                     auto it = std::ranges::find_if(att,
                                                    [keyName](const std::pair<std::string, Entity::DynamoDb::AttributeValue> &attribute) {
@@ -491,16 +491,16 @@ namespace AwsMock::Database {
                                                    });
                     if (it != att.end()) {
                         if (!it->second.stringValue.empty()) {
-                            query.append(kvp("attributes." + key + ".S", it->second.stringValue));
+                            query.append(kvp("attributes." + keyName + ".S", it->second.stringValue));
                         }
                         if (!it->second.numberValue.empty()) {
-                            query.append(kvp("attributes." + key + ".N", it->second.numberValue));
+                            query.append(kvp("attributes." + keyName + ".N", it->second.numberValue));
                         }
                         if (it->second.boolValue) {
-                            query.append(kvp("attributes." + key + ".BOOL", *it->second.boolValue));
+                            query.append(kvp("attributes." + keyName + ".BOOL", *it->second.boolValue));
                         }
                         if (it->second.nullValue && it->second.nullValue) {
-                            query.append(kvp("attributes." + key + ".nullptr", *it->second.nullValue));
+                            query.append(kvp("attributes." + keyName + ".nullptr", *it->second.nullValue));
                         }
                     }
                 }
@@ -580,7 +580,7 @@ namespace AwsMock::Database {
                     } else if (snd.boolValue) {
                         query.append(kvp(fst + "BOOL", *snd.boolValue));
                     } else if (snd.nullValue && *snd.nullValue) {
-                        query.append(kvp(fst + "nullptr", *snd.nullValue));
+                        query.append(kvp(fst + "NULL", *snd.nullValue));
                     }
                 }
                 const auto result = _itemCollection.delete_one(make_document(kvp("tableName", tableName)));

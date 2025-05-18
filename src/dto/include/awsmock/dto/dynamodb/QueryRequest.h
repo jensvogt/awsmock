@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -20,41 +21,29 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueryRequest final : Common::BaseDto<QueryRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct QueryRequest final : Common::BaseCounter<QueryRequest> {
 
         /**
          * Table name
          */
         std::string tableName;
 
-        /**
-         * Original HTTP request body
-         */
-        std::string body;
+      private:
 
-        /**
-         * Original HTTP request headers
-         */
-        std::map<std::string, std::string> headers;
+        friend QueryRequest tag_invoke(boost::json::value_to_tag<QueryRequest>, boost::json::value const &v) {
+            QueryRequest r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            return r;
+        }
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueryRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"TableName", obj.tableName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb
