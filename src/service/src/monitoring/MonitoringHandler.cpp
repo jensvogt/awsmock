@@ -14,7 +14,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::MonitoringCommandType::GET_COUNTERS: {
 
-                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
+                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand);
                     const Dto::Monitoring::GetCountersResponse response = _monitoringService.GetCounters(monitoringRequest);
 
                     log_debug << "Get counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
@@ -23,7 +23,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::MonitoringCommandType::GET_MULTI_COUNTERS: {
 
-                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand.payload);
+                    const Dto::Monitoring::GetCountersRequest monitoringRequest = Dto::Monitoring::GetCountersRequest::FromJson(clientCommand);
                     const Dto::Monitoring::GetMultiCountersResponse response = _monitoringService.GetMultiCounters(monitoringRequest);
 
                     log_debug << "Get multiple counters, name: " << monitoringRequest.name << " count: " << response.counters.size();
