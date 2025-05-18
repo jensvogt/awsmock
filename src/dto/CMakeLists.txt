@@ -70,8 +70,7 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
-set(DYNAMODB_SOURCES
-        src/dynamodb/mapper/Mapper.cpp)
+set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp
         src/secretsmanager/DeleteSecretRequest.cpp src/secretsmanager/DeleteSecretResponse.cpp
         src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
@@ -91,8 +90,8 @@ set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cp
         src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
         src/module/ImportInfrastructureRequest.cpp)
-set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp
-        src/monitoring/GetMultiCountersResponse.cpp)
+set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp
+)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}

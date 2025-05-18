@@ -6,14 +6,11 @@
 #define AWSMOCK_DTO_MONITORING_GET_COUNTERS_RESPONSE_H
 
 // C++ standard includes
-#include <string>
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/entity/monitoring/Counter.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/monitoring/Counter.h>
 
 namespace AwsMock::Dto::Monitoring {
 
@@ -22,33 +19,25 @@ namespace AwsMock::Dto::Monitoring {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetCountersResponse {
+    struct GetCountersResponse final : Common::BaseCounter<GetCountersResponse> {
 
         /**
          * Counters
          */
-        std::vector<Database::Entity::Monitoring::Counter> counters;
+        std::vector<Counter> counters;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetCountersResponse const &obj) {
+            boost::json::array countersJson;
+            for (const auto &c: obj.counters) {
+                boost::json::array v;
+                v.emplace_back(Core::DateTimeUtils::ToISO8601(c.timestamp));
+                v.emplace_back(c.performanceValue);
+                countersJson.emplace_back(v);
+            }
+            jv = {{"counters", countersJson}};
+        }
     };
 
 }// namespace AwsMock::Dto::Monitoring

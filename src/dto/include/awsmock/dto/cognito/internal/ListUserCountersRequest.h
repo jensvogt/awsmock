@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
-#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::Cognito {
 
