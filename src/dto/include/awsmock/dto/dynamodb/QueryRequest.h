@@ -10,9 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
