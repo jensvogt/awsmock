@@ -241,15 +241,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::CREATE_GROUP: {
-                    Dto::Cognito::CreateGroupRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got create group request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::CreateGroupRequest cognitoRequest = Dto::Cognito::CreateGroupRequest::FromJson(clientCommand);
                     Dto::Cognito::CreateGroupResponse serviceResponse = _cognitoService.CreateGroup(cognitoRequest);
                     log_info << "Group created, group: " << serviceResponse.group;
 
@@ -289,15 +282,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_REMOVE_USER_FROM_GROUP: {
-                    Dto::Cognito::AdminRemoveUserFromGroupRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Remove user from group request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::AdminRemoveUserFromGroupRequest cognitoRequest = Dto::Cognito::AdminRemoveUserFromGroupRequest::FromJson(clientCommand);
                     _cognitoService.AdminRemoveUserFromGroup(cognitoRequest);
                     log_info << "Remove user from group, userPoolId: " << cognitoRequest.userPoolId;
 

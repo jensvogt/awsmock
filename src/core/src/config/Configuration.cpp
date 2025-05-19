@@ -179,6 +179,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.monitoring.internal", "AWSMOCK_MONITORING_INTERN", true);
         DefineProperty<int>("awsmock.monitoring.retention", "AWSMOCK_MONITORING_RETENTION", 3);
         DefineProperty<bool>("awsmock.monitoring.smooth", "AWSMOCK_MONITORING_SMOOTH", false);
+        DefineProperty<int>("awsmock.monitoring.average", "AWSMOCK_MONITORING_AVERAGE", 300);
 
         // Database
         DefineProperty<bool>("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);

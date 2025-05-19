@@ -50,27 +50,27 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Attributes
          */
-        std::map<std::string, std::string> attributes;
+        std::vector<std::map<std::string, std::string>> attributes;
 
         /**
          * Key schemas
          */
-        std::map<std::string, std::string> keySchemas;
+        std::vector<std::map<std::string, std::string>> keySchemas;
 
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::vector<std::map<std::string, std::string>> tags;
 
         /**
          * Item count
          */
-        long itemCount;
+        long itemCount{};
 
         /**
          * Size in bytes
          */
-        long size;
+        long size{};
 
         /**
          * Provisioned throughput

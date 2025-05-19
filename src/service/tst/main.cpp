@@ -32,6 +32,7 @@ class TestEnvironment final : public testing::Environment {
         AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
         AwsMock::Database::TestUtils::CreateServices();
         AwsMock::Core::LogStream::SetSeverity("error");
+        AwsMock::Core::LogStream::RemoveConsoleLogs();
 
         // As Awsmock is not running under root set shared memory permissions
         boost::interprocess::permissions unrestricted_permissions;

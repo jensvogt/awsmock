@@ -5,28 +5,18 @@
 #ifndef AWSMOCK_SERVICE_MONITORING_SERVICE_H
 #define AWSMOCK_SERVICE_MONITORING_SERVICE_H
 
-// C++ standard includes
-#include <string>
-
-// Boost includes
-#include <boost/iostreams/copy.hpp>
-#include <boost/thread/thread.hpp>
-
 // AwsMock includes
-#include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/MemoryMappedFile.h>
-#include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/monitoring/GetCountersRequest.h>
 #include <awsmock/dto/monitoring/GetCountersResponse.h>
 #include <awsmock/dto/monitoring/GetMultiCountersResponse.h>
+#include <awsmock/dto/monitoring/mapper/Mapper.h>
 #include <awsmock/repository/MonitoringDatabase.h>
 
 namespace AwsMock::Service {
 
     /**
-     * @brief S3 service.
+     * @brief Monitoring service.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -37,7 +27,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()){};
+        explicit MonitoringService() : _database(Database::MonitoringDatabase::instance()) {};
 
         /**
          * @brief Get counters request
@@ -49,10 +39,10 @@ namespace AwsMock::Service {
         Dto::Monitoring::GetCountersResponse GetCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 
         /**
-         * @brief Returns deveral series of counters in a map
+         * @brief Returns several series of counters in a map
          *
-         * @param request monitoring counter request
-         * @return map of counter objects
+         * @param request monitoring counters request
+         * @return map of counter-objects
          */
         Dto::Monitoring::GetMultiCountersResponse GetMultiCounters(const Dto::Monitoring::GetCountersRequest &request) const;
 

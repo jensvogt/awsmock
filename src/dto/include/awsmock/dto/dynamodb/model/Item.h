@@ -39,17 +39,12 @@ namespace AwsMock::Dto::DynamoDb {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Item final : Dto::Common::BaseCounter<Item> {
+    struct Item final : Common::BaseCounter<Item> {
 
         /**
          * ID
          */
         std::string oid;
-
-        /**
-         * AWS region name
-         */
-        std::string region;
 
         /**
          * Table name
@@ -80,21 +75,12 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend Item tag_invoke(boost::json::value_to_tag<Item>, boost::json::value const &v) {
             Item r;
-            r.oid = v.at("oid").as_string();
-            r.tableName = v.at("tableName").as_string();
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
-            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
-
+            r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "attributes");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Item const &obj) {
-            jv = {
-                    {"oid", obj.oid},
-                    {"tableName", obj.tableName},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-            };
+            jv = {{"Item", boost::json::value_from(obj.attributes)}};
         }
     };
 

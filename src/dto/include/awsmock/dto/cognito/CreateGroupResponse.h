@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/Group.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -36,19 +34,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateGroupResponse final : Common::BaseDto<CreateGroupResponse> {
+    struct CreateGroupResponse final : Common::BaseCounter<CreateGroupResponse> {
 
         /**
          * Group
          */
         Group group;
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend CreateGroupResponse tag_invoke(boost::json::value_to_tag<CreateGroupResponse>, boost::json::value const &v) {
+            CreateGroupResponse r;
+            r.group = boost::json::value_to<Group>(v, "group");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateGroupResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", boost::json::value_from(obj.group)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

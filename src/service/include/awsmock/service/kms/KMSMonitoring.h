@@ -21,7 +21,6 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class KMSMonitoring {
-
       public:
 
         /**

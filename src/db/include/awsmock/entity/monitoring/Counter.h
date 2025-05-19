@@ -8,24 +8,11 @@
 // C++ includes
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
-
 // AwsMock includes
-#include "awsmock/core/BsonUtils.h"
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Database::Entity::Monitoring {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     struct Counter {
 

@@ -27,12 +27,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Number of objects keys
          */
-        long items;
+        long items{};
 
         /**
          * Bucket size in bytes
          */
-        long size;
+        long size{};
 
         /**
          * Create timestamp
@@ -48,9 +48,9 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend TableCounter tag_invoke(boost::json::value_to_tag<TableCounter>, boost::json::value const &v) {
             TableCounter r;
-            r.tableName = v.at("tableName").as_string();
-            r.items = v.at("items").as_int64();
-            r.size = v.at("pageSize").as_int64();
+            r.tableName = Core::Json::GetStringValue(v, "tableName");
+            r.items = Core::Json::GetLongValue(v, "items");
+            r.size = Core::Json::GetLongValue(v, "pageSize");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 

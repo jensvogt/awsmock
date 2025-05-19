@@ -137,7 +137,7 @@ namespace AwsMock::Service {
                 moduleRequest.FromJson(payload);
 
                 // Get modules
-                Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
+                const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
                 if (moduleResponse.ToJson().length() > 100000000) {
                     log_error << "Response > 10MB";
                     return SendBadRequestError(request, "Size > 100 MB.");
@@ -145,6 +145,9 @@ namespace AwsMock::Service {
                 return SendOkResponse(request, moduleResponse.ToJson());
             }
             return SendBadRequestError(request, "Unknown action");
+        } catch (Core::JsonException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());

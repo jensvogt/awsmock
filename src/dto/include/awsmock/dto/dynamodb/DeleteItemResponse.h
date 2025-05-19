@@ -12,11 +12,12 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include "model/AttributeValue.h"
+
+
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -37,46 +38,42 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteItemResponse final : Common::BaseDto<DeleteItemResponse> {
+    struct DeleteItemResponse final : Common::BaseCounter<DeleteItemResponse> {
 
         /**
-         * Region
+         * Item array
          */
-        std::string region;
+        std::vector<std::map<std::string, AttributeValue>> attributes;
 
-        /**
-         * Table name
-         */
-        std::string tableName;
+      private:
 
-        /**
-         * Original HTTP response body
-         */
-        std::string body;
+        friend DeleteItemResponse tag_invoke(boost::json::value_to_tag<DeleteItemResponse>, boost::json::value const &v) {
+            DeleteItemResponse r;
+            if (Core::Json::AttributeExists(v, "Attributes")) {
+                for (boost::json::array itemsJson = v.at("Attributes").as_array(); auto &item: itemsJson) {
+                    std::map<std::string, AttributeValue> itemMap;
+                    for (auto &attribute: item.as_object()) {
+                        itemMap[attribute.key()] = boost::json::value_to<AttributeValue>(attribute.value());
+                    }
+                    r.attributes.push_back(itemMap);
+                }
+            }
+            return r;
+        }
 
-        /**
-         * HTTP response headers
-         */
-        std::map<std::string, std::string> headers;
-
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
-
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteItemResponse const &obj) {
+            if (!obj.attributes.empty()) {
+                boost::json::array itemsJson;
+                for (const auto &a: obj.attributes) {
+                    boost::json::object itemJson;
+                    for (const auto &[fst, snd]: a) {
+                        itemJson[fst] = boost::json::value_from(snd);
+                    }
+                    itemsJson.emplace_back(itemJson);
+                }
+                jv.as_object()["Attributes"] = itemsJson;
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

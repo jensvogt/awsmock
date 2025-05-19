@@ -133,7 +133,7 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            MetricService::instance().SetGauge(TOTAL_THREADS, std::stod(tokens[19]));
+            MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, std::stod(tokens[19]));
             log_trace << "Total threads: " << std::stol(tokens[22]);
         }
         ifs.close();
@@ -252,7 +252,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricSystemCollector::GetThreadInfoWin32() {
-        MetricService::instance().SetGauge(TOTAL_THREADS, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
+        MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
     }
 
     long long MetricSystemCollector::GetPerformanceValue(const std::string &counter) {

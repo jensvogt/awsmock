@@ -8,19 +8,13 @@
 // C++ standard includes
 #include <string>
 
-// Boost include<
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    namespace http = boost::beast::http;
 
     /**
      * @brief Put item response
@@ -38,12 +32,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PutItemResponse final : Common::BaseDto<PutItemResponse> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct PutItemResponse final : Common::BaseCounter<PutItemResponse> {
 
         /**
          * Table name
@@ -63,21 +52,21 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * HTTP status from docker image
          */
-        http::status status;
+        boost::beast::http::status status = boost::beast::http::status::unknown;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend PutItemResponse tag_invoke(boost::json::value_to_tag<PutItemResponse>, boost::json::value const &v) {
+            PutItemResponse r{};
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutItemResponse const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

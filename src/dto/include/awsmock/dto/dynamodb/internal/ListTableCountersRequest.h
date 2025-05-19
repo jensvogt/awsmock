@@ -34,12 +34,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Page size
          */
-        int pageSize;
+        long pageSize = 10;
 
         /**
          * Page index
          */
-        int pageIndex;
+        long pageIndex = 0;
 
         /**
          * Page index

@@ -8,31 +8,20 @@
 // C++ standard includes
 #include <string>
 
-// Boost include<
-#include <boost/beast.hpp>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    namespace http = boost::beast::http;
 
     /**
      * @brief DynamoDB delete table response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteTableResponse final : Common::BaseDto<DeleteTableResponse> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct DeleteTableResponse final : Common::BaseCounter<DeleteTableResponse> {
 
         /**
          * Table name
@@ -57,47 +46,39 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Table status
          */
-        TableStatusType tableStatus;
+        TableStatusType tableStatus = TableStatusType::UNKNOWN;
 
         /**
          * Item count
          */
-        long itemCount;
+        long itemCount{};
 
         /**
          * Table size in bytes
          */
-        long size;
+        long size{};
 
-        /**
-         * HTTP response body
-         */
-        std::string body;
+      private:
 
-        /**
-         * HTTP response headers
-         */
-        std::map<std::string, std::string> headers;
+        friend DeleteTableResponse tag_invoke(boost::json::value_to_tag<DeleteTableResponse>, boost::json::value const &v) {
+            DeleteTableResponse r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            r.tableId = Core::Json::GetStringValue(v, "TableId");
+            r.tableArn = Core::Json::GetStringValue(v, "TableArn");
+            r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(v, "ProvisionedThroughput");
+            r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(v, "TableStatus"));
+            return r;
+        }
 
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
-
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param body JSON body
-         * @param headerMap map of headers
-         */
-        void FromJson(const std::string &body, const std::map<std::string, std::string> &headerMap);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteTableResponse const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+                    {"TableId", obj.tableId},
+                    {"TableArn", obj.tableArn},
+                    {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
+                    {"TableStatus", TableStatusTypeToString(obj.tableStatus)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

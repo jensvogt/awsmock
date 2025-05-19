@@ -6,7 +6,7 @@
 #define AWSMOCK_DTO_MODULE_MAPPER_H
 
 // AwsMock includes
-#include "awsmock/dto/module/model/Module.h"
+#include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
 
 namespace AwsMock::Dto::Module {
@@ -26,7 +26,7 @@ namespace AwsMock::Dto::Module {
          * @param moduleList module entity list
          * @return module DTO list
          */
-        static Dto::Module::Module::ModuleList map(const std::vector<Database::Entity::Module::Module> &moduleList);
+        static Module::ModuleList map(const std::vector<Database::Entity::Module::Module> &moduleList);
     };
 
 }// namespace AwsMock::Dto::Module

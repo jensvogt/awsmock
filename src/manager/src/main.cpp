@@ -164,8 +164,8 @@ int main(const int argc, char *argv[]) {
     boost::program_options::options_description desc("Options");
     desc.add_options()("help", "produce help message");
     desc.add_options()("version", "application version");
+    desc.add_options()("loglevel", boost::program_options::value<std::string>(), "set log level");
     desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "set configuration file");
-    desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_LEVEL), "set log level");
     desc.add_options()("logfile", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_PREFIX), "set log file");
 #ifdef _WIN32
     desc.add_options()("foreground", "run as foreground process");

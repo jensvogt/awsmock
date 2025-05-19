@@ -43,6 +43,7 @@
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListLambdaArnsResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
@@ -300,6 +301,14 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::ListEventSourceMappingsResponse
          */
         Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
+
+        /**
+         * @brief Returns a list of all available functions ARNs
+         *
+         * @return ListLambdaArnsResponse
+         * @see ListLambdaArnsResponse
+         */
+        [[nodiscard]] Dto::Lambda::ListLambdaArnsResponse ListLambdaArns() const;
 
         /**
          * @brief Starts the lambda function by starting a docker container
