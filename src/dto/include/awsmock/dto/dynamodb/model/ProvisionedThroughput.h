@@ -38,12 +38,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Last decrease time
          */
-        system_clock::time_point lastDecreaseDateTime;
+        system_clock::time_point lastDecreaseDateTime = system_clock::now();
 
         /**
          * Last increase time
          */
-        system_clock::time_point lastIncreaseDateTime;
+        system_clock::time_point lastIncreaseDateTime = system_clock::now();
 
         /**
          * NUmber of decreases
@@ -81,8 +81,8 @@ namespace AwsMock::Dto::DynamoDb {
             r.readCapacityUnits = Core::Json::GetLongValue(v, "ReadCapacityUnits", 1);
             r.writeCapacityUnits = Core::Json::GetLongValue(v, "WriteCapacityUnits", 1);
             r.numberOfDecreasesToday = Core::Json::GetLongValue(v, "NumberOfDecreasesToday");
-            r.lastDecreaseDateTime = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "LastDecreaseDateTime"));
-            r.lastIncreaseDateTime = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "LastIncreaseDateTime"));
+            r.lastDecreaseDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(v, "LastDecreaseDateTime"));
+            r.lastIncreaseDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(v, "LastIncreaseDateTime"));
             return r;
         }
 
@@ -91,8 +91,8 @@ namespace AwsMock::Dto::DynamoDb {
                     {"ReadCapacityUnits", boost::json::value_from(obj.readCapacityUnits)},
                     {"WriteCapacityUnits", boost::json::value_from(obj.writeCapacityUnits)},
                     {"NumberOfDecreasesToday", boost::json::value_from(obj.numberOfDecreasesToday)},
-                    {"LastDecreaseDateTime", Core::DateTimeUtils::ToISO8601(obj.lastDecreaseDateTime)},
-                    {"LastIncreaseDateTime", Core::DateTimeUtils::ToISO8601(obj.lastIncreaseDateTime)},
+                    {"LastDecreaseDateTime", Core::DateTimeUtils::UnixTimestamp(obj.lastDecreaseDateTime)},
+                    {"LastIncreaseDateTime", Core::DateTimeUtils::UnixTimestamp(obj.lastIncreaseDateTime)},
             };
         }
     };
