@@ -51,17 +51,15 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/intern/ListLambdaEnvironmentCountersResponse.cpp src/lambda/intern/AddFunctionEnvironmentRequest.cpp src/lambda/intern/DeleteFunctionEnvironmentRequest.cpp
         src/lambda/intern/UpdateFunctionEnvironmentRequest.cpp src/lambda/intern/StartFunctionRequest.cpp src/lambda/intern/StopFunctionRequest.cpp src/lambda/intern/DeleteImageRequest.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
-        src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/common/CognitoClientCommand.cpp src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp
         src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/CustomSmsSender.cpp
-        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp
-        src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp
+        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp
         src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp
         src/cognito/DescribeUserPoolRequest.cpp
         src/cognito/DescribeUserPoolResponse.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
         src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthRequest.cpp
         src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp
-        src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DeleteUserPoolClientRequest.cpp src/cognito/DescribeUserPoolClientRequest.cpp
+        src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DescribeUserPoolClientRequest.cpp
         src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
         src/cognito/UpdateUserPoolDomainRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp
         src/cognito/DescribeUserPoolDomainRequest.cpp src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp

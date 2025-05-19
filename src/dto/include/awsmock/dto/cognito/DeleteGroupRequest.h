@@ -9,9 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -20,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteGroupRequest final : Common::BaseDto<DeleteGroupRequest> {
+    struct DeleteGroupRequest final : Common::BaseCounter<DeleteGroupRequest> {
 
         /**
          * Group name
@@ -32,19 +32,24 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string userPoolId;
 
-        /**
-         * Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend DeleteGroupRequest tag_invoke(boost::json::value_to_tag<DeleteGroupRequest>, boost::json::value const &v) {
+            DeleteGroupRequest r;
+            r.groupName = Core::Json::GetStringValue(v, "GroupName");
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteGroupRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"GroupName", obj.groupName},
+                    {"UserPoolId", obj.userPoolId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
