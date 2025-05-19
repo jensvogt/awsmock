@@ -9,17 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include "model/AttributeValue.h"
-
-
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    namespace http = boost::beast::http;
 
     /**
      * @brief Query request

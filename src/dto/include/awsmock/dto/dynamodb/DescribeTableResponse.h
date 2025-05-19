@@ -122,7 +122,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.itemCount = Core::Json::GetLongValue(tableObject, "ItemCount");
                 r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(tableObject, "ProvisionedThroughput");
                 r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(tableObject, "TableStatus"));
-                r.createdDateTime = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(tableObject, "CreatedDateTime"));
+                r.createdDateTime = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(tableObject, "CreatedDateTime"));
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
                     r.tags = boost::json::value_to<std::map<std::string, std::string>>(tableObject, "Tags");
                 }
@@ -156,7 +156,7 @@ namespace AwsMock::Dto::DynamoDb {
                     {"ItemCount", obj.itemCount},
                     {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
                     {"TableStatus", TableStatusTypeToString(obj.tableStatus)},
-                    {"CreatedDateTime", Core::DateTimeUtils::ToISO8601(obj.createdDateTime)},
+                    {"CreatedDateTime", Core::DateTimeUtils::UnixTimestamp(obj.createdDateTime)},
             };
             if (!obj.tags.empty()) {
                 tableObject["Tags"] = boost::json::value_from(obj.tags);
