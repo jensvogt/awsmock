@@ -10,7 +10,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -25,7 +27,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomDomainConfig {
+    struct CustomDomainConfig final : Common::BaseCounter<CustomDomainConfig> {
 
         /**
          * CertificateArn
@@ -65,6 +67,23 @@ namespace AwsMock::Dto::Cognito {
                 log_error << exc.what();
                 throw Core::JsonException(exc.what());
             }
+        }
+
+      private:
+
+        friend CustomDomainConfig tag_invoke(boost::json::value_to_tag<CustomDomainConfig>, boost::json::value const &v) {
+            CustomDomainConfig r;
+            r.certificateArn = Core::Json::GetStringValue(v, "CertificateArn");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CustomDomainConfig const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"CertificateArn", obj.certificateArn},
+            };
         }
     };
 
