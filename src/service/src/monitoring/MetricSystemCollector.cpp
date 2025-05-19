@@ -156,7 +156,7 @@ namespace AwsMock::Monitoring {
         if (res != KERN_SUCCESS) {
             return;
         }
-        MetricService::instance().SetGauge(TOTAL_THREADS, numberOfThreads);
+        MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, numberOfThreads);
         log_trace << "Total Threads: " << numberOfThreads;
     }
 

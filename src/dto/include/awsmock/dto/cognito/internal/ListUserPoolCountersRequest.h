@@ -45,7 +45,7 @@ namespace AwsMock::Dto::Cognito {
 
         friend ListUserPoolCountersRequest tag_invoke(boost::json::value_to_tag<ListUserPoolCountersRequest>, boost::json::value const &v) {
             ListUserPoolCountersRequest r;
-            r.prefix = Core::Json::GetStringValue(v, "pageSize");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
             if (Core::Json::AttributeExists(v, "sortColumns")) {

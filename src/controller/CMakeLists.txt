@@ -35,6 +35,10 @@ else ()
         target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
                 ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
     endif ()
+    if (APPLE)
+        add_link_options("-rpath /usr/local/awsmock/lib")
+        set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")
+    endif ()
 endif ()
 
 install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

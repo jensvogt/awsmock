@@ -9,10 +9,10 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/CustomDomainConfig.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -34,7 +34,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateUserPoolDomainRequest final : Common::BaseDto<CreateUserPoolDomainRequest> {
+    struct CreateUserPoolDomainRequest final : Common::BaseCounter<CreateUserPoolDomainRequest> {
 
         /**
          * Name of the user pool domain
