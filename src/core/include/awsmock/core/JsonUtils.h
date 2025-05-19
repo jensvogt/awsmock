@@ -54,21 +54,21 @@ namespace AwsMock::Core::Json {
 
     inline bool GetBoolValue(const boost::json::value &value, const std::string &name) {
         if (AttributeExists(value, name)) {
-            return value.at("name").as_bool();
+            return value.at(name).as_bool();
         }
         return false;
     }
 
     inline float GetFloatValue(const boost::json::value &value, const std::string &name) {
         if (AttributeExists(value, name)) {
-            return static_cast<float>(value.at("name").as_double());
+            return static_cast<float>(value.at(name).as_double());
         }
         return 0.0;
     }
 
     inline double GetDoubleValue(const boost::json::value &value, const std::string &name) {
         if (AttributeExists(value, name)) {
-            return value.at("name").as_double();
+            return value.at(name).as_double();
         }
         return 0.0;
     }

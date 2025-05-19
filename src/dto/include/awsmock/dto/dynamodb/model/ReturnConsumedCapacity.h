@@ -5,14 +5,6 @@
 #ifndef AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H
 #define AWSMOCK_DTO_DYNAMODB_RETURN_CONSUMED_CAPACITY_H
 
-// C++ includes
-#include <map>
-#include <string>
-
-// AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/s3/model/Owner.h>
-
 namespace AwsMock::Dto::DynamoDb {
 
     /**

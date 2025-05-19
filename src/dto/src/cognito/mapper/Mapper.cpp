@@ -185,16 +185,16 @@ namespace AwsMock::Dto::Cognito {
         tokenValidityUnits.refreshToken = GetMaxTokenUnits(clientEntity.refreshTokenValidity);
         tokenValidityUnits.idToken = GetMaxTokenUnits(clientEntity.idTokenValidity);
 
-        UserPoolClient userPoolClient = {
-                .userPoolId = clientEntity.userPoolId,
-                .clientId = clientEntity.clientId,
-                .clientName = clientEntity.clientName,
-                .clientSecret = clientEntity.clientSecret,
-                .accessTokenValidity = GetMaxValidityToken(clientEntity.accessTokenValidity, tokenValidityUnits.accessToken),
-                .idTokenValidity = GetMaxValidityToken(clientEntity.idTokenValidity, tokenValidityUnits.idToken),
-                .refreshTokenValidity = GetMaxValidityToken(clientEntity.refreshTokenValidity, tokenValidityUnits.refreshToken),
-                .created = clientEntity.created,
-                .modified = clientEntity.modified};
+        UserPoolClient userPoolClient;
+        userPoolClient.userPoolId = clientEntity.userPoolId;
+        userPoolClient.clientId = clientEntity.clientId;
+        userPoolClient.clientName = clientEntity.clientName;
+        userPoolClient.clientSecret = clientEntity.clientSecret;
+        userPoolClient.accessTokenValidity = GetMaxValidityToken(clientEntity.accessTokenValidity, tokenValidityUnits.accessToken);
+        userPoolClient.idTokenValidity = GetMaxValidityToken(clientEntity.idTokenValidity, tokenValidityUnits.idToken);
+        userPoolClient.refreshTokenValidity = GetMaxValidityToken(clientEntity.refreshTokenValidity, tokenValidityUnits.refreshToken);
+        userPoolClient.created = clientEntity.created;
+        userPoolClient.modified = clientEntity.modified;
         return userPoolClient;
     }
 

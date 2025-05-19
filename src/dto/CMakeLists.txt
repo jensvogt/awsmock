@@ -56,8 +56,8 @@ set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPool
         src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/CustomSmsSender.cpp
         src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp
         src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp
-        src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp src/cognito/model/UserPoolClient.cpp
-        src/cognito/CreateUserPoolClientRequest.cpp src/cognito/CreateUserPoolClientResponse.cpp src/cognito/DescribeUserPoolRequest.cpp
+        src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp
+        src/cognito/DescribeUserPoolRequest.cpp
         src/cognito/DescribeUserPoolResponse.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
         src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthRequest.cpp
         src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp
