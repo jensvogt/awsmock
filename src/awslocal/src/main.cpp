@@ -71,9 +71,9 @@ int main(const int argc, char *argv[]) {
     boost::program_options::options_description desc("Options");
     desc.add_options()("host", boost::program_options::value<std::string>()->default_value(DEFAULT_HOST), "AWS host name");
     desc.add_options()("port", boost::program_options::value<int>()->default_value(DEFAULT_PORT), "AWS port");
-    desc.add_options()("profile", boost::program_options::value<std::string>()->default_value(DEFAULT_PROFILE), "AWS profile");
     desc.add_options()("config", boost::program_options::value<std::string>()->default_value(DEFAULT_CONFIG_FILE), "AwsMock configuration");
-    desc.add_options()("loglevel", boost::program_options::value<std::string>()->default_value(DEFAULT_LOG_LEVEL), "AwsMock log level");
+    desc.add_options()("profile", boost::program_options::value<std::string>(), "AWS profile");
+    desc.add_options()("loglevel", boost::program_options::value<std::string>(), "AwsMock log level");
     desc.add_options()("help", "produce help message");
 
     // Get command line options.
