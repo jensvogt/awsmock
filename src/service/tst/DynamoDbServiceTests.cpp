@@ -34,7 +34,8 @@ namespace AwsMock::Service {
         }
 
         void TearDown() override {
-            _database.DeleteAllTables();
+            const long count = _database.DeleteAllTables();
+            log_debug << "Dynamodb tables deleted, count: " << count;
         }
 
         static std::map<std::string, std::string> CreateHeaders() {

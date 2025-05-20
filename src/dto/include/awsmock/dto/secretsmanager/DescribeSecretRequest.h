@@ -10,53 +10,45 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-    struct DescribeSecretRequest {
+    /**
+     * @brief Describe secret request
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "SecretId": "string"
+     * }
+     * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct DescribeSecretRequest final : Common::BaseCounter<DescribeSecretRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Secret Id
+         * Secret ID
          */
         std::string secretId;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend DescribeSecretRequest tag_invoke(boost::json::value_to_tag<DescribeSecretRequest>, boost::json::value const &v) {
+            DescribeSecretRequest r;
+            r.secretId = Core::Json::GetStringValue(v, "SecretId");
+            return r;
+        }
 
-        /**
-         * Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DescribeSecretRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeSecretRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"SecretId", obj.secretId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

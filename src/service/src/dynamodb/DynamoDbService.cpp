@@ -254,32 +254,31 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::PutItemResponse putItemResponse;
         try {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("PutItem");
             if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
-
-                putItemResponse.body = body;
-                putItemResponse.headers = outHeaders;
-                putItemResponse.status = status;
+                Dto::DynamoDb::PutItemResponse putItemResponse = Dto::DynamoDb::PutItemResponse::FromJson(body);
 
                 // Get the table
                 Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
 
                 // Convert to an entity and save to a database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
                 Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
+                // TODO: Calculate real size
+                item.size = body.size();
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
                 log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
+
+                return putItemResponse;
             }
+            return {};
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb put item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb put item failed, error: " + exc.message());
         }
-
-        return putItemResponse;
     }
 
     Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) const {

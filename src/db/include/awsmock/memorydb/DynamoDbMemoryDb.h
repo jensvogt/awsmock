@@ -107,6 +107,15 @@ namespace AwsMock::Database {
         long CountTables(const std::string &region = {}) const;
 
         /**
+         * @brief Returns the approximate size of a table in bytes
+         *
+         * @param region AWS region
+         * @param tableName name of the table
+         * @return approximate table size in bytes
+         */
+        [[nodiscard]] long GetTableSize(const std::string &region = {}, const std::string &tableName = {}) const;
+
+        /**
          * @brief Deletes an existing DynamoDB table
          *
          * @param tableName name of the table
@@ -126,7 +135,7 @@ namespace AwsMock::Database {
          * @brief Checks the existence of an item.
          *
          * @param item DynamoDB item
-         * @return true if database exists, otherwise false
+         * @return true if the database exists, otherwise false
          * @throws DatabaseException
          */
         bool ItemExists(const Entity::DynamoDb::Item &item);
