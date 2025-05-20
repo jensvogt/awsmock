@@ -10,12 +10,13 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/Secret.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * List secrets response
+     * @brief List secrets response
      *
      * Example:
      * @code{.json}
@@ -29,12 +30,7 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListSecretsResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListSecretsResponse final : Common::BaseCounter<ListSecretsResponse> {
 
         /**
          * Next token
@@ -46,26 +42,24 @@ namespace AwsMock::Dto::SecretsManager {
          */
         std::vector<Secret> secretList;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListSecretsResponse tag_invoke(boost::json::value_to_tag<ListSecretsResponse>, boost::json::value const &v) {
+            ListSecretsResponse r;
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            r.secretList = boost::json::value_to<std::vector<Secret>>(v.at("SecretList"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListSecretsResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListSecretsResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"NextToken", obj.nextToken},
+                    {"SecretList", boost::json::value_from(obj.secretList)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

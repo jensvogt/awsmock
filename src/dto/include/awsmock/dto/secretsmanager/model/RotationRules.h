@@ -10,6 +10,7 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -27,12 +28,12 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RotationRules {
+    struct RotationRules final : Common::BaseCounter<RotationRules> {
 
         /**
          * Automatic rotation period
          */
-        long automaticallyAfterDays;
+        long automaticallyAfterDays{};
 
         /**
          * Duration
@@ -49,35 +50,61 @@ namespace AwsMock::Dto::SecretsManager {
          *
          * @return DTO as string
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetIntValue(document, "AutomaticallyAfterDays", automaticallyAfterDays);
+                Core::Bson::BsonUtils::SetStringValue(document, "Duration", duration);
+                Core::Bson::BsonUtils::SetStringValue(document, "ScheduleExpression", scheduleExpression);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Converts a JSON representation to s DTO.
          *
-         * @param jsonObject JSON object.
+         * @param document JSON object.
          */
-        void FromDocument(const view_or_value<view, value> &jsonObject);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                automaticallyAfterDays = Core::Bson::BsonUtils::GetIntValue(document, "Duration");
+                duration = Core::Bson::BsonUtils::GetStringValue(document, "Duration");
+                scheduleExpression = Core::Bson::BsonUtils::GetStringValue(document, "scheduleExpression");
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const RotationRules &r);
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend RotationRules tag_invoke(boost::json::value_to_tag<RotationRules>, boost::json::value const &v) {
+            RotationRules r;
+            r.automaticallyAfterDays = Core::Json::GetLongValue(v, "AutomaticallyAfterDays");
+            r.duration = Core::Json::GetStringValue(v, "Duration");
+            r.scheduleExpression = Core::Json::GetStringValue(v, "ScheduleExpression");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RotationRules const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"AutomaticallyAfterDays", obj.automaticallyAfterDays},
+                    {"Duration", obj.duration},
+                    {"ScheduleExpression", obj.scheduleExpression},
+            };
+        }
     };
 
 }//namespace AwsMock::Dto::SecretsManager

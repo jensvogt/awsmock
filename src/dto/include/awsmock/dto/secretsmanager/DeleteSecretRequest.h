@@ -9,47 +9,46 @@
 #include <string>
 
 // AwsMoc includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-    struct DeleteSecretRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    /**
+     * @brief Delete secret request
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "Name": "string"
+     * }
+     * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct DeleteSecretRequest final : Common::BaseCounter<DeleteSecretRequest> {
 
         /**
          * Secret name
          */
         std::string name;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend DeleteSecretRequest tag_invoke(boost::json::value_to_tag<DeleteSecretRequest>, boost::json::value const &v) {
+            DeleteSecretRequest r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteSecretRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteSecretRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

@@ -9,10 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -38,21 +35,6 @@ namespace AwsMock::Dto::DynamoDb {
          * Table name
          */
         std::string tableName;
-
-        /**
-         * Original HTTP response body
-         */
-        std::string body;
-
-        /**
-         * Original HTTP response headers
-         */
-        std::map<std::string, std::string> headers;
-
-        /**
-         * HTTP status from docker image
-         */
-        boost::beast::http::status status = boost::beast::http::status::unknown;
 
       private:
 
