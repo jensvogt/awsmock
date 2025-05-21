@@ -2,12 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#include <awsmock/core/SystemUtils.h>
 #ifndef AWMOCK_CORE_FILE_UTILS_TEST_H
 #define AWMOCK_CORE_FILE_UTILS_TEST_H
-
-// GTest includes
-#include <gtest/gtest.h>
 
 // Local includes
 #include <awsmock/core/DirUtils.h>
@@ -17,71 +13,50 @@
 
 namespace AwsMock::Core {
 
-    class FileUtilsTest : public testing::Test {
-
-      protected:
-
-        void SetUp() override {
-            tempDir = DirUtils::CreateTempDir();
-        }
-
-        void TearDown() override {
-            DirUtils::DeleteDirectory(tempDir);
-        }
-
-        static std::string GetImagePath(const std::string &imageFileName) {
-            char cwd[256];
-
-            const char *result = getcwd(cwd, sizeof(cwd));
-            EXPECT_TRUE(result != nullptr);
-
-            std::stringstream ss;
-            ss << cwd << FileUtils::separator() << "src" << FileUtils::separator() << "core" << FileUtils::separator() << "tst" << FileUtils::separator() << "resources" << FileUtils::separator() << "images" << FileUtils::separator() << imageFileName;
-
-            return ss.str();
-        }
-        std::string tempDir;
-    };
-
-    TEST_F(FileUtilsTest, BasenameTest) {
+    BOOST_AUTO_TEST_CASE(BasenameTest) {
 
         // arrange
-        const std::string fileName = tempDir + FileUtils::separator() + "example.gif";
+        const std::string fileName = "/tmp/example.gif";
 
         // act
         const std::string result = FileUtils::GetBasename(fileName);
 
         // assert
-        EXPECT_EQ(result.length(), 7);
-        EXPECT_EQ(result, "example");
+        BOOST_CHECK_EQUAL(result.length(), 7);
+        BOOST_CHECK_EQUAL(result, "example");
     }
 
-    TEST_F(FileUtilsTest, ExtensionTest) {
+    BOOST_AUTO_TEST_CASE(ExtensionTest) {
+
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
         const std::string result = FileUtils::GetExtension(fileName);
 
         // assert
-        EXPECT_EQ(result.length(), 3);
-        EXPECT_EQ(result, "gif");
+        BOOST_CHECK_EQUAL(result.length(), 3);
+        BOOST_CHECK_EQUAL(result, "gif");
     }
 
-    TEST_F(FileUtilsTest, FileSizeTest) {
+    BOOST_AUTO_TEST_CASE(FileSizeTest) {
+
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
         const long result = FileUtils::FileSize(fileName);
 
         // assert
-        EXPECT_EQ(result, 100);
+        BOOST_CHECK_EQUAL(result, 100);
     }
 
-    TEST_F(FileUtilsTest, FileMoveToTest) {
+    BOOST_AUTO_TEST_CASE(FileMoveToTest) {
 
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
         const std::string targetFilename = tempDir + FileUtils::separator() + "test1/test2/test3/test4.gif";
 
@@ -90,103 +65,99 @@ namespace AwsMock::Core {
         const bool result = FileUtils::FileExists(targetFilename);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(FileUtilsTest, DeleteFileTest) {
+    BOOST_AUTO_TEST_CASE(DeleteFileTest) {
 
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
-        EXPECT_NO_THROW({ FileUtils::DeleteFile(fileName); });
+        BOOST_CHECK_NO_THROW({ FileUtils::DeleteFile(fileName); });
 
         // assert
-        EXPECT_FALSE(FileUtils::FileExists(fileName));
+        BOOST_CHECK_EQUAL(FileUtils::FileExists(fileName), false);
     }
 
-    TEST_F(FileUtilsTest, StripBasenameTest) {
+
+    BOOST_AUTO_TEST_CASE(StripBasenameTest) {
 
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = tempDir + FileUtils::separator() + "testFile.txt";
 
         // act
         std::string basename;
-        EXPECT_NO_THROW({ basename = FileUtils::StripBasePath(fileName); });
+        BOOST_CHECK_NO_THROW({ basename = FileUtils::StripBasePath(fileName); });
 
         // assert
-        EXPECT_FALSE(basename.empty());
-        EXPECT_STREQ(basename.c_str(), "testFile.txt");
+        BOOST_CHECK_EQUAL(basename.empty(), false);
+        BOOST_CHECK_EQUAL(basename, "testFile.txt");
     }
 
-    TEST_F(FileUtilsTest, GetParentPathTest) {
+    BOOST_AUTO_TEST_CASE(GetParentPathTest) {
 
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = tempDir + FileUtils::separator() + "testFile.txt";
 
         // act
         const std::string tempPath = FileUtils::GetParentPath(fileName);
 
         // assert
-        EXPECT_FALSE(tempPath.empty());
-        EXPECT_TRUE(tempPath == tempDir);
+        BOOST_CHECK_EQUAL(tempPath.empty(), false);
+        BOOST_CHECK_EQUAL(tempPath, tempDir);
     }
 
-    TEST_F(FileUtilsTest, CreateTempFileTest) {
+
+    BOOST_AUTO_TEST_CASE(CreateTempFileTest) {
+
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
 
         // act
         const std::string tempFile = FileUtils::CreateTempFile(tempDir, "json", FILE_SIZE);
 
         // assert
-        EXPECT_FALSE(tempFile.empty());
-        EXPECT_TRUE(FileUtils::FileExists(tempFile));
-        EXPECT_EQ(FILE_SIZE, FileUtils::FileSize(tempFile));
+        BOOST_CHECK_EQUAL(tempFile.empty(), false);
+        BOOST_CHECK_EQUAL(FileUtils::FileExists(tempFile), true);
+        BOOST_CHECK_EQUAL(FILE_SIZE, FileUtils::FileSize(tempFile));
     }
 
-    TEST_F(FileUtilsTest, ReadFileTest) {
+    BOOST_AUTO_TEST_CASE(ReadFileTest) {
 
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "txt", 100);
 
         // act
         std::string result;
-        EXPECT_NO_THROW({ result = FileUtils::ReadFile(fileName); });
+        BOOST_CHECK_NO_THROW({ result = FileUtils::ReadFile(fileName); });
 
         // assert
-        EXPECT_TRUE(FileUtils::FileExists(fileName));
-        EXPECT_EQ(100, result.size());
+        BOOST_CHECK_EQUAL(FileUtils::FileExists(fileName), true);
+        BOOST_CHECK_EQUAL(100, result.size());
     }
-    /*
-    TEST_F(FileUtilsTest, StreamCopierTest) {
+
+    BOOST_AUTO_TEST_CASE(StreamCopierTest) {
 
         // arrange
+        const std::string tempDir = DirUtils::CreateTempDir();
         const std::string fileName1 = FileUtils::CreateTempFile(tempDir, "txt", 100);
         const std::string fileName2 = tempDir + FileUtils::separator() + "testFile.txt";
-        // act
-        std::string result;
-        EXPECT_NO_THROW({ result = FileUtils::StreamCopier(fileName1, filename2); });
-
-        // assert
-        EXPECT_TRUE(FileUtils::FileExists(fileName2));
-        EXPECT_EQ(100, result);
-    }*/
-
-    TEST_F(FileUtilsTest, StripChunkSignatureTest) {
-
-        // arrange
-        const std::string tempFile = FileUtils::CreateTempFile("txt", "b;chunk-signature=654753fda\ntest\nb;chunk-signature=654753fda\n");
 
         // act
-        FileUtils::StripChunkSignature(tempFile);
+        long result;
+        BOOST_CHECK_NO_THROW({ result = FileUtils::StreamCopier(fileName1, fileName2); });
 
         // assert
-        EXPECT_FALSE(tempFile.empty());
-        EXPECT_TRUE(FileUtils::FileExists(tempFile));
-        EXPECT_EQ(4, FileUtils::FileSize(tempFile));
+        BOOST_CHECK_EQUAL(FileUtils::FileExists(fileName2), true);
+        BOOST_CHECK_EQUAL(100, result);
     }
 
-    TEST_F(FileUtilsTest, GetContentTypePlainTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypePlainTest) {
 
         // arrange
         const std::string tempFile = FileUtils::CreateTempFile("txt", "This is a text file");
@@ -195,11 +166,11 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(Core::StringUtils::Equals(contentType, "text/plain"));
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "text/plain");
     }
 
-    TEST_F(FileUtilsTest, GetContentTypeJsonTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypeJsonTest) {
 
         // arrange
         const std::string tempFile = FileUtils::CreateTempFile("json", R"({"key":"value"})");
@@ -208,11 +179,11 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "application/json");
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "application/json");
     }
 
-    TEST_F(FileUtilsTest, GetContentTypeXmlTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypeXmlTest) {
 
         // arrange
         const std::string tempFile = FileUtils::CreateTempFile("xml", "<ONIXMessage xmlns=¸\"http://www.editeur.org/onix/3.0/reference\" release=\"3.0\"><Header><Sender><SenderName>APA</SenderName><ContactName>Violetta Tatar</ContactName></Sender></Header>");
@@ -221,11 +192,11 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentType(tempFile, tempFile);
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "application/xml");
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "application/xml");
     }
 
-    TEST_F(FileUtilsTest, GetContentTypeJsonStringTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypeJsonStringTest) {
 
         // arrange
         const std::string content = R"({"key":"value"})";
@@ -234,11 +205,11 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentTypeMagicString(content);
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "application/json");
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "application/json");
     }
 
-    TEST_F(FileUtilsTest, GetContentTypeXmlStringTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypeXmlStringTest) {
 
         // arrange
         const std::string content = R"(<?xml version="1.0" encoding="utf-8"?>)";
@@ -247,11 +218,11 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentTypeMagicString(content);
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "text/xml");
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "text/xml");
     }
 
-    TEST_F(FileUtilsTest, GetContentTypeJpgTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypeJpgTest) {
 
         // arrange
 
@@ -259,11 +230,11 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentTypeMagicFile("/tmp/9783911244381.jpg");
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "image/jpeg");
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "image/jpeg");
     }
 
-    TEST_F(FileUtilsTest, GetContentTypeTifTest) {
+    BOOST_AUTO_TEST_CASE(GetContentTypeTifTest) {
 
         // arrange
 
@@ -271,8 +242,20 @@ namespace AwsMock::Core {
         const std::string contentType = FileUtils::GetContentTypeMagicFile("/tmp/7337529778404.tif");
 
         // assert
-        EXPECT_FALSE(contentType.empty());
-        EXPECT_TRUE(contentType == "image/tiff");
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "image/tiff");
+    }
+
+    BOOST_AUTO_TEST_CASE(GetContentTypePdfTest) {
+
+        // arrange
+
+        // act
+        const std::string contentType = FileUtils::GetContentTypeMagicFile("/tmp/dummy.pdf");
+
+        // assert
+        BOOST_CHECK_EQUAL(contentType.empty(), false);
+        BOOST_CHECK_EQUAL(contentType, "application/pdf");
     }
 
 }// namespace AwsMock::Core

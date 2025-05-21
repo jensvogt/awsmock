@@ -43,7 +43,7 @@ namespace AwsMock::Service {
             headers["Accept-Encoding"] = "identity";
             headers["Content-Length"] = "244";
             headers["Content-Type"] = "application/x-amz-json-1.0";
-            headers["Host"] = "vogje01-nuc:14566";
+            headers["Host"] = "localhost:14566";
             headers["User-Agent"] = "aws-cli/2.22.31 md/awscrt#0.23.4 ua/2.0 os/linux#6.8.0-51-generic md/arch#x86_64 lang/python#3.12.6 md/pyimpl#CPython cfg/retry-mode#standard md/installer#exe md/distrib#ubuntu.24 md/prompt#off md/command#dynamodb.create-table";
             headers["X-Amz-Date"] = "20250109T034230Z";
             headers["X-Amz-Target"] = "DynamoDB_20120810.CreateTable";

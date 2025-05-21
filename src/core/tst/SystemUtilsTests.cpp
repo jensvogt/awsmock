@@ -5,25 +5,20 @@
 #ifndef AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
 #define AWSMOCK_CORE_SYSTEM_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/SystemUtils.h>
 
 namespace AwsMock::Core {
 
-    class SystemUtilsTest : public ::testing::Test {};
-
-    TEST_F(SystemUtilsTest, GetHostNameTest) {
+    BOOST_AUTO_TEST_CASE(GetHostNameTest) {
 
         // arrange
 
         // act
-        std::string hostName = Core::SystemUtils::GetHostName();
+        const std::string hostName = SystemUtils::GetHostName();
 
         // assert
-        EXPECT_FALSE(hostName.empty());
+        BOOST_CHECK_EQUAL(hostName.empty(), false);
     }
 
 }// namespace AwsMock::Core
