@@ -22,9 +22,9 @@ namespace AwsMock::Database {
 
     struct CognitoDatabaseDbTest {
         CognitoDatabaseDbTest() {
-            BOOST_TEST_MESSAGE( "setup fixture" );
+            BOOST_TEST_MESSAGE("setup fixture");
         }
-        ~CognitoDatabaseDbTestF()         { BOOST_TEST_MESSAGE( "teardown fixture" ); }
+        ~CognitoDatabaseDbTestF() { BOOST_TEST_MESSAGE("teardown fixture"); }
 
         int i;
     };
