@@ -5,47 +5,44 @@
 #ifndef AWMOCK_CORE_XML_UTILS_TEST_H
 #define AWMOCK_CORE_XML_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Core {
 
-    /*class XmlUtilsTest : public ::testing::Test {};
-
-    TEST_F(XmlUtilsTest, CreateTextNodeTest) {
+    BOOST_AUTO_TEST_CASE(CreateTextNodeTest) {
 
         // arrange
-        std::string testValue = "TestValue";
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Root");
-        pDoc->appendChild(pRoot);
+        boost::property_tree::ptree root;
+        root.add("Root", "");
+        root.add("Root.Test", "TestValue");
+        const std::string xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Root><Test>TestValue</Test></Root>";
 
         // act
-        XmlUtils::CreateTextNode(pDoc, pRoot, "Test", testValue);
-        std::string result = XmlUtils::ToXmlString(pDoc);
+        const std::string result = XmlUtils::ToXmlString(root);
 
         // assert
-        EXPECT_TRUE(result == "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Test>TestValue</Test></Root>");
+        BOOST_CHECK_EQUAL(Core::StringUtils::StripLineEndings(result), xmlString);
     }
 
-    TEST_F(XmlUtilsTest, CreateTextArrayTest) {
+
+    BOOST_AUTO_TEST_CASE(CreateTextArrayTest) {
 
         // arrange
-        Poco::XML::AutoPtr<Poco::XML::Document> pDoc = new Poco::XML::Document;
-        Poco::XML::AutoPtr<Poco::XML::Element> pRoot = pDoc->createElement("Root");
-        pDoc->appendChild(pRoot);
-        std::vector<std::string> values = {"Value1", "Value2", "Value3"};
+        boost::property_tree::ptree root;
+        root.add("Root", "");
+        root.add("Root.Test", "TestValue");
+        root.add("Root.Test.TextValue", "Value1");
+        root.add("Root.Test.TextValue", "Value2");
+        root.add("Root.Test.TextValue", "Value3");
+        const std::string xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><Root><Test>TestValue<TextValue>Value1</TextValue><TextValue>Value2</TextValue><TextValue>Value3</TextValue></Test></Root>";
 
         // act
-        XmlUtils::CreateTextArray(pDoc, pRoot, "Test", "TestValue", values);
-        std::string result = XmlUtils::ToXmlString(pDoc);
+        const std::string result = XmlUtils::ToXmlString(root);
 
         // assert
-        EXPECT_TRUE(result == "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Root><Test><TestValue>Value1</TestValue><TestValue>Value2</TestValue><TestValue>Value3</TestValue></Test></Root>");
-    }*/
+        BOOST_CHECK_EQUAL(Core::StringUtils::StripLineEndings(result), xmlString);
+    }
 
 }// namespace AwsMock::Core
 

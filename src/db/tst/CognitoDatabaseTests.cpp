@@ -5,9 +5,6 @@
 #ifndef AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H
 #define AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
@@ -21,6 +18,16 @@
 #define CLIENT_NAME "test-client"
 
 namespace AwsMock::Database {
+
+
+    struct CognitoDatabaseDbTest {
+        CognitoDatabaseDbTest() {
+            BOOST_TEST_MESSAGE( "setup fixture" );
+        }
+        ~CognitoDatabaseDbTestF()         { BOOST_TEST_MESSAGE( "teardown fixture" ); }
+
+        int i;
+    };
 
     class CognitoDatabaseDbTest : public ::testing::Test {
 
