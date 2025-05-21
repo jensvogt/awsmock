@@ -198,8 +198,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all modules
+         *
+         * @return number of modules deleted
          */
-        void DeleteAllModules();
+        long DeleteAllModules();
 
       private:
 

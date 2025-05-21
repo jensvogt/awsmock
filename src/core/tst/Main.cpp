@@ -24,7 +24,7 @@
 // initialization function:
 bool init_unit_test() {
     AwsMock::Core::LogStream::Initialize();
-    AwsMock::Core::LogStream::SetSeverity("fatal");
+    AwsMock::Core::LogStream::RemoveConsoleLogs();
     AwsMock::Core::TestUtils::CreateTestConfigurationFile(false);
     return true;
 }

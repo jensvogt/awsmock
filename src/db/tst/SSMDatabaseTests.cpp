@@ -20,7 +20,7 @@
 #include <bsoncxx/builder/basic/document.hpp>
 #include <mongocxx/client.hpp>
 
-#define SERVICE "test-module"
+#define MODULE "test-module"
 
 namespace AwsMock::Database {
 

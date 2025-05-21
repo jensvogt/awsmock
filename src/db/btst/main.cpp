@@ -33,6 +33,12 @@ AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::ins
 
 #include "CognitoDatabaseTests.cpp"
 #include "CognitoMemoryDbTests.cpp"
+#include "LambdaDatabaseTests.cpp"
+#include "LambdaMemoryDbTests.cpp"
+#include "ModuleDatabaseTests.cpp"
+#include "ModuleMemoryDbTests.cpp"
+#include "S3DatabaseTests.cpp"
+#include "S3MemoryDbTests.cpp"
 
 /**
  * Initialize database
@@ -68,7 +74,7 @@ void InitializeShm() {
 bool init_unit_test() {
 
     AwsMock::Core::LogStream::Initialize();
-    AwsMock::Core::LogStream::SetSeverity("fatal");
+    AwsMock::Core::LogStream::RemoveConsoleLogs();
     AwsMock::Core::TestUtils::CreateTestConfigurationFile();
 
     InitializeDatabase();
