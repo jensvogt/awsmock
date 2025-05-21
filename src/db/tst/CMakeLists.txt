@@ -7,9 +7,9 @@ set(S3_SOURCES ../btst/S3DatabaseTests.cpp ../btst/S3MemoryDbTests.cpp)
 set(MODULE_SOURCES ../btst/ModuleMemoryDbTests.cpp)
 set(LAMBDA_SOURCES ../btst/LambdaDatabaseTests.cpp ../btst/LambdaMemoryDbTests.cpp)
 set(COGNITO_SOURCES CognitoDatabaseTests.cpp CognitoMemoryDbTests.cpp)
-set(SECRETSMANAGER_SOURCES SecretsManagerDatabaseTests.cpp)
-set(SSM_SOURCES SSMDatabaseTests.cpp)
-set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
+set(SECRETSMANAGER_SOURCES ../btst/SecretsManagerDatabaseTests.cpp)
+set(SSM_SOURCES ../btst/SSMDatabaseTests.cpp)
+set(TRANSFER_SOURCES ../btst/TransferMemoryDbTests.cpp)
 
 # Includes
 include_directories(../include ../../core/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})

@@ -39,6 +39,12 @@ AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::ins
 #include "ModuleMemoryDbTests.cpp"
 #include "S3DatabaseTests.cpp"
 #include "S3MemoryDbTests.cpp"
+#include "SSMDatabaseTests.cpp"
+#include "SSMMemoryDbTests.cpp"
+#include "SecretsManagerDatabaseTests.cpp"
+#include "SecretsManagerMemoryDbTests.cpp"
+#include "TransferDatabaseTests.cpp"
+#include "TransferMemoryDbTests.cpp"
 
 /**
  * Initialize database

@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
       - run: cmake .
       - run: cmake --build . -j 16
-      - run: ctest -V
+      - run: ctest
 
   build:
     runs-on: self-hosted
