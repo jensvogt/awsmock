@@ -18,7 +18,8 @@ set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES})
 
 # Test directory
 if (NOT WIN32)
-    add_subdirectory(tst)
+    #    add_subdirectory(tst)
+    add_subdirectory(btst)
 endif ()
 
 # Shared library
