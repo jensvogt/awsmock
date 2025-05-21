@@ -2,11 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_LAMBDAMEMORYDBTEST_H
-#define AWMOCK_CORE_LAMBDAMEMORYDBTEST_H
-
-// GTest includes
-#include <gtest/gtest.h>
+#ifndef AWMOCK_CORE_LAMBDA_MEMORYDB_TEST_H
+#define AWMOCK_CORE_LAMBDA_MEMORYDB_TEST_H
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
@@ -21,26 +18,25 @@
 
 namespace AwsMock::Database {
 
-    class LambdaMemoryDbTest : public testing::Test {
+    struct LambdaMemoryDbTest {
 
-      protected:
-
-        void SetUp() override {
+        LambdaMemoryDbTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
             _accountId = _configuration.GetValue<std::string>("awsmock.access.account-id");
         }
 
-        void TearDown() override {
-            _lambdaDatabase.DeleteAllLambdas();
+        ~LambdaMemoryDbTest() {
+            const long count = _lambdaDatabase.DeleteAllLambdas();
+            log_debug << "Lambdas deleted, count: " << count;
         }
 
         std::string _region;
         std::string _accountId;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
-        LambdaDatabase &_lambdaDatabase = LambdaDatabase::instance();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        LambdaDatabase _lambdaDatabase = LambdaDatabase();
     };
 
-    TEST_F(LambdaMemoryDbTest, LambdaCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaCreateMTest, LambdaMemoryDbTest) {
 
         // arrange
         const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
@@ -49,39 +45,39 @@ namespace AwsMock::Database {
         const Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
 
         // assert
-        EXPECT_TRUE(result.function == FUNCTION);
-        EXPECT_TRUE(result.runtime == RUNTIME);
-        EXPECT_TRUE(result.role == ROLE);
-        EXPECT_TRUE(result.handler == HANDLER);
+        BOOST_CHECK_EQUAL(result.function, FUNCTION);
+        BOOST_CHECK_EQUAL(result.runtime, RUNTIME);
+        BOOST_CHECK_EQUAL(result.role, ROLE);
+        BOOST_CHECK_EQUAL(result.handler, HANDLER);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaCountTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaCountMTest, LambdaMemoryDbTest) {
 
         // arrange
-        const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
-        _lambdaDatabase.CreateLambda(lambda);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
         const long result = _lambdaDatabase.LambdaCount(lambda.region);
 
         // assert
-        EXPECT_EQ(1, result);
+        BOOST_CHECK_EQUAL(1, result);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaExistsTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaExistsMTest, LambdaMemoryDbTest) {
 
         // arrange
-        const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
-        _lambdaDatabase.CreateLambda(lambda);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
         const bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaGetByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaGetByIdMTest, LambdaMemoryDbTest) {
 
         // arrange
         Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
@@ -91,10 +87,10 @@ namespace AwsMock::Database {
         const Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaById(lambda.oid);
 
         // assert
-        EXPECT_EQ(result.oid, lambda.oid);
+        BOOST_CHECK_EQUAL(result.oid, lambda.oid);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaGetByArnTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaGetByArnMTest, LambdaMemoryDbTest) {
 
         // arrange
         const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
@@ -105,10 +101,10 @@ namespace AwsMock::Database {
         const Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaByArn(arn);
 
         // assert
-        EXPECT_EQ(result.arn, lambda.arn);
+        BOOST_CHECK_EQUAL(result.arn, lambda.arn);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaUpdateMTest, LambdaMemoryDbTest) {
 
         // arrange
         const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
@@ -120,10 +116,10 @@ namespace AwsMock::Database {
         const Entity::Lambda::Lambda result = _lambdaDatabase.UpdateLambda(lambda);
 
         // assert
-        EXPECT_EQ(result.role, lambda.role);
+        BOOST_CHECK_EQUAL(result.role, lambda.role);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaListTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaListMTest, LambdaMemoryDbTest) {
 
         // arrange
         Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
@@ -133,13 +129,13 @@ namespace AwsMock::Database {
         const std::vector<Entity::Lambda::Lambda> result = _lambdaDatabase.ListLambdas(lambda.region);
 
         // assert
-        EXPECT_EQ(1, result.size());
-        EXPECT_TRUE(result[0].runtime == RUNTIME);
-        EXPECT_TRUE(result[0].role == ROLE);
-        EXPECT_TRUE(result[0].handler == HANDLER);
+        BOOST_CHECK_EQUAL(1, result.size());
+        BOOST_CHECK_EQUAL(result[0].runtime, RUNTIME);
+        BOOST_CHECK_EQUAL(result[0].role, ROLE);
+        BOOST_CHECK_EQUAL(result[0].handler, HANDLER);
     }
 
-    TEST_F(LambdaMemoryDbTest, LambdaDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaDeleteMTest, LambdaMemoryDbTest) {
 
         // arrange
         const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
@@ -151,9 +147,9 @@ namespace AwsMock::Database {
         const bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_LAMBDAMEMORYDBTEST_H
+#endif// AWMOCK_CORE_LAMBDA_MEMORYDB_TEST_H

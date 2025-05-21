@@ -45,6 +45,7 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/etc && \
     mkdir -p /usr/local/awsmock/init && \
     mkdir -p /usr/local/awsmock/log && \
+    mkdir -p /usr/local/awsmock/tmp && \
     mkdir -p /usr/local/awsmock/frontend
 
 # Install AWS CLI (v2, latest)

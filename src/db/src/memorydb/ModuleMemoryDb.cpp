@@ -168,10 +168,12 @@ namespace AwsMock::Database {
         log_debug << "Module deleted, count: " << count;
     }
 
-    void ModuleMemoryDb::DeleteAllModules() {
+    long ModuleMemoryDb::DeleteAllModules() {
         boost::mutex::scoped_lock lock(_moduleMutex);
 
+        long count = _modules.size();
         log_debug << "All modules deleted, count: " << _modules.size();
         _modules.clear();
+        return count;
     }
 }// namespace AwsMock::Database
