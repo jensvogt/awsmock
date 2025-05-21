@@ -2,123 +2,111 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_TRANSFERMEMORYDBTEST_H
-#define AWMOCK_CORE_TRANSFERMEMORYDBTEST_H
+#ifndef AWMOCK_CORE_TRANSFER_MEMORYDB_TEST_H
+#define AWMOCK_CORE_TRANSFER_MEMORYDB_TEST_H
 
 // C++ standard includes
-#include <iostream>
 #include <vector>
-
-// GTest includes
-#include <gtest/gtest.h>
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/TransferDatabase.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/client.hpp>
 
 #define BUCKET "test-bucket"
 #define OWNER "test-owner"
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
+    struct TransferMemoryDbTests {
 
-    class TransferMemoryDbTest : public ::testing::Test {
-
-      protected:
-
-        void SetUp() override {
+        TransferMemoryDbTests() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
-            Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", false);
         }
 
-        void TearDown() override {
+        ~TransferMemoryDbTests() {
             const long deleted = _transferDatabase.DeleteAllTransfers();
-            log_info << "Database cleaned, count:" << deleted;
+            log_debug << "Database cleaned, count:" << deleted;
         }
 
         std::string _region;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         TransferDatabase &_transferDatabase = TransferDatabase::instance();
     };
 
-    TEST_F(TransferMemoryDbTest, TransferCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferCreateMTest, TransferDatabaseTests) {
 
         // arrange
-        const Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        const Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
 
         // act
         const Entity::Transfer::Transfer result = _transferDatabase.CreateTransfer(transfer);
 
         // assert
-        EXPECT_TRUE(result.protocols[0] == Entity::Transfer::FTP);
-        EXPECT_TRUE(result.region == _region);
+        BOOST_CHECK_EQUAL(result.protocols[0] == Database::Entity::Transfer::FTP, true);
+        BOOST_CHECK_EQUAL(result.region, _region);
     }
 
-    TEST_F(TransferMemoryDbTest, TransferExistsUniqueTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferExistsUniqueMTest, TransferDatabaseTests) {
 
         // arrange
         Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP}};
-        const Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {Entity::Transfer::SFTP}};
+        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_abc6af45e", .protocols = {Entity::Transfer::SFTP}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
+        transfer2 = _transferDatabase.CreateTransfer(transfer2);
 
         // act
         const bool result1 = _transferDatabase.TransferExists(_region, transfer1.protocols);
         const bool result2 = _transferDatabase.TransferExists(_region, transfer2.protocols);
 
         // assert
-        EXPECT_TRUE(result1);
-        EXPECT_FALSE(result2);
+        BOOST_CHECK_EQUAL(result1, false);
+        BOOST_CHECK_EQUAL(result2, false);
     }
 
-    TEST_F(TransferMemoryDbTest, TransferExistsByServerIdTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferExistsByServerIdMTest, TransferDatabaseTests) {
 
         // arrange
         Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
-        bool result1 = _transferDatabase.TransferExists(_region, transfer.serverId);
-        bool result2 = _transferDatabase.TransferExists(transfer.serverId);
+        const bool result1 = _transferDatabase.TransferExists(_region, transfer.serverId);
+        const bool result2 = _transferDatabase.TransferExists(transfer.serverId);
 
         // assert
-        EXPECT_TRUE(result1);
-        EXPECT_TRUE(result2);
+        BOOST_CHECK_EQUAL(result1, true);
+        BOOST_CHECK_EQUAL(result2, true);
     }
 
-    TEST_F(TransferMemoryDbTest, TransferGetByServerIdTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferGetByServerIdMTest, TransferDatabaseTests) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        Entity::Transfer::Transfer transfer = {.region = _region, .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
-        Entity::Transfer::Transfer result = _transferDatabase.GetTransferByServerId(_region, transfer.serverId);
+        const Entity::Transfer::Transfer result = _transferDatabase.GetTransferByServerId(_region, transfer.serverId);
 
         // assert
-        EXPECT_TRUE(result.serverId == transfer.serverId);
+        BOOST_CHECK_EQUAL(result.serverId, transfer.serverId);
     }
 
-    TEST_F(TransferMemoryDbTest, TransferGetByServerArnTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferGetByServerArnMTest, TransferDatabaseTests) {
 
         // arrange
-        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .arn = "aws:transfer", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        const std::string serverId = "s_3456af45e";
+        const std::string arn = "arn:aws:transfer:" + _region + ":" + OWNER + ":server/" + serverId;
+        Entity::Transfer::Transfer transfer = {.region = _region, .serverId = serverId, .arn = arn, .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer = _transferDatabase.CreateTransfer(transfer);
 
         // act
-        Entity::Transfer::Transfer result = _transferDatabase.GetTransferByArn(transfer.arn);
+        const Entity::Transfer::Transfer result = _transferDatabase.GetTransferByArn(transfer.arn);
 
         // assert
-        EXPECT_TRUE(result.arn == transfer.arn);
+        BOOST_CHECK_EQUAL(result.serverId, transfer.serverId);
     }
 
-    TEST_F(TransferMemoryDbTest, TransferUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferUpdateMTest, TransferDatabaseTests) {
 
         // arrange
         Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
@@ -126,13 +114,13 @@ namespace AwsMock::Database {
 
         // act
         transfer.users.push_back({.userName = "test", .password = "test", .homeDirectory = "/"});
-        Entity::Transfer::Transfer result = _transferDatabase.UpdateTransfer(transfer);
+        const Entity::Transfer::Transfer result = _transferDatabase.UpdateTransfer(transfer);
 
         // assert
-        EXPECT_TRUE(result.users[0].userName == "test");
+        BOOST_CHECK_EQUAL(result.users[0].userName, "test");
     }
 
-    TEST_F(TransferMemoryDbTest, TransferDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferDeleteMTest, TransferDatabaseTests) {
 
         // arrange
         Entity::Transfer::Transfer transfer = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
@@ -143,14 +131,14 @@ namespace AwsMock::Database {
         const bool result = _transferDatabase.TransferExists(transfer.serverId);
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
-    TEST_F(TransferMemoryDbTest, TransferDeleteAllTest) {
+    BOOST_FIXTURE_TEST_CASE(TransferDeleteAllMTest, TransferDatabaseTests) {
 
         // arrange
         Entity::Transfer::Transfer transfer1 = {.region = _region, .serverId = "s_3456af45e", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
-        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_123abef22", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
+        Entity::Transfer::Transfer transfer2 = {.region = _region, .serverId = "s_14eab3422", .protocols = {Entity::Transfer::FTP, Entity::Transfer::SFTP}};
         transfer1 = _transferDatabase.CreateTransfer(transfer1);
         transfer2 = _transferDatabase.CreateTransfer(transfer2);
 
@@ -160,10 +148,10 @@ namespace AwsMock::Database {
         const bool result2 = _transferDatabase.TransferExists(transfer2.serverId);
 
         // assert
-        EXPECT_FALSE(result1);
-        EXPECT_FALSE(result2);
+        BOOST_CHECK_EQUAL(result1, false);
+        BOOST_CHECK_EQUAL(result2, false);
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_TRANSFERMEMORYDBTEST_H
+#endif// AWMOCK_CORE_TRANSFER_MEMORYDB_TEST_H

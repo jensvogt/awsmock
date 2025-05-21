@@ -2,13 +2,10 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SECRETSMANAGER_DATABASE_TEST_H
-#define AWMOCK_CORE_SECRETSMANAGER_DATABASE_TEST_H
+#ifndef AWMOCK_CORE_SECRETSMANAGER_MEMORYDB_TEST_H
+#define AWMOCK_CORE_SECRETSMANAGER_MEMORYDB_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
-// Local includes
+// AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 
@@ -18,24 +15,23 @@
 
 namespace AwsMock::Database {
 
-    class SecretsManagerDatabaseTest : public ::testing::Test {
+    struct SecretsManagerMemoryDbTest {
 
-      protected:
-
-        void SetUp() override {
+        SecretsManagerMemoryDbTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
         }
 
-        void TearDown() override {
-            _secretsManagerDatabase.DeleteAllSecrets();
+        ~SecretsManagerMemoryDbTest() {
+            const long count = _secretsManagerDatabase.DeleteAllSecrets();
+            log_debug << "Secrets deleted, count: " << count;
         }
 
         std::string _region;
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
-        SecretsManagerDatabase &_secretsManagerDatabase = SecretsManagerDatabase::instance();
+        SecretsManagerDatabase _secretsManagerDatabase = SecretsManagerDatabase();
     };
 
-    TEST_F(SecretsManagerDatabaseTest, SecretCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretCreateMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         const Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
@@ -44,12 +40,12 @@ namespace AwsMock::Database {
         const Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);
 
         // assert
-        EXPECT_TRUE(result.name == SECRET_NAME);
-        EXPECT_TRUE(result.region == REGION);
-        EXPECT_FALSE(result.oid.empty());
+        BOOST_CHECK_EQUAL(result.name, SECRET_NAME);
+        BOOST_CHECK_EQUAL(result.region, REGION);
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretGetByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretGetByIdMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
@@ -59,12 +55,12 @@ namespace AwsMock::Database {
         const Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretBySecretId(secret.secretId);
 
         // assert
-        EXPECT_TRUE(result.name == SECRET_NAME);
-        EXPECT_TRUE(result.region == REGION);
-        EXPECT_FALSE(result.oid.empty());
+        BOOST_CHECK_EQUAL(result.name, SECRET_NAME);
+        BOOST_CHECK_EQUAL(result.region, REGION);
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretGetByRegionNameTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretGetByRegionNameMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
@@ -74,12 +70,12 @@ namespace AwsMock::Database {
         const Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretByRegionName(secret.region, secret.name);
 
         // assert
-        EXPECT_TRUE(result.name == SECRET_NAME);
-        EXPECT_TRUE(result.region == REGION);
-        EXPECT_FALSE(result.oid.empty());
+        BOOST_CHECK_EQUAL(result.name, SECRET_NAME);
+        BOOST_CHECK_EQUAL(result.region, REGION);
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretGetByOidTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretGetByOidMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
@@ -89,25 +85,25 @@ namespace AwsMock::Database {
         const Entity::SecretsManager::Secret result = _secretsManagerDatabase.GetSecretById(secret.oid);
 
         // assert
-        EXPECT_TRUE(result.name == SECRET_NAME);
-        EXPECT_TRUE(result.region == REGION);
-        EXPECT_FALSE(result.oid.empty());
+        BOOST_CHECK_EQUAL(result.name, SECRET_NAME);
+        BOOST_CHECK_EQUAL(result.region, REGION);
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretExistsTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretExistsMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
-        bool result = _secretsManagerDatabase.SecretExists(secret.secretId);
+        const bool result = _secretsManagerDatabase.SecretExists(secret.secretId);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretUpdateMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         // arrange
@@ -119,13 +115,13 @@ namespace AwsMock::Database {
         secret = _secretsManagerDatabase.UpdateSecret(secret);
 
         // assert
-        EXPECT_TRUE(secret.name == SECRET_NAME);
-        EXPECT_TRUE(secret.region == REGION);
-        EXPECT_TRUE(Core::StringUtils::EqualsIgnoreCase(secret.description, "Test secretupdate"));
-        EXPECT_FALSE(secret.oid.empty());
+        BOOST_CHECK_EQUAL(secret.name, SECRET_NAME);
+        BOOST_CHECK_EQUAL(secret.region, REGION);
+        BOOST_CHECK_EQUAL(secret.description, "Test secretupdate");
+        BOOST_CHECK_EQUAL(secret.oid.empty(), false);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretListTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretListMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         // arrange
@@ -133,14 +129,14 @@ namespace AwsMock::Database {
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
-        Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
+        const Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
 
         // assert
-        EXPECT_FALSE(secretList.empty());
-        EXPECT_EQ(1, secretList.size());
+        BOOST_CHECK_EQUAL(secretList.empty(), false);
+        BOOST_CHECK_EQUAL(1, secretList.size());
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretDeleteMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
@@ -148,13 +144,13 @@ namespace AwsMock::Database {
 
         // act
         _secretsManagerDatabase.DeleteSecret(secret);
-        Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
+        const Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
 
         // assert
-        EXPECT_TRUE(secretList.empty());
+        BOOST_CHECK_EQUAL(secretList.empty(), true);
     }
 
-    TEST_F(SecretsManagerDatabaseTest, SecretDeleteAllTest) {
+    BOOST_FIXTURE_TEST_CASE(SecretDeleteAllMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
         Entity::SecretsManager::Secret secret1 = {.region = _region, .name = SECRET_NAME, .description = "Test secret1"};
@@ -163,13 +159,14 @@ namespace AwsMock::Database {
         secret2 = _secretsManagerDatabase.CreateSecret(secret2);
 
         // act
-        _secretsManagerDatabase.DeleteAllSecrets();
-        Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
+        const long count = _secretsManagerDatabase.DeleteAllSecrets();
+        const Entity::SecretsManager::SecretList secretList = _secretsManagerDatabase.ListSecrets();
 
         // assert
-        EXPECT_TRUE(secretList.empty());
+        BOOST_CHECK_EQUAL(count, 2);
+        BOOST_CHECK_EQUAL(secretList.empty(), true);
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_SECRETSMANAGER_DATABASE_TEST_H
+#endif// AWMOCK_CORE_SECRETSMANAGER_MEMORYDB_TEST_H
