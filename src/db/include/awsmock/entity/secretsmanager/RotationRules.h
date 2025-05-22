@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(const std::optional<view> &mResult);
 
         /**
          * Converts the entity to a string representation.

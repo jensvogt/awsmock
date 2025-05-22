@@ -458,37 +458,28 @@ namespace AwsMock::Core {
         }
     }
 
-    std::string Crypto::Base64Encode(const std::string &inputString) {
-        std::stringstream os;
-        typedef boost::archive::iterators::base64_from_binary<boost::archive::iterators::transform_width<const char *, 6, 8>> base64_enc;
-        const std::string base64_padding[] = {"", "==", "="};
-        std::copy(base64_enc(inputString.c_str()), base64_enc(inputString.c_str() + inputString.size()), std::ostream_iterator<char>(os));
-        os << base64_padding[inputString.size() % 3];
-        return os.str();
+    std::string Crypto::Base64Encode(const std::string &decodedString) {
+        std::stringstream ofs;
+        const size_t size = boost::beast::detail::base64::encoded_size(decodedString.length());
+        const auto bytes = static_cast<unsigned char *>(malloc(size));
+        const unsigned long encodedSize = boost::beast::detail::base64::encode(bytes, decodedString.c_str(), decodedString.length());
+        ofs.write((const char *) bytes, encodedSize);
+        free(bytes);
+        std::string encodedString = ofs.str();
+        encodedString[encodedSize] = '\0';
+        return encodedString;
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
-        std::string output;
-        std::string input = encodedString;
-        using namespace boost::archive::iterators;
-        typedef remove_whitespace<std::string::const_iterator> StripIt;
-        typedef transform_width<binary_from_base64<std::string::const_iterator>, 8, 6> ItBinaryT;
-        try {
-            /// Trailing whitespace makes remove_whitespace barf because the iterator never == end().
-            while (!input.empty() && std::isspace(input.back())) { input.pop_back(); }
-            //inputString.swap(StripIt(inputString.begin()), StripIt(inputString.end()));
-            /// If the input isn't a multiple of 4, pad with =
-            input.append((4 - input.size() % 4) % 4, '=');
-            const size_t pad_chars(std::count(input.end() - 4, input.end(), '='));
-            std::replace(input.end() - 4, input.end(), '=', 'A');
-            output.clear();
-            output.reserve(input.size() * 1.3334);
-            output.assign(ItBinaryT(input.begin()), ItBinaryT(input.end()));
-            output.erase(output.end() - (pad_chars < 2 ? pad_chars : 2), output.end());
-        } catch (std::exception const &) {
-            output.clear();
-        }
-        return output;
+        std::stringstream ofs;
+        const size_t size = boost::beast::detail::base64::decoded_size(encodedString.length());
+        const auto bytes = static_cast<unsigned char *>(malloc(size));
+        const auto [fst, snd] = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
+        ofs.write((const char *) bytes, snd);
+        free(bytes);
+        std::string decodedString = ofs.str();
+        decodedString[snd] = '\0';
+        return encodedString;
     }
 
 #ifdef _WIN32
@@ -505,38 +496,15 @@ namespace AwsMock::Core {
     }
 #else
     void Crypto::Base64Decode(const std::string &encodedString, const std::string &filename) {
-        std::string output;
-        std::string input = encodedString;
-        using namespace boost::archive::iterators;
-        typedef remove_whitespace<std::string::const_iterator> StripIt;
-        typedef transform_width<binary_from_base64<std::string::const_iterator>, 8, 6> ItBinaryT;
-        try {
-            /// Trailing whitespace makes remove_whitespace barf because the iterator never == end().
-            while (!input.empty() && std::isspace(input.back())) { input.pop_back(); }
-            //inputString.swap(StripIt(inputString.begin()), StripIt(inputString.end()));
-            /// If the input isn't a multiple of 4, pad with =
-            input.append((4 - input.size() % 4) % 4, '=');
-            const size_t pad_chars(std::count(input.end() - 4, input.end(), '='));
-            std::replace(input.end() - 4, input.end(), '=', 'A');
-            output.clear();
-            output.reserve(input.size() * 1.3334);
-            output.assign(ItBinaryT(input.begin()), ItBinaryT(input.end()));
-            if (pad_chars < 2)
-                output.erase(output.end() - pad_chars, output.end());
-            else
-                output.erase(output.end() - 2, output.end());
-        } catch (std::exception const &) {
-            output.clear();
-        }
-        if (output.empty()) {
-            log_error << "Empty ZIP file, filename: " << filename;
-            return;
-        }
-        log_debug << "Writing base64 decoded file, filename: " << filename << ", size: " << output.size();
-        std::ofstream ofs(filename, std::ios::out | std::ios::binary | std::ios::trunc);
-        ofs << output;
+        typedef std::basic_ofstream<unsigned char> uofstream;
+        uofstream ofs(filename, std::ios::out | std::ios::binary);
+        const size_t size = boost::beast::detail::base64::decoded_size(encodedString.length());
+        const auto bytes = static_cast<unsigned char *>(malloc(size));
+        const auto [fst, snd] = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
+        ofs.write(bytes, snd);
         ofs.flush();
         ofs.close();
+        free(bytes);
     }
 #endif
     bool Crypto::IsBase64(const std::string &inputString) {
