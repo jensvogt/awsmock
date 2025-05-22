@@ -43,35 +43,35 @@ namespace AwsMock::Database::Entity::SecretsManager {
     void Secret::FromDocument(const std::optional<view> &mResult) {
 
         try {
-            oid = mResult.value()["_id"].get_oid().value.to_string();
-            region = bsoncxx::string::to_string(mResult.value()["region"].get_string().value);
-            name = bsoncxx::string::to_string(mResult.value()["name"].get_string().value);
-            arn = bsoncxx::string::to_string(mResult.value()["arn"].get_string().value);
-            secretId = bsoncxx::string::to_string(mResult.value()["secretId"].get_string().value);
-            kmsKeyId = bsoncxx::string::to_string(mResult.value()["kmsKeyId"].get_string().value);
-            versionId = bsoncxx::string::to_string(mResult.value()["versionId"].get_string().value);
-            secretString = bsoncxx::string::to_string(mResult.value()["secretString"].get_string().value);
-            secretBinary = bsoncxx::string::to_string(mResult.value()["secretBinary"].get_string().value);
-            description = bsoncxx::string::to_string(mResult.value()["description"].get_string().value);
-            owningService = bsoncxx::string::to_string(mResult.value()["owningService"].get_string().value);
-            primaryRegion = bsoncxx::string::to_string(mResult.value()["primaryRegion"].get_string().value);
-            createdDate = mResult.value()["createdDate"].get_int64().value;
-            deletedDate = mResult.value()["deletedDate"].get_int64().value;
-            lastAccessedDate = mResult.value()["lastAccessedDate"].get_int64().value;
-            lastChangedDate = mResult.value()["lastChangedDate"].get_int64().value;
-            lastRotatedDate = mResult.value()["lastRotatedDate"].get_int64().value;
-            nextRotatedDate = mResult.value()["nextRotatedDate"].get_int64().value;
-            rotationEnabled = mResult.value()["rotationEnabled"].get_bool().value;
-            rotationLambdaARN = bsoncxx::string::to_string(mResult.value()["rotationLambdaARN"].get_string().value);
-            created = bsoncxx::types::b_date(mResult.value()["created"].get_date().value);
-            modified = bsoncxx::types::b_date(mResult.value()["modified"].get_date().value);
+            oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+            region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+            name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+            arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
+            secretId = Core::Bson::BsonUtils::GetStringValue(mResult, "secretId");
+            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsKeyId");
+            versionId = Core::Bson::BsonUtils::GetStringValue(mResult, "versionId");
+            secretString = Core::Bson::BsonUtils::GetStringValue(mResult, "secretString");
+            secretBinary = Core::Bson::BsonUtils::GetStringValue(mResult, "secretBinary");
+            description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
+            owningService = Core::Bson::BsonUtils::GetStringValue(mResult, "owningService");
+            primaryRegion = Core::Bson::BsonUtils::GetStringValue(mResult, "primaryRegion");
+            createdDate = Core::Bson::BsonUtils::GetLongValue(mResult, "createdDate");
+            deletedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "deletedDate");
+            lastAccessedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastAccessedDate");
+            lastChangedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastChangedDate");
+            lastRotatedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastRotatedDate");
+            nextRotatedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "nextRotatedDate");
+            rotationEnabled = Core::Bson::BsonUtils::GetLongValue(mResult, "rotationEnabled");
+            rotationLambdaARN = Core::Bson::BsonUtils::GetStringValue(mResult, "rotationLambdaARN");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get rotation rules
             if (mResult.value().find("rotationRules") != mResult.value().end()) {
                 const view rotationView = mResult.value()["rotationRules"].get_document().value;
-                rotationRules.automaticallyAfterDays = rotationView["automaticallyAfterDays"].get_int64().value;
-                rotationRules.duration = bsoncxx::string::to_string(rotationView["duration"].get_string().value);
-                rotationRules.scheduleExpression = bsoncxx::string::to_string(rotationView["scheduleExpression"].get_string().value);
+                rotationRules.automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(rotationView, "automaticallyAfterDays");
+                rotationRules.duration = Core::Bson::BsonUtils::GetStringValue(rotationView, "duration");
+                rotationRules.scheduleExpression = Core::Bson::BsonUtils::GetStringValue(rotationView, "scheduleExpression");
             }
         } catch (const bsoncxx::exception &exc) {
             log_error << "Exception: oid: " << oid << " error: " << exc.what();

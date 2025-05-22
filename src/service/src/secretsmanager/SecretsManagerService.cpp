@@ -126,7 +126,7 @@ namespace AwsMock::Service {
             response.versionId = secret.versionId;
             if (!secret.secretString.empty()) {
                 const std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
-                int len = base64Decoded.length();
+                int len = static_cast<int>(base64Decoded.length());
                 response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, (unsigned char *) _kmsKey.c_str())));
             } /*else if (!secret.secretString.empty()) {
                 std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
