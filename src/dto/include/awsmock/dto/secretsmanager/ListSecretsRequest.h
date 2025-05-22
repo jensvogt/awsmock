@@ -72,7 +72,8 @@ namespace AwsMock::Dto::SecretsManager {
             r.sortOrder = Core::Json::GetStringValue(v, "SortOrder");
             r.maxResults = Core::Json::GetLongValue(v, "MaxResults");
             r.includePlannedDeletion = Core::Json::GetBoolValue(v, "IncludePlannedDeletion");
-            r.filters = boost::json::value_to<std::vector<Filter>>(v.at("Filters"));
+            if (Core::Json::AttributeExists(v, "Filters"))
+                r.filters = boost::json::value_to<std::vector<Filter>>(v.at("Filters"));
             return r;
         }
 

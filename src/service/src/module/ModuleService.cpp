@@ -271,10 +271,9 @@ namespace AwsMock::Service {
                         dynamoDbRequest.region = table.region;
                         dynamoDbRequest.tableName = table.name;
                         dynamoDbRequest.provisionedThroughput = provisionedThroughput;
-                        // TODO: Fix with next JSON schema
-                        //dynamoDbRequest.attributes = table.attributes;
-                        //dynamoDbRequest.keySchemas = table.keySchemas;
-                        //                        dynamoDbRequest.tags = table.tags;
+                        dynamoDbRequest.attributes = table.attributes;
+                        dynamoDbRequest.keySchemas = table.keySchemas;
+                        dynamoDbRequest.tags = table.tags;
                         Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
                     } else {
                         _dynamoDatabase.CreateOrUpdateTable(table);
