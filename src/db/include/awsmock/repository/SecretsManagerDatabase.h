@@ -62,13 +62,22 @@ namespace AwsMock::Database {
         bool SecretExists(const Entity::SecretsManager::Secret &secret) const;
 
         /**
-         * @brief Secret exists
+         * @brief Secret exists by ID
          *
          * @param secretId secret ID
          * @return true if secret exists
          * @throws DatabaseException
          */
         bool SecretExists(const std::string &secretId) const;
+
+        /**
+         * @brief Secret exists by ARN
+         *
+         * @param arn secret ARN
+         * @return true if secret exists
+         * @throws DatabaseException
+         */
+        bool SecretExistsByArn(const std::string &arn) const;
 
         /**
          * @brief Returns the secret by oid
@@ -87,6 +96,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SecretsManager::Secret GetSecretById(const std::string &oid) const;
+
+        /**
+         * @brief Returns the secret by AWS ARN
+         *
+         * @param arn secret ARN
+         * @return secret, if existing
+         * @throws DatabaseException
+         */
+        Entity::SecretsManager::Secret GetSecretByArn(const std::string &arn) const;
 
         /**
          * @brief Returns the secret by region and name.

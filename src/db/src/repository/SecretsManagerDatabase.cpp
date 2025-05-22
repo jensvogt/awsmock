@@ -33,6 +33,27 @@ namespace AwsMock::Database {
         return _memoryDb.SecretExists(region, name);
     }
 
+    bool SecretsManagerDatabase::SecretExistsByArn(const std::string &arn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
+
+                const int64_t count = _secretCollection.count_documents(make_document(kvp("arn", arn)));
+                log_trace << "Secret exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.SecretExistsByArn(arn);
+    }
+
     bool SecretsManagerDatabase::SecretExists(const Entity::SecretsManager::Secret &secret) const {
         return SecretExists(secret.region, secret.name);
     }
@@ -115,6 +136,25 @@ namespace AwsMock::Database {
             return result;
         }
         return _memoryDb.GetSecretBySecretId(secretId);
+    }
+
+    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretByArn(const std::string &arn) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
+            const auto mResult = _bucketCollection.find_one(make_document(kvp("arn", arn)));
+            if (mResult->empty()) {
+                return {};
+            }
+
+            Entity::SecretsManager::Secret result;
+            result.FromDocument(mResult->view());
+            log_trace << "Got secret: " << result.ToString();
+            return result;
+        }
+        return _memoryDb.GetSecretByArn(arn);
     }
 
     Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) const {

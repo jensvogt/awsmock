@@ -16,6 +16,14 @@ namespace AwsMock::Database {
                                     }) != _secrets.end();
     }
 
+    bool SecretsManagerMemoryDb::SecretExistsByArn(const std::string &arn) const {
+
+        return std::ranges::find_if(_secrets,
+                                    [arn](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                        return secret.second.arn == arn;
+                                    }) != _secrets.end();
+    }
+
     bool SecretsManagerMemoryDb::SecretExists(const Entity::SecretsManager::Secret &secret) {
         return SecretExists(secret.region, secret.name);
     }
@@ -65,6 +73,22 @@ namespace AwsMock::Database {
         const auto it = std::ranges::find_if(_secrets,
                                              [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                                                  return secret.second.secretId == secretId;
+                                             });
+
+        if (it != _secrets.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+        return {};
+    }
+
+    Entity::SecretsManager::Secret SecretsManagerMemoryDb::GetSecretByArn(const std::string &arn) {
+
+        Entity::SecretsManager::Secret result;
+
+        const auto it = std::ranges::find_if(_secrets,
+                                             [arn](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
+                                                 return secret.second.arn == arn;
                                              });
 
         if (it != _secrets.end()) {
