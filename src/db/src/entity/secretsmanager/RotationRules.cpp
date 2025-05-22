@@ -16,11 +16,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return rotationRulesDoc.extract();
     }
 
-    void RotationRules::FromDocument(std::optional<view> mResult) {
+    void RotationRules::FromDocument(const std::optional<view> &mResult) {
 
-        automaticallyAfterDays = mResult.value()["automaticallyAfterDays"].get_int64().value;
-        duration = bsoncxx::string::to_string(mResult.value()["duration"].get_string().value);
-        scheduleExpression = bsoncxx::string::to_string(mResult.value()["scheduleExpression"].get_string().value);
+        automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(mResult, "automaticallyAfterDays");
+        duration = Core::Bson::BsonUtils::GetStringValue(mResult, "duration");
+        scheduleExpression = Core::Bson::BsonUtils::GetStringValue(mResult, "scheduleExpression");
     }
 
     std::string RotationRules::ToString() const {

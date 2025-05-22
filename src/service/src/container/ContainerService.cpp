@@ -103,10 +103,13 @@ namespace AwsMock::Service {
 
         std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
         std::string imageFile = BuildImageFile(codeDir, name);
-
-        if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile); statusCode != http::status::ok) {
+        auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
+        log_trace << "Build image, status: " << statusCode << ", body: " << body;
+        if (statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
+            return {};
         }
+
         log_debug << "Build image request finished, name: " << name << " tags: " << tag << " runtime: " << runtime;
         return imageFile;
     }
@@ -115,7 +118,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
         log_debug << "Build image request, name: " << name << " tags: " << tag;
 
-        // Write docker file
+        // Write the docker file
         const std::string codeDir = Core::DirUtils::CreateTempDir();
         const std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::ofstream ofs(fileName);
@@ -633,11 +636,8 @@ namespace AwsMock::Service {
                 ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
             }
             ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws" << std::endl;
-            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "RUN pip install -r requirements.txt" << std::endl;
-            ofs << "COPY lambda_function.py ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;
@@ -646,9 +646,6 @@ namespace AwsMock::Service {
             }
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
             ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws" << std::endl;
-            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
             ofs << "FROM " << supportedRuntime << std::endl;
@@ -657,9 +654,6 @@ namespace AwsMock::Service {
             }
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws" << std::endl;
-            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         }
         ofs.close();
