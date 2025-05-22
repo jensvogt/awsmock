@@ -329,7 +329,7 @@ namespace AwsMock::Service {
                     sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
                     std::istream stream(&sb);
 
-                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId);
+                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId, std::stol(contentLength));
 
                     std::map<std::string, std::string> headerMap;
                     headerMap["ETag"] = Core::StringUtils::Quoted(eTag);
@@ -423,9 +423,12 @@ namespace AwsMock::Service {
                     return SendBadRequestError(request, "Unknown method");
             }
 
+        } catch (Core::NotFoundException &exc) {
+            log_error << exc.message();
+            return SendInternalServerError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendNotFoundError(request, exc.what());
         } catch (...) {
             log_error << "Unknown exception";
             return SendInternalServerError(request, "Unknown exception");
@@ -494,7 +497,7 @@ namespace AwsMock::Service {
 
                     Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
-                    log_info << "Create multi-part upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
+                    log_info << "Created multi-part upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     return SendOkResponse(request, result.ToXml());
                 }
 
@@ -658,7 +661,7 @@ namespace AwsMock::Service {
                 }
 
                 default:
-                    log_error << "Unknown method";
+                    log_error << "Unknown method, command: " << Dto::Common::S3CommandTypeToString(clientCommand.command);
                     return SendBadRequestError(request, "Unknown method");
             }
 
@@ -713,6 +716,9 @@ namespace AwsMock::Service {
             log_info << "Get metadata, count: " << s3Response.metadata.size();
             return SendHeadResponse(request, s3Response.size, headers);
 
+        } catch (Core::NotFoundException &exc) {
+            log_error << exc.message();
+            return SendNotFoundError(request, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());

@@ -9,11 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -22,7 +20,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminCreateUserRequest final : Common::BaseDto<AdminCreateUserRequest> {
+    struct AdminCreateUserRequest final : Common::BaseCounter<AdminCreateUserRequest> {
 
         /**
          * ID of the user pool
@@ -47,21 +45,34 @@ namespace AwsMock::Dto::Cognito {
         /**
          * User userAttributes list
          */
-        UserAttributeList userAttributes;
+        std::vector<UserAttribute> userAttributes;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend AdminCreateUserRequest tag_invoke(boost::json::value_to_tag<AdminCreateUserRequest>, boost::json::value const &v) {
+            AdminCreateUserRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            r.messageAction = MessageActionFromString(Core::Json::GetStringValue(v, "messageAction"));
+            r.temporaryPassword = Core::Json::GetStringValue(v, "temporaryPassword");
+            if (Core::Json::AttributeExists(v, "userAttributes")) {
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "userAttributes");
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminCreateUserRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", obj.userPoolId},
+                    {"userName", obj.userName},
+                    {"messageAction", MessageActionToString(obj.messageAction)},
+                    {"temporaryPassword", obj.temporaryPassword},
+                    {"userAttributes", boost::json::value_from(obj.userAttributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

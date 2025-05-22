@@ -27,7 +27,7 @@ set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secre
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
 set(SSM_SOURCES src/entity/ssm/Parameter.cpp src/repository/SSMDatabase.cpp src/memorydb/SSMMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
-set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp)
+set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp src/utils/SqsUtils.cpp)
 set(MONITORING_SOURCES src/entity/monitoring/Counter.cpp src/repository/MonitoringDatabase.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
@@ -36,7 +36,7 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
 
 # Test directory
 if (NOT WIN32)
-    add_subdirectory(tst)
+    add_subdirectory(btst)
 endif ()
 
 # Includes

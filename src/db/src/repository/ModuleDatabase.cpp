@@ -361,7 +361,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
                 const auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
-                log_info << "Service deleted, count: " << result->deleted_count();
+                log_debug << "Module deleted, count: " << result->deleted_count();
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Delete module failed, error: " << e.what();
@@ -373,7 +373,7 @@ namespace AwsMock::Database {
         }
     }
 
-    void ModuleDatabase::DeleteAllModules() {
+    long ModuleDatabase::DeleteAllModules() {
 
         if (HasDatabase()) {
 
@@ -382,16 +382,14 @@ namespace AwsMock::Database {
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
                 const auto result = _moduleCollection.delete_many(make_document());
-                log_info << "All module deleted, count: " << result->deleted_count();
+                log_debug << "All module deleted, count: " << result->deleted_count();
+                return result->deleted_count();
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Delete all module failed, error: " << e.what();
             }
-
-        } else {
-
-            return _memoryDb.DeleteAllModules();
         }
+        return _memoryDb.DeleteAllModules();
     }
 
 }// namespace AwsMock::Database

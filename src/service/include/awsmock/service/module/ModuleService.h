@@ -39,6 +39,10 @@ namespace AwsMock::Service {
     /**
      * @brief The ModuleService controls the different services
      *
+     * @par
+     * Provides the import/export functionalities. Exports are provided using the BSON structure directly out of the
+     * MongoDB. Imports assume a valid BSON document, which is directly imported into the MongoDB.
+     *
      * @author jens.vogt\@opitz-consulting.com
      */
     class ModuleService {
@@ -48,10 +52,10 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()){};
+        explicit ModuleService() : _moduleDatabase(Database::ModuleDatabase::instance()) {};
 
         /**
-         * @brief Return all list of all modules
+         * @brief Return a list of all modules
          *
          * @return list of all modules
          */
@@ -74,6 +78,13 @@ namespace AwsMock::Service {
         Dto::Module::Module::ModuleList StopModules(Dto::Module::Module::ModuleList &modules) const;
 
         /**
+         * @brief List module names
+         *
+         * @return JSON string
+         */
+        Dto::Module::ListModuleNamesResponse ListModuleNames() const;
+
+        /**
          * @brief Exports the current infrastructure
          *
          * @par
@@ -82,14 +93,7 @@ namespace AwsMock::Service {
          * @param request export infrastructure request
          * @return JSON string
          */
-        Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request);
-
-        /**
-         * @brief List module names
-         *
-         * @return JSON string
-         */
-        Dto::Module::ListModuleNamesResponse ListModuleNames() const;
+        static Dto::Module::ExportInfrastructureResponse ExportInfrastructure(const Dto::Module::ExportInfrastructureRequest &request);
 
         /**
          * @brief Import the infrastructure

@@ -41,12 +41,12 @@ namespace AwsMock::Dto::Cognito {
     }
 
     Database::Entity::Cognito::Group Mapper::map(const CreateGroupRequest &request) {
-        Database::Entity::Cognito::Group group = {
-                .region = request.region,
-                .userPoolId = request.userPoolId,
-                .groupName = request.groupName,
-                .description = request.description,
-                .precedence = request.precedence};
+        Database::Entity::Cognito::Group group;
+        group.region = request.region;
+        group.userPoolId = request.userPoolId;
+        group.groupName = request.groupName;
+        group.description = request.description;
+        group.precedence = request.precedence;
         return group;
     }
 
@@ -95,31 +95,22 @@ namespace AwsMock::Dto::Cognito {
     }
 
     UserPool Mapper::map(const Database::Entity::Cognito::UserPool &userPoolEntity) {
-        UserPool userPoolDto = {
-                .id = userPoolEntity.userPoolId,
-                .region = userPoolEntity.region,
-                .name = userPoolEntity.name,
-                .userPoolId = userPoolEntity.userPoolId,
-                .arn = userPoolEntity.arn,
-                .domain = userPoolEntity.domain.domain,
-                .created = userPoolEntity.created,
-                .modified = userPoolEntity.modified};
+        UserPool userPoolDto;
+        userPoolDto.userPoolId = userPoolEntity.userPoolId;
+        userPoolDto.region = userPoolEntity.region;
+        userPoolDto.name = userPoolEntity.name;
+        userPoolDto.userPoolId = userPoolEntity.userPoolId;
+        userPoolDto.arn = userPoolEntity.arn;
+        userPoolDto.domain = userPoolEntity.domain.domain;
+        userPoolDto.created = userPoolEntity.created;
+        userPoolDto.modified = userPoolEntity.modified;
         return userPoolDto;
     }
 
     std::vector<UserPool> Mapper::map(const std::vector<Database::Entity::Cognito::UserPool> &userPoolEntities) {
         std::vector<UserPool> userPoolDtos;
         for (const auto &userPoolEntity: userPoolEntities) {
-            UserPool userPoolDto = {
-                    .id = userPoolEntity.userPoolId,
-                    .region = userPoolEntity.region,
-                    .name = userPoolEntity.name,
-                    .userPoolId = userPoolEntity.userPoolId,
-                    .arn = userPoolEntity.arn,
-                    .domain = userPoolEntity.domain.domain,
-                    .created = userPoolEntity.created,
-                    .modified = userPoolEntity.modified};
-            userPoolDtos.emplace_back(userPoolDto);
+            userPoolDtos.emplace_back(map(userPoolEntity));
         }
         return userPoolDtos;
     }
@@ -142,15 +133,13 @@ namespace AwsMock::Dto::Cognito {
     }
 
     User Mapper::map(const Database::Entity::Cognito::User &userEntity) {
-        User userDto = {
-                .region = userEntity.region,
-                .userPoolId = userEntity.userPoolId,
-                .userName = userEntity.userName,
-                .enabled = userEntity.enabled,
-                .created = userEntity.created,
-                .modified = userEntity.modified,
-        };
-
+        User userDto;
+        userDto.region = userEntity.region;
+        userDto.userPoolId = userEntity.userPoolId;
+        userDto.userName = userEntity.userName;
+        userDto.enabled = userEntity.enabled;
+        userDto.created = userEntity.created;
+        userDto.modified = userEntity.modified;
         for (const auto &group: userEntity.groups) {
             userDto.groups.emplace_back(map(group));
         }
@@ -180,13 +169,13 @@ namespace AwsMock::Dto::Cognito {
     }
 
     Group Mapper::map(const Database::Entity::Cognito::Group &groupEntity) {
-        Group groupDto = {
-                .region = groupEntity.region,
-                .groupName = groupEntity.groupName,
-                .userPoolId = groupEntity.userPoolId,
-                .precedence = groupEntity.precedence,
-                .created = groupEntity.created,
-                .modified = groupEntity.modified};
+        Group groupDto;
+        groupDto.region = groupEntity.region;
+        groupDto.groupName = groupEntity.groupName;
+        groupDto.userPoolId = groupEntity.userPoolId;
+        groupDto.precedence = groupEntity.precedence;
+        groupDto.created = groupEntity.created;
+        groupDto.modified = groupEntity.modified;
         return groupDto;
     }
 
@@ -196,16 +185,16 @@ namespace AwsMock::Dto::Cognito {
         tokenValidityUnits.refreshToken = GetMaxTokenUnits(clientEntity.refreshTokenValidity);
         tokenValidityUnits.idToken = GetMaxTokenUnits(clientEntity.idTokenValidity);
 
-        UserPoolClient userPoolClient = {
-                .userPoolId = clientEntity.userPoolId,
-                .clientId = clientEntity.clientId,
-                .clientName = clientEntity.clientName,
-                .clientSecret = clientEntity.clientSecret,
-                .accessTokenValidity = GetMaxValidityToken(clientEntity.accessTokenValidity, tokenValidityUnits.accessToken),
-                .idTokenValidity = GetMaxValidityToken(clientEntity.idTokenValidity, tokenValidityUnits.idToken),
-                .refreshTokenValidity = GetMaxValidityToken(clientEntity.refreshTokenValidity, tokenValidityUnits.refreshToken),
-                .created = clientEntity.created,
-                .modified = clientEntity.modified};
+        UserPoolClient userPoolClient;
+        userPoolClient.userPoolId = clientEntity.userPoolId;
+        userPoolClient.clientId = clientEntity.clientId;
+        userPoolClient.clientName = clientEntity.clientName;
+        userPoolClient.clientSecret = clientEntity.clientSecret;
+        userPoolClient.accessTokenValidity = GetMaxValidityToken(clientEntity.accessTokenValidity, tokenValidityUnits.accessToken);
+        userPoolClient.idTokenValidity = GetMaxValidityToken(clientEntity.idTokenValidity, tokenValidityUnits.idToken);
+        userPoolClient.refreshTokenValidity = GetMaxValidityToken(clientEntity.refreshTokenValidity, tokenValidityUnits.refreshToken);
+        userPoolClient.created = clientEntity.created;
+        userPoolClient.modified = clientEntity.modified;
         return userPoolClient;
     }
 

@@ -72,20 +72,20 @@ namespace AwsMock::Database {
         }
 
         /**
-         * @brief Check existence of topic
+         * @brief Check the existence of a topic
          *
          * @param region AWS region
          * @param topicName topic name
-         * @return true if topic already exists
+         * @return true if the topic already exists
          * @throws DatabaseException
          */
         bool TopicExists(const std::string &region, const std::string &topicName) const;
 
         /**
-         * @brief Check existence of topic
+         * @brief Check the existence of a topic
          *
          * @param topicArn topic ARN
-         * @return true if topic already exists
+         * @return true if the topic already exists
          * @throws DatabaseException
          */
         bool TopicExists(const std::string &topicArn) const;
@@ -198,7 +198,7 @@ namespace AwsMock::Database {
          * @return list of SNS topics
          * @throws DatabaseException
          */
-        Entity::SNS::TopicList ListTopics(const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region = {}) const;
+        Entity::SNS::TopicList ListTopics(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region = {}) const;
 
         /**
          * @brief Export all available topics
@@ -354,6 +354,14 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         Entity::SNS::Message CreateOrUpdateMessage(Entity::SNS::Message &message) const;
+
+        /**
+         * @brief Sets the message status
+         *
+         * @param message SNS message
+         * @param status new status
+         */
+        void SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const;
 
         /**
          * @brief Deletes a message.

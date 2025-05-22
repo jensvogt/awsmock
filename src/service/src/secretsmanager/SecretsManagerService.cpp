@@ -49,10 +49,10 @@ namespace AwsMock::Service {
 
             // Either string or binary data
             if (!request.secretString.empty()) {
-                auto *plaintext = (unsigned char *) request.secretString.c_str();
-                int len = static_cast<int>(strlen(reinterpret_cast<const char *>(plaintext)));
-                unsigned char *encrypted = Core::Crypto::Aes256EncryptString(plaintext, &len, (unsigned char *) _kmsKey.c_str());
-                secret.secretString = Core::Crypto::Base64Encode({reinterpret_cast<char *>(encrypted), static_cast<size_t>(len)});
+                const auto *plaintext = reinterpret_cast<const unsigned char *>(request.secretString.c_str());
+                int plaintextLength = static_cast<int>(request.secretString.length());
+                unsigned char *encrypted = Core::Crypto::Aes256EncryptString(const_cast<unsigned char *>(plaintext), &plaintextLength, reinterpret_cast<unsigned char *>(const_cast<char *>(_kmsKey.c_str())));
+                secret.secretString = Core::Crypto::Base64Encode({reinterpret_cast<char *>(encrypted), static_cast<size_t>(plaintextLength)});
             } else {
                 secret.secretBinary = request.secretBinary;
             }
@@ -62,7 +62,14 @@ namespace AwsMock::Service {
             log_error << exc.what();
             throw Core::ServiceException(exc.what());
         }
-        return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
+
+        Dto::SecretsManager::CreateSecretResponse response;
+        response.region = secret.region;
+        response.name = secret.name;
+        response.arn = secret.arn;
+        response.versionId = secret.versionId;
+
+        return response;
     }
 
     Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const {
@@ -195,7 +202,7 @@ namespace AwsMock::Service {
 
         try {
 
-            // Get object from database
+            // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
 
             // Update database
@@ -209,7 +216,12 @@ namespace AwsMock::Service {
 
             // Convert to DTO
             log_debug << "Database secret described, secretId: " << request.secretId;
-            return {.region = secret.region, .name = secret.name, .arn = secret.arn, .versionId = secret.versionId};
+            Dto::SecretsManager::UpdateSecretResponse response;
+            response.region = secret.region;
+            response.name = secret.name;
+            response.arn = secret.arn;
+            response.versionId = secret.versionId;
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
@@ -228,7 +240,7 @@ namespace AwsMock::Service {
 
         try {
 
-            // Get object from database
+            // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
             secret.lastRotatedDate = Core::DateTimeUtils::UnixTimestampNow();
 
@@ -242,7 +254,10 @@ namespace AwsMock::Service {
 
             // Convert to DTO
             log_debug << "Database secret described, secretId: " << request.secretId;
-            return {.region = secret.region, .arn = secret.arn};
+            Dto::SecretsManager::RotateSecretResponse response;
+            response.region = secret.region;
+            response.arn = secret.arn;
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
@@ -262,13 +277,18 @@ namespace AwsMock::Service {
         Dto::SecretsManager::DeleteSecretResponse response;
         try {
 
-            // Get object from database
+            // Get an object from the database
             const Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
 
             // Delete from database
             _database.DeleteSecret(secret);
             log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
-            return {.region = request.region, .name = secret.name, .arn = secret.arn, .deletionDate = static_cast<double>(Core::DateTimeUtils::UnixTimestampNow() - secret.lastRotatedDate)};
+            Dto::SecretsManager::DeleteSecretResponse response;
+            response.region = request.region;
+            response.name = secret.name;
+            response.arn = secret.arn;
+            response.deletionDate = static_cast<double>(Core::DateTimeUtils::UnixTimestampNow() - secret.lastRotatedDate);
+            return response;
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SecretManager delete secret failed, message: " + exc.message();

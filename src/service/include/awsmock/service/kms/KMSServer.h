@@ -36,6 +36,16 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * @brief Update counters
+         */
+        void UpdateCounter() const;
+
+        /**
+         * @brief Delete keys which are pending for deletion
+         */
+        void DeleteKeys() const;
+
+        /**
          * KMS database
          */
         Database::KMSDatabase &_kmsDatabase;
@@ -49,6 +59,11 @@ namespace AwsMock::Service {
          * SNS worker
          */
         KMSWorker _kmsWorker;
+
+        /**
+         * @brief Metric service
+         */
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief KMS server period

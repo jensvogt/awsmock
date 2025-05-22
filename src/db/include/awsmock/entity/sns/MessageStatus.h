@@ -22,9 +22,9 @@ namespace AwsMock::Database::Entity::SNS {
         RESEND
     };
     static std::map<MessageStatus, std::string> MessageStatusNames{
-            {MessageStatus::INITIAL, "INITIAL"},
-            {MessageStatus::SEND, "SEND"},
-            {MessageStatus::RESEND, "RESEND"},
+            {INITIAL, "INITIAL"},
+            {SEND, "SEND"},
+            {RESEND, "RESEND"},
     };
 
     [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
@@ -32,12 +32,12 @@ namespace AwsMock::Database::Entity::SNS {
     }
 
     [[maybe_unused]] static MessageStatus MessageStatusFromString(const std::string &messageStatusString) {
-        for (auto &it: MessageStatusNames) {
-            if (it.second == messageStatusString) {
-                return it.first;
+        for (auto &[fst, snd]: MessageStatusNames) {
+            if (snd == messageStatusString) {
+                return fst;
             }
         }
-        return MessageStatus::INITIAL;
+        return INITIAL;
     }
 
 }// namespace AwsMock::Database::Entity::SNS

@@ -114,20 +114,20 @@ namespace AwsMock::Dto::SQS {
 
         friend GetQueueDetailsResponse tag_invoke(boost::json::value_to_tag<GetQueueDetailsResponse>, boost::json::value const &v) {
             GetQueueDetailsResponse r;
-            r.queueName = v.at("queueName").as_string();
-            r.queueUrl = v.at("queueUrl").as_string();
-            r.queueArn = v.at("queueArn").as_string();
-            r.owner = v.at("owner").as_string();
-            r.dlqArn = v.at("dlqArn").as_string();
-            r.dlqMaxReceive = v.at("dlqMaxReceive").as_int64();
-            r.messageCount = v.at("messageCount").as_int64();
-            r.retentionPeriod = v.at("retentionPeriod").as_int64();
-            r.maxMessageSize = v.at("maxMessageSize").as_int64();
-            r.visibilityTimeout = v.at("visibilityTimeout").as_int64();
-            r.size = v.at("size").as_int64();
-            r.delay = v.at("delay").as_int64();
-            r.invisible = v.at("invisible").as_int64();
-            r.delayed = v.at("delayed").as_int64();
+            r.queueName = Core::Json::GetStringValue(v, "queueName");
+            r.queueUrl = Core::Json::GetStringValue(v, "queueUrl");
+            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.owner = Core::Json::GetStringValue(v, "owner");
+            r.dlqArn = Core::Json::GetStringValue(v, "dlqArn");
+            r.dlqMaxReceive = Core::Json::GetLongValue(v, "dlqMaxReceive");
+            r.messageCount = Core::Json::GetLongValue(v, "messageCount");
+            r.retentionPeriod = Core::Json::GetLongValue(v, "retentionPeriod");
+            r.maxMessageSize = Core::Json::GetLongValue(v, "maxMessageSize");
+            r.visibilityTimeout = Core::Json::GetLongValue(v, "visibilityTimeout");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.delay = Core::Json::GetLongValue(v, "delay");
+            r.invisible = Core::Json::GetLongValue(v, "invisible");
+            r.delayed = Core::Json::GetLongValue(v, "delayed");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;

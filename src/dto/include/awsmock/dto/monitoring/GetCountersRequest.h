@@ -10,9 +10,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Monitoring {
 
@@ -23,12 +23,7 @@ namespace AwsMock::Dto::Monitoring {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetCountersRequest {
-
-        /**
-         * AWS region name
-         */
-        std::string region;
+    struct GetCountersRequest final : Common::BaseCounter<GetCountersRequest> {
 
         /**
          * Name
@@ -48,12 +43,12 @@ namespace AwsMock::Dto::Monitoring {
         /**
          * Stepping
          */
-        int step;
+        long step{};
 
         /**
          * Limit to top x counters
          */
-        int limit = 10;
+        long limit = 10;
 
         /**
          * Start time
@@ -65,33 +60,35 @@ namespace AwsMock::Dto::Monitoring {
          */
         system_clock::time_point end;
 
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param body json input stream
-         */
-        static GetCountersRequest FromJson(const std::string &body);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend GetCountersRequest tag_invoke(boost::json::value_to_tag<GetCountersRequest>, boost::json::value const &v) {
+            GetCountersRequest r;
+            r.name = Core::Json::GetStringValue(v, "name");
+            if (Core::Json::AttributeExists(v, "labelName")) {
+                r.labelName = Core::Json::GetStringValue(v, "labelName");
+            }
+            if (Core::Json::AttributeExists(v, "labelValue")) {
+                r.labelValue = Core::Json::GetStringValue(v, "labelValue");
+            }
+            r.step = Core::Json::GetLongValue(v, "step");
+            r.limit = Core::Json::GetLongValue(v, "limit");
+            r.start = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(v, "start"));
+            r.end = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(v, "end"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetCountersRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetCountersRequest const &obj) {
+            jv = {
+                    {"name", obj.name},
+                    {"labelName", obj.labelName},
+                    {"labelValue", obj.labelValue},
+                    {"step", obj.step},
+                    {"limit", obj.limit},
+                    {"start", Core::DateTimeUtils::UnixTimestamp(obj.start)},
+                    {"end", Core::DateTimeUtils::UnixTimestamp(obj.end)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Monitoring

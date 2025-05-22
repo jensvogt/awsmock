@@ -15,6 +15,7 @@
 #elif __APPLE__
 #include <mach/mach.h>
 #include <sys/resource.h>
+#define TO_MICROS 1000000
 #endif
 
 // C++ Standard includes
@@ -63,12 +64,17 @@ namespace AwsMock::Monitoring {
         /**
         * @brief Get number of threads on macOS
         */
-        void GetThreadInfoMac();
+        static void GetThreadInfoMac();
 
         /**
          * @brief Get CPU utilization on macOS
          */
-        void GetCpuInfoMac();
+        void GetCpuInfoAwsmockMac() const;
+
+        /**
+         * @brief Get CPU utilization on macOS
+         */
+        void GetCpuInfoTotalMac();
 
         /**
          * @brief Get memory utilization on macOS
@@ -78,7 +84,7 @@ namespace AwsMock::Monitoring {
 #elif __linux__
 
         /**
-         * @brief Get number of threads on macOS
+         * @brief Get the number of threads on macOS
          */
         static void GetThreadInfoAwsmockLinux();
 
@@ -138,7 +144,18 @@ namespace AwsMock::Monitoring {
          */
         int _numProcessors;
 
-#ifdef __linux__
+#ifdef __APPLE__
+
+        /**
+         * Calculate the total CPU
+         */
+        void CalculateCPULoadMac(unsigned long long idleTicks, unsigned long long totalTicks);
+        unsigned long long _previousTotalTicks;
+        unsigned long long _previousIdleTicks;
+        unsigned long long _previousSystemTicks;
+        unsigned long long _previousUserTicks;
+
+#elif __linux__
 
         /**
          * Last collection timestamp

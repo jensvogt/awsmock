@@ -7,6 +7,7 @@ if (WIN32)
     target_include_directories(${BINARY} PUBLIC ./include ${EXTERNAL_INCLDUE_DIR})
     target_link_directories(${BINARY} PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static awsmockcore_static
+            bsoncxx-v_noabi-rhs-x64-v143-md.lib mongocxx-v_noabi-rhs-x64-v143-md.lib bson-1.0.lib mongoc-1.0.lib
             libboost_filesystem-vc143-mt-s-x64-1_88.lib libboost_url-vc143-mt-s-x64-1_88.lib
             libboost_thread-vc143-mt-s-x64-1_88.lib libboost_locale-vc143-mt-s-x64-1_88.lib
             libboost_program_options-vc143-mt-s-x64-1_88.lib libboost_log-vc143-mt-s-x64-1_88.lib
@@ -17,6 +18,10 @@ else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PUBLIC ./include ${EXTERNAL_INCLDUE_DIR})
     target_link_libraries(${BINARY} PUBLIC awsmockcore boost_program_options boost_process)
+    if (APPLE)
+        add_link_options("-rpath /usr/local/awsmock/lib")
+        set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")
+    endif ()
 endif ()
 
 install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

@@ -29,16 +29,16 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Total number of user pools
          */
-        long total;
+        long total{};
 
       private:
 
         friend ListUserPoolCountersResponse tag_invoke(boost::json::value_to_tag<ListUserPoolCountersResponse>, boost::json::value const &v) {
             ListUserPoolCountersResponse r;
-            r.region = v.at("region").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.total = v.at("total").as_int64();
-            r.userPoolCounters = boost::json::value_to<std::vector<UserPoolCounter>>(v.at("userPools"));
+            r.total = Core::Json::GetLongValue(v, "total");
+            if (Core::Json::AttributeExists(v, "userPools")) {
+                r.userPoolCounters = boost::json::value_to<std::vector<UserPoolCounter>>(v.at("userPools"));
+            }
             return r;
         }
 

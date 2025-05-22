@@ -9,13 +9,17 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/core/JsonUtils.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/SftpAuthenticationMethod.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct IdentityProviderDetails {
+    struct IdentityProviderDetails final : Common::BaseCounter<IdentityProviderDetails> {
 
         /**
          * Directory ID
@@ -35,7 +39,7 @@ namespace AwsMock::Dto::Transfer {
         /**
          * Identity provider type
          */
-        SftpAuthenticationMethod sftpAuthenticationMethod;
+        SftpAuthenticationMethod sftpAuthenticationMethod = SftpAuthenticationMethod::UNKNOWN;
 
         /**
          * Url
@@ -45,44 +49,54 @@ namespace AwsMock::Dto::Transfer {
         /**
          * @brief Converts the DTO to a JSON representation.
          *
-         * @param jsonString DTO as JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
          * @return JSON object
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the DTO to a JSON representation.
+         * @brief Converts the entity to a DTO representation.
          *
-         * @return JSON object
+         * @param document BSON document
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
+                directoryId = Core::Bson::BsonUtils::GetStringValue(document, "DirectoryId");
+                function = Core::Bson::BsonUtils::GetStringValue(document, "Function");
+                url = Core::Bson::BsonUtils::GetStringValue(document, "Url");
+                invocationRole = Core::Bson::BsonUtils::GetStringValue(document, "InvocationRole");
+                sftpAuthenticationMethod = SftpAuthenticationMethodFromString(Core::Bson::BsonUtils::GetStringValue(document, "SftpAuthenticationMethod"));
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const IdentityProviderDetails &r);
+      private:
+
+        friend IdentityProviderDetails tag_invoke(boost::json::value_to_tag<IdentityProviderDetails>, boost::json::value const &v) {
+            IdentityProviderDetails r;
+            r.directoryId = Core::Json::GetStringValue(v, "DirectoryId");
+            r.function = Core::Json::GetStringValue(v, "Function");
+            r.invocationRole = Core::Json::GetStringValue(v, "InvocationRole");
+            r.sftpAuthenticationMethod = SftpAuthenticationMethodFromString(Core::Json::GetStringValue(v, "SftpAuthenticationMethod"));
+            r.url = Core::Json::GetStringValue(v, "Url");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, IdentityProviderDetails const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"DirectoryId", obj.directoryId},
+                    {"Function", obj.function},
+                    {"InvocationRole", obj.invocationRole},
+                    {"SftpAuthenticationMethod", SftpAuthenticationMethodToString(obj.sftpAuthenticationMethod)},
+                    {"Url", obj.url},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

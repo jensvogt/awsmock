@@ -66,26 +66,11 @@ namespace AwsMock::Monitoring {
          * @brief Increments a counter.
          *
          * @param name of the counter
-         * @param value value for the incrementation (default: 1), can be negative
-         */
-        void IncrementCounter(const std::string &name, int value = 1);
-
-        /**
-         * @brief Increments a labeled counter.
-         *
-         * @param name of the counter
          * @param labelName name of the label
          * @param labelValue label value of the counter
-         * @param value value for the incrementation (default: 1), can be negative
+         * @param value value for the incrementation (default: 1) can be negative
          */
-        void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, int value = 1);
-
-        /**
-         * @brief Clears a counter.
-         *
-         * @param name of the counter
-         */
-        void ClearCounter(const std::string &name) const;
+        void IncrementCounter(const std::string &name, const std::string &labelName = {}, const std::string &labelValue = {}, int value = 1);
 
         /**
          * @brief Clears a counter.
@@ -94,15 +79,7 @@ namespace AwsMock::Monitoring {
          * @param labelName name of the label
          * @param labelValue label value of the counter
          */
-        void ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
-
-        /**
-         * @brief Sets a double gauge value in the map.
-         *
-         * @param name name of the gauge
-         * @param value value of the gauge
-         */
-        [[maybe_unused]] void SetGauge(const std::string &name, double value);
+        void ClearCounter(const std::string &name, const std::string &labelName = {}, const std::string &labelValue = {}) const;
 
         /**
          * @brief Sets a double gauge value in the map.
@@ -112,7 +89,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the gauge
          * @param value value of the gauge
          */
-        void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value);
+        [[maybe_unused]] void SetGauge(const std::string &name, const std::string &labelName = {}, const std::string &labelValue = {}, double value = 0.0);
 
       private:
 
@@ -143,7 +120,7 @@ namespace AwsMock::Monitoring {
          * @brief Check whether a counter exists
          *
          * @param name name of the counter.
-         * @return true if counter exists.
+         * @return true if the counter exists.
          */
         [[nodiscard]] bool CounterExists(const std::string &name) const;
 
@@ -153,7 +130,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the counter.
          * @param labelName label name of the counter
          * @param labelValue label value of the counter
-         * @return true if counter exists.
+         * @return true if the counter exists.
          */
         [[nodiscard]] bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
@@ -194,7 +171,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the gauge.
          * @return true if gauge exists.
          */
-        bool GaugeExists(const std::string &name) const;
+        [[nodiscard]] bool GaugeExists(const std::string &name) const;
 
         /**
          * @brief Check whether a gauge exists

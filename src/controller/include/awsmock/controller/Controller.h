@@ -138,16 +138,6 @@ namespace AwsMock::Controller {
         void CleanObjects(Dto::Module::Module::ModuleList &modules) const;
 
         /**
-         * @brief Show FTP users.
-         *
-         * As the AWS CLI does not allow to see the users password, this is a workaround. It will send a FTP user list
-         * request to the server and shows the currently defined FTP users.
-         *
-         * @param serverId ID of the FTP server.
-         */
-        void ShowFtpUsers(const std::string &serverId) const;
-
-        /**
          * @brief Send a ping to the server and waits for the response
          */
         void PingManager() const;
@@ -155,7 +145,7 @@ namespace AwsMock::Controller {
       private:
 
         /**
-         * @brief Add authorization header.
+         * @brief Add an authorization header.
          *
          * @param headers headers
          * @param action action to perform

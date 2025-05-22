@@ -92,43 +92,22 @@ namespace AwsMock::Database {
                     return;
                 }
 
-                // As mongoDB uses UTC timestamps, we need to calculate everything in UTC
-                const system_clock::time_point now = Core::DateTimeUtils::UtcDateTimeNow();
-                const system_clock::time_point end = Core::CeilTimePoint(now, std::chrono::seconds(300));
-                const system_clock::time_point middle = end - std::chrono::seconds(150);
-
-                document document;
-                document.append(kvp("name", name));
-                document.append(kvp("created", bsoncxx::types::b_date(middle)));
+                document newDocument;
+                newDocument.append(kvp("value", value));
+                newDocument.append(kvp("count", 1));
+                newDocument.append(kvp("name", name));
+                newDocument.append(kvp("created", bsoncxx::types::b_date(Core::DateTimeUtils::UtcDateTimeNow())));
                 if (!labelName.empty()) {
-                    document.append(kvp("labelName", labelName));
+                    newDocument.append(kvp("labelName", labelName));
                 }
                 if (!labelValue.empty()) {
-                    document.append(kvp("labelValue", labelValue));
+                    newDocument.append(kvp("labelValue", labelValue));
                 }
 
                 session.start_transaction();
-                if (const auto mResult = _monitoringCollection.find_one(document.extract())) {
-                    double currentValue = mResult.value()["value"].get_double().value;
-                    int currentCount = mResult.value()["count"].get_int32().value;
-                    currentValue += value / static_cast<double>(++currentCount);
-                    _monitoringCollection.update_one(make_document(kvp("_id", mResult.value()["_id"].get_oid())),
-                                                     make_document(kvp("$set", make_document(kvp("value", currentValue), kvp("count", currentCount)))));
-                } else {
-                    bsoncxx::builder::basic::document newDocument;
-                    newDocument.append(kvp("value", value));
-                    newDocument.append(kvp("count", 1));
-                    newDocument.append(kvp("name", name));
-                    newDocument.append(kvp("created", bsoncxx::types::b_date(middle)));
-                    if (!labelName.empty()) {
-                        newDocument.append(kvp("labelName", labelName));
-                    }
-                    if (!labelValue.empty()) {
-                        newDocument.append(kvp("labelValue", labelValue));
-                    }
-                    _monitoringCollection.insert_one(newDocument.extract());
-                }
+                _monitoringCollection.insert_one(newDocument.extract());
                 session.commit_transaction();
+
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
@@ -139,9 +118,10 @@ namespace AwsMock::Database {
         }
     }
 
+    typedef boost::date_time::local_adjustor<boost::posix_time::ptime, +2, boost::posix_time::no_dst> eu_central;
     std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
-
+        using namespace std::literals;
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
@@ -149,14 +129,10 @@ namespace AwsMock::Database {
             try {
                 // As mongoDB uses UTC timestamps, we need to convert everything to UTC
 #ifdef __APPLE__
-                // As mongoDB uses UTC timestamps, we need to convert everything to UTC
                 const std::chrono::time_point startTime = std::chrono::time_point_cast<std::chrono::microseconds>(start);
                 auto startUtc = bsoncxx::types::b_date(system_clock::time_point(startTime.time_since_epoch()));
                 const std::chrono::time_point endTime = std::chrono::time_point_cast<std::chrono::microseconds>(end);
                 auto endUtc = bsoncxx::types::b_date(system_clock::time_point(endTime.time_since_epoch()));
-#elif __linux__
-                auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
-                auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));
 #else
                 auto startUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(start));
                 auto endUtc = bsoncxx::types::b_date(Core::DateTimeUtils::ConvertToUtc(end));

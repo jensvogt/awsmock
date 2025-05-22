@@ -117,7 +117,6 @@ namespace AwsMock::Service {
             // Get the list of tables from DynamoDB
             Dto::DynamoDb::ListTableRequest request;
             request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-            request.PrepareRequest();
             if (const Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 
                 for (const auto &tableName: listTableResponse.tableNames) {
@@ -125,10 +124,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::DescribeTableRequest describeTableRequest;
                     describeTableRequest.region = _region;
                     describeTableRequest.tableName = tableName;
-                    describeTableRequest.PrepareRequest();
                     Dto::DynamoDb::DescribeTableResponse describeTableResponse = _dynamoDbService.DescribeTable(describeTableRequest);
                     describeTableResponse.region = _region;
-                    describeTableResponse.PrepareResponse();
 
                     Database::Entity::DynamoDb::Table table = Dto::DynamoDb::Mapper::map(describeTableResponse);
                     table = _dynamoDbDatabase.CreateOrUpdateTable(table);
@@ -160,7 +157,6 @@ namespace AwsMock::Service {
             // Get the list of tables from DynamoDB
             Dto::DynamoDb::ListTableRequest request;
             request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-            request.PrepareRequest();
             if (const Dto::DynamoDb::ListTableResponse listTableResponse = _dynamoDbService.ListTables(request); !listTableResponse.tableNames.empty()) {
 
                 for (const auto &tableName: listTableResponse.tableNames) {
@@ -171,16 +167,17 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::ScanRequest scanRequest;
                     scanRequest.region = _region;
                     scanRequest.tableName = tableName;
-                    scanRequest.PrepareRequest();
+                    //scanRequest.PrepareRequest();
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
                     scanResponse.region = _region;
-                    scanResponse.PrepareResponse(table);
+                    //scanResponse.PrepareResponse(table);
 
                     if (!scanResponse.items.empty()) {
                         for (auto &item: scanResponse.items) {
-                            item = _dynamoDbDatabase.CreateOrUpdateItem(item);
+                            /*Database::Entity::DynamoDb::Item itemEntity = Dto::DynamoDb::Mapper::map(item);
+                            itemEntity = _dynamoDbDatabase.CreateOrUpdateItem(itemEntity);
                             log_trace << "Item synchronized, item: " << item.oid;
-                            size += item.ToJson().size();
+                            size += item.ToJson().size();*/
                         }
                     }
 
@@ -209,8 +206,8 @@ namespace AwsMock::Service {
 
         const long tables = _dynamoDbDatabase.CountTables();
         const long items = _dynamoDbDatabase.CountItems();
-        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, static_cast<double>(tables));
-        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, static_cast<double>(items));
+        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables));
+        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(items));
 
         log_trace << "DynamoDb monitoring finished";
     }

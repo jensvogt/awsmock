@@ -5,9 +5,12 @@
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Service {
+
     TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
+
         // REST manager configuration
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.monitoring.period");
+        _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
 
         // Check module active
         if (!IsActive("transfer")) {
@@ -144,7 +147,6 @@ namespace AwsMock::Service {
 
     void TransferServer::StartTransferServers() {
         log_info << "Starting transfer servers, count: " << _transferDatabase.CountServers(_region);
-
         for (std::vector<Database::Entity::Transfer::Transfer> transfers = _transferDatabase.ListServers(_region); auto &transfer: transfers) {
             if (transfer.state == Database::Entity::Transfer::ServerState::ONLINE) {
                 StartTransferServer(transfer);
@@ -182,7 +184,7 @@ namespace AwsMock::Service {
         log_trace << "Transfer monitoring starting";
 
         const long servers = _transferDatabase.CountServers();
-        _metricService.SetGauge(TRANSFER_SERVER_COUNT, static_cast<double>(servers));
+        _metricService.SetGauge(TRANSFER_SERVER_COUNT, {}, {}, static_cast<double>(servers));
 
         log_trace << "Transfer monitoring finished";
     }

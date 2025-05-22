@@ -9,10 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
-#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -31,12 +30,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Page size
          */
-        int pageSize;
+        long pageSize = 10;
 
         /**
          * Skip
          */
-        int pageIndex;
+        long pageIndex = 0;
 
         /**
          * @brief List of sort columns names
@@ -47,10 +46,10 @@ namespace AwsMock::Dto::S3 {
 
         friend ListBucketCounterRequest tag_invoke(boost::json::value_to_tag<ListBucketCounterRequest>, boost::json::value const &v) {
             ListBucketCounterRequest r;
-            r.region = v.at("region").as_string();
-            r.prefix = v.at("prefix").as_string();
-            r.pageSize = v.at("pageSize").as_int64();
-            r.pageIndex = v.at("pageIndex").as_int64();
+            r.region = Core::Json::GetStringValue(v, "region");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
             r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
             return r;
         }

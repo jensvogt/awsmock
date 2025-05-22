@@ -75,6 +75,15 @@ namespace AwsMock::Core {
             return _message.c_str();
         }
 
+        /**
+         * @brief Overrides the std::exception message
+         *
+         * @return std::exception what
+         */
+        [[nodiscard]] const char *message() const noexcept {
+            return _message.c_str();
+        }
+
       private:
 
         /**

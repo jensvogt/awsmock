@@ -16,10 +16,9 @@
 #include <boost/version.hpp>
 
 // AwsMock includes
-#include "BaseClientCommand.h"
-
-
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/dto/common/BaseClientCommand.h>
 
 namespace AwsMock::Dto::Common {
     class BaseClientCommand;
@@ -56,6 +55,11 @@ namespace AwsMock::Dto::Common {
         std::string user{};
 
         /**
+         * Content type
+         */
+        std::string contentType{};
+
+        /**
          * @brief Convert to JSON representation
          *
          * @return JSON string
@@ -72,7 +76,27 @@ namespace AwsMock::Dto::Common {
          * @param jsonString JSON string
          */
         static T FromJson(const std::string &jsonString) {
-            return boost::json::value_to<T>(boost::json::parse(jsonString));
+            const boost::json::value jv = boost::json::parse(jsonString);
+            T t = boost::json::value_to<T>(jv);
+            if (Core::Json::AttributeExists(jv, "region")) {
+                t.region = Core::Json::GetStringValue(jv, "region");
+            }
+            if (Core::Json::AttributeExists(jv, "Region")) {
+                t.region = Core::Json::GetStringValue(jv, "Region");
+            }
+            if (Core::Json::AttributeExists(jv, "user")) {
+                t.user = Core::Json::GetStringValue(jv, "user");
+            }
+            if (Core::Json::AttributeExists(jv, "User")) {
+                t.user = Core::Json::GetStringValue(jv, "User");
+            }
+            if (Core::Json::AttributeExists(jv, "requestId")) {
+                t.requestId = Core::Json::GetStringValue(jv, "requestId");
+            }
+            if (Core::Json::AttributeExists(jv, "RequestId")) {
+                t.requestId = Core::Json::GetStringValue(jv, "RequestId");
+            }
+            return t;
         }
 
         /**
@@ -85,6 +109,7 @@ namespace AwsMock::Dto::Common {
             t.region = clientCommand.region;
             t.user = clientCommand.user;
             t.requestId = clientCommand.requestId;
+            t.contentType = clientCommand.contentType;
             return t;
         }
 

@@ -42,7 +42,7 @@ namespace AwsMock::Service {
         /**
          * @brief Default User-defined Constructor
          */
-        explicit AbstractHandler(std::string name) : _name(std::move(name)){};
+        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -143,6 +143,16 @@ namespace AwsMock::Service {
          * @return response HTTP response
          */
         static http::response<http::dynamic_body> SendBadRequestError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+
+        /**
+         * @brief Send a not-found response (HTTP state code 404).
+         *
+         * @param request HTTP request
+         * @param body HTTP body payload
+         * @param headers HTTP header map values, added to the default headers
+         * @return response HTTP response
+         */
+        static http::response<http::dynamic_body> SendNotFoundError(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
         /**
          * @brief Send an OK response (HTTP state code 200) with an part of an output.

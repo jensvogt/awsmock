@@ -10,6 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
@@ -33,12 +34,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Number of objects keys
          */
-        long keys;
+        long keys = 0;
 
         /**
          * Bucket size in bytes
          */
-        long size;
+        long size = 0;
 
         /**
          * Bucket owner
@@ -60,18 +61,32 @@ namespace AwsMock::Dto::S3 {
          *
          * @return BSON document
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
+                Core::Bson::BsonUtils::SetLongValue(document, "keys", keys);
+                Core::Bson::BsonUtils::SetLongValue(document, "size", size);
+                Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
+                Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+                Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
       private:
 
         friend BucketCounter tag_invoke(boost::json::value_to_tag<BucketCounter>, boost::json::value const &v) {
             BucketCounter r;
-            r.region = v.at("region").as_string();
-            r.user = v.at("user").as_string();
-            r.bucketName = v.at("bucketName").as_string();
-            r.keys = v.at("keys").as_int64();
-            r.size = v.at("size").as_int64();
-            r.owner = v.at("owner").as_string();
+            r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            r.keys = Core::Json::GetLongValue(v, "keys");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.owner = Core::Json::GetStringValue(v, "owner");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;

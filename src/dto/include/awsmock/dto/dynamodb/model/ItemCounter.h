@@ -36,7 +36,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Attributes
          */
-        Item item;
+        std::map<std::string, AttributeValue> attributes;
+
+        /**
+         * Keys
+         */
+        std::map<std::string, AttributeValue> keys;
 
         /**
          * Create timestamp
@@ -59,9 +64,11 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend ItemCounter tag_invoke(boost::json::value_to_tag<ItemCounter>, boost::json::value const &v) {
             ItemCounter r;
-            r.tableName = v.at("tableName").as_string();
-            r.id = v.at("id").as_string();
-            r.size = v.at("size").as_int64();
+            r.tableName = Core::Json::GetStringValue(v, "tableName");
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "attributes");
+            r.keys = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "keys");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 
@@ -73,10 +80,12 @@ namespace AwsMock::Dto::DynamoDb {
                     {"tableName", obj.tableName},
                     {"id", obj.id},
                     {"size", obj.size},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+                    {"keys", boost::json::value_from(obj.keys)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
-        }
+        }// namespace AwsMock::Dto::DynamoDb
     };
 
 }// namespace AwsMock::Dto::DynamoDb

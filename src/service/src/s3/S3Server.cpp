@@ -82,7 +82,6 @@ namespace AwsMock::Service {
             for (auto const &[key, val]: *_s3CounterMap) {
 
                 std::string labelValue = key;
-                Core::StringUtils::Replace(labelValue, "-", "_");
 
                 _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.keys));
                 _metricService.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.size));
@@ -91,8 +90,8 @@ namespace AwsMock::Service {
                 totalSize += val.size;
                 _s3Database.UpdateBucketCounter(key, val.keys, val.size);
             }
-            _metricService.SetGauge(S3_BUCKET_COUNT, static_cast<double>(_s3CounterMap->size()));
-            _metricService.SetGauge(S3_OBJECT_COUNT, static_cast<double>(totalKeys));
+            _metricService.SetGauge(S3_BUCKET_COUNT, {}, {}, static_cast<double>(_s3CounterMap->size()));
+            _metricService.SetGauge(S3_OBJECT_COUNT, {}, {}, static_cast<double>(totalKeys));
         }
         log_debug << "S3 monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }

@@ -148,7 +148,7 @@
         "container": {
           "host": "localhost",
           "port": "8000",
-          "name": "dynamodb-local",
+          "name": "dynamodb",
           "image-name": "amazon/dynamodb-local",
           "image-tag": "latest"
         }
@@ -207,7 +207,8 @@
       "prometheus": false,
       "internal": true,
       "retention": 3,
-      "smooth": false
+      "smooth": false,
+      "average": 300
     },
     "mongodb": {
       "active": true,

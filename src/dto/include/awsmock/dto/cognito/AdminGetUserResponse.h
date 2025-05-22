@@ -10,9 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,17 +22,12 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminGetUserResponse {
+    struct AdminGetUserResponse final : Common::BaseCounter<AdminGetUserResponse> {
 
         /**
          * ID user
          */
         std::string id;
-
-        /**
-         * AWS region
-         */
-        std::string region;
 
         /**
          * User pool ID
@@ -58,12 +52,12 @@ namespace AwsMock::Dto::Cognito {
         /**
          * User status
          */
-        Database::Entity::Cognito::UserStatus userStatus;
+        Database::Entity::Cognito::UserStatus userStatus = Database::Entity::Cognito::UserStatus::UNKNOWN;
 
         /**
-         * User userAttributes list
+         * User attributes list
          */
-        UserAttributeList userAttributes;
+        std::vector<UserAttribute> userAttributes;
 
         /**
          * Created
@@ -75,33 +69,41 @@ namespace AwsMock::Dto::Cognito {
          */
         system_clock::time_point modified = system_clock::now();
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @return JSON representation of the object
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend AdminGetUserResponse tag_invoke(boost::json::value_to_tag<AdminGetUserResponse>, boost::json::value const &v) {
+            AdminGetUserResponse r;
+            r.id = Core::Json::GetStringValue(v, "idd");
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            r.password = Core::Json::GetStringValue(v, "password");
+            r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "userStatus"));
+            if (Core::Json::AttributeExists(v, "userAttributes")) {
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "userAttributes");
+            }
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminGetUserResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"id", obj.id},
+                    {"userPoolId", obj.userPoolId},
+                    {"userName", obj.userName},
+                    {"password", obj.password},
+                    {"enabled", obj.enabled},
+                    {"userStatus", Database::Entity::Cognito::UserStatusToString(obj.userStatus)},
+                    {"userAttributes", boost::json::value_from(obj.userAttributes)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const AdminGetUserResponse &i);
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

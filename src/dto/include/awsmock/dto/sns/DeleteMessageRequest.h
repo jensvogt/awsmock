@@ -9,9 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
@@ -20,7 +20,7 @@ namespace AwsMock::Dto::SNS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteMessageRequest {
+    struct DeleteMessageRequest final : Common::BaseCounter<DeleteMessageRequest> {
 
         /**
          * Topic ARN
@@ -28,37 +28,28 @@ namespace AwsMock::Dto::SNS {
         std::string topicArn;
 
         /**
-         * Message Id
+         * Message ID
          */
         std::string messageId;
 
-        /**
-         * Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend DeleteMessageRequest tag_invoke(boost::json::value_to_tag<DeleteMessageRequest>, boost::json::value const &v) {
+            DeleteMessageRequest r;
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.messageId = Core::Json::GetStringValue(v, "messageId");
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMessageRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"topicArn", obj.topicArn},
+                    {"messageId", obj.messageId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SNS

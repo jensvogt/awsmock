@@ -9,36 +9,36 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/transfer/model/Protocol.h>
-#include <awsmock/dto/transfer/model/User.h>
 
 namespace AwsMock::Dto::Transfer {
 
-    struct ProtocolCounter {
+    struct ProtocolCounter final : Common::BaseCounter<ProtocolCounter> {
 
         /**
          * Protocol
          */
-        ProtocolType protocol;
+        ProtocolType protocol = ProtocolType::UNKNOWN;
 
         /**
          * Port
          */
-        int port;
+        long port = 0;
 
         /**
          * @brief Crete JSON document from object
          *
          * @return JSON document
          */
-        view_or_value<view, value> ToDocument() const {
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
             try {
 
                 auto protocolDoc = document{};
                 Core::Bson::BsonUtils::SetStringValue(protocolDoc, "Protocol", ProtocolTypeToString(protocol));
-                Core::Bson::BsonUtils::SetIntValue(protocolDoc, "Port", port);
+                Core::Bson::BsonUtils::SetLongValue(protocolDoc, "Port", port);
                 return protocolDoc.extract();
 
             } catch (const std::exception &exc) {
@@ -46,9 +46,28 @@ namespace AwsMock::Dto::Transfer {
                 throw Core::JsonException(exc.what());
             }
         }
+
+      private:
+
+        friend ProtocolCounter tag_invoke(boost::json::value_to_tag<ProtocolCounter>, boost::json::value const &v) {
+            ProtocolCounter r;
+            r.port = Core::Json::GetLongValue(v, "port");
+            r.protocol = ProtocolTypeFromString(Core::Json::GetStringValue(v, "protocol"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ProtocolCounter const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"port", obj.port},
+                    {"protocol", ProtocolTypeToString(obj.protocol)},
+            };
+        }
     };
 
-    struct ListProtocolCountersResponse {
+    struct ListProtocolCountersResponse final : Common::BaseCounter<ListProtocolCountersResponse> {
 
         /**
          * List of attribute counters
@@ -60,26 +79,24 @@ namespace AwsMock::Dto::Transfer {
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListProtocolCountersResponse tag_invoke(boost::json::value_to_tag<ListProtocolCountersResponse>, boost::json::value const &v) {
+            ListProtocolCountersResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.protocolCounters = boost::json::value_to<std::vector<ProtocolCounter>>(v.at("protocolCounters"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListProtocolCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListProtocolCountersResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"total", obj.total},
+                    {"protocolCounters", boost::json::value_from(obj.protocolCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Transfer

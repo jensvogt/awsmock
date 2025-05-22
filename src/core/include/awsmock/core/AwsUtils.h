@@ -33,6 +33,8 @@
 #define SQS_DEFAULT_ACCOUNT_ID "000000000000"
 #define SQS_DEFAULT_REGION "eu-central-1"
 
+#define SNS_RECEIPT_HANDLE_LENGTH 256
+
 #define GATEWAY_DEFAULT_PORT 4566
 #define GATEWAY_DEFAULT_PROTOCOL std::string("http")
 #define GATEWAY_DEFAULT_REGION "eu-central-1"
@@ -312,6 +314,15 @@ namespace AwsMock::Core {
          */
         static std::string CreateSqsReceiptHandler() {
             return StringUtils::GenerateRandomString(SQS_RECEIPT_HANDLE_LENGTH);
+        }
+
+        /**
+         * @brief Returns a receipt handle.
+         *
+         * @return receipt handle
+         */
+        static std::string CreateSnsReceiptHandler() {
+            return StringUtils::GenerateRandomString(SNS_RECEIPT_HANDLE_LENGTH);
         }
 
         /**

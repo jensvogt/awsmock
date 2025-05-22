@@ -1,6 +1,7 @@
 //
 // Created by vogje01 on 30/05/2023.
 //
+
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
@@ -29,7 +30,7 @@ namespace AwsMock::Service {
 
             lambdaEntity = _lambdaDatabase.GetLambdaByArn(lambdaArn);
             const std::string fileName = GetLambdaCodePath(lambdaEntity);
-            if (!Core::FileUtils::FileExists(fileName)) {
+            if (!Core::FileUtils::FileExists(fileName) || Core::FileUtils::FileSize(fileName) == 0) {
                 throw Core::ServiceException("Lambda base64 encoded code does not exists, fileName: " + fileName);
             }
             zippedCode = Core::FileUtils::ReadFile(fileName);
@@ -496,7 +497,7 @@ namespace AwsMock::Service {
 
         Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
 
-        // Get the hostname, the hostname is different from a manager running as Linux host and a manager running as docker container.
+        // Get the hostname; the hostname is different from a manager running as a Linux host and a manager running as docker container.
         std::string hostName = GetHostname(instance);
         int port = GetContainerPort(instance);
 
@@ -562,7 +563,7 @@ namespace AwsMock::Service {
         response.accountLimit.codeSizeUnzipped = 50 * 1024 * 1024L;
         response.accountLimit.codeSizeZipped = 50 * 1024 * 1024L;
 
-        // 1000 concurrent executions (which is irrelevant in AwsMock environment)
+        // 1000 concurrent executions (that are irrelevant in AwsMock environment)
         response.accountLimit.concurrentExecutions = 1000;
 
         // 75 GB
@@ -604,7 +605,7 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Lambda function updated, function: " << lambdaEntity.function;
 
-        // Create response (which is actually the request)
+        // Create a response (which is actually the request)
         Dto::Lambda::CreateEventSourceMappingsResponse response;
         response.functionName = request.functionName;
         response.eventSourceArn = request.eventSourceArn;
@@ -632,6 +633,25 @@ namespace AwsMock::Service {
         const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
         return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
+    }
+
+    Dto::Lambda::ListLambdaArnsResponse LambdaService::ListLambdaArns() const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_lambda_arns");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_lambda_arns");
+        log_trace << "List all queues ARNs request";
+
+        try {
+            const std::vector<Database::Entity::Lambda::Lambda> lambdaList = _lambdaDatabase.ListLambdas();
+            Dto::Lambda::ListLambdaArnsResponse listLambdaArnsResponse;
+            for (const auto &lambda: lambdaList) {
+                listLambdaArnsResponse.lambdaArns.emplace_back(lambda.arn);
+            }
+            log_trace << "Lambda create function ARN list response: " << listLambdaArnsResponse.ToJson();
+            return listLambdaArnsResponse;
+        } catch (Core::DatabaseException &exc) {
+            log_error << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
     }
 
     void LambdaService::StartFunction(const Dto::Lambda::StartFunctionRequest &request) const {
@@ -852,6 +872,13 @@ namespace AwsMock::Service {
     std::string LambdaService::GetLambdaCodePath(const Database::Entity::Lambda::Lambda &lambda) {
         const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         return lambdaDir + Core::FileUtils::separator() + lambda.function + "-" + lambda.dockerTag + ".b64";
+    }
+
+    std::string LambdaService::GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const {
+        const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+
+        const Database::Entity::S3::Object object = _s3Database.GetObject(lambda.region, lambda.code.s3Bucket, lambda.code.s3Key);
+        return s3DataDir + Core::FileUtils::separator() + object.internalName;
     }
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {

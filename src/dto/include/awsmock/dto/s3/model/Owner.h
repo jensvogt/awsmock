@@ -9,10 +9,13 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/common/BaseCounter.h"
+
+
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -21,7 +24,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Owner {
+    struct Owner final : Common::BaseCounter<Owner> {
 
         /**
          * ID
@@ -34,32 +37,42 @@ namespace AwsMock::Dto::S3 {
         std::string displayName;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Owner &r);
+                document document;
+
+                Core::Bson::BsonUtils::SetStringValue(document, "id", id);
+                Core::Bson::BsonUtils::SetStringValue(document, "displayName", displayName);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend Owner tag_invoke(boost::json::value_to_tag<Owner>, boost::json::value const &v) {
+
+            Owner r;
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.displayName = Core::Json::GetStringValue(v, "displayName");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Owner const &obj) {
+            jv = {
+                    {"id", obj.id},
+                    {"displayName", boost::json::value_from(obj.displayName)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

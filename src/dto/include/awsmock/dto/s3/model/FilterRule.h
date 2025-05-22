@@ -9,16 +9,12 @@
 #include <map>
 #include <string>
 
-// Boost includes
-#include <boost/describe.hpp>
-#include <boost/json.hpp>
-#include <boost/mp11.hpp>
-#include <boost/version.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::S3 {
@@ -55,7 +51,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct FilterRule final : Common::BaseDto<FilterRule> {
+    struct FilterRule final : Common::BaseCounter<FilterRule> {
 
         /**
          * Name
@@ -88,16 +84,14 @@ namespace AwsMock::Dto::S3 {
          */
         void FromXml(const boost::property_tree::ptree &pt);
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override {
-            return ToJson2();
-        };
-
       private:
+
+        friend FilterRule tag_invoke(boost::json::value_to_tag<FilterRule>, boost::json::value const &v) {
+            FilterRule r;
+            r.name = NameTypeFromString(Core::Json::GetStringValue(v, "name"));
+            r.filterValue = Core::Json::GetStringValue(v, "filterValue");
+            return r;
+        }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, FilterRule const &obj) {
             jv = {

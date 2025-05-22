@@ -10,13 +10,15 @@
 #include <vector>
 
 // AwsMock includes
+#include "awsmock/utils/SortColumn.h"
+
+
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/memorydb/TransferMemoryDb.h>
 #include <awsmock/repository/Database.h>
-#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -43,39 +45,39 @@ namespace AwsMock::Database {
         }
 
         /**
-         * @brief Check existence of transfer server
+         * @brief Check the existence of a transfer server
          *
          * @param region AWS region name
          * @param serverId AWS server ID
-         * @return true if transfer server already exists
+         * @return true if the transfer server already exists
          * @throws DatabaseException
          */
         bool TransferExists(const std::string &region, const std::string &serverId) const;
 
         /**
-         * @brief Check existence of transfer server
+         * @brief Check the existence of a transfer server
          *
          * @param transfer AWS transfer
-         * @return true if transfer server already exists
+         * @return true if the transfer server already exists
          * @throws DatabaseException
          */
         bool TransferExists(const Entity::Transfer::Transfer &transfer) const;
 
         /**
-         * @brief Check existence of transfer server
+         * @brief Check the existence of the transfer server
          *
          * @param serverId AWS transfer server ID
-         * @return true if transfer server already exists
+         * @return true if the transfer server already exists
          * @throws DatabaseException
          */
         bool TransferExists(const std::string &serverId) const;
 
         /**
-         * @brief Check existence of transfer server
+         * @brief Check the existence of a transfer server
          *
          * @param region AWS region name
          * @param protocols list of protocols
-         * @return true if transfer server already exists
+         * @return true if the transfer server already exists
          * @throws DatabaseException
          */
         bool TransferExists(const std::string &region, const std::vector<Entity::Transfer::Protocol> &protocols) const;
@@ -151,7 +153,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting
          * @return list of transfer manager
          */
-        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns a list of transfer users.
@@ -167,10 +169,20 @@ namespace AwsMock::Database {
         std::vector<Entity::Transfer::User> ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
+         * @brief Returns a list of transfer users.
+         *
+         * @param region AWS region name
+         * @param maxResults maximal numbers of results
+         * @param nextToken next token
+         * @return list of transfer users
+         */
+        std::vector<Entity::Transfer::Transfer> ListServers(const std::string &region, std::string &nextToken, long maxResults = -1) const;
+
+        /**
          * @brief Returns the total number of servers.
          *
          * @param region AWS region name
-         * @return total number of transfer server
+         * @return total number of transfer servers
          */
         long CountServers(const std::string &region = {}) const;
 

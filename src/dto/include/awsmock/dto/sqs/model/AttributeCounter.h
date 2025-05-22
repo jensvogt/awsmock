@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
@@ -30,8 +29,8 @@ namespace AwsMock::Dto::SQS {
 
         friend AttributeCounter tag_invoke(boost::json::value_to_tag<AttributeCounter>, boost::json::value const &v) {
             AttributeCounter r;
-            r.attributeKey = v.at("attributeKey").as_string();
-            r.attributeValue = v.at("attributeValue").as_string();
+            r.attributeKey = Core::Json::GetStringValue(v, "attributeKey");
+            r.attributeValue = Core::Json::GetStringValue(v, "attributeValue");
             return r;
         }
 

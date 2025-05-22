@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Transfer {
 
     static ProtocolType ProtocolTypeFromString(const std::string &nameType) {
         for (auto &[fst, snd]: ProtocolTypeNames) {
-            if (snd == nameType) {
+            if (Core::StringUtils::EqualsIgnoreCase(snd, nameType)) {
                 return fst;
             }
         }

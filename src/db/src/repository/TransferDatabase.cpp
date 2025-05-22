@@ -19,7 +19,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             const int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("serverId", serverId)));
-            log_trace << "Transfer manager exists: " << std::boolalpha << count;
+            log_trace << "Transfer server exists: " << std::boolalpha << count;
             return count > 0;
         }
         return _memoryDb.TransferExists(region, serverId);
@@ -37,7 +37,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             const int64_t count = _transferCollection.count_documents(make_document(kvp("serverId", serverId)));
-            log_trace << "Transfer manager exists: " << std::boolalpha << count;
+            log_trace << "Transfer server exists: " << std::boolalpha << count;
             return count > 0;
         }
         return _memoryDb.TransferExists(serverId);
@@ -55,7 +55,7 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
             const int64_t count = _transferCollection.count_documents(make_document(kvp("region", region), kvp("protocols", make_document(kvp("$elemMatch", make_document(kvp("$in", mProtocol)))))));
-            log_trace << "Transfer manager exists: " << std::boolalpha << count;
+            log_trace << "Transfer server exists: " << std::boolalpha << count;
             return count > 0;
         }
         return _memoryDb.TransferExists(region, protocols);
@@ -154,7 +154,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetTransferByArn(arn);
     }
 
-    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 
@@ -162,7 +162,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
 
                 document query;
@@ -176,8 +176,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -203,6 +203,58 @@ namespace AwsMock::Database {
         } else {
 
             return _memoryDb.ListServers(region);
+        }
+        return transfers;
+    }
+
+    std::vector<Entity::Transfer::Transfer> TransferDatabase::ListServers(const std::string &region, std::string &nextToken, const long maxResults) const {
+
+        std::vector<Entity::Transfer::Transfer> transfers;
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
+
+                document query;
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!nextToken.empty()) {
+                    query.append(kvp("serverId", make_document(kvp("$gte", nextToken))));
+                }
+
+                mongocxx::options::find opts;
+                document sort = {};
+                sort.append(kvp("serverId", 1));
+                opts.sort(sort.extract());
+
+                if (maxResults > 0) {
+                    opts.limit(maxResults + 1);
+                }
+
+                for (auto transferCursor = _transferCollection.find(query.extract(), opts); const auto transfer: transferCursor) {
+                    Entity::Transfer::Transfer result;
+                    result.FromDocument(transfer);
+                    transfers.push_back(result);
+                    nextToken = result.serverId;
+                }
+                if (transfers.size() < maxResults) {
+                    nextToken = {};
+                } else if (!transfers.empty()) {
+                    transfers.pop_back();
+                }
+                log_trace << "Got transfer list, size:" << transfers.size();
+
+            } catch (mongocxx::exception::system_error &e) {
+                log_error << "List servers failed, error: " << e.what();
+            }
+
+        } else {
+
+            transfers = _memoryDb.ListServers(region);
         }
         return transfers;
     }

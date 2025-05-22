@@ -12,8 +12,8 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/entity/monitoring/Counter.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/monitoring/Counter.h>
 
 namespace AwsMock::Dto::Monitoring {
 
@@ -22,33 +22,30 @@ namespace AwsMock::Dto::Monitoring {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetMultiCountersResponse {
+    struct GetMultiCountersResponse final : Common::BaseCounter<GetMultiCountersResponse> {
 
         /**
          * Counters
          */
-        std::map<std::string, std::vector<Database::Entity::Monitoring::Counter>> counters;
+        std::map<std::string, std::vector<Counter>> counters;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetMultiCountersResponse const &obj) {
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetMultiCountersResponse &r);
+            jv = {};
+            boost::json::object rootObject;
+            for (const auto &[fst, snd]: obj.counters) {
+                boost::json::array countersJson;
+                for (const auto &c: snd) {
+                    boost::json::array v;
+                    v.emplace_back(Core::DateTimeUtils::ToISO8601(c.timestamp));
+                    v.emplace_back(c.performanceValue);
+                    countersJson.emplace_back(v);
+                }
+                jv.as_object()[fst] = countersJson;
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::Monitoring

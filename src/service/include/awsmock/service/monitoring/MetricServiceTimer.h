@@ -7,17 +7,17 @@
 
 #include <awsmock/service/monitoring/MetricService.h>
 
-#define TIME_DIFF (std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - _start).count())
+#define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count())
 
 namespace AwsMock::Monitoring {
 
-    using std::chrono::high_resolution_clock;
     using std::chrono::time_point;
 
     /**
      * @brief Measures the execution time of a method.
      *
-     * Is self-destroying, which means the timer is automatically destroyed, when the method goes out of scope.
+     * @par
+     * Is self-destroying, which means the timer is automatically destroyed when the method goes out of scope.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -28,16 +28,18 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Constructor
          *
-         * <p>Measure a methods execution time.</p>
+         * @par
+         * Measures a method execution time.</p>
          *
          * @param name name of the underlying timer
          */
-        explicit MetricServiceTimer(std::string name) : _metricService(MetricService::instance()), _name(std::move(name)), _start(high_resolution_clock::now()) {}
+        explicit MetricServiceTimer(std::string name) : _metricService(MetricService::instance()), _name(std::move(name)), _start(system_clock::now()) {}
 
         /**
          * @brief Constructor
          *
-         * <p>Measure a methods execution time.</p>
+         * @par
+         * Measures a method execution time.</p>
          *
          * @param name name of the underlying timer
          * @param labelName label name of the underlying timer
@@ -45,16 +47,17 @@ namespace AwsMock::Monitoring {
          */
         explicit MetricServiceTimer(std::string name, std::string labelName, std::string labelValue) : _metricService(MetricService::instance()), _name(std::move(name)),
                                                                                                        _labelName(std::move(labelName)), _labelValue(std::move(labelValue)),
-                                                                                                       _start(high_resolution_clock::now()) {}
+                                                                                                       _start(system_clock::now()) {}
 
         /**
          * @brief Destructor
          *
+         * @par
          * Stop the timer and reports the execution to the metric service.
          */
         ~MetricServiceTimer() {
             if (_labelName.empty()) {
-                _metricService.SetGauge(_name, TIME_DIFF);
+                _metricService.SetGauge(_name, {}, {}, TIME_DIFF);
                 log_trace << "Timer deleted, name: " << _name;
             } else {
                 _metricService.SetGauge(_name, _labelName, _labelValue, TIME_DIFF);
@@ -102,7 +105,7 @@ namespace AwsMock::Monitoring {
         /**
          * Timer start time point
          */
-        time_point<high_resolution_clock> _start;
+        system_clock::time_point _start;
     };
 
 }// namespace AwsMock::Monitoring

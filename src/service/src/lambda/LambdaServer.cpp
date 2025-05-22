@@ -140,7 +140,7 @@ namespace AwsMock::Service {
         log_trace << "Lambda monitoring starting";
 
         const long lambdas = _lambdaDatabase.LambdaCount();
-        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, lambdas);
+        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, lambdas);
 
         log_trace << "Lambda monitoring finished";
     }

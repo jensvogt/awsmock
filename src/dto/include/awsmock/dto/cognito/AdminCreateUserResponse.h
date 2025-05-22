@@ -9,19 +9,17 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
     /**
-     * @brief Create user response
+     * @brief Create a user response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AdminCreateUserResponse final : Common::BaseDto<AdminCreateUserResponse> {
+    struct AdminCreateUserResponse final : Common::BaseCounter<AdminCreateUserResponse> {
 
         /**
          * Name of the user
@@ -34,23 +32,31 @@ namespace AwsMock::Dto::Cognito {
         bool enabled = false;
 
         /**
-         * User userAttributes list
+         * User attributes list
          */
-        UserAttributeList userAttributes;
+        std::vector<UserAttribute> userAttributes;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @return JSON representation of the object
-         */
-        std::string ToJson() const override;
+        friend AdminCreateUserResponse tag_invoke(boost::json::value_to_tag<AdminCreateUserResponse>, boost::json::value const &v) {
+            AdminCreateUserResponse r;
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            if (Core::Json::AttributeExists(v, "userAttributes")) {
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "userAttributes");
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminCreateUserResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userName", obj.userName},
+                    {"enabled", obj.enabled},
+                    {"userAttributes", boost::json::value_from(obj.userAttributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

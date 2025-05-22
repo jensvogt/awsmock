@@ -14,7 +14,7 @@ namespace AwsMock::Database::Entity::Cognito {
                 kvp("userPoolId", userPoolId),
                 kvp("description", description),
                 kvp("roleArn", roleArn),
-                kvp("precedence", precedence),
+                kvp("precedence", bsoncxx::types::b_int64(precedence)),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
         return userDocument;
@@ -29,7 +29,7 @@ namespace AwsMock::Database::Entity::Cognito {
         userPoolId = Core::Bson::BsonUtils::GetStringValue(mResult, "userPoolId");
         description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
         roleArn = Core::Bson::BsonUtils::GetStringValue(mResult, "roleArn");
-        precedence = Core::Bson::BsonUtils::GetIntValue(mResult, "precedence");
+        precedence = Core::Bson::BsonUtils::GetLongValue(mResult, "precedence");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }

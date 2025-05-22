@@ -9,14 +9,15 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/secretsmanager/model/SecretTags.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Example:
+     * @brief Secrets manager create secret request
      *
+     * Example:
      * @code{.json}
      * {
      *   "Name": "test",
@@ -26,12 +27,7 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateSecretRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct CreateSecretRequest final : Common::BaseCounter<CreateSecretRequest> {
 
         /**
          * Secret name
@@ -71,40 +67,36 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Tags
          */
-        SecretTags tags;
+        std::map<std::string, std::string> tags;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend CreateSecretRequest tag_invoke(boost::json::value_to_tag<CreateSecretRequest>, boost::json::value const &v) {
+            CreateSecretRequest r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.clientRequestToken = Core::Json::GetStringValue(v, "ClientRequestToken");
+            r.secretString = Core::Json::GetStringValue(v, "SecretString");
+            r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
+            r.forceOverwriteReplicaSecret = Core::Json::GetBoolValue(v, "ForceOverwriteReplicaSecret");
+            r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateSecretRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateSecretRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"ClientRequestToken", obj.clientRequestToken},
+                    {"SecretString", obj.secretString},
+                    {"SecretBinary", obj.secretBinary},
+                    {"ForceOverwriteReplicaSecret", obj.forceOverwriteReplicaSecret},
+                    {"KmsKeyId", obj.kmsKeyId},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

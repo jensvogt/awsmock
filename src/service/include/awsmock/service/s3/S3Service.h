@@ -204,9 +204,10 @@ namespace AwsMock::Service {
          * @param stream input stream
          * @param part part number
          * @param updateId upload ID
+         * @param length content length
          * @return ETag
          */
-        static std::string UploadPart(std::istream &stream, int part, const std::string &updateId);
+        static std::string UploadPart(std::istream &stream, int part, const std::string &updateId, long length);
 
         /**
          * @brief Upload a partial file copy.

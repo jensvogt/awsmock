@@ -5,17 +5,12 @@
 #ifndef AWMOCK_CORE_HTTP_UTILS_TEST_H
 #define AWMOCK_CORE_HTTP_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 
 namespace AwsMock::Core {
 
-    class HttpUtilsTest : public ::testing::Test {};
-
-    TEST_F(HttpUtilsTest, QueryStringTest) {
+    BOOST_AUTO_TEST_CASE(QueryStringTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?listType=1";
@@ -24,10 +19,10 @@ namespace AwsMock::Core {
         const std::string result = HttpUtils::GetQueryString(uri);
 
         // assert
-        EXPECT_TRUE(result == "listType=1");
+        BOOST_CHECK_EQUAL(result, "listType=1");
     }
 
-    TEST_F(HttpUtilsTest, CountParametersTest) {
+    BOOST_AUTO_TEST_CASE(CountParametersTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?listType=1";
@@ -36,10 +31,10 @@ namespace AwsMock::Core {
         const int result = HttpUtils::CountQueryParameters(uri);
 
         // assert
-        EXPECT_EQ(1, result);
+        BOOST_CHECK_EQUAL(1, result);
     }
 
-    TEST_F(HttpUtilsTest, GetPathParameterTest) {
+    BOOST_AUTO_TEST_CASE(GetPathParameterTest) {
 
         // arrange
         const std::string uri = "/2017-03-31/tags/arn%3Aaws%3Alambda%3Aeu-central-1%3A000000000000%3Afunction%3Aftp-file-copy";
@@ -48,10 +43,10 @@ namespace AwsMock::Core {
         const std::string result = HttpUtils::GetPathParameter(uri, 2);
 
         // assert
-        EXPECT_TRUE(result == "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy");
+        BOOST_CHECK_EQUAL(result, "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy");
     }
 
-    TEST_F(HttpUtilsTest, CountByNameTest) {
+    BOOST_AUTO_TEST_CASE(CountByNameTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg1=1&arg2=2&arg3=3";
@@ -60,10 +55,10 @@ namespace AwsMock::Core {
         const int result = HttpUtils::CountQueryParametersByPrefix(uri, "arg");
 
         // assert
-        EXPECT_EQ(3, result);
+        BOOST_CHECK_EQUAL(3, result);
     }
 
-    TEST_F(HttpUtilsTest, GetParameterValueTest) {
+    BOOST_AUTO_TEST_CASE(GetParameterValueTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming?arg1=1";
@@ -72,10 +67,10 @@ namespace AwsMock::Core {
         const std::string result = HttpUtils::GetStringParameter(uri, "arg1");
 
         // assert
-        EXPECT_EQ("1", result);
+        BOOST_CHECK_EQUAL("1", result);
     }
 
-    TEST_F(HttpUtilsTest, GetPathParametersTest) {
+    BOOST_AUTO_TEST_CASE(GetPathParametersTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg1=1&arg2=2&arg3=3";
@@ -84,13 +79,13 @@ namespace AwsMock::Core {
         const std::vector<std::string> result = HttpUtils::GetPathParameters(uri);
 
         // assert
-        EXPECT_EQ(3, result.size());
-        EXPECT_TRUE("ftpuser1" == result[0]);
-        EXPECT_TRUE("incoming" == result[1]);
-        EXPECT_TRUE("mix" == result[2]);
+        BOOST_CHECK_EQUAL(3, result.size());
+        BOOST_CHECK_EQUAL("ftpuser1", result[0]);
+        BOOST_CHECK_EQUAL("incoming", result[1]);
+        BOOST_CHECK_EQUAL("mix", result[2]);
     }
 
-    TEST_F(HttpUtilsTest, GetPathParametersFromIndexTest) {
+    BOOST_AUTO_TEST_CASE(GetPathParametersFromIndexTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix/pim123.xml";
@@ -99,10 +94,10 @@ namespace AwsMock::Core {
         const std::string key = HttpUtils::GetPathParameter(uri, 1);
 
         // assert
-        EXPECT_TRUE("incoming" == key);
+        BOOST_CHECK_EQUAL("incoming", key);
     }
 
-    TEST_F(HttpUtilsTest, GetQueryParametersByPrefixTest) {
+    BOOST_AUTO_TEST_CASE(GetQueryParametersByPrefixTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg1=1&arg2=2&arg3=3";
@@ -111,13 +106,13 @@ namespace AwsMock::Core {
         const std::vector<std::string> result = HttpUtils::GetQueryParametersByPrefix(uri, "arg");
 
         // assert
-        EXPECT_EQ(3, result.size());
-        EXPECT_TRUE("1" == result[0]);
-        EXPECT_TRUE("2" == result[1]);
-        EXPECT_TRUE("3" == result[2]);
+        BOOST_CHECK_EQUAL(3, result.size());
+        BOOST_CHECK_EQUAL("1", result[0]);
+        BOOST_CHECK_EQUAL("2", result[1]);
+        BOOST_CHECK_EQUAL("3", result[2]);
     }
 
-    TEST_F(HttpUtilsTest, GetQueryParameterByPrefixIndexTest) {
+    BOOST_AUTO_TEST_CASE(GetQueryParameterByPrefixIndexTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg1=1&arg2=2&arg3=3";
@@ -126,10 +121,10 @@ namespace AwsMock::Core {
         const std::string result = HttpUtils::GetQueryParameterByPrefix(uri, "arg", 1);
 
         // assert
-        EXPECT_TRUE("1" == result);
+        BOOST_CHECK_EQUAL("1", result);
     }
 
-    TEST_F(HttpUtilsTest, GetQueryParameterByNameTest) {
+    BOOST_AUTO_TEST_CASE(GetQueryParameterByNameTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg=value";
@@ -138,10 +133,10 @@ namespace AwsMock::Core {
         const std::string result = HttpUtils::GetStringParameter(uri, "arg");
 
         // assert
-        EXPECT_TRUE("value" == result);
+        BOOST_CHECK_EQUAL("value", result);
     }
 
-    TEST_F(HttpUtilsTest, HasQueryParameterTest) {
+    BOOST_AUTO_TEST_CASE(HasQueryParameterTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg=value";
@@ -150,10 +145,10 @@ namespace AwsMock::Core {
         const bool result = HttpUtils::HasQueryParameter(uri, "arg");
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(HttpUtilsTest, IsUrlEncodedTest) {
+    BOOST_AUTO_TEST_CASE(IsUrlEncodedTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg=This%20is%20an%20encoded%20query%20parameter%20mit%20length%20%3E%201";
@@ -162,10 +157,10 @@ namespace AwsMock::Core {
         const bool result = HttpUtils::HasQueryParameter(uri, "arg");
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(HttpUtilsTest, GetUrlEncodedQueryParameterTest) {
+    BOOST_AUTO_TEST_CASE(GetUrlEncodedQueryParameterTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/incoming/mix?arg=This%20is%20an%20encoded%20query%20parameter%20mit%20length%20%3E%201";
@@ -174,10 +169,10 @@ namespace AwsMock::Core {
         const std::string result = HttpUtils::GetStringParameter(uri, "arg");
 
         // assert
-        EXPECT_TRUE(result == "This is an encoded query parameter mit length > 1");
+        BOOST_CHECK_EQUAL(result, "This is an encoded query parameter mit length > 1");
     }
 
-    TEST_F(HttpUtilsTest, GetVersionActionTest) {
+    BOOST_AUTO_TEST_CASE(GetVersionActionTest) {
 
         // arrange
         const std::string uri = "/2016-03-04/functions/functions/invocations";
@@ -187,11 +182,11 @@ namespace AwsMock::Core {
         HttpUtils::GetVersionAction(uri, version, action);
 
         // assert
-        EXPECT_TRUE(version == "2016-03-04");
-        EXPECT_TRUE(action == "functions");
+        BOOST_CHECK_EQUAL(version, "2016-03-04");
+        BOOST_CHECK_EQUAL(action, "functions");
     }
 
-    TEST_F(HttpUtilsTest, GetStringParameterTest) {
+    BOOST_AUTO_TEST_CASE(GetStringParameterTest) {
 
         // arrange
         const std::string uri = "/ftpuser1/testqueue?stringParameter1=testvalue";
@@ -201,8 +196,8 @@ namespace AwsMock::Core {
         const std::string parameter = HttpUtils::GetQueryParameterByPrefix(uri, "stringParameter", 1);
 
         // assert
-        EXPECT_EQ(1, count);
-        EXPECT_TRUE(parameter == "testvalue");
+        BOOST_CHECK_EQUAL(1, count);
+        BOOST_CHECK_EQUAL(parameter, "testvalue");
     }
 
 }// namespace AwsMock::Core

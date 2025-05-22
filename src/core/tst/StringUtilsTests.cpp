@@ -5,17 +5,12 @@
 #ifndef AWSMOCK_CORE_STRING_UTILS_TEST_H
 #define AWSMOCK_CORE_STRING_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
 
-    class StringUtilsTest : public ::testing::Test {};
-
-    TEST_F(StringUtilsTest, IsNumericTest) {
+    BOOST_AUTO_TEST_CASE(IsNumericTest) {
 
         // arrange
         const std::string value1 = "123456";
@@ -26,11 +21,11 @@ namespace AwsMock::Core {
         const bool result2 = StringUtils::IsNumeric(value2);
 
         // assert
-        EXPECT_TRUE(result1);
-        EXPECT_FALSE(result2);
+        BOOST_CHECK_EQUAL(result1, true);
+        BOOST_CHECK_EQUAL(result2, false);
     }
 
-    TEST_F(StringUtilsTest, SplitTest) {
+    BOOST_AUTO_TEST_CASE(SplitTest) {
 
         // arrange
         const std::string value1 = "123 456 789";
@@ -41,11 +36,11 @@ namespace AwsMock::Core {
         const std::vector<std::string> result2 = StringUtils::Split(value2, '\n');
 
         // assert
-        EXPECT_EQ(result1.size(), 3);
-        EXPECT_EQ(result2.size(), 3);
+        BOOST_CHECK_EQUAL(result1.size(), 3);
+        BOOST_CHECK_EQUAL(result2.size(), 3);
     }
 
-    TEST_F(StringUtilsTest, JoinTest) {
+    BOOST_AUTO_TEST_CASE(JoinTest) {
 
         // arrange
         const std::vector<std::string> values = {"transfer-manager", "ftpuser1", "incoming", "mix"};
@@ -54,10 +49,10 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::Join(values, "/", 1);
 
         // assert
-        EXPECT_TRUE(result == "ftpuser1/incoming/mix");
+        BOOST_CHECK_EQUAL(result, "ftpuser1/incoming/mix");
     }
 
-    TEST_F(StringUtilsTest, IsUUidTest) {
+    BOOST_AUTO_TEST_CASE(IsUUidTest) {
 
         // arrange
         const std::string value1 = "88c3b756-ebc3-46fd-998e-7a2bfb02f347";
@@ -70,12 +65,12 @@ namespace AwsMock::Core {
         const bool result3 = StringUtils::IsUuid(value3);
 
         // assert
-        EXPECT_TRUE(result1);
-        EXPECT_TRUE(result2);
-        EXPECT_FALSE(result3);
+        BOOST_CHECK_EQUAL(result1, true);
+        BOOST_CHECK_EQUAL(result2, true);
+        BOOST_CHECK_EQUAL(result3, false);
     }
 
-    TEST_F(StringUtilsTest, StripWhiteSpacesTest) {
+    BOOST_AUTO_TEST_CASE(StripWhiteSpacesTest) {
 
         // arrange
         std::string value = "   \r\n\r\n\n   ";
@@ -84,10 +79,10 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::StripWhiteSpaces(value);
 
         // assert
-        EXPECT_EQ(result.length(), 0);
+        BOOST_CHECK_EQUAL(result.length(), 0);
     }
 
-    TEST_F(StringUtilsTest, StripNonWhiteSpacesTest) {
+    BOOST_AUTO_TEST_CASE(StripNonWhiteSpacesTest) {
         // arrange
         std::string value = "   \r\n\r\n\n   aksjdh";
 
@@ -95,11 +90,11 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::StripWhiteSpaces(value);
 
         // assert
-        EXPECT_EQ(result.length(), 6);
-        EXPECT_STREQ(result.c_str(), value.c_str());
+        BOOST_CHECK_EQUAL(result.length(), 6);
+        BOOST_CHECK_EQUAL(result, value);
     }
 
-    TEST_F(StringUtilsTest, EqualTest) {
+    BOOST_AUTO_TEST_CASE(EqualTest) {
 
         // arrange
         const std::string s1 = "The quick brown fox jumps over the lazy dog";
@@ -111,11 +106,11 @@ namespace AwsMock::Core {
         const bool result2 = StringUtils::EqualsIgnoreCase(s1, s3);
 
         // assert
-        EXPECT_TRUE(result1);
-        EXPECT_TRUE(result2);
+        BOOST_CHECK_EQUAL(result1, true);
+        BOOST_CHECK_EQUAL(result2, true);
     }
 
-    TEST_F(StringUtilsTest, ContainsTest) {
+    BOOST_AUTO_TEST_CASE(ContainsTest) {
 
         // arrange
         const std::string s1 = "The quick brown fox jumps over the lazy dog";
@@ -125,10 +120,10 @@ namespace AwsMock::Core {
         const bool result = StringUtils::Contains(s1, s2);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(StringUtilsTest, StripTest) {
+    BOOST_AUTO_TEST_CASE(StripTest) {
 
         // arrange
         const std::string s1 = "Threads:        80";
@@ -140,12 +135,12 @@ namespace AwsMock::Core {
         const std::string result3 = StringUtils::Trim(s2);
 
         // assert
-        EXPECT_STREQ(result1.c_str(), "        80");
-        EXPECT_STREQ(result2.c_str(), "80");
-        EXPECT_STREQ(result3.c_str(), "80");
+        BOOST_CHECK_EQUAL(result1, "        80");
+        BOOST_CHECK_EQUAL(result2, "80");
+        BOOST_CHECK_EQUAL(result3, "80");
     }
 
-    TEST_F(StringUtilsTest, StringDoubleTest) {
+    BOOST_AUTO_TEST_CASE(StringDoubleTest) {
 
         // arrange
         const std::string s1 = " 80 ";
@@ -154,10 +149,10 @@ namespace AwsMock::Core {
         const double result1 = std::stod(StringUtils::Trim(s1));
 
         // assert
-        EXPECT_EQ(80.0, result1);
+        BOOST_CHECK_EQUAL(80.0, result1);
     }
 
-    TEST_F(StringUtilsTest, UrlEncodeTest) {
+    BOOST_AUTO_TEST_CASE(UrlEncodeTest) {
 
         // arrange
         const std::string input = "/abc/xyz/\n ";
@@ -166,10 +161,10 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::UrlEncode(input);
 
         // assert
-        EXPECT_STREQ("/abc/xyz/%0A%20", result.c_str());
+        BOOST_CHECK_EQUAL("/abc/xyz/%0A%20", result.c_str());
     }
 
-    TEST_F(StringUtilsTest, UrlEncodeSpecialCharactersTest) {
+    BOOST_AUTO_TEST_CASE(UrlEncodeSpecialCharactersTest) {
 
         // arrange
         const std::string input = "/abc/xyz/\n +";
@@ -178,10 +173,10 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::UrlEncode(input);
 
         // assert
-        EXPECT_STREQ("/abc/xyz/%0A%20%2B", result.c_str());
+        BOOST_CHECK_EQUAL("/abc/xyz/%0A%20%2B", result.c_str());
     }
 
-    TEST_F(StringUtilsTest, StripLineEndingsTest) {
+    BOOST_AUTO_TEST_CASE(StripLineEndingsTest) {
 
         // arrange
         const std::string input = "/abc/xyz/\r\n";
@@ -190,10 +185,10 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::StripLineEndings(input);
 
         // assert
-        EXPECT_STREQ("/abc/xyz/", result.c_str());
+        BOOST_CHECK_EQUAL("/abc/xyz/", result.c_str());
     }
 
-    TEST_F(StringUtilsTest, GetBodyTestTest) {
+    BOOST_AUTO_TEST_CASE(GetBodyTestTest) {
 
         /*        // arrange
         std::string output =
@@ -208,7 +203,7 @@ namespace AwsMock::Core {
         EXPECT_EQ(matches, 3);*/
     }
 
-    /*TEST_F(StringUtilsTest, SanitizeUtf8Test) {
+    /*BOOST_AUTO_TEST_CASE(SanitizeUtf8Test) {
 
         // arrange
         std::string input = "some invalid\xFE\xFE\xFF\xFF\xBB stuff";
@@ -220,7 +215,7 @@ namespace AwsMock::Core {
         EXPECT_TRUE(result == "some invalid stuff");
     }*/
 
-    TEST_F(StringUtilsTest, SnakeCaseTest) {
+    BOOST_AUTO_TEST_CASE(SnakeCaseTest) {
 
         // arrange
         const std::string input = "CreateQueue";
@@ -229,7 +224,7 @@ namespace AwsMock::Core {
         const std::string result = StringUtils::ToSnakeCase(input);
 
         // assert
-        EXPECT_TRUE(result == "create-queue");
+        BOOST_CHECK_EQUAL(result, "create-queue");
     }
 
 }// namespace AwsMock::Core

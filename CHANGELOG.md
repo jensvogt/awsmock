@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.3.0](https://github.com/jensvogt/awsmock/compare/v1.2.5...v1.3.0) (2025-05-18)
+
+
+### Features
+
+* **PIM-1234:** windows port ([bc6a494](https://github.com/jensvogt/awsmock/commit/bc6a494a1ba8caa57f73142093a25ccca3fc1b95))
+
+
+### Bug Fixes
+
+* **1181-dynamodb-tablesitems-missing-in-ui:** fix logging backend ([3189583](https://github.com/jensvogt/awsmock/commit/318958371385f5ea7ca97a0319e7959328f15ee0))
+* **1181-dynamodb-tablesitems-missing-in-ui:** fix metric service ([e6871fe](https://github.com/jensvogt/awsmock/commit/e6871fe16082893d07fe8dd53474130203195718))
+* **1219-dynamodb-resolve-host-exception:** fix resolve exception, fix monitoring http counter, fix imports. ([3e9ea85](https://github.com/jensvogt/awsmock/commit/3e9ea85217d8fc03ec21543477bc03ef8a583ff8))
+* **1219-dynamodb-resolve-host-exception:** fix resolve exception, fix monitoring http counter, fix imports. ([f90a22d](https://github.com/jensvogt/awsmock/commit/f90a22dc6167bedb82e1241305cb6a9271f41f60))
+* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON schema ([808975d](https://github.com/jensvogt/awsmock/commit/808975d0bcffd04111f0a0d19c2254648fc925d6))
+* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON schema ([3fcbf64](https://github.com/jensvogt/awsmock/commit/3fcbf642c65138205ecbe7f96f3fdd5b38375f63))
+* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON schema ([68a376f](https://github.com/jensvogt/awsmock/commit/68a376f4e9d134c55fa99958ff579434f015ce0c))
+
+## [1.2.5](https://github.com/jensvogt/awsmock/compare/v1.2.4...v1.2.5) (2025-05-11)
+
+
+### Bug Fixes
+
+* **1181-dynamodb-tablesitems-missing-in-ui:** add transfer server tags, fix S3 metadata in frontend ([1a41367](https://github.com/jensvogt/awsmock/commit/1a413673c669eeab8769cef281578f26c0ed1a71))
+
+## [1.2.4](https://github.com/jensvogt/awsmock/compare/v1.2.3...v1.2.4) (2025-05-10)
+
+
+### Bug Fixes
+
+* **1181-dynamodb-tablesitems-missing-in-ui:** segfault in SQS database ([78bbc62](https://github.com/jensvogt/awsmock/commit/78bbc62251ecbf2674dc7ba47306234753f31435))
+
 ## [1.2.3](https://github.com/jensvogt/awsmock/compare/v1.2.2...v1.2.3) (2025-05-04)
 
 

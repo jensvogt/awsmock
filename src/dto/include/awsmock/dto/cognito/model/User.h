@@ -10,9 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/Group.h>
-#include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -24,17 +22,12 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct User {
+    struct User final : Common::BaseCounter<User> {
 
         /**
          * MongoDB OID
          */
         std::string oid;
-
-        /**
-         * Aws region
-         */
-        std::string region;
 
         /**
          * User pool ID
@@ -49,7 +42,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Enabled
          */
-        bool enabled;
+        bool enabled = false;
 
         /**
          * Attributes
@@ -59,7 +52,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Status
          */
-        Database::Entity::Cognito::UserStatus userStatus;
+        Database::Entity::Cognito::UserStatus userStatus = Database::Entity::Cognito::UserStatus::UNKNOWN;
 
         /**
          * Password
@@ -86,37 +79,81 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return DTO as string
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Converts the entity to a JSON string
-         *
-         * @return DTO as string.
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "region", region);
+                Core::Bson::BsonUtils::SetStringValue(document, "userName", userName);
+                Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
+                Core::Bson::BsonUtils::SetStringValue(document, "userStatus", Database::Entity::Cognito::UserStatusToString(userStatus));
+                Core::Bson::BsonUtils::SetBoolValue(document, "enabled", enabled);
+                Core::Bson::BsonUtils::SetDateValue(document, "created", created);
+                Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Converts the entity to a JSON object
          *
          * @param document JSON object.
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * @brief Converts the entity to a string representation.
-         *
-         * @return entity as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param user user entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const User &user);
+                region = Core::Bson::BsonUtils::GetStringValue(document, "region");
+                userName = Core::Bson::BsonUtils::GetStringValue(document, "userName");
+                userPoolId = Core::Bson::BsonUtils::GetStringValue(document, "userPoolId");
+                enabled = Core::Bson::BsonUtils::GetBoolValue(document, "enabled");
+                userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Bson::BsonUtils::GetStringValue(document, "userStatus"));
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend User tag_invoke(boost::json::value_to_tag<User>, boost::json::value const &v) {
+            User r;
+            r.oid = Core::Json::GetStringValue(v, "oid");
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.userName = Core::Json::GetStringValue(v, "userName");
+            r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "userStatus"));
+            r.password = Core::Json::GetStringValue(v, "password");
+            if (Core::Json::AttributeExists(v, "groups")) {
+                r.groups = boost::json::value_to<std::vector<Group>>(v, "groups");
+            }
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, User const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"oid", obj.oid},
+                    {"userPoolId", obj.userPoolId},
+                    {"userName", obj.userName},
+                    {"enabled", obj.enabled},
+                    {"userStatus", Database::Entity::Cognito::UserStatusToString(obj.userStatus)},
+                    {"password", boost::json::value_from(obj.password)},
+                    {"groups", boost::json::value_from("groups")},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
     typedef std::vector<User> UserList;

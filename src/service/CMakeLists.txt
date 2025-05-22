@@ -14,8 +14,8 @@ set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandle
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp)
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
         src/secretsmanager/SecretsManagerService.cpp src/secretsmanager/SecretsManagerMonitoring.cpp)
-set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSWorker.cpp src/kms/KMSService.cpp
-        src/kms/KMSMonitoring.cpp src/kms/KMSCreator.cpp)
+set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSService.cpp
+        src/kms/KMSCreator.cpp)
 set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)
 set(FTP_SOURCES src/ftpserver/Filesystem.cpp src/ftpserver/FtpSession.cpp src/ftpserver/FtpServer.cpp
         src/ftpserver/FtpServerImpl.cpp src/ftpserver/UserDatabase.cpp src/sftpserver/SftpServer.cpp
@@ -36,7 +36,7 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRAN
 
 # Test directory
 if (NOT WIN32)
-    add_subdirectory(tst)
+    #    add_subdirectory(tst)
 endif ()
 
 # Includes

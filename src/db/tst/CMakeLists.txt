@@ -3,13 +3,13 @@ set(STATIC_LIB awsmockdb)
 
 set(SQS_SOURCES SQSDatabaseTests.cpp SQSMemoryDbTests.cpp)
 set(SNS_SOURCES SNSDatabaseTests.cpp SNSMemoryDbTests.cpp)
-set(S3_SOURCES S3DatabaseTests.cpp S3MemoryDbTests.cpp)
-set(MODULE_SOURCES ModuleDatabaseTests.cpp ModuleMemoryDbTests.cpp)
-set(LAMBDA_SOURCES LambdaDatabaseTests.cpp LambdaMemoryDbTests.cpp)
+set(S3_SOURCES ../btst/S3DatabaseTests.cpp ../btst/S3MemoryDbTests.cpp)
+set(MODULE_SOURCES ../btst/ModuleMemoryDbTests.cpp)
+set(LAMBDA_SOURCES ../btst/LambdaDatabaseTests.cpp ../btst/LambdaMemoryDbTests.cpp)
 set(COGNITO_SOURCES CognitoDatabaseTests.cpp CognitoMemoryDbTests.cpp)
-set(SECRETSMANAGER_SOURCES SecretsManagerDatabaseTests.cpp)
-set(SSM_SOURCES SSMDatabaseTests.cpp)
-set(TRANSFER_SOURCES TransferDatabaseTest.cpp TransferMemoryDbTest.cpp)
+set(SECRETSMANAGER_SOURCES ../btst/SecretsManagerDatabaseTests.cpp)
+set(SSM_SOURCES ../btst/SSMDatabaseTests.cpp)
+set(TRANSFER_SOURCES ../btst/TransferMemoryDbTests.cpp)
 
 # Includes
 include_directories(../include ../../core/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
@@ -18,7 +18,7 @@ add_executable(${BINARY} DatabaseTests.cpp ${SQS_SOURCES} ${S3_SOURCES} ${SNS_SO
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} main.cpp)
 
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore mongocxx bsoncxx boost_filesystem boost_program_options
-        boost_url boost_thread boost_locale boost_log boost_log_setup boost_process boost_json ssl crypto archive magic
-        gtest gmock)
+        boost_url boost_thread boost_locale boost_log boost_log_setup boost_process boost_json boost_unit_test_framework
+        ssl crypto archive magic gtest gmock)
 
 add_test(NAME ${BINARY} COMMAND ${BINARY})

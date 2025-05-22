@@ -11,8 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -23,12 +22,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Group {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct Group final : Common::BaseCounter<Group> {
 
         /**
          * Group name
@@ -36,7 +30,7 @@ namespace AwsMock::Dto::Cognito {
         std::string groupName;
 
         /**
-         * User pool Id
+         * User pool ID
          */
         std::string userPoolId;
 
@@ -53,7 +47,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Precedence
          */
-        int precedence;
+        long precedence{};
 
         /**
          * Created
@@ -66,32 +60,58 @@ namespace AwsMock::Dto::Cognito {
         system_clock::time_point modified = system_clock::now();
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert to a JSON object
          *
          * @return JSON object
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Group &r);
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "groupName", groupName);
+                Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
+                Core::Bson::BsonUtils::SetStringValue(document, "description", description);
+                Core::Bson::BsonUtils::SetLongValue(document, "precedence", precedence);
+                Core::Bson::BsonUtils::SetLongValue(document, "created", Core::DateTimeUtils::UnixTimestamp(created));
+                Core::Bson::BsonUtils::SetLongValue(document, "modified", Core::DateTimeUtils::UnixTimestamp(modified));
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend Group tag_invoke(boost::json::value_to_tag<Group>, boost::json::value const &v) {
+            Group r;
+            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
+            r.groupName = Core::Json::GetStringValue(v, "groupName");
+            r.description = Core::Json::GetStringValue(v, "description");
+            r.roleArn = Core::Json::GetStringValue(v, "roleArn");
+            r.precedence = Core::Json::GetLongValue(v, "precedence");
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Group const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"userPoolId", boost::json::value_from(obj.userPoolId)},
+                    {"groupName", boost::json::value_from(obj.groupName)},
+                    {"description", boost::json::value_from(obj.description)},
+                    {"roleArn", boost::json::value_from(obj.roleArn)},
+                    {"roleArn", boost::json::value_from(obj.roleArn)},
+                    {"precedence", boost::json::value_from(obj.precedence)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
