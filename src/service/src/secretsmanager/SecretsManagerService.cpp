@@ -105,27 +105,29 @@ namespace AwsMock::Service {
     Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const {
         log_trace << "Get secret value request: " << request.ToString();
 
+        // Check whether we have a name of ARN
+        std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
+
         // Check bucket existence
-        if (!_database.SecretExists(request.secretId)) {
-            log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId);
+        if (!_database.SecretExistsByArn(arn)) {
+            log_warning << "Secret does not exist, arn: " << arn;
+            throw Core::ServiceException("Secret does not exist, arn: " + arn);
         }
 
         try {
             Dto::SecretsManager::GetSecretValueResponse response;
 
-            // Get object from database
-            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+            // Get the object from the database
+            Database::Entity::SecretsManager::Secret secret = _database.GetSecretByArn(arn);
 
             // Convert to DTO
             response.name = secret.name;
             response.arn = secret.arn;
             response.versionId = secret.versionId;
             if (!secret.secretString.empty()) {
-                int len;
-                //const auto base64Decoded = (unsigned char *) (Core::Crypto::Base64Decode(secret.secretString).c_str());
-                response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) Core::Crypto::Base64Decode(secret.secretString).c_str(), &len, (unsigned char *) _kmsKey.c_str())));
-                response.secretString[len] = '\0';
+                const std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
+                int len = base64Decoded.length();
+                response.secretString = std::string(reinterpret_cast<char *>(Core::Crypto::Aes256DecryptString((unsigned char *) base64Decoded.c_str(), &len, (unsigned char *) _kmsKey.c_str())));
             } /*else if (!secret.secretString.empty()) {
                 std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
                 int len = (int) base64Decoded.length();
@@ -155,7 +157,7 @@ namespace AwsMock::Service {
         try {
             Dto::SecretsManager::ListSecretsResponse response;
 
-            // Get object from database
+            // Get the object from the database
             for (Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets(); const auto &s: secrets) {
                 Dto::SecretsManager::Secret secret;
                 secret.primaryRegion = s.primaryRegion;
@@ -268,21 +270,23 @@ namespace AwsMock::Service {
     Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const {
         log_trace << "Delete secret request: " << request.ToString();
 
+        // Check whether we have a name of ARN
+        std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
+
         // Check bucket existence
-        if (!_database.SecretExists(request.region, request.name)) {
-            log_warning << "Secret does not exist, name: " << request.name;
-            throw Core::ServiceException("Secret does not exist, name: " + request.name);
+        if (!_database.SecretExistsByArn(arn)) {
+            log_warning << "Secret does not exist, name: " << arn;
+            throw Core::ServiceException("Secret does not exist, arn: " + arn);
         }
 
-        Dto::SecretsManager::DeleteSecretResponse response;
         try {
 
             // Get an object from the database
-            const Database::Entity::SecretsManager::Secret secret = _database.GetSecretByRegionName(request.region, request.name);
+            const Database::Entity::SecretsManager::Secret secret = _database.GetSecretByArn(arn);
 
             // Delete from database
             _database.DeleteSecret(secret);
-            log_debug << "Database secret deleted, region: " << request.region << " name: " << request.name;
+            log_debug << "Database secret deleted, region: " << request.region << " name: " << arn;
             Dto::SecretsManager::DeleteSecretResponse response;
             response.region = request.region;
             response.name = secret.name;

@@ -20,7 +20,9 @@ namespace AwsMock::Dto::SecretsManager {
      * Example:
      * @code{.json}
      * {
-     *   "Name": "string"
+     *   "ForceDeleteWithoutRecovery": boolean,
+     *   "RecoveryWindowInDays": number,
+     *   "SecretId": "string"
      * }
      * @endcode
      *
@@ -29,15 +31,27 @@ namespace AwsMock::Dto::SecretsManager {
     struct DeleteSecretRequest final : Common::BaseCounter<DeleteSecretRequest> {
 
         /**
-         * Secret name
+         * Secret ID; can be the name of the secret or ARN
          */
-        std::string name;
+        std::string secretId;
+
+        /**
+         * Force deletion
+         */
+        bool forceDeleteWithoutRecovery = false;
+
+        /**
+         * Recovery windows in days
+         */
+        long recoveryWindowInDays{};
 
       private:
 
         friend DeleteSecretRequest tag_invoke(boost::json::value_to_tag<DeleteSecretRequest>, boost::json::value const &v) {
             DeleteSecretRequest r;
-            r.name = Core::Json::GetStringValue(v, "Name");
+            r.secretId = Core::Json::GetStringValue(v, "SecretId");
+            r.forceDeleteWithoutRecovery = Core::Json::GetBoolValue(v, "ForceDeleteWithoutRecovery");
+            r.recoveryWindowInDays = Core::Json::GetLongValue(v, "RecoveryWindowInDays");
             return r;
         }
 
@@ -46,7 +60,9 @@ namespace AwsMock::Dto::SecretsManager {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Name", obj.name},
+                    {"SecretId", obj.secretId},
+                    {"ForceDeleteWithoutRecovery", obj.forceDeleteWithoutRecovery},
+                    {"RecoveryWindowInDays", obj.recoveryWindowInDays},
             };
         }
     };
