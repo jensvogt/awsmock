@@ -2,11 +2,14 @@
 // Created by vogje01 on 08/04/2024.
 //
 
+#include "awsmock/service/secretsmanager/SecretRotation.h"
+
+
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {
 
-    SecretsManagerService::SecretsManagerService() : _database(Database::SecretsManagerDatabase::instance()) {
+    SecretsManagerService::SecretsManagerService() : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         // Initialize environment
         _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
@@ -18,11 +21,11 @@ namespace AwsMock::Service {
     Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const {
         log_trace << "Create secret request, request: " << request.ToString();
 
-        // Get region
+        // Get the region
         const std::string region = request.region;
 
         // Check existence
-        if (_database.SecretExists(request.region, request.name)) {
+        if (_secretsManagerDatabase.SecretExists(request.region, request.name)) {
             log_error << "Secrets exists already";
             throw Core::ServiceException("Secret exists already");
         }
@@ -46,6 +49,9 @@ namespace AwsMock::Service {
             secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
             secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
             secret.createdDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.description = request.description;
+            secret.kmsKeyId = request.kmsKeyId;
+            secret.versionIdsToStages.versions[secret.versionId] = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)};
 
             // Either string or binary data
             if (!request.secretString.empty()) {
@@ -56,7 +62,7 @@ namespace AwsMock::Service {
             } else {
                 secret.secretBinary = request.secretBinary;
             }
-            secret = _database.CreateSecret(secret);
+            secret = _secretsManagerDatabase.CreateSecret(secret);
 
         } catch (Core::DatabaseException &exc) {
             log_error << exc.what();
@@ -76,21 +82,30 @@ namespace AwsMock::Service {
         log_trace << "Describe secret request: " << request.ToString();
 
         // Check bucket existence
-        if (!_database.SecretExists(request.secretId)) {
+        if (!_secretsManagerDatabase.SecretExists(request.secretId)) {
             log_warning << "Secret does not exist, secretId: " << request.secretId;
             throw Core::NotFoundException("Secret does not exist, secretId: " + request.secretId);
         }
 
         try {
-            Dto::SecretsManager::DescribeSecretResponse response;
-
-            // Get object from database
-            const Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+            // Get the object from the database
+            const Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretBySecretId(request.secretId);
 
             // Convert to DTO
+            Dto::SecretsManager::DescribeSecretResponse response;
             response.region = secret.region;
             response.name = secret.name;
             response.arn = secret.arn;
+            response.deletedDate = secret.deletedDate;
+            response.description = secret.description;
+            response.kmsKeyId = secret.kmsKeyId;
+            response.rotationEnabled = secret.rotationEnabled;
+            response.rotationLambdaARN = secret.rotationLambdaARN;
+
+            // Version stages
+            for (const auto &[fst, snd]: secret.versionIdsToStages.versions) {
+                response.versionIdsToStages.versions[fst] = snd;
+            }
             log_debug << "Database secret described, secretId: " << request.secretId;
             return response;
 
@@ -109,7 +124,7 @@ namespace AwsMock::Service {
         std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
 
         // Check bucket existence
-        if (!_database.SecretExistsByArn(arn)) {
+        if (!_secretsManagerDatabase.SecretExistsByArn(arn)) {
             log_warning << "Secret does not exist, arn: " << arn;
             throw Core::ServiceException("Secret does not exist, arn: " + arn);
         }
@@ -118,7 +133,7 @@ namespace AwsMock::Service {
             Dto::SecretsManager::GetSecretValueResponse response;
 
             // Get the object from the database
-            Database::Entity::SecretsManager::Secret secret = _database.GetSecretByArn(arn);
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
 
             // Convert to DTO
             response.name = secret.name;
@@ -140,7 +155,7 @@ namespace AwsMock::Service {
 
             // Update database
             secret.lastAccessedDate = Core::DateTimeUtils::UnixTimestampNow();
-            secret = _database.UpdateSecret(secret);
+            secret = _secretsManagerDatabase.UpdateSecret(secret);
             log_trace << "Secret updated, secretId: " << secret.oid;
 
             return response;
@@ -158,7 +173,7 @@ namespace AwsMock::Service {
             Dto::SecretsManager::ListSecretsResponse response;
 
             // Get the object from the database
-            for (Database::Entity::SecretsManager::SecretList secrets = _database.ListSecrets(); const auto &s: secrets) {
+            for (Database::Entity::SecretsManager::SecretList secrets = _secretsManagerDatabase.ListSecrets(); const auto &s: secrets) {
                 Dto::SecretsManager::Secret secret;
                 secret.primaryRegion = s.primaryRegion;
                 secret.arn = s.arn;
@@ -197,7 +212,7 @@ namespace AwsMock::Service {
         log_trace << "Update secret request: " << request.ToString();
 
         // Check bucket existence
-        if (!_database.SecretExists(request.secretId)) {
+        if (!_secretsManagerDatabase.SecretExists(request.secretId)) {
             log_warning << "Secret does not exist, secretId: " << request.secretId;
             throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId);
         }
@@ -205,7 +220,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the object from the database
-            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretBySecretId(request.secretId);
 
             // Update database
             secret.kmsKeyId = request.kmsKeyId;
@@ -214,7 +229,7 @@ namespace AwsMock::Service {
             secret.description = request.description;
             secret.lastChangedDate = Core::DateTimeUtils::UnixTimestampNow();
 
-            secret = _database.UpdateSecret(secret);
+            secret = _secretsManagerDatabase.UpdateSecret(secret);
 
             // Convert to DTO
             log_debug << "Database secret described, secretId: " << request.secretId;
@@ -234,31 +249,43 @@ namespace AwsMock::Service {
     Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const {
         log_trace << "Rotate secret request: " << request.ToString();
 
+        // Check whether we have a name of ARN
+        std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
+
         // Check bucket existence
-        if (!_database.SecretExists(request.secretId)) {
-            log_warning << "Secret does not exist, secretId: " << request.secretId;
-            throw Core::NotFoundException("Secret does not exist, secretId: " + request.secretId);
+        if (!_secretsManagerDatabase.SecretExistsByArn(arn)) {
+            log_warning << "Secret does not exist, arn: " << arn;
+            throw Core::NotFoundException("Secret does not exist, arn: " + arn);
         }
 
         try {
 
             // Get the object from the database
-            Database::Entity::SecretsManager::Secret secret = _database.GetSecretBySecretId(request.secretId);
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
             secret.lastRotatedDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.rotationLambdaARN = request.rotationLambdaARN;
+            secret.rotationEnabled = true;
+            secret.versionIdsToStages.versions[request.clientRequestToken] = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPENDING)};
+            secret = _secretsManagerDatabase.UpdateSecret(secret);
 
-            // Update database
-            //secret.rotationRules = request.rotationRules;
-            //secret.secretString = request.secretString;
-            //secret.secretBinary = request.secretBinary;
-            //secret.description = request.description;
+            if (request.rotateImmediately) {
+                if (!secret.rotationLambdaARN.empty()) {
 
-            secret = _database.UpdateSecret(secret);
+                    // Rotate secret
+                    SecretRotation secretRotation;
+                    boost::thread t(boost::ref(secretRotation), secret, request.clientRequestToken);
+                    t.detach();
+                    log_debug << "Secret rotation started, arn: " << arn;
+                }
+            }
 
             // Convert to DTO
-            log_debug << "Database secret described, secretId: " << request.secretId;
+            log_debug << "Database secret described, arn: " << arn;
             Dto::SecretsManager::RotateSecretResponse response;
             response.region = secret.region;
             response.arn = secret.arn;
+            response.name = secret.name;
+            response.versionId = secret.versionId;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -274,7 +301,7 @@ namespace AwsMock::Service {
         std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
 
         // Check bucket existence
-        if (!_database.SecretExistsByArn(arn)) {
+        if (!_secretsManagerDatabase.SecretExistsByArn(arn)) {
             log_warning << "Secret does not exist, name: " << arn;
             throw Core::ServiceException("Secret does not exist, arn: " + arn);
         }
@@ -282,10 +309,10 @@ namespace AwsMock::Service {
         try {
 
             // Get an object from the database
-            const Database::Entity::SecretsManager::Secret secret = _database.GetSecretByArn(arn);
+            const Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
 
             // Delete from database
-            _database.DeleteSecret(secret);
+            _secretsManagerDatabase.DeleteSecret(secret);
             log_debug << "Database secret deleted, region: " << request.region << " name: " << arn;
             Dto::SecretsManager::DeleteSecretResponse response;
             response.region = request.region;

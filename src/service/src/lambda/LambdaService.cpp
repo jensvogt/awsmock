@@ -166,7 +166,7 @@ namespace AwsMock::Service {
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaEnvironmentCountersResponse response;
-            response.total = lambda.environment.variables.size();
+            response.total = static_cast<long>(lambda.environment.variables.size());
 
             std::vector<std::pair<std::string, std::string>> environments;
             for (const auto &[fst, snd]: lambda.environment.variables) {
@@ -464,8 +464,8 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
-        std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
+        auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        auto lambdaArn = Core::AwsUtils::CreateLambdaArn(region, accountId, functionName);
 
         // Get the lambda entity
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
@@ -674,7 +674,7 @@ namespace AwsMock::Service {
         }
 
         // Load code
-        const std::string lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
 
         // Create lambda function asynchronously

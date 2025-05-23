@@ -34,7 +34,7 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretCreateTest, SecretsManagerDatabaseTest) {
 
         // arrange
-        const Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
 
         // act
         const Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);

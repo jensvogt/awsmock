@@ -157,7 +157,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetSecretByArn(arn);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) const {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
@@ -170,10 +170,10 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto insert_one_result = _secretCollection.insert_one(secret.ToDocument());
                 session.commit_transaction();
-                log_trace << "Secret created, oid: "
-                          << insert_one_result->inserted_id().get_oid().value.to_string();
+                log_trace << "Secret created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
 
-                return GetSecretById(insert_one_result->inserted_id().get_oid().value);
+                secret.oid = insert_one_result->inserted_id().get_oid().value.to_string();
+                return secret;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -184,7 +184,7 @@ namespace AwsMock::Database {
         return _memoryDb.CreateSecret(secret);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(const Entity::SecretsManager::Secret &secret) const {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
@@ -210,7 +210,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateSecret(secret);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) const {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(Entity::SecretsManager::Secret &secret) const {
 
         if (SecretExists(secret)) {
 

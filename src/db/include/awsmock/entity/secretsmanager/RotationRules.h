@@ -10,7 +10,6 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
 

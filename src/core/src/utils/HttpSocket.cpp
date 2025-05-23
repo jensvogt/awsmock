@@ -2,6 +2,9 @@
 // Created by vogje01 on 5/28/24.
 //
 
+#include "awsmock/core/DateTimeUtils.h"
+
+
 #include <awsmock/core/HttpSocket.h>
 
 namespace AwsMock::Core {
@@ -164,6 +167,7 @@ namespace AwsMock::Core {
         request.set(http::field::host, host);
         request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         request.set(http::field::content_type, "application/json");
+        request.set(http::field::date, DateTimeUtils::HttpFormatNow());
         request.target(path);
         request.body() = body;
         request.prepare_payload();
@@ -185,6 +189,7 @@ namespace AwsMock::Core {
         request.base().set("Host", "localhost");
         request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         request.set(http::field::content_type, "application/octet-stream");
+        request.set(http::field::date, DateTimeUtils::HttpFormatNow());
         request.body().open(filename.c_str(), boost::beast::file_mode::scan, ec);
         request.prepare_payload();
 

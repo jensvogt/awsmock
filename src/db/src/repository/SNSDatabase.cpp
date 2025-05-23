@@ -26,7 +26,7 @@ namespace AwsMock::Database {
             counter.size = GetTopicSize(topic.topicArn);
             _snsCounterMap->insert_or_assign(topic.topicArn, counter);
         }
-        log_debug << "SNS queues counters initialized" << _snsCounterMap->size();
+        log_debug << "SNS queues counters initialized, size: " << _snsCounterMap->size();
     }
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {

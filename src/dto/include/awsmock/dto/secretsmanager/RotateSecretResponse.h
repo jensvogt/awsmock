@@ -31,6 +31,11 @@ namespace AwsMock::Dto::SecretsManager {
     struct RotateSecretResponse final : Common::BaseCounter<RotateSecretResponse> {
 
         /**
+         * Secret name
+         */
+        std::string name;
+
+        /**
          * Secret ARN
          */
         std::string arn;
@@ -45,6 +50,7 @@ namespace AwsMock::Dto::SecretsManager {
         friend RotateSecretResponse tag_invoke(boost::json::value_to_tag<RotateSecretResponse>, boost::json::value const &v) {
             RotateSecretResponse r;
             r.arn = Core::Json::GetStringValue(v, "ARN");
+            r.name = Core::Json::GetStringValue(v, "Name");
             r.versionId = Core::Json::GetStringValue(v, "VersionId");
             return r;
         }
@@ -54,6 +60,7 @@ namespace AwsMock::Dto::SecretsManager {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
+                    {"Name", obj.name},
                     {"ARN", obj.arn},
                     {"VersionId", obj.versionId},
             };

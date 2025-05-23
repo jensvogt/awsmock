@@ -13,7 +13,8 @@ set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cp
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp)
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
-        src/secretsmanager/SecretsManagerService.cpp src/secretsmanager/SecretsManagerMonitoring.cpp)
+        src/secretsmanager/SecretsManagerService.cpp src/secretsmanager/SecretsManagerMonitoring.cpp
+        src/secretsmanager/SecretRotation.cpp)
 set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSService.cpp
         src/kms/KMSCreator.cpp)
 set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)

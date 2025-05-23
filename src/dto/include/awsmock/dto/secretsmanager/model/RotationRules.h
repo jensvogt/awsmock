@@ -15,7 +15,7 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Rotation rules
+     * @brief Rotation rules
      *
      * Example:
      * @code{.json}
