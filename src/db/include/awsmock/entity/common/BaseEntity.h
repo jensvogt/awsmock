@@ -12,11 +12,11 @@
 #include <boost/describe.hpp>
 #include <boost/json.hpp>
 #include <boost/mp11.hpp>
+#include <boost/proto/traits.hpp>
 #include <boost/version.hpp>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
-#include <boost/proto/traits.hpp>
 
 namespace AwsMock::Database::Entity::Common {
 

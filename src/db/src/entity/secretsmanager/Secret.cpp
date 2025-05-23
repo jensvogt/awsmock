@@ -13,13 +13,13 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 kvp("duration", rotationRules.duration),
                 kvp("scheduleExpression", rotationRules.scheduleExpression));
 
-        view_or_value<view, value> versionIdStageDoc;
+        bsoncxx::builder::basic::document versionIdStageDoc;
         for (const auto &key: versionIdsToStages.versions | std::views::keys) {
             array versionStateArray;
             for (const auto &stage: versionIdsToStages.versions.at(key)) {
                 versionStateArray.append(stage);
             }
-            versionIdStageDoc = make_document(kvp(key, versionStateArray));
+            versionIdStageDoc.append(kvp(key, versionStateArray));
         }
 
         view_or_value<view, value> secretDoc = make_document(
@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 kvp("rotationEnabled", rotationEnabled),
                 kvp("rotationLambdaARN", rotationLambdaARN),
                 kvp("rotationRules", rotationRulesDoc),
-                kvp("versionIdsToStages", versionIdStageDoc),
+                kvp("versionIdsToStages", versionIdStageDoc.extract()),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
 

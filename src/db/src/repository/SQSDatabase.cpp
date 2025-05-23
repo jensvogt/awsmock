@@ -404,7 +404,7 @@ namespace AwsMock::Database {
                 queue.modified = system_clock::now();
                 const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
                 session.commit_transaction();
-                log_trace << "Queue updated: " << queue.ToString();
+                log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
                 if (mResult) {
                     queue.FromDocument(mResult->view());
@@ -742,7 +742,7 @@ namespace AwsMock::Database {
 
                 if (mResult) {
                     message.FromDocument(mResult->view());
-                    log_trace << "Message updated: " << message.ToString();
+                    log_trace << "Message updated: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
                     return message;
                 }
                 return {};

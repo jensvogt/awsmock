@@ -17,7 +17,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::SQS {
 
@@ -54,7 +53,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MessageAttribute final : Common::BaseEntity<MessageAttribute> {
+    struct MessageAttribute /*final : Common::BaseEntity<MessageAttribute>*/ {
 
         /**
          * Attribute string value
@@ -96,7 +95,7 @@ namespace AwsMock::Database::Entity::SQS {
          * @return entity as MongoDB document.
          */
         void FromDocument(const view_or_value<view, value> &object);
-
+        /*
       private:
 
         friend MessageAttribute tag_invoke(boost::json::value_to_tag<MessageAttribute>, boost::json::value const &v) {
@@ -125,7 +124,7 @@ namespace AwsMock::Database::Entity::SQS {
                     //{"binaryListValues", boost::json::value_from(obj.binaryListValues)},
                     {"dataType", MessageAttributeTypeToString(obj.dataType)},
             };
-        }
+        }*/
     };
 
     typedef std::map<std::string, MessageAttribute> MessageAttributeList;

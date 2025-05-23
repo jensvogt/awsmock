@@ -209,8 +209,9 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param payload SQS message
          * @param receiptHandle receipt handle of the message which triggered the lambda
+         * @param detached detached thread
          */
-        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}) const;
+        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = true) const;
 
         /**
          * @brief Create a new tag for a lambda function.

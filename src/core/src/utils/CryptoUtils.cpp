@@ -459,10 +459,10 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Encode(const std::string &decodedString) {
-        std::stringstream ofs;
         const size_t size = boost::beast::detail::base64::encoded_size(decodedString.length());
         const auto bytes = static_cast<unsigned char *>(malloc(size));
         const unsigned long encodedSize = boost::beast::detail::base64::encode(bytes, decodedString.c_str(), decodedString.length());
+        std::stringstream ofs;
         ofs.write((const char *) bytes, encodedSize);
         free(bytes);
         std::string encodedString = ofs.str();

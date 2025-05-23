@@ -11,8 +11,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database {
 
@@ -47,7 +45,7 @@ namespace AwsMock::Database {
         view_or_value<view, value> ToDocument() const {
 
             try {
-                document document;
+                bsoncxx::builder::basic::document document;
                 Core::Bson::BsonUtils::SetStringValue(document, "column", column);
                 Core::Bson::BsonUtils::SetIntValue(document, "sortDirection", sortDirection);
 
@@ -57,15 +55,6 @@ namespace AwsMock::Database {
                 log_error << exc.what();
                 throw Core::JsonException(exc.what());
             }
-        }
-
-      private:
-
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SortColumn const &obj) {
-            jv = {
-                    {"column", obj.column},
-                    {"sortDirection", obj.sortDirection},
-            };
         }
     };
 
