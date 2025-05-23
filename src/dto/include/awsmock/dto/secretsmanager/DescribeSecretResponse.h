@@ -47,24 +47,49 @@ namespace AwsMock::Dto::SecretsManager {
         std::string description;
 
         /**
-         * Last accessed date
+         * KMS key ID
          */
-        double lastAccessDate;
+        std::string kmsKeyId;
+
+        /**
+         * Rotation lambda ARN
+         */
+        std::string rotationLambdaARN;
+
+        /**
+         * Create date
+         */
+        long createdDate{};
+
+        /**
+         * Deleted date
+         */
+        long deletedDate{};
 
         /**
          * Last accessed date
          */
-        double lastChangedDate;
+        long lastAccessDate{};
+
+        /**
+         * Last accessed date
+         */
+        long lastChangedDate{};
 
         /**
          * Last rotation date
          */
-        double lastRotatedDate;
+        long lastRotatedDate{};
 
         /**
          * Last rotation date
          */
-        double nextRotationDate;
+        long nextRotationDate{};
+
+        /**
+         * Owning service
+         */
+        std::string owningService{};
 
         /**
          * Rotation enabled flag
@@ -74,7 +99,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Replication status
          */
-        ReplicationStatus replicationStatus;
+        std::vector<ReplicationStatus> replicationStatus;
 
         /**
          * Version IDs to stages
@@ -93,14 +118,24 @@ namespace AwsMock::Dto::SecretsManager {
             r.name = Core::Json::GetStringValue(v, "Name");
             r.arn = Core::Json::GetStringValue(v, "ARN");
             r.description = Core::Json::GetStringValue(v, "Description");
-            r.lastAccessDate = Core::Json::GetDoubleValue(v, "LastAccessDate");
-            r.lastChangedDate = Core::Json::GetDoubleValue(v, "LastChangedDate");
-            r.lastRotatedDate = Core::Json::GetDoubleValue(v, "LastRotatedDate");
-            r.nextRotationDate = Core::Json::GetDoubleValue(v, "NextRotationDate");
+            r.owningService = Core::Json::GetStringValue(v, "OwningService");
+            r.rotationLambdaARN = Core::Json::GetStringValue(v, "RotationLambdaARN");
+            r.createdDate = Core::Json::GetLongValue(v, "CreatedDate");
+            r.deletedDate = Core::Json::GetLongValue(v, "DeletedDate");
+            r.lastAccessDate = Core::Json::GetLongValue(v, "LastAccessDate");
+            r.lastChangedDate = Core::Json::GetLongValue(v, "LastChangedDate");
+            r.lastRotatedDate = Core::Json::GetLongValue(v, "LastRotatedDate");
+            r.nextRotationDate = Core::Json::GetLongValue(v, "NextRotationDate");
             r.rotationEnabled = Core::Json::GetBoolValue(v, "RotationEnabled");
-            r.replicationStatus = boost::json::value_to<ReplicationStatus>(v.at("RotationEnabled"));
-            r.versionIdsToStages = boost::json::value_to<VersionIdsToStages>(v.at("VersionIdsToStages"));
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            if (Core::Json::AttributeExists(v, "ReplicationStatus")) {
+                r.replicationStatus = boost::json::value_to<std::vector<ReplicationStatus>>(v.at("ReplicationStatus"));
+            }
+            if (Core::Json::AttributeExists(v, "VersionIdsToStages")) {
+                r.versionIdsToStages = boost::json::value_to<VersionIdsToStages>(v.at("VersionIdsToStages"));
+            }
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
             return r;
         }
 
@@ -112,6 +147,10 @@ namespace AwsMock::Dto::SecretsManager {
                     {"Name", obj.name},
                     {"ARN", obj.arn},
                     {"Description", obj.description},
+                    {"OwningService", obj.owningService},
+                    {"RotationLambdaARN", obj.rotationLambdaARN},
+                    {"CreatedDate", obj.createdDate},
+                    {"DeletedDate", obj.deletedDate},
                     {"LastAccessDate", obj.lastAccessDate},
                     {"LastChangedDate", obj.lastChangedDate},
                     {"LastRotatedDate", obj.lastRotatedDate},

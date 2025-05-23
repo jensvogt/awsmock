@@ -2,8 +2,8 @@
 // Created by vogje01 on 01/06/2023.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
-#define AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
+#ifndef AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_H
+#define AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_H
 
 // C++ includes
 #include <string>
@@ -13,13 +13,14 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>
+#include <awsmock/entity/secretsmanager/VersionIdsToStages.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
 
     using std::chrono::system_clock;
 
     /**
-     * SecretManager secrets entity.
+     * @brief SecretManager secrets entity.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -131,6 +132,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
         std::string rotationLambdaARN;
 
         /**
+         * Version ID stages
+         */
+        VersionIdsToStages versionIdsToStages;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -182,4 +188,4 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
 }// namespace AwsMock::Database::Entity::SecretsManager
 
-#endif// AWSMOCK_DB_ENTITY_SECRETSMANAGER_MESSAGE_H
+#endif// AWSMOCK_DB_ENTITY_SECRETSMANAGER_SECRET_H

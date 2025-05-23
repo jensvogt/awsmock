@@ -98,7 +98,8 @@ include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
 
 # Shared library
 if (NOT WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/dto/secretsmanager/model/VersionStage.h)
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
 endif ()

@@ -13,6 +13,15 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 kvp("duration", rotationRules.duration),
                 kvp("scheduleExpression", rotationRules.scheduleExpression));
 
+        view_or_value<view, value> versionIdStageDoc;
+        for (const auto &key: versionIdsToStages.versions | std::views::keys) {
+            array versionStateArray;
+            for (const auto &stage: versionIdsToStages.versions.at(key)) {
+                versionStateArray.append(stage);
+            }
+            versionIdStageDoc = make_document(kvp(key, versionStateArray));
+        }
+
         view_or_value<view, value> secretDoc = make_document(
                 kvp("region", region),
                 kvp("name", name),
@@ -34,6 +43,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 kvp("rotationEnabled", rotationEnabled),
                 kvp("rotationLambdaARN", rotationLambdaARN),
                 kvp("rotationRules", rotationRulesDoc),
+                kvp("versionIdsToStages", versionIdStageDoc),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -61,7 +71,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
             lastChangedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastChangedDate");
             lastRotatedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastRotatedDate");
             nextRotatedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "nextRotatedDate");
-            rotationEnabled = Core::Bson::BsonUtils::GetLongValue(mResult, "rotationEnabled");
+            rotationEnabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "rotationEnabled");
             rotationLambdaARN = Core::Bson::BsonUtils::GetStringValue(mResult, "rotationLambdaARN");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
@@ -73,6 +83,19 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 rotationRules.duration = Core::Bson::BsonUtils::GetStringValue(rotationView, "duration");
                 rotationRules.scheduleExpression = Core::Bson::BsonUtils::GetStringValue(rotationView, "scheduleExpression");
             }
+
+            // Get version stages
+            if (mResult.value().find("versionIdsToStages") != mResult.value().end()) {
+                for (const view versionStagesView = mResult.value()["versionIdsToStages"].get_document().value; const auto &element: versionStagesView) {
+                    std::string versionId = bsoncxx::string::to_string(element.key());
+                    std::vector<std::string> stages;
+                    for (const auto &stage: versionStagesView[versionId].get_array().value) {
+                        stages.push_back(bsoncxx::string::to_string(stage.get_string().value));
+                    }
+                    versionIdsToStages.versions.emplace(versionId, stages);
+                }
+            }
+
         } catch (const bsoncxx::exception &exc) {
             log_error << "Exception: oid: " << oid << " error: " << exc.what();
             throw Core::JsonException(exc.what());

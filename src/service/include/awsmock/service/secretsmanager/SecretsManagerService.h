@@ -22,13 +22,17 @@
 #include <awsmock/dto/secretsmanager/DescribeSecretResponse.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
+#include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
 #include <awsmock/dto/secretsmanager/RotateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
+#include <awsmock/dto/secretsmanager/model/VersionStage.h>
+#include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
+#include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
 
@@ -42,20 +46,20 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         explicit SecretsManagerService();
 
         /**
-         * Create a new secret
+         * @brief Create a new secret
          *
-         * @param request create secret request
+         * @param request create a secret request
          * @return CreateSecretResponse
          */
         [[nodiscard]] Dto::SecretsManager::CreateSecretResponse CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const;
 
         /**
-         * Describes an existing secret
+         * @brief Describes an existing secret
          *
          * @param request describe secret request
          * @return DescribeSecretResponse
@@ -63,7 +67,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::DescribeSecretResponse DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const;
 
         /**
-         * Returns the secret value
+         * @brief Returns the secret value
          *
          * @param request get secret value request
          * @return GetSecretValueResponse
@@ -71,7 +75,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
 
         /**
-         * List existing secrets
+         * @brief List existing secrets
          *
          * @param request list secrets request
          * @return ListSecretsResponse
@@ -79,7 +83,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
 
         /**
-         * Updates an existing secret
+         * @brief Updates an existing secret
          *
          * @param request update secret request
          * @return UpdateSecretResponse
@@ -87,7 +91,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const;
 
         /**
-         * Rotates an existing secret
+         * @brief Rotates an existing secret
          *
          * @param request rotate secret request
          * @return RotateSecretResponse
@@ -95,7 +99,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::RotateSecretResponse RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const;
 
         /**
-         * Deletes an existing secret
+         * @brief Deletes an existing secret
          *
          * @param request delete secret request
          * @return DeleteSecretResponse
@@ -110,9 +114,14 @@ namespace AwsMock::Service {
         std::string _accountId;
 
         /**
-         * Database connection
+         * Secrets manager database connection
          */
-        Database::SecretsManagerDatabase &_database;
+        Database::SecretsManagerDatabase &_secretsManagerDatabase;
+
+        /**
+         * Lambda database connection
+         */
+        Database::LambdaDatabase &_lambdaDatabase;
 
         /**
          * Shutdown mutex
@@ -123,6 +132,11 @@ namespace AwsMock::Service {
          * Key management system key
          */
         std::string _kmsKey;
+
+        /**
+         * Lambda service
+         */
+        LambdaService _lambdaService;
     };
 
 }// namespace AwsMock::Service

@@ -33,7 +33,7 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::DescribeSecretRequest secretsManagerRequest = Dto::SecretsManager::DescribeSecretRequest::FromJson(clientCommand);
                     Dto::SecretsManager::DescribeSecretResponse secretsManagerResponse = _secretsManagerService.DescribeSecret(secretsManagerRequest);
-                    log_info << "Secret described, secretId: " << secretsManagerResponse.name;
+                    log_info << "Secret described, response: " << secretsManagerResponse;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 

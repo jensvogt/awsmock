@@ -608,6 +608,24 @@ namespace AwsMock::Service {
         auto supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
+        std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
+        std::ofstream awsOfs(awsConfig);
+        awsOfs << "[default]" << std::endl;
+        awsOfs << "region=" << Core::Configuration::instance().GetValue<std::string>("awsmock.region") << std::endl;
+        awsOfs << "output=json" << std::endl;
+        awsOfs.close();
+
+        std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
+        std::ofstream awsCredOfs(awsCredentials);
+        awsCredOfs << "[default]" << std::endl;
+        awsCredOfs << "region=" << Core::Configuration::instance().GetValue<std::string>("awsmock.region") << std::endl;
+        awsCredOfs << "aws_access_key_id=none" << std::endl;
+        awsCredOfs << "aws_secret_access_key=none" << std::endl;
+        awsCredOfs << "aws_session_token=none" << std::endl;
+        awsCredOfs << "retry_mode=standard" << std::endl;
+        awsCredOfs << "max_attempts=1" << std::endl;
+        awsCredOfs.close();
+
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
             ofs << "FROM " << supportedRuntime << std::endl;
@@ -637,6 +655,9 @@ namespace AwsMock::Service {
             }
             ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "RUN pip install -r requirements.txt" << std::endl;
+            ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "COPY config /root/.aws/" << std::endl;
+            ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {

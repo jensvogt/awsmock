@@ -75,6 +75,7 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
+#include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Service {
     using std::chrono::system_clock;

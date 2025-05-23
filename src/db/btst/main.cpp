@@ -12,11 +12,6 @@
 // C++ includes
 #include <memory>
 
-// MongoDB includes
-#include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
-#include <mongocxx/uri.hpp>
-
 // Boost includes
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/interprocess/mapped_region.hpp>
