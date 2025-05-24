@@ -119,21 +119,31 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
+    LambdaResultCounter Mapper::mapCounter(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        LambdaResultCounter counter;
+        counter.oid = resultEntity.oid;
+        counter.lambdaArn = resultEntity.lambdaArn;
+        counter.lambdaName = resultEntity.lambdaName;
+        counter.runtime = resultEntity.runtime;
+        counter.requestBody = resultEntity.requestBody;
+        counter.responseBody = resultEntity.responseBody;
+        counter.lambdaStatus = resultEntity.lambdaStatus;
+        counter.httpStatusCode = resultEntity.httpStatusCode;
+        counter.timestamp = resultEntity.timestamp;
+        return counter;
+    }
+
     ListLambdaResultCountersResponse Mapper::map(const std::vector<Database::Entity::Lambda::LambdaResult> &lambdaResultEntities) {
         ListLambdaResultCountersResponse response;
         for (auto &lambdaResultEntity: lambdaResultEntities) {
-            LambdaResultCounter counter;
-            counter.oid = lambdaResultEntity.oid;
-            counter.lambdaArn = lambdaResultEntity.lambdaArn;
-            counter.lambdaName = lambdaResultEntity.lambdaName;
-            counter.runtime = lambdaResultEntity.runtime;
-            counter.requestBody = lambdaResultEntity.requestBody;
-            counter.responseBody = lambdaResultEntity.responseBody;
-            counter.lambdaStatus = lambdaResultEntity.lambdaStatus;
-            counter.httpStatusCode = lambdaResultEntity.httpStatusCode;
-            counter.timestamp = lambdaResultEntity.timestamp;
-            response.lambdaResultCounters.emplace_back(counter);
+            response.lambdaResultCounters.emplace_back(mapCounter(lambdaResultEntity));
         }
+        return response;
+    }
+
+    GetLambdaResultCounterResponse Mapper::map(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        GetLambdaResultCounterResponse response;
+        response.lambdaResultCounter = mapCounter(resultEntity);
         return response;
     }
 

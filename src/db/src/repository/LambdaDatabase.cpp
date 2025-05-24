@@ -476,6 +476,32 @@ namespace AwsMock::Database {
         return _memoryDb.CreateLambdaResult(lambdaResult);
     }
 
+
+    Entity::Lambda::LambdaResult LambdaDatabase::GetLambdaResultCounter(const std::string &oid) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultsCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+
+                const auto result = _lambdaResultsCollection.find_one(make_document(kvp("_id", bsoncxx::oid(oid))));
+                log_trace << "Lambda result found, oid: " << oid;
+                if (!result->empty()) {
+                    Entity::Lambda::LambdaResult lambdaResult;
+                    lambdaResult.FromDocument(result->view());
+                    return lambdaResult;
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return {};
+    }
+
     std::vector<Entity::Lambda::LambdaResult> LambdaDatabase::ListLambdaResultCounters(const std::string &lambdaArn, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Lambda::LambdaResult> lambdaResults;

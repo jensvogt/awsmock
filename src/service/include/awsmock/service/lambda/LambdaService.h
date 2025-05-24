@@ -44,6 +44,8 @@
 #include <awsmock/dto/lambda/intern/DeleteLambdaResultCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/GetLambdaResultCounterRequest.h>
+#include <awsmock/dto/lambda/intern/GetLambdaResultCounterResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaArnsResponse.h>
@@ -263,7 +265,7 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::GetFunctionCountersRequest
          * @see Dto::Lambda::GetFunctionCountersResponse
          */
-        Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const;
+        [[nodiscard]] Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const;
 
         /**
          * @brief Reset function counters
@@ -281,7 +283,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::AccountSettingsResponse
          */
-        Dto::Lambda::AccountSettingsResponse GetAccountSettings() const;
+        [[nodiscard]] Dto::Lambda::AccountSettingsResponse GetAccountSettings() const;
 
         /**
          * @brief Creates an event source mapping.
@@ -295,7 +297,7 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::CreateEventSourceMappingsRequest
          * @see Dto::Lambda::CreateEventSourceMappingsResponse
          */
-        Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const;
+        [[nodiscard]] Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const;
 
         /**
          * @brief List am event source mappings
@@ -306,7 +308,7 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::ListEventSourceMappingsRequest
          * @see Dto::Lambda::ListEventSourceMappingsResponse
          */
-        Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
+        [[nodiscard]] Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
 
         /**
          * @brief Returns a list of all available functions ARNs
@@ -315,6 +317,18 @@ namespace AwsMock::Service {
          * @see ListLambdaArnsResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaArnsResponse ListLambdaArns() const;
+
+        /**
+         * @brief Returns a lambda result counter
+         *
+         * @param request get result counter request
+         * @return GetLambdaResultCounterResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::GetLambdaResultCounterRequest
+         * @see Dto::Lambda::GetLambdaResultCounterResponse
+         */
+        [[nodiscard]] Dto::Lambda::GetLambdaResultCounterResponse GetLambdaResultCounter(const Dto::Lambda::GetLambdaResultCounterRequest &request) const;
+
 
         /**
          * @brief Returns a list of all available lambda result counters
@@ -335,7 +349,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::DeleteLambdaResultCounterRequest
          */
-        long DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const;
+        [[nodiscard]] long DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const;
 
         /**
          * @brief Deletes all lambda result counter
@@ -345,7 +359,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::DeleteLambdaResultCountersRequest
          */
-        long DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const;
+        [[nodiscard]] long DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const;
 
         /**
          * @brief Starts the lambda function by starting a docker container

@@ -241,6 +241,14 @@ namespace AwsMock::Database {
         [[nodiscard]] long RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) const;
 
         /**
+         * @brief Returns a lambda function result.
+         *
+         * @param oid lambda result OID
+         * @return lambda function result counter
+         */
+        [[nodiscard]] Entity::Lambda::LambdaResult GetLambdaResultCounter(const std::string &oid) const;
+
+        /**
          * @brief Returns a list of lambda function results.
          *
          * @param lambdaArn lambda function ARN
