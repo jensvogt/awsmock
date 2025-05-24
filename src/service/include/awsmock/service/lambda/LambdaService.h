@@ -21,6 +21,7 @@
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsResponse.h>
@@ -39,6 +40,8 @@
 #include <awsmock/dto/lambda/intern/DeleteFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/intern/DeleteFunctionTagRequest.h>
 #include <awsmock/dto/lambda/intern/DeleteImageRequest.h>
+#include <awsmock/dto/lambda/intern/DeleteLambdaResultCounterRequest.h>
+#include <awsmock/dto/lambda/intern/DeleteLambdaResultCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
@@ -46,6 +49,8 @@
 #include <awsmock/dto/lambda/intern/ListLambdaArnsResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListLambdaResultCountersRequest.h>
+#include <awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
@@ -209,8 +214,9 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param payload SQS message
          * @param receiptHandle receipt handle of the message which triggered the lambda
+         * @param detached detached thread
          */
-        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}) const;
+        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = true) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -311,6 +317,37 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Lambda::ListLambdaArnsResponse ListLambdaArns() const;
 
         /**
+         * @brief Returns a list of all available lambda result counters
+         *
+         * @param request list lambda result counters request
+         * @return ListLambdaResultCountersResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::ListLambdaResultCountersRequest
+         * @see Dto::Lambda::ListLambdaResultCountersResponse
+         */
+        [[nodiscard]] Dto::Lambda::ListLambdaResultCountersResponse ListLambdaResultCounters(const Dto::Lambda::ListLambdaResultCountersRequest &request) const;
+
+        /**
+         * @brief Deletes a lambda result counter
+         *
+         * @param request delete lambda result counter request
+         * @return number of results deleted
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::DeleteLambdaResultCounterRequest
+         */
+        long DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const;
+
+        /**
+         * @brief Deletes all lambda result counter
+         *
+         * @param request delete lambda result counters request
+         * @return number of results deleted
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::DeleteLambdaResultCountersRequest
+         */
+        long DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const;
+
+        /**
          * @brief Starts the lambda function by starting a docker container
          *
          * @param request start lambda function request
@@ -356,7 +393,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::DeleteTagsRequest
          */
-        void DeleteTags(Dto::Lambda::DeleteTagsRequest &request) const;
+        void DeleteTags(const Dto::Lambda::DeleteTagsRequest &request) const;
 
       private:
 
@@ -443,7 +480,7 @@ namespace AwsMock::Service {
          * @param lambda lambda entity
          * @return lambda code size
          */
-        std::string GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]] std::string GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * Lambda database connection

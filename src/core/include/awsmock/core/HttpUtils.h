@@ -499,6 +499,13 @@ namespace AwsMock::Core {
          */
         static http::response<http::dynamic_body> BadRequest(const http::request<http::dynamic_body> &request, const std::string &reason);
 
+        /**
+         * @brief Return a bad request response (400)
+         *
+         * @param request HTTP request
+         * @param reason reason string
+         * @return HTTP response
+         */
         static http::response<http::dynamic_body> BadRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &reason);
 
         /**
@@ -545,6 +552,14 @@ namespace AwsMock::Core {
          * @return HTTP response
          */
         static http::response<http::string_body> NotImplemented(const http::request<http::string_body> &request, const std::string &reason);
+
+        /**
+         * @brief Return a not implemented response (501)
+         *
+         * @param status HTTP status
+         * @return HTTP status as string
+         */
+        static std::string StatusCodeToString(const http::status &status);
 
       private:
 

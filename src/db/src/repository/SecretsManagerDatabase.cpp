@@ -192,14 +192,23 @@ namespace AwsMock::Database {
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+            opts.upsert(true);
+
             try {
 
                 session.start_transaction();
-                auto result = _secretCollection.find_one_and_update(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
+                const auto mResult = _secretCollection.find_one_and_update(make_document(kvp("secretId", secret.secretId)), secret.ToDocument(), opts);
                 session.commit_transaction();
-                log_trace << "Bucket updated: " << secret.ToString();
+                log_trace << "Secret updated: " << secret.ToString();
 
-                return GetSecretBySecretId(secret.secretId);
+                if (!mResult->empty()) {
+                    log_trace << "Secret user updated: " << secret.ToString();
+                    secret.FromDocument(mResult->view());
+                    return secret;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

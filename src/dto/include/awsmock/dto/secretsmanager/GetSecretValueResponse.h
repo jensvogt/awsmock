@@ -47,7 +47,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Created date
          */
-        double createdDate = -1;
+        long createdDate = -1;
 
         /**
          * Secret string
@@ -75,7 +75,7 @@ namespace AwsMock::Dto::SecretsManager {
             GetSecretValueResponse r;
             r.name = Core::Json::GetStringValue(v, "Name");
             r.versionId = Core::Json::GetStringValue(v, "VersionId");
-            r.createdDate = Core::Json::GetDoubleValue(v, "CreatedDate");
+            r.createdDate = Core::Json::GetLongValue(v, "CreatedDate");
             r.secretString = Core::Json::GetStringValue(v, "SecretString");
             r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
             r.versionId = Core::Json::GetStringValue(v, "VersionId");

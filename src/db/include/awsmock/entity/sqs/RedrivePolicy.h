@@ -37,7 +37,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -46,21 +46,10 @@ namespace AwsMock::Database::Entity::SQS {
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
-      private:
-
-        friend RedrivePolicy tag_invoke(boost::json::value_to_tag<RedrivePolicy>, boost::json::value const &v) {
-            RedrivePolicy r;
-            r.deadLetterTargetArn = v.at("deadLetterTargetArn").as_string();
-            r.maxReceiveCount = v.at("maxReceiveCount").as_int64();
-            return r;
-        }
-
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RedrivePolicy const &obj) {
-            jv = {
-                    {"deadLetterTargetArn", obj.deadLetterTargetArn},
-                    {"maxReceiveCount", obj.maxReceiveCount},
-            };
-        }
+        void FromJson(const std::string &json) {
+            value jsonObject = bsoncxx::from_json(json);
+            FromDocument(jsonObject);
+        };
     };
 
 }// namespace AwsMock::Database::Entity::SQS

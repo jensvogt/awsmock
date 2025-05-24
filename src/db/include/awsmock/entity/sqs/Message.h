@@ -17,7 +17,6 @@
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/exception/JsonException.h>
-#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>
@@ -31,7 +30,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Message final : Common::BaseEntity<Message> {
+    struct Message /*final : Common::BaseEntity<Message>*/ {
 
         /**
          * ID
@@ -185,7 +184,7 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
-
+        /*
       private:
 
         friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
@@ -238,7 +237,7 @@ namespace AwsMock::Database::Entity::SQS {
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
-        }
+        }*/
     };
 
     typedef std::vector<Message> MessageList;

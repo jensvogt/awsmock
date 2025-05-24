@@ -167,7 +167,8 @@ namespace AwsMock::Service {
     }
 
     int LambdaCreator::CreateRandomHostPort() {
-        return Core::RandomUtils::NextInt(HOST_PORT_MIN, HOST_PORT_MAX);
+        const int port = Core::SystemUtils::GetNextFreePort();
+        return port;
     }
 
     std::string LambdaCreator::GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) {

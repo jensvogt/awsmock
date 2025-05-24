@@ -128,6 +128,13 @@ namespace AwsMock::Core {
          * @param error error stream
          */
         static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error);
+
+        /**
+         * @brief Return the next free port number
+         *
+         * @return next free port number
+         */
+        static int GetNextFreePort();
     };
 
 }// namespace AwsMock::Core

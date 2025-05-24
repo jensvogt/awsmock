@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _collectionName("lambda"), _memoryDb(LambdaMemoryDb::instance()) {}
+    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambdaResult"), _memoryDb(LambdaMemoryDb::instance()) {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
@@ -15,7 +15,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime)));
                 log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
@@ -40,7 +40,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const int64_t count = _lambdaCollection.count_documents(make_document(kvp("function", functionName)));
                 log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
@@ -60,7 +60,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const int64_t count = _lambdaCollection.count_documents(make_document(kvp("arn", arn)));
                 log_trace << "lambda function exists: " << std::boolalpha << count;
                 return count > 0;
@@ -80,7 +80,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
 
                 long count = 0;
                 if (region.empty()) {
@@ -107,7 +107,7 @@ namespace AwsMock::Database {
             try {
 
                 auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
 
                 auto result = _lambdaCollection.insert_one(lambda.ToDocument());
                 log_trace << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string();
@@ -129,7 +129,7 @@ namespace AwsMock::Database {
         try {
 
             auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
             const auto mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Lambda not found ";
@@ -162,7 +162,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const auto mResult = _lambdaCollection.find_one(make_document(kvp("arn", arn)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
@@ -191,7 +191,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const auto mResult = _lambdaCollection.find_one(make_document(kvp("region", region), kvp("function", name)));
                 if (!mResult) {
                     log_error << "Database exception: Lambda not found ";
@@ -228,7 +228,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 auto result = _lambdaCollection.find_one_and_update(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
                 log_trace << "Lambda updated: " << lambda.ToString();
                 return GetLambdaByArn(lambda.arn);
@@ -257,7 +257,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
             auto session = client->start_session();
 
             try {
@@ -282,7 +282,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
             auto session = client->start_session();
 
             try {
@@ -306,7 +306,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
             auto session = client->start_session();
 
             try {
@@ -339,7 +339,7 @@ namespace AwsMock::Database {
                 std::vector<Entity::Lambda::Lambda> lambdas;
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
 
                 document query;
                 if (!region.empty()) {
@@ -384,7 +384,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
 
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
@@ -436,7 +436,7 @@ namespace AwsMock::Database {
                 query.append(kvp("eventSources", make_document(kvp("$elemMatch", make_document(kvp("eventSourceArn", eventSourceArn))))));
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 for (auto lambdaCursor = _lambdaCollection.find(query.extract()); auto lambda: lambdaCursor) {
                     Entity::Lambda::Lambda result;
                     result.FromDocument(lambda);
@@ -454,6 +454,162 @@ namespace AwsMock::Database {
         return _memoryDb.ListLambdasWithEventSource(eventSourceArn);
     }
 
+    Entity::Lambda::LambdaResult LambdaDatabase::CreateLambdaResult(Entity::Lambda::LambdaResult &lambdaResult) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultsCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+
+                const auto result = _lambdaResultsCollection.insert_one(lambdaResult.ToDocument());
+                log_trace << "Lambda result created, oid: " << result->inserted_id().get_oid().value.to_string();
+                lambdaResult.oid = result->inserted_id().get_oid().value.to_string();
+                return lambdaResult;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.CreateLambdaResult(lambdaResult);
+    }
+
+    std::vector<Entity::Lambda::LambdaResult> LambdaDatabase::ListLambdaResultCounters(const std::string &lambdaArn, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+
+        std::vector<Entity::Lambda::LambdaResult> lambdaResults;
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+                if (pageIndex > 0) {
+                    opts.skip(pageSize * pageIndex);
+                }
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
+                }
+
+                document query = {};
+                if (!lambdaArn.empty()) {
+                    query.append(kvp("arn", lambdaArn));
+                }
+
+                for (auto lambdaCursor = _lambdaResultCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
+                    Entity::Lambda::LambdaResult result;
+                    result.FromDocument(lambda);
+                    lambdaResults.push_back(result);
+                }
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+
+        log_trace << "Got lambda result counter list, size:" << lambdaResults.size();
+        return lambdaResults;
+    }
+
+    long LambdaDatabase::LambdaResultsCount(const std::string &lambdaArn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+
+                document query = {};
+                if (!lambdaArn.empty()) {
+                    query.append(kvp("arn", lambdaArn));
+                }
+
+                const int64_t count = _lambdaResultCollection.count_documents(query.extract());
+                log_trace << "Got lambda result count, size:" << count;
+                return count;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return 0;
+    }
+
+    long LambdaDatabase::DeleteResultsCounter(const std::string &oid) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+                const auto result = _lambdaResultCollection.delete_one(make_document(kvp("_id", bsoncxx::oid(oid))));
+                log_trace << "Lambda result deleted, size:" << result->deleted_count();
+                return result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return 0;
+    }
+
+    long LambdaDatabase::DeleteResultsCounters(const std::string &lambdaArn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+                const auto result = _lambdaResultCollection.delete_many(make_document(kvp("arn", lambdaArn)));
+                log_trace << "Lambda results deleted, size:" << result->deleted_count();
+                return result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return 0;
+    }
+
+    long LambdaDatabase::RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) const {
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultsCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+
+                document query;
+                query.append(kvp("timestamp", make_document(kvp("$lt", bsoncxx::types::b_date(cutOff)))));
+                const auto result = _lambdaResultsCollection.delete_many(query.extract());
+                log_trace << "Lambda results deleted, count: " << result->deleted_count();
+                return result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.RemoveExpiredLambdaLogs(cutOff);
+    }
+
     void LambdaDatabase::DeleteLambda(const std::string &functionName) const {
 
         if (HasDatabase()) {
@@ -461,7 +617,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const auto result = _lambdaCollection.delete_many(make_document(kvp("function", functionName)));
                 log_debug << "lambda deleted, function: " << functionName << " count: " << result->deleted_count();
 
@@ -483,7 +639,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_collectionName];
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const auto result = _lambdaCollection.delete_many({});
                 log_debug << "All lambdas deleted, count: " << result->deleted_count();
                 return result->deleted_count();

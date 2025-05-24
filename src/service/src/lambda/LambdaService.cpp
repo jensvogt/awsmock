@@ -458,7 +458,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle) const {
+    void LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle, bool detached) const {
         boost::mutex::scoped_lock lock(_mutex);
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "invoke_lambda_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
@@ -503,8 +503,12 @@ namespace AwsMock::Service {
 
         // Asynchronous execution
         LambdaExecutor lambdaExecutor;
-        boost::thread t(boost::ref(lambdaExecutor), lambda.oid, instance.containerId, hostName, port, payload, lambda.function, receiptHandle);
-        t.detach();
+        boost::thread t(boost::ref(lambdaExecutor), lambda, instance.containerId, hostName, port, payload, lambda.function, receiptHandle);
+        if (detached) {
+            t.detach();
+        } else {
+            t.join();
+        }
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
 
         // Update database
@@ -654,6 +658,63 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Lambda::ListLambdaResultCountersResponse LambdaService::ListLambdaResultCounters(const Dto::Lambda::ListLambdaResultCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_lambda_results");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_lambda_results");
+        log_debug << "List function counters request, region: " << request.region;
+
+        try {
+
+            const std::vector<Database::Entity::Lambda::LambdaResult> lambdaResults = _lambdaDatabase.ListLambdaResultCounters(request.lambdaArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const long count = _lambdaDatabase.LambdaResultsCount(request.lambdaArn);
+
+            Dto::Lambda::ListLambdaResultCountersResponse response = Dto::Lambda::Mapper::map(lambdaResults);
+            response.total = count;
+
+            log_trace << "Lambda list function counters, result: " << response.ToString();
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    long LambdaService::DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_result");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_result");
+        log_debug << "Delete lambda result counters request, region: " << request.region;
+
+        try {
+
+            long count = _lambdaDatabase.DeleteResultsCounter(request.oid);
+            log_trace << "Lambda result counter deleted, count: " << count;
+            return count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+
+    long LambdaService::DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_result");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_result");
+        log_debug << "Delete lambda result counters request, region: " << request.region;
+
+        try {
+
+            long count = _lambdaDatabase.DeleteResultsCounters(request.lambdaArn);
+            log_trace << "Lambda result counter deleted, arn: " << request.lambdaArn;
+            return count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     void LambdaService::StartFunction(const Dto::Lambda::StartFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_function");
@@ -677,7 +738,7 @@ namespace AwsMock::Service {
         const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
 
-        // Create lambda function asynchronously
+        // Create the lambda function asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         LambdaCreator lambdaCreator;
         boost::thread t(boost::ref(lambdaCreator), functionCode, lambda.oid, instanceId);
@@ -791,7 +852,7 @@ namespace AwsMock::Service {
         log_info << "Lambda function deleted, function: " + request.functionName;
     }
 
-    void LambdaService::DeleteTags(Dto::Lambda::DeleteTagsRequest &request) const {
+    void LambdaService::DeleteTags(const Dto::Lambda::DeleteTagsRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_tags");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_tags");
         log_trace << "Delete tags: " + request.ToString();
@@ -804,12 +865,12 @@ namespace AwsMock::Service {
         // Get the existing entity
         Dto::Lambda::ListTagsResponse response;
         Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByArn(request.arn);
-        int count = 0;
+        long count = 0;
         for (const auto &tag: request.tags) {
-            count += std::erase_if(lambdaEntity.tags, [tag](const auto &item) {
+            count += static_cast<long>(std::erase_if(lambdaEntity.tags, [tag](const auto &item) {
                 auto const &[k, v] = item;
                 return k == tag;
-            });
+            }));
         }
         lambdaEntity = _lambdaDatabase.UpdateLambda(lambdaEntity);
         log_debug << "Delete tag request succeeded, arn: " + lambdaEntity.arn << " deleted: " << count;
