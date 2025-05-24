@@ -8,10 +8,10 @@ namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.lambda.monitoring.period");
-        _counterPeriod = configuration.GetValue<int>("awsmock.modules.lambda.counter.period");
-        _removePeriod = configuration.GetValue<int>("awsmock.modules.lambda.remove.period");
-        log_debug << "Lambda remove period: " << _removePeriod << ", counterPeriod: " << _counterPeriod << ", monitoringPeriod: " << _monitoringPeriod;
+        _counterPeriod = configuration.GetValue<int>("awsmock.modules.lambda.counter-period");
+        _removePeriod = configuration.GetValue<int>("awsmock.modules.lambda.remove-period");
+        _logRetentionPeriod = configuration.GetValue<int>("awsmock.modules.lambda.log-retention-period");
+        log_debug << "Lambda remove period: " << _removePeriod << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
         // Directories
         _lambdaDir = configuration.GetValue<std::string>("awsmock.modules.lambda.data-dir");
@@ -29,19 +29,23 @@ namespace AwsMock::Service {
         // Cleanup container
         CleanupDocker();
 
-        // Create a local network, if it is not existing yet
+        // Create a local network if it does not exist yet
         CreateLocalNetwork();
 
         // Start the lambdas, this will build the containers, if not already existing
         CreateContainers();
 
         // Start lambda monitoring update counters
-        scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
-        log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _monitoringPeriod;
+        scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _counterPeriod);
+        log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
-        // Start the delete old message task
+        // Start the delete old lambda task
         scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
         log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
+
+        // Start the delete old lambda logs
+        scheduler.AddTask("remove-lambda-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
+        log_debug << "Lambda task started, name remove-lambda-logs, period: " << _logRetentionPeriod;
 
         // Set running
         SetRunning();
@@ -103,7 +107,7 @@ namespace AwsMock::Service {
 
     void LambdaServer::RemoveExpiredLambdas() const {
 
-        // Get lambda list
+        // Get the list of lambdas
         Database::Entity::Lambda::LambdaList lambdaList = _lambdaDatabase.ListLambdas();
         if (lambdaList.empty()) {
             return;
@@ -123,7 +127,7 @@ namespace AwsMock::Service {
 
             // Remove instance
             const auto count = std::erase_if(lambda.instances, [expired](const Database::Entity::Lambda::Instance &instance) {
-                return instance.created > instance.created.min() && instance.created < expired;
+                return instance.created > system_clock::time_point::min() && instance.created < expired;
             });
 
             // Update lambda
@@ -134,6 +138,14 @@ namespace AwsMock::Service {
             }
         }
         log_debug << "Lambda worker finished, count: " << lambdaList.size();
+    }
+
+    void LambdaServer::RemoveExpiredLambdaLogs() const {
+
+        // Cleanup logs
+        const system_clock::time_point cutOff = system_clock::now() - std::chrono::days(_logRetentionPeriod);
+        const long count = _lambdaDatabase.RemoveExpiredLambdaLogs(cutOff);
+        log_debug << "Lambda logs removed, cutOff: " << Core::DateTimeUtils::ToISO8601(cutOff) << ", count: " << count;
     }
 
     void LambdaServer::UpdateCounter() const {

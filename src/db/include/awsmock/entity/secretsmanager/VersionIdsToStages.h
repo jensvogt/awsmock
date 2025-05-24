@@ -47,10 +47,10 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
             try {
 
-                document rootDocument;
+                bsoncxx::builder::basic::document rootDocument;
                 if (!versions.empty()) {
                     for (const auto &[fst, snd]: versions) {
-                        array stagesArray;
+                        bsoncxx::builder::basic::array stagesArray;
                         for (const auto &stage: snd) {
                             stagesArray.append(stage);
                         }

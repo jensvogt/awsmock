@@ -34,7 +34,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretCreateMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
 
         // act
         const Entity::SecretsManager::Secret result = _secretsManagerDatabase.CreateSecret(secret);
@@ -48,7 +51,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretGetByIdMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -63,7 +69,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretGetByRegionNameMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -78,7 +87,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretGetByOidMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -93,7 +105,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretExistsMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -106,8 +121,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretUpdateMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -124,8 +141,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretListMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -139,7 +158,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretDeleteMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret = {.region = _region, .name = SECRET_NAME, .description = "Test secret"};
+        Entity::SecretsManager::Secret secret;
+        secret.region = _region;
+        secret.name = SECRET_NAME;
+        secret.description = "Test secret";
         secret = _secretsManagerDatabase.CreateSecret(secret);
 
         // act
@@ -153,9 +175,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(SecretDeleteAllMTest, SecretsManagerMemoryDbTest) {
 
         // arrange
-        Entity::SecretsManager::Secret secret1 = {.region = _region, .name = SECRET_NAME, .description = "Test secret1"};
+        Entity::SecretsManager::Secret secret1;
+        secret1.region = _region;
+        secret1.name = SECRET_NAME;
+        secret1.description = "Test secret";
         secret1 = _secretsManagerDatabase.CreateSecret(secret1);
-        Entity::SecretsManager::Secret secret2 = {.region = _region, .name = std::string(SECRET_NAME) + "1", .description = "Test secret2"};
+        Entity::SecretsManager::Secret secret2;
+        secret2.region = _region;
+        secret2.name = std::string(SECRET_NAME) + "1";
+        secret2.description = "Test secret";
         secret2 = _secretsManagerDatabase.CreateSecret(secret2);
 
         // act

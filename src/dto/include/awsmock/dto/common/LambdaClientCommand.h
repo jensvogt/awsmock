@@ -49,6 +49,9 @@ namespace AwsMock::Dto::Common {
         ADD_ENVIRONMENT,
         DELETE_ENVIRONMENT,
         UPDATE_ENVIRONMENT,
+        LIST_LAMBDA_RESULT_COUNTERS,
+        DELETE_LAMBDA_RESULT_COUNTER,
+        DELETE_LAMBDA_RESULT_COUNTERS,
         START_FUNCTION,
         STOP_FUNCTION,
         DELETE_IMAGE,
@@ -77,6 +80,9 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::ADD_ENVIRONMENT, "add-function-environment"},
             {LambdaCommandType::DELETE_ENVIRONMENT, "delete-function-environment"},
             {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
+            {LambdaCommandType::LIST_LAMBDA_RESULT_COUNTERS, "list-lambda-result-counters"},
+            {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER, "delete-lambda-result-counter"},
+            {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS, "delete-lambda-result-counters"},
             {LambdaCommandType::START_FUNCTION, "start-function"},
             {LambdaCommandType::STOP_FUNCTION, "stop-function"},
             {LambdaCommandType::DELETE_IMAGE, "delete-image"},
@@ -110,7 +116,7 @@ namespace AwsMock::Dto::Common {
         LambdaCommandType command{};
 
         /**
-         * @brief Returns the command from HTTP header
+         * @brief Returns the command from the HTTP header
          *
          * @param request HTTP request
          * @return command string

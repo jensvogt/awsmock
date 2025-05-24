@@ -45,7 +45,7 @@ namespace AwsMock::Service {
         /**
          * @brief Executes a lambda function
          *
-         * @param oid ID of the function
+         * @param lambda lambda function
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
@@ -53,7 +53,7 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param receiptHandle receipt handle of the message which triggered the invocation
          */
-        void operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
+        void operator()(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
 
       private:
 
