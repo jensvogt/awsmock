@@ -12,7 +12,9 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/secretsmanager/RotationRules.h>
+#include <awsmock/entity/secretsmanager/SecretVersion.h>
 #include <awsmock/entity/secretsmanager/VersionIdsToStages.h>
 
 namespace AwsMock::Database::Entity::SecretsManager {
@@ -24,17 +26,12 @@ namespace AwsMock::Database::Entity::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Secret {
+    struct Secret final : Common::BaseEntity<Secret> {
 
         /**
          * ID
          */
         std::string oid;
-
-        /**
-         * Aws region name
-         */
-        std::string region;
 
         /**
          * Secret name
@@ -59,17 +56,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Secret string
          */
-        std::string secretString;
-
-        /**
-         * Base64 encoded secret binary
-         */
-        std::string secretBinary;
-
-        /**
-         * Version Id
-         */
-        std::string versionId;
+        std::vector<SecretVersion> versions;
 
         /**
          * Description
@@ -147,11 +134,74 @@ namespace AwsMock::Database::Entity::SecretsManager {
         system_clock::time_point modified = system_clock::now();
 
         /**
+         * @brief Checks if the secret has a version with the given version ID.
+         *
+         * @param versionId version ID
+         * @return true, if found, otherwise false
+         */
+        [[nodiscard]] bool HasVersion(const std::string &versionId) const {
+            return std::ranges::find_if(versions, [versionId](const SecretVersion &version) {
+                       return version.versionId == versionId;
+                   }) != versions.end();
+        }
+
+        /**
+         * @brief Returns the version with the given version ID, or an empty object if not found.
+         *
+         * @par
+         * The version is not checked for existence. Use HasVersion() to check for existence before calling this method.
+         *
+         * @param versionId version ID
+         * @return version with the given ID, or empty object
+         */
+        [[nodiscard]] SecretVersion GetVersion(const std::string &versionId) const {
+            const auto it =
+                    std::ranges::find_if(versions, [versionId](const SecretVersion &version) {
+                        return version.versionId == versionId;
+                    });
+            if (it != versions.end()) {
+                return *it;
+            }
+            return {};
+        }
+
+        /**
+         * @brief Returns the current version.
+         *
+         * @return current version, or empty object
+         */
+        [[nodiscard]] SecretVersion GetCurrent() const {
+
+            const auto it =
+                    std::ranges::find_if(versions, [](const SecretVersion &version) {
+                        return std::ranges::find(version.stages, "AWSCURRENT") != version.stages.end();
+                    });
+            if (it != versions.end()) {
+                return *it;
+            }
+            return {};
+        }
+
+        /**
+         * @brief Resets all verions to AWSPREVIOUS, except the one with the given versionID.
+         *
+         * @param versionId current version ID
+         */
+        void ResetVersions(const std::string &versionId) {
+            for (auto &version: versions) {
+                if (version.versionId != versionId) {
+                    version.stages.clear();
+                    version.stages.push_back("AWSPREVIOUS");
+                }
+            }
+        }
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -159,29 +209,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param m message
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Secret &m);
     };
 
     typedef std::vector<Secret> SecretList;

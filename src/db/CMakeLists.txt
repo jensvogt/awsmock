@@ -22,8 +22,9 @@ set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp 
 set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
         src/entity/dynamodb/ProvisionedThroughput.cpp src/repository/DynamoDbDatabase.cpp
         src/memorydb/DynamoDbMemoryDb.cpp)
-set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
-        src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)
+set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/SecretVersion.cpp
+        src/entity/secretsmanager/RotationRules.cpp src/repository/SecretsManagerDatabase.cpp
+        src/memorydb/SecretsManagerMemoryDb.cpp)
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
 set(SSM_SOURCES src/entity/ssm/Parameter.cpp src/repository/SSMDatabase.cpp src/memorydb/SSMMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)

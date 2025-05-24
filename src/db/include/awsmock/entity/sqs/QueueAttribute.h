@@ -97,7 +97,7 @@ namespace AwsMock::Database::Entity::SQS {
         std::string redriveAllowPolicy;
 
         /**
-         * Number of message counter
+         * Number of messages
          */
         long approximateNumberOfMessages = 0;
 
@@ -121,7 +121,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
