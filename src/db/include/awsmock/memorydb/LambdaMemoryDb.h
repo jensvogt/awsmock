@@ -219,6 +219,29 @@ namespace AwsMock::Database {
         long RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff);
 
         /**
+         * @brief Deletes a lambda result counter
+         *
+         * @param oid lambda function oid
+         * @return number of results deleted
+         */
+        [[nodiscard]] long DeleteResultsCounter(const std::string &oid);
+
+        /**
+         * @brief Deletes all lambda result counter for a lambda function
+         *
+         * @param lambdaArn lambda function ARN
+         * @return number of results deleted
+         */
+        long DeleteResultsCounters(const std::string &lambdaArn);
+
+        /**
+         * @brief Deletes all lambda result counters
+         *
+         * @return number of results deleted
+         */
+        long DeleteAllResultsCounters();
+
+        /**
          * @brief Deletes an existing lambda function
          *
          * @param functionName lambda function name

@@ -282,7 +282,7 @@ namespace AwsMock::Database {
          * @param oid lambda function oid
          * @return number of results deleted
          */
-        long DeleteResultsCounter(const std::string &oid) const;
+        [[nodiscard]] long DeleteResultsCounter(const std::string &oid) const;
 
         /**
          * @brief Deletes all lambda result counter for a lambda function
@@ -291,6 +291,13 @@ namespace AwsMock::Database {
          * @return number of results deleted
          */
         long DeleteResultsCounters(const std::string &lambdaArn) const;
+
+        /**
+         * @brief Deletes all lambda result counters
+         *
+         * @return number of results deleted
+         */
+        long DeleteAllResultsCounters() const;
 
         /**
          * @brief Deletes an existing lambda function

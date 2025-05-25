@@ -245,6 +245,36 @@ namespace AwsMock::Database {
         return it->second;
     }
 
+    long LambdaMemoryDb::DeleteResultsCounter(const std::string &oid) {
+        boost::mutex::scoped_lock lock(_lambdaResultMutex);
+
+        const auto count = std::erase_if(_lambdas, [oid](const auto &item) {
+            auto const &[key, value] = item;
+            return key == oid;
+        });
+        log_debug << "Lambda results deleted, count: " << count;
+        return count;
+    }
+
+    long LambdaMemoryDb::DeleteResultsCounters(const std::string &lambdaArn) {
+        boost::mutex::scoped_lock lock(_lambdaResultMutex);
+
+        const auto count = std::erase_if(_lambdas, [lambdaArn](const auto &item) {
+            auto const &[key, value] = item;
+            return value.arn == lambdaArn;
+        });
+        log_debug << "Lambda results deleted, count: " << count;
+        return static_cast<long>(count);
+    }
+
+    long LambdaMemoryDb::DeleteAllResultsCounters() {
+        boost::mutex::scoped_lock lock(_lambdaResultMutex);
+        const long deleted = static_cast<long>(_lambdaResults.size());
+        log_debug << "All lambda results deleted, count: " << deleted;
+        _lambdaResults.clear();
+        return deleted;
+    }
+
     long LambdaMemoryDb::RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 

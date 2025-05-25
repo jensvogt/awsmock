@@ -25,8 +25,21 @@ namespace AwsMock::Database {
         }
 
         ~LambdaDatabaseTest() {
-            const long count = _lambdaDatabase.DeleteAllLambdas();
+            long count = _lambdaDatabase.DeleteAllLambdas();
             log_debug << "Lambdas deleted, count: " << count;
+            count = _lambdaDatabase.DeleteAllResultsCounters();
+            log_debug << "Lambda results deleted, count: " << count;
+        }
+
+        [[nodiscard]] Entity::Lambda::LambdaResult createDefaultLambdaResult(const std::string &arn) const {
+            Entity::Lambda::LambdaResult lambdaResult;
+            lambdaResult.region = _region;
+            lambdaResult.lambdaName = FUNCTION;
+            lambdaResult.lambdaArn = arn;
+            lambdaResult.runtime = "Java21";
+            lambdaResult.requestBody = "requestBody";
+            lambdaResult.responseBody = "responseBody";
+            return lambdaResult;
         }
 
         std::string _region;
@@ -147,6 +160,42 @@ namespace AwsMock::Database {
 
         // assert
         BOOST_CHECK_EQUAL(result, false);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(LambdaResultCreateTest, LambdaDatabaseTest) {
+
+        // arrange
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
+        Entity::Lambda::LambdaResult lambdaResult = createDefaultLambdaResult(lambda.arn);
+        lambdaResult = _lambdaDatabase.CreateLambdaResult(lambdaResult);
+
+        // act
+        const long count = _lambdaDatabase.LambdaResultsCount(lambda.arn);
+        const bool result = _lambdaDatabase.LambdaResultExists(lambdaResult.oid);
+
+        // assert
+        BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(count, 1);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(LambdaResultDeleteTest, LambdaDatabaseTest) {
+
+        // arrange
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
+        Entity::Lambda::LambdaResult lambdaResult = createDefaultLambdaResult(lambda.arn);
+        lambdaResult = _lambdaDatabase.CreateLambdaResult(lambdaResult);
+
+        // act
+        const long count = _lambdaDatabase.DeleteResultsCounter(lambdaResult.oid);
+        const bool result = _lambdaDatabase.LambdaResultExists(lambdaResult.oid);
+
+        // assert
+        BOOST_CHECK_EQUAL(result, false);
+        BOOST_CHECK_EQUAL(count, 1);
     }
 
 }// namespace AwsMock::Database

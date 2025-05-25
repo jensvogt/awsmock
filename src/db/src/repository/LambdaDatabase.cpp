@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database {
 
-    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambdaResult"), _memoryDb(LambdaMemoryDb::instance()) {}
+    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
@@ -485,9 +485,9 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaResultsCollection = (*client)[_databaseName][_lambdaResultCollectionName];
 
-                const auto result = _lambdaResultsCollection.find_one(make_document(kvp("_id", bsoncxx::oid(oid))));
-                log_trace << "Lambda result exists, oid: " << oid << ", result: " << !result->empty();
-                return !result->empty();
+                const auto result = _lambdaResultsCollection.count_documents(make_document(kvp("_id", bsoncxx::oid(oid))));
+                log_trace << "Lambda result exists, oid: " << oid << ", result: " << std::boolalpha << (result > 0);
+                return result > 0;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -611,7 +611,7 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
         }
-        return 0;
+        return _memoryDb.DeleteResultsCounter(oid);
     }
 
     long LambdaDatabase::DeleteResultsCounters(const std::string &lambdaArn) const {
@@ -631,7 +631,27 @@ namespace AwsMock::Database {
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
         }
-        return 0;
+        return _memoryDb.DeleteResultsCounters(lambdaArn);
+    }
+
+    long LambdaDatabase::DeleteAllResultsCounters() const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaResultCollection = (*client)[_databaseName][_lambdaResultCollectionName];
+                const auto result = _lambdaResultCollection.delete_many({});
+                log_trace << "All lambda results deleted, size:" << result->deleted_count();
+                return result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.DeleteAllResultsCounters();
     }
 
     long LambdaDatabase::RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) const {
