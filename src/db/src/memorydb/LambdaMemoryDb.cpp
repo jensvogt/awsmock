@@ -223,6 +223,12 @@ namespace AwsMock::Database {
         return GetLambdaResultById(oid);
     }
 
+    bool LambdaMemoryDb::LambdaResultExists(const std::string &oid) {
+        return std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
+                   return lambdaResult.first == oid;
+               }) != _lambdaResults.end();
+    }
+
     Entity::Lambda::LambdaResult LambdaMemoryDb::GetLambdaResultById(const std::string &oid) {
 
         const auto it =

@@ -9,9 +9,9 @@ namespace AwsMock::Service {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _counterPeriod = configuration.GetValue<int>("awsmock.modules.lambda.counter-period");
-        _removePeriod = configuration.GetValue<int>("awsmock.modules.lambda.remove-period");
+        _lifetime = configuration.GetValue<int>("awsmock.modules.lambda.lifetime");
         _logRetentionPeriod = configuration.GetValue<int>("awsmock.modules.lambda.log-retention-period");
-        log_debug << "Lambda remove period: " << _removePeriod << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
+        log_debug << "Lambda remove period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
         // Directories
         _lambdaDir = configuration.GetValue<std::string>("awsmock.modules.lambda.data-dir");
@@ -40,8 +40,8 @@ namespace AwsMock::Service {
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _removePeriod);
-        log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _removePeriod;
+        scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _lifetime);
+        log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _lifetime;
 
         // Start the delete old lambda logs
         scheduler.AddTask("remove-lambda-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
@@ -112,11 +112,10 @@ namespace AwsMock::Service {
         if (lambdaList.empty()) {
             return;
         }
-        log_debug << "Lambda worker starting, count: " << lambdaList.size();
+        log_debug << "Lambda lifetime starting, count: " << lambdaList.size();
 
         // Get lifetime from configuration
-        const int lifetime = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.lifetime");
-        const auto expired = system_clock::now() - std::chrono::seconds(lifetime);
+        const auto expired = system_clock::now() - std::chrono::seconds(_lifetime);
 
         // Loop over lambdas and remove expired instances
         for (auto &lambda: lambdaList) {
@@ -126,8 +125,13 @@ namespace AwsMock::Service {
             }
 
             // Remove instance
-            const auto count = std::erase_if(lambda.instances, [expired](const Database::Entity::Lambda::Instance &instance) {
-                return instance.created > system_clock::time_point::min() && instance.created < expired;
+            const auto count = std::erase_if(lambda.instances, [lambda, expired](const Database::Entity::Lambda::Instance &instance) {
+                if (instance.created > system_clock::time_point::min() && instance.created < expired) {
+                    ContainerService::instance().StopContainer(instance.containerId);
+                    log_info << "Lambda instance stopped, lambda: " << lambda.function << ", containerId: " << instance.containerId;
+                    return true;
+                }
+                return false;
             });
 
             // Update lambda
@@ -152,7 +156,7 @@ namespace AwsMock::Service {
         log_trace << "Lambda monitoring starting";
 
         const long lambdas = _lambdaDatabase.LambdaCount();
-        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, lambdas);
+        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas));
 
         log_trace << "Lambda monitoring finished";
     }

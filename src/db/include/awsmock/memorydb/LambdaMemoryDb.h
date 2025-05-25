@@ -183,6 +183,14 @@ namespace AwsMock::Database {
         Entity::Lambda::LambdaResult CreateLambdaResult(const Entity::Lambda::LambdaResult &lambdaResult);
 
         /**
+         * @brief Returns the existence of a lambda result
+         *
+         * @param oid lambda result record OID
+         * @return true if the result with the given OID exists
+         */
+        bool LambdaResultExists(const std::string &oid);
+
+        /**
          * @brief Returns a lambda result by OID
          *
          * @param oid lambda result OID

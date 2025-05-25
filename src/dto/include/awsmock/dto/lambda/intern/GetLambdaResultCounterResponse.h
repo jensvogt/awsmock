@@ -17,7 +17,7 @@ namespace AwsMock::Dto::Lambda {
     struct GetLambdaResultCounterResponse final : Common::BaseCounter<GetLambdaResultCounterResponse> {
 
         /**
-         * List of buckets
+         * Result counter
          */
         LambdaResultCounter lambdaResultCounter;
 
@@ -25,7 +25,7 @@ namespace AwsMock::Dto::Lambda {
 
         friend GetLambdaResultCounterResponse tag_invoke(boost::json::value_to_tag<GetLambdaResultCounterResponse>, boost::json::value const &v) {
             GetLambdaResultCounterResponse r;
-            r.lambdaResultCounter = boost::json::value_to<LambdaResultCounter>(v.at("lambdaResultCounter");
+            r.lambdaResultCounter = boost::json::value_to<LambdaResultCounter>(v.at("lambdaResultCounter"));
             return r;
         }
 

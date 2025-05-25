@@ -169,10 +169,9 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
 
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
-
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
-
+                std::string tmp = lambdaResponse.ToJson();
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
 
@@ -310,6 +309,15 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaResultCountersRequest lambdaRequest = Dto::Lambda::ListLambdaResultCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaResultCountersResponse lambdaResponse = _lambdaService.ListLambdaResultCounters(lambdaRequest);
                 log_trace << "Lambda result counters list";
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::GET_LAMBDA_RESULT_COUNTER) {
+
+                Dto::Lambda::GetLambdaResultCounterRequest lambdaRequest = Dto::Lambda::GetLambdaResultCounterRequest::FromJson(clientCommand);
+                Dto::Lambda::GetLambdaResultCounterResponse lambdaResponse = _lambdaService.GetLambdaResultCounter(lambdaRequest);
+                log_trace << "Get lambda result counter, oid: " << lambdaRequest.oid;
 
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }

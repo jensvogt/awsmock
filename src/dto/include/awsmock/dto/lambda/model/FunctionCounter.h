@@ -50,7 +50,6 @@ namespace AwsMock::Dto::Lambda {
          * Description
          */
         std::string description = {};
-        // TODO: Environment, EpheremalStorage, FileSystemConfig
 
         /**
          * Function ARN
@@ -77,8 +76,6 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string runtime = {};
 
-        // TODO: ImageConfigResponse
-
         /**
          * Last modification datetime
          */
@@ -98,8 +95,6 @@ namespace AwsMock::Dto::Lambda {
          * Last update state reason
          */
         std::string lastUpdateStatusReasonCode = {};
-
-        // TODO: Layers
 
         /**
          * State
@@ -134,12 +129,17 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Invocations
          */
-        long invocations = 0;
+        long invocations{};
 
         /**
          * Average runtime in milliseconds
          */
-        long averageRuntime = 0;
+        long averageRuntime{};
+
+        /**
+         * Instances
+         */
+        long instances{};
 
         /**
          * Tags
