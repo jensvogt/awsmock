@@ -179,6 +179,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.monitoring.internal", "AWSMOCK_MONITORING_INTERN", true);
         DefineProperty<int>("awsmock.monitoring.retention", "AWSMOCK_MONITORING_RETENTION", 3);
         DefineProperty<bool>("awsmock.monitoring.smooth", "AWSMOCK_MONITORING_SMOOTH", false);
+        DefineProperty<int>("awsmock.monitoring.average", "AWSMOCK_MONITORING_AVERAGE", 300);
 
         // Database
         DefineProperty<bool>("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
@@ -223,12 +224,12 @@ namespace AwsMock::Core {
 
     void Configuration::SetFilename(const std::string &filename) {
         if (filename.empty()) {
-            log_error << "Empty configuration filename, name: " << filename;
+            log_error << "Empty configuration filename";
             throw CoreException("Empty configuration filename");
         }
         if (!FileUtils::FileExists(filename)) {
             log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
-            return;
+            throw CoreException("Configuration file '" + filename + "' does not exist. Will use default.");
         }
 
         // Save file name

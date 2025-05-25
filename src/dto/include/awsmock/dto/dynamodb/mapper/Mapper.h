@@ -78,6 +78,14 @@ namespace AwsMock::Dto::DynamoDb {
         static AttributeValue map(const Database::Entity::DynamoDb::AttributeValue &attributeValueEntity);
 
         /**
+         * @brief Maps a DynamoDB item attribute DTO to an item attribute entity.
+         *
+         * @param attributeValueDto attribute value DTO
+         * @return attribute value entity
+         */
+        static Database::Entity::DynamoDb::AttributeValue map(const AttributeValue &attributeValueDto);
+
+        /**
          * @brief Maps a DynamoDB item entity to an item DTO.
          *
          * @param itemEntity DynamoDb item entity
@@ -86,6 +94,14 @@ namespace AwsMock::Dto::DynamoDb {
          * @see Database::Entity::DynamoDb::Item
          */
         static Item map(const Database::Entity::DynamoDb::Item &itemEntity);
+
+        /**
+         * @brief Maps a DynamoDB item DTO to an entity
+         *
+         * @param itemDto item DTO
+         * @return item entity.
+         */
+        static Database::Entity::DynamoDb::Item map(const Item &itemDto);
 
         /**
          * @brief Maps a list of DynamoDB item entities to an item DTO list.

@@ -15,7 +15,7 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Rotate a secret value request.
+     * @brief Rotate a secret value request.
      *
      * Example:
      * @code{.json}
@@ -34,15 +34,10 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RotateSecretRequest {
+    struct RotateSecretRequest final : Common::BaseCounter<RotateSecretRequest> {
 
         /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Secret ID
+         * Secret ID: ARN or name
          */
         std::string secretId;
 
@@ -59,45 +54,39 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Rotate immediately
          */
-        bool rotateImmediately;
+        bool rotateImmediately = false;
 
         /**
          * Rotation rules
          */
         RotationRules rotationRules;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend RotateSecretRequest tag_invoke(boost::json::value_to_tag<RotateSecretRequest>, boost::json::value const &v) {
+            RotateSecretRequest r;
+            r.secretId = Core::Json::GetStringValue(v, "SecretId");
+            r.clientRequestToken = Core::Json::GetStringValue(v, "ClientRequestToken");
+            r.rotationLambdaARN = Core::Json::GetStringValue(v, "RotationLambdaARN");
+            r.rotateImmediately = Core::Json::GetBoolValue(v, "RotateImmediately");
+            if (Core::Json::AttributeExists(v, "RotationRules")) {
+                r.rotationRules = boost::json::value_to<RotationRules>(v.at("RotationRules"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const RotateSecretRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RotateSecretRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"SecretId", obj.secretId},
+                    {"ClientRequestToken", obj.clientRequestToken},
+                    {"RotationLambdaARN", obj.rotationLambdaARN},
+                    {"RotateImmediately", obj.rotateImmediately},
+                    {"RotationRules", boost::json::value_from(obj.rotationRules)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

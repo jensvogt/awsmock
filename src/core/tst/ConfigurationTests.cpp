@@ -5,45 +5,54 @@
 #ifndef AWS_MOCK_CORE_CONFIGURATION_TEST_H
 #define AWS_MOCK_CORE_CONFIGURATION_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/core/config/Configuration.h>
 
 namespace AwsMock::Core {
-    class ConfigurationTest : public testing::Test {
-    };
 
-    TEST_F(ConfigurationTest, EmptyFilenameTest) {
+    BOOST_AUTO_TEST_CASE(EmptyFilenameTest) {
         // arrange
 
         // act
-        EXPECT_THROW({
+        BOOST_CHECK_THROW({
                      try {
                         auto configuration = Configuration("");
                      } catch (const CoreException &e) {
-                         EXPECT_STREQ("Empty configuration filename", e.message().c_str());
+                         BOOST_CHECK_EQUAL("Empty configuration filename", e.message());
                          throw;
                      } }, CoreException);
 
         // assert
     }
 
-    TEST_F(ConfigurationTest, ConstructorTest) {
+    BOOST_AUTO_TEST_CASE(NonexistentFilenameTest) {
+        // arrange
+
+        // act
+        BOOST_CHECK_THROW({
+                     try {
+                        auto configuration = Configuration("FooBarBaz.json");
+                     } catch (const CoreException &e) {
+                         BOOST_CHECK_EQUAL("Configuration file 'FooBarBaz.json' does not exist. Will use default.", e.message());
+                         throw;
+                     } }, CoreException);
+
+        // assert
+    }
+
+    BOOST_AUTO_TEST_CASE(ConstructorTest) {
 
         // arrange
-        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
 
         // act
 
         // assert
-        EXPECT_STREQ(Configuration::instance().GetFilename().c_str(), TMP_CONFIGURATION_FILE);
-        EXPECT_FALSE(Configuration::instance().GetValue<std::string>("awsmock.logging.level").empty());
+        BOOST_CHECK_EQUAL(Configuration::instance().GetFilename(), TMP_CONFIGURATION_FILE);
+        BOOST_CHECK_EQUAL(Configuration::instance().GetValue<std::string>("awsmock.logging.level").empty(), false);
     }
 
-    TEST_F(ConfigurationTest, EnvironmentTest) {
+    BOOST_AUTO_TEST_CASE(EnvironmentTest) {
 
         // arrange
 #ifdef WIN32
@@ -51,15 +60,16 @@ namespace AwsMock::Core {
 #else
         setenv("AWSMOCK_LOG_LEVEL", "error", true);
 #endif
-        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        Configuration configuration;
+        configuration.SetFilename(TMP_CONFIGURATION_FILE);
 
         // act
 
         // assert
-        EXPECT_STREQ(Configuration::instance().GetValue<std::string>("awsmock.logging.level").c_str(), "debug");
+        BOOST_CHECK_EQUAL(configuration.GetValue<std::string>("awsmock.logging.level"), "error");
     }
 
-    TEST_F(ConfigurationTest, JsonConfigurationTest) {
+    BOOST_AUTO_TEST_CASE(JsonConfigurationTest) {
 
         // arrange
         const std::string jsonString = "{\n"
@@ -70,22 +80,26 @@ namespace AwsMock::Core {
                                        "      \"key-id\": \"none\",\n"
                                        "      \"secret-access-key\": \"none\",\n"
                                        "      \"account-id\": \"000000000000\"\n"
+                                       "    },\n"
+                                       "    \"logging\": {\n"
+                                       "      \"level\": \"debug\"\n"
                                        "    }\n"
                                        "  }\n"
                                        "}";
         const std::string jsonFile = FileUtils::CreateTempFile("json", jsonString);
-        Configuration::instance().SetFilename(jsonFile);
+        Configuration configuration;
+        configuration.SetFilename(jsonFile);
 
         // act
-        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const auto keyId = Configuration::instance().GetValue<std::string>("awsmock.access.key-id");
+        const auto region = configuration.GetValue<std::string>("awsmock.region");
+        const auto keyId = configuration.GetValue<std::string>("awsmock.access.key-id");
 
         // assert
-        EXPECT_TRUE(region == "eu-central-1");
-        EXPECT_TRUE(keyId == "none");
+        BOOST_CHECK_EQUAL(region, "eu-central-1");
+        BOOST_CHECK_EQUAL(keyId, "none");
     }
 
-    TEST_F(ConfigurationTest, JsonConfigurationArrayTest) {
+    BOOST_AUTO_TEST_CASE(JsonConfigurationArrayTest) {
 
         // arrange
         const std::string jsonString = "{\n"
@@ -104,17 +118,21 @@ namespace AwsMock::Core {
                                        "          \"/feedback\"\n"
                                        "        ]\n"
                                        "      }\n"
+                                       "    },\n"
+                                       "    \"logging\": {\n"
+                                       "      \"level\": \"debug\"\n"
                                        "    }\n"
                                        "  }\n"
                                        "}\n";
         const std::string jsonFile = FileUtils::CreateTempFile("json", jsonString);
-        Configuration::instance().SetFilename(jsonFile);
+        Configuration configuration;
+        configuration.SetFilename(jsonFile);
 
         // act
-        const std::vector<std::string> directories = Configuration::instance().GetValueArray<std::string>("awsmock.modules.transfer.directories");
+        const std::vector<std::string> directories = configuration.GetValueArray<std::string>("awsmock.modules.transfer.directories");
 
         // assert
-        EXPECT_EQ(2, directories.size());
+        BOOST_CHECK_EQUAL(2, directories.size());
     }
 
 }// namespace AwsMock::Core

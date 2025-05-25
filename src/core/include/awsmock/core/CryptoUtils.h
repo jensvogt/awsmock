@@ -263,10 +263,10 @@ namespace AwsMock::Core {
         /**
          * @brief Base64 encoding.
          *
-         * @param inputString input string
+         * @param decodedString input string
          * @return BASE64 encoded string.
          */
-        static std::string Base64Encode(const std::string &inputString);
+        static std::string Base64Encode(const std::string &decodedString);
 
         /**
          * @brief Base64 decoding.

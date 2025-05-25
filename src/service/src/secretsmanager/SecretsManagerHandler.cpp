@@ -15,100 +15,60 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SecretsManagerCommandType::CREATE_SECRET: {
 
-                    Dto::SecretsManager::CreateSecretRequest
-                            secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::CreateSecretResponse
-                            secretsManagerResponse = _secretsManagerService.CreateSecret(secretsManagerRequest);
+                    Dto::SecretsManager::CreateSecretRequest secretsManagerRequest = Dto::SecretsManager::CreateSecretRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::CreateSecretResponse secretsManagerResponse = _secretsManagerService.CreateSecret(secretsManagerRequest);
                     log_info << "Secret created, secretId: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
 
                 case Dto::Common::SecretsManagerCommandType::DELETE_SECRET: {
 
-                    Dto::SecretsManager::DeleteSecretRequest
-                            secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::DeleteSecretResponse
-                            secretsManagerResponse = _secretsManagerService.DeleteSecret(secretsManagerRequest);
+                    Dto::SecretsManager::DeleteSecretRequest secretsManagerRequest = Dto::SecretsManager::DeleteSecretRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::DeleteSecretResponse secretsManagerResponse = _secretsManagerService.DeleteSecret(secretsManagerRequest);
                     log_info << "Secret deleted, secretId: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
 
                 case Dto::Common::SecretsManagerCommandType::DESCRIBE_SECRET: {
 
-                    Dto::SecretsManager::DescribeSecretRequest
-                            secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::DescribeSecretResponse
-                            secretsManagerResponse = _secretsManagerService.DescribeSecret(secretsManagerRequest);
-                    log_info << "Secret described, secretId: " << secretsManagerResponse.name;
+                    Dto::SecretsManager::DescribeSecretRequest secretsManagerRequest = Dto::SecretsManager::DescribeSecretRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::DescribeSecretResponse secretsManagerResponse = _secretsManagerService.DescribeSecret(secretsManagerRequest);
+                    log_info << "Secret described, response: " << secretsManagerResponse;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
 
                 case Dto::Common::SecretsManagerCommandType::GET_SECRET_VALUE: {
 
-                    Dto::SecretsManager::GetSecretValueRequest
-                            secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::GetSecretValueResponse
-                            secretsManagerResponse = _secretsManagerService.GetSecretValue(secretsManagerRequest);
+                    Dto::SecretsManager::GetSecretValueRequest secretsManagerRequest = Dto::SecretsManager::GetSecretValueRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::GetSecretValueResponse secretsManagerResponse = _secretsManagerService.GetSecretValue(secretsManagerRequest);
                     log_info << "Secret get value, secretId: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
 
                 case Dto::Common::SecretsManagerCommandType::UPDATE_SECRET: {
 
-                    Dto::SecretsManager::UpdateSecretRequest
-                            secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::UpdateSecretResponse
-                            secretsManagerResponse = _secretsManagerService.UpdateSecret(secretsManagerRequest);
+                    Dto::SecretsManager::UpdateSecretRequest secretsManagerRequest = Dto::SecretsManager::UpdateSecretRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::UpdateSecretResponse secretsManagerResponse = _secretsManagerService.UpdateSecret(secretsManagerRequest);
                     log_info << "Secret updated, secretId: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
 
                 case Dto::Common::SecretsManagerCommandType::ROTATE_SECRET: {
 
-                    Dto::SecretsManager::RotateSecretRequest secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::RotateSecretResponse
-                            secretsManagerResponse = _secretsManagerService.RotateSecret(secretsManagerRequest);
+                    Dto::SecretsManager::RotateSecretRequest secretsManagerRequest = Dto::SecretsManager::RotateSecretRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::RotateSecretResponse secretsManagerResponse = _secretsManagerService.RotateSecret(secretsManagerRequest);
                     log_info << "Secret rotated, secretId: " << secretsManagerResponse.arn;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
 
                 case Dto::Common::SecretsManagerCommandType::LIST_SECRETS: {
 
-                    Dto::SecretsManager::ListSecretsRequest
-                            secretsManagerRequest = {.region = clientCommand.region, .requestId = Core::AwsUtils::CreateRequestId()};
-                    secretsManagerRequest.FromJson(clientCommand.payload);
-
-                    Dto::SecretsManager::ListSecretsResponse
-                            secretsManagerResponse = _secretsManagerService.ListSecrets(secretsManagerRequest);
+                    Dto::SecretsManager::ListSecretsRequest secretsManagerRequest = Dto::SecretsManager::ListSecretsRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::ListSecretsResponse secretsManagerResponse = _secretsManagerService.ListSecrets(secretsManagerRequest);
                     log_info << "Secrets listed, region: " << secretsManagerResponse.region;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
-
-                    break;
                 }
+
                 default:
                     log_error << "Unknown method";
                     SendBadRequestError(request, "Unknown method");

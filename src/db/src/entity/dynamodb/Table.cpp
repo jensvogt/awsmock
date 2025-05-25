@@ -23,8 +23,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
             // Tags
             if (!tags.empty()) {
                 auto tagsDoc = document{};
-                for (const auto &[fst, snd]: tags) {
-                    tagsDoc.append(kvp(fst, snd));
+                for (const auto &t: tags) {
+                    tagsDoc.append(kvp(t.at("Key"), t.at("Value")));
                 }
                 tableDoc.append(kvp("tags", tagsDoc));
             }
@@ -32,8 +32,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
             // Attributes
             if (!attributes.empty()) {
                 auto attributesDoc = document{};
-                for (const auto &[fst, snd]: attributes) {
-                    attributesDoc.append(kvp(fst, snd));
+                for (const auto &k: attributes) {
+                    attributesDoc.append(kvp(k.at("AttributeName"), k.at("AttributeType")));
                 }
                 tableDoc.append(kvp("attributes", attributesDoc));
             }
@@ -41,8 +41,8 @@ namespace AwsMock::Database::Entity::DynamoDb {
             // Key schemas
             if (!keySchemas.empty()) {
                 auto keySchemaDoc = document{};
-                for (const auto &[fst, snd]: keySchemas) {
-                    keySchemaDoc.append(kvp(fst, snd));
+                for (const auto &k: keySchemas) {
+                    keySchemaDoc.append(kvp(k.at("AttributeName"), k.at("KeyType")));
                 }
                 tableDoc.append(kvp("keySchemas", keySchemaDoc));
             }
@@ -71,30 +71,32 @@ namespace AwsMock::Database::Entity::DynamoDb {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get tags
-        tags = Core::Bson::MapFromBsonObject(mResult, "Tags");
-        /*        if (mResult.value().find("tags") != mResult.value().end()) {
+        if (mResult.value().find("tags") != mResult.value().end()) {
             for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                std::string key = bsoncxx::string::to_string(tagElement.key());
-                std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-                tags.emplace(key, value);
+                std::map<std::string, std::string> tag;
+                tag["Key"] = bsoncxx::string::to_string(tagElement.key());
+                tag["Value"] = bsoncxx::string::to_string(tagElement.get_string().value);
+                tags.emplace_back(tag);
             }
-        }*/
+        }
 
         // Get attributes
         if (mResult.value().find("attributes") != mResult.value().end()) {
             for (const view tagsView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
-                std::string key = bsoncxx::string::to_string(tagElement.key());
-                std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
-                attributes.emplace(key, value);
+                std::map<std::string, std::string> attribute;
+                attribute["AttributeName"] = bsoncxx::string::to_string(tagElement.key());
+                attribute["AttributeType"] = bsoncxx::string::to_string(tagElement.get_string().value);
+                attributes.emplace_back(attribute);
             }
         }
 
         // Key schemas
         if (mResult.value().find("keySchemas") != mResult.value().end()) {
             for (const view keySchemaView = mResult.value()["keySchemas"].get_document().value; const bsoncxx::document::element &keySchemaElement: keySchemaView) {
-                std::string key = bsoncxx::string::to_string(keySchemaElement.key());
-                std::string value = bsoncxx::string::to_string(keySchemaView[key].get_string().value);
-                keySchemas.emplace(key, value);
+                std::map<std::string, std::string> key;
+                key["AttributeName"] = bsoncxx::string::to_string(keySchemaElement.key());
+                key["KeyType"] = bsoncxx::string::to_string(keySchemaElement.get_string().value);
+                keySchemas.emplace_back(key);
             }
         }
 

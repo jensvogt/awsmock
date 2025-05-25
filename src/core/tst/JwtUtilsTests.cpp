@@ -5,9 +5,6 @@
 #ifndef AWMOCK_CORE_JWT_UTILS_TEST_H
 #define AWMOCK_CORE_JWT_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/JwtUtils.h>
 
@@ -74,9 +71,7 @@ accessToken:"eyJraWQiOiJnNU05ajFIbnpUSVVabWU0QU4rd0JWaTBWYzhvUzZ6SjNHblIxdnF0Yyt
  */
 namespace AwsMock::Core {
 
-    class JwtUtilsTest : public ::testing::Test {};
-
-    TEST_F(JwtUtilsTest, TokenCreateTest) {
+    BOOST_AUTO_TEST_CASE(TokenCreateTest) {
 
         // arrange
         std::map<std::string, std::string> payload;
@@ -87,23 +82,23 @@ namespace AwsMock::Core {
         const std::string result = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
 
         // assert
-        EXPECT_FALSE(result.empty());
+        BOOST_CHECK_EQUAL(result.empty(), false);
     }
 
-    TEST_F(JwtUtilsTest, TokenVerifyTest) {
+    BOOST_AUTO_TEST_CASE(TokenVerifyTest) {
 
         // arrange
         std::map<std::string, std::string> payload;
         payload["first1"] = "second1";
         payload["first2"] = "second2";
         const std::string createResult = JwtUtils::CreateTokenRs256(privateKey, "auth0", payload);
-        EXPECT_FALSE(createResult.empty());
+        BOOST_CHECK_EQUAL(createResult.empty(), false);
 
         // act
         const bool result = JwtUtils::VerifyTokenRs256(publicKey, createResult, "auth0");
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
 }// namespace AwsMock::Core

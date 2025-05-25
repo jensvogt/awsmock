@@ -9,14 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/dynamodb/model/TableStatus.h>
+#include <awsmock/dto/dynamodb/model/AttributeValue.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    namespace http = boost::beast::http;
 
     /**
      * @brief Query request
@@ -34,12 +31,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueryResponse final : Common::BaseDto<QueryResponse> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct QueryResponse final : Common::BaseCounter<QueryResponse> {
 
         /**
          * Table name
@@ -47,33 +39,43 @@ namespace AwsMock::Dto::DynamoDb {
         std::string tableName;
 
         /**
-         * Original HTTP response body
+         * Item array
          */
-        std::string body;
+        std::vector<std::map<std::string, AttributeValue>> items;
 
-        /**
-         * Original HTTP response headers
-         */
-        std::map<std::string, std::string> headers;
+      private:
 
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
+        friend QueryResponse tag_invoke(boost::json::value_to_tag<QueryResponse>, boost::json::value const &v) {
+            QueryResponse r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            if (Core::Json::AttributeExists(v, "Items")) {
+                for (boost::json::array itemsJson = v.at("Items").as_array(); auto &item: itemsJson) {
+                    std::map<std::string, AttributeValue> itemMap;
+                    for (auto &attribute: item.as_object()) {
+                        itemMap[attribute.key()] = boost::json::value_to<AttributeValue>(attribute.value());
+                    }
+                    r.items.push_back(itemMap);
+                }
+            }
+            return r;
+        }
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueryResponse const &obj) {
+            boost::json::array itemsJson;
+            if (!obj.items.empty()) {
+                for (const auto &a: obj.items) {
+                    boost::json::object itemJson;
+                    for (const auto &[fst, snd]: a) {
+                        itemJson[fst] = boost::json::value_from(snd);
+                    }
+                    itemsJson.emplace_back(itemJson);
+                }
+            }
+            jv = {
+                    {"TableName", obj.tableName},
+                    {"Items", itemsJson},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

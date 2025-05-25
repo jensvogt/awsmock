@@ -9,13 +9,13 @@
 #include <string>
 
 // AwsMoc includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-
     /**
-     * Return structure for the delete secret request.
+     * @brief Return structure for the delete secret request.
      *
      * Example:
      * @code{.json}
@@ -28,12 +28,7 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteSecretResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct DeleteSecretResponse final : Common::BaseCounter<DeleteSecretResponse> {
 
         /**
          * Secret name
@@ -50,33 +45,26 @@ namespace AwsMock::Dto::SecretsManager {
          */
         double deletionDate = -1;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend DeleteSecretResponse tag_invoke(boost::json::value_to_tag<DeleteSecretResponse>, boost::json::value const &v) {
+            DeleteSecretResponse r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.arn = Core::Json::GetStringValue(v, "ARN");
+            r.deletionDate = Core::Json::GetDoubleValue(v, "DeletionDate");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteSecretResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteSecretResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"ARN", obj.arn},
+                    {"DeletionDate", obj.deletionDate},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

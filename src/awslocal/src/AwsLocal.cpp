@@ -39,7 +39,11 @@ namespace AwsMock::AwsLocal {
 
         const std::string fileName = Core::SystemUtils::GetHomeDir() + "/.aws/config";
         if (!Core::FileUtils::FileExists(fileName)) {
-            log_error << "In order to use profiles, you need to provide a ~/.aws/config file";
+#ifdef _WIN32
+            log_error << "In order to use profiles, you need to provide a %HOMEPATH%/.aws/config file";
+#else
+            log_error << "In order to use profiles, you need to provide a " << Core::SystemUtils::GetHomeDir() << "/.aws/config file";
+#endif
             return;
         }
         boost::property_tree::ptree pt;

@@ -10,11 +10,12 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Rotate a secret value response.
+     * @brief Rotate a secret value response.
      *
      * Example:
      * @code{.json}
@@ -27,12 +28,12 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RotateSecretResponse {
+    struct RotateSecretResponse final : Common::BaseCounter<RotateSecretResponse> {
 
         /**
-         * Region
+         * Secret name
          */
-        std::string region;
+        std::string name;
 
         /**
          * Secret ARN
@@ -44,38 +45,26 @@ namespace AwsMock::Dto::SecretsManager {
          */
         std::string versionId;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend RotateSecretResponse tag_invoke(boost::json::value_to_tag<RotateSecretResponse>, boost::json::value const &v) {
+            RotateSecretResponse r;
+            r.arn = Core::Json::GetStringValue(v, "ARN");
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.versionId = Core::Json::GetStringValue(v, "VersionId");
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const RotateSecretResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RotateSecretResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"ARN", obj.arn},
+                    {"VersionId", obj.versionId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

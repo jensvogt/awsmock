@@ -297,6 +297,41 @@ namespace AwsMock::Service {
                 return SendOkResponse(request);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_ARNS) {
+
+                Dto::Lambda::ListLambdaArnsResponse lambdaResponse = _lambdaService.ListLambdaArns();
+                log_trace << "List function ARNs, count: " << lambdaResponse.lambdaArns.size();
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_RESULT_COUNTERS) {
+
+                Dto::Lambda::ListLambdaResultCountersRequest lambdaRequest = Dto::Lambda::ListLambdaResultCountersRequest::FromJson(clientCommand);
+                Dto::Lambda::ListLambdaResultCountersResponse lambdaResponse = _lambdaService.ListLambdaResultCounters(lambdaRequest);
+                log_trace << "Lambda result counters list";
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER) {
+
+                Dto::Lambda::DeleteLambdaResultCounterRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCounterRequest::FromJson(clientCommand);
+                long count = _lambdaService.DeleteLambdaResultCounter(lambdaRequest);
+                log_trace << "Delete lambda result counter, count: " << count;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS) {
+
+                Dto::Lambda::DeleteLambdaResultCountersRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCountersRequest::FromJson(clientCommand);
+                long count = _lambdaService.DeleteLambdaResultCounters(lambdaRequest);
+                log_trace << "Delete lambda result counters, count: " << count;
+
+                return SendOkResponse(request);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
 
                 Dto::Lambda::StartFunctionRequest lambdaRequest;

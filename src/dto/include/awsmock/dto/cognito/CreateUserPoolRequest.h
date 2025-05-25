@@ -10,9 +10,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -144,7 +144,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateUserPoolRequest final : Common::BaseDto<CreateUserPoolRequest> {
+    struct CreateUserPoolRequest final : Common::BaseCounter<CreateUserPoolRequest> {
 
         /**
          * Name of the user pool
@@ -161,19 +161,26 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend CreateUserPoolRequest tag_invoke(boost::json::value_to_tag<CreateUserPoolRequest>, boost::json::value const &v) {
+            CreateUserPoolRequest r;
+            r.name = Core::Json::GetStringValue(v, "PoolName");
+            r.domain = Core::Json::GetStringValue(v, "Domain");
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateUserPoolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"Domain", obj.domain},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

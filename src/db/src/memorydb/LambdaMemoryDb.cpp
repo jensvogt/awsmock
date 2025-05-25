@@ -7,6 +7,7 @@
 namespace AwsMock::Database {
 
     boost::mutex LambdaMemoryDb::_lambdaMutex;
+    boost::mutex LambdaMemoryDb::_lambdaResultMutex;
 
     bool LambdaMemoryDb::LambdaExists(const std::string &function) {
 
@@ -213,6 +214,42 @@ namespace AwsMock::Database {
         it->second.averageRuntime = (it->second.averageRuntime + millis) / it->second.invocations;
     }
 
+    Entity::Lambda::LambdaResult LambdaMemoryDb::CreateLambdaResult(const Entity::Lambda::LambdaResult &lambdaResult) {
+        boost::mutex::scoped_lock lock(_lambdaResultMutex);
+
+        std::string oid = Core::StringUtils::CreateRandomUuid();
+        _lambdaResults.emplace(oid, lambdaResult);
+        log_trace << "Lambda created, oid: " << oid;
+        return GetLambdaResultById(oid);
+    }
+
+    Entity::Lambda::LambdaResult LambdaMemoryDb::GetLambdaResultById(const std::string &oid) {
+
+        const auto it =
+                std::ranges::find_if(_lambdaResults, [oid](const std::pair<std::string, Entity::Lambda::LambdaResult> &lambdaResult) {
+                    return lambdaResult.first == oid;
+                });
+
+        if (it == _lambdaResults.end()) {
+            log_error << "Get lambda result by ID failed, arn: " << oid;
+            throw Core::DatabaseException("Get lambda result by ID failed, arn: " + oid);
+        }
+
+        it->second.oid = oid;
+        return it->second;
+    }
+
+    long LambdaMemoryDb::RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) {
+        boost::mutex::scoped_lock lock(_lambdaMutex);
+
+        const auto count = std::erase_if(_lambdaResults, [cutOff](const auto &item) {
+            auto const &[key, value] = item;
+            return value.timestamp < cutOff;
+        });
+        log_debug << "Lambda results deleted, count: " << count;
+        return static_cast<long>(count);
+    }
+
     void LambdaMemoryDb::DeleteLambda(const std::string &functionName) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
@@ -225,7 +262,7 @@ namespace AwsMock::Database {
 
     long LambdaMemoryDb::DeleteAllLambdas() {
         boost::mutex::scoped_lock lock(_lambdaMutex);
-        const long deleted = _lambdas.size();
+        const long deleted = static_cast<long>(_lambdas.size());
         log_debug << "All lambdas deleted, count: " << _lambdas.size();
         _lambdas.clear();
         return deleted;

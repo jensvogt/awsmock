@@ -9,38 +9,19 @@
 #include <map>
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/types/bson_value/view.hpp>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB create table request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateTableRequest final : Common::BaseDto<CreateTableRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct CreateTableRequest final : Common::BaseCounter<CreateTableRequest> {
 
         /**
          * Table class
@@ -55,12 +36,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Attribute definitions
          */
-        std::map<std::string, std::string> attributes;
+        std::vector<std::map<std::string, std::string>> attributes;
 
         /**
          * Key schemas
          */
-        std::map<std::string, std::string> keySchemas;
+        std::vector<std::map<std::string, std::string>> keySchemas;
 
         /**
          * Provisioned throughput
@@ -70,31 +51,75 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::vector<std::map<std::string, std::string>> tags;
 
-        /**
-         * Original HTTP request body
-         */
-        std::string body;
+      private:
 
-        /**
-         * Original HTTP request headers
-         */
-        std::map<std::string, std::string> headers;
+        friend CreateTableRequest tag_invoke(boost::json::value_to_tag<CreateTableRequest>, boost::json::value const &v) {
+            CreateTableRequest r;
+            r.tableClass = Core::Json::GetStringValue(v, "TableClass");
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(v.as_object(), "ProvisionedThroughput");
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                for (boost::json::array tagsArray = v.at("Tags").as_array(); const auto &a: tagsArray) {
+                    boost::json::object tagObject = a.as_object();
+                    std::map<std::string, std::string> tag;
+                    tag["Key"] = a.at("Key").as_string();
+                    tag["Value"] = a.at("Value").as_string();
+                    r.tags.push_back(std::move(tag));
+                }
+            }
+            if (Core::Json::AttributeExists(v, "AttributeDefinitions")) {
+                for (boost::json::array attributeDefinitionsArray = v.at("AttributeDefinitions").as_array(); const auto &a: attributeDefinitionsArray) {
+                    boost::json::object attributeDefinitionObject = a.as_object();
+                    std::map<std::string, std::string> attributeDefinition;
+                    attributeDefinition["AttributeName"] = a.at("AttributeName").as_string();
+                    attributeDefinition["AttributeType"] = a.at("AttributeType").as_string();
+                    r.attributes.push_back(std::move(attributeDefinition));
+                }
+            }
+            if (Core::Json::AttributeExists(v, "KeySchema")) {
+                for (boost::json::array attributeDefinitionsArray = v.at("KeySchema").as_array(); const auto &a: attributeDefinitionsArray) {
+                    boost::json::object attributeDefinitionObject = a.as_object();
+                    std::map<std::string, std::string> keySchema;
+                    keySchema["AttributeName"] = a.at("AttributeName").as_string();
+                    keySchema["KeyType"] = a.at("KeyType").as_string();
+                    r.keySchemas.emplace_back(keySchema);
+                }
+            }
+            return r;
+        }
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonBody JSON string
-         */
-        void FromJson(const std::string &jsonBody);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateTableRequest const &obj) {
+            jv = {
+                    {"TableClass", obj.tableClass},
+                    {"TableName", obj.tableName},
+                    {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
+            };
+            if (!obj.tags.empty()) {
+                jv.as_object()["Tags"] = boost::json::value_from(obj.tags);
+            }
+            if (!obj.keySchemas.empty()) {
+                boost::json::array jvKeySchema;
+                for (const auto &k: obj.keySchemas) {
+                    boost::json::object jvKeySchemaItem;
+                    jvKeySchemaItem["AttributeName"] = k.at("AttributeName");
+                    jvKeySchemaItem["KeyType"] = k.at("KeyType");
+                    jvKeySchema.push_back(std::move(jvKeySchemaItem));
+                }
+                jv.as_object()["KeySchema"] = jvKeySchema;
+            }
+            if (!obj.attributes.empty()) {
+                boost::json::array jvAttributeArray;
+                for (const auto &a: obj.attributes) {
+                    boost::json::object jvAttributeItem;
+                    jvAttributeItem["AttributeName"] = a.at("AttributeName");
+                    jvAttributeItem["AttributeType"] = a.at("AttributeType");
+                    jvAttributeArray.push_back(std::move(jvAttributeItem));
+                }
+                jv.as_object()["AttributeDefinitions"] = jvAttributeArray;
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

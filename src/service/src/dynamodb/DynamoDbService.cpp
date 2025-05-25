@@ -31,21 +31,19 @@ namespace AwsMock::Service {
 
             // Send request to DynamoDB docker container
             std::map<std::string, std::string> headers = PrepareHeaders("CreateTable");
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            createTableResponse.body = body;
-            createTableResponse.headers = outHeaders;
-            createTableResponse.status = status;
-            createTableResponse.ScanResponse();
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
 
             // Update database
-            const Database::Entity::DynamoDb::ProvisionedThroughput provisionedThroughput = {.readCapacityUnits = request.provisionedThroughput.readCapacityUnits, .writeCapacityUnits = request.provisionedThroughput.writeCapacityUnits};
-            Database::Entity::DynamoDb::Table table = {
-                    .region = request.region,
-                    .name = request.tableName,
-                    .attributes = request.attributes,
-                    .keySchemas = request.keySchemas,
-                    .tags = request.tags,
-                    .provisionedThroughput = provisionedThroughput};
+            Database::Entity::DynamoDb::ProvisionedThroughput provisionedThroughput;
+            provisionedThroughput.readCapacityUnits = request.provisionedThroughput.readCapacityUnits;
+            provisionedThroughput.writeCapacityUnits = request.provisionedThroughput.writeCapacityUnits;
+            Database::Entity::DynamoDb::Table table;
+            table.region = request.region;
+            table.name = request.tableName;
+            table.attributes = request.attributes;
+            table.keySchemas = request.keySchemas;
+            table.tags = request.tags;
+            table.provisionedThroughput = provisionedThroughput;
             table = _dynamoDbDatabase.CreateTable(table);
             log_debug << "DynamoDb table created, name: " << table.name;
 
@@ -68,14 +66,9 @@ namespace AwsMock::Service {
             Dto::DynamoDb::ListTableRequest request;
             request.region = region;
             request.limit = 100;
-            request.body = request.ToJson();
             std::map<std::string, std::string> headers = PrepareHeaders("ListTables");
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            Dto::DynamoDb::ListTableResponse listTableResponse;
-            listTableResponse.body = body;
-            listTableResponse.headers = outHeaders;
-            listTableResponse.status = status;
-            listTableResponse.ScanResponse();
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::ListTableResponse listTableResponse = Dto::DynamoDb::ListTableResponse::FromJson(body);
             log_trace << "DynamoDb list tables, region: " << region << ", tableName: " << tableName;
             return std::ranges::find_if(listTableResponse.tableNames,
                                         [tableName](const std::string &t) {
@@ -96,18 +89,10 @@ namespace AwsMock::Service {
         try {
 
             // Send request to docker container
-            std::map<std::string, std::string> headers = request.headers;
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            Dto::DynamoDb::ListTableResponse listTableResponse;
-            listTableResponse.body = body;
-            listTableResponse.headers = outHeaders;
-            listTableResponse.status = status;
-            if (listTableResponse.status == http::status::ok) {
-                listTableResponse.ScanResponse();
-                log_trace << "DynamoDb list tables, region: " << request.region << " body: " << body;
-                return listTableResponse;
-            }
-            return {};
+            std::map<std::string, std::string> headers = PrepareHeaders("ListTables");
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::ListTableResponse listTableResponse = Dto::DynamoDb::ListTableResponse::FromJson(body);
+            return listTableResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd list tables failed, error: " << exc.message();
@@ -163,17 +148,11 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "describe_table");
         log_debug << "Describe DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
-        Dto::DynamoDb::DescribeTableResponse describeTableResponse;
-        describeTableResponse.region = request.region;
-
         try {
             // Send request to docker container
-            std::map<std::string, std::string> headers = request.headers;
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            describeTableResponse.body = body;
-            describeTableResponse.headers = outHeaders;
-            describeTableResponse.status = status;
-            describeTableResponse.PrepareResponse();
+            std::map<std::string, std::string> headers = PrepareHeaders("DescribeTable");
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::DescribeTableResponse describeTableResponse = Dto::DynamoDb::DescribeTableResponse::FromJson(body);
             log_debug << "DynamoDb describe table, name: " << request.tableName;
             return describeTableResponse;
 
@@ -193,26 +172,23 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table does not exist, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::DeleteTableResponse deleteTableResponse;
         try {
 
             // Send request to DynamoDB docker container
             std::map<std::string, std::string> headers = PrepareHeaders("DeleteTable");
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            deleteTableResponse.body = body;
-            deleteTableResponse.headers = outHeaders;
-            deleteTableResponse.status = status;
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::DeleteTableResponse deleteTableResponse = Dto::DynamoDb::DeleteTableResponse::FromJson(body);
 
             // Delete table in a database
             _dynamoDbDatabase.DeleteTable(request.region, request.tableName);
             log_debug << "DynamoDb table deleted, name: " << request.tableName;
 
+            return deleteTableResponse;
+
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd delete table failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd delete table failed, error: " + exc.message());
         }
-
-        return deleteTableResponse;
     }
 
     long DynamoDbService::DeleteAllTables() const {
@@ -225,14 +201,13 @@ namespace AwsMock::Service {
             // Delete all tables from DynamoDB
             for (const auto &table: _dynamoDbDatabase.ListTables()) {
 
+                std::map<std::string, std::string> headers = PrepareHeaders("DeleteTable");
                 Dto::DynamoDb::DeleteTableRequest dynamoDeleteRequest;
                 dynamoDeleteRequest.tableName = table.name;
-                dynamoDeleteRequest.body = dynamoDeleteRequest.ToJson();
-                dynamoDeleteRequest.headers = PrepareHeaders("DeleteTable");
-                SendAuthorizedDynamoDbRequest(dynamoDeleteRequest.body, dynamoDeleteRequest.headers);
+                SendAuthorizedDynamoDbRequest(dynamoDeleteRequest.ToJson(), headers);
             }
 
-            // Delete table in database
+            // Delete the table from the database
             const long count = _dynamoDbDatabase.DeleteAllTables();
             log_debug << "DynamoDb tables deleted, count: " << count;
             return count;
@@ -253,24 +228,20 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::GetItemResponse getItemResponse;
         try {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("GetItem");
-            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers); status == http::status::ok) {
-
-                getItemResponse.body = body;
-                getItemResponse.headers = outHeaders;
-                getItemResponse.status = status;
+            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
+                Dto::DynamoDb::GetItemResponse getItemResponse = Dto::DynamoDb::GetItemResponse::FromJson(body);
                 log_debug << "DynamoDb get item, name: " << request.tableName;
+                return getItemResponse;
             }
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd get item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd get item failed, , error: " + exc.message());
         }
-
-        return getItemResponse;
+        return {};
     }
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) const {
@@ -283,32 +254,31 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::PutItemResponse putItemResponse;
         try {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("PutItem");
-            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers); status == http::status::ok) {
-
-                putItemResponse.body = body;
-                putItemResponse.headers = outHeaders;
-                putItemResponse.status = status;
+            if (auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
+                Dto::DynamoDb::PutItemResponse putItemResponse = Dto::DynamoDb::PutItemResponse::FromJson(body);
 
                 // Get the table
                 Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
 
                 // Convert to an entity and save to a database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
                 Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
+                // TODO: Calculate real size
+                item.size = body.size();
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
                 log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
+
+                return putItemResponse;
             }
+            return {};
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb put item failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb put item failed, error: " + exc.message());
         }
-
-        return putItemResponse;
     }
 
     Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) const {
@@ -321,23 +291,20 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::QueryResponse queryResponse;
         try {
 
             // Send request to docker container
-            std::map<std::string, std::string> headers = request.headers;
-            auto [body, outHeaders, status] = SendDynamoDbRequest(request.body, headers);
-            queryResponse.body = body;
-            queryResponse.headers = outHeaders;
-            queryResponse.status = status;
+            std::map<std::string, std::string> headers = PrepareHeaders("Query");
+            auto [body, outHeaders, status] = SendDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::QueryResponse queryResponse = Dto::DynamoDb::QueryResponse::FromJson(body);
             log_debug << "DynamoDb query item, name: " << request.tableName;
+
+            return queryResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb query failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDb query failed, error: " + exc.message());
         }
-
-        return queryResponse;
     }
 
     Dto::DynamoDb::ScanResponse DynamoDbService::Scan(const Dto::DynamoDb::ScanRequest &request) const {
@@ -350,23 +317,19 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::ScanResponse scanResponse;
         try {
 
             // Send request to docker container
             std::map<std::string, std::string> headers = PrepareHeaders("Scan");
-            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            scanResponse.body = body;
-            scanResponse.headers = outHeaders;
-            scanResponse.status = status;
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::ScanResponse scanResponse = Dto::DynamoDb::ScanResponse::FromJson(body);
             log_debug << "DynamoDb scan item, name: " << request.tableName;
+            return scanResponse;
 
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDb scan failed, message: " << exc.message();
             throw Core::ServiceException(exc.message());
         }
-
-        return scanResponse;
     }
 
     Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const {
@@ -379,21 +342,18 @@ namespace AwsMock::Service {
             throw Core::BadRequestException("DynamoDb table exists already, region: " + request.region + " name: " + request.tableName);
         }
 
-        Dto::DynamoDb::DeleteItemResponse deleteItemResponse;
         try {
 
             // Send request to docker container
+            std::string tp = request.ToJson();
             std::map<std::string, std::string> headers = PrepareHeaders("DeleteItem");
-            auto [body, oldHeaders, status] = SendAuthorizedDynamoDbRequest(request.body, headers);
-            deleteItemResponse.body = body;
-            deleteItemResponse.headers = oldHeaders;
-            deleteItemResponse.status = status;
+            if (auto [body, oldHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers); status == http::status::ok) {
 
-            if (status == http::status::ok) {
+                Dto::DynamoDb::DeleteItemResponse deleteItemResponse = Dto::DynamoDb::DeleteItemResponse::FromJson(body);
 
                 // Delete item in database
                 std::map<std::string, Database::Entity::DynamoDb::AttributeValue> keys;
-                for (const auto &[fst, snd]: request.key.keys) {
+                for (const auto &[fst, snd]: request.keys) {
                     Database::Entity::DynamoDb::AttributeValue attributeEntity;
                     if (!snd.stringValue.empty()) {
                         attributeEntity.stringValue = snd.stringValue;
@@ -407,6 +367,8 @@ namespace AwsMock::Service {
                     keys[fst] = attributeEntity;
                 }
                 _dynamoDbDatabase.DeleteItem(request.region, request.tableName, keys);
+
+                return deleteItemResponse;
             }
             log_debug << "DynamoDb item deleted, table: " << request.tableName;
 
@@ -414,15 +376,13 @@ namespace AwsMock::Service {
             log_error << "DynamoDbd delete item failed, message: " << exc.message();
             throw Core::ServiceException("DynamoDbd delete item failed, message: " + exc.message());
         }
-
-        return deleteItemResponse;
+        return {};
     }
 
     std::map<std::string, std::string> DynamoDbService::PrepareHeaders(const std::string &command) {
         std::map<std::string, std::string> headers;
-        const std::string commandSnake = Core::StringUtils::ToSnakeCase(command);
         headers["Region"] = "eu-central-1";
-        headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb." + commandSnake;
+        headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb." + Core::StringUtils::ToSnakeCase(command);
         headers["Content-Type"] = "application/x-amz-json-1.0";
         headers["X-Amz-Target"] = "DynamoDB_20120810." + command;
         headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
@@ -443,12 +403,14 @@ namespace AwsMock::Service {
 
     Dto::DynamoDb::DynamoDbResponse DynamoDbService::SendAuthorizedDynamoDbRequest(const std::string &body, std::map<std::string, std::string> &headers) const {
         log_debug << "Sending DynamoDB container request, endpoint: " << _containerHost << ":" << _containerPort;
+        log_debug << "Body: " << body;
 
         const Core::HttpSocketResponse response = Core::HttpSocket::SendAuthorizedJson(http::verb::post, "dynamodb", _containerHost, _containerPort, "/", "content-type;host;x-amz-date;x-amz-security-token;x-amz-target", headers, body);
         if (response.statusCode != http::status::ok) {
-            log_error << "HTTP error, status: " << response.statusCode << " body: " << response.body;
+            log_error << "HTTP error, status: " << response.statusCode << ", responseBody: " << response.body << ", requestBody: " << body;
             throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(response.statusCode) + " reason: " + response.body);
         }
+        log_debug << "Success, returnBody: " << response.body;
         return {.body = response.body, .headers = headers, .status = response.statusCode};
     }
 

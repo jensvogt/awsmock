@@ -6,13 +6,12 @@
 #define AWSMOCK_DTO_DYNAMODB_SCAN_REQUEST_H
 
 // C++ standard includes
-#include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -21,46 +20,26 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ScanRequest final : Common::BaseDto<ScanRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ScanRequest final : Common::BaseCounter<ScanRequest> {
 
         /**
          * Table name
          */
         std::string tableName;
 
-        /**
-         * Original HTTP request body
-         */
-        std::string body;
+      private:
 
-        /**
-         * Original HTTP request headers
-         */
-        std::map<std::string, std::string> headers;
+        friend ScanRequest tag_invoke(boost::json::value_to_tag<ScanRequest>, boost::json::value const &v) {
+            ScanRequest r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            return r;
+        }
 
-        /**
-         * @brief Prepare scan request
-         */
-        void PrepareRequest();
-
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ScanRequest const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

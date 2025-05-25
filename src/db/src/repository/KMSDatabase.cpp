@@ -70,7 +70,7 @@ namespace AwsMock::Database {
             try {
 
                 const auto mResult = _keyCollection.find_one(make_document(kvp("keyId", keyId)));
-                if (mResult) {
+                if (!mResult) {
                     log_error << "KMS key not found, keyId: " << keyId;
                     throw Core::DatabaseException("KMS key not found, keyId" + keyId);
                 }

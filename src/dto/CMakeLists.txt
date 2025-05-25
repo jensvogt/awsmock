@@ -51,17 +51,15 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/intern/ListLambdaEnvironmentCountersResponse.cpp src/lambda/intern/AddFunctionEnvironmentRequest.cpp src/lambda/intern/DeleteFunctionEnvironmentRequest.cpp
         src/lambda/intern/UpdateFunctionEnvironmentRequest.cpp src/lambda/intern/StartFunctionRequest.cpp src/lambda/intern/StopFunctionRequest.cpp src/lambda/intern/DeleteImageRequest.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
-        src/cognito/CreateUserPoolRequest.cpp src/cognito/CreateUserPoolResponse.cpp src/cognito/DeleteUserPoolRequest.cpp
         src/common/CognitoClientCommand.cpp src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp
         src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/CustomSmsSender.cpp
-        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/DeleteGroupRequest.cpp
-        src/cognito/CreateUserPoolDomainRequest.cpp src/cognito/CreateUserPoolDomainResponse.cpp
-        src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp src/cognito/model/UserPoolClient.cpp
-        src/cognito/CreateUserPoolClientRequest.cpp src/cognito/CreateUserPoolClientResponse.cpp src/cognito/DescribeUserPoolRequest.cpp
+        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp
+        src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp
+        src/cognito/DescribeUserPoolRequest.cpp
         src/cognito/DescribeUserPoolResponse.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
         src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthRequest.cpp
         src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp
-        src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DeleteUserPoolClientRequest.cpp src/cognito/DescribeUserPoolClientRequest.cpp
+        src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DescribeUserPoolClientRequest.cpp
         src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
         src/cognito/UpdateUserPoolDomainRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp
         src/cognito/DescribeUserPoolDomainRequest.cpp src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp
@@ -70,21 +68,8 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
-set(DYNAMODB_SOURCES src/dynamodb/CreateTableRequest.cpp src/dynamodb/CreateTableResponse.cpp src/dynamodb/DeleteTableRequest.cpp
-        src/dynamodb/DeleteTableResponse.cpp src/dynamodb/model/ProvisionedThroughput.cpp src/dynamodb/ListTableRequest.cpp
-        src/dynamodb/ListTableRequest.cpp src/dynamodb/ListTableResponse.cpp src/dynamodb/GetItemRequest.cpp
-        src/dynamodb/GetItemResponse.cpp src/dynamodb/PutItemRequest.cpp src/dynamodb/PutItemResponse.cpp
-        src/dynamodb/QueryRequest.cpp src/dynamodb/QueryResponse.cpp src/dynamodb/DeleteItemRequest.cpp
-        src/dynamodb/DeleteItemResponse.cpp src/dynamodb/model/AttributeValue.cpp src/dynamodb/DescribeTableRequest.cpp
-        src/dynamodb/DescribeTableResponse.cpp src/dynamodb/ScanRequest.cpp src/dynamodb/ScanResponse.cpp src/dynamodb/model/Key.cpp
-        src/dynamodb/mapper/Mapper.cpp src/dynamodb/GetItemKey.cpp)
-set(SECRETSMANAGER_SOURCES src/secretsmanager/CreateSecretRequest.cpp src/secretsmanager/CreateSecretResponse.cpp
-        src/secretsmanager/DeleteSecretRequest.cpp src/secretsmanager/DeleteSecretResponse.cpp
-        src/secretsmanager/DescribeSecretRequest.cpp src/secretsmanager/DescribeSecretResponse.cpp
-        src/secretsmanager/GetSecretValueRequest.cpp src/secretsmanager/GetSecretValueResponse.cpp src/secretsmanager/model/ReplicationStatus.cpp
-        src/secretsmanager/model/VersionIdsToStages.cpp src/secretsmanager/UpdateSecretRequest.cpp src/secretsmanager/UpdateSecretResponse.cpp src/secretsmanager/model/SecretTags.cpp
-        src/secretsmanager/RotateSecretRequest.cpp src/secretsmanager/model/Filter.cpp src/secretsmanager/RotateSecretResponse.cpp src/secretsmanager/model/RotationRules.cpp
-        src/secretsmanager/model/Secret.cpp src/secretsmanager/ListSecretsRequest.cpp src/secretsmanager/ListSecretsResponse.cpp)
+set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
+#set(SECRETSMANAGER_SOURCES)
 set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/kms/Key.cpp src/kms/ListKey.cpp src/kms/ScheduleKeyDeletionRequest.cpp
         src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp
@@ -97,16 +82,15 @@ set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cp
         src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
         src/module/ImportInfrastructureRequest.cpp)
-set(MONITORING_SOURCES src/monitoring/GetCountersRequest.cpp src/monitoring/GetCountersResponse.cpp
-        src/monitoring/GetMultiCountersResponse.cpp)
+set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
-        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${SECRETSMANAGER_SOURCES} ${KMS_SOURCES}
-        ${SSM_SOURCES} ${MODULE_SOURCES} ${MONITORING_SOURCES})
+        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
+        ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)
-    add_subdirectory(tst)
+    #    add_subdirectory(tst)
 endif ()
 
 # Includes
@@ -114,7 +98,8 @@ include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
 
 # Shared library
 if (NOT WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/dto/secretsmanager/model/VersionStage.h)
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
 endif ()

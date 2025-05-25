@@ -79,15 +79,9 @@
         "active": true,
         "lifetime": 3600,
         "data-dir": "/usr/local/awsmock/data/lambda",
-        "monitoring": {
-          "period": 300
-        },
-        "remove": {
-          "period": 300
-        },
-        "counter": {
-          "period": 300
-        },
+        "remove-period": 3600,
+        "counter-period": 300,
+        "log-retention-period": 1,
         "runtime": {
           "java11": "public.ecr.aws/lambda/java:11",
           "java17": "public.ecr.aws/lambda/java:17",
@@ -207,7 +201,8 @@
       "prometheus": false,
       "internal": true,
       "retention": 3,
-      "smooth": false
+      "smooth": false,
+      "average": 300
     },
     "mongodb": {
       "active": true,

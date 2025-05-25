@@ -10,19 +10,13 @@
 #include <ranges>
 #include <string>
 
-// Boost include<
-#include <boost/beast.hpp>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/dynamodb/model/Item.h>
 #include <awsmock/dto/dynamodb/model/TableStatus.h>
-#include <awsmock/entity/dynamodb/Item.h>
 
 namespace AwsMock::Dto::DynamoDb {
-
-    namespace http = boost::beast::http;
 
     /**
      * @brief Scan response
@@ -59,12 +53,7 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ScanResponse final : Common::BaseDto<ScanResponse> {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ScanResponse final : Common::BaseCounter<ScanResponse> {
 
         /**
          * Table name
@@ -72,55 +61,58 @@ namespace AwsMock::Dto::DynamoDb {
         std::string tableName;
 
         /**
-         * Original HTTP response body
-         */
-        std::string body;
-
-        /**
-         * Original HTTP response headers
-         */
-        std::map<std::string, std::string> headers;
-
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
-
-        /**
          * Item count
          */
-        long count;
+        long count{};
 
         /**
          * Scanned item count
          */
-        long scannedCount;
+        long scannedCount{};
 
         /**
          * Item array
          */
-        std::vector<Database::Entity::DynamoDb::Item> items;
+        std::vector<std::map<std::string, AttributeValue>> items;
 
-        /**
-         * @brief Scans the response and fills in the attributes
-         *
-         * @param table table entity
-         */
-        void PrepareResponse(const Database::Entity::DynamoDb::Table &table);
+      private:
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend ScanResponse tag_invoke(boost::json::value_to_tag<ScanResponse>, boost::json::value const &v) {
+            ScanResponse r;
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            r.count = Core::Json::GetLongValue(v, "Count");
+            r.scannedCount = Core::Json::GetLongValue(v, "ScannedCount");
+            if (Core::Json::AttributeExists(v, "Items")) {
+                for (boost::json::array itemsJson = v.at("Items").as_array(); auto &item: itemsJson) {
+                    std::map<std::string, AttributeValue> itemMap;
+                    for (auto &attribute: item.as_object()) {
+                        itemMap[attribute.key()] = boost::json::value_to<AttributeValue>(attribute.value());
+                    }
+                    r.items.push_back(itemMap);
+                }
+            }
+            return r;
+        }
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ScanResponse const &obj) {
+            jv = {
+                    {"TableName", obj.tableName},
+                    {"Count", obj.count},
+                    {"ScannedCount", obj.scannedCount},
+                    {"ScannedCount", obj.scannedCount},
+            };
+            if (!obj.items.empty()) {
+                boost::json::array itemsJson;
+                for (const auto &a: obj.items) {
+                    boost::json::object itemJson;
+                    for (const auto &[fst, snd]: a) {
+                        itemJson[fst] = boost::json::value_from(snd);
+                    }
+                    itemsJson.emplace_back(itemJson);
+                }
+                jv.as_object()["Items"] = itemsJson;
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb

@@ -12,11 +12,11 @@
 #include <boost/describe.hpp>
 #include <boost/json.hpp>
 #include <boost/mp11.hpp>
+#include <boost/proto/traits.hpp>
 #include <boost/version.hpp>
 
 // AwsMock includes
 #include <awsmock/core/StringUtils.h>
-#include <boost/proto/traits.hpp>
 
 namespace AwsMock::Database::Entity::Common {
 
@@ -32,14 +32,14 @@ namespace AwsMock::Database::Entity::Common {
     struct BaseEntity {
 
         /**
+         * ID
+         */
+        std::string oid;
+
+        /**
          * Destructor
          */
         virtual ~BaseEntity() = default;
-
-        /**
-         * Request ID
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
          * Region
@@ -47,9 +47,11 @@ namespace AwsMock::Database::Entity::Common {
         std::string region{};
 
         /**
-         * User
+         * @brief Convert the entity to a JSON document
+         *
+         * @return MongoDB BSON string
          */
-        std::string user{};
+        virtual view_or_value<view, value> ToDocument() const = 0;
 
         /**
          * @brief Convert to JSON representation
@@ -58,17 +60,8 @@ namespace AwsMock::Database::Entity::Common {
          */
         [[nodiscard]] virtual std::string ToJson() const {
             std::stringstream ss;
-            ss << boost::json::value_from(*dynamic_cast<const T *>(this));
+            ss << Core::Bson::BsonUtils::ToJsonString(this->ToDocument());
             return ss.str();
-        }
-
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        static T FromJson(const std::string &jsonString) {
-            return boost::json::value_to<T>(boost::json::parse(jsonString));
         }
 
 #ifndef _WIN32

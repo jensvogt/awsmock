@@ -87,7 +87,6 @@ namespace AwsMock::Dto::Module {
          */
         static Module FromJson(const std::string &payload);
 
-
         /**
          * @brief Convert from BSON representation
          *

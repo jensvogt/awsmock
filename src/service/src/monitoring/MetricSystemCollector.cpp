@@ -156,7 +156,7 @@ namespace AwsMock::Monitoring {
         if (res != KERN_SUCCESS) {
             return;
         }
-        MetricService::instance().SetGauge(TOTAL_THREADS, numberOfThreads);
+        MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, numberOfThreads);
         log_trace << "Total Threads: " << numberOfThreads;
     }
 
@@ -252,7 +252,7 @@ namespace AwsMock::Monitoring {
     }
 
     void MetricSystemCollector::GetThreadInfoWin32() {
-        MetricService::instance().SetGauge(TOTAL_THREADS, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
+        MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
     }
 
     long long MetricSystemCollector::GetPerformanceValue(const std::string &counter) {

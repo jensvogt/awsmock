@@ -176,6 +176,36 @@ namespace AwsMock::Database {
         return items;
     }
 
+    long DynamoDbMemoryDb::GetTableSize(const std::string &region, const std::string &tableName) const {
+
+        long size = 0;
+        if (region.empty() && tableName.empty()) {
+
+            for (const auto &val: _items | std::views::values) {
+                size += val.size;
+            }
+
+        } else if (tableName.empty()) {
+
+            for (const auto &val: _items | std::views::values) {
+                if (val.region == region) {
+                    size += val.size;
+                }
+            }
+
+        } else {
+
+            for (const auto &val: _items | std::views::values) {
+                if (val.region == region && val.tableName == tableName) {
+                    size += val.size;
+                }
+            }
+        }
+
+        log_trace << "Got DynamoDB size, region: " << region << ", tableName: " << tableName << ", size: " << size;
+        return size;
+    }
+
     long DynamoDbMemoryDb::CountTables(const std::string &region) const {
 
         if (!region.empty()) {

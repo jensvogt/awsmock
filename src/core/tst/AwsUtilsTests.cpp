@@ -5,100 +5,114 @@
 #ifndef AWMOCK_CORE_AWS_UTILS_TEST_H
 #define AWMOCK_CORE_AWS_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
 
 namespace AwsMock::Core {
 
-    class AwsUtilsTest : public testing::Test {
-
-      public:
-
-        void SetUp() override {
-            Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
-            _region = Configuration::instance().GetValue<std::string>("awsmock.region");
-            _accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-            _port = Configuration::instance().GetValue<int>("awsmock.gateway.http.port");
-            _endpoint = SystemUtils::GetHostName() + ":" + std::to_string(_port);
-        }
-
-      protected:
-
-        int _port = 0;
-        std::string _region, _accountId, _endpoint;
-        //Configuration _configuration = Configuration::instance();
-    };
-
-    TEST_F(AwsUtilsTest, CreateS3ArnTest) {
+    BOOST_AUTO_TEST_CASE(CreateS3ArnTest) {
 
         // arrange
         const std::string bucket = "testBucket";
         const std::string key = "testKey";
-        const std::string s3Arn = "arn:aws:s3:" + _region + ":" + _accountId + ":" + bucket + "/" + key;
+        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string s3Arn = "arn:aws:s3:" + region + ":" + accountId + ":" + bucket + "/" + key;
 
         // act
-        const std::string result = AwsUtils::CreateS3ObjectArn(_region, _accountId, bucket, key);
+        const std::string result = AwsUtils::CreateS3ObjectArn(region, accountId, bucket, key);
 
         // assert
-        EXPECT_STREQ(result.c_str(), s3Arn.c_str());
+        BOOST_CHECK_EQUAL(result, s3Arn);
     }
 
-    TEST_F(AwsUtilsTest, CreateSqsArnTest) {
+    BOOST_AUTO_TEST_CASE(CreateSqsArnTest) {
 
         // arrange
         const std::string queueName = "testQueue";
-        const std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string sqsQueueArn = "arn:aws:sqs:" + region + ":" + accountId + ":" + queueName;
 
         // act
-        const std::string result = Core::CreateSQSQueueArn(queueName);
+        const std::string result = CreateSQSQueueArn(queueName);
 
         // assert
-        EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());
+        BOOST_CHECK_EQUAL(result, sqsQueueArn);
     }
 
-    TEST_F(AwsUtilsTest, CreateSNSTopicTest) {
+    BOOST_AUTO_TEST_CASE(CreateSNSTopicTest) {
 
         // arrange
         const std::string topicName = "testTopic";
-        const std::string snsTopic3Arn = "arn:aws:sns:" + _region + ":" + _accountId + ":" + topicName;
+        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string snsTopicArn = "arn:aws:sns:" + region + ":" + accountId + ":" + topicName;
 
         // act
-        const std::string result = AwsUtils::CreateSNSTopicArn(_region, _accountId, topicName);
+        const std::string result = AwsUtils::CreateSNSTopicArn(region, accountId, topicName);
 
         // assert
-        EXPECT_STREQ(result.c_str(), snsTopic3Arn.c_str());
+        BOOST_CHECK_EQUAL(result.c_str(), snsTopicArn.c_str());
     }
 
-    TEST_F(AwsUtilsTest, ConvertArnToUrlTest) {
+    BOOST_AUTO_TEST_CASE(CreateLambdaTopicTest) {
+
+        // arrange
+        const std::string topicName = "testTopic";
+        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        const std::string functionName = "test-function";
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string lambdaArn = "arn:aws:lambda:" + region + ":" + accountId + ":function:" + functionName;
+
+        // act
+        const std::string result = AwsUtils::CreateLambdaArn(region, accountId, functionName);
+
+        // assert
+        BOOST_CHECK_EQUAL(result.c_str(), lambdaArn.c_str());
+    }
+
+    BOOST_AUTO_TEST_CASE(ConvertArnToUrlTest) {
 
         // arrange
         const std::string queueName = "file-delivery1-queue";
-        const std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
-        const std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string endpoint = SystemUtils::GetHostName() + ":" + port;
+        const std::string sqsQueueUrl = "http://sqs." + region + "." + endpoint + "/" + accountId + "/" + queueName;
+        const std::string sqsQueueArn = "arn:aws:sqs:" + region + ":" + accountId + ":" + queueName;
 
         // act
         const std::string result = AwsUtils::ConvertSQSQueueArnToUrl(sqsQueueArn);
 
         // assert
-        EXPECT_STREQ(result.c_str(), sqsQueueUrl.c_str());
+        BOOST_CHECK_EQUAL(result.c_str(), sqsQueueUrl.c_str());
     }
 
-    TEST_F(AwsUtilsTest, ConvertUrlToArnTest) {
+    BOOST_AUTO_TEST_CASE(ConvertUrlToArnTest) {
 
         // arrange
         const std::string queueName = "file-delivery1-queue";
-        const std::string sqsQueueUrl = "http://sqs." + _region + "." + _endpoint + "/" + _accountId + "/" + queueName;
-        const std::string sqsQueueArn = "arn:aws:sqs:" + _region + ":" + _accountId + ":" + queueName;
+        Configuration::instance().SetFilename(TMP_CONFIGURATION_FILE);
+        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const std::string endpoint = SystemUtils::GetHostName() + ":" + port;
+        const std::string sqsQueueUrl = "http://sqs." + region + "." + endpoint + "/" + accountId + "/" + queueName;
+        const std::string sqsQueueArn = "arn:aws:sqs:" + region + ":" + accountId + ":" + queueName;
 
         // act
-        const std::string result = AwsUtils::ConvertSQSQueueUrlToArn(_region, sqsQueueUrl);
+        const std::string result = AwsUtils::ConvertSQSQueueUrlToArn(region, sqsQueueUrl);
 
         // assert
-        EXPECT_STREQ(result.c_str(), sqsQueueArn.c_str());
+        BOOST_CHECK_EQUAL(result, sqsQueueArn);
     }
 
     /**
@@ -113,7 +127,7 @@ namespace AwsMock::Core {
      * x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
      * x-amz-date: 20130524T000000Z
      */
-    TEST_F(AwsUtilsTest, VerifySignatureTest) {
+    BOOST_AUTO_TEST_CASE(VerifySignatureTest) {
 
         // arrange
         http::request<http::dynamic_body> request;
@@ -130,7 +144,7 @@ namespace AwsMock::Core {
         const bool result = AwsUtils::VerifySignature(request, secretAccessKey);
 
         // assert
-        ASSERT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
 }// namespace AwsMock::Core

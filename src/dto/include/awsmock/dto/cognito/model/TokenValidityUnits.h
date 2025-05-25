@@ -15,8 +15,6 @@
 
 namespace AwsMock::Dto::Cognito {
 
-    using std::chrono::system_clock;
-
     /**
      * @brief Validation units
      *

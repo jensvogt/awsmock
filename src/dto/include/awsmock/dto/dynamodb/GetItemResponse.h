@@ -13,9 +13,9 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/dynamodb/model/Item.h>
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -43,46 +43,30 @@ namespace AwsMock::Dto::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetItemResponse final : Common::BaseDto<GetItemResponse> {
-
-        /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Table name
-         */
-        std::string tableName;
+    struct GetItemResponse final : Common::BaseCounter<GetItemResponse> {
 
         /**
          * Original HTTP response body
          */
-        std::string body;
+        Item item;
 
-        /**
-         * Original HTTP response headers
-         */
-        std::map<std::string, std::string> headers;
+      private:
 
-        /**
-         * HTTP status from docker image
-         */
-        http::status status;
+        friend GetItemResponse tag_invoke(boost::json::value_to_tag<GetItemResponse>, boost::json::value const &v) {
+            GetItemResponse r;
+            if (Core::Json::AttributeExists(v, "Item")) {
+                r.item = boost::json::value_to<Item>(v.at("Item"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetItemResponse const &obj) {
+            boost::json::object itemJson;
+            for (const auto &[fst, snd]: obj.item.attributes) {
+                itemJson[fst] = boost::json::value_from(snd);
+            }
+            jv = {{"Item", boost::json::value_from(obj.item.attributes)}};
+        }
     };
 
 }// namespace AwsMock::Dto::DynamoDb
