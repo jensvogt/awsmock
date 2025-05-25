@@ -9,6 +9,7 @@ namespace AwsMock::Database::Entity::Lambda {
     view_or_value<view, value> LambdaResult::ToDocument() const {
 
         document lambdaDocResult;
+        Core::Bson::BsonUtils::SetOidValue(lambdaDocResult, "_id", oid);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "region", region);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "name", lambdaName);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "arn", lambdaArn);
