@@ -24,6 +24,7 @@ namespace AwsMock::Dto::Lambda {
                     jsonObject.append(kvp("state", functionCounter.state));
                     jsonObject.append(kvp("averageRuntime", bsoncxx::types::b_int64(functionCounter.averageRuntime)));
                     jsonObject.append(kvp("invocations", bsoncxx::types::b_int64(functionCounter.invocations)));
+                    jsonObject.append(kvp("instances", bsoncxx::types::b_int64(functionCounter.instances)));
                     jsonBucketArray.append(jsonObject);
                 }
                 rootDocument.append(kvp("functionCounters", jsonBucketArray));

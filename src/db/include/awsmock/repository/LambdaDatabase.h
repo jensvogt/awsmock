@@ -233,12 +233,28 @@ namespace AwsMock::Database {
         Entity::Lambda::LambdaResult CreateLambdaResult(Entity::Lambda::LambdaResult &lambdaResult) const;
 
         /**
+         * @brief Returns the existence of a lambda result
+         *
+         * @param oid lambda result record OID
+         * @return true if the result with the given OID exists
+         */
+        [[nodiscard]] bool LambdaResultExists(const std::string &oid) const;
+
+        /**
          * @brief Removes old lambda logs
          *
          * @param cutOff cut off time point
          * @return numberof logs removed
          */
         [[nodiscard]] long RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) const;
+
+        /**
+         * @brief Returns a lambda function result.
+         *
+         * @param oid lambda result OID
+         * @return lambda function result counter
+         */
+        [[nodiscard]] Entity::Lambda::LambdaResult GetLambdaResultCounter(const std::string &oid) const;
 
         /**
          * @brief Returns a list of lambda function results.

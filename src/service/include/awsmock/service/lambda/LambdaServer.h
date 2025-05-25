@@ -134,7 +134,7 @@ namespace AwsMock::Service {
         /**
          * Remove period in seconds
          */
-        int _removePeriod;
+        int _lifetime;
 
         /**
          * Log retention period in days

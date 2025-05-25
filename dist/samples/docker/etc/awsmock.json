@@ -78,7 +78,7 @@
       "lambda": {
         "active": true,
         "lifetime": 3600,
-        "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\lambda",
+        "data-dir": "/usr/local/awsmock/data/lambda",
         "remove-period": 3600,
         "counter-period": 300,
         "log-retention-period": 1,

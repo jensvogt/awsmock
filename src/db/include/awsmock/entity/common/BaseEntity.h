@@ -100,8 +100,10 @@ namespace AwsMock::Database::Entity::Common {
          *
          * @return output stream
          */
-        template<class S>
-        friend std::ostream &operator<<(std::ostream &os, const BaseEntity &i);
+        friend std::ostream &operator<<(std::ostream &os, const T &e) {
+            os << e.ToString();
+            return os;
+        }
     };
 
 }// namespace AwsMock::Database::Entity::Common

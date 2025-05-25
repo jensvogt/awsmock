@@ -149,8 +149,10 @@ namespace AwsMock::Dto::Common {
          *
          * @return output stream
          */
-        template<class S>
-        friend std::ostream &operator<<(std::ostream &os, const BaseCounter &i);
+        friend std::ostream &operator<<(std::ostream &os, const BaseCounter &e) {
+            std::operator<<(os, e.ToString());
+            return os;
+        }
 
       private:
 
