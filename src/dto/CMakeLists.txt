@@ -48,8 +48,8 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/model/EventSourceMapping.cpp src/lambda/intern/ResetFunctionCountersRequest.cpp
         src/lambda/DeleteFunctionRequest.cpp src/lambda/intern/UploadFunctionCodeRequest.cpp
         src/lambda/intern/ListLambdaTagCountersRequest.cpp src/lambda/intern/ListLambdaTagCountersResponse.cpp
-        src/lambda/intern/UpdateFunctionTagRequest.cpp src/lambda/intern/ListLambdaEnvironmentCountersRequest.cpp
-        src/lambda/intern/ListLambdaEnvironmentCountersResponse.cpp src/lambda/intern/UpdateFunctionEnvironmentRequest.cpp
+        src/lambda/intern/UpdateFunctionTagRequest.cpp
+        src/lambda/intern/UpdateFunctionEnvironmentRequest.cpp
         src/lambda/intern/StartFunctionRequest.cpp src/lambda/intern/StopFunctionRequest.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/common/CognitoClientCommand.cpp src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp

@@ -15,7 +15,7 @@
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListLambdaEnvironmentCountersResponse {
+    struct ListLambdaEnvironmentCountersResponse final : Common::BaseCounter<ListLambdaEnvironmentCountersResponse> {
 
         /**
          * List of tag counters
@@ -27,26 +27,21 @@ namespace AwsMock::Dto::Lambda {
          */
         long total = 0;
 
-        /**
-         * Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListLambdaEnvironmentCountersResponse tag_invoke(boost::json::value_to_tag<ListLambdaEnvironmentCountersResponse>, boost::json::value const &v) {
+            ListLambdaEnvironmentCountersResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.environmentCounters = boost::json::value_to<std::vector<std::pair<std::string, std::string>>>(v.at("environmentCounters"));
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListLambdaEnvironmentCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListLambdaEnvironmentCountersResponse const &obj) {
+            jv = {
+                    {"total", obj.total},
+                    {"sortColumns", boost::json::value_from(obj.environmentCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda
