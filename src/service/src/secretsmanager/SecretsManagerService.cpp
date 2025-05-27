@@ -44,6 +44,7 @@ namespace AwsMock::Service {
             // Update database
             Database::Entity::SecretsManager::SecretVersion version;
             version.versionId = Core::StringUtils::CreateRandomUuid();
+            version.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
 
             secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
             secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
@@ -148,11 +149,16 @@ namespace AwsMock::Service {
             // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
 
-            if (!secret.HasVersion(request.versionId)) {
+            if (!request.versionId.empty() && !secret.HasVersion(request.versionId)) {
                 log_warning << "Secret version does not exist, versionId: " << request.versionId;
                 throw Core::ServiceException("Secret version does not exist, versionId: " + request.versionId);
             }
-            Database::Entity::SecretsManager::SecretVersion version = secret.GetVersion(request.versionId);
+            Database::Entity::SecretsManager::SecretVersion version;
+            if (!request.versionId.empty()) {
+                version = secret.GetVersion(request.versionId);
+            } else {
+                version = secret.GetCurrent();
+            }
 
             // Convert to DTO
             response.name = secret.name;

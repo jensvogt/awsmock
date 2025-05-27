@@ -120,8 +120,10 @@ namespace AwsMock::Dto::Common {
          *
          * @return output stream
          */
-        template<class S>
-        friend std::ostream &operator<<(std::ostream &os, const BaseDto &i);
+        friend std::ostream &operator<<(std::ostream &os, const BaseDto &i) {
+            std::operator<<(os, i.ToString());
+            return os;
+        };
     };
 
 }// namespace AwsMock::Dto::Common

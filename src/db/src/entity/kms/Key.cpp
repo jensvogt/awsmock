@@ -9,7 +9,7 @@ namespace AwsMock::Database::Entity::KMS {
     view_or_value<view, value> Key::ToDocument() const {
 
         try {
-            bsoncxx::builder::basic::document keyDoc;
+            document keyDoc;
             keyDoc.append(
                     kvp("region", region),
                     kvp("arn", arn),
@@ -38,9 +38,9 @@ namespace AwsMock::Database::Entity::KMS {
 
             // Tags
             if (!tags.empty()) {
-                auto tagsDoc = bsoncxx::builder::basic::document{};
-                for (const auto &t: tags) {
-                    tagsDoc.append(kvp(t.first, t.second));
+                auto tagsDoc = document{};
+                for (const auto &[fst, snd]: tags) {
+                    tagsDoc.append(kvp(fst, snd));
                 }
                 keyDoc.append(kvp("tags", tagsDoc));
             }
@@ -52,7 +52,7 @@ namespace AwsMock::Database::Entity::KMS {
         }
     }
 
-    void Key::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Key::FromDocument(const std::optional<view> &mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -70,15 +70,14 @@ namespace AwsMock::Database::Entity::KMS {
             hmac512Key = Core::Bson::BsonUtils::GetStringValue(mResult, "hmac512Key");
             rsaPrivateKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPrivateKey");
             rsaPublicKey = Core::Bson::BsonUtils::GetStringValue(mResult, "rsaPublicKey");
-            pendingWindowInDays = mResult.value()["pendingWindowInDays"].get_int32().value;
+            pendingWindowInDays = Core::Bson::BsonUtils::GetIntValue(mResult, "pendingWindowInDays");
             scheduledDeletion = Core::Bson::BsonUtils::GetDateValue(mResult, "scheduledDeletion");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
-                bsoncxx::document::view tagsView = mResult.value()["tags"].get_document().value;
-                for (const bsoncxx::document::element &tagElement: tagsView) {
+                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);
