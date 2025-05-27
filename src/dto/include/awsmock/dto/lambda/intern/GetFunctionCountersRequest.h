@@ -9,45 +9,30 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/lambda/model/EphemeralStorage.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct GetFunctionCountersRequest {
+    struct GetFunctionCountersRequest final : Common::BaseCounter<GetFunctionCountersRequest> {
 
         /**
          * function name
          */
         std::string functionArn;
 
-        /**
-         * Convert from a JSON string.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend GetFunctionCountersRequest tag_invoke(boost::json::value_to_tag<GetFunctionCountersRequest>, boost::json::value const &v) {
+            GetFunctionCountersRequest r;
+            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetFunctionCountersRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionCountersRequest const &obj) {
+            jv = {
+                    {"FunctionArn", obj.functionArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

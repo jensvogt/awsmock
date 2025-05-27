@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteFunctionTagRequest {
+    struct DeleteFunctionTagRequest final : Common::BaseCounter<DeleteFunctionTagRequest> {
 
         /**
          * Lambda function ARN
@@ -39,33 +39,21 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string tagKey;
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Parse a JSON string.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend DeleteFunctionTagRequest tag_invoke(boost::json::value_to_tag<DeleteFunctionTagRequest>, boost::json::value const &v) {
+            DeleteFunctionTagRequest r;
+            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            r.tagKey = Core::Json::GetStringValue(v, "Key");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteFunctionTagRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteFunctionTagRequest const &obj) {
+            jv = {
+                    {"FunctionArn", obj.functionArn},
+                    {"Key", obj.tagKey},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

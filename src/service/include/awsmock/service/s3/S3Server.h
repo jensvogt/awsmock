@@ -44,11 +44,6 @@ namespace AwsMock::Service {
         [[maybe_unused]] void SyncObjects() const;
 
         /**
-         * @brief Synchronize S3 bucket size and object counts
-         */
-        [[maybe_unused]] void SyncBuckets() const;
-
-        /**
          * Update counters
          */
         void UpdateCounter();

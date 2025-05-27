@@ -6,7 +6,24 @@
 
 namespace AwsMock::Database {
 
-    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {}
+    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {
+
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _lambdaCounterMap = _segment.find<LambdaCounterMapType>(LAMBDA_COUNTER_MAP_NAME).first;
+        if (!_lambdaCounterMap) {
+            _lambdaCounterMap = _segment.construct<LambdaCounterMapType>(LAMBDA_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
+        }
+
+        // Initialize the counters
+        for (const auto &lambda: ListLambdas()) {
+            LambdaMonitoringCounter counter;
+            counter.instances = lambda.instances.size();
+            counter.invocations = lambda.invocations;
+            counter.averageRuntime = lambda.averageRuntime;
+            _lambdaCounterMap->insert_or_assign(lambda.arn, counter);
+        }
+        log_debug << "Lambda counters initialized" << _lambdaCounterMap->size();
+    }
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
@@ -17,7 +34,7 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
                 const int64_t count = _lambdaCollection.count_documents(make_document(kvp("region", region), kvp("function", function), kvp("runtime", runtime)));
-                log_trace << "lambda function exists: " << std::boolalpha << count;
+                log_trace << "Lambda function exists: " << std::boolalpha << count;
                 return count > 0;
 
             } catch (const mongocxx::exception &exc) {
@@ -73,7 +90,7 @@ namespace AwsMock::Database {
         return _memoryDb.LambdaExistsByArn(arn);
     }
 
-    int LambdaDatabase::LambdaCount(const std::string &region) const {
+    long LambdaDatabase::LambdaCount(const std::string &region) const {
 
         if (HasDatabase()) {
 
@@ -100,18 +117,18 @@ namespace AwsMock::Database {
         return _memoryDb.LambdaCount(region);
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::CreateLambda(const Entity::Lambda::Lambda &lambda) const {
+    Entity::Lambda::Lambda LambdaDatabase::CreateLambda(Entity::Lambda::Lambda &lambda) const {
 
         if (HasDatabase()) {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
 
-                auto result = _lambdaCollection.insert_one(lambda.ToDocument());
+                const auto result = _lambdaCollection.insert_one(lambda.ToDocument());
                 log_trace << "Bucket created, oid: " << result->inserted_id().get_oid().value.to_string();
-                return GetLambdaById(result->inserted_id().get_oid().value);
+                lambda.oid = result->inserted_id().get_oid().value.to_string();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -120,15 +137,20 @@ namespace AwsMock::Database {
 
         } else {
 
-            return _memoryDb.CreateLambda(lambda);
+            lambda = _memoryDb.CreateLambda(lambda);
         }
+
+        // Update counters
+        _lambdaCounterMap->insert_or_assign(lambda.arn, LambdaMonitoringCounter{.instances = 0, .invocations = 0, .averageRuntime = 0});
+
+        return lambda;
     }
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) const {
 
         try {
 
-            auto client = ConnectionPool::instance().GetConnection();
+            const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
             const auto mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
@@ -205,23 +227,11 @@ namespace AwsMock::Database {
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Get lambda by ARN failed, error: " << e.what();
             }
-
-        } else {
-
-            return _memoryDb.GetLambdaByName(region, name);
         }
-        return {};
+        return _memoryDb.GetLambdaByName(region, name);
     }
 
-    Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const {
-
-        if (LambdaExists(lambda)) {
-            return UpdateLambda(lambda);
-        }
-        return CreateLambda(lambda);
-    }
-
-    Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(const Entity::Lambda::Lambda &lambda) const {
+    Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(Entity::Lambda::Lambda &lambda) const {
 
         if (HasDatabase()) {
 
@@ -239,6 +249,14 @@ namespace AwsMock::Database {
             }
         }
         return _memoryDb.UpdateLambda(lambda);
+    }
+
+    Entity::Lambda::Lambda LambdaDatabase::CreateOrUpdateLambda(Entity::Lambda::Lambda &lambda) const {
+
+        if (LambdaExists(lambda)) {
+            return UpdateLambda(lambda);
+        }
+        return CreateLambda(lambda);
     }
 
     Entity::Lambda::Lambda LambdaDatabase::ImportLambda(Entity::Lambda::Lambda &lambda) const {
@@ -389,8 +407,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }

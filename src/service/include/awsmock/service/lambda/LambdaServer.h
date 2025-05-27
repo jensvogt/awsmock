@@ -140,6 +140,16 @@ namespace AwsMock::Service {
          * Log retention period in days
          */
         int _logRetentionPeriod;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::LambdaCounterMapType *_lambdaCounterMap{};
     };
 
 }// namespace AwsMock::Service
