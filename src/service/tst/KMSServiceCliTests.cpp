@@ -24,7 +24,7 @@ namespace AwsMock::Service {
     /**
      * @brief AwsMock cognito integration test.
      */
-    class KMSServerCliTest : public testing::Test, public TestBase {
+    class KMSServiceCliTests : public testing::Test, public TestBase {
 
       protected:
 
@@ -50,7 +50,7 @@ namespace AwsMock::Service {
         Database::KMSDatabase &_database = Database::KMSDatabase::instance();
     };
 
-    TEST_F(KMSServerCliTest, KeyCreateSymmetricTest) {
+    TEST_F(KMSServiceCliTests, KeyCreateSymmetricTest) {
 
         // arrange
 
@@ -65,7 +65,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT));
     }
 
-    TEST_F(KMSServerCliTest, KeyCreateRSA2048Test) {
+    TEST_F(KMSServiceCliTests, KeyCreateRSA2048Test) {
 
         // arrange
 
@@ -80,7 +80,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT));
     }
 
-    TEST_F(KMSServerCliTest, KeyCreateRSA3072Test) {
+    TEST_F(KMSServiceCliTests, KeyCreateRSA3072Test) {
 
         // arrange
 
@@ -95,7 +95,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT));
     }
 
-    TEST_F(KMSServerCliTest, KeyCreateRSA4096Test) {
+    TEST_F(KMSServiceCliTests, KeyCreateRSA4096Test) {
 
         // arrange
 
@@ -110,7 +110,7 @@ namespace AwsMock::Service {
         EXPECT_TRUE(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT));
     }
 
-    TEST_F(KMSServerCliTest, KeyListTest) {
+    TEST_F(KMSServiceCliTests, KeyListTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "create-key", "--key-spec", "RSA_4096", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
         ASSERT_THAT(output2, testing::HasSubstr("KeyArn"));
     }
 
-    TEST_F(KMSServerCliTest, EncryptTest) {
+    TEST_F(KMSServiceCliTests, EncryptTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "create-key", "--key-spec", "SYMMETRIC_DEFAULT", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(response.ciphertext.empty());
     }
 
-    TEST_F(KMSServerCliTest, DecryptTest) {
+    TEST_F(KMSServiceCliTests, DecryptTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "create-key", "--key-spec", "SYMMETRIC_DEFAULT", "--key-usage", "ENCRYPT_DECRYPT", "--endpoint", _endpoint});

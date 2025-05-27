@@ -285,7 +285,7 @@ namespace AwsMock::Core {
             return {};
         }
 
-        // max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
+        // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 byte
         int c_len = *len + CRYPTO_AES256_BLOCK_SIZE, f_len = 0;
         auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
 
@@ -313,7 +313,7 @@ namespace AwsMock::Core {
         }
 
         const int c_len = *len;
-        // Max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
+        // Max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 byte
         int f_len = 0, p_len = 0;
         auto *plaintext = static_cast<unsigned char *>(malloc(c_len));
 
@@ -389,7 +389,7 @@ namespace AwsMock::Core {
         std::ofstream output_file(outFilename, std::ios::binary);
         int outFileLen = 0;
 
-        // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes
+        // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 byte
         auto in_buf = new char[AWSMOCK_BUFFER_SIZE];
         auto out_buf = new char[AWSMOCK_BUFFER_SIZE + AES_BLOCK_SIZE];
 
@@ -465,9 +465,7 @@ namespace AwsMock::Core {
         std::stringstream ofs;
         ofs.write((const char *) bytes, encodedSize);
         free(bytes);
-        std::string encodedString = ofs.str();
-        encodedString[encodedSize] = '\0';
-        return encodedString;
+        return ofs.str();
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
@@ -579,7 +577,7 @@ namespace AwsMock::Core {
         return pRSA;
     }
 
-    std::string Crypto::GetRsaPublicKey(EVP_PKEY *pRSA) {
+    std::string Crypto::GetRsaPublicKey(const EVP_PKEY *pRSA) {
 
         BIO *bp = BIO_new(BIO_s_mem());
         PEM_write_bio_PUBKEY(bp, pRSA);
@@ -596,7 +594,7 @@ namespace AwsMock::Core {
         return sstream.str();
     }
 
-    std::string Crypto::GetRsaPrivateKey(EVP_PKEY *pRSA) {
+    std::string Crypto::GetRsaPrivateKey(const EVP_PKEY *pRSA) {
 
         BIO *bp = BIO_new(BIO_s_mem());
         PEM_write_bio_PUBKEY(bp, pRSA);

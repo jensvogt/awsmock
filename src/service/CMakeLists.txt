@@ -37,7 +37,7 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRAN
 
 # Test directory
 if (NOT WIN32)
-    #    add_subdirectory(tst)
+    add_subdirectory(btst)
 endif ()
 
 # Includes

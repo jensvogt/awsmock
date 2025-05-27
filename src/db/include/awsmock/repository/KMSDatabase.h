@@ -110,7 +110,7 @@ namespace AwsMock::Database {
          * @return created KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key CreateKey(const Entity::KMS::Key &key) const;
+        Entity::KMS::Key CreateKey(Entity::KMS::Key &key) const;
 
         /**
          * @brief Create or update a key in the KMS key table
@@ -119,7 +119,7 @@ namespace AwsMock::Database {
          * @return created or updated KMS key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpsertKey(const Entity::KMS::Key &key) const;
+        Entity::KMS::Key UpsertKey(Entity::KMS::Key &key) const;
 
         /**
          * @brief Updates a key
@@ -128,7 +128,7 @@ namespace AwsMock::Database {
          * @return created key entity
          * @throws DatabaseException
          */
-        Entity::KMS::Key UpdateKey(const Entity::KMS::Key &key) const;
+        Entity::KMS::Key UpdateKey(Entity::KMS::Key &key) const;
 
         /**
          * @brief Delete a key

@@ -144,7 +144,7 @@ namespace AwsMock::Database {
         return -1;
     }
 
-    Entity::KMS::Key KMSDatabase::CreateKey(const Entity::KMS::Key &key) const {
+    Entity::KMS::Key KMSDatabase::CreateKey(Entity::KMS::Key &key) const {
 
         if (HasDatabase()) {
 
@@ -158,8 +158,8 @@ namespace AwsMock::Database {
                 const auto result = _keyCollection.insert_one(key.ToDocument());
                 session.commit_transaction();
                 log_trace << "Key created, oid: " << result->inserted_id().get_oid().value.to_string();
-
-                return GetKeyById(result->inserted_id().get_oid().value);
+                key.oid = result->inserted_id().get_oid().value.to_string();
+                return key;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -170,7 +170,7 @@ namespace AwsMock::Database {
         return _memoryDb.CreateKey(key);
     }
 
-    Entity::KMS::Key KMSDatabase::UpdateKey(const Entity::KMS::Key &key) const {
+    Entity::KMS::Key KMSDatabase::UpdateKey(Entity::KMS::Key &key) const {
 
         if (HasDatabase()) {
 
@@ -179,12 +179,19 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
+                mongocxx::options::find_one_and_update opts{};
+                opts.return_document(mongocxx::options::return_document::k_after);
 
                 session.start_transaction();
-                auto result = _keyCollection.find_one_and_update(make_document(kvp("keyId", key.keyId)), key.ToDocument());
-                log_trace << "Key updated: " << key.ToString();
+                const auto mResult = _keyCollection.find_one_and_update(make_document(kvp("keyId", key.keyId)), key.ToDocument(), opts);
+                log_trace << "Key updated: " << key;
                 session.commit_transaction();
-                return GetKeyByKeyId(key.keyId);
+
+                if (!mResult->empty()) {
+                    key.FromDocument(mResult->view());
+                    return key;
+                }
+                return key;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -195,7 +202,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateKey(key);
     }
 
-    Entity::KMS::Key KMSDatabase::UpsertKey(const Entity::KMS::Key &key) const {
+    Entity::KMS::Key KMSDatabase::UpsertKey(Entity::KMS::Key &key) const {
 
         if (KeyExists(key.keyId)) {
 
