@@ -11,19 +11,12 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/lambda/model/Error.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
-
-    struct EnvironmentVariables {
+    struct EnvironmentVariables final : Common::BaseCounter<EnvironmentVariables> {
 
         /**
          * @brief Environment variables
@@ -40,28 +33,67 @@ namespace AwsMock::Dto::Lambda {
          *
          * @return DTO as BSON document
          */
-        view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+            try {
+
+                document document;
+                if (!variables.empty()) {
+                    bsoncxx::builder::basic::document variablesDocument;
+                    for (const auto &[fst, snd]: variables) {
+                        variablesDocument.append(kvp(fst, snd));
+                    }
+                    document.append(kvp("Variables", variablesDocument));
+                }
+
+                bsoncxx::builder::basic::document errorDocument;
+                errorDocument.append(kvp("ErrorCode", error.errorCode));
+                errorDocument.append(kvp("Message", error.message));
+                document.append(kvp("Error", errorDocument));
+
+                return document.extract();
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Convert to a JSON string
          *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
+                if (document.view().find("Variables") != document.view().end()) {
+                    for (const view jsonObject = document.view()["Variables"].get_document().value; const auto &element: jsonObject) {
+                        std::string key = bsoncxx::string::to_string(element.key());
+                        const std::string value = bsoncxx::string::to_string(jsonObject[key].get_string().value);
+                        variables[key] = value;
+                    }
+                }
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const EnvironmentVariables &r);
+      private:
+
+        friend EnvironmentVariables tag_invoke(boost::json::value_to_tag<EnvironmentVariables>, boost::json::value const &v) {
+            EnvironmentVariables r;
+            r.variables = boost::json::value_to<std::map<std::string, std::string>>(v.at("variables"));
+            r.error = boost::json::value_to<Error>(v.at("error"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EnvironmentVariables const &obj) {
+            jv = {
+                    {"variables", boost::json::value_from(obj.error)},
+                    {"error", boost::json::value_from(obj.error)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

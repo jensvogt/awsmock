@@ -20,6 +20,10 @@ namespace AwsMock::Service {
         // Create environment
         _region = configuration.GetValue<std::string>("awsmock.region");
 
+        // Initialize shared memory
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _lambdaCounterMap = _segment.find<Database::LambdaCounterMapType>(Database::LAMBDA_COUNTER_MAP_NAME).first;
+
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
 
@@ -155,9 +159,24 @@ namespace AwsMock::Service {
     void LambdaServer::UpdateCounter() const {
         log_trace << "Lambda monitoring starting";
 
-        const long lambdas = _lambdaDatabase.LambdaCount();
-        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas));
+        // Get the lambda list
+        const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
+        if (lambdas.empty()) {
+            return;
+        }
+        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas.size()));
 
+        for (const auto &lambda: lambdas) {
+            double averageRuntime = 0.0;
+            if ((*_lambdaCounterMap)[lambda.arn].invocations > 0) {
+                averageRuntime = (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
+            }
+            _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function, (*_lambdaCounterMap)[lambda.arn].invocations);
+            _metricService.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
+            _metricService.SetGauge(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function, averageRuntime);
+            (*_lambdaCounterMap)[lambda.arn].invocations = 0;
+            (*_lambdaCounterMap)[lambda.arn].averageRuntime = 0.0;
+        }
         log_trace << "Lambda monitoring finished";
     }
 

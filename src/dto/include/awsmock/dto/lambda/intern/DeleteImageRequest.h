@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -18,45 +18,31 @@ namespace AwsMock::Dto::Lambda {
      * @brief Delete function docker image.
      *
      * @par
-     * FIrst stops all container and remves containers from docker. If all containers are stopped, the image is removed from the
+     * First stops all containers and remove containers from docker. If all containers are stopped, the image is removed from the
      * docker daemon.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteImageRequest {
+    struct DeleteImageRequest final : Common::BaseCounter<DeleteImageRequest> {
 
         /**
          * Function ARN
          */
         std::string functionArn;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend DeleteImageRequest tag_invoke(boost::json::value_to_tag<DeleteImageRequest>, boost::json::value const &v) {
+            DeleteImageRequest r;
+            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteImageRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteImageRequest const &obj) {
+            jv = {
+                    {"FunctionArn", obj.functionArn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -8,6 +8,10 @@ namespace AwsMock::Service {
 
     void LambdaExecutor::operator()(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, const int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle) const {
 
+        // Initialize shared memory
+        auto _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        Database::LambdaCounterMapType *_lambdaCounterMap = _segment.find<Database::LambdaCounterMapType>(Database::LAMBDA_COUNTER_MAP_NAME).first;
+
         Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", functionName);
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", functionName);
         log_debug << "Sending lambda invocation request, function: " << functionName << " endpoint: " << host << ":" << port;
@@ -17,15 +21,20 @@ namespace AwsMock::Service {
         Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceRunning);
         Database::LambdaDatabase::instance().SetLastInvocation(lambda.oid, system_clock::now());
         const system_clock::time_point start = system_clock::now();
+        (*_lambdaCounterMap)[lambda.arn].invocations++;
 
         // Send request to lambda docker container
         Database::Entity::Lambda::LambdaResult result;
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload);
+
+        // Calculate runtime
+        long runtime = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
+        Database::LambdaDatabase::instance().SetAverageRuntime(lambda.oid, runtime);
+
         if (response.statusCode != http::status::ok) {
 
             log_error << "HTTP error, httpStatus: " << response.statusCode << ", responseBody: " << response.body << ", requestBody: " << payload;
             Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceFailed);
-            Database::LambdaDatabase::instance().SetAverageRuntime(lambda.oid, std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count());
 
             result.httpStatusCode = Core::HttpUtils::StatusCodeToString(response.statusCode);
             result.lambdaStatus = Database::Entity::Lambda::InstanceFailed;
@@ -34,7 +43,6 @@ namespace AwsMock::Service {
 
             // Reset status
             Database::LambdaDatabase::instance().SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
-            Database::LambdaDatabase::instance().SetAverageRuntime(lambda.oid, std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count());
             log_debug << "Lambda invocation finished, function: " << functionName << " httpStatus: " << response.statusCode;
 
             if (Core::StringUtils::Contains(response.body, "success") && !receiptHandle.empty()) {
@@ -52,6 +60,9 @@ namespace AwsMock::Service {
         result.lambdaArn = lambda.arn;
         result.runtime = lambda.runtime;
         Database::LambdaDatabase::instance().CreateLambdaResult(result);
+
+        (*_lambdaCounterMap)[lambda.arn].invocations++;
+        (*_lambdaCounterMap)[lambda.arn].averageRuntime += runtime;
 
         log_debug << "Lambda invocation finished, lambda: " << functionName << " output: " << response.body;
         log_info << "Lambda invocation finished, lambda: " << functionName;

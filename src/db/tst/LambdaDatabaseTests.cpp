@@ -51,7 +51,7 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(LambdaCreateTest, LambdaDatabaseTest) {
 
         // arrange
-        const Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
 
         // act
         const Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
