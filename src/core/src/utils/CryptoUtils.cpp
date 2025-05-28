@@ -279,7 +279,6 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
 
         auto *key_data = key;
-
         if (const int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256EncryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
             log_error << "Couldn't initialize AES256 cipher";
             return {};

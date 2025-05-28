@@ -21,7 +21,7 @@
 
 namespace AwsMock::Service {
 
-    struct KMSServiceTest : public TestBase {
+    struct KMSServiceTest : TestBase {
 
         KMSServiceTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
@@ -44,7 +44,7 @@ namespace AwsMock::Service {
         std::string _region;
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-        KMSService _kmsService;
+        KMSService _kmsService = KMSService();
     };
 
     BOOST_FIXTURE_TEST_CASE(CreateSymmetricKeyTest, KMSServiceTest) {
