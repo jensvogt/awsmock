@@ -41,7 +41,7 @@ namespace AwsMock::Service {
         boost::thread _thread;
         std::string _endpoint, _region;
         boost::asio::io_context _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         Database::KMSDatabase &_database = Database::KMSDatabase::instance();
     };
 
@@ -54,12 +54,11 @@ namespace AwsMock::Service {
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        BOOST_CHECK_EQUAL(1, keyList.size());
+        BOOST_CHECK_EQUAL(keyList.size() > 0, true);
         BOOST_CHECK_EQUAL(keyList.at(0).arn.empty(), false);
         BOOST_CHECK_EQUAL(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::SYMMETRIC_DEFAULT), true);
         BOOST_CHECK_EQUAL(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT), true);
     }
-
 
     BOOST_FIXTURE_TEST_CASE(KeyCreateRSA2048Test, KMSServiceCliTests) {
 

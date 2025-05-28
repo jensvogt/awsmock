@@ -34,6 +34,7 @@ AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::ins
 #include "KMSServiceCliTests.cpp"
 #include "KMSServiceJavaTests.cpp"
 #include "KMSServiceTests.cpp"
+#include "SecretsManagerServiceTests.cpp"
 
 /**
  * Initialize database

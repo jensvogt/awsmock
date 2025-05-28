@@ -46,7 +46,9 @@ namespace AwsMock::Service {
          * @return current endpoint
          */
         std::string GetEndpoint() { return _endpoint; }
-
+        void InitializeDatabase();
+        void InitializeShm();
+        bool InitUnitTest();
       protected:
 
         /**

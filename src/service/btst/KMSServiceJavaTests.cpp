@@ -47,7 +47,7 @@ namespace AwsMock::Service {
 
         std::string _kmsBaseUrl, _region;
         boost::asio::io_context _ios{10};
-        Core::Configuration &_configuration = Core::Configuration::instance();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
     };
 
