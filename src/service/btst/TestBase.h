@@ -49,6 +49,7 @@ namespace AwsMock::Service {
         void InitializeDatabase();
         void InitializeShm();
         bool InitUnitTest();
+
       protected:
 
         /**
