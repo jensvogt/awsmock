@@ -5,9 +5,11 @@
 #include "awsmock/service/sns/SNSServer.h"
 
 namespace AwsMock::Service {
+
     SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
-        // HTTP manager configuration
-        Core::Configuration &configuration = Core::Configuration::instance();
+
+        // Configuration
+        const Core::Configuration &configuration = Core::Configuration::instance();
         _deletePeriod = configuration.GetValue<int>("awsmock.modules.sns.delete.period");
         _counterPeriod = configuration.GetValue<int>("awsmock.modules.sns.counter.period");
         _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.sns.monitoring.period");

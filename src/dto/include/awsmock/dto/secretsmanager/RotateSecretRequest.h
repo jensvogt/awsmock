@@ -37,7 +37,7 @@ namespace AwsMock::Dto::SecretsManager {
     struct RotateSecretRequest final : Common::BaseCounter<RotateSecretRequest> {
 
         /**
-         * Secret ID
+         * Secret ID: ARN or name
          */
         std::string secretId;
 
@@ -69,7 +69,9 @@ namespace AwsMock::Dto::SecretsManager {
             r.clientRequestToken = Core::Json::GetStringValue(v, "ClientRequestToken");
             r.rotationLambdaARN = Core::Json::GetStringValue(v, "RotationLambdaARN");
             r.rotateImmediately = Core::Json::GetBoolValue(v, "RotateImmediately");
-            r.rotationRules = boost::json::value_to<RotationRules>(v.at("RotationRules"));
+            if (Core::Json::AttributeExists(v, "RotationRules")) {
+                r.rotationRules = boost::json::value_to<RotationRules>(v.at("RotationRules"));
+            }
             return r;
         }
 

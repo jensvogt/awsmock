@@ -263,10 +263,10 @@ namespace AwsMock::Core {
         /**
          * @brief Base64 encoding.
          *
-         * @param inputString input string
+         * @param decodedString input string
          * @return BASE64 encoded string.
          */
-        static std::string Base64Encode(const std::string &inputString);
+        static std::string Base64Encode(const std::string &decodedString);
 
         /**
          * @brief Base64 decoding.
@@ -332,14 +332,14 @@ namespace AwsMock::Core {
          *
          * @param pRSA pointer to RSA key pair
          */
-        static std::string GetRsaPublicKey(EVP_PKEY *pRSA);
+        static std::string GetRsaPublicKey(const EVP_PKEY *pRSA);
 
         /**
          * @brief Converts the private key to a string.
          *
          * @param pRSA pointer to RSA key pair
          */
-        static std::string GetRsaPrivateKey(EVP_PKEY *pRSA);
+        static std::string GetRsaPrivateKey(const EVP_PKEY *pRSA);
 
         /**
          * @brief Read an EVP_PKEY from a string.

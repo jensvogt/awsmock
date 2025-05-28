@@ -10,10 +10,13 @@
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
+#include <awsmock/dto/lambda/intern/GetLambdaResultCounterResponse.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
 #include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/entity/lambda/LambdaResult.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -36,19 +39,19 @@ namespace AwsMock::Dto::Lambda {
          * @return CreateFunctionResponse
          * @see CreateFunctionResponse
          */
-        static Dto::Lambda::CreateFunctionResponse map(const Dto::Lambda::CreateFunctionRequest &request, const Database::Entity::Lambda::Lambda &lambdaEntity);
+        static CreateFunctionResponse map(const CreateFunctionRequest &request, const Database::Entity::Lambda::Lambda &lambdaEntity);
 
         /**
          * @brief Maps a lambda entity to a create function request.
          *
          * Some values will be pulled over from the request. This is needed, as the server starts all lambdas during startup and needs to convert the lambda entities
-         * stored in the database to an CreateLambdaRequest, which ís send to the lambda service.
+         * stored in the database to a CreateLambdaRequest, which ís sent to the lambda service.
          *
          * @param lambdaEntity lambda entity
          * @return CreateFunctionRequest
          * @see CreateFunctionRequest
          */
-        static Dto::Lambda::CreateFunctionRequest map(const Database::Entity::Lambda::Lambda &lambdaEntity);
+        static CreateFunctionRequest map(const Database::Entity::Lambda::Lambda &lambdaEntity);
 
         /**
          * @brief Maps a lambda create request to a lambda entity
@@ -57,7 +60,7 @@ namespace AwsMock::Dto::Lambda {
          * @return lambda entity
          * @see CreateFunctionRequest
          */
-        static Database::Entity::Lambda::Lambda map(const Dto::Lambda::CreateFunctionRequest &request);
+        static Database::Entity::Lambda::Lambda map(const CreateFunctionRequest &request);
 
         /**
          * @brief Maps a lambda create eventsource mappings request request to a lambda event source mapping
@@ -67,7 +70,7 @@ namespace AwsMock::Dto::Lambda {
          * @see CreateEventSourceMappingsRequest
          * @see EventSourceMapping
          */
-        static Database::Entity::Lambda::EventSourceMapping map(const Dto::Lambda::CreateEventSourceMappingsRequest &request);
+        static Database::Entity::Lambda::EventSourceMapping map(const CreateEventSourceMappingsRequest &request);
 
         /**
          * @brief Maps a list of lambda event source mappings to a lambda event source mapping response.
@@ -78,7 +81,7 @@ namespace AwsMock::Dto::Lambda {
          * @see ListEventSourceMappingsRequest
          * @see EventSourceMapping
          */
-        static Dto::Lambda::ListEventSourceMappingsResponse map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings);
+        static ListEventSourceMappingsResponse map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings);
 
         /**
          * @brief Maps a list of lambda entities to list lambda counters response
@@ -89,7 +92,31 @@ namespace AwsMock::Dto::Lambda {
          * @see ListFunctionCountersRequest
          * @see ListFunctionCountersResponse
          */
-        static Dto::Lambda::ListFunctionCountersResponse map(const Dto::Lambda::ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
+        static ListFunctionCountersResponse map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
+
+        /**
+         * @brief Maps a list of lambda result entities to a list lambda result counters response
+         *
+         * @param lambdaResultEntities lambda result entities
+         * @return lambda result counters response
+         */
+        static ListLambdaResultCountersResponse map(const std::vector<Database::Entity::Lambda::LambdaResult> &lambdaResultEntities);
+
+        /**
+         * @brief Maps a lambda result entities to a lambda result counters response
+         *
+         * @param resultEntity lambda result entities
+         * @return lambda result counters response
+         */
+        static GetLambdaResultCounterResponse map(const Database::Entity::Lambda::LambdaResult &resultEntity);
+
+        /**
+         * @brief Maps a lambda result entities to a lambda result counters response
+         *
+         * @param resultEntity lambda result entities
+         * @return lambda result counters response
+         */
+        static LambdaResultCounter mapCounter(const Database::Entity::Lambda::LambdaResult &resultEntity);
     };
 
 }// namespace AwsMock::Dto::Lambda

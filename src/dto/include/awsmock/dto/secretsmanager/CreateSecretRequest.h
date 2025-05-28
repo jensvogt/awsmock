@@ -57,7 +57,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Force overwrite flag
          */
-        bool forceOverwriteReplicaSecret;
+        bool forceOverwriteReplicaSecret{};
 
         /**
          * KMS key ID
@@ -79,7 +79,9 @@ namespace AwsMock::Dto::SecretsManager {
             r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
             r.forceOverwriteReplicaSecret = Core::Json::GetBoolValue(v, "ForceOverwriteReplicaSecret");
             r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            }
             return r;
         }
 

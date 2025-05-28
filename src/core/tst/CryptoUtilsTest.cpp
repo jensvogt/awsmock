@@ -180,6 +180,19 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(testText, decrypted);
     }
 
+    BOOST_AUTO_TEST_CASE(Base64FileDecodeTest) {
+
+        // arrange
+        const std::string tempFile = FileUtils::CreateTempFile("b64", 300);
+
+        // act
+        Crypto::Base64Decode(BASE64_TEST_STRING, tempFile);
+
+        // assert
+        const long size = FileUtils::FileSize(tempFile);
+        BOOST_CHECK_EQUAL(43, size);
+    }
+
     BOOST_AUTO_TEST_CASE(Aes256KeyText) {
 
         // arrange

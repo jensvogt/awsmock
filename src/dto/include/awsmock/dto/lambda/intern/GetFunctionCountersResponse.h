@@ -10,8 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -129,17 +129,12 @@ namespace AwsMock::Dto::Lambda {
      *}
      * @endcode
      */
-    struct GetFunctionCountersResponse {
+    struct GetFunctionCountersResponse final : Common::BaseCounter<GetFunctionCountersResponse> {
 
         /**
          * OID
          */
         std::string id;
-
-        /**
-         * Region
-         */
-        std::string region;
 
         /**
          * AWS ARN
@@ -150,11 +145,6 @@ namespace AwsMock::Dto::Lambda {
          * Function name
          */
         std::string functionName;
-
-        /**
-         * User
-         */
-        std::string user;
 
         /**
          * Role
@@ -199,22 +189,22 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Size
          */
-        long size;
+        long size{};
 
         /**
          * Concurrency
          */
-        long concurrency;
+        long concurrency{};
 
         /**
          * Invocation
          */
-        long invocations;
+        long invocations{};
 
         /**
          * Invocation
          */
-        long averageRuntime;
+        long averageRuntime{};
 
         /**
          * Environment
@@ -246,26 +236,59 @@ namespace AwsMock::Dto::Lambda {
          */
         system_clock::time_point modified = system_clock::now();
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend GetFunctionCountersResponse tag_invoke(boost::json::value_to_tag<GetFunctionCountersResponse>, boost::json::value const &v) {
+            GetFunctionCountersResponse r;
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.functionName = Core::Json::GetStringValue(v, "functionName");
+            r.role = Core::Json::GetStringValue(v, "role");
+            r.handler = Core::Json::GetStringValue(v, "handler");
+            r.runtime = Core::Json::GetStringValue(v, "runtime");
+            r.version = Core::Json::GetStringValue(v, "version");
+            r.zipFile = Core::Json::GetStringValue(v, "zipFile");
+            r.s3Bucket = Core::Json::GetStringValue(v, "s3Bucket");
+            r.s3Key = Core::Json::GetStringValue(v, "s3Key");
+            r.s3ObjectVersion = Core::Json::GetStringValue(v, "s3ObjectVersion");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.concurrency = Core::Json::GetLongValue(v, "concurrency");
+            r.invocations = Core::Json::GetLongValue(v, "invocations");
+            r.averageRuntime = Core::Json::GetLongValue(v, "averageRuntime");
+            r.environment = boost::json::value_to<std::map<std::string, std::string>>(v.at("environment"));
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            r.lastInvocation = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastInvocation"));
+            r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetFunctionCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionCountersResponse const &obj) {
+            jv = {
+                    {"id", obj.id},
+                    {"functionArn", obj.functionArn},
+                    {"functionName", obj.functionName},
+                    {"role", obj.role},
+                    {"handler", obj.handler},
+                    {"runtime", obj.runtime},
+                    {"version", obj.version},
+                    {"zipFile", obj.zipFile},
+                    {"s3Bucket", obj.s3Bucket},
+                    {"s3Key", obj.s3Key},
+                    {"s3ObjectVersion", obj.s3ObjectVersion},
+                    {"size", obj.size},
+                    {"concurrency", obj.concurrency},
+                    {"invocations", obj.invocations},
+                    {"averageRuntime", obj.averageRuntime},
+                    {"environment", boost::json::value_from(obj.environment)},
+                    {"tags", boost::json::value_from(obj.tags)},
+                    {"lastInvocation", Core::DateTimeUtils::ToISO8601(obj.lastInvocation)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -14,6 +14,7 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/lambda/Lambda.h>
+#include <awsmock/entity/lambda/LambdaResult.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -174,6 +175,73 @@ namespace AwsMock::Database {
         void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
 
         /**
+         * @brief Creates a new lambda result
+         *
+         * @param lambdaResult lambda result record
+         * @return created lambdaResult entity
+         */
+        Entity::Lambda::LambdaResult CreateLambdaResult(const Entity::Lambda::LambdaResult &lambdaResult);
+
+        /**
+         * @brief Returns the existence of a lambda result
+         *
+         * @param oid lambda result record OID
+         * @return true if the result with the given OID exists
+         */
+        bool LambdaResultExists(const std::string &oid);
+
+        /**
+         * @brief Returns a lambda result by OID
+         *
+         * @param oid lambda result OID
+         * @return lambdaResult entity
+         */
+        Entity::Lambda::LambdaResult GetLambdaResultById(const std::string &oid);
+
+        /**
+         * @brief Returns a list of lambda function results.
+         *
+         * @param lambdaArn lambda function ARN
+         * @param prefix name prefix
+         * @param maxResults maximal number of results
+         * @param skip number of records to skip
+         * @param sortColumns sorting columns
+         * @return list of lambda function result counters
+         */
+        std::vector<Entity::Lambda::LambdaResult> ListLambdaResultCounters(const std::string &lambdaArn, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {});
+
+        /**
+         * @brief Removes old lambda logs
+         *
+         * @param cutOff cut off time point
+         * @return numberof logs removed
+         */
+        long RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff);
+
+        /**
+         * @brief Deletes a lambda result counter
+         *
+         * @param oid lambda function oid
+         * @return number of results deleted
+         */
+        [[nodiscard]] long DeleteResultsCounter(const std::string &oid);
+
+        /**
+         * @brief Deletes all lambda result counter for a lambda function
+         *
+         * @param lambdaArn lambda function ARN
+         * @return number of results deleted
+         */
+        long DeleteResultsCounters(const std::string &lambdaArn);
+
+        /**
+         * @brief Deletes all lambda result counters
+         *
+         * @return number of results deleted
+         */
+        long DeleteAllResultsCounters();
+
+        /**
          * @brief Deletes an existing lambda function
          *
          * @param functionName lambda function name
@@ -197,9 +265,19 @@ namespace AwsMock::Database {
         std::map<std::string, Entity::Lambda::Lambda> _lambdas{};
 
         /**
+         * Lambda result map
+         */
+        std::map<std::string, Entity::Lambda::LambdaResult> _lambdaResults{};
+
+        /**
          * Lambda mutex
          */
         static boost::mutex _lambdaMutex;
+
+        /**
+         * Lambda result mutex
+         */
+        static boost::mutex _lambdaResultMutex;
     };
 
 }// namespace AwsMock::Database

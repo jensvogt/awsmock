@@ -2,6 +2,10 @@
 // Created by vogje01 on 5/10/24.
 //
 
+#include "awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h"
+#include "awsmock/entity/lambda/LambdaResult.h"
+
+
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -110,8 +114,37 @@ namespace AwsMock::Dto::Lambda {
             counter.state = LambdaStateToString(lambdaEntity.state);
             counter.version = lambdaEntity.dockerTag;
             counter.averageRuntime = lambdaEntity.averageRuntime;
+            counter.instances = static_cast<long>(lambdaEntity.instances.size());
             response.functionCounters.emplace_back(counter);
         }
+        return response;
+    }
+
+    LambdaResultCounter Mapper::mapCounter(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        LambdaResultCounter counter;
+        counter.oid = resultEntity.oid;
+        counter.lambdaArn = resultEntity.lambdaArn;
+        counter.lambdaName = resultEntity.lambdaName;
+        counter.runtime = resultEntity.runtime;
+        counter.requestBody = resultEntity.requestBody;
+        counter.responseBody = resultEntity.responseBody;
+        counter.lambdaStatus = resultEntity.lambdaStatus;
+        counter.httpStatusCode = resultEntity.httpStatusCode;
+        counter.timestamp = resultEntity.timestamp;
+        return counter;
+    }
+
+    ListLambdaResultCountersResponse Mapper::map(const std::vector<Database::Entity::Lambda::LambdaResult> &lambdaResultEntities) {
+        ListLambdaResultCountersResponse response;
+        for (auto &lambdaResultEntity: lambdaResultEntities) {
+            response.lambdaResultCounters.emplace_back(mapCounter(lambdaResultEntity));
+        }
+        return response;
+    }
+
+    GetLambdaResultCounterResponse Mapper::map(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        GetLambdaResultCounterResponse response;
+        response.lambdaResultCounter = mapCounter(resultEntity);
         return response;
     }
 

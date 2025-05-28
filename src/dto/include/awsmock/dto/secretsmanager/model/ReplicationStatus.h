@@ -45,7 +45,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Last access date
          */
-        double lastAccessedDate{};
+        long lastAccessedDate{};
 
         /**
          * Status
@@ -109,9 +109,9 @@ namespace AwsMock::Dto::SecretsManager {
             ReplicationStatus r;
             r.arn = Core::Json::GetStringValue(v, "ARN");
             r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
-            r.lastAccessedDate = Core::Json::GetDoubleValue(v, "LastAccessedDate");
-            r.status = Core::Json::GetDoubleValue(v, "Status");
-            r.statusMessage = Core::Json::GetDoubleValue(v, "StatusMessage");
+            r.lastAccessedDate = Core::Json::GetLongValue(v, "LastAccessedDate");
+            r.status = Core::Json::GetStringValue(v, "Status");
+            r.statusMessage = Core::Json::GetStringValue(v, "StatusMessage");
             return r;
         }
 

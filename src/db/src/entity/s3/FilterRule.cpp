@@ -8,7 +8,7 @@ namespace AwsMock::Database::Entity::S3 {
 
     view_or_value<view, value> FilterRule::ToDocument() const {
 
-        auto filterRuleDoc = bsoncxx::builder::basic::document{};
+        auto filterRuleDoc = document{};
         filterRuleDoc.append(kvp("name", name));
         filterRuleDoc.append(kvp("value", value));
 

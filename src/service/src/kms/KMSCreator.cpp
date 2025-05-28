@@ -110,15 +110,12 @@ namespace AwsMock::Service {
         log_debug << "HMAC KMS key created, keyId: " << key.keyId;
     }
 
-    void KMSCreator::GenerateRsaKeyPair(Database::Entity::KMS::Key &key, int length) {
+    void KMSCreator::GenerateRsaKeyPair(Database::Entity::KMS::Key &key, const int length) {
         log_debug << "Start creating RSA KMS key pair, keyId: " << key.keyId << " length: " << length;
 
         EVP_PKEY *keyMaterial = Core::Crypto::GenerateRsaKeys(length);
-        const std::string publicKey = Core::Crypto::GetRsaPublicKey(keyMaterial);
-        const std::string privateKey = Core::Crypto::GetRsaPrivateKey(keyMaterial);
-
-        key.rsaPublicKey = publicKey;
-        key.rsaPrivateKey = privateKey;
+        key.rsaPublicKey = Core::Crypto::GetRsaPublicKey(keyMaterial);
+        key.rsaPrivateKey = Core::Crypto::GetRsaPrivateKey(keyMaterial);
 
         log_debug << "AES256 KMS key created, keyId: " << key.keyId;
     }

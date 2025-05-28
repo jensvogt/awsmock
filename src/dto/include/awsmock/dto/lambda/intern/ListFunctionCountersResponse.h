@@ -9,43 +9,38 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListFunctionCountersResponse {
+    struct ListFunctionCountersResponse final : Common::BaseCounter<ListFunctionCountersResponse> {
 
         /**
          * List of buckets
          */
-        FunctionCounterList functionCounters;
+        std::vector<FunctionCounter> functionCounters;
 
         /**
          * Total number of buckets
          */
         long total = 0;
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListFunctionCountersResponse tag_invoke(boost::json::value_to_tag<ListFunctionCountersResponse>, boost::json::value const &v) {
+            ListFunctionCountersResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.functionCounters = boost::json::value_to<std::vector<FunctionCounter>>(v.at("functionCounters"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListFunctionCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListFunctionCountersResponse const &obj) {
+            jv = {
+                    {"total", obj.total},
+                    {"functionCounters", boost::json::value_from(obj.functionCounters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -84,6 +84,14 @@ namespace AwsMock::Service {
         void RemoveExpiredLambdas() const;
 
         /**
+         * @brief Remove expired lambda logs
+         *
+         * @par
+         * The log retention period is defined in the configuration file.
+         */
+        void RemoveExpiredLambdaLogs() const;
+
+        /**
          * Update counters
          */
         void UpdateCounter() const;
@@ -119,19 +127,29 @@ namespace AwsMock::Service {
         std::string _region;
 
         /**
-         * Monitoring period
-         */
-        int _monitoringPeriod;
-
-        /**
-         * Counter period
+         * Counter period in seconds
          */
         int _counterPeriod;
 
         /**
-         * Remove period
+         * Remove period in seconds
          */
-        int _removePeriod;
+        int _lifetime;
+
+        /**
+         * Log retention period in days
+         */
+        int _logRetentionPeriod;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::LambdaCounterMapType *_lambdaCounterMap{};
     };
 
 }// namespace AwsMock::Service

@@ -8,13 +8,14 @@ namespace AwsMock::Dto::Common {
 
     void SecretsManagerClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
-        Dto::Common::UserAgent userAgent;
+        UserAgent userAgent;
         userAgent.FromRequest(request);
 
         // Basic values
         this->region = region;
         this->user = user;
-        this->method = method;
+        this->method = request.method();
+        this->headers = Core::HttpUtils::GetHeaders(request);
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
         this->payload = Core::HttpUtils::GetBodyAsString(request);

@@ -1344,7 +1344,7 @@ static int process_opendir(sftp_client_message client_msg) {
     ssh_string handle_s = nullptr;
     struct sftp_handle *h = nullptr;
 
-    log_info << "Processing opendir: " << dir_name;
+    log_debug << "Processing opendir: " << dir_name;
 
     dir = opendir(dir_name);
     if (dir == nullptr) {
@@ -1467,7 +1467,7 @@ static int process_readdir(const sftp_client_message client_msg) {
     DIR *dir = nullptr;
     const char *handle_name = nullptr;
 
-    log_info << "Processing readdir: " << reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle);
+    log_debug << "Processing readdir: " << reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle);
 
     awsmock_ssh_log_hexdump("Processing readdir: handle", reinterpret_cast<const unsigned char *>(ssh_string_get_char(handle)), ssh_string_len(handle));
 
@@ -1986,7 +1986,7 @@ int sftp_reply_version(sftp_client_message client_msg) {
     const sftp_session sftp = client_msg->sftp;
     const ssh_session session = sftp->session;
 
-    log_info << "Sending version packet";
+    log_debug << "Sending version packet";
 
     const int version = sftp->client_version;
     ssh_buffer reply = ssh_buffer_new();

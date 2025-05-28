@@ -33,6 +33,27 @@ namespace AwsMock::Database {
         return _memoryDb.SecretExists(region, name);
     }
 
+    bool SecretsManagerDatabase::SecretExistsByArn(const std::string &arn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
+
+                const int64_t count = _secretCollection.count_documents(make_document(kvp("arn", arn)));
+                log_trace << "Secret exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.SecretExistsByArn(arn);
+    }
+
     bool SecretsManagerDatabase::SecretExists(const Entity::SecretsManager::Secret &secret) const {
         return SecretExists(secret.region, secret.name);
     }
@@ -117,7 +138,26 @@ namespace AwsMock::Database {
         return _memoryDb.GetSecretBySecretId(secretId);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(const Entity::SecretsManager::Secret &secret) const {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::GetSecretByArn(const std::string &arn) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_collectionName];
+            const auto mResult = _bucketCollection.find_one(make_document(kvp("arn", arn)));
+            if (mResult->empty()) {
+                return {};
+            }
+
+            Entity::SecretsManager::Secret result;
+            result.FromDocument(mResult->view());
+            log_trace << "Got secret: " << result.ToString();
+            return result;
+        }
+        return _memoryDb.GetSecretByArn(arn);
+    }
+
+    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateSecret(Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
@@ -130,10 +170,10 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto insert_one_result = _secretCollection.insert_one(secret.ToDocument());
                 session.commit_transaction();
-                log_trace << "Secret created, oid: "
-                          << insert_one_result->inserted_id().get_oid().value.to_string();
+                log_trace << "Secret created, oid: " << insert_one_result->inserted_id().get_oid().value.to_string();
 
-                return GetSecretById(insert_one_result->inserted_id().get_oid().value);
+                secret.oid = insert_one_result->inserted_id().get_oid().value.to_string();
+                return secret;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -144,7 +184,7 @@ namespace AwsMock::Database {
         return _memoryDb.CreateSecret(secret);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(const Entity::SecretsManager::Secret &secret) const {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::UpdateSecret(Entity::SecretsManager::Secret &secret) const {
 
         if (HasDatabase()) {
 
@@ -152,14 +192,23 @@ namespace AwsMock::Database {
             mongocxx::collection _secretCollection = (*client)[_databaseName][_collectionName];
             auto session = client->start_session();
 
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+            opts.upsert(true);
+
             try {
 
                 session.start_transaction();
-                auto result = _secretCollection.find_one_and_update(make_document(kvp("secretId", secret.secretId)), secret.ToDocument());
+                const auto mResult = _secretCollection.find_one_and_update(make_document(kvp("secretId", secret.secretId)), secret.ToDocument(), opts);
                 session.commit_transaction();
-                log_trace << "Bucket updated: " << secret.ToString();
+                log_trace << "Secret updated: " << secret.ToString();
 
-                return GetSecretBySecretId(secret.secretId);
+                if (!mResult->empty()) {
+                    log_trace << "Secret user updated: " << secret.ToString();
+                    secret.FromDocument(mResult->view());
+                    return secret;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -170,7 +219,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateSecret(secret);
     }
 
-    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(const Entity::SecretsManager::Secret &secret) const {
+    Entity::SecretsManager::Secret SecretsManagerDatabase::CreateOrUpdateSecret(Entity::SecretsManager::Secret &secret) const {
 
         if (SecretExists(secret)) {
 
