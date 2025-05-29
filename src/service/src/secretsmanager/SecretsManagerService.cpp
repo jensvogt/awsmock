@@ -43,38 +43,28 @@ namespace AwsMock::Service {
 
             // Update database
             Database::Entity::SecretsManager::SecretVersion version;
-            version.versionId = Core::StringUtils::CreateRandomUuid();
+            std::string versionId = Core::StringUtils::CreateRandomUuid();
             version.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
 
-            secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
-            secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
-            secret.createdDate = Core::DateTimeUtils::UnixTimestampNow();
-            secret.description = request.description;
-            secret.versionIdsToStages.versions[version.versionId] = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)};
-
             if (request.kmsKeyId.empty()) {
-                Dto::KMS::CreateKeyRequest kmsRequest;
-                kmsRequest.description = "KMS key for secret " + secret.name;
-                kmsRequest.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
-                kmsRequest.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
-                Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
-                _kmsService.WaitForAesKey(kmsResponse.key.keyId, 5);
-                secret.kmsKeyId = kmsResponse.key.keyId;
+                CreateKmsKey(secret);
             } else {
                 secret.kmsKeyId = request.kmsKeyId;
             }
 
             // Either string or binary data
             if (!request.secretString.empty()) {
-                Dto::KMS::EncryptRequest encryptRequest;
-                encryptRequest.keyId = secret.kmsKeyId;
-                encryptRequest.plainText = Core::Crypto::Base64Encode(request.secretString);
-                Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
-                version.secretString = encryptResponse.ciphertext;
+                EncryptSecret(version, secret.kmsKeyId, request.secretString);
             } else {
                 version.secretBinary = request.secretBinary;
             }
-            secret.versions.emplace_back(version);
+
+            secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
+            secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
+            secret.createdDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.description = request.description;
+            secret.versionIdsToStages.versions[versionId] = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)};
+            secret.versions[versionId] = version;
             secret = _secretsManagerDatabase.CreateSecret(secret);
 
             // Create the response
@@ -82,7 +72,7 @@ namespace AwsMock::Service {
             response.region = secret.region;
             response.name = secret.name;
             response.arn = secret.arn;
-            response.versionId = version.versionId;
+            response.versionId = versionId;
 
             return response;
 
@@ -127,8 +117,6 @@ namespace AwsMock::Service {
             log_error << "Secret describe secret failed, message: " + exc.message();
             throw Core::ServiceException(exc.message());
         }
-
-        return {};
     }
 
     Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const {
@@ -155,17 +143,17 @@ namespace AwsMock::Service {
             }
             Database::Entity::SecretsManager::SecretVersion version;
             if (!request.versionId.empty()) {
-                version = secret.GetVersion(request.versionId);
+                version = secret.versions[request.versionId];
             } else {
-                version = secret.GetCurrent();
+                version = secret.versions[secret.GetCurrentVersionId()];
             }
 
             // Convert to DTO
             response.name = secret.name;
             response.arn = secret.arn;
-            response.versionId = version.versionId;
+            response.versionId = request.versionId;
             response.createdDate = secret.createdDate;
-            response.versionStages = secret.versionIdsToStages.versions[version.versionId];
+            response.versionStages = secret.versionIdsToStages.versions[request.versionId];
 
             if (!secret.kmsKeyId.empty()) {
                 Dto::KMS::DecryptRequest decryptRequest;
@@ -254,17 +242,16 @@ namespace AwsMock::Service {
 
             // Update database
             Database::Entity::SecretsManager::SecretVersion version;
-            version.versionId = Core::StringUtils::CreateRandomUuid();
+            std::string versionId = Core::StringUtils::CreateRandomUuid();
             version.secretString = request.secretString;
             version.secretBinary = request.secretBinary;
             version.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
 
             secret.kmsKeyId = request.kmsKeyId;
-            secret.versions.emplace_back(version);
+            secret.versions[versionId] = version;
             secret.description = request.description;
             secret.lastChangedDate = Core::DateTimeUtils::UnixTimestampNow();
-            secret.versions.emplace_back(version);
-            secret.ResetVersions(version.versionId);
+            secret.ResetVersions(versionId);
 
             secret = _secretsManagerDatabase.UpdateSecret(secret);
 
@@ -274,7 +261,7 @@ namespace AwsMock::Service {
             response.region = secret.region;
             response.name = secret.name;
             response.arn = secret.arn;
-            response.versionId = version.versionId;
+            response.versionId = versionId;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -302,6 +289,14 @@ namespace AwsMock::Service {
             secret.lastRotatedDate = Core::DateTimeUtils::UnixTimestampNow();
             secret.rotationLambdaARN = request.rotationLambdaARN;
             secret.rotationEnabled = true;
+
+            // Create a copy of the current
+            std::string versionId = secret.GetCurrentVersionId();
+            Database::Entity::SecretsManager::SecretVersion version = secret.versions[versionId];
+            version.stages.clear();
+            version.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPENDING));
+            secret.versions[request.clientRequestToken] = version;
+
             secret.versionIdsToStages.versions[request.clientRequestToken] = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPENDING)};
             secret = _secretsManagerDatabase.UpdateSecret(secret);
 
@@ -332,7 +327,7 @@ namespace AwsMock::Service {
             response.region = secret.region;
             response.arn = secret.arn;
             response.name = secret.name;
-            response.versionId = secret.GetCurrent().versionId;
+            response.versionId = secret.GetCurrentVersionId();
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -428,5 +423,23 @@ namespace AwsMock::Service {
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         _lambdaService.InvokeLambdaFunction(region, lambda.function, body, {}, false);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function;
+    }
+
+    void SecretsManagerService::CreateKmsKey(Database::Entity::SecretsManager::Secret &secret) const {
+        Dto::KMS::CreateKeyRequest kmsRequest;
+        kmsRequest.description = "KMS key for secret " + secret.name;
+        kmsRequest.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
+        kmsRequest.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
+        Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
+        _kmsService.WaitForAesKey(kmsResponse.key.keyId, 5);
+        secret.kmsKeyId = kmsResponse.key.keyId;
+    }
+
+    void SecretsManagerService::EncryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {
+        Dto::KMS::EncryptRequest encryptRequest;
+        encryptRequest.keyId = kmsKeyId;
+        encryptRequest.plainText = Core::Crypto::Base64Encode(secretString);
+        const Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
+        version.secretString = encryptResponse.ciphertext;
     }
 }// namespace AwsMock::Service

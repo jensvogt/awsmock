@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/lambda/intern/UpdateFunctionEnvironmentRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 
 namespace AwsMock::Dto::Lambda {
 

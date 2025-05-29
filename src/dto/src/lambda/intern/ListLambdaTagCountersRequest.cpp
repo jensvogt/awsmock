@@ -2,7 +2,7 @@
 // Created by vogje01 on 23/09/2023.
 //
 
-#include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaTagCountersRequest.h>
 
 namespace AwsMock::Dto::Lambda {
 

@@ -14,7 +14,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         }
 
         document secretVersionDoc;
-        secretVersionDoc.append(kvp("versionId", versionId));
         secretVersionDoc.append(kvp("secretString", secretString));
         secretVersionDoc.append(kvp("secretBinary", secretBinary));
         secretVersionDoc.append(kvp("stages", stagesArray.extract()));
@@ -25,7 +24,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
     void SecretVersion::FromDocument(const std::optional<view> &mResult) {
 
         try {
-            versionId = Core::Bson::BsonUtils::GetStringValue(mResult, "versionId");
             secretString = Core::Bson::BsonUtils::GetStringValue(mResult, "secretString");
             secretBinary = Core::Bson::BsonUtils::GetStringValue(mResult, "secretBinary");
 

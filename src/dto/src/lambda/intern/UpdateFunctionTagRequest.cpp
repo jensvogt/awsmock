@@ -2,7 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include <awsmock/dto/lambda/intern/UpdateFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
 
 namespace AwsMock::Dto::Lambda {
 

@@ -41,11 +41,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         std::string secretBinary;
 
         /**
-         * Version Id
-         */
-        std::string versionId;
-
-        /**
          * Version ID stages
          */
         std::vector<std::string> stages;

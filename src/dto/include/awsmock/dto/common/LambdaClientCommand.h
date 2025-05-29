@@ -53,6 +53,7 @@ namespace AwsMock::Dto::Common {
         GET_LAMBDA_RESULT_COUNTER,
         DELETE_LAMBDA_RESULT_COUNTER,
         DELETE_LAMBDA_RESULT_COUNTERS,
+        TAIL_FUNCTION,
         START_FUNCTION,
         STOP_FUNCTION,
         DELETE_IMAGE,
@@ -86,6 +87,7 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER, "delete-lambda-result-counter"},
             {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS, "delete-lambda-result-counters"},
             {LambdaCommandType::START_FUNCTION, "start-function"},
+            {LambdaCommandType::TAIL_FUNCTION, "tail-function"},
             {LambdaCommandType::STOP_FUNCTION, "stop-function"},
             {LambdaCommandType::DELETE_IMAGE, "delete-image"},
     };
