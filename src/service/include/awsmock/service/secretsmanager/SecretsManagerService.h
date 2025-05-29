@@ -183,6 +183,22 @@ namespace AwsMock::Service {
         void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) const;
 
         /**
+         * @brief Create a new KMS key for the secret
+         *
+         * @param secret to create KMS key for
+         */
+        void CreateKmsKey(Database::Entity::SecretsManager::Secret &secret) const;
+
+        /**
+         * @brief Encrypt the secret string using the given KMS key.
+         *
+         * @param version secret version
+         * @param kmsKeyId KMS key ID
+         * @param secretString secret string
+         */
+        void EncryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const;
+
+        /**
          * Account ID
          */
         std::string _accountId;

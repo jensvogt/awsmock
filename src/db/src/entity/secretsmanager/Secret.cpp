@@ -22,9 +22,9 @@ namespace AwsMock::Database::Entity::SecretsManager {
             versionIdStageDoc.append(kvp(key, versionStateArray));
         }
 
-        array versionsArray;
-        for (const auto &version: versions) {
-            versionsArray.append(version.ToDocument());
+        document versionsDoc;
+        for (const auto &[fst, snd]: versions) {
+            versionsDoc.append(kvp(fst, snd.ToDocument()));
         }
 
         document secretDoc;
@@ -33,7 +33,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         secretDoc.append(kvp("arn", arn));
         secretDoc.append(kvp("secretId", secretId));
         secretDoc.append(kvp("kmsKeyId", kmsKeyId));
-        secretDoc.append(kvp("versions", versionsArray.extract()));
+        secretDoc.append(kvp("versions", versionsDoc.extract()));
         secretDoc.append(kvp("description", description));
         secretDoc.append(kvp("owningService", owningService));
         secretDoc.append(kvp("primaryRegion", primaryRegion));
@@ -78,10 +78,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
             // Get versions
             if (mResult.value().find("versions") != mResult.value().end()) {
-                for (const view versionsView = mResult.value()["versions"].get_array().value; const auto &element: versionsView) {
+                for (const view versionsView = mResult.value()["versions"].get_document().value; const auto &element: versionsView) {
+                    std::string versionId = bsoncxx::string::to_string(element.key());
                     SecretVersion version;
                     version.FromDocument(element.get_document().value);
-                    versions.push_back(version);
+                    versions[versionId] = version;
                 }
             }
 

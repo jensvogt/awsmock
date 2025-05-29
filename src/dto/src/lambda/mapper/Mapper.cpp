@@ -2,7 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#include "awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h"
+#include "awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h"
 #include "awsmock/entity/lambda/LambdaResult.h"
 
 

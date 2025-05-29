@@ -10,10 +10,10 @@
 #include <awsmock/dto/lambda/CreateFunctionRequest.h>
 #include <awsmock/dto/lambda/CreateFunctionResponse.h>
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
-#include <awsmock/dto/lambda/intern/GetLambdaResultCounterResponse.h>
-#include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
-#include <awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h>
+#include <awsmock/dto/lambda/internal/GetLambdaResultCounterResponse.h>
+#include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
