@@ -177,9 +177,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
 
-                Dto::Lambda::GetFunctionCountersRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::GetFunctionCountersRequest lambdaRequest = Dto::Lambda::GetFunctionCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::GetFunctionCountersResponse lambdaResponse = _lambdaService.GetFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list";
 
@@ -188,9 +186,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_ENVIRONMENT_COUNTERS) {
 
-                Dto::Lambda::ListLambdaEnvironmentCountersRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::ListLambdaEnvironmentCountersRequest lambdaRequest = Dto::Lambda::ListLambdaEnvironmentCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaEnvironmentCountersResponse lambdaResponse = _lambdaService.ListLambdaEnvironmentCounters(lambdaRequest);
                 log_trace << "Lambda environment counters list, count: " << lambdaResponse.environmentCounters.size();
 
@@ -199,9 +195,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_ENVIRONMENT) {
 
-                Dto::Lambda::AddFunctionEnvironmentRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::AddFunctionEnvironmentRequest lambdaRequest = Dto::Lambda::AddFunctionEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.AddLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment added, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
@@ -336,6 +330,15 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteLambdaResultCountersRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCountersRequest::FromJson(clientCommand);
                 long count = _lambdaService.DeleteLambdaResultCounters(lambdaRequest);
                 log_trace << "Delete lambda result counters, count: " << count;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::TAIL_FUNCTION) {
+
+                Dto::Lambda::TailLambdaLogsRequest lambdaRequest = Dto::Lambda::TailLambdaLogsRequest::FromJson(clientCommand);
+                Dto::Lambda::TailLambdaLogsResponse lambdaResponse = _lambdaService.TailLambdaLogs(lambdaRequest);
+                log_trace << "Tail lambda logs, lambdaArn: " << lambdaRequest.lambdaArn;
 
                 return SendOkResponse(request);
             }

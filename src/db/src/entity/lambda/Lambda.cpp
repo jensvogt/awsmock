@@ -35,6 +35,10 @@ namespace AwsMock::Database::Entity::Lambda {
         return it->second;
     }
 
+    bool Lambda::HasInstance(const std::string &instanceId) {
+        return std::ranges::find(instances, instanceId, &Instance::instanceId) != instances.end();
+    }
+
     Instance Lambda::GetInstance(const std::string &instanceId) {
         if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
             return *it;

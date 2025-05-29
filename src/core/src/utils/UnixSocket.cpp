@@ -2,7 +2,11 @@
 // Created by vogje01 on 5/28/24.
 //
 
+#include "awsmock/core/FileUtils.h"
+
+
 #include <awsmock/core/UnixSocket.h>
+#include <boost/asio/streambuf.hpp>
 
 namespace AwsMock::Core {
 

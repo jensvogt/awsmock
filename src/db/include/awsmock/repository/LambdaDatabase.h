@@ -30,9 +30,9 @@ namespace AwsMock::Database {
     using std::chrono::system_clock;
 
     struct LambdaMonitoringCounter {
-        int instances{};
-        int invocations{};
-        int averageRuntime{};
+        long instances{};
+        long invocations{};
+        long averageRuntime{};
         system_clock::time_point modified = system_clock::now();
     };
 

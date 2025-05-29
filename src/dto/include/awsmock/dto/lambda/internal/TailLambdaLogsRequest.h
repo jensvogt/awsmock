@@ -2,8 +2,8 @@
 // Created by vogje01 on 31/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_LAMBDA_TAIL_FUNCTION_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_LAMBDA_TAIL_FUNCTION_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_LAMBDA_TAIL_LAMBDA_LOGS_REQUEST_H
+#define AWSMOCK_DTO_LAMBDA_TAIL_LAMBDA_LOGS_REQUEST_H
 
 // C++ Standard includes
 #include <string>
@@ -22,6 +22,11 @@ namespace AwsMock::Dto::Lambda {
         std::string lambdaArn;
 
         /**
+         * Instance ID
+         */
+        std::string instanceId;
+
+        /**
          * number of lines
          */
         long numLines{};
@@ -31,6 +36,7 @@ namespace AwsMock::Dto::Lambda {
         friend TailLambdaLogsRequest tag_invoke(boost::json::value_to_tag<TailLambdaLogsRequest>, boost::json::value const &v) {
             TailLambdaLogsRequest r;
             r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
+            r.instanceId = Core::Json::GetStringValue(v, "instanceId");
             r.numLines = Core::Json::GetLongValue(v, "numLines");
             return r;
         }
@@ -38,6 +44,7 @@ namespace AwsMock::Dto::Lambda {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, TailLambdaLogsRequest const &obj) {
             jv = {
                     {"lambdaArn", obj.lambdaArn},
+                    {"instanceId", obj.instanceId},
                     {"numLines", obj.numLines},
             };
         }
@@ -45,4 +52,4 @@ namespace AwsMock::Dto::Lambda {
 
 }// namespace AwsMock::Dto::Lambda
 
-#endif//AWSMOCK_DTO_LAMBDA_TAIL_FUNCTION_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_LAMBDA_TAIL_LAMBDA_LOGS_REQUEST_H

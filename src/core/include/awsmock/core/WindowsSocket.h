@@ -46,7 +46,7 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit WindowsSocket(const std::string &path) : DomainSocket(path){};
+        explicit WindowsSocket(const std::string &path) : DomainSocket(path) {};
 
         /**
          * @brief Send JSON data

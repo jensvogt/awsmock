@@ -141,17 +141,13 @@ namespace AwsMock::Service {
                 log_warning << "Secret version does not exist, versionId: " << request.versionId;
                 throw Core::ServiceException("Secret version does not exist, versionId: " + request.versionId);
             }
-            Database::Entity::SecretsManager::SecretVersion version;
-            if (!request.versionId.empty()) {
-                version = secret.versions[request.versionId];
-            } else {
-                version = secret.versions[secret.GetCurrentVersionId()];
-            }
+            std::string versionId = request.versionId.empty() ? secret.GetCurrentVersionId() : request.versionId;
+            Database::Entity::SecretsManager::SecretVersion version = secret.versions[versionId];
 
             // Convert to DTO
             response.name = secret.name;
             response.arn = secret.arn;
-            response.versionId = request.versionId;
+            response.versionId = versionId;
             response.createdDate = secret.createdDate;
             response.versionStages = secret.versionIdsToStages.versions[request.versionId];
 

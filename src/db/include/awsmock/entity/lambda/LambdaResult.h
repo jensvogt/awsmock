@@ -41,9 +41,19 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string responseBody;
 
         /**
+         * Log messages
+         */
+        std::string logMessages;
+
+        /**
          * Runtime
          */
         std::string runtime;
+
+        /**
+         * Instance ID
+         */
+        std::string containerId;
 
         /**
          * Status code

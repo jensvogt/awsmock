@@ -2,8 +2,8 @@
 // Created by JVO on 22.04.2024.
 //
 
-#ifndef AWSMOCK_DTO_DOCKER_HOST_CONFIG_H
-#define AWSMOCK_DTO_DOCKER_HOST_CONFIG_H
+#ifndef AWSMOCK_DTO_DOCKER_LOG_CONFIG_H
+#define AWSMOCK_DTO_DOCKER_LOG_CONFIG_H
 
 // C++ includes
 #include <chrono>
@@ -12,7 +12,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/docker/model/LogConfig.h>
 #include <awsmock/dto/docker/model/PortBinding.h>
 
 namespace AwsMock::Dto::Docker {
@@ -20,44 +19,38 @@ namespace AwsMock::Dto::Docker {
     using std::chrono::system_clock;
 
     /**
-     * @brief Docker host config object
+     * @brief Docker log config object
+     *
+     * @par
+     * Currently not used.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct Config {};
+
+    /**
+     * @brief Docker log config object
      *
      * @code{.jso}
-     * "HostConfig" : {
-     *   "Binds" : null,
-     *   "ContainerIDFile" : "",
-     *   "LogConfig" : {
-     *     "Type" : "json-file",
-     *     "Config" : { }
-     *   },
-     *   "NetworkMode" : "local",
-     *   "PortBindings" : {
-     *     "8080" : [{
-     *       "HostIp" : "",
-     *       "HostPort" : "65519"
-     *     }
-     *   ]
+     * "LogConfig" : {
+     *   "Type" : "json-file",
+     *   "Config" : { }
      * }
      * @endCode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct HostConfig {
+    struct LogConfig {
 
         /**
          * Network mode
          */
-        std::string networkMode;
+        std::string type = "journald";
 
         /**
          * Network mode
          */
-        PortBinding portBindings;
-
-        /**
-         * Log config
-         */
-        LogConfig logConfig;
+        Config config;
 
         /**
          * Convert to a JSON string
@@ -99,7 +92,7 @@ namespace AwsMock::Dto::Docker {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const HostConfig &i);
+        friend std::ostream &operator<<(std::ostream &os, const LogConfig &i);
     };
 
 }// namespace AwsMock::Dto::Docker

@@ -307,6 +307,14 @@ namespace AwsMock::Database::Entity::Lambda {
         system_clock::time_point modified = system_clock::now();
 
         /**
+         * @brief Returns the existence of a lambda instance by ID
+         *
+         * @param instanceId instance ID
+         * @return true if the lambda instance exists, otherwise false.
+         */
+        bool HasInstance(const std::string &instanceId);
+
+        /**
          * @brief Returns an instance by instance ID
          *
          * @param instanceId instance ID

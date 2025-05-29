@@ -42,13 +42,13 @@ namespace AwsMock::Core {
          *
          * @param path domain socket path
          */
-        explicit UnixSocket(const std::string &path) : DomainSocket(path){};
+        explicit UnixSocket(const std::string &path) : DomainSocket(path) {};
 
         /**
          * @brief Send JSON data
          *
          * @par
-         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a JSON string as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -62,7 +62,7 @@ namespace AwsMock::Core {
          * @brief Send JSON data
          *
          * @par
-         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a JSON string as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -71,13 +71,13 @@ namespace AwsMock::Core {
          * @return result struct
          * @see Core::DomainSocketResult
          */
-        DomainSocketResult SendJson(verb method, const std::string &pat, const std::string &body) override;
+        DomainSocketResult SendJson(verb method, const std::string &path, const std::string &body) override;
 
         /**
          * @brief Send JSON data
          *
          * @par
-         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a JSON string as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -92,7 +92,7 @@ namespace AwsMock::Core {
         /**
          * @brief Send binary data
          *
-         * This will send a file as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a file as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -106,7 +106,7 @@ namespace AwsMock::Core {
         /**
          * @brief Send binary data
          *
-         * This will send a file as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a file as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method

@@ -92,7 +92,7 @@ namespace AwsMock::Core {
                 return {.statusCode = status::internal_server_error, .body = ec.message()};
             }
 
-            // Prepare message
+            // Prepare the message
             request<file_body> request = PrepareBinaryMessage(method, path, fileName, {});
 
             // Write to TCP socket
@@ -122,35 +122,6 @@ namespace AwsMock::Core {
             log_error << "Error sending JSON message, error: " << exc.what();
         }
         return {.statusCode = status::internal_server_error, .body = "General error"};
-        /*boost::system::error_code ec;
-        std::string fullPath = _basePath + path;
-        boost::asio::io_context ctx;
-        boost::asio::local::stream_protocol::endpoint endpoint(fullPath);
-        boost::asio::local::stream_protocol::socket socket(ctx);
-        ec = socket.connect(endpoint, ec);
-        if (ec) {
-            log_error << "Could not connect to docker Windows Docker API, fullPath: " << fullPath << ", method: " << method << ", error: " << ec.message();
-            return {.statusCode = status::internal_server_error, .body = "Could not connect to docker Windows Docker API"};
-        }
-
-        // Prepare message
-        request<file_body> request = PrepareBinaryMessage(method, path, fileName, headers);
-
-        // Write to unix socket
-        http::write(socket, request);
-
-        boost::beast::flat_buffer buffer;
-        response<string_body> response;
-        read(socket, buffer, response, ec);
-        if (ec) {
-            log_error << "Send to docker daemon failed, error: " << ec.message();
-        }
-        socket.close();
-        if (ec) {
-            log_error << "Shutdown socket failed, error: " << ec.message();
-            return {.statusCode = status::internal_server_error, .body = ec.message()};
-        }
-        return PrepareResult(response);*/
     }
 
     void WindowsSocket::GetHostPort(const std::string &url, std::string &host, int &port) {
