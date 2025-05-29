@@ -10,12 +10,11 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/lambda/model/Tags.h>
 #include <awsmock/dto/sqs/model/TagCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListLambdaTagCountersResponse {
+    struct ListLambdaTagCountersResponse final : Common::BaseCounter<ListLambdaTagCountersResponse> {
 
         /**
          * List of tag counters
@@ -27,26 +26,28 @@ namespace AwsMock::Dto::Lambda {
          */
         long total = 0;
 
-        /**
-         * Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListLambdaTagCountersResponse tag_invoke(boost::json::value_to_tag<ListLambdaTagCountersResponse>, boost::json::value const &v) {
+            ListLambdaTagCountersResponse r;
+            r.total = Core::Json::GetLongValue(v, "total");
+            r.tagCounters = boost::json::value_to<std::vector<std::pair<std::string, std::string>>>(v.at("tagCounters"));
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListLambdaTagCountersResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListLambdaTagCountersResponse const &obj) {
+            boost::json::array tagArray;
+            for (const auto &[fst, snd]: obj.tagCounters) {
+                boost::json::object tagObject;
+                tagObject["key"] = fst;
+                tagObject["value"] = snd;
+                tagArray.push_back(tagObject);
+            }
+            jv = {
+                    {"total", obj.total},
+                    {"tagCounters", tagArray},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -274,7 +274,7 @@ namespace AwsMock::Service {
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaTagCountersResponse response;
-            response.total = lambda.tags.size();
+            response.total = static_cast<long>(lambda.tags.size());
 
             std::vector<std::pair<std::string, std::string>> tags;
             for (const auto &[fst, snd]: lambda.tags) {
@@ -425,6 +425,7 @@ namespace AwsMock::Service {
             response.s3Key = lambda.code.s3Key;
             response.s3ObjectVersion = lambda.code.s3ObjectVersion;
             response.concurrency = lambda.concurrency;
+            response.instances = static_cast<long>(lambda.instances.size());
             response.invocations = lambda.invocations;
             response.averageRuntime = lambda.averageRuntime;
             response.lastStarted = lambda.lastStarted;

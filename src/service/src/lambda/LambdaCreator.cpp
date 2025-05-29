@@ -31,6 +31,8 @@ namespace AwsMock::Service {
         // Docker tag
         if (lambdaEntity.dockerTag.empty()) {
             lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
+            lambdaEntity.tags["dockerTag"] = lambdaEntity.dockerTag;
+            lambdaEntity.tags["version"] = lambdaEntity.dockerTag;
             log_debug << "Using docker tag: " << lambdaEntity.dockerTag;
         }
 

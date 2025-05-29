@@ -24,13 +24,13 @@ namespace AwsMock::Dto::Lambda {
 
         friend GetFunctionCountersRequest tag_invoke(boost::json::value_to_tag<GetFunctionCountersRequest>, boost::json::value const &v) {
             GetFunctionCountersRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionCountersRequest const &obj) {
             jv = {
-                    {"FunctionArn", obj.functionArn},
+                    {"functionArn", obj.functionArn},
             };
         }
     };
