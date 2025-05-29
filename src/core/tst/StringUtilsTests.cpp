@@ -188,6 +188,18 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL("/abc/xyz/", result.c_str());
     }
 
+    BOOST_AUTO_TEST_CASE(RemoveColorCodingTest) {
+
+        // arrange
+        const std::string input = "2025-05-29 15:38:33.044 [35m[main            ][0;39m [34mINFO [0;39m [36meInitializer.CustomRuntimeInitializer.java:55[0;39m : AWS Handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker";
+
+        // act
+        const std::string result = StringUtils::RemoveColorCoding(input);
+
+        // assert
+        BOOST_CHECK_EQUAL("2025-05-29 15:38:33.044 [main            ] INFO  eInitializer.CustomRuntimeInitializer.java:55 : AWS Handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker", result.c_str());
+    }
+
     BOOST_AUTO_TEST_CASE(GetBodyTestTest) {
 
         /*        // arrange

@@ -126,8 +126,10 @@ namespace AwsMock::Dto::Lambda {
         counter.lambdaArn = resultEntity.lambdaArn;
         counter.lambdaName = resultEntity.lambdaName;
         counter.runtime = resultEntity.runtime;
+        counter.containerId = resultEntity.containerId;
         counter.requestBody = resultEntity.requestBody;
         counter.responseBody = resultEntity.responseBody;
+        counter.logMessages = resultEntity.logMessages;
         counter.lambdaStatus = resultEntity.lambdaStatus;
         counter.httpStatusCode = resultEntity.httpStatusCode;
         counter.timestamp = resultEntity.timestamp;

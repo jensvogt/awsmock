@@ -88,6 +88,11 @@ namespace AwsMock::Dto::Docker {
         std::string hostPort;
 
         /**
+         * TTy settings
+         */
+        bool tty = true;
+
+        /**
          * @brief Convert to a JSON string
          *
          * @return JSON string

@@ -2,6 +2,9 @@
 // Created by root on 10/9/23.
 //
 
+#include "awsmock/service/container/ContainerService.h"
+
+
 #include <awsmock/service/lambda/LambdaExecutor.h>
 
 namespace AwsMock::Service {
@@ -25,10 +28,11 @@ namespace AwsMock::Service {
 
         // Send request to lambda docker container
         Database::Entity::Lambda::LambdaResult result;
+        result.containerId = containerId;
         const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload);
 
         // Calculate runtime
-        long runtime = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
+        const long runtime = std::chrono::duration_cast<std::chrono::milliseconds>(system_clock::now() - start).count();
         Database::LambdaDatabase::instance().SetAverageRuntime(lambda.oid, runtime);
 
         if (response.statusCode != http::status::ok) {
@@ -53,9 +57,13 @@ namespace AwsMock::Service {
             result.lambdaStatus = Database::Entity::Lambda::InstanceIdle;
         }
 
+        // Get log messages
+        const std::string logs = ContainerService::instance().GetContainerLogs(containerId, start);
+
         // Save results
         result.requestBody = payload;
         result.responseBody = response.body;
+        result.logMessages = Core::StringUtils::RemoveColorCoding(logs);
         result.lambdaName = functionName;
         result.lambdaArn = lambda.arn;
         result.runtime = lambda.runtime;

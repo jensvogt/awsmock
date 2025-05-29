@@ -75,7 +75,7 @@ namespace AwsMock::Core {
          * @brief Generates a random version string with the given length.
          *
          * @param length length of the string
-         * @return generated random password string with the given length.
+         * @return generated a random password string with the given length.
          */
         static std::string GenerateRandomVersion(int length);
 
@@ -106,7 +106,7 @@ namespace AwsMock::Core {
         /**
          * @brief Creates a random UUID and return is as a string
          *
-         * @return random UUID as string
+         * @return random UUID as a string
          */
         static std::string CreateRandomUuid();
 
@@ -118,6 +118,22 @@ namespace AwsMock::Core {
          * @return vector os strings.
          */
         static std::vector<std::string> Split(const std::string &s, char delim);
+
+        /**
+         * @brief Splits a string into pieces using the provided delimiter char.
+         *
+         * @param input string to split
+         * @return vector os strings.
+         */
+        static std::vector<std::string> SplitOnNewline(const std::string &input);
+
+        /**
+         * @brief Remove color coding from string
+         *
+         * @param input string to proceed
+         * @return sanitized string
+         */
+        static std::string RemoveColorCoding(const std::string &input);
 
         /**
          * @brief Joins a string array to a string using the given delimiter.

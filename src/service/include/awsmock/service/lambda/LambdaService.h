@@ -58,6 +58,8 @@
 #include <awsmock/dto/lambda/internal/ResetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/StartFunctionRequest.h>
 #include <awsmock/dto/lambda/internal/StopFunctionRequest.h>
+#include <awsmock/dto/lambda/internal/TailLambdaLogsRequest.h>
+#include <awsmock/dto/lambda/internal/TailLambdaLogsResponse.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
@@ -329,7 +331,6 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::Lambda::GetLambdaResultCounterResponse GetLambdaResultCounter(const Dto::Lambda::GetLambdaResultCounterRequest &request) const;
 
-
         /**
          * @brief Returns a list of all available lambda result counters
          *
@@ -340,6 +341,17 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::ListLambdaResultCountersResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaResultCountersResponse ListLambdaResultCounters(const Dto::Lambda::ListLambdaResultCountersRequest &request) const;
+
+        /**
+         * @brief Returns a list of lambda log messages from the docker daemon
+         *
+         * @param request list lambda logs request
+         * @return TailLambdaLogsResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::TailLambdaLogsRequest
+         * @see Dto::Lambda::TailLambdaLogsResponse
+         */
+        [[nodiscard]] Dto::Lambda::TailLambdaLogsResponse TailLambdaLogs(const Dto::Lambda::TailLambdaLogsRequest &request) const;
 
         /**
          * @brief Deletes a lambda result counter

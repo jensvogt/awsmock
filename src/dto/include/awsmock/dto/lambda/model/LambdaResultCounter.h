@@ -53,9 +53,19 @@ namespace AwsMock::Dto::Lambda {
         std::string responseBody;
 
         /**
+         * Log messages
+         */
+        std::string logMessages;
+
+        /**
          * Runtime
          */
         std::string runtime;
+
+        /**
+         * Container ID
+         */
+        std::string containerId;
 
         /**
          * Status code
@@ -82,7 +92,9 @@ namespace AwsMock::Dto::Lambda {
             r.lambdaArn = Core::Json::GetLongValue(v, "lambdaArn");
             r.requestBody = Core::Json::GetLongValue(v, "requestBody");
             r.responseBody = Core::Json::GetStringValue(v, "responseBody");
+            r.logMessages = Core::Json::GetStringValue(v, "logMessages");
             r.runtime = Core::Json::GetStringValue(v, "runtime");
+            r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.httpStatusCode = Core::Json::GetStringValue(v, "httpStatusCode");
             r.lambdaStatus = Database::Entity::Lambda::LambdaInstanceStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
             r.timestamp = Core::DateTimeUtils::FromISO8601(v.at("timestamp").as_string().data());
@@ -98,7 +110,9 @@ namespace AwsMock::Dto::Lambda {
                     {"lambdaArn", obj.lambdaArn},
                     {"requestBody", obj.requestBody},
                     {"responseBody", obj.responseBody},
+                    {"logMessages", obj.logMessages},
                     {"runtime", obj.runtime},
+                    {"containerId", obj.containerId},
                     {"httpStatusCode", obj.httpStatusCode},
                     {"lambdaStatus", Database::Entity::Lambda::LambdaInstanceStatusToString(obj.lambdaStatus)},
                     {"timestamp", Core::DateTimeUtils::ToISO8601(obj.timestamp)},

@@ -27,7 +27,7 @@ namespace AwsMock::Service {
             log_debug << "Keys deleted: " << count;
         }
 
-        Dto::SecretsManager::CreateSecretRequest createDefaultRequest() const {
+        [[nodiscard]] Dto::SecretsManager::CreateSecretRequest createDefaultRequest() const {
             Dto::SecretsManager::CreateSecretRequest request;
             request.requestId = Core::StringUtils::CreateRandomUuid();
             request.region = _region;
@@ -59,8 +59,8 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(response.name, "test-secret");
         BOOST_CHECK_EQUAL(response.versionId.empty(), false);
         BOOST_CHECK_EQUAL(secret.versions.empty(), false);
-        BOOST_CHECK_EQUAL(secret.versions.begin()->secretString.empty(), false);
-        BOOST_CHECK_EQUAL(*secret.versions.begin()->stages.begin() == Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT), true);
+        BOOST_CHECK_EQUAL(secret.versions.begin()->second.secretString.empty(), false);
+        BOOST_CHECK_EQUAL(*secret.versions.begin()->second.stages.begin() == Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT), true);
         BOOST_CHECK_EQUAL(secret.kmsKeyId.empty(), false);
     }
 

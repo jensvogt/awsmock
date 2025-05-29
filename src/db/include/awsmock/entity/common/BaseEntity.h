@@ -51,7 +51,7 @@ namespace AwsMock::Database::Entity::Common {
          *
          * @return MongoDB BSON string
          */
-        virtual view_or_value<view, value> ToDocument() const = 0;
+        [[nodiscard]] virtual view_or_value<view, value> ToDocument() const = 0;
 
         /**
          * @brief Convert to JSON representation
