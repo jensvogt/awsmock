@@ -34,12 +34,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Page size
          */
-        int pageSize;
+        int pageSize{};
 
         /**
          * Page index
          */
-        int pageIndex;
+        int pageIndex{};
 
         /**
          * Sort column
@@ -61,6 +61,7 @@ namespace AwsMock::Dto::Lambda {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListLambdaEnvironmentCountersRequest const &obj) {
             jv = {
                     {"lambdaArn", obj.lambdaArn},
+                    {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},
                     {"sortColumns", boost::json::value_from(obj.sortColumns)},

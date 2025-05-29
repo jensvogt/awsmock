@@ -215,9 +215,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_ENVIRONMENT) {
 
-                Dto::Lambda::DeleteFunctionEnvironmentRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::DeleteFunctionEnvironmentRequest lambdaRequest = Dto::Lambda::DeleteFunctionEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.DeleteLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment deleted, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
@@ -226,9 +224,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_TAG_COUNTERS) {
 
-                Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::ListLambdaTagCountersRequest lambdaRequest = Dto::Lambda::ListLambdaTagCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaTagCountersResponse lambdaResponse = _lambdaService.ListLambdaTagCounters(lambdaRequest);
                 log_trace << "Lambda tag counters list";
 
@@ -237,9 +233,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_TAG) {
 
-                Dto::Lambda::AddFunctionTagRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::AddFunctionTagRequest lambdaRequest = Dto::Lambda::AddFunctionTagRequest::FromJson(clientCommand);
                 _lambdaService.AddLambdaTag(lambdaRequest);
                 log_trace << "Lambda tag added";
 

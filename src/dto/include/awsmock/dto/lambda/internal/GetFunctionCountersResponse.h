@@ -197,6 +197,11 @@ namespace AwsMock::Dto::Lambda {
         long concurrency{};
 
         /**
+         * Instances
+         */
+        long instances{};
+
+        /**
          * Invocation
          */
         long invocations{};
@@ -253,6 +258,7 @@ namespace AwsMock::Dto::Lambda {
             r.s3ObjectVersion = Core::Json::GetStringValue(v, "s3ObjectVersion");
             r.size = Core::Json::GetLongValue(v, "size");
             r.concurrency = Core::Json::GetLongValue(v, "concurrency");
+            r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
             r.averageRuntime = Core::Json::GetLongValue(v, "averageRuntime");
             r.environment = boost::json::value_to<std::map<std::string, std::string>>(v.at("environment"));
@@ -266,6 +272,8 @@ namespace AwsMock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetFunctionCountersResponse const &obj) {
             jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
                     {"id", obj.id},
                     {"functionArn", obj.functionArn},
                     {"functionName", obj.functionName},
@@ -279,6 +287,7 @@ namespace AwsMock::Dto::Lambda {
                     {"s3ObjectVersion", obj.s3ObjectVersion},
                     {"size", obj.size},
                     {"concurrency", obj.concurrency},
+                    {"instances", obj.instances},
                     {"invocations", obj.invocations},
                     {"averageRuntime", obj.averageRuntime},
                     {"environment", boost::json::value_from(obj.environment)},

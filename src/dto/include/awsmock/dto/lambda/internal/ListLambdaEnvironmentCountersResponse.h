@@ -9,8 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/lambda/model/Tags.h>
 #include <awsmock/dto/sqs/model/TagCounter.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -37,9 +35,16 @@ namespace AwsMock::Dto::Lambda {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListLambdaEnvironmentCountersResponse const &obj) {
+            boost::json::array envArray;
+            for (const auto &[fst, snd]: obj.environmentCounters) {
+                boost::json::object envObject;
+                envObject["key"] = fst;
+                envObject["value"] = snd;
+                envArray.push_back(envObject);
+            }
             jv = {
                     {"total", obj.total},
-                    {"sortColumns", boost::json::value_from(obj.environmentCounters)},
+                    {"environmentCounters", envArray},
             };
         }
     };

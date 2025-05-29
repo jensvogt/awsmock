@@ -8,14 +8,13 @@
 // C++ standard includes
 #include <string>
 
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/utils/SortColumn.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListLambdaTagCountersRequest {
+    struct ListLambdaTagCountersRequest final : Common::BaseCounter<ListLambdaTagCountersRequest> {
 
         /**
          * Lambda ARN
@@ -30,45 +29,39 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Page size
          */
-        int pageSize;
+        long pageSize{};
 
         /**
          * Page index
          */
-        int pageIndex;
+        long pageIndex{};
 
         /**
          * Sort column
          */
-        std::vector<Database::SortColumn> sortColumns;
+        std::vector<Common::SortColumn> sortColumns;
 
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListLambdaTagCountersRequest tag_invoke(boost::json::value_to_tag<ListLambdaTagCountersRequest>, boost::json::value const &v) {
+            ListLambdaTagCountersRequest r;
+            r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListLambdaTagCountersRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListLambdaTagCountersRequest const &obj) {
+            jv = {
+                    {"lambdaArn", obj.lambdaArn},
+                    {"prefix", obj.prefix},
+                    {"pageSize", obj.pageSize},
+                    {"pageIndex", obj.pageIndex},
+                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda
