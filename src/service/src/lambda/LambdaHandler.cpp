@@ -328,15 +328,6 @@ namespace AwsMock::Service {
                 return SendOkResponse(request);
             }
 
-            if (clientCommand.command == Dto::Common::LambdaCommandType::TAIL_FUNCTION) {
-
-                Dto::Lambda::TailLambdaLogsRequest lambdaRequest = Dto::Lambda::TailLambdaLogsRequest::FromJson(clientCommand);
-                Dto::Lambda::TailLambdaLogsResponse lambdaResponse = _lambdaService.TailLambdaLogs(lambdaRequest);
-                log_trace << "Tail lambda logs, lambdaArn: " << lambdaRequest.lambdaArn;
-
-                return SendOkResponse(request);
-            }
-
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
 
                 Dto::Lambda::StartFunctionRequest lambdaRequest;

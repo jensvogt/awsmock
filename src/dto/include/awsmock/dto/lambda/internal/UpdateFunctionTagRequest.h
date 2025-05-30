@@ -5,12 +5,8 @@
 #ifndef AWSMOCK_DTO_LAMBDA_UPDATE_FUNCTION_TAG_REQUEST_H
 #define AWSMOCK_DTO_LAMBDA_UPDATE_FUNCTION_TAG_REQUEST_H
 
-// C++ standard includes
-#include <string>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -28,7 +24,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UpdateFunctionTagRequest {
+    struct UpdateFunctionTagRequest final : Common::BaseCounter<UpdateFunctionTagRequest> {
 
         /**
          * Lambda function ARN
@@ -45,33 +41,23 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string tagValue;
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Parse a JSON string.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend UpdateFunctionTagRequest tag_invoke(boost::json::value_to_tag<UpdateFunctionTagRequest>, boost::json::value const &v) {
+            UpdateFunctionTagRequest r;
+            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
+            r.tagKey = Core::Json::GetStringValue(v, "tagKey");
+            r.tagValue = Core::Json::GetStringValue(v, "tagValue");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UpdateFunctionTagRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateFunctionTagRequest const &obj) {
+            jv = {
+                    {"functionArn", obj.functionArn},
+                    {"tagKey", obj.tagKey},
+                    {"tagValue", obj.tagValue},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda
