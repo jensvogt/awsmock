@@ -92,7 +92,7 @@ namespace AwsMock::Service {
 
         boost::thread _thread;
         std::string _endpoint, _region;
-        boost::asio::io_context _ios{10};
+        boost::asio::io_context _ios{2};
         std::shared_ptr<GatewayServer> _gatewayServer;
         Core::Configuration &_configuration = Core::Configuration::instance();
     };
