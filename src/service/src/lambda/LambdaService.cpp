@@ -732,36 +732,6 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Lambda::TailLambdaLogsResponse LambdaService::TailLambdaLogs(const Dto::Lambda::TailLambdaLogsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "tail_lambda_logs");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "tail_lambda_logs");
-        log_debug << "Tail lambda logs function, lambdaArn: " + request.lambdaArn;
-
-        if (!_lambdaDatabase.LambdaExistsByArn(request.lambdaArn)) {
-            log_error << "Lambda function does not exist, lambdaArn: " << request.lambdaArn;
-            throw Core::ServiceException("Lambda function does not exist, lambdaArn: " + request.lambdaArn);
-        }
-
-        // Get lambda function
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
-
-        // Check state
-        if (lambda.state != Database::Entity::Lambda::Active) {
-            log_info << "Lambda function not running, lambdaArn: " << request.lambdaArn;
-            return {};
-        }
-
-        // Check instance
-        if (!lambda.HasInstance(request.instanceId)) {
-            log_info << "No such instance, lambdaArn: " << request.lambdaArn << ", instanceId: " << request.instanceId;
-            return {};
-        }
-        Dto::Lambda::TailLambdaLogsResponse response;
-
-        log_info << "Tail lambda function finished, functionArn: " + lambda.arn << ", count: " << response.logs.size();
-        return response;
-    }
-
     void LambdaService::StartFunction(const Dto::Lambda::StartFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_function");
