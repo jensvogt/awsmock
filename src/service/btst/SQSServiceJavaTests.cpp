@@ -8,13 +8,9 @@
 // C++ includes
 #include <string>
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpSocket.h>
-#include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
 
@@ -87,13 +83,11 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSServiceJavaTest : public testing::Test, public TestBase {
+    struct SQSServiceJavaTest : public TestBase {
 
-      protected:
+        SQSServiceJavaTest() {
 
-        void SetUp() override {
-
-            // Start gateway server
+            // Start the gateway server
             StartGateway(TEST_PORT);
 
             // General configuration
@@ -103,7 +97,7 @@ namespace AwsMock::Service {
             _baseUrl = "/api/sqs/";
         }
 
-        void TearDown() override {
+        ~SQSServiceJavaTest() {
             long deleted = _sqsDatabase.DeleteAllMessages();
             log_info << "SQS message deleted, count: " << deleted;
             deleted = _sqsDatabase.DeleteAllQueues();
@@ -138,7 +132,7 @@ namespace AwsMock::Service {
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
     };
 
-    TEST_F(SQSServiceJavaTest, SQSCreateQueueTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSCreateQueueTest, SQSServiceJavaTest) {
 
         // arrange
 
@@ -147,32 +141,32 @@ namespace AwsMock::Service {
         const std::string queueUrl = result.body;
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_FALSE(queueUrl.empty());
-        EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, TEST_QUEUE));
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(queueUrl.empty(), false);
+        BOOST_CHECK_EQUAL(Core::StringUtils::Contains(queueUrl, TEST_QUEUE), true);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSGetQueueUrlTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSGetQueueUrlTest, SQSServiceJavaTest) {
 
         // arrange
         const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
 
         // act
         const Core::HttpSocketResponse getUrlResult = SendGetCommand(_baseUrl + "getQueueUrl?queueName=" + Core::StringUtils::UrlEncode(TEST_QUEUE), {});
         const std::string queueUrl = result.body;
 
         // assert
-        EXPECT_TRUE(getUrlResult.statusCode == http::status::ok);
-        EXPECT_FALSE(queueUrl.empty());
-        EXPECT_TRUE(Core::StringUtils::Contains(queueUrl, TEST_QUEUE));
+        BOOST_CHECK_EQUAL(getUrlResult.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(queueUrl.empty(), false);
+        BOOST_CHECK_EQUAL(Core::StringUtils::Contains(queueUrl, TEST_QUEUE), true);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSGetAllQueueAttributes) {
+    BOOST_FIXTURE_TEST_CASE(SQSGetAllQueueAttributes, SQSServiceJavaTest) {
 
         // arrange
         const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
         const std::string queueUrl = result.body;
 
         // act
@@ -180,15 +174,15 @@ namespace AwsMock::Service {
         const std::string queueAttributes = resultQueueAttributes.body;
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_TRUE(!queueAttributes.empty());
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(queueAttributes.empty(), false);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSGetSingleQueueAttributes) {
+    BOOST_FIXTURE_TEST_CASE(SQSGetSingleQueueAttributes, SQSServiceJavaTest) {
 
         // arrange
         const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
         const std::string queueUrl = result.body;
 
         // act
@@ -196,47 +190,47 @@ namespace AwsMock::Service {
         const std::string queueAttributes = resultQueueAttributes.body;
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_TRUE(!queueAttributes.empty());
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(queueAttributes.empty(), false);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSSetQueueAttributes) {
+    BOOST_FIXTURE_TEST_CASE(SQSSetQueueAttributes, SQSServiceJavaTest) {
 
         // arrange
         const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
         const std::string queueUrl = result.body;
 
         // act
         const Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "setQueueAttribute?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&attributeValue=3600", {});
 
         // assert
-        EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
+        BOOST_CHECK_EQUAL(resultQueueAttributes.statusCode == http::status::ok, true);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSChangeMessageVisibilityTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSChangeMessageVisibilityTest, SQSServiceJavaTest) {
 
         // arrange
         Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
-        TestMessage testMessage = {.testKey = "testKey"};
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
+        const std::string queueUrl = result.body;
+        const TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
-        std::string receiptHandle = messageList[0].receiptHandle;
+        const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        const std::string receiptHandle = messageList[0].receiptHandle;
 
         // act
-        Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "changeVisibility?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&visibility=3600&receiptHandle=" + Core::StringUtils::UrlEncode(receiptHandle), {});
+        const Core::HttpSocketResponse resultQueueAttributes = SendPostCommand(_baseUrl + "changeVisibility?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&visibility=3600&receiptHandle=" + Core::StringUtils::UrlEncode(receiptHandle), {});
 
         // assert
-        EXPECT_TRUE(resultQueueAttributes.statusCode == http::status::ok);
+        BOOST_CHECK_EQUAL(resultQueueAttributes.statusCode == http::status::ok, true);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSSendMessageTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSSendMessageTest, SQSServiceJavaTest) {
 
         // arrange
         const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
         const std::string queueUrl = result.body;
 
         // act
@@ -245,79 +239,79 @@ namespace AwsMock::Service {
         const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_EQ(1, messageList.size());
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(1, messageList.size());
     }
 
-    TEST_F(SQSServiceJavaTest, SQSSendMessageAttributeTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSSendMessageAttributeTest, SQSServiceJavaTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        std::string queueUrl = result.body;
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        const std::string queueUrl = result.body;
 
         // act
-        TestMessage testMessage = {.testKey = "testKey"};
+        const TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessageAttributes?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        EXPECT_TRUE(result.statusCode == http::status::ok);
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
 
         Core::HttpSocketResponse receiveResult = SendGetCommand(_baseUrl + "receiveMessages?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&maxMessages=10&maxWaitTime=5", {});
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
-        EXPECT_EQ(1, messageList.size());
-        Database::Entity::SQS::Message message = messageList.front();
+        BOOST_CHECK_EQUAL(1, messageList.size());
+        const Database::Entity::SQS::Message message = messageList.front();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_EQ(1, messageList.size());
-        EXPECT_EQ(5, message.attributes.size());
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(1, messageList.size());
+        BOOST_CHECK_EQUAL(5, message.attributes.size());
     }
 
-    TEST_F(SQSServiceJavaTest, SQSMessageReceiveTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSMessageReceiveTest, SQSServiceJavaTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        std::string queueUrl = result.body;
-        TestMessage testMessage = {.testKey = "testKey"};
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        const std::string queueUrl = result.body;
+        const TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
 
         // act
         Core::HttpSocketResponse receiveResult = SendGetCommand(_baseUrl + "receiveMessages?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl) + "&maxMessages=10&maxWaitTime=5", {});
-        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
-        EXPECT_EQ(1, messageList.size());
-        Database::Entity::SQS::Message message = messageList.front();
+        const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        BOOST_CHECK_EQUAL(1, messageList.size());
+        const Database::Entity::SQS::Message message = messageList.front();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_EQ(1, messageList.size());
-        EXPECT_TRUE(message.status == Database::Entity::SQS::MessageStatus::INVISIBLE);
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(1, messageList.size());
+        BOOST_CHECK_EQUAL(message.status == Database::Entity::SQS::MessageStatus::INVISIBLE, true);
     }
 
-    TEST_F(SQSServiceJavaTest, SQSPurgeQueueTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSPurgeQueueTest, SQSServiceJavaTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, result.statusCode);
-        std::string queueUrl = result.body;
-        TestMessage testMessage = {.testKey = "testKey"};
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
+        const std::string queueUrl = result.body;
+        const TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
 
         // act
         Core::HttpSocketResponse purgeResult = SendGetCommand(_baseUrl + "purgeQueue?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), {});
-        Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
+        const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_EQ(0, messageList.size());
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(0, messageList.size());
     }
 
-    TEST_F(SQSServiceJavaTest, SQSTemplateTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSTemplateTest, SQSServiceJavaTest) {
 
         // arrange
         const Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, createResult.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, createResult.statusCode);
         std::string queueUrl = createResult.body;
 
         // act
@@ -326,22 +320,22 @@ namespace AwsMock::Service {
         const Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(result.statusCode == http::status::ok);
-        EXPECT_EQ(1, messageList.size());
+        BOOST_CHECK_EQUAL(result.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(1, messageList.size());
     }
 
-    TEST_F(SQSServiceJavaTest, SQSDeleteMessageTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSDeleteMessageTest, SQSServiceJavaTest) {
 
         // arrange
         TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, createResult.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, createResult.statusCode);
         std::string queueUrl = createResult.body;
         Core::HttpSocketResponse sendResult = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        EXPECT_EQ(http::status::ok, sendResult.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, sendResult.statusCode);
         std::string messageId = sendResult.body;
         Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
-        EXPECT_EQ(1, messageList.size());
+        BOOST_CHECK_EQUAL(1, messageList.size());
 
         // act
         std::string receiptHandle = messageList[0].receiptHandle;
@@ -349,23 +343,23 @@ namespace AwsMock::Service {
         messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
-        EXPECT_EQ(0, messageList.size());
+        BOOST_CHECK_EQUAL(deleteResult.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(0, messageList.size());
     }
 
-    TEST_F(SQSServiceJavaTest, SQSDeleteMessageBatchTest) {
+    BOOST_FIXTURE_TEST_CASE(SQSDeleteMessageBatchTest, SQSServiceJavaTest) {
 
         // arrange
         TestMessage testMessage = {.testKey = "testKey"};
         Core::HttpSocketResponse createResult = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
-        EXPECT_EQ(http::status::ok, createResult.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, createResult.statusCode);
         std::string queueUrl = createResult.body;
         Core::HttpSocketResponse sendResult1 = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        EXPECT_EQ(http::status::ok, sendResult1.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, sendResult1.statusCode);
         Core::HttpSocketResponse sendResult2 = SendPostCommand(_baseUrl + "sendMessage?queueUrl=" + Core::StringUtils::UrlEncode(queueUrl), testMessage.ToJson());
-        EXPECT_EQ(http::status::ok, sendResult2.statusCode);
+        BOOST_CHECK_EQUAL(http::status::ok, sendResult2.statusCode);
         Database::Entity::SQS::MessageList messageList = _sqsDatabase.ListMessages();
-        EXPECT_EQ(2, messageList.size());
+        BOOST_CHECK_EQUAL(2, messageList.size());
 
         // act
         std::string receiptHandle1 = messageList[0].receiptHandle;
@@ -374,8 +368,8 @@ namespace AwsMock::Service {
         messageList = _sqsDatabase.ListMessages();
 
         // assert
-        EXPECT_TRUE(deleteResult.statusCode == http::status::ok);
-        EXPECT_EQ(0, messageList.size());
+        BOOST_CHECK_EQUAL(deleteResult.statusCode == http::status::ok, true);
+        BOOST_CHECK_EQUAL(0, messageList.size());
     }
 
 }// namespace AwsMock::Service

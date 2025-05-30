@@ -38,9 +38,7 @@ namespace AwsMock::Service {
             StopGateway();
         }
 
-        boost::thread _thread;
         std::string _endpoint, _region;
-        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         Database::KMSDatabase &_database = Database::KMSDatabase::instance();
     };

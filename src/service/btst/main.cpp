@@ -34,6 +34,8 @@ AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::ins
 #include "KMSServiceCliTests.cpp"
 #include "KMSServiceJavaTests.cpp"
 #include "KMSServiceTests.cpp"
+#include "SQSServiceCliTests.cpp"
+#include "SQSServiceJavaTests.cpp"
 #include "SecretsManagerServiceTests.cpp"
 
 /**
@@ -69,9 +71,9 @@ void InitializeShm() {
 
 bool init_unit_test() {
 
+    AwsMock::Core::TestUtils::CreateTestConfigurationFile();
     AwsMock::Core::LogStream::Initialize();
     AwsMock::Core::LogStream::RemoveConsoleLogs();
-    AwsMock::Core::TestUtils::CreateTestConfigurationFile();
 
     InitializeDatabase();
     InitializeShm();
