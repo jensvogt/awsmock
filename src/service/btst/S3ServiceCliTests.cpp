@@ -2,22 +2,15 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#include "TestBase.h"
-#ifndef AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
-#define AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
-
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/s3/S3Server.h>
 
-// Test includes
-#include <awsmock/core/TestUtils.h>
-
+#define BOOST_TEST_MODULE S3ServiceCliTestss
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
 #define TEST_BUCKET_NAME std::string("test-bucket")
@@ -31,21 +24,20 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3ServerCliTest : public testing::Test, public TestBase {
+    struct S3ServiceCliTests : TestBase {
 
-      protected:
-
-        void SetUp() override {
+        S3ServiceCliTests() {
 
             // General configuration
             StartGateway();
 
             _region = GetRegion();
             _endpoint = GetEndpoint();
-        }
 
-        void TearDown() override {
+            // Cleanup
+            // ReSharper disable once CppExpressionWithoutSideEffects
             _database.DeleteAllObjects();
+            // ReSharper disable once CppExpressionWithoutSideEffects
             _database.DeleteAllBuckets();
         }
 
@@ -53,7 +45,7 @@ namespace AwsMock::Service {
         Database::S3Database &_database = Database::S3Database::instance();
     };
 
-    TEST_F(S3ServerCliTest, BucketCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketCreateTest, S3ServiceCliTests) {
 
         // arrange
 
@@ -62,10 +54,10 @@ namespace AwsMock::Service {
         const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
         // assert
-        EXPECT_EQ(1, bucketList.size());
+        BOOST_CHECK_EQUAL(1, bucketList.size());
     }
 
-    TEST_F(S3ServerCliTest, BucketListTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketListTest, S3ServiceCliTests) {
 
         // arrange
         std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -75,11 +67,11 @@ namespace AwsMock::Service {
         std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "ls", "--endpoint", _endpoint});
 
         // assert
-        EXPECT_FALSE(output2.empty());
-        EXPECT_TRUE(Core::StringUtils::Contains(output2, TEST_BUCKET_NAME));
+        BOOST_CHECK_EQUAL(output2.empty(), false);
+        BOOST_CHECK_EQUAL(Core::StringUtils::Contains(output2, TEST_BUCKET_NAME), true);
     }
 
-    TEST_F(S3ServerCliTest, BucketDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketDeleteTest, S3ServiceCliTests) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
@@ -89,10 +81,10 @@ namespace AwsMock::Service {
         const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
 
         // assert
-        EXPECT_EQ(0, bucketList.size());
+        BOOST_CHECK_EQUAL(0, bucketList.size());
     }
 
-    TEST_F(S3ServerCliTest, ObjectCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectCreateTest, S3ServiceCliTests) {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -103,10 +95,10 @@ namespace AwsMock::Service {
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
         // assert
-        EXPECT_EQ(1, objectList.size());
+        BOOST_CHECK_EQUAL(1, objectList.size());
     }
 
-    TEST_F(S3ServerCliTest, ObjectGetTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectGetTest, S3ServiceCliTests) {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -117,11 +109,11 @@ namespace AwsMock::Service {
         std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", TEST_BUCKET + "/" + filename, filename, "--endpoint", _endpoint});
 
         // assert
-        EXPECT_EQ(10, Core::FileUtils::FileSize(filename));
-        EXPECT_TRUE(Core::FileUtils::FileExists(filename));
+        BOOST_CHECK_EQUAL(10, Core::FileUtils::FileSize(filename));
+        BOOST_CHECK_EQUAL(Core::FileUtils::FileExists(filename), true);
     }
 
-    TEST_F(S3ServerCliTest, ObjectCopyTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectCopyTest, S3ServiceCliTests) {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -133,12 +125,12 @@ namespace AwsMock::Service {
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
-        EXPECT_EQ(2, objectList.size());
-        EXPECT_TRUE(objectList[0].key == "test/" + filename || objectList[0].key == filename);
-        EXPECT_TRUE(objectList[1].key == "test/" + filename || objectList[1].key == filename);
+        BOOST_CHECK_EQUAL(2, objectList.size());
+        BOOST_CHECK_EQUAL(objectList[0].key == "test/" + filename || objectList[0].key == filename, true);
+        BOOST_CHECK_EQUAL(objectList[1].key == "test/" + filename || objectList[1].key == filename, true);
     }
 
-    TEST_F(S3ServerCliTest, ObjectMoveTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectMoveTest, S3ServiceCliTests) {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -151,15 +143,15 @@ namespace AwsMock::Service {
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
-        EXPECT_EQ(1, objectList.size());
-        EXPECT_TRUE(objectList[0].key == "test/" + objectName);
+        BOOST_CHECK_EQUAL(1, objectList.size());
+        BOOST_CHECK_EQUAL(objectList[0].key, "test/" + objectName);
     }
 
-    TEST_F(S3ServerCliTest, ObjectMultipartUploadTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectMultipartUploadTest, S3ServiceCliTests) {
 
         // arrange: Create bucket
-        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
-        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "create-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--endpoint", _endpoint});
+        const std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "create-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--endpoint", _endpoint});
 
         // arrange: CreateMultipartUpload
         Dto::S3::CreateMultipartUploadResult s3Result;
@@ -169,16 +161,16 @@ namespace AwsMock::Service {
         std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);
         std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "upload-part", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--part-number", "1", "--body", filename, "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
 
-        //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_test_file --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
+        //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_BOOST_FIXTURE_TEST_CASEile --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
         std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "complete-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
         Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
-        EXPECT_EQ(1, objectList.size());
-        EXPECT_TRUE(objectList[0].key == "multipart-upload.json");
+        BOOST_CHECK_EQUAL(1, objectList.size());
+        BOOST_CHECK_EQUAL(objectList[0].key, "multipart-upload.json");
     }
 
-    TEST_F(S3ServerCliTest, ObjectDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectDeleteTest, S3ServiceCliTests) {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
@@ -190,8 +182,7 @@ namespace AwsMock::Service {
         const Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
 
         // assert
-        EXPECT_EQ(0, objectList.size());
+        BOOST_CHECK_EQUAL(0, objectList.size());
     }
-}// namespace AwsMock::Service
 
-#endif// AWMOCK_SERVICE_S3_SERVER_CLI_TEST_H
+}// namespace AwsMock::Service

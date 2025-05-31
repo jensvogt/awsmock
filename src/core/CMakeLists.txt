@@ -22,22 +22,15 @@ if (NOT WIN32)
 endif ()
 
 # Shared library
-if (NOT WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/core/TypeName.h)
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR})
+else ()
+    add_library(${LIBRARY} SHARED ${SOURCES})
     target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY} PUBLIC mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_log boost_log_setup boost_process ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
-        ${EXTERNAL_INCLUDE_DIR})
-if (NOT WIN32)
-    target_link_directories(${LIBRARY_STATIC} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY_STATIC} mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
-            boost_log boost_log_setup boost_process ssl crypto archive magic)
 endif ()

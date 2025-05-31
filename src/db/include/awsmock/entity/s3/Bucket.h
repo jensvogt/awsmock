@@ -18,6 +18,7 @@
 
 // AwsMock include
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
 #include <awsmock/entity/s3/BucketEncryption.h>
 #include <awsmock/entity/s3/BucketNotification.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
@@ -26,11 +27,6 @@
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Versioning status
@@ -47,13 +43,13 @@ namespace AwsMock::Database::Entity::S3 {
             {DISABLED, "disabled"},
     };
 
-    [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
+    [[maybe_unused]] static std::string BucketVersionStatusToString(const BucketVersionStatus bucketVersionStatus) {
         return BucketVersionStatusNames[bucketVersionStatus];
     }
 
     [[maybe_unused]] static BucketVersionStatus BucketVersionStatusFromString(const std::string &bucketVersionStatus) {
         for (auto &[fst, snd]: BucketVersionStatusNames) {
-            if (snd == bucketVersionStatus) {
+            if (Core::StringUtils::EqualsIgnoreCase(snd, bucketVersionStatus)) {
                 return fst;
             }
         }
