@@ -62,6 +62,6 @@ namespace AwsMock::Dto::SecretsManager {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SecretsManager
 
 #endif// AWSMOCK_DTO_SECRETSMANAGER_LIST_SECRET_COUNTERS_REQUEST_H
