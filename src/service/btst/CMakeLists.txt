@@ -32,9 +32,13 @@ target_link_libraries(srv_sqs_cli PUBLIC ${STATIC_LIB} ${LIBRARIES})
 add_executable(srv_sqs_java SQSServiceJavaTests.cpp TestBase.cpp)
 target_link_libraries(srv_sqs_java PUBLIC ${STATIC_LIB} ${LIBRARIES})
 
-# SQS
+# SNS
 add_executable(srv_sns_service SNSServiceTests.cpp TestBase.cpp)
 target_link_libraries(srv_sns_service PUBLIC ${STATIC_LIB} ${LIBRARIES})
+add_executable(srv_sns_cli SNSServiceCliTests.cpp TestBase.cpp)
+target_link_libraries(srv_sns_cli PUBLIC ${STATIC_LIB} ${LIBRARIES})
+add_executable(srv_sns_java SNSServiceJavaTests.cpp TestBase.cpp)
+target_link_libraries(srv_sns_java PUBLIC ${STATIC_LIB} ${LIBRARIES})
 
 #add_test(NAME srv_kms_service COMMAND srv_kms_service WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 add_test(NAME srv_kms_cli COMMAND srv_kms_cli WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
@@ -46,5 +50,7 @@ add_test(NAME srv_sqs_service COMMAND srv_sqs_service WORKING_DIRECTORY ${CMAKE_
 add_test(NAME srv_sqs_cli COMMAND srv_sqs_cli WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 add_test(NAME srv_sqs_java COMMAND srv_sqs_java WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 add_test(NAME srv_sns_service COMMAND srv_sns_service WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
+add_test(NAME srv_sns_cli COMMAND srv_sns_cli WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
+add_test(NAME srv_sns_java COMMAND srv_sns_java WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 
 #file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources/lambda/java-basic-1.0-SNAPSHOT.jar DESTINATION /tmp)

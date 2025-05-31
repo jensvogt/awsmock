@@ -23,7 +23,7 @@ RUN cd /usr/src && \
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
-    git clone -b releases/v3.10 https://github.com/mongodb/mongo-cxx-driver.git && \
+    git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
     cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
     cmake --build . --config Release -j 16 && \
@@ -50,12 +50,3 @@ RUN cd /usr/src && \
     ./configure && \
     make && \
     make install
-
-# Install gtest
-RUN cd /usr/src && \
-    rm -rf googletest gtest && \
-    git clone https://github.com/google/googletest.git && \
-    cd googletest && \
-    cmake . && \
-    cmake --build . --config Release -j 16 && \
-    cmake --install . --prefix /usr/local
