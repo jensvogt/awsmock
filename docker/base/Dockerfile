@@ -1,7 +1,7 @@
 FROM gcc:13.2.0-bookworm
 
 RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip libtool linux-libc-dev  \
-    pandoc wget libarchive-dev libmagic-dev libssh-dev
+    pandoc wget libarchive-dev libmagic-dev libssh-dev automake autoconf libtool
 
 # Create build environment
 RUN mkdir -p /usr/src
@@ -21,11 +21,19 @@ RUN cd /usr/src && \
     cmake --build . -j16 && \
     cmake --install .
 
+# Install mongo-c-driver
+RUN cd /usr/src && \
+    git clone -b r2.0 https://github.com/mongodb/mongo-c-driver.git && \
+    cd mongo-c-driver && \
+    cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_MONGOC=ON && \
+    cmake --build . -j16 && \
+    cmake --install .
+
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
     git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
-    cmake -DCMAKE_CXX_STANDARD=20 -DENABLE_UNINSTALL=OFF . && \
+    cmake . -DCMAKE_CXX_STANDARD=17 && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --prefix /usr/local
 
