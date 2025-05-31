@@ -29,6 +29,8 @@
 #include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
+#include <awsmock/dto/secretsmanager/internal/ListSecretCountersRequest.h>
+#include <awsmock/dto/secretsmanager/internal/ListSecretCountersResponse.h>
 #include <awsmock/dto/secretsmanager/model/VersionStage.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
@@ -111,6 +113,14 @@ namespace AwsMock::Service {
          * @return ListSecretsResponse
          */
         [[nodiscard]] Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
+
+        /**
+         * @brief List secret counters
+         *
+         * @param request list secret counters request
+         * @return ListSecretCountersResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::ListSecretCountersResponse ListSecretCounters(const Dto::SecretsManager::ListSecretCountersRequest &request) const;
 
         /**
          * @brief Updates an existing secret
