@@ -10,6 +10,7 @@
 #include <awsmock/service/sns/SNSService.h>
 #include <awsmock/service/sqs/SQSService.h>
 
+#define BOOST_TEST_MODULE SNSServiceTests
 #define REGION "eu-central-1"
 #define TOPIC "test-topic"
 #define QUEUE "test-queue"

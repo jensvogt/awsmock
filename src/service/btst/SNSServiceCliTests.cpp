@@ -2,15 +2,6 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SERVICE_SNS_CLI_INTEGRATION_TEST_H
-#define AWMOCK_SERVICE_SNS_CLI_INTEGRATION_TEST_H
-
-// C++ includes
-#include <string>
-
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
 #include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
@@ -22,7 +13,10 @@
 #include <awsmock/service/sns/SNSServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
 
+#define BOOST_TEST_MODULE SNSServiceCliTests
 #define TEST_TOPIC std::string("test-topic")
+#define TEST_QUEUE std::string("test-queue")
+#define REGION std::string("eu-central-1")
 
 namespace AwsMock::Service {
 
@@ -31,27 +25,24 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSServerCliTest : public ::testing::Test, public TestBase {
+    struct SNSServerCliTest : TestBase {
 
-      protected:
-
-        void SetUp() override {
+        SNSServerCliTest() {
 
             // General configuration
             StartGateway();
             _region = GetRegion();
             _endpoint = GetEndpoint();
-        }
 
-        void TearDown() override {
-            long deleted = _snsDatabase.DeleteAllMessages();
-            log_info << "SNS message deleted, count: " << deleted;
-            deleted = _snsDatabase.DeleteAllTopics();
-            log_info << "SNS topics deleted, count: " << deleted;
-            deleted = _sqsDatabase.DeleteAllMessages();
-            log_info << "SQS message deleted, count: " << deleted;
-            deleted = _sqsDatabase.DeleteAllQueues();
-            log_info << "SQS queues deleted, count: " << deleted;
+            // Cleanup
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _snsDatabase.DeleteAllMessages();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _snsDatabase.DeleteAllTopics();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _sqsDatabase.DeleteAllMessages();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _sqsDatabase.DeleteAllQueues();
         }
 
         static std::string GetTopicArn(const std::string &jsonString) {
@@ -98,7 +89,7 @@ namespace AwsMock::Service {
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
     };
 
-    TEST_F(SNSServerCliTest, TopicCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicCreateTest, SNSServerCliTest) {
 
         // arrange
 
@@ -107,11 +98,11 @@ namespace AwsMock::Service {
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_EQ(1, topicList.size());
-        EXPECT_TRUE(Core::StringUtils::Contains(output, TEST_TOPIC));
+        BOOST_CHECK_EQUAL(1, topicList.size());
+        BOOST_CHECK_EQUAL(Core::StringUtils::Contains(output, TEST_TOPIC), true);
     }
 
-    TEST_F(SNSServerCliTest, TopicListTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicListTest, SNSServerCliTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
@@ -121,16 +112,15 @@ namespace AwsMock::Service {
         Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_TRUE(Core::StringUtils::Contains(output2, TEST_TOPIC));
+        BOOST_CHECK_EQUAL(Core::StringUtils::Contains(output2, TEST_TOPIC), true);
     }
 
-    TEST_F(SNSServerCliTest, TopicSubscribeTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicSubscribeTest, SNSServerCliTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
-
         const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", "test-queue", "--endpoint", _endpoint});
         const std::string queueUrl = GetQueueUrl(output3);
 
@@ -139,15 +129,14 @@ namespace AwsMock::Service {
         const std::string subscriptionArn = GetSubscriptionArn(output4);
 
         // assert
-        EXPECT_FALSE(output4.empty());
-        EXPECT_FALSE(subscriptionArn.empty());
-        EXPECT_TRUE(Core::StringUtils::Contains(subscriptionArn, "test-topic"));
+        BOOST_CHECK_EQUAL(output4.empty(), false);
+        BOOST_CHECK_EQUAL(subscriptionArn.empty(), false);
+        BOOST_CHECK_EQUAL(Core::StringUtils::Contains(subscriptionArn, "test-topic"), true);
     }
 
-    TEST_F(SNSServerCliTest, TopicUnsubscribeTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicUnsubscribeTest, SNSServerCliTest) {
 
         // arrange
-        // create topic
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
         const std::string topicArn = GetTopicArn(output2);
@@ -164,10 +153,10 @@ namespace AwsMock::Service {
         const std::string output5 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "unsubscribe", "--subscription-arn", subscriptionArn, "--endpoint", _endpoint});
 
         // assert
-        EXPECT_TRUE(output5.empty());
+        BOOST_CHECK_EQUAL(output5.empty(), true);
     }
 
-    TEST_F(SNSServerCliTest, TopicDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicDeleteTest, SNSServerCliTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
@@ -179,10 +168,10 @@ namespace AwsMock::Service {
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
 
         // assert
-        EXPECT_EQ(0, topicList.size());
+        BOOST_CHECK_EQUAL(0, topicList.size());
     }
 
-    TEST_F(SNSServerCliTest, MessagePublishTest) {
+    BOOST_FIXTURE_TEST_CASE(MessagePublishTest, SNSServerCliTest) {
 
         // arrange
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
@@ -195,30 +184,30 @@ namespace AwsMock::Service {
         const std::string messageId = GetMessageId(output3);
 
         // assert
-        EXPECT_EQ(1, messageCount);
-        EXPECT_FALSE(messageId.empty());
+        BOOST_CHECK_EQUAL(1, messageCount);
+        BOOST_CHECK_EQUAL(messageId.empty(), false);
     }
 
-    /*  TEST_F(SNSServerCliTest, MessageDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(MessageReceiveTest, SNSServerCliTest) {
 
-    // arrange
-    Core::ExecResult createResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs create-queue --queue-name " + TEST_TOPIC + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, createResult.status);
-    Core::ExecResult sendResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs send-message --queue-url " + _queueUrl + " --message-body TEST-BODY --endpoint " + _endpoint);
-    EXPECT_EQ(0, createResult.status);
-    Core::ExecResult receiveResult = Core::TestUtils::SendCliCommand("sqs", "aws sqs receive-message --queue-url " + _queueUrl + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, receiveResult.status);
-    std::string receiptHandle = GetReceiptHandle(receiveResult.output);
+        // arrange
+        std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "create-topic", "--name", TEST_TOPIC, "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "list-topics", "--endpoint", _endpoint});
+        const std::string topicArn = GetTopicArn(output2);
+        const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
+        const std::string queueArn = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueArn;
+        const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
+        const std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "subscribe", "--topic-arn", topicArn, "--protocol", "sqs", "--notification-endpoint", queueArn, "--endpoint", _endpoint});
+        const std::string subscriptionArn = GetSubscriptionArn(output4);
 
-    // act
-    Core::ExecResult result = Core::TestUtils::SendCliCommand("sqs", "aws sqs delete-message --queue-url " + _queueUrl + " --receipt-handle " + receiptHandle + " --endpoint " + _endpoint);
-    EXPECT_EQ(0, receiveResult.status);
-    long messageCount = _database.CountMessages(REGION, _queueUrl);
+        // act
+        const std::string output5 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sns", "publish", "--topic-arn", topicArn, "--message", "TEST-BODY", "--endpoint", _endpoint});
+        const long messageCount = _snsDatabase.CountMessages();
+        const std::string output6 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "receive-message", "--queue-url", queueUrl, "--endpoint", _endpoint});
 
-    // assert
-    EXPECT_EQ(0, messageCount);
-  }*/
+        // assert
+        BOOST_CHECK_EQUAL(1, messageCount);
+        BOOST_CHECK_EQUAL(output6.empty(), false);
+    }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_SERVICE_SNS_CLI_INTEGRATION_TEST_H
