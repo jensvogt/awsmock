@@ -42,7 +42,7 @@ namespace AwsMock::Database::Entity::Lambda {
             {InstanceUnknown, "Unknown"},
     };
 
-    [[maybe_unused]] static std::string LambdaInstanceStatusToString(LambdaInstanceStatus lambdaInstanceStatus) {
+    [[maybe_unused]] static std::string LambdaInstanceStatusToString(const LambdaInstanceStatus &lambdaInstanceStatus) {
         return LambdaInstanceStatusNames[lambdaInstanceStatus];
     }
 

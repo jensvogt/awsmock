@@ -2,19 +2,16 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_SERVICE_LAMBDASERVICETEST_H
-#define AWMOCK_SERVICE_LAMBDASERVICETEST_H
-
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
+
+#include "TestBase.h"
+
+
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
-// Test includes
-#include <awsmock/core/TestUtils.h>
-
+#define BOOST_TEST_MODULE LambdaServiceTests
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
 #define RUNTIME "java11"
@@ -26,14 +23,9 @@
 
 namespace AwsMock::Service {
 
-    class LambdaServiceTest : public ::testing::Test {
+    struct LambdaServiceTest : TestBase {
 
-      protected:
-
-        void SetUp() override {
-        }
-
-        void TearDown() override {
+        LambdaServiceTest() {
             try {
                 Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest = {.functionName = FUNCTION_NAME, .qualifier = "latest"};
                 _lambdaService.DeleteFunction({.region = REGION, .functionName = FUNCTION_NAME, .qualifier = "latest"});
@@ -76,7 +68,7 @@ namespace AwsMock::Service {
         std::string testFile;
     };
 
-    TEST_F(LambdaServiceTest, LambdaCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaCreateTest, LambdaServiceTest) {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
@@ -87,12 +79,12 @@ namespace AwsMock::Service {
         const long functionCount = _database.LambdaCount();
 
         // assert
-        EXPECT_TRUE(response.handler == HANDLER);
-        EXPECT_TRUE(response.runtime == RUNTIME);
-        EXPECT_EQ(1, functionCount);
+        BOOST_CHECK_EQUAL(response.handler, HANDLER);
+        BOOST_CHECK_EQUAL(response.runtime, RUNTIME);
+        BOOST_CHECK_EQUAL(1, functionCount);
     }
 
-    TEST_F(LambdaServiceTest, LambdaListTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaListTest, LambdaServiceTest) {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest createRequest = CreateTestLambdaRequest();
@@ -103,11 +95,11 @@ namespace AwsMock::Service {
         auto [lambdaList, functions] = _lambdaService.ListFunctions(REGION);
 
         // assert
-        EXPECT_FALSE(lambdaList.empty());
-        EXPECT_TRUE(lambdaList.front().function == FUNCTION_NAME);
+        BOOST_CHECK_EQUAL(lambdaList.empty(), false);
+        BOOST_CHECK_EQUAL(lambdaList.front().function, FUNCTION_NAME);
     }
 
-    TEST_F(LambdaServiceTest, LambdaGetTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaGetTest, LambdaServiceTest) {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
@@ -118,11 +110,11 @@ namespace AwsMock::Service {
         const Dto::Lambda::GetFunctionResponse response = _lambdaService.GetFunction(REGION, FUNCTION_NAME);
 
         // assert
-        EXPECT_TRUE(response.configuration.handler == HANDLER);
-        EXPECT_TRUE(response.configuration.runtime == RUNTIME);
+        BOOST_CHECK_EQUAL(response.configuration.handler, HANDLER);
+        BOOST_CHECK_EQUAL(response.configuration.runtime, RUNTIME);
     }
 
-    TEST_F(LambdaServiceTest, LambdaCreateTagsTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaCreateTagsTest, LambdaServiceTest) {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
@@ -139,12 +131,12 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambda = _database.GetLambdaByArn(functionArn);
 
         // assert
-        EXPECT_FALSE(lambda.tags.empty());
-        EXPECT_TRUE(lambda.tags["test-key1"] == "test-value1");
-        EXPECT_TRUE(lambda.tags["test-key2"] == "test-value2");
+        BOOST_CHECK_EQUAL(lambda.tags.empty(), false);
+        BOOST_CHECK_EQUAL(lambda.tags["test-key1"], "test-value1");
+        BOOST_CHECK_EQUAL(lambda.tags["test-key2"], "test-value2");
     }
 
-    TEST_F(LambdaServiceTest, LambdaDeleteTagsTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaDeleteTagsTest, LambdaServiceTest) {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest request = CreateTestLambdaRequest();
@@ -160,15 +152,15 @@ namespace AwsMock::Service {
 
         // act
         const std::vector<std::string> tagKeys = {"test-key1", "test-key2"};
-        Dto::Lambda::DeleteTagsRequest deleteTabsRequest(functionArn, tagKeys);
+        const Dto::Lambda::DeleteTagsRequest deleteTabsRequest(functionArn, tagKeys);
         _lambdaService.DeleteTags(deleteTabsRequest);
         const Database::Entity::Lambda::Lambda lambda = _database.GetLambdaByArn(functionArn);
 
         // assert
-        EXPECT_TRUE(lambda.tags.empty());
+        BOOST_CHECK_EQUAL(lambda.tags.empty(), false);
     }
 
-    TEST_F(LambdaServiceTest, LambdaDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaDeleteTest, LambdaServiceTest) {
 
         // arrange
         Dto::Lambda::CreateFunctionRequest createRequest = CreateTestLambdaRequest();
@@ -181,9 +173,7 @@ namespace AwsMock::Service {
         const long functionCount = _database.LambdaCount();
 
         // assert
-        EXPECT_EQ(0, functionCount);
+        BOOST_CHECK_EQUAL(0, functionCount);
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_SERVICE_LAMBDASERVICETEST_H

@@ -2,20 +2,15 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_S3_SERVICE_TEST_H
-#define AWMOCK_CORE_S3_SERVICE_TEST_H
-
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
+
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/S3Database.h>
 #include <awsmock/service/s3/S3Service.h>
 
-// Test includes
-#include <awsmock/core/TestUtils.h>
-
+#define BOOST_TEST_MODULE S3ServiceTests
 #define REGION "eu-central-1"
 #define BUCKET "test-bucket"
 #define KEY "testfile.json"
@@ -31,29 +26,25 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class S3ServiceTest : public ::testing::Test {
+    struct S3ServiceTest : TestBase {
 
-      protected:
-
-        void SetUp() override {
+        S3ServiceTest() {
             testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
-        }
 
-        void TearDown() override {
-            long count = _database.DeleteAllObjects();
-            log_info << "Database objects deleted: " << count << std::endl;
-            count = _database.DeleteAllBuckets();
-            log_info << "Database buckets deleted: " << count << std::endl;
+            // Cleanup
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _database.DeleteAllObjects();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _database.DeleteAllBuckets();
             Core::FileUtils::DeleteFile(testFile);
         }
 
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
-        Database::S3Database _database = Database::S3Database();
         S3Service _service;
         std::string testFile;
+        Database::S3Database _database = Database::S3Database();
     };
 
-    TEST_F(S3ServiceTest, BucketCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketCreateTest, S3ServiceTest) {
 
         // arrange
         const Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -62,10 +53,10 @@ namespace AwsMock::Service {
         auto [location, arn] = _service.CreateBucket(request);
 
         // assert
-        EXPECT_TRUE(location == "eu-central-1");
+        BOOST_CHECK_EQUAL(location, "eu-central-1");
     }
 
-    TEST_F(S3ServiceTest, BucketListTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketListTest, S3ServiceTest) {
 
         // arrange
         const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -82,11 +73,11 @@ namespace AwsMock::Service {
         const Dto::S3::ListBucketResponse listResponse = _service.ListBucket(listRequest);
 
         // assert
-        EXPECT_TRUE(listResponse.contents.size() > 0);
-        EXPECT_TRUE(listResponse.contents.front().key == KEY);
+        BOOST_CHECK_EQUAL(listResponse.contents.size() > 0, true);
+        BOOST_CHECK_EQUAL(listResponse.contents.front().key, KEY);
     }
 
-    TEST_F(S3ServiceTest, BucketListAllTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketListAllTest, S3ServiceTest) {
 
         // arrange
         const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -96,11 +87,11 @@ namespace AwsMock::Service {
         const Dto::S3::ListAllBucketResponse response = _service.ListAllBuckets();
 
         // assert
-        EXPECT_TRUE(response.total > 0);
-        EXPECT_TRUE(response.bucketList.front().bucketName == BUCKET);
+        BOOST_CHECK_EQUAL(response.total > 0, true);
+        BOOST_CHECK_EQUAL(response.bucketList.front().bucketName, BUCKET);
     }
 
-    TEST_F(S3ServiceTest, BucketDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketDeleteTest, S3ServiceTest) {
 
         // arrange
         const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -112,10 +103,10 @@ namespace AwsMock::Service {
         const Dto::S3::ListAllBucketResponse response = _service.ListAllBuckets();
 
         // assert
-        EXPECT_EQ(0, response.bucketList.size());
+        BOOST_CHECK_EQUAL(0, response.bucketList.size());
     }
 
-    TEST_F(S3ServiceTest, ObjectPutTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectPutTest, S3ServiceTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -130,11 +121,11 @@ namespace AwsMock::Service {
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // assert
-        EXPECT_TRUE(putResponse.bucket == BUCKET);
-        EXPECT_TRUE(putResponse.key == KEY);
+        BOOST_CHECK_EQUAL(putResponse.bucket, BUCKET);
+        BOOST_CHECK_EQUAL(putResponse.key, KEY);
     }
 
-    TEST_F(S3ServiceTest, ObjectGetTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectGetTest, S3ServiceTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -154,11 +145,11 @@ namespace AwsMock::Service {
         Dto::S3::GetObjectResponse getResponse = _service.GetObject(getRequest);
 
         // assert
-        EXPECT_TRUE(getResponse.bucket == BUCKET);
-        EXPECT_TRUE(getResponse.key == KEY);
+        BOOST_CHECK_EQUAL(getResponse.bucket, BUCKET);
+        BOOST_CHECK_EQUAL(getResponse.key, KEY);
     }
 
-    TEST_F(S3ServiceTest, ObjectDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectDeleteTest, S3ServiceTest) {
 
         // arrange
         Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
@@ -172,11 +163,9 @@ namespace AwsMock::Service {
 
         // act
         Dto::S3::DeleteObjectRequest deleteRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
-        EXPECT_NO_THROW({ _service.DeleteObject(deleteRequest); });
+        BOOST_CHECK_NO_THROW({ _service.DeleteObject(deleteRequest); });
 
         // assert
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_CORE_S3_SERVICE_TEST_H
