@@ -251,7 +251,6 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = _keyCollection.delete_many({});
                 session.commit_transaction();
-                log_debug << "All KMS keys deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {

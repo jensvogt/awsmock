@@ -2,18 +2,14 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SERVICE_KMS_JAVA_SERVER_TEST_H
-#define AWMOCK_SERVICE_KMS_JAVA_SERVER_TEST_H
-
 // AwsMock includes
 #include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/KMSDatabase.h>
-#include <awsmock/service/gateway/GatewayServer.h>
-#include <awsmock/service/kms/KMSServer.h>
 
+#define BOOST_TEST_MODULE KMSServiceJavaTests
 #define TEST_PORT 10100
+#define REGION "eu-central-1"
 
 namespace AwsMock::Service {
 
@@ -32,22 +28,14 @@ namespace AwsMock::Service {
             // Start the gateway server
             StartGateway(TEST_PORT);
 
-            // General configuration
-            _region = GetRegion();
-
             // Base URL
             _kmsBaseUrl = "/api/kms/";
+
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _kmsDatabase.DeleteAllKeys();
         }
 
-        ~KMSServiceJavaTest() {
-            const long count = _kmsDatabase.DeleteAllKeys();
-            log_debug << "Keys deleted, count: " << count;
-            StopGateway();
-        }
-
-        std::string _kmsBaseUrl, _region;
-        boost::asio::io_context _ios{10};
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        std::string _kmsBaseUrl;
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
     };
 
@@ -67,6 +55,7 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(response.keySpec == Dto::KMS::KeySpec::SYMMETRIC_DEFAULT, true);
         BOOST_CHECK_EQUAL(response.keyUsage == Dto::KMS::KeyUsage::ENCRYPT_DECRYPT, true);
     }
+
     BOOST_FIXTURE_TEST_CASE(KeyRSA2048Test, KMSServiceJavaTest) {
 
         // arrange
@@ -119,6 +108,7 @@ namespace AwsMock::Service {
     }
 
     BOOST_FIXTURE_TEST_CASE(KeyListJTest, KMSServiceJavaTest) {
+
         // arrange
         const Core::HttpSocketResponse result = SendPostCommand(_kmsBaseUrl + "createRSA2048Key?keySpec=" + KeySpecToString(Dto::KMS::KeySpec::RSA_2048) + "&keyUsage=" + KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT) + "&description=Description", {}, TEST_PORT);
         BOOST_CHECK_EQUAL(result.statusCode, http::status::ok);
@@ -140,5 +130,3 @@ namespace AwsMock::Service {
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_SERVICE_KMS_JAVA_SERVER_TEST_H

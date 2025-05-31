@@ -2,20 +2,13 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SQS_CLI_INTEGRATIONTEST_H
-#define AWMOCK_SQS_CLI_INTEGRATIONTEST_H
-
-// C++ includes
-#include <string>
-
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/FileUtils.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 
-// Test includes
-#include "TestBase.h"
-#include <awsmock/core/TestUtils.h>
-
+#define BOOST_TEST_MODULE SQSServiceCliTests
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
 #define SQS_ACCOUNT_ID "000000000000"
@@ -36,14 +29,11 @@ namespace AwsMock::Service {
             StartGateway();
             _region = GetRegion();
             _endpoint = GetEndpoint();
-        }
 
-        ~SQSServiceCliTests() {
-            long deleted = _sqsDatabase.DeleteAllMessages();
-            log_info << "SQS message deleted, count: " << deleted;
-            deleted = _sqsDatabase.DeleteAllQueues();
-            log_info << "SQS queues deleted, count: " << deleted;
-            StopGateway();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _sqsDatabase.DeleteAllMessages();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _sqsDatabase.DeleteAllQueues();
         }
 
         static std::string GetReceiptHandle(const std::string &jsonString) {
@@ -104,7 +94,6 @@ namespace AwsMock::Service {
         // arrange
         const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
-
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "send-message", "--queue-url", queueUrl, "--message-body", "TEST-BODY", "--endpoint", _endpoint});
 
         // act
@@ -131,6 +120,7 @@ namespace AwsMock::Service {
     }
 
     BOOST_FIXTURE_TEST_CASE(MessageSendTest, SQSServiceCliTests) {
+
         // arrange
         const std::string output = Core::TestUtils::SendCliCommand(AWS_CMD, {"sqs", "create-queue", "--queue-name", TEST_QUEUE, "--endpoint", _endpoint});
         const std::string queueUrl = _sqsDatabase.GetQueueByName(REGION, TEST_QUEUE).queueUrl;
@@ -178,5 +168,3 @@ namespace AwsMock::Service {
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_SQS_CLI_INTEGRATIONTEST_H

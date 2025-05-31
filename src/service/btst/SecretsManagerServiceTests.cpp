@@ -2,13 +2,11 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_SERVICE_SECRETS_MANAGER_SERVICE_TEST_H
-#define AWMOCK_SERVICE_SECRETS_MANAGER_SERVICE_TEST_H
-
 // Test includes
 #include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
 
+#define BOOST_TEST_MODULE SecretManagerServiceTests
 #define REGION "eu-central-1"
 #define OWNER "test-owner"
 #define PLAIN_TEXT "The quick brown fox jumps over the lazy dog"
@@ -19,18 +17,15 @@ namespace AwsMock::Service {
     struct SecretsServiceTest : TestBase {
 
         SecretsServiceTest() {
-            _region = _configuration.GetValue<std::string>("awsmock.region");
+
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _secretsManagerDatabase.DeleteAllSecrets();
         }
 
-        ~SecretsServiceTest() {
-            const long count = _secretsManagerDatabase.DeleteAllSecrets();
-            log_debug << "Keys deleted: " << count;
-        }
-
-        [[nodiscard]] Dto::SecretsManager::CreateSecretRequest createDefaultRequest() const {
+        [[nodiscard]] static Dto::SecretsManager::CreateSecretRequest createDefaultRequest() {
             Dto::SecretsManager::CreateSecretRequest request;
             request.requestId = Core::StringUtils::CreateRandomUuid();
-            request.region = _region;
+            request.region = REGION;
             request.user = "user";
             request.description = "description";
             request.name = "test-secret";
@@ -38,8 +33,6 @@ namespace AwsMock::Service {
             return request;
         }
 
-        std::string _region;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
         SecretsManagerService _secretsManagerService;
     };
@@ -72,7 +65,7 @@ namespace AwsMock::Service {
 
         // act
         Dto::SecretsManager::GetSecretValueRequest getRequest;
-        getRequest.region = _region;
+        getRequest.region = REGION;
         getRequest.secretId = createResponse.arn;
         getRequest.versionStage = "AWSCURRENT";
 
@@ -85,6 +78,5 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(getResponse.versionId.empty(), false);
         BOOST_CHECK_EQUAL(getResponse.secretString, createRequest.secretString);
     }
-}// namespace AwsMock::Service
 
-#endif// AWMOCK_SERVICE_SECRETS_MANAGER_SERVICE_TEST_H
+}// namespace AwsMock::Service

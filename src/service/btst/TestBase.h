@@ -5,10 +5,16 @@
 #ifndef AWSMOCK_SERVICE_TEST_BASE_H
 #define AWSMOCK_SERVICE_TEST_BASE_H
 
+#define BOOST_TEST_DYN_LINK
+#include <boost/test/unit_test.hpp>
+
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 
 #define AWS_CMD "/usr/local/bin/aws"
+#define TEST_IMAGE_NAME std::string("jensvogt/awsmock-test")
+#define TEST_CONTAINER_VERSION std::string("latest")
+#define TEST_CONTAINER_NAME std::string("awsmock-test")
 
 namespace AwsMock::Service {
 
@@ -46,9 +52,14 @@ namespace AwsMock::Service {
          * @return current endpoint
          */
         std::string GetEndpoint() { return _endpoint; }
-        void InitializeDatabase();
-        void InitializeShm();
-        bool InitUnitTest();
+
+        static bool InitUnitTests();
+
+        static void InitializeDatabase();
+
+        static void InitializeShm();
+
+        static void StartContainer();
 
       protected:
 
@@ -92,7 +103,7 @@ namespace AwsMock::Service {
 
         boost::thread _thread;
         std::string _endpoint, _region;
-        boost::asio::io_context _ios{2};
+        boost::asio::io_context _ios{5};
         std::shared_ptr<GatewayServer> _gatewayServer;
         Core::Configuration &_configuration = Core::Configuration::instance();
     };

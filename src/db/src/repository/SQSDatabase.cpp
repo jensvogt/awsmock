@@ -214,7 +214,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
             if (!queueName.empty()) {
-                query.append(kvp("queueName", queueName));
+                query.append(kvp("name", queueName));
             }
 
             if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
@@ -1428,13 +1428,7 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        for (const auto &key: *_sqsCounterMap | std::views::keys) {
-            (*_sqsCounterMap)[key].messages = 0;
-            (*_sqsCounterMap)[key].initial = 0;
-            (*_sqsCounterMap)[key].invisible = 0;
-            (*_sqsCounterMap)[key].delayed = 0;
-            (*_sqsCounterMap)[key].size = 0;
-        }
+        _sqsCounterMap->clear();
         return deleted;
     }
 }// namespace AwsMock::Database
