@@ -2,22 +2,15 @@
 // Created by vogje01 on 21/10/2023.
 //
 
-#ifndef AWMOCK_SQS_SPRING_SERVER_TEST_H
-#define AWMOCK_SQS_SPRING_SERVER_TEST_H
-
-// C++ includes
-#include <string>
-
 // AwsMock includes
+#include "TestBase.h"
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/TestUtils.h>
 #include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/sqs/SQSServer.h>
 
-// Test includes
-#include "TestBase.h"
-#include <awsmock/core/TestUtils.h>
-
+#define BOOST_TEST_MODULE SQSServiceJavaTests
 #define TEST_QUEUE std::string("test-queue")
 #define TEST_MESSAGE std::string("{\"testKey\": \"testValue\"}")
 #define TEST_PORT 10100
@@ -29,7 +22,7 @@ namespace AwsMock::Service {
         std::string testKey;
         std::string receiptHandle;
 
-        std::string ToJson() const {
+        [[nodiscard]] std::string ToJson() const {
 
             document rootDocument;
             rootDocument.append(kvp("testKey", testKey));
@@ -83,7 +76,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SQSServiceJavaTest : public TestBase {
+    struct SQSServiceJavaTest : TestBase {
 
         SQSServiceJavaTest() {
 
@@ -98,10 +91,11 @@ namespace AwsMock::Service {
         }
 
         ~SQSServiceJavaTest() {
-            long deleted = _sqsDatabase.DeleteAllMessages();
-            log_info << "SQS message deleted, count: " << deleted;
-            deleted = _sqsDatabase.DeleteAllQueues();
-            log_info << "SQS queues deleted, count: " << deleted;
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _sqsDatabase.DeleteAllMessages();
+
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _sqsDatabase.DeleteAllQueues();
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {
@@ -211,7 +205,7 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(SQSChangeMessageVisibilityTest, SQSServiceJavaTest) {
 
         // arrange
-        Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
+        const Core::HttpSocketResponse result = SendPostCommand(_baseUrl + "createQueue?queueName=" + TEST_QUEUE, {});
         BOOST_CHECK_EQUAL(http::status::ok, result.statusCode);
         const std::string queueUrl = result.body;
         const TestMessage testMessage = {.testKey = "testKey"};
@@ -373,5 +367,3 @@ namespace AwsMock::Service {
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_SQS_SPRING_SERVER_TEST_H

@@ -58,7 +58,7 @@ namespace AwsMock::Database {
          * @return true if key already exists
          * @throws DatabaseException
          */
-        bool KeyExists(const std::string &keyId) const;
+        [[nodiscard]] bool KeyExists(const std::string &keyId) const;
 
         /**
          * @brief Returns a KMS key by primary key

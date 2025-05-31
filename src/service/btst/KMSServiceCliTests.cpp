@@ -2,17 +2,16 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_KMS_SERVER_CLI_TEST_H
-#define AWMOCK_KMS_SERVER_CLI_TEST_H
-
 // AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/service/kms/KMSService.h>
+
+// Test includes
 #include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/repository/S3Database.h>
-#include <awsmock/service/cognito/CognitoServer.h>
-#include <awsmock/service/cognito/CognitoService.h>
-#include <awsmock/service/gateway/GatewayServer.h>
 
+#define BOOST_TEST_MODULE KMSServiceCliTests
 #define PLAIN_TEXT_BASE64 std::string("VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==")
 
 namespace AwsMock::Service {
@@ -30,12 +29,9 @@ namespace AwsMock::Service {
             // General configuration
             _region = GetRegion();
             _endpoint = GetEndpoint();
-        }
 
-        ~KMSServiceCliTests() {
-            const long count = _database.DeleteAllKeys();
-            log_debug << "KMS keys deleted, count: " << count;
-            StopGateway();
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _database.DeleteAllKeys();
         }
 
         std::string _endpoint, _region;
@@ -52,7 +48,7 @@ namespace AwsMock::Service {
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        BOOST_CHECK_EQUAL(keyList.size() > 0, true);
+        BOOST_CHECK_EQUAL(keyList.empty(), false);
         BOOST_CHECK_EQUAL(keyList.at(0).arn.empty(), false);
         BOOST_CHECK_EQUAL(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::SYMMETRIC_DEFAULT), true);
         BOOST_CHECK_EQUAL(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT), true);
@@ -156,5 +152,3 @@ namespace AwsMock::Service {
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_KMS_SERVER_CLI_TEST_H

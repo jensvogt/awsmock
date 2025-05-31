@@ -111,7 +111,7 @@ namespace AwsMock::Database {
 
     long KMSMemoryDb::DeleteAllKeys() {
         boost::mutex::scoped_lock lock(_keyMutex);
-        const long deleted = _keys.size();
+        const long deleted = static_cast<long>(_keys.size());
         _keys.clear();
         log_debug << "All KMS keys deleted, count: " << deleted;
         return deleted;
