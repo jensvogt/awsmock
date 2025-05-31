@@ -181,13 +181,13 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const {
-        log_trace << "List secrets request: " << request.ToString();
+        log_trace << "List secrets request: " << request;
 
         try {
             Dto::SecretsManager::ListSecretsResponse response;
 
             // Get the object from the database
-            for (Database::Entity::SecretsManager::SecretList secrets = _secretsManagerDatabase.ListSecrets(); const auto &s: secrets) {
+            for (const Database::Entity::SecretsManager::SecretList secrets = _secretsManagerDatabase.ListSecrets(); const auto &s: secrets) {
                 Dto::SecretsManager::Secret secret;
                 secret.primaryRegion = s.primaryRegion;
                 secret.arn = s.arn;
@@ -210,7 +210,48 @@ namespace AwsMock::Service {
 
                 response.secretList.emplace_back(secret);
             }
-            //response.nextToken = secrets.back().secretId;
+
+            // Convert to DTO
+            log_debug << "Database list secrets, region: " << request.region;
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "List secrets failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    Dto::SecretsManager::ListSecretCountersResponse SecretsManagerService::ListSecretCounters(const Dto::SecretsManager::ListSecretCountersRequest &request) const {
+        log_trace << "List secret counters request: " << request;
+
+        try {
+            Dto::SecretsManager::ListSecretCountersResponse response;
+            response.total = _secretsManagerDatabase.CountSecrets(request.region);
+
+            // Get the object from the database
+            for (const Database::Entity::SecretsManager::SecretList secrets = _secretsManagerDatabase.ListSecrets(); const auto &s: secrets) {
+                Dto::SecretsManager::SecretCounter secretCounter;
+                secretCounter.secretName = s.name;
+                secretCounter.secretArn = s.arn;
+                secretCounter.secretId = s.secretId;
+                secretCounter.createdDate = s.createdDate;
+                secretCounter.deletedDate = s.deletedDate;
+                secretCounter.lastAccessedDate = s.lastAccessedDate;
+                secretCounter.lastChangedDate = s.lastChangedDate;
+                secretCounter.lastRotatedDate = s.lastRotatedDate;
+                secretCounter.nextRotatedDate = s.nextRotatedDate;
+                secretCounter.rotationEnabled = s.rotationEnabled;
+                secretCounter.rotationLambdaARN = s.rotationLambdaARN;
+                secretCounter.created = s.created;
+                secretCounter.modified = s.modified;
+
+                // Rotation rules
+                secretCounter.rotationRules.automaticallyAfterDays = s.rotationRules.automaticallyAfterDays;
+                secretCounter.rotationRules.duration = s.rotationRules.duration;
+                secretCounter.rotationRules.scheduleExpression = s.rotationRules.scheduleExpression;
+
+                response.secretCounters.emplace_back(secretCounter);
+            }
 
             // Convert to DTO
             log_debug << "Database list secrets, region: " << request.region;

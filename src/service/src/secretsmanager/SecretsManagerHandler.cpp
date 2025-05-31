@@ -69,6 +69,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
+                case Dto::Common::SecretsManagerCommandType::LIST_SECRET_COUNTERS: {
+
+                    Dto::SecretsManager::ListSecretCountersRequest secretsManagerRequest = Dto::SecretsManager::ListSecretCountersRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::ListSecretCountersResponse secretsManagerResponse = _secretsManagerService.ListSecretCounters(secretsManagerRequest);
+                    log_info << "Secrets counters listed, region: " << secretsManagerResponse.region;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
                 default:
                     log_error << "Unknown method";
                     SendBadRequestError(request, "Unknown method");

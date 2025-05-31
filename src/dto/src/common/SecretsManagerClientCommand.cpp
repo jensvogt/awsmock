@@ -23,29 +23,19 @@ namespace AwsMock::Dto::Common {
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
         // Command
-        const std::string action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-
+        std::string action;
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "secretsmanager") {
+            action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+        } else {
+            action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
+        }
         switch (method) {
             case http::verb::get:
             case http::verb::put:
             case http::verb::delete_:
                 break;
             case http::verb::post:
-                if (Core::StringUtils::ContainsIgnoreCase(action, "CreateSecret")) {
-                    command = SecretsManagerCommandType::CREATE_SECRET;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "DeleteSecret")) {
-                    command = SecretsManagerCommandType::DELETE_SECRET;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "DescribeSecret")) {
-                    command = SecretsManagerCommandType::DESCRIBE_SECRET;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "GetSecretValue")) {
-                    command = SecretsManagerCommandType::GET_SECRET_VALUE;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "UpdateSecret")) {
-                    command = SecretsManagerCommandType::UPDATE_SECRET;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "RotateSecret")) {
-                    command = SecretsManagerCommandType::ROTATE_SECRET;
-                } else if (Core::StringUtils::ContainsIgnoreCase(action, "ListSecrets")) {
-                    command = SecretsManagerCommandType::LIST_SECRETS;
-                }
+                command = SecretsManagerCommandTypeFromString(action);
                 break;
             default:;
         }

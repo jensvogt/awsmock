@@ -10,6 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "SecretValue.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/RotationRules.h>
@@ -133,6 +136,11 @@ namespace AwsMock::Dto::SecretsManager {
         RotationRules rotationRules;
 
         /**
+         * Secret values
+         */
+        std::vector<SecretValue> secretValues;
+
+        /**
          * @brief Converts the DTO to a JSON object.
          *
          * @return DTO as JSON object.
@@ -239,7 +247,7 @@ namespace AwsMock::Dto::SecretsManager {
                     {"LastAccessedDate", obj.lastAccessedDate},
                     {"LastChangedDate", obj.lastChangedDate},
                     {"LastRotatedDate", obj.lastRotatedDate},
-                    {"BextRotatedDate", obj.nextRotatedDate},
+                    {"NextRotatedDate", obj.nextRotatedDate},
                     {"RotationEnabled", obj.rotationEnabled},
                     {"RotationLambdaARN", obj.rotationLambdaARN},
                     {"RotationRules", boost::json::value_from(obj.rotationRules)},
