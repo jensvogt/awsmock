@@ -555,7 +555,7 @@ namespace AwsMock::Service {
     void SecretsManagerService::EncryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {
         Dto::KMS::EncryptRequest encryptRequest;
         encryptRequest.keyId = kmsKeyId;
-        encryptRequest.plainText = Core::Crypto::Base64Encode(secretString);
+        encryptRequest.plaintext = Core::Crypto::Base64Encode(secretString);
         const Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
         version.secretString = encryptResponse.ciphertext;
     }

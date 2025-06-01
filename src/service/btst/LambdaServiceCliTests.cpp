@@ -52,12 +52,8 @@ namespace AwsMock::Service {
                 _s3Database.DeleteAllObjects();
                 // ReSharper disable once CppExpressionWithoutSideEffects
                 _s3Database.DeleteAllBuckets();
-                // ReSharper disable once CppNoDiscardExpression
+                // ReSharper disable once CppExpressionWithoutSideEffects
                 _lambdaDatabase.DeleteAllLambdas();
-
-                // Delete lambda function
-                //Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest = {.functionName = FUNCTION_NAME, .qualifier = "latest"};
-                //_lambdaService.DeleteFunction({.region = REGION, .functionName = FUNCTION_NAME, .qualifier = "latest"});
 
             } catch (Core::ServiceException &ex) {
                 // Do nothing

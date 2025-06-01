@@ -62,7 +62,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Encryption algorithm
          */
-        EncryptionAlgorithm encryptionAlgorithm{};
+        EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm::UNKNOWN;
 
         /**
          * Encryption model
@@ -86,9 +86,13 @@ namespace AwsMock::Dto::KMS {
             r.keyId = Core::Json::GetStringValue(v, "KeyId");
             r.ciphertext = Core::Json::GetStringValue(v, "CiphertextBlob");
             r.encryptionAlgorithm = EncryptionAlgorithmsFromString(Core::Json::GetStringValue(v, "EncryptionAlgorithm"));
-            r.encryptionContext = boost::json::value_to<std::map<std::string, std::string>>(v.at("EncryptionContext"));
-            r.grantTokens = boost::json::value_to<std::vector<std::string>>(v.at("GrantTokens"));
             r.dryRun = Core::Json::GetBoolValue(v, "DryRun");
+            if (Core::Json::AttributeExists(v, "GrantTokens")) {
+                r.grantTokens = boost::json::value_to<std::vector<std::string>>(v.at("GrantTokens"));
+            }
+            if (Core::Json::AttributeExists(v, "EncryptionContext")) {
+                r.encryptionContext = boost::json::value_to<std::map<std::string, std::string>>(v.at("EncryptionContext"));
+            }
             return r;
         }
 

@@ -61,10 +61,7 @@ namespace AwsMock::Service {
 
             case Dto::Common::KMSCommandType::ENCRYPT: {
 
-                Dto::KMS::EncryptRequest kmsRequest;
-                kmsRequest.FromJson(clientCommand.payload);
-                kmsRequest.region = clientCommand.region;
-
+                Dto::KMS::EncryptRequest kmsRequest = Dto::KMS::EncryptRequest::FromJson(clientCommand);
                 Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(kmsRequest);
 
                 log_info << "Encrypt received, size: " << kmsResponse.ciphertext.length();
@@ -73,10 +70,7 @@ namespace AwsMock::Service {
 
             case Dto::Common::KMSCommandType::DECRYPT: {
 
-                Dto::KMS::DecryptRequest kmsRequest;
-                kmsRequest.FromJson(clientCommand.payload);
-                kmsRequest.region = clientCommand.region;
-
+                Dto::KMS::DecryptRequest kmsRequest = Dto::KMS::DecryptRequest::FromJson(clientCommand);
                 Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(kmsRequest);
 
                 log_info << "Decrypt received, size: " << kmsResponse.plaintext.length();

@@ -20,14 +20,16 @@ namespace AwsMock::Dto::KMS {
         SYMMETRIC_DEFAULT,
         RSAES_OAEP_SHA_1,
         RSAES_OAEP_SHA_256,
-        SM2PKE
+        SM2PKE,
+        UNKNOWN,
     };
 
     static std::map<EncryptionAlgorithm, std::string> EncryptionAlgorithmsNames{
             {EncryptionAlgorithm::SYMMETRIC_DEFAULT, "SYMMETRIC_DEFAULT"},
             {EncryptionAlgorithm::RSAES_OAEP_SHA_1, "RSAES_OAEP_SHA_1"},
             {EncryptionAlgorithm::RSAES_OAEP_SHA_256, "RSAES_OAEP_SHA_256"},
-            {EncryptionAlgorithm::SM2PKE, "SM2PKE"}};
+            {EncryptionAlgorithm::SM2PKE, "SM2PKE"},
+            {EncryptionAlgorithm::UNKNOWN, "UNKNOWN"}};
 
     [[maybe_unused]] static std::string EncryptionAlgorithmsToString(EncryptionAlgorithm encryptionAlgorithm) {
         return EncryptionAlgorithmsNames[encryptionAlgorithm];
@@ -39,7 +41,7 @@ namespace AwsMock::Dto::KMS {
                 return fst;
             }
         }
-        return EncryptionAlgorithm::SYMMETRIC_DEFAULT;
+        return EncryptionAlgorithm::UNKNOWN;
     }
 
 }// namespace AwsMock::Dto::KMS
