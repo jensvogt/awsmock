@@ -40,6 +40,8 @@ namespace AwsMock::Dto::Common {
         ROTATE_SECRET,
         LIST_SECRETS,
         LIST_SECRET_COUNTERS,
+        GET_SECRET_DETAILS,
+        LIST_SECRET_VERSIONS,
         UNKNOWN
     };
 
@@ -52,6 +54,8 @@ namespace AwsMock::Dto::Common {
             {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
             {SecretsManagerCommandType::LIST_SECRETS, "ListSecrets"},
             {SecretsManagerCommandType::LIST_SECRET_COUNTERS, "ListSecretCounters"},
+            {SecretsManagerCommandType::GET_SECRET_DETAILS, "GetSecretDetails"},
+            {SecretsManagerCommandType::LIST_SECRET_VERSIONS, "ListSecretVersions"},
             {SecretsManagerCommandType::UNKNOWN, "Unknown"},
     };
 
