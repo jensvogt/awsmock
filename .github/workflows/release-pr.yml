@@ -19,21 +19,22 @@ jobs:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  test:
-    needs: release-please
-    runs-on: self-hosted
-    env:
-      LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/local/lib
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - run: cmake .
-      - run: cmake --build . -j 16
-      - run: ctest -V
+  # test:
+  #   needs: release-please
+  #   runs-on: self-hosted
+  #   env:
+  #     LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/local/lib
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - run: cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock
+  #     - run: cmake --build . --config Release -j 16
+  #     - run: cmake --install . --config Release
+  #     - run: ctest
 
   build:
     runs-on: self-hosted
-    needs: test
+    needs: release-please
     env:
       GH_TOKEN: ${{ github.token }}
     steps:

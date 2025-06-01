@@ -192,7 +192,7 @@ namespace AwsMock::Service {
             const Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
-            const std::string cipherText = EncryptPlaintext(keyEntity, request.plainText);
+            const std::string cipherText = EncryptPlaintext(keyEntity, request.plaintext);
 
             Dto::KMS::EncryptResponse response;
             response.region = request.region;

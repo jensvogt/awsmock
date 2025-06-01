@@ -53,7 +53,7 @@ target_link_libraries(srv_lambda_service PUBLIC ${LIBRARIES})
 add_executable(srv_lambda_cli LambdaServiceCliTests.cpp TestBase.cpp)
 target_link_libraries(srv_lambda_cli PUBLIC ${LIBRARIES})
 
-#add_test(NAME srv_kms_service COMMAND srv_kms_service WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
+add_test(NAME srv_kms_service COMMAND srv_kms_service WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 add_test(NAME srv_kms_cli COMMAND srv_kms_cli WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 #add_test(NAME srv_kms_java COMMAND srv_kms_java WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})
 add_test(NAME srv_secret_service COMMAND srv_secret_service WORKING_DIRECTORY ${CMAKE_CURRENT_SRC_DIR})

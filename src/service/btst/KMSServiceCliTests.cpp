@@ -123,8 +123,7 @@ namespace AwsMock::Service {
 
         // act
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "encrypt", "--key-id", keyId, "--plaintext", PLAIN_TEXT_BASE64, "--endpoint", _endpoint});
-        Dto::KMS::EncryptResponse response;
-        response.FromJson(output2);
+        const Dto::KMS::EncryptResponse response = Dto::KMS::EncryptResponse::FromJson(output2);
 
         // assert
         BOOST_CHECK_EQUAL(output2.empty(), false);
@@ -138,13 +137,11 @@ namespace AwsMock::Service {
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
         const std::string keyId = keyList.at(0).keyId;
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "encrypt", "--key-id", keyId, "--plaintext", PLAIN_TEXT_BASE64, "--endpoint", _endpoint});
-        Dto::KMS::EncryptResponse response1;
-        response1.FromJson(output2);
+        Dto::KMS::EncryptResponse response1 = Dto::KMS::EncryptResponse::FromJson(output2);
 
         // act
         const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "decrypt", "--key-id", keyId, "--ciphertext-blob", response1.ciphertext, "--endpoint", _endpoint});
-        Dto::KMS::DecryptResponse response2;
-        response2.FromJson(output3);
+        Dto::KMS::DecryptResponse response2 = Dto::KMS::DecryptResponse::FromJson(output3);
 
         // assert
         BOOST_CHECK_EQUAL(output3.empty(), false);

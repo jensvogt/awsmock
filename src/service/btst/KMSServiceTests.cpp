@@ -169,7 +169,7 @@ namespace AwsMock::Service {
         Dto::KMS::EncryptRequest encryptRequest;
         encryptRequest.region = REGION;
         encryptRequest.keyId = keyId;
-        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.plaintext = SYMMETRIC_BASE64_PLAIN_TEXT;
         encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
@@ -197,7 +197,7 @@ namespace AwsMock::Service {
         Dto::KMS::EncryptRequest encryptRequest;
         encryptRequest.region = REGION;
         encryptRequest.keyId = keyId;
-        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.plaintext = SYMMETRIC_BASE64_PLAIN_TEXT;
         encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
         Dto::KMS::EncryptRequest encryptRequest;
         encryptRequest.region = REGION;
         encryptRequest.keyId = keyId;
-        encryptRequest.plainText = SYMMETRIC_BASE64_PLAIN_TEXT;
+        encryptRequest.plaintext = SYMMETRIC_BASE64_PLAIN_TEXT;
         encryptRequest.encryptionAlgorithm = Dto::KMS::EncryptionAlgorithm::SYMMETRIC_DEFAULT;
 
         // act
