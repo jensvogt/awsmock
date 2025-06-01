@@ -13,6 +13,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "create_secret");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "create_secret");
         log_trace << "Create secret request, request: " << request.ToString();
 
         // Get the region
@@ -83,6 +85,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "describe_secret");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "describe_secret");
         log_trace << "Describe secret request: " << request.ToString();
 
         // Check bucket existence
@@ -120,6 +124,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret_value");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret_value");
         log_trace << "Get secret value request: " << request.ToString();
 
         // Check whether we have a name of ARN
@@ -181,6 +187,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
         log_trace << "List secrets request: " << request;
 
         try {
@@ -222,12 +230,15 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretCountersResponse SecretsManagerService::ListSecretCounters(const Dto::SecretsManager::ListSecretCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
         log_trace << "List secret counters request: " << request;
 
         try {
             Dto::SecretsManager::ListSecretCountersResponse response;
             response.total = _secretsManagerDatabase.CountSecrets(request.region);
 
+            // TODO: use mapper
             // Get the object from the database
             for (const Database::Entity::SecretsManager::SecretList secrets = _secretsManagerDatabase.ListSecrets(); const auto &s: secrets) {
                 Dto::SecretsManager::SecretCounter secretCounter;
@@ -263,7 +274,72 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SecretsManager::ListSecretVersionCountersResponse SecretsManagerService::ListSecretVersionCounters(const Dto::SecretsManager::ListSecretVersionCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
+        log_trace << "List secret versions request: " << request;
+
+        try {
+            Dto::SecretsManager::ListSecretVersionCountersResponse response;
+            const Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretBySecretId(request.secretId);
+            response.total = static_cast<long>(secret.versions.size());
+
+            // TODO: use mapper
+            // Get the object from the database
+            for (const auto &[fst, snd]: secret.versions) {
+                Dto::SecretsManager::SecretVersionCounter secretVersionCounter;
+                secretVersionCounter.versionId = fst;
+                for (const auto &s: snd.stages) {
+                    secretVersionCounter.states.emplace_back(s);
+                }
+                response.secretVersionCounters.emplace_back(secretVersionCounter);
+            }
+
+            // Convert to DTO
+            log_debug << "List secret versions, secretId: " << request.secretId;
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "List secrets failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    Dto::SecretsManager::GetSecretDetailsResponse SecretsManagerService::GetSecretDetails(const Dto::SecretsManager::GetSecretDetailsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret");
+        log_trace << "Get secret details request: " << request;
+
+        // Check bucket existence
+        if (!_secretsManagerDatabase.SecretExists(request.secretId)) {
+            log_warning << "Secret does not exist, secretId: " << request.secretId;
+            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretId);
+        }
+
+        try {
+            Dto::SecretsManager::GetSecretDetailsResponse response;
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretBySecretId(request.secretId);
+
+            // TODO: use mapper
+            // Convert to DTO
+            log_debug << "Get secret details, secretId: " << request.secretId;
+            response.secretId = secret.secretId;
+            response.secretName = secret.name;
+            response.secretArn = secret.arn;
+            response.secretString = GetSecretString(secret);
+            response.created = secret.created;
+            response.modified = secret.modified;
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "Get secret details failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
         log_trace << "Update secret request: " << request.ToString();
 
         // Check bucket existence
@@ -308,6 +384,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "rotate_secrets");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "rotate_secrets");
         log_trace << "Rotate secret request: " << request.ToString();
 
         // Check whether we have a name of ARN
@@ -374,6 +452,8 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "delete_secrets");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "delete_secrets");
         log_trace << "Delete secret request: " << request.ToString();
 
         // Check whether we have a name of ARN
@@ -478,5 +558,16 @@ namespace AwsMock::Service {
         encryptRequest.plainText = Core::Crypto::Base64Encode(secretString);
         const Dto::KMS::EncryptResponse encryptResponse = _kmsService.Encrypt(encryptRequest);
         version.secretString = encryptResponse.ciphertext;
+    }
+
+    std::string SecretsManagerService::GetSecretString(Database::Entity::SecretsManager::Secret &secret) const {
+        const std::string versionId = secret.GetCurrentVersionId();
+        const Database::Entity::SecretsManager::SecretVersion version = secret.versions[versionId];
+
+        Dto::KMS::DecryptRequest decryptRequest;
+        decryptRequest.keyId = secret.kmsKeyId;
+        decryptRequest.ciphertext = version.secretString;
+        const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
+        return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 }// namespace AwsMock::Service

@@ -29,8 +29,12 @@
 #include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretResponse.h>
+#include <awsmock/dto/secretsmanager/internal/GetSecretDetailsRequest.h>
+#include <awsmock/dto/secretsmanager/internal/GetSecretDetailsResponse.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretCountersRequest.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretCountersResponse.h>
+#include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersRequest.h>
+#include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersResponse.h>
 #include <awsmock/dto/secretsmanager/model/VersionStage.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
@@ -123,6 +127,22 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SecretsManager::ListSecretCountersResponse ListSecretCounters(const Dto::SecretsManager::ListSecretCountersRequest &request) const;
 
         /**
+         * @brief List secret versions
+         *
+         * @param request list secret version counters request
+         * @return ListSecretVersionCountersResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::ListSecretVersionCountersResponse ListSecretVersionCounters(const Dto::SecretsManager::ListSecretVersionCountersRequest &request) const;
+
+        /**
+         * @brief Returns the secret details
+         *
+         * @param request get secret details request
+         * @return GetSecretDetailsResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::GetSecretDetailsResponse GetSecretDetails(const Dto::SecretsManager::GetSecretDetailsRequest &request) const;
+
+        /**
          * @brief Updates an existing secret
          *
          * @param request update secret request
@@ -207,6 +227,13 @@ namespace AwsMock::Service {
          * @param secretString secret string
          */
         void EncryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const;
+
+        /**
+         * @brief Returns the decrypted raw secret string
+         *
+         * @param secret secret
+         */
+        std::string GetSecretString(Database::Entity::SecretsManager::Secret &secret) const;
 
         /**
          * Account ID

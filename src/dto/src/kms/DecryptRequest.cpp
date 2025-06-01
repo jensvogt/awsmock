@@ -5,7 +5,7 @@
 #include <awsmock/dto/kms/DecryptRequest.h>
 
 namespace AwsMock::Dto::KMS {
-
+    /*
     void DecryptRequest::FromJson(const std::string &jsonString) {
 
         try {
@@ -55,5 +55,5 @@ namespace AwsMock::Dto::KMS {
             throw Core::JsonException(exc.what());
         }
     }
-
+*/
 }// namespace AwsMock::Dto::KMS

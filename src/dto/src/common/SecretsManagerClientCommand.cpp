@@ -28,6 +28,7 @@ namespace AwsMock::Dto::Common {
             action = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
         } else {
             action = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
+            action = action.substr(action.find_first_of(".") + 1);
         }
         switch (method) {
             case http::verb::get:
