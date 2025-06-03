@@ -13,12 +13,8 @@ namespace AwsMock::Service {
 
             case Dto::Common::KMSCommandType::CREATE_KEY: {
 
-                Dto::KMS::CreateKeyRequest kmsRequest;
-                kmsRequest.FromJson(clientCommand.payload);
-                kmsRequest.region = clientCommand.region;
-
+                Dto::KMS::CreateKeyRequest kmsRequest = Dto::KMS::CreateKeyRequest::FromJson(clientCommand);
                 Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
-
                 log_info << "Key created, keyId: " << kmsResponse.key.keyId;
                 return SendOkResponse(request, kmsResponse.ToJson());
             }

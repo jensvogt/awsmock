@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyState.h>
@@ -68,7 +68,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Key {
+    struct Key final : Common::BaseCounter<Key> {
 
         /**
          * Key ID
@@ -108,7 +108,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Creation date
          */
-        long creationDate = static_cast<long>(system_clock::to_time_t(system_clock::now()));
+        long creationDate = system_clock::to_time_t(system_clock::now());
 
         /**
          * Deletion date
@@ -135,42 +135,116 @@ namespace AwsMock::Dto::KMS {
          *
          * @return JSON object
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+                Core::Bson::BsonUtils::SetStringValue(document, "KeySpec", KeySpecToString(keySpec));
+                Core::Bson::BsonUtils::SetStringValue(document, "KeyUsage", KeyUsageToString(keyUsage));
+                Core::Bson::BsonUtils::SetStringValue(document, "KeyState", KeyStateToString(keyState));
+                Core::Bson::BsonUtils::SetStringValue(document, "Arn", arn);
+                Core::Bson::BsonUtils::SetLongValue(document, "CreationDate", creationDate);
+                Core::Bson::BsonUtils::SetLongValue(document, "DeletionDate", deletionDate);
+                Core::Bson::BsonUtils::SetBoolValue(document, "MultiRegion", multiRegion);
+                Core::Bson::BsonUtils::SetStringValue(document, "Origin", OriginToString(origin));
+
+                if (!encryptionAlgorithms.empty()) {
+                    array jsonArray;
+                    for (const auto &element: encryptionAlgorithms) {
+                        jsonArray.append(EncryptionAlgorithmsToString(element));
+                    }
+                    document.append(kvp("EncryptionAlgorithms", jsonArray));
+                }
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Convert to from a JSON object
          *
          * @param jsonObject JSON object
          */
-        void FromDocument(const view_or_value<view, value> &jsonObject);
+        void FromDocument(const view_or_value<view, value> &jsonObject) {
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+                keyId = Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyId");
+                keySpec = KeySpecFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeySpec"));
+                keyUsage = KeyUsageFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyUsage"));
+                keyState = KeyStateFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "KeyState"));
+                description = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Description");
+                arn = Core::Bson::BsonUtils::GetStringValue(jsonObject, "Arn");
+                creationDate = Core::Bson::BsonUtils::GetLongValue(jsonObject, "CreationDate");
+                multiRegion = Core::Bson::BsonUtils::GetBoolValue(jsonObject, "MultiRegion");
+                enabled = Core::Bson::BsonUtils::GetBoolValue(jsonObject, "Enabled");
+                origin = OriginFromString(Core::Bson::BsonUtils::GetStringValue(jsonObject, "Origin"));
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                // Grant tokens
+                if (jsonObject.view().find("EncryptionAlgorithms") != jsonObject.view().end()) {
+                    for (const bsoncxx::array::view jsonArray = jsonObject.view()["EncryptionAlgorithms"].get_array().value; const auto &element: jsonArray) {
+                        encryptionAlgorithms.emplace_back(EncryptionAlgorithmsFromString(std::string(element.get_string().value)));
+                    }
+                }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Key &r);
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+
+      private:
+
+        friend Key tag_invoke(boost::json::value_to_tag<Key>, boost::json::value const &v) {
+            Key r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.arn = Core::Json::GetStringValue(v, "Arn");
+            r.keySpec = KeySpecFromString(Core::Json::GetStringValue(v, "KeySpec"));
+            r.keyUsage = KeyUsageFromString(Core::Json::GetStringValue(v, "KeyUsage"));
+            r.keyState = KeyStateFromString(Core::Json::GetStringValue(v, "KeyState"));
+            r.multiRegion = Core::Json::GetBoolValue(v, "MultiRegion");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.creationDate = Core::Json::GetLongValue(v, "CreationDate");
+            r.deletionDate = Core::Json::GetLongValue(v, "DeletionDate");
+            r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            r.origin = OriginFromString(Core::Json::GetStringValue(v, "Origin"));
+            if (Core::Json::AttributeExists(v, "EncryptionAlgorithms")) {
+                for (boost::json::array encryptionAlgorithmArray = v.at("EncryptionAlgorithms").as_array(); const auto &a: encryptionAlgorithmArray) {
+                    r.encryptionAlgorithms.emplace_back(EncryptionAlgorithmsFromString(a.get_string().data()));
+                }
+            }
+
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Key const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"Arn", obj.arn},
+                    {"KeySpec", KeySpecToString(obj.keySpec)},
+                    {"KeyUsage", KeyUsageToString(obj.keyUsage)},
+                    {"MultiRegion", obj.multiRegion},
+                    {"Description", obj.description},
+                    {"CreationDate", obj.creationDate},
+                    {"DeletionDate", obj.deletionDate},
+                    {"Enabled", obj.enabled},
+                    {"Origin", OriginToString(obj.origin)},
+            };
+            if (!obj.encryptionAlgorithms.empty()) {
+                for (const auto &a: obj.encryptionAlgorithms) {
+                    jv.as_string() = EncryptionAlgorithmsToString(a);
+                }
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

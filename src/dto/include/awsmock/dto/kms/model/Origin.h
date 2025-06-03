@@ -29,14 +29,14 @@ namespace AwsMock::Dto::KMS {
             {Origin::AWS_CLOUDHSM, "AWS_CLOUDHSM"},
             {Origin::EXTERNAL_KEY_STORE, "EXTERNAL_KEY_STORE"}};
 
-    [[maybe_unused]] static std::string OriginToString(Origin keySpec) {
+    [[maybe_unused]] static std::string OriginToString(const Origin &keySpec) {
         return OriginNames[keySpec];
     }
 
     [[maybe_unused]] static Origin OriginFromString(const std::string &origin) {
-        for (auto &it: OriginNames) {
-            if (it.second == origin) {
-                return it.first;
+        for (auto &[fst, snd]: OriginNames) {
+            if (snd == origin) {
+                return fst;
             }
         }
         return Origin::AWS_KMS;

@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/Key.h>
 
 namespace AwsMock::Dto::KMS {
@@ -67,26 +65,29 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateKeyResponse final : Common::BaseDto<CreateKeyResponse> {
+    struct CreateKeyResponse final : Common::BaseCounter<CreateKeyResponse> {
 
         /**
          * Key metadata
          */
         Key key;
 
-        /**
-         * @brief Convert to from a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend CreateKeyResponse tag_invoke(boost::json::value_to_tag<CreateKeyResponse>, boost::json::value const &v) {
+            CreateKeyResponse r;
+            r.key = boost::json::value_to<Key>(v.at("Key"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateKeyResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Key", boost::json::value_from(obj.key)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS
