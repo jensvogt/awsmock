@@ -307,6 +307,14 @@ namespace AwsMock::Database::Entity::Lambda {
         system_clock::time_point modified = system_clock::now();
 
         /**
+         * @brief Returns the existence of a lambda instance by ID
+         *
+         * @param instanceId instance ID
+         * @return true if the lambda instance exists, otherwise false.
+         */
+        bool HasInstance(const std::string &instanceId);
+
+        /**
          * @brief Returns an instance by instance ID
          *
          * @param instanceId instance ID
@@ -315,7 +323,7 @@ namespace AwsMock::Database::Entity::Lambda {
         Instance GetInstance(const std::string &instanceId);
 
         /**
-         * @brief Remove an instance from the instances list.
+         * @brief Remove an instance from the instance list.
          *
          * @par
          * The instance is identified by the containerId.
@@ -348,10 +356,10 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] EventSourceMapping GetEventSource(const std::string &eventSourceArn) const;
 
         /**
-         * @brief Checks whether a tags with the given tags key exists.
+         * @brief Checks whether tags with the given tags key exist.
          *
          * @param key key of the tags
-         * @return true if tags with the given key exists.
+         * @return true if tags with the given key exist.
          */
         [[nodiscard]] bool HasTag(const std::string &key) const;
 

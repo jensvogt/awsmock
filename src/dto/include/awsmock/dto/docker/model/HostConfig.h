@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/docker/model/LogConfig.h>
 #include <awsmock/dto/docker/model/PortBinding.h>
 
 namespace AwsMock::Dto::Docker {
@@ -52,6 +53,11 @@ namespace AwsMock::Dto::Docker {
          * Network mode
          */
         PortBinding portBindings;
+
+        /**
+         * Log config
+         */
+        LogConfig logConfig;
 
         /**
          * Convert to a JSON string

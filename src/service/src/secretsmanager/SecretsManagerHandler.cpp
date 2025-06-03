@@ -69,6 +69,30 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
+                case Dto::Common::SecretsManagerCommandType::LIST_SECRET_COUNTERS: {
+
+                    Dto::SecretsManager::ListSecretCountersRequest secretsManagerRequest = Dto::SecretsManager::ListSecretCountersRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::ListSecretCountersResponse secretsManagerResponse = _secretsManagerService.ListSecretCounters(secretsManagerRequest);
+                    log_info << "Secrets counters listed, region: " << secretsManagerResponse.region;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
+                case Dto::Common::SecretsManagerCommandType::GET_SECRET_DETAILS: {
+
+                    Dto::SecretsManager::GetSecretDetailsRequest secretsManagerRequest = Dto::SecretsManager::GetSecretDetailsRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::GetSecretDetailsResponse secretsManagerResponse = _secretsManagerService.GetSecretDetails(secretsManagerRequest);
+                    log_info << "Get secret details, secretId: " << secretsManagerResponse.secretId;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
+                case Dto::Common::SecretsManagerCommandType::LIST_SECRET_VERSIONS: {
+
+                    Dto::SecretsManager::ListSecretVersionCountersRequest secretsManagerRequest = Dto::SecretsManager::ListSecretVersionCountersRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::ListSecretVersionCountersResponse secretsManagerResponse = _secretsManagerService.ListSecretVersionCounters(secretsManagerRequest);
+                    log_info << "Get secret versions, secretId: " << secretsManagerRequest.secretId;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
                 default:
                     log_error << "Unknown method";
                     SendBadRequestError(request, "Unknown method");

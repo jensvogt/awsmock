@@ -486,8 +486,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateNetworkResponse response;
         if (_isDocker) {
 
-            auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
-            if (statusCode == http::status::ok) {
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
                 log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
                 response.FromJson(body);
             } else {
@@ -495,8 +494,7 @@ namespace AwsMock::Service {
             }
         } else {
 
-            auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
-            if (statusCode == http::status::ok) {
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
                 log_debug << "Podman network created, name: " << request.name << " driver: " << request.driver;
                 response.FromJson(body);
             } else {
@@ -552,6 +550,29 @@ namespace AwsMock::Service {
 
     void ContainerService::StopContainer(const Dto::Docker::Container &container) const {
         StopContainer(container.id);
+    }
+
+    std::string ContainerService::GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        std::string logMessages;
+        if (_isDocker) {
+            const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(start));
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true"); statusCode == http::status::ok) {
+                log_debug << "Container logs received, containerId: " << containerId;
+                logMessages = body;
+            } else {
+                log_error << "Receive container logs failed, statusCode: " << statusCode;
+            }
+        } else {
+
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/logs", {}); statusCode == http::status::ok) {
+                log_debug << "Container logs received, containerId: " << containerId;
+            } else {
+                log_error << "Receive container logs failed, statusCode: " << statusCode;
+            }
+        }
+        return logMessages;
     }
 
     void ContainerService::StopContainer(const std::string &id) const {

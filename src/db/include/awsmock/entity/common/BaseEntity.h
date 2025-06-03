@@ -51,7 +51,7 @@ namespace AwsMock::Database::Entity::Common {
          *
          * @return MongoDB BSON string
          */
-        virtual view_or_value<view, value> ToDocument() const = 0;
+        [[nodiscard]] virtual view_or_value<view, value> ToDocument() const = 0;
 
         /**
          * @brief Convert to JSON representation
@@ -100,8 +100,10 @@ namespace AwsMock::Database::Entity::Common {
          *
          * @return output stream
          */
-        template<class S>
-        friend std::ostream &operator<<(std::ostream &os, const BaseEntity &i);
+        friend std::ostream &operator<<(std::ostream &os, const T &e) {
+            os << e.ToString();
+            return os;
+        }
     };
 
 }// namespace AwsMock::Database::Entity::Common

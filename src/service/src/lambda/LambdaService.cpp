@@ -141,7 +141,7 @@ namespace AwsMock::Service {
 
         try {
 
-            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, request.sortColumns);
+            const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdaCounters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             const long count = _lambdaDatabase.LambdaCount(request.region);
 
             Dto::Lambda::ListFunctionCountersResponse response = Dto::Lambda::Mapper::map(request, lambdas);
@@ -274,7 +274,7 @@ namespace AwsMock::Service {
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
 
             Dto::Lambda::ListLambdaTagCountersResponse response;
-            response.total = lambda.tags.size();
+            response.total = static_cast<long>(lambda.tags.size());
 
             std::vector<std::pair<std::string, std::string>> tags;
             for (const auto &[fst, snd]: lambda.tags) {
@@ -425,6 +425,7 @@ namespace AwsMock::Service {
             response.s3Key = lambda.code.s3Key;
             response.s3ObjectVersion = lambda.code.s3ObjectVersion;
             response.concurrency = lambda.concurrency;
+            response.instances = static_cast<long>(lambda.instances.size());
             response.invocations = lambda.invocations;
             response.averageRuntime = lambda.averageRuntime;
             response.lastStarted = lambda.lastStarted;
@@ -656,6 +657,22 @@ namespace AwsMock::Service {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
         }
+    }
+
+    Dto::Lambda::GetLambdaResultCounterResponse LambdaService::GetLambdaResultCounter(const Dto::Lambda::GetLambdaResultCounterRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "get_lambda_result");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "get_lambda_result");
+        log_debug << "Get lambda result counter request, region: " << request.region << ", oid: " << request.oid;
+
+        if (!_lambdaDatabase.LambdaResultExists(request.oid)) {
+            log_warning << "Lambda function result does not exist, oid: " << request.oid;
+            throw Core::NotFoundException("Lambda function result does not exist, oid: " + request.oid);
+        }
+
+        Database::Entity::Lambda::LambdaResult lambdaResult = _lambdaDatabase.GetLambdaResultCounter(request.oid);
+        log_trace << "Lambda result found, lambdaResult: " << lambdaResult;
+
+        return Dto::Lambda::Mapper::map(lambdaResult);
     }
 
     Dto::Lambda::ListLambdaResultCountersResponse LambdaService::ListLambdaResultCounters(const Dto::Lambda::ListLambdaResultCountersRequest &request) const {

@@ -2,7 +2,7 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#include "awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h"
+#include "awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h"
 #include "awsmock/entity/lambda/LambdaResult.h"
 
 
@@ -114,26 +114,39 @@ namespace AwsMock::Dto::Lambda {
             counter.state = LambdaStateToString(lambdaEntity.state);
             counter.version = lambdaEntity.dockerTag;
             counter.averageRuntime = lambdaEntity.averageRuntime;
+            counter.instances = static_cast<long>(lambdaEntity.instances.size());
             response.functionCounters.emplace_back(counter);
         }
         return response;
     }
 
+    LambdaResultCounter Mapper::mapCounter(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        LambdaResultCounter counter;
+        counter.oid = resultEntity.oid;
+        counter.lambdaArn = resultEntity.lambdaArn;
+        counter.lambdaName = resultEntity.lambdaName;
+        counter.runtime = resultEntity.runtime;
+        counter.containerId = resultEntity.containerId;
+        counter.requestBody = resultEntity.requestBody;
+        counter.responseBody = resultEntity.responseBody;
+        counter.logMessages = resultEntity.logMessages;
+        counter.lambdaStatus = resultEntity.lambdaStatus;
+        counter.httpStatusCode = resultEntity.httpStatusCode;
+        counter.timestamp = resultEntity.timestamp;
+        return counter;
+    }
+
     ListLambdaResultCountersResponse Mapper::map(const std::vector<Database::Entity::Lambda::LambdaResult> &lambdaResultEntities) {
         ListLambdaResultCountersResponse response;
         for (auto &lambdaResultEntity: lambdaResultEntities) {
-            LambdaResultCounter counter;
-            counter.oid = lambdaResultEntity.oid;
-            counter.lambdaArn = lambdaResultEntity.lambdaArn;
-            counter.lambdaName = lambdaResultEntity.lambdaName;
-            counter.runtime = lambdaResultEntity.runtime;
-            counter.requestBody = lambdaResultEntity.requestBody;
-            counter.responseBody = lambdaResultEntity.responseBody;
-            counter.lambdaStatus = lambdaResultEntity.lambdaStatus;
-            counter.httpStatusCode = lambdaResultEntity.httpStatusCode;
-            counter.timestamp = lambdaResultEntity.timestamp;
-            response.lambdaResultCounters.emplace_back(counter);
+            response.lambdaResultCounters.emplace_back(mapCounter(lambdaResultEntity));
         }
+        return response;
+    }
+
+    GetLambdaResultCounterResponse Mapper::map(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        GetLambdaResultCounterResponse response;
+        response.lambdaResultCounter = mapCounter(resultEntity);
         return response;
     }
 

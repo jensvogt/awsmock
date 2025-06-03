@@ -9,8 +9,15 @@
 #include <string>
 #include <vector>
 
+// Boost includes
+#include <boost/container/map.hpp>
+#include <boost/container/string.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/lambda/Lambda.h>
@@ -20,9 +27,19 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
+    using std::chrono::system_clock;
+
+    struct LambdaMonitoringCounter {
+        long instances{};
+        long invocations{};
+        long averageRuntime{};
+        system_clock::time_point modified = system_clock::now();
+    };
+
+    using LambdaShmAllocator = boost::interprocess::allocator<std::pair<const std::string, LambdaMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using LambdaCounterMapType = boost::container::map<std::string, LambdaMonitoringCounter, std::less<std::string>, LambdaShmAllocator>;
+
+    static constexpr auto LAMBDA_COUNTER_MAP_NAME = "LambdaCounter";
 
     /**
      * Lambda MongoDB database.
@@ -82,7 +99,7 @@ namespace AwsMock::Database {
          * @return true if lambda exists
          * @throws DatabaseException
          */
-        bool LambdaExistsByArn(const std::string &arn) const;
+        [[nodiscard]] bool LambdaExistsByArn(const std::string &arn) const;
 
         /**
          * @brief Create a new lambda function
@@ -90,7 +107,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created lambda entity.
          */
-        Entity::Lambda::Lambda CreateLambda(const Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda CreateLambda(Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Count all lambdas
@@ -98,7 +115,7 @@ namespace AwsMock::Database {
          * @param region aws-mock region.
          * @return total number of lambdas.
          */
-        int LambdaCount(const std::string &region = {}) const;
+        [[nodiscard]] long LambdaCount(const std::string &region = {}) const;
 
         /**
          * @brief Updates an existing lambda lambda function
@@ -106,7 +123,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return updated lambda entity.
          */
-        Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda UpdateLambda(Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Created or updates an existing lambda function
@@ -114,7 +131,7 @@ namespace AwsMock::Database {
          * @param lambda lambda entity
          * @return created or updated lambda entity.
          */
-        Entity::Lambda::Lambda CreateOrUpdateLambda(const Entity::Lambda::Lambda &lambda) const;
+        Entity::Lambda::Lambda CreateOrUpdateLambda(Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Import a lambda function
@@ -140,7 +157,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaById(const std::string &oid) const;
+        [[nodiscard]] Entity::Lambda::Lambda GetLambdaById(const std::string &oid) const;
 
         /**
          * @brief Returns a lambda entity by ARN
@@ -149,7 +166,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn) const;
+        [[nodiscard]] Entity::Lambda::Lambda GetLambdaByArn(const std::string &arn) const;
 
         /**
          * @brief Returns a lambda entity by name
@@ -233,12 +250,28 @@ namespace AwsMock::Database {
         Entity::Lambda::LambdaResult CreateLambdaResult(Entity::Lambda::LambdaResult &lambdaResult) const;
 
         /**
+         * @brief Returns the existence of a lambda result
+         *
+         * @param oid lambda result record OID
+         * @return true if the result with the given OID exists
+         */
+        [[nodiscard]] bool LambdaResultExists(const std::string &oid) const;
+
+        /**
          * @brief Removes old lambda logs
          *
          * @param cutOff cut off time point
          * @return numberof logs removed
          */
         [[nodiscard]] long RemoveExpiredLambdaLogs(const system_clock::time_point &cutOff) const;
+
+        /**
+         * @brief Returns a lambda function result.
+         *
+         * @param oid lambda result OID
+         * @return lambda function result counter
+         */
+        [[nodiscard]] Entity::Lambda::LambdaResult GetLambdaResultCounter(const std::string &oid) const;
 
         /**
          * @brief Returns a list of lambda function results.
@@ -266,7 +299,7 @@ namespace AwsMock::Database {
          * @param oid lambda function oid
          * @return number of results deleted
          */
-        long DeleteResultsCounter(const std::string &oid) const;
+        [[nodiscard]] long DeleteResultsCounter(const std::string &oid) const;
 
         /**
          * @brief Deletes all lambda result counter for a lambda function
@@ -275,6 +308,13 @@ namespace AwsMock::Database {
          * @return number of results deleted
          */
         long DeleteResultsCounters(const std::string &lambdaArn) const;
+
+        /**
+         * @brief Deletes all lambda result counters
+         *
+         * @return number of results deleted
+         */
+        long DeleteAllResultsCounters() const;
 
         /**
          * @brief Deletes an existing lambda function
@@ -287,10 +327,10 @@ namespace AwsMock::Database {
         /**
          * @brief Deletes all existing lambda functions
          *
-         * @return number of lambda object deleted
+         * @return number of lambda objects deleted
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteAllLambdas() const;
+        long DeleteAllLambdas() const;
 
       private:
 
@@ -313,6 +353,16 @@ namespace AwsMock::Database {
          * Lambda in-memory database
          */
         LambdaMemoryDb &_memoryDb;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Map of monitoring counters
+         */
+        LambdaCounterMapType *_lambdaCounterMap;
     };
 
 }// namespace AwsMock::Database

@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
@@ -36,7 +34,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DecryptResponse : Common::BaseDto<DecryptResponse> {
+    struct DecryptResponse final : Common::BaseCounter<DecryptResponse> {
 
         /**
          * Key ID
@@ -46,7 +44,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Encryption algorithm
          */
-        EncryptionAlgorithm encryptionAlgorithm;
+        EncryptionAlgorithm encryptionAlgorithm = EncryptionAlgorithm::UNKNOWN;
 
         /**
          * @brief Plain text.
@@ -57,19 +55,26 @@ namespace AwsMock::Dto::KMS {
          */
         std::string plaintext;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-        */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend DecryptResponse tag_invoke(boost::json::value_to_tag<DecryptResponse>, boost::json::value const &v) {
+            DecryptResponse r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.plaintext = Core::Json::GetStringValue(v, "Plaintext");
+            r.encryptionAlgorithm = EncryptionAlgorithmsFromString(Core::Json::GetStringValue(v, "EncryptionAlgorithm"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DecryptResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"Plaintext", obj.plaintext},
+                    {"EncryptionAlgorithm", EncryptionAlgorithmsToString(obj.encryptionAlgorithm)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

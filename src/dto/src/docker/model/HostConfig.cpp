@@ -24,7 +24,11 @@ namespace AwsMock::Dto::Docker {
 
             networkMode = Core::Bson::BsonUtils::GetStringValue(document, "NetworkMode");
 
-            // Names array
+            if (document.view().find("LogConfig") != document.view().end()) {
+                logConfig.FromDocument(document.view()["LogConfig"].get_document().value);
+            }
+
+            // Port bindings
             if (document.view().find("PortBindings") != document.view().end()) {
                 for (const view portBindingsView = document.view()["PortBindings"].get_document().value; const bsoncxx::document::element &portBindingsElement: portBindingsView) {
                     std::string name = bsoncxx::string::to_string(portBindingsElement.key());

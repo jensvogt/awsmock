@@ -37,25 +37,19 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRAN
 
 # Test directory
 if (NOT WIN32)
-    #    add_subdirectory(tst)
+    add_subdirectory(btst)
 endif ()
 
 # Includes
 include_directories(./include ../core/include ../db/include ../dto/include ${EXTERNAL_INCLUDE_DIR} ${BSONCXX_INCLUDE_DIR}
         ${MONGOCXX_INCLUDE_DIR})
 
-# Shared library
-if (NOT WIN32)
+# Library
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale boost_thread boost_filesystem
             ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull boost_log boost_log_setup ssh)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (NOT WIN32)
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
-            boost_thread boost_filesystem boost_log boost_log_setup jwt-cpp ssl crypto archive magic
-            prometheus-cpp-core prometheus-cpp-pull ssh)
 endif ()

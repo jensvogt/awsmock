@@ -21,8 +21,6 @@ namespace AwsMock::Service {
         lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
         lambdaEntity.stateReason = "Activated";
         lambdaEntity.codeSize = static_cast<long>(functionCode.size());
-        lambdaEntity.averageRuntime = 0;
-        lambdaEntity.invocations = 0;
         lambdaEntity = Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
 
         log_info << "Lambda function installed: " << lambdaEntity.function << " status: " << LambdaStateToString(lambdaEntity.state);
@@ -33,6 +31,8 @@ namespace AwsMock::Service {
         // Docker tag
         if (lambdaEntity.dockerTag.empty()) {
             lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
+            lambdaEntity.tags["dockerTag"] = lambdaEntity.dockerTag;
+            lambdaEntity.tags["version"] = lambdaEntity.dockerTag;
             log_debug << "Using docker tag: " << lambdaEntity.dockerTag;
         }
 
@@ -167,8 +167,7 @@ namespace AwsMock::Service {
     }
 
     int LambdaCreator::CreateRandomHostPort() {
-        const int port = Core::SystemUtils::GetNextFreePort();
-        return port;
+        return Core::SystemUtils::GetNextFreePort();
     }
 
     std::string LambdaCreator::GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) {

@@ -6,10 +6,6 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     bool Bucket::HasNotification(const std::string &eventName) {
         return std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
                    return eventNotification.event == eventName;
@@ -106,7 +102,7 @@ namespace AwsMock::Database::Entity::S3 {
 
     view_or_value<view, value> Bucket::ToDocument() const {
 
-        // Bucket notification are deprecated, should be removed at a certain point
+        // Bucket notifications are deprecated, should be removed at a certain point
         auto notificationsDoc = array{};
         for (const auto &notification: notifications) {
             notificationsDoc.append(notification.ToDocument());
@@ -158,7 +154,7 @@ namespace AwsMock::Database::Entity::S3 {
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
         keys = Core::Bson::BsonUtils::GetLongValue(mResult.value()["keys"]);
-        versionStatus = BucketVersionStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "arn"));
+        versionStatus = BucketVersionStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "versionStatus"));
         created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
         modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
 

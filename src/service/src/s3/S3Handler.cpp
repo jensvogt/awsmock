@@ -763,8 +763,6 @@ namespace AwsMock::Service {
 
     long S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
 
-        // std::string str = buffers_to_string(request.body());
-
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
 
         if (Core::HttpUtils::HasHeaderValue(request, "content-encoding", "aws-chunked")) {

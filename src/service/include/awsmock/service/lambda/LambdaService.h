@@ -35,30 +35,32 @@
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
-#include <awsmock/dto/lambda/intern/AddFunctionEnvironmentRequest.h>
-#include <awsmock/dto/lambda/intern/AddFunctionTagRequest.h>
-#include <awsmock/dto/lambda/intern/DeleteFunctionEnvironmentRequest.h>
-#include <awsmock/dto/lambda/intern/DeleteFunctionTagRequest.h>
-#include <awsmock/dto/lambda/intern/DeleteImageRequest.h>
-#include <awsmock/dto/lambda/intern/DeleteLambdaResultCounterRequest.h>
-#include <awsmock/dto/lambda/intern/DeleteLambdaResultCountersRequest.h>
-#include <awsmock/dto/lambda/intern/GetFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/intern/GetFunctionCountersResponse.h>
-#include <awsmock/dto/lambda/intern/ListFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/intern/ListFunctionCountersResponse.h>
-#include <awsmock/dto/lambda/intern/ListLambdaArnsResponse.h>
-#include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersRequest.h>
-#include <awsmock/dto/lambda/intern/ListLambdaEnvironmentCountersResponse.h>
-#include <awsmock/dto/lambda/intern/ListLambdaResultCountersRequest.h>
-#include <awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h>
-#include <awsmock/dto/lambda/intern/ListLambdaTagCountersRequest.h>
-#include <awsmock/dto/lambda/intern/ListLambdaTagCountersResponse.h>
-#include <awsmock/dto/lambda/intern/ResetFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/intern/StartFunctionRequest.h>
-#include <awsmock/dto/lambda/intern/StopFunctionRequest.h>
-#include <awsmock/dto/lambda/intern/UpdateFunctionEnvironmentRequest.h>
-#include <awsmock/dto/lambda/intern/UpdateFunctionTagRequest.h>
-#include <awsmock/dto/lambda/intern/UploadFunctionCodeRequest.h>
+#include <awsmock/dto/lambda/internal/AddFunctionEnvironmentRequest.h>
+#include <awsmock/dto/lambda/internal/AddFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteFunctionEnvironmentRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteImageRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteLambdaResultCounterRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteLambdaResultCountersRequest.h>
+#include <awsmock/dto/lambda/internal/GetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/GetFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/internal/GetLambdaResultCounterRequest.h>
+#include <awsmock/dto/lambda/internal/GetLambdaResultCounterResponse.h>
+#include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaArnsResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaResultCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaTagCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaTagCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ResetFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/StartFunctionRequest.h>
+#include <awsmock/dto/lambda/internal/StopFunctionRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
@@ -263,7 +265,7 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::GetFunctionCountersRequest
          * @see Dto::Lambda::GetFunctionCountersResponse
          */
-        Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const;
+        [[nodiscard]] Dto::Lambda::GetFunctionCountersResponse GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const;
 
         /**
          * @brief Reset function counters
@@ -281,7 +283,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::AccountSettingsResponse
          */
-        Dto::Lambda::AccountSettingsResponse GetAccountSettings() const;
+        [[nodiscard]] Dto::Lambda::AccountSettingsResponse GetAccountSettings() const;
 
         /**
          * @brief Creates an event source mapping.
@@ -295,7 +297,7 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::CreateEventSourceMappingsRequest
          * @see Dto::Lambda::CreateEventSourceMappingsResponse
          */
-        Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const;
+        [[nodiscard]] Dto::Lambda::CreateEventSourceMappingsResponse CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const;
 
         /**
          * @brief List am event source mappings
@@ -306,7 +308,7 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::ListEventSourceMappingsRequest
          * @see Dto::Lambda::ListEventSourceMappingsResponse
          */
-        Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
+        [[nodiscard]] Dto::Lambda::ListEventSourceMappingsResponse ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const;
 
         /**
          * @brief Returns a list of all available functions ARNs
@@ -315,6 +317,17 @@ namespace AwsMock::Service {
          * @see ListLambdaArnsResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaArnsResponse ListLambdaArns() const;
+
+        /**
+         * @brief Returns a lambda result counter
+         *
+         * @param request get result counter request
+         * @return GetLambdaResultCounterResponse
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::GetLambdaResultCounterRequest
+         * @see Dto::Lambda::GetLambdaResultCounterResponse
+         */
+        [[nodiscard]] Dto::Lambda::GetLambdaResultCounterResponse GetLambdaResultCounter(const Dto::Lambda::GetLambdaResultCounterRequest &request) const;
 
         /**
          * @brief Returns a list of all available lambda result counters
@@ -335,7 +348,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::DeleteLambdaResultCounterRequest
          */
-        long DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const;
+        [[nodiscard]] long DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const;
 
         /**
          * @brief Deletes all lambda result counter
@@ -345,7 +358,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::DeleteLambdaResultCountersRequest
          */
-        long DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const;
+        [[nodiscard]] long DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const;
 
         /**
          * @brief Starts the lambda function by starting a docker container

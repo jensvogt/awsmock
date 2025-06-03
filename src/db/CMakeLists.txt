@@ -38,25 +38,21 @@ set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} $
 
 # Test directory
 if (NOT WIN32)
-    add_subdirectory(btst)
+    add_subdirectory(tst)
 endif ()
 
 # Includes
 include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
 # Shared library
-if (NOT WIN32)
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
             include/awsmock/utils/SqsUtils.h
             src/utils/SqsUtils.cpp)
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (NOT WIN32)
-    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
-            boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

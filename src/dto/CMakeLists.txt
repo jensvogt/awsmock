@@ -34,22 +34,20 @@ set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp sr
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
         src/s3/UploadPartCopyResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
         src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp)
-set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp
-        src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp src/docker/CreateNetworkRequest.cpp
-        src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp
-        src/docker/model/Platform.cpp src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp src/docker/model/HostConfig.cpp)
-set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp src/lambda/model/DeadLetterConfig.cpp
-        src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
-        src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp src/lambda/model/Error.cpp src/lambda/model/Environment.cpp src/lambda/model/UserIdentity.cpp
-        src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp
-        src/lambda/model/Configuration.cpp src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
-        src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp src/lambda/model/EventSourceMapping.cpp
-        src/lambda/model/FunctionCounter.cpp src/lambda/intern/ListFunctionCounterRequest.cpp src/lambda/intern/ListFunctionCounterResponse.cpp src/lambda/intern/GetFunctionCountersRequest.cpp
-        src/lambda/intern/GetFunctionCountersResponse.cpp src/lambda/intern/ResetFunctionCountersRequest.cpp src/lambda/DeleteFunctionRequest.cpp src/lambda/intern/UploadFunctionCodeRequest.cpp
-        src/lambda/intern/ListLambdaTagCountersRequest.cpp src/lambda/intern/ListLambdaTagCountersResponse.cpp src/lambda/intern/AddFunctionTagRequest.cpp
-        src/lambda/intern/UpdateFunctionTagRequest.cpp src/lambda/intern/DeleteFunctionTagRequest.cpp src/lambda/intern/ListLambdaEnvironmentCountersRequest.cpp
-        src/lambda/intern/ListLambdaEnvironmentCountersResponse.cpp src/lambda/intern/AddFunctionEnvironmentRequest.cpp src/lambda/intern/DeleteFunctionEnvironmentRequest.cpp
-        src/lambda/intern/UpdateFunctionEnvironmentRequest.cpp src/lambda/intern/StartFunctionRequest.cpp src/lambda/intern/StopFunctionRequest.cpp src/lambda/intern/DeleteImageRequest.cpp)
+set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp
+        src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp src/docker/model/LogConfig.cpp
+        src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp
+        src/docker/CreateNetworkRequest.cpp src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp
+        src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp src/docker/model/Platform.cpp
+        src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp src/docker/model/HostConfig.cpp)
+set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp
+        src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp
+        src/lambda/CreateFunctionResponse.cpp src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp
+        src/lambda/model/UserIdentity.cpp src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp
+        src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp src/lambda/model/Configuration.cpp
+        src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
+        src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp
+        src/lambda/model/EventSourceMapping.cpp src/lambda/DeleteFunctionRequest.cpp)
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/common/CognitoClientCommand.cpp src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp
         src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/CustomSmsSender.cpp
@@ -70,9 +68,9 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
 #set(SECRETSMANAGER_SOURCES)
-set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/kms/Key.cpp src/kms/ListKey.cpp src/kms/ScheduleKeyDeletionRequest.cpp
-        src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
-        src/kms/EncryptRequest.cpp src/kms/EncryptResponse.cpp src/kms/DecryptRequest.cpp src/kms/DecryptResponse.cpp
+set(KMS_SOURCES src/kms/CreateKeyRequest.cpp src/kms/CreateKeyResponse.cpp src/kms/Key.cpp src/kms/ListKey.cpp
+        src/kms/ScheduleKeyDeletionRequest.cpp src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp
+        src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
         src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp)
 set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
         src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
@@ -97,17 +95,12 @@ endif ()
 include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
 # Shared library
-if (NOT WIN32)
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
             include/awsmock/dto/secretsmanager/model/VersionStage.h)
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (NOT WIN32)
-    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static awsmockdb_static mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
