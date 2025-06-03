@@ -45,14 +45,14 @@ namespace AwsMock::Dto::KMS {
             {KeySpec::HMAC_384, "HMAC_384"},
             {KeySpec::HMAC_512, "HMAC_512"}};
 
-    [[maybe_unused]] static std::string KeySpecToString(KeySpec keySpec) {
+    [[maybe_unused]] static std::string KeySpecToString(const KeySpec &keySpec) {
         return KeySpecNames[keySpec];
     }
 
     [[maybe_unused]] static KeySpec KeySpecFromString(const std::string &keySpec) {
-        for (auto &it: KeySpecNames) {
-            if (it.second == keySpec) {
-                return it.first;
+        for (auto &[fst, snd]: KeySpecNames) {
+            if (snd == keySpec) {
+                return fst;
             }
         }
         return KeySpec::SYMMETRIC_DEFAULT;
