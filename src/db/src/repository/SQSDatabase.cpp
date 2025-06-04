@@ -58,7 +58,7 @@ namespace AwsMock::Database {
             }
 
             const int64_t count = _queueCollection.count_documents(query.extract());
-            log_trace << "Queue exists: " << std::boolalpha << count;
+            log_trace << "Queue exists: " << std::boolalpha << (count > 0);
             return count > 0;
         }
         return _memoryDb.QueueUrlExists(region, queueUrl);

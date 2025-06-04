@@ -84,7 +84,7 @@ namespace AwsMock::Service {
 
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
             log_debug << "Get containers";
-            for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, "latest"); const auto &container: containers) {
+            for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, lambda.dockerTag); const auto &container: containers) {
                 ContainerService::instance().StopContainer(container.id);
                 ContainerService::instance().DeleteContainer(container.id);
             }

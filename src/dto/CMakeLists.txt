@@ -67,11 +67,6 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
-#set(SECRETSMANAGER_SOURCES)
-set(KMS_SOURCES src/kms/ListKey.cpp
-        src/kms/ScheduleKeyDeletionRequest.cpp src/kms/ScheduleKeyDeletionResponse.cpp src/kms/ListKeysRequest.cpp
-        src/kms/ListKeysResponse.cpp src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp
-        src/kms/DescribeKeyRequest.cpp src/kms/DescribeKeyResponse.cpp)
 set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
         src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
         src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp

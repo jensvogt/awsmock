@@ -10,9 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -29,7 +27,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeKeyRequest : Common::BaseDto<DescribeKeyRequest> {
+    struct DescribeKeyRequest final : Common::BaseCounter<DescribeKeyRequest> {
 
         /**
          * Key ID
@@ -41,19 +39,24 @@ namespace AwsMock::Dto::KMS {
          */
         std::vector<std::string> grantTokens;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-        */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend DescribeKeyRequest tag_invoke(boost::json::value_to_tag<DescribeKeyRequest>, boost::json::value const &v) {
+            DescribeKeyRequest r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.grantTokens = boost::json::value_to<std::vector<std::string>>(v.at("GrantTokens"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeKeyRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"GrantTokens", boost::json::value_from(obj.grantTokens)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

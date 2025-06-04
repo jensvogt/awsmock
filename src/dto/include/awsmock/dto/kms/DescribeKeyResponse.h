@@ -9,9 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/kms/model/Key.h>
 
 namespace AwsMock::Dto::KMS {
@@ -29,19 +26,29 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeKeyResponse final : Common::BaseDto<DescribeKeyResponse> {
+    struct DescribeKeyResponse final : Common::BaseCounter<DescribeKeyResponse> {
 
         /**
          * Key metadata
          */
         Key key;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend DescribeKeyResponse tag_invoke(boost::json::value_to_tag<DescribeKeyResponse>, boost::json::value const &v) {
+            DescribeKeyResponse r;
+            r.key = boost::json::value_to<Key>(v.at("Key"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeKeyResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Key", boost::json::value_from(obj.key)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS
