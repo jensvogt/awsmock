@@ -27,7 +27,9 @@ namespace AwsMock::Service {
             const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
             Dto::KMS::ListKeysResponse listKeysResponse;
             for (const auto &k: keyList) {
-                Dto::KMS::ListKey key = {.keyId = k.keyId, .keyArn = k.arn};
+                Dto::KMS::Key key;
+                key.keyId = k.keyId;
+                key.arn = k.arn;
                 listKeysResponse.keys.emplace_back(key);
             }
             log_debug << "List all keys, size: " << keyList.size();

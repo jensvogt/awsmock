@@ -694,7 +694,7 @@ namespace AwsMock::Core {
     }
 
     /**
-     * Spring cloud sends the queueName, the queueUrl, or the queueArn.
+     * @brief Spring cloud sends the queueName, the queueUrl, or the queueArn.
      *
      * @param queue from Spring cloud request
      * @return queue URL
