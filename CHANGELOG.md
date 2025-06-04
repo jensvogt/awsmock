@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/jensvogt/awsmock/compare/v1.3.1...v1.4.0) (2025-06-04)
+
+
+### Features
+
+* **1251-show-lambda-logs:** fix lambda details page ([da01080](https://github.com/jensvogt/awsmock/commit/da01080e8a296836f97a92a9aaedf0c92c5b71c4))
+
 ## [1.3.1](https://github.com/jensvogt/awsmock/compare/v1.3.0...v1.3.1) (2025-05-25)
 
 
