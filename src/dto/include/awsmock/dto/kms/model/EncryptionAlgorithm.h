@@ -31,7 +31,7 @@ namespace AwsMock::Dto::KMS {
             {EncryptionAlgorithm::SM2PKE, "SM2PKE"},
             {EncryptionAlgorithm::UNKNOWN, "UNKNOWN"}};
 
-    [[maybe_unused]] static std::string EncryptionAlgorithmsToString(EncryptionAlgorithm encryptionAlgorithm) {
+    [[maybe_unused]] static std::string EncryptionAlgorithmsToString(const EncryptionAlgorithm &encryptionAlgorithm) {
         return EncryptionAlgorithmsNames[encryptionAlgorithm];
     }
 

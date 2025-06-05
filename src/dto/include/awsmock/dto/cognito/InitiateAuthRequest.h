@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/AuthFlow.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -42,7 +40,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct InitiateAuthRequest final : Common::BaseDto<InitiateAuthRequest> {
+    struct InitiateAuthRequest final : Common::BaseCounter<InitiateAuthRequest> {
 
         /**
          * Auth flow
@@ -87,19 +85,28 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string GetClientSecret();
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend InitiateAuthRequest tag_invoke(boost::json::value_to_tag<InitiateAuthRequest>, boost::json::value const &v) {
+            InitiateAuthRequest r;
+            r.authFlow = AuthFlowTypeFromString(Core::Json::GetStringValue(v, "AuthFlow"));
+            r.clientId = Core::Json::GetStringValue(v, "ClientId");
+            r.authParameters = boost::json::value_to<std::map<std::string, std::string>>(v.at("AuthParameters"));
+            r.clientMetaData = boost::json::value_to<std::map<std::string, std::string>>(v.at("ClientMetaData"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, InitiateAuthRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"AuthFlow", AuthFlowTypeToString(obj.authFlow)},
+                    {"ClientId", obj.clientId},
+                    {"AuthParameters", boost::json::value_from(obj.clientId)},
+                    {"ClientMetaData", boost::json::value_from(obj.clientMetaData)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

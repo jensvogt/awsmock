@@ -37,14 +37,14 @@ namespace AwsMock::Dto::KMS {
             {KeyState::UNAVAILABLE, "Unavailable"},
             {KeyState::UPDATING, "Updating"}};
 
-    [[maybe_unused]] static std::string KeyStateToString(KeyState keyState) {
+    [[maybe_unused]] static std::string KeyStateToString(const KeyState &keyState) {
         return KeyStateNames[keyState];
     }
 
     [[maybe_unused]] static KeyState KeyStateFromString(const std::string &keyState) {
-        for (auto &it: KeyStateNames) {
-            if (it.second == keyState) {
-                return it.first;
+        for (auto &[fst, snd]: KeyStateNames) {
+            if (snd == keyState) {
+                return fst;
             }
         }
         return KeyState::UNAVAILABLE;

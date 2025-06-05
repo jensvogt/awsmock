@@ -51,17 +51,14 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/common/CognitoClientCommand.cpp src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp
         src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/CustomSmsSender.cpp
-        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp
-        src/cognito/ListGroupRequest.cpp src/cognito/ListGroupsResponse.cpp
-        src/cognito/DescribeUserPoolRequest.cpp
-        src/cognito/DescribeUserPoolResponse.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
-        src/cognito/model/UserContextData.cpp src/cognito/InitiateAuthRequest.cpp src/cognito/InitiateAuthRequest.cpp
-        src/cognito/InitiateAuthResponse.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/ListUserPoolClientsRequest.cpp
-        src/cognito/ListUserPoolClientsResponse.cpp src/cognito/DescribeUserPoolClientRequest.cpp
-        src/cognito/DescribeUserPoolClientResponse.cpp src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
+        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/ListGroupRequest.cpp
+        src/cognito/ListGroupsResponse.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
+        src/cognito/model/UserContextData.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp
+        src/cognito/ListUserPoolClientsRequest.cpp src/cognito/ListUserPoolClientsResponse.cpp
+        src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
         src/cognito/UpdateUserPoolDomainRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp
-        src/cognito/DescribeUserPoolDomainRequest.cpp src/cognito/DescribeUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp
-        src/cognito/ResponseToAuthChallengeRequest.cpp src/cognito/ResponseToAuthChallengeResponse.cpp src/cognito/GlobalSignOutRequest.cpp)
+        src/cognito/model/ValidationData.cpp src/cognito/ResponseToAuthChallengeRequest.cpp
+        src/cognito/ResponseToAuthChallengeResponse.cpp)
 set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp

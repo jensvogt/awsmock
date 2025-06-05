@@ -16,34 +16,17 @@ namespace AwsMock::Service {
             switch (clientCommand.command) {
                 case Dto::Common::CognitoCommandType::CREATE_USER_POOL: {
 
-                    Dto::Cognito::CreateUserPoolRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got create user pool request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::CreateUserPoolRequest cognitoRequest = Dto::Cognito::CreateUserPoolRequest::FromJson(clientCommand);
                     Dto::Cognito::CreateUserPoolResponse serviceResponse = _cognitoService.CreateUserPool(cognitoRequest);
                     log_info << "User pool created, userPoolId: " << serviceResponse.userPoolId;
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::CognitoCommandType::CREATE_USER_POOL_DOMAIN: {
-                    Dto::Cognito::CreateUserPoolDomainRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got create user pool domain request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::CreateUserPoolDomainRequest cognitoRequest = Dto::Cognito::CreateUserPoolDomainRequest::FromJson(clientCommand);
                     Dto::Cognito::CreateUserPoolDomainResponse serviceResponse = _cognitoService.CreateUserPoolDomain(cognitoRequest);
                     log_info << "User pool domain created, domain: " << serviceResponse.cloudFrontDomain;
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -54,9 +37,6 @@ namespace AwsMock::Service {
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got update user pool domain request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::UpdateUserPoolDomainResponse cognitoResponse = _cognitoService.UpdateUserPoolDomain(cognitoRequest);
                     log_info << "User pool domain updated, domain: " << cognitoResponse.cloudFrontDomain;
 
@@ -64,18 +44,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::CREATE_USER_POOL_CLIENT: {
-                    Dto::Cognito::CreateUserPoolClientRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got create user pool client request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::CreateUserPoolClientRequest cognitoRequest = Dto::Cognito::CreateUserPoolClientRequest::FromJson(clientCommand);
                     Dto::Cognito::CreateUserPoolClientResponse serviceResponse = _cognitoService.CreateUserPoolClient(cognitoRequest);
                     log_info << "User pool client created, userPoolId: " << cognitoRequest.userPoolId << " clientName: " << cognitoRequest.clientName;
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -86,9 +58,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got list user pool request, json: " << cognitoRequest.ToString();
 
                     Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
                     log_info << "User pools listed, count: " << serviceResponse.userPools.size();
@@ -111,10 +80,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got update user pool request, json: " << cognitoRequest.ToString();
-
                     _cognitoService.UpdateUserPool(cognitoRequest);
                     log_info << "User pool updated, userPoolId: " << cognitoRequest.userPoolId;
 
@@ -128,9 +93,6 @@ namespace AwsMock::Service {
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got list user pool clients request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::ListUserPoolClientsResponse serviceResponse = _cognitoService.ListUserPoolClients(cognitoRequest);
                     log_info << "User pool clients listed, userPoolId: " << serviceResponse.userPoolsClients.size();
 
@@ -138,15 +100,8 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::DESCRIBE_USER_POOL_CLIENTS: {
-                    Dto::Cognito::DescribeUserPoolClientRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got describe user pool client request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::DescribeUserPoolClientRequest cognitoRequest = Dto::Cognito::DescribeUserPoolClientRequest::FromJson(clientCommand);
                     Dto::Cognito::DescribeUserPoolClientResponse cognitoResponse = _cognitoService.DescribeUserPoolClient(cognitoRequest);
                     log_info << "Describe user pool client, userPoolId: " << cognitoResponse.userPoolClient.userPoolId << " clientId: " << cognitoResponse.userPoolClient.clientId;
 
@@ -159,10 +114,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got update user pool client request, json: " << cognitoRequest.ToString();
-
                     _cognitoService.UpdateUserPoolClient(cognitoRequest);
                     log_info << "User pool client updated, userPoolId: " << cognitoRequest.userPoolId << " clientId: " << cognitoRequest.clientId;
 
@@ -170,18 +121,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::DELETE_USER_POOL_CLIENT: {
-                    Dto::Cognito::DeleteUserPoolClientRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got delete user pool client request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::DeleteUserPoolClientRequest cognitoRequest = Dto::Cognito::DeleteUserPoolClientRequest::FromJson(clientCommand);
                     _cognitoService.DeleteUserPoolClient(cognitoRequest);
                     log_info << "User pool client deleted, userPoolId: " << cognitoRequest.userPoolId << " clientId: " << cognitoRequest.clientId;
-
                     return SendOkResponse(request);
                 }
 
@@ -192,9 +135,6 @@ namespace AwsMock::Service {
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Describe user pool request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::DescribeUserPoolResponse serviceResponse = _cognitoService.DescribeUserPool(cognitoRequest);
                     log_info << "Describe user pool, userPoolId: " << cognitoRequest.userPoolId;
 
@@ -202,17 +142,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::DELETE_USER_POOL: {
-                    Dto::Cognito::DeleteUserPoolRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got delete user pool request, json: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::DeleteUserPoolRequest cognitoRequest = Dto::Cognito::DeleteUserPoolRequest::FromJson(clientCommand);
                     _cognitoService.DeleteUserPool(cognitoRequest);
                     log_info << "User pool deleted, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request);
                 }
 
@@ -222,9 +155,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got list users request: " << cognitoRequest.ToString();
-
                     Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
                     log_info << "Users listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
 
@@ -271,10 +201,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "List users in group request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::ListUsersInGroupResponse serviceResponse = _cognitoService.ListUsersInGroup(cognitoRequest);
                     log_info << "Users in group listed, userPoolId: " << cognitoRequest.userPoolId;
 
@@ -291,18 +217,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::DELETE_GROUP: {
-                    Dto::Cognito::DeleteGroupRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got delete group request, json: " << cognitoRequest.ToString();
-
+                    Dto::Cognito::DeleteGroupRequest cognitoRequest = Dto::Cognito::DeleteGroupRequest::FromJson(clientCommand);
                     _cognitoService.DeleteGroup(cognitoRequest);
                     log_info << "Group deleted, userPoolId: " << cognitoRequest.userPoolId << " group: " << cognitoRequest.groupName;
-
                     return SendOkResponse(request);
                 }
 
@@ -312,10 +230,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got sign up request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::SignUpResponse cognitoResponse = _cognitoService.SignUp(cognitoRequest);
                     log_info << "Sign up user, user: " << cognitoRequest.user << " clientId: " << cognitoRequest.clientId;
 
@@ -337,10 +251,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got initiate auth request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::InitiateAuthResponse cognitoResponse = _cognitoService.InitiateAuth(cognitoRequest);
                     log_info << "User authorization initiated, userName: " << cognitoRequest.GetUserId();
                     std::string tmp = cognitoResponse.ToJson();
@@ -353,10 +263,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got response to auth challenge request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::RespondToAuthChallengeResponse cognitoResponse = _cognitoService.RespondToAuthChallenge(cognitoRequest);
                     log_info << "Respond to auth challenge, clientId: " << cognitoRequest.clientId << " json: " << cognitoResponse.ToJson();
 
@@ -369,10 +275,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got global sign out request, json: " << cognitoRequest.ToString();
-
                     _cognitoService.GlobalSignOut(cognitoRequest);
                     log_info << "Global sign out, accessToken: " << cognitoRequest.accessToken;
 
@@ -380,17 +282,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_CREATE_USER: {
-                    Dto::Cognito::AdminCreateUserRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got admin create user request, json: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::AdminCreateUserRequest cognitoRequest = Dto::Cognito::AdminCreateUserRequest::FromJson(clientCommand);
                     Dto::Cognito::AdminCreateUserResponse cognitoResponse = _cognitoService.AdminCreateUser(cognitoRequest);
                     log_info << "User created, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
@@ -404,17 +299,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::ADMIN_ENABLE_USER: {
-                    Dto::Cognito::AdminEnableUserRequest cognitoRequest;
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got admin enable user request, json: " << cognitoRequest.ToString();
 
+                    Dto::Cognito::AdminEnableUserRequest cognitoRequest = Dto::Cognito::AdminEnableUserRequest::FromJson(clientCommand);
                     _cognitoService.AdminEnableUser(cognitoRequest);
                     log_info << "User enabled, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
-
                     return SendOkResponse(request);
                 }
 
