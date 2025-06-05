@@ -9,10 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
-#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
