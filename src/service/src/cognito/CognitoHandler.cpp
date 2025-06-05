@@ -53,15 +53,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::CognitoCommandType::LIST_USER_POOLS: {
 
-                    Dto::Cognito::ListUserPoolRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
-
+                    Dto::Cognito::ListUserPoolRequest cognitoRequest = Dto::Cognito::ListUserPoolRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
                     log_info << "User pools listed, count: " << serviceResponse.userPools.size();
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -87,15 +81,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::LIST_USER_POOL_CLIENTS: {
-                    Dto::Cognito::ListUserPoolClientsRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
+                    Dto::Cognito::ListUserPoolClientsRequest cognitoRequest = Dto::Cognito::ListUserPoolClientsRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserPoolClientsResponse serviceResponse = _cognitoService.ListUserPoolClients(cognitoRequest);
                     log_info << "User pool clients listed, userPoolId: " << serviceResponse.userPoolsClients.size();
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -175,14 +164,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::LIST_GROUPS: {
-                    Dto::Cognito::ListGroupsRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::ListGroupsRequest cognitoRequest = Dto::Cognito::ListGroupsRequest::FromJson(clientCommand);
                     Dto::Cognito::ListGroupsResponse serviceResponse = _cognitoService.ListGroups(cognitoRequest);
                     log_info << "Groups listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << serviceResponse.groups.size();
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -237,14 +222,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::INITIATE_AUTH: {
-                    Dto::Cognito::InitiateAuthRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::InitiateAuthRequest cognitoRequest = Dto::Cognito::InitiateAuthRequest::FromJson(clientCommand);
                     Dto::Cognito::InitiateAuthResponse cognitoResponse = _cognitoService.InitiateAuth(cognitoRequest);
                     log_info << "User authorization initiated, userName: " << cognitoRequest.GetUserId();
-                    std::string tmp = cognitoResponse.ToJson();
                     return SendOkResponse(request, cognitoResponse.ToJson(), headers);
                 }
 
@@ -261,14 +242,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::GLOBAL_SIGN_OUT: {
-                    Dto::Cognito::GlobalSignOutRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::GlobalSignOutRequest cognitoRequest = Dto::Cognito::GlobalSignOutRequest::FromJson(clientCommand);
                     _cognitoService.GlobalSignOut(cognitoRequest);
                     log_info << "Global sign out, accessToken: " << cognitoRequest.accessToken;
-
                     return SendOkResponse(request, {}, headers);
                 }
 

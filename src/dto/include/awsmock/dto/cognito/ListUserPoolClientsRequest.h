@@ -35,7 +35,7 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Max results
          */
-        int maxResults;
+        int maxResults{};
 
         /**
          * Next token
