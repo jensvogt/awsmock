@@ -51,11 +51,9 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
 set(COGNITO_SOURCES src/cognito/ListUserPoolRequest.cpp src/cognito/ListUserPoolResponse.cpp
         src/common/CognitoClientCommand.cpp src/cognito/ListUsersRequest.cpp src/cognito/ListUsersResponse.cpp
         src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp src/cognito/model/CustomSmsSender.cpp
-        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/ListGroupRequest.cpp
-        src/cognito/ListGroupsResponse.cpp src/cognito/ListUsersInGroupRequest.cpp src/cognito/ListUsersInGroupResponse.cpp
-        src/cognito/model/UserContextData.cpp src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp
-        src/cognito/ListUserPoolClientsRequest.cpp src/cognito/ListUserPoolClientsResponse.cpp
-        src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
+        src/cognito/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp src/cognito/ListUsersInGroupRequest.cpp
+        src/cognito/ListUsersInGroupResponse.cpp src/cognito/model/UserContextData.cpp src/cognito/SignUpRequest.cpp
+        src/cognito/SignUpResponse.cpp src/cognito/UpdateUserPoolRequest.cpp src/cognito/UpdateUserPoolClientRequest.cpp
         src/cognito/UpdateUserPoolDomainRequest.cpp src/cognito/UpdateUserPoolDomainResponse.cpp
         src/cognito/model/ValidationData.cpp src/cognito/ResponseToAuthChallengeRequest.cpp
         src/cognito/ResponseToAuthChallengeResponse.cpp)

@@ -129,15 +129,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::DESCRIBE_USER_POOL: {
-                    Dto::Cognito::DescribeUserPoolRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
+                    Dto::Cognito::DescribeUserPoolRequest cognitoRequest = Dto::Cognito::DescribeUserPoolRequest::FromJson(clientCommand);
                     Dto::Cognito::DescribeUserPoolResponse serviceResponse = _cognitoService.DescribeUserPool(cognitoRequest);
                     log_info << "Describe user pool, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -185,10 +180,6 @@ namespace AwsMock::Service {
                     cognitoRequest.region = clientCommand.region;
                     cognitoRequest.requestId = clientCommand.requestId;
                     cognitoRequest.user = clientCommand.user;
-
-                    // TODO:: Fix for new templates
-                    //log_debug << "Got list groups request, json: " << cognitoRequest.ToString();
-
                     Dto::Cognito::ListGroupsResponse serviceResponse = _cognitoService.ListGroups(cognitoRequest);
                     log_info << "Groups listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << serviceResponse.groups.size();
 
