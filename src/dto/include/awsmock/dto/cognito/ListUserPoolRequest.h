@@ -24,25 +24,13 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Page size
          */
-        long pageSize{};
-
-        /**
-         * Page index
-         */
-        long pageIndex{};
-
-        /**
-         * Page index
-         */
-        std::vector<Common::SortColumn> sortColumns{};
+        long maxResults{};
 
       private:
 
         friend ListUserPoolRequest tag_invoke(boost::json::value_to_tag<ListUserPoolRequest>, boost::json::value const &v) {
             ListUserPoolRequest r;
-            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
-            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
-            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            r.maxResults = Core::Json::GetLongValue(v, "MaxResults");
             return r;
         }
 
@@ -51,9 +39,7 @@ namespace AwsMock::Dto::Cognito {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"pageSize", obj.pageSize},
-                    {"pageIndex", obj.pageIndex},
-                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
+                    {"MaxResults", obj.maxResults},
             };
         }
     };

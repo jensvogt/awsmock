@@ -35,26 +35,6 @@ namespace AwsMock::Dto::Cognito {
         std::string name;
 
         /**
-         * User pool ID
-         */
-        std::string userPoolId;
-
-        /**
-         * User pool ARN
-         */
-        std::string arn;
-
-        /**
-         * User pool domain
-         */
-        std::string domain;
-
-        /**
-         * Number of users
-         */
-        long userCount{};
-
-        /**
          * Created
          */
         system_clock::time_point created;
@@ -77,8 +57,6 @@ namespace AwsMock::Dto::Cognito {
                 Core::Bson::BsonUtils::SetStringValue(document, "id", oid);
                 Core::Bson::BsonUtils::SetStringValue(document, "region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "name", name);
-                Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
-                Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
                 Core::Bson::BsonUtils::SetDateValue(document, "created", created);
                 Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
                 return document.extract();
@@ -93,11 +71,8 @@ namespace AwsMock::Dto::Cognito {
 
         friend UserPool tag_invoke(boost::json::value_to_tag<UserPool>, boost::json::value const &v) {
             UserPool r;
-            r.oid = Core::Json::GetStringValue(v, "oid");
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.arn = Core::Json::GetStringValue(v, "arn");
-            r.domain = Core::Json::GetStringValue(v, "domain");
-            r.userCount = Core::Json::GetLongValue(v, "userCount");
+            r.oid = Core::Json::GetStringValue(v, "Id");
+            r.name = Core::Json::GetStringValue(v, "Name");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
             return r;
@@ -105,16 +80,13 @@ namespace AwsMock::Dto::Cognito {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserPool const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"oid", obj.oid},
-                    {"userPoolId", obj.userPoolId},
-                    {"arn", obj.arn},
-                    {"domain", obj.domain},
-                    {"userCount", obj.userCount},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Id", obj.oid},
+                    {"Name", obj.name},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"LastModified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
