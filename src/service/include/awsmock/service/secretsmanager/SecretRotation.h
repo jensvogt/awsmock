@@ -9,7 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
@@ -63,7 +62,6 @@ namespace AwsMock::Service {
          *
          * @param secret to create
          * @param clientRequestToken client request token
-         * @param requestId request ID
          */
         void operator()(const Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
 

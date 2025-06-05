@@ -98,7 +98,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Multi region
          */
-        bool multiRegion;
+        bool multiRegion{};
 
         /**
          * Description
@@ -118,7 +118,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Enabled flag
          */
-        bool enabled;
+        bool enabled{};
 
         /**
          * Origin

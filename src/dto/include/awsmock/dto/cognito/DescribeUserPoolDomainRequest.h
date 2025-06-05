@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -29,26 +27,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeUserPoolDomainRequest final : Common::BaseDto<DescribeUserPoolDomainRequest> {
+    struct DescribeUserPoolDomainRequest final : Common::BaseCounter<DescribeUserPoolDomainRequest> {
 
         /**
          * Domain name
          */
         std::string domain;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend DescribeUserPoolDomainRequest tag_invoke(boost::json::value_to_tag<DescribeUserPoolDomainRequest>, boost::json::value const &v) {
+            DescribeUserPoolDomainRequest r;
+            r.domain = Core::Json::GetStringValue(v, "Domain");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeUserPoolDomainRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Domain", obj.domain},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
