@@ -55,7 +55,7 @@ namespace AwsMock::Service {
 
                     Dto::Cognito::ListUserPoolRequest cognitoRequest = Dto::Cognito::ListUserPoolRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserPoolResponse serviceResponse = _cognitoService.ListUserPools(cognitoRequest);
-                    log_info << "User pools listed, count: " << serviceResponse.userPools.size();
+                    log_debug << "User pools listed, response: " << serviceResponse.ToJson();
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -63,8 +63,7 @@ namespace AwsMock::Service {
 
                     Dto::Cognito::ListUserPoolCountersRequest cognitoRequest = Dto::Cognito::ListUserPoolCountersRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserPoolCountersResponse serviceResponse = _cognitoService.ListUserPoolCounters(cognitoRequest);
-                    log_info << "User pools counters listed, count: " << serviceResponse.userPoolCounters.size();
-
+                    log_debug << "User pools counters listed, response: " << serviceResponse.ToJson();
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 

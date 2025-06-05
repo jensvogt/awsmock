@@ -80,13 +80,12 @@ namespace AwsMock::Service {
     Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "list_user_pool");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "list_user_pool");
-        log_debug << "List user pools request, pageSize: " << request.pageSize;
+        log_debug << "List user pools request, maxResults: " << request.maxResults;
 
         try {
-            const long total = _database.CountUserPools(request.region);
             const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list count: " << userPools.size();
-            return Dto::Cognito::Mapper::map(request, userPools, total);
+            return Dto::Cognito::Mapper::map(request, userPools, request.maxResults);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
