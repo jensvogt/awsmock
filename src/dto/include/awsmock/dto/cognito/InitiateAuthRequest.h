@@ -69,21 +69,27 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return user ID
          */
-        std::string GetUserId();
+        std::string GetUserId() {
+            return authParameters["USERNAME"];
+        }
 
         /**
          * @brief Returns the user password
          *
          * @return user password
          */
-        std::string GetPassword();
+        std::string GetPassword() {
+            return authParameters["PASSWORD"];
+        }
 
         /**
          * @brief Returns the client secret from the AuthParameters
          *
          * @return client secret
          */
-        std::string GetClientSecret();
+        std::string GetClientSecret() {
+            return authParameters["SECRET_HASH"];
+        }
 
       private:
 

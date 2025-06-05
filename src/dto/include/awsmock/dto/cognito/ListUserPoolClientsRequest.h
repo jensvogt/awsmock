@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -27,7 +25,7 @@ namespace AwsMock::Dto::Cognito {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolClientsRequest final : Common::BaseDto<ListUserPoolClientsRequest> {
+    struct ListUserPoolClientsRequest final : Common::BaseCounter<ListUserPoolClientsRequest> {
 
         /**
          * User pool ID
@@ -44,19 +42,26 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string nextToken;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend ListUserPoolClientsRequest tag_invoke(boost::json::value_to_tag<ListUserPoolClientsRequest>, boost::json::value const &v) {
+            ListUserPoolClientsRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.maxResults = Core::Json::GetLongValue(v, "MaxResults");
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolClientsRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"MaxResults", obj.maxResults},
+                    {"NextToken", obj.nextToken},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

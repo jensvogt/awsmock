@@ -21,19 +21,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListGroupsResponse final : Common::BaseDto<ListGroupsResponse> {
+    struct ListGroupsResponse final : Common::BaseCounter<ListGroupsResponse> {
 
         /**
          * Group entities
          */
         std::vector<Group> groups{};
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return user pools json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend ListGroupsResponse tag_invoke(boost::json::value_to_tag<ListGroupsResponse>, boost::json::value const &v) {
+            ListGroupsResponse r;
+            r.groups = boost::json::value_to<std::vector<Group>>(v.at("Groups"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListGroupsResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Groups", boost::json::value_from(obj.groups)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
