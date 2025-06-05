@@ -134,14 +134,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::LIST_USERS: {
-                    Dto::Cognito::ListUsersRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::ListUsersRequest cognitoRequest = Dto::Cognito::ListUsersRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUsersResponse cognitoResponse = _cognitoService.ListUsers(cognitoRequest);
                     log_info << "Users listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
@@ -172,14 +168,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::LIST_USERS_IN_GROUP: {
-                    Dto::Cognito::ListUsersInGroupRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::ListUsersInGroupRequest cognitoRequest = Dto::Cognito::ListUsersInGroupRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUsersInGroupResponse serviceResponse = _cognitoService.ListUsersInGroup(cognitoRequest);
                     log_info << "Users in group listed, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 

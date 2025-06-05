@@ -10,10 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/User.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -22,19 +20,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUsersInGroupResponse final : Common::BaseDto<ListUsersInGroupResponse> {
+    struct ListUsersInGroupResponse final : Common::BaseCounter<ListUsersInGroupResponse> {
 
         /**
          * User pool entities
          */
         std::vector<User> users;
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return user pools json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend ListUsersInGroupResponse tag_invoke(boost::json::value_to_tag<ListUsersInGroupResponse>, boost::json::value const &v) {
+            ListUsersInGroupResponse r;
+            r.users = boost::json::value_to<std::vector<User>>(v.at("Users"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUsersInGroupResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Users", boost::json::value_from(obj.users)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
