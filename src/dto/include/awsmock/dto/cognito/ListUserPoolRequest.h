@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/utils/SortColumn.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -21,36 +19,43 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolRequest : Common::BaseDto<ListUserPoolRequest> {
+    struct ListUserPoolRequest final : Common::BaseCounter<ListUserPoolRequest> {
 
         /**
          * Page size
          */
-        int pageSize{};
+        long pageSize{};
 
         /**
          * Page index
          */
-        int pageIndex{};
+        long pageIndex{};
 
         /**
          * Page index
          */
-        std::vector<Database::SortColumn> sortColumns{};
+        std::vector<Common::SortColumn> sortColumns{};
 
-        /**
-         * Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend ListUserPoolRequest tag_invoke(boost::json::value_to_tag<ListUserPoolRequest>, boost::json::value const &v) {
+            ListUserPoolRequest r;
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"pageSize", obj.pageSize},
+                    {"pageIndex", obj.pageIndex},
+                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
