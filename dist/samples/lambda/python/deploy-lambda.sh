@@ -1,13 +1,10 @@
 #!/bin/bash
 
 # Create bucket
-aws s3 mb s3://test-bucket \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+awslocal s3 mb s3://test-bucket
 
 # Create lambda function
-aws lambda create-function \
+awslocal lambda create-function \
   --function-name python-events \
   --runtime python3.8 \
   --timeout 120 \
@@ -17,7 +14,4 @@ aws lambda create-function \
   --ephemeral-storage Size=2024 \
   --handler lambda_function.lambda_handler \
   --zip-file fileb://./resources/python-events.zip \
-  --role arn:aws:iam::000000000000:role/lambda-role \
-  --region eu-central-1 \
-  --endpoint http://localhost:4566 \
-  --profile awsmock
+  --role arn:aws:iam::000000000000:role/lambda-role

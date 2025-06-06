@@ -38,12 +38,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Last decrease time
          */
-        system_clock::time_point lastDecreaseDateTime;
+        system_clock::time_point lastDecreaseDateTime = system_clock::now();
 
         /**
          * Last increase time
          */
-        system_clock::time_point lastIncreaseDateTime;
+        system_clock::time_point lastIncreaseDateTime = system_clock::now();
 
         /**
          * NUmber of decreases

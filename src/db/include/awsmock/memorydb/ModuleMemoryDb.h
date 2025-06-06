@@ -155,15 +155,17 @@ namespace AwsMock::Database {
 
         /**
          * @brief Deletes all modules
+         *
+         * @return number of modules deleted
          */
-        void DeleteAllModules();
+        long DeleteAllModules();
 
       private:
 
         /**
          * Modules map
          */
-        std::map<std::string, Entity::Module::Module> _modules;
+        std::map<std::string, Entity::Module::Module> _modules{};
 
         /**
          * Existing modules

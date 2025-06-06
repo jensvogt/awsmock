@@ -144,7 +144,7 @@ namespace AwsMock::Database {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
-            if (const auto mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name))); !mResult->empty()) {
+            if (const auto mResult = _bucketCollection.find_one(make_document(kvp("region", region), kvp("name", name))); mResult) {
                 Entity::S3::Bucket result;
                 result.FromDocument(mResult->view());
                 log_trace << "Got bucket: " << result.ToString();
@@ -722,7 +722,7 @@ namespace AwsMock::Database {
                                                                               kvp("bucket", bucket),
                                                                               kvp("key", key),
                                                                               kvp("md5sum", md5sum)));
-                if (!mResult->empty()) {
+                if (mResult) {
                     Entity::S3::Object result;
                     result.FromDocument(mResult->view());
 

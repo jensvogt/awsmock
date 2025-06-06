@@ -103,10 +103,13 @@ namespace AwsMock::Service {
 
         std::string dockerFile = WriteDockerFile(codeDir, handler, runtime, environment);
         std::string imageFile = BuildImageFile(codeDir, name);
-
-        if (auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile); statusCode != http::status::ok) {
+        auto [statusCode, body] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile);
+        log_trace << "Build image, status: " << statusCode << ", body: " << body;
+        if (statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
+            return {};
         }
+
         log_debug << "Build image request finished, name: " << name << " tags: " << tag << " runtime: " << runtime;
         return imageFile;
     }
@@ -115,7 +118,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
         log_debug << "Build image request, name: " << name << " tags: " << tag;
 
-        // Write docker file
+        // Write the docker file
         const std::string codeDir = Core::DirUtils::CreateTempDir();
         const std::string fileName = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::ofstream ofs(fileName);
@@ -483,8 +486,7 @@ namespace AwsMock::Service {
         Dto::Docker::CreateNetworkResponse response;
         if (_isDocker) {
 
-            auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
-            if (statusCode == http::status::ok) {
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
                 log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver;
                 response.FromJson(body);
             } else {
@@ -492,8 +494,7 @@ namespace AwsMock::Service {
             }
         } else {
 
-            auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson());
-            if (statusCode == http::status::ok) {
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/networks/create", request.ToJson()); statusCode == http::status::ok) {
                 log_debug << "Podman network created, name: " << request.name << " driver: " << request.driver;
                 response.FromJson(body);
             } else {
@@ -551,6 +552,29 @@ namespace AwsMock::Service {
         StopContainer(container.id);
     }
 
+    std::string ContainerService::GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        std::string logMessages;
+        if (_isDocker) {
+            const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(start));
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true"); statusCode == http::status::ok) {
+                log_debug << "Container logs received, containerId: " << containerId;
+                logMessages = body;
+            } else {
+                log_error << "Receive container logs failed, statusCode: " << statusCode;
+            }
+        } else {
+
+            if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/logs", {}); statusCode == http::status::ok) {
+                log_debug << "Container logs received, containerId: " << containerId;
+            } else {
+                log_error << "Receive container logs failed, statusCode: " << statusCode;
+            }
+        }
+        return logMessages;
+    }
+
     void ContainerService::StopContainer(const std::string &id) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
@@ -605,6 +629,24 @@ namespace AwsMock::Service {
         auto supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
+        std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
+        std::ofstream awsOfs(awsConfig);
+        awsOfs << "[default]" << std::endl;
+        awsOfs << "region=" << Core::Configuration::instance().GetValue<std::string>("awsmock.region") << std::endl;
+        awsOfs << "output=json" << std::endl;
+        awsOfs.close();
+
+        std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
+        std::ofstream awsCredOfs(awsCredentials);
+        awsCredOfs << "[default]" << std::endl;
+        awsCredOfs << "region=" << Core::Configuration::instance().GetValue<std::string>("awsmock.region") << std::endl;
+        awsCredOfs << "aws_access_key_id=none" << std::endl;
+        awsCredOfs << "aws_secret_access_key=none" << std::endl;
+        awsCredOfs << "aws_session_token=none" << std::endl;
+        awsCredOfs << "retry_mode=standard" << std::endl;
+        awsCredOfs << "max_attempts=1" << std::endl;
+        awsCredOfs.close();
+
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
             ofs << "FROM " << supportedRuntime << std::endl;
@@ -633,11 +675,11 @@ namespace AwsMock::Service {
                 ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
             }
             ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws" << std::endl;
-            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "RUN pip install -r requirements.txt" << std::endl;
-            ofs << "COPY lambda_function.py ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "COPY config /root/.aws/" << std::endl;
+            ofs << "COPY credentials /root/.aws/" << std::endl;
+            ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;
@@ -646,9 +688,6 @@ namespace AwsMock::Service {
             }
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
             ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws" << std::endl;
-            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
             ofs << "FROM " << supportedRuntime << std::endl;
@@ -657,9 +696,6 @@ namespace AwsMock::Service {
             }
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
-            ofs << "RUN mkdir -p /root/.aws" << std::endl;
-            ofs << "COPY config /root/.aws" << std::endl;
-            ofs << "COPY credentials /root/.aws" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         }
         ofs.close();

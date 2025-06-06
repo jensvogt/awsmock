@@ -108,7 +108,7 @@ namespace AwsMock::Database {
          * @return bucket, if existing
          * @throws DatabaseException
          */
-        Entity::S3::Bucket GetBucketById(const std::string &oid) const;
+        [[nodiscard]] Entity::S3::Bucket GetBucketById(const std::string &oid) const;
 
         /**
          * @brief Returns the bucket by region and name.

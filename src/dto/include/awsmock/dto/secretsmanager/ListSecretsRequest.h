@@ -11,12 +11,13 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/Filter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * List secrets request.
+     * @brief List secrets request.
      *
      * Example:
      * @code{.json}
@@ -36,12 +37,7 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListSecretsRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListSecretsRequest final : Common::BaseCounter<ListSecretsRequest> {
 
         /**
          * Next token
@@ -56,7 +52,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Maximal number of results
          */
-        int maxResults;
+        long maxResults{};
 
         /**
          * Include deletion flag
@@ -68,38 +64,31 @@ namespace AwsMock::Dto::SecretsManager {
          */
         std::vector<Filter> filters;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListSecretsRequest tag_invoke(boost::json::value_to_tag<ListSecretsRequest>, boost::json::value const &v) {
+            ListSecretsRequest r;
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            r.sortOrder = Core::Json::GetStringValue(v, "SortOrder");
+            r.maxResults = Core::Json::GetLongValue(v, "MaxResults");
+            r.includePlannedDeletion = Core::Json::GetBoolValue(v, "IncludePlannedDeletion");
+            if (Core::Json::AttributeExists(v, "Filters"))
+                r.filters = boost::json::value_to<std::vector<Filter>>(v.at("Filters"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListSecretsRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListSecretsRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"NextToken", obj.nextToken},
+                    {"SortOrder", obj.sortOrder},
+                    {"MaxResults", obj.maxResults},
+                    {"IncludePlannedDeletion", obj.includePlannedDeletion},
+                    {"Filters", boost::json::value_from(obj.filters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

@@ -5,15 +5,9 @@
 #ifndef AWSMOCK_DTO_COGNITO_DESCRIBE_USERPOOL_CLIENT_RESPONSE_H
 #define AWSMOCK_DTO_COGNITO_DESCRIBE_USERPOOL_CLIENT_RESPONSE_H
 
-// C++ standard includes
-
-#include <string>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserPoolClient.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -65,19 +59,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeUserPoolClientResponse final : Common::BaseDto<DescribeUserPoolClientResponse> {
+    struct DescribeUserPoolClientResponse final : Common::BaseCounter<DescribeUserPoolClientResponse> {
 
         /**
          * User pool client
          */
         UserPoolClient userPoolClient;
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend DescribeUserPoolClientResponse tag_invoke(boost::json::value_to_tag<DescribeUserPoolClientResponse>, boost::json::value const &v) {
+            DescribeUserPoolClientResponse r;
+            r.userPoolClient = boost::json::value_to<UserPoolClient>(v.at("UserPoolClient"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeUserPoolClientResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolClient", boost::json::value_from(obj.userPoolClient)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

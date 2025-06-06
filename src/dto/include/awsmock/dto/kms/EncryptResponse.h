@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
@@ -30,7 +28,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EncryptResponse : Common::BaseDto<EncryptResponse> {
+    struct EncryptResponse final : Common::BaseCounter<EncryptResponse> {
 
         /**
          * Key ID
@@ -51,19 +49,26 @@ namespace AwsMock::Dto::KMS {
          */
         std::string ciphertext;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-        */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend EncryptResponse tag_invoke(boost::json::value_to_tag<EncryptResponse>, boost::json::value const &v) {
+            EncryptResponse r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.ciphertext = Core::Json::GetStringValue(v, "CiphertextBlob");
+            r.encryptionAlgorithm = EncryptionAlgorithmsFromString(Core::Json::GetStringValue(v, "EncryptionAlgorithm"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EncryptResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"CiphertextBlob", obj.ciphertext},
+                    {"EncryptionAlgorithm", EncryptionAlgorithmsToString(obj.encryptionAlgorithm)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

@@ -11,11 +11,13 @@
 
 // AwsMoc includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Secrets manager version ID and stages
+     * @brief Secrets manager version ID and stages
      *
      * Example:
      * @code{.json}
@@ -29,47 +31,31 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct VersionIdsToStages {
+    struct VersionIdsToStages final : Common::BaseCounter<VersionIdsToStages> {
 
         /**
          * Version/stages map
          */
         std::map<std::string, std::vector<std::string>> versions;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+      private:
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param jsonObject JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &jsonObject);
+        friend VersionIdsToStages tag_invoke(boost::json::value_to_tag<VersionIdsToStages>, boost::json::value const &v) {
+            VersionIdsToStages r;
+            r.versions = boost::json::value_to<std::map<std::string, std::vector<std::string>>>(v.at("Versions"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const VersionIdsToStages &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, VersionIdsToStages const &obj) {
+            jv = {};
+            for (const auto &[fst, snd]: obj.versions) {
+                boost::json::array stagesArray;
+                for (const auto &stage: snd) {
+                    stagesArray.push_back(stage.c_str());
+                }
+                jv.as_object()[fst] = stagesArray;
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

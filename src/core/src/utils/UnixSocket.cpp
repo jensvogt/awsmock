@@ -2,7 +2,11 @@
 // Created by vogje01 on 5/28/24.
 //
 
+#include "awsmock/core/FileUtils.h"
+
+
 #include <awsmock/core/UnixSocket.h>
+#include <boost/asio/streambuf.hpp>
 
 namespace AwsMock::Core {
 
@@ -28,7 +32,7 @@ namespace AwsMock::Core {
             return {.statusCode = status::internal_server_error, .body = "Could not connect to docker UNIX domain socket, error: " + ec.message()};
         }
 
-        // Prepare message
+        // Prepare the message
         request<string_body> request = PrepareJsonMessage(method, path, body, headers);
 
         // Write to unix socket
@@ -64,7 +68,7 @@ namespace AwsMock::Core {
             return {.statusCode = status::internal_server_error, .body = "Could not connect to docker UNIX domain socket"};
         }
 
-        // Prepare message
+        // Prepare the message
         request<file_body> request = PrepareBinaryMessage(method, path, fileName, headers);
 
         // Write to unix socket

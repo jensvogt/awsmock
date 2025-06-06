@@ -360,6 +360,12 @@ namespace AwsMock::Core {
         return response.body();
     }
 
+    std::string HttpUtils::StatusCodeToString(const http::status &status) {
+        std::ostringstream oss;
+        oss << static_cast<int>(status);
+        return oss.str();
+    }
+
     http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
 
         http::response<http::dynamic_body> response{http::status::ok, request.version()};

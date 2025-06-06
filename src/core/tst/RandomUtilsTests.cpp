@@ -5,21 +5,16 @@
 #ifndef AWSMOCK_CORE_RANDOM_UTILS_TEST_H
 #define AWSMOCK_CORE_RANDOM_UTILS_TEST_H
 
-// GTest includes
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/RandomUtils.h>
 
 namespace AwsMock::Core {
 
-    class RandomUtilsTest : public ::testing::Test {};
-
-    TEST_F(RandomUtilsTest, MinMaxIntTest) {
+    BOOST_AUTO_TEST_CASE(MinMaxIntTest) {
 
         // arrange
-        int min = 32768;
-        int max = 65536;
+        constexpr int min = 32768;
+        constexpr int max = 65536;
 
         // act
         std::vector<int> result;
@@ -30,33 +25,33 @@ namespace AwsMock::Core {
 
         // assert
         for (int i = 0; i < 100; i++) {
-            EXPECT_TRUE(result[i] >= min && result[i] <= max);
+            BOOST_CHECK_EQUAL(result[i] >= min && result[i] <= max, true);
         }
         result.clear();
     }
 
-    TEST_F(RandomUtilsTest, IntArrayTest) {
+    BOOST_AUTO_TEST_CASE(IntArrayTest) {
 
         // arrange
-        int min = 32768;
-        int max = 65536;
-        int size = 100;
+        constexpr int min = 32768;
+        constexpr int max = 65536;
+        constexpr int size = 100;
 
         // act
         std::vector<int> result = RandomUtils::IntArray(size, min, max);
 
         // assert
         for (int i = 0; i < size; i++) {
-            EXPECT_TRUE(result[i] >= min && result[i] <= max);
+            BOOST_CHECK_EQUAL(result[i] >= min && result[i] <= max, true);
         }
         result.clear();
     }
 
-    TEST_F(RandomUtilsTest, MinMaxDoubleTest) {
+    BOOST_AUTO_TEST_CASE(MinMaxDoubleTest) {
 
         // arrange
-        double min = 0.0;
-        double max = 1.0;
+        constexpr double min = 0.0;
+        constexpr double max = 1.0;
 
         // act
         std::vector<double> result;
@@ -67,24 +62,24 @@ namespace AwsMock::Core {
 
         // assert
         for (int i = 0; i < 100; i++) {
-            EXPECT_TRUE(result[i] > min && result[i] < max);
+            BOOST_CHECK_EQUAL(result[i] > min && result[i] < max, true);
         }
         result.clear();
     }
 
-    TEST_F(RandomUtilsTest, DoubleArrayTest) {
+    BOOST_AUTO_TEST_CASE(DoubleArrayTest) {
 
         // arrange
-        double min = 0.0;
-        double max = 1.0;
-        int size = 100;
+        constexpr double min = 0.0;
+        constexpr double max = 1.0;
+        constexpr int size = 100;
 
         // act
         std::vector<double> result = RandomUtils::DoubleArray(size, min, max);
 
         // assert
         for (int i = 0; i < size; i++) {
-            EXPECT_TRUE(result[i] > min && result[i] < max);
+            BOOST_CHECK_EQUAL(result[i] > min && result[i] < max, true);
         }
         result.clear();
     }

@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -28,32 +26,36 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListKeysRequest : Common::BaseDto<ListKeysRequest> {
-
+    struct ListKeysRequest final : Common::BaseCounter<ListKeysRequest> {
 
         /**
          * Limit
          */
-        long limit;
+        long limit{};
 
         /**
          * Marker for paging
          */
         std::string marker;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend ListKeysRequest tag_invoke(boost::json::value_to_tag<ListKeysRequest>, boost::json::value const &v) {
+            ListKeysRequest r;
+            r.limit = Core::Json::GetLongValue(v, "Limit");
+            r.marker = Core::Json::GetStringValue(v, "Marker");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListKeysRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Limit", obj.limit},
+                    {"Marker", boost::json::value_from(obj.marker)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

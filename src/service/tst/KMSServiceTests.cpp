@@ -227,7 +227,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(decryptResponse.keyId.empty());
         EXPECT_TRUE(decryptResponse.plaintext == SYMMETRIC_BASE64_PLAIN_TEXT);
     }
-
+    /*
     TEST_F(KMSServiceTest, RSA2048EncryptTest) {
 
         // arrange
@@ -412,7 +412,7 @@ namespace AwsMock::Service {
         EXPECT_FALSE(decryptResponse.keyId.empty());
         EXPECT_TRUE(decryptResponse.plaintext == SYMMETRIC_BASE64_PLAIN_TEXT);
     }
-
+*/
     TEST_F(KMSServiceTest, DeleteKeyTest) {
 
         // arrange

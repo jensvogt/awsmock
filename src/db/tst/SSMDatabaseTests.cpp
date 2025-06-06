@@ -5,39 +5,23 @@
 #ifndef AWSMOCK_REPOSITORY_SSM_DATABASE_TESTS_H
 #define AWSMOCK_REPOSITORY_SSM_DATABASE_TESTS_H
 
-// C++ standard includes
-#include <iostream>
-#include <vector>
-
-// GTest includes
-#include <gtest/gtest.h>
-
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/SSMDatabase.h>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/client.hpp>
-
-#define SERVICE "test-module"
+#define MODULE "test-module"
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
+    struct SSMDatabaseTest {
 
-    class SSMDatabaseTest : public ::testing::Test {
-
-      protected:
-
-        void SetUp() override {
+        SSMDatabaseTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
         }
 
-        void TearDown() override {
-            _ssmDatabase.DeleteAllParameters();
+        ~SSMDatabaseTest() {
+            const long deleted = _ssmDatabase.DeleteAllParameters();
+            log_debug << "Parameter cleaned, count:" << deleted;
         }
 
         std::string _region;
@@ -45,63 +29,63 @@ namespace AwsMock::Database {
         SSMDatabase &_ssmDatabase = SSMDatabase::instance();
     };
 
-    TEST_F(SSMDatabaseTest, ParameterCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(ParameterCreateTest, SSMDatabaseTest) {
 
         // arrange
         Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
 
         // act
-        Entity::SSM::Parameter result = _ssmDatabase.CreateParameter(parameter);
+        const Entity::SSM::Parameter result = _ssmDatabase.CreateParameter(parameter);
 
         // assert
-        EXPECT_FALSE(result.oid.empty());
-        EXPECT_TRUE(result.parameterName == "parameter-name");
-        EXPECT_EQ(1, _ssmDatabase.CountParameters());
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
+        BOOST_CHECK_EQUAL(result.parameterName, "parameter-name");
+        BOOST_CHECK_EQUAL(1, _ssmDatabase.CountParameters());
     }
 
-    TEST_F(SSMDatabaseTest, ParameterExistsTest) {
-
-        // arrange
-        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
-        Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
-
-        // act
-        bool result1 = _ssmDatabase.ParameterExists(parameter.parameterName);
-        bool result2 = _ssmDatabase.ParameterExists("blabla");
-
-        // assert
-        EXPECT_TRUE(result1);
-        EXPECT_FALSE(result2);
-    }
-
-    TEST_F(SSMDatabaseTest, ParameterGetByNameTest) {
+    BOOST_FIXTURE_TEST_CASE(ParameterExistsTest, SSMDatabaseTest) {
 
         // arrange
         Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
 
         // act
-        Entity::SSM::Parameter result = _ssmDatabase.GetParameterByName(parameter.parameterName);
+        const bool result1 = _ssmDatabase.ParameterExists(parameter.parameterName);
+        const bool result2 = _ssmDatabase.ParameterExists("blabla");
 
         // assert
-        EXPECT_TRUE(result.parameterName == "parameter-name");
+        BOOST_CHECK_EQUAL(result1, true);
+        BOOST_CHECK_EQUAL(result2, false);
     }
 
-    TEST_F(SSMDatabaseTest, ParameterGetByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(ParameterGetByNameTest, SSMDatabaseTest) {
 
         // arrange
         Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
         Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
-        bsoncxx::oid oid(createResult.oid);
 
         // act
-        Entity::SSM::Parameter result = _ssmDatabase.GetParameterById(oid);
+        const Entity::SSM::Parameter result = _ssmDatabase.GetParameterByName(parameter.parameterName);
 
         // assert
-        EXPECT_TRUE(result.parameterName == "parameter-name");
+        BOOST_CHECK_EQUAL(result.parameterName, "parameter-name");
     }
 
-    TEST_F(SSMDatabaseTest, ParameterUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(ParameterGetByIdTest, SSMDatabaseTest) {
+
+        // arrange
+        Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
+        const Entity::SSM::Parameter createResult = _ssmDatabase.CreateParameter(parameter);
+        const bsoncxx::oid oid(createResult.oid);
+
+        // act
+        const Entity::SSM::Parameter result = _ssmDatabase.GetParameterById(oid);
+
+        // assert
+        BOOST_CHECK_EQUAL(result.parameterName, "parameter-name");
+    }
+
+    BOOST_FIXTURE_TEST_CASE(ParameterUpdateTest, SSMDatabaseTest) {
 
         // arrange
         Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
@@ -109,26 +93,13 @@ namespace AwsMock::Database {
         parameter.description = "new description";
 
         // act
-        Entity::SSM::Parameter result = _ssmDatabase.UpdateParameter(parameter);
+        const Entity::SSM::Parameter result = _ssmDatabase.UpdateParameter(parameter);
 
         // assert
-        EXPECT_TRUE(result.description == "new description");
+        BOOST_CHECK_EQUAL(result.description, "new description");
     }
 
-    /*TEST_F(SSMDatabaseTest, ModuleListTest) {
-
-        // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
-        _moduleDatabase.CreateModule(module);
-
-        // act
-        Entity::Module::ModuleList result = _moduleDatabase.ListModules();
-
-        // assert
-        EXPECT_EQ(1, result.size());
-    }*/
-
-    TEST_F(SSMDatabaseTest, ParameterDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(ParameterDeleteTest, SSMDatabaseTest) {
 
         // arrange
         Entity::SSM::Parameter parameter = {.region = _region, .parameterName = "parameter-name", .parameterValue = "parameter-value", .description = "description", .tier = "tier", .version = 1};
@@ -136,10 +107,10 @@ namespace AwsMock::Database {
 
         // act
         _ssmDatabase.DeleteParameter(parameter);
-        long count = _ssmDatabase.CountParameters();
+        const long count = _ssmDatabase.CountParameters();
 
         // assert
-        EXPECT_EQ(0, count);
+        BOOST_CHECK_EQUAL(0, count);
     }
 
 }// namespace AwsMock::Database

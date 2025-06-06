@@ -3,6 +3,11 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace AwsMock::Core {
 
@@ -49,6 +54,37 @@ namespace AwsMock::Core {
 #else
         return getpid();
 #endif
+    }
+
+    int SystemUtils::GetNextFreePort() {
+        sockaddr_in sin;
+        constexpr int port = 0;
+
+        const int s = socket(AF_INET, SOCK_STREAM, 0);
+        if (s == -1)
+            return -1;
+
+        sin.sin_port = htons(port);
+        sin.sin_addr.s_addr = 0;
+        sin.sin_addr.s_addr = INADDR_ANY;
+        sin.sin_family = AF_INET;
+
+        if (bind(s, (sockaddr *) &sin, sizeof(sockaddr_in)) == -1) {
+            if (errno == EADDRINUSE)
+                log_error << "Port in use";
+            return -1;
+        }
+        socklen_t len = sizeof(sin);
+        if (getsockname(s, (sockaddr *) &sin, &len) != -1) {
+#ifdef _WIN32
+            closesocket(s);
+#else
+            shutdown(s, SHUT_RDWR);
+            close(s);
+#endif
+            return ntohs(sin.sin_port);
+        }
+        return -1;
     }
 
     int SystemUtils::GetNumberOfCores() {

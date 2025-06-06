@@ -18,7 +18,7 @@ namespace AwsMock::Core {
         /**
          * Status code
          */
-        boost::beast::http::status statusCode;
+        http::status statusCode;
 
         /**
          * Body

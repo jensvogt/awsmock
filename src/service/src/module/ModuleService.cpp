@@ -257,47 +257,50 @@ namespace AwsMock::Service {
             }
         }
 
-        // DynamoDB
-        if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
-            DynamoDbService _dynamoDbService;
-            const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
-            if (!infrastructure.dynamoDbTables.empty()) {
-                for (auto &table: infrastructure.dynamoDbTables) {
-                    if (!_dynamoDbService.ExistTable(table.region, table.name)) {
-                        Dto::DynamoDb::ProvisionedThroughput provisionedThroughput;
-                        provisionedThroughput.readCapacityUnits = 1;
-                        provisionedThroughput.writeCapacityUnits = 1;
-                        Dto::DynamoDb::CreateTableRequest dynamoDbRequest;
-                        dynamoDbRequest.region = table.region;
-                        dynamoDbRequest.tableName = table.name;
-                        dynamoDbRequest.provisionedThroughput = provisionedThroughput;
-                        // TODO: Fix with next JSON schema
-                        //dynamoDbRequest.attributes = table.attributes;
-                        //dynamoDbRequest.keySchemas = table.keySchemas;
-                        //                        dynamoDbRequest.tags = table.tags;
-                        Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
-                    } else {
-                        _dynamoDatabase.CreateOrUpdateTable(table);
+        try {
+            // DynamoDB
+            if (!infrastructure.dynamoDbTables.empty() || !infrastructure.dynamoDbItems.empty()) {
+                DynamoDbService _dynamoDbService;
+                const Database::DynamoDbDatabase &_dynamoDatabase = Database::DynamoDbDatabase::instance();
+                if (!infrastructure.dynamoDbTables.empty()) {
+                    for (auto &table: infrastructure.dynamoDbTables) {
+                        if (!_dynamoDbService.ExistTable(table.region, table.name)) {
+                            Dto::DynamoDb::ProvisionedThroughput provisionedThroughput;
+                            provisionedThroughput.readCapacityUnits = 1;
+                            provisionedThroughput.writeCapacityUnits = 1;
+                            Dto::DynamoDb::CreateTableRequest dynamoDbRequest;
+                            dynamoDbRequest.region = table.region;
+                            dynamoDbRequest.tableName = table.name;
+                            dynamoDbRequest.provisionedThroughput = provisionedThroughput;
+                            dynamoDbRequest.attributes = table.attributes;
+                            dynamoDbRequest.keySchemas = table.keySchemas;
+                            dynamoDbRequest.tags = table.tags;
+                            Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
+                        } else {
+                            _dynamoDatabase.CreateOrUpdateTable(table);
+                        }
+                        log_debug << "DynamoDB table created: " << table.name;
                     }
-                    log_debug << "DynamoDB table created: " << table.name;
+                    log_info << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size();
                 }
-                log_info << "DynamoDb tables imported, count: " << infrastructure.dynamoDbTables.size();
-            }
-            if (!infrastructure.dynamoDbItems.empty()) {
-                for (auto &item: infrastructure.dynamoDbItems) {
-                    if (_dynamoDbService.ExistTable(item.region, item.tableName)) {
-                        Dto::DynamoDb::PutItemRequest putItemRequest;
-                        putItemRequest.region = item.region;
-                        putItemRequest.tableName = item.tableName;
-                        putItemRequest.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
-                        putItemRequest.keys = Dto::DynamoDb::Mapper::map(item.keys);
-                        putItemRequest.body = putItemRequest.ToJson();
-                        Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(putItemRequest);
-                        log_debug << "DynamoDB item created, tableName: " << response.tableName;
+                if (!infrastructure.dynamoDbItems.empty()) {
+                    for (auto &item: infrastructure.dynamoDbItems) {
+                        if (_dynamoDbService.ExistTable(item.region, item.tableName)) {
+                            Dto::DynamoDb::PutItemRequest putItemRequest;
+                            putItemRequest.region = item.region;
+                            putItemRequest.tableName = item.tableName;
+                            putItemRequest.attributes = Dto::DynamoDb::Mapper::map(item.attributes);
+                            putItemRequest.keys = Dto::DynamoDb::Mapper::map(item.keys);
+                            putItemRequest.body = putItemRequest.ToJson();
+                            Dto::DynamoDb::PutItemResponse response = _dynamoDbService.PutItem(putItemRequest);
+                            log_debug << "DynamoDB item created, tableName: " << response.tableName;
+                        }
                     }
+                    log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
                 }
-                log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
             }
+        } catch (Core::ServiceException ex) {
+            log_error << "Service exception: " << ex.what();
         }
 
         // SecretsManager
@@ -324,7 +327,7 @@ namespace AwsMock::Service {
             for (auto &parameter: infrastructure.ssmParameters) {
                 _ssmDatabase.UpsertParameter(parameter);
             }
-            log_info << "Secrets imported, count: " << infrastructure.secrets.size();
+            log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
         }
     }
 

@@ -2,184 +2,173 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_MODULEMEMORYDBTEST_H
-#define AWMOCK_CORE_MODULEMEMORYDBTEST_H
+#ifndef AWMOCK_CORE_MODULE_MEMORYDB_TEST_H
+#define AWMOCK_CORE_MODULE_MEMORYDB_TEST_H
 
 // C++ standard includes
-#include <iostream>
 #include <vector>
-
-// GTest includes
-#include <gtest/gtest.h>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/document.hpp>
-#include <mongocxx/client.hpp>
 
 // AwsMock includes
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
-#define SERVICE "test-module"
+#define MODULE "test-module"
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
+    struct ModuleMemoryDbTest {
 
-    class ModuleMemoryDbTest : public ::testing::Test {
-
-      protected:
-
-        void SetUp() override {
+        ModuleMemoryDbTest() {
+            _region = _configuration.GetValue<std::string>("awsmock.region");
         }
 
-        void TearDown() override {
-            _moduleDatabase.DeleteAllModules();
+        ~ModuleMemoryDbTest() {
+            const long count = _moduleDatabase.DeleteAllModules();
+            log_debug << "Modules deleted, count: " << count;
         }
 
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
-        ModuleDatabase _moduleDatabase = ModuleDatabase();
+        std::string _region;
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        ModuleDatabase &_moduleDatabase = ModuleDatabase::instance();
     };
 
-    TEST_F(ModuleMemoryDbTest, ModuleCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleCreateMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
 
         // act
-        Entity::Module::Module result = _moduleDatabase.CreateModule(module);
+        const Entity::Module::Module result = _moduleDatabase.CreateModule(module);
 
         // assert
-        EXPECT_TRUE(result.name == SERVICE);
-        EXPECT_TRUE(result.state == Entity::Module::ModuleState::RUNNING);
+        BOOST_CHECK_EQUAL(result.name, MODULE);
+        BOOST_CHECK_EQUAL(result.state == Entity::Module::ModuleState::RUNNING, true);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleExistsTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleExistsMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
 
         // act
-        bool result1 = _moduleDatabase.ModuleExists(module.name);
-        bool result2 = _moduleDatabase.ModuleExists("blabla");
+        const bool result1 = _moduleDatabase.ModuleExists(module.name);
+        const bool result2 = _moduleDatabase.ModuleExists("blabla");
 
         // assert
-        EXPECT_TRUE(result1);
-        EXPECT_FALSE(result2);
+        BOOST_CHECK_EQUAL(result1, true);
+        BOOST_CHECK_EQUAL(result2, false);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleActiveTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleActiveMTest, ModuleMemoryDbTest) {
 
         // arrange
         Entity::Module::Module module =
-                {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING, .status = Entity::Module::ModuleStatus::ACTIVE};
+                {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING, .status = Entity::Module::ModuleStatus::ACTIVE};
         module = _moduleDatabase.CreateModule(module);
 
         // act
-        bool result = _moduleDatabase.IsActive(module.name);
+        const bool result = _moduleDatabase.IsActive(module.name);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleGetByNameTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleGetByNameMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
 
         // act
-        Entity::Module::Module result = _moduleDatabase.GetModuleByName(module.name);
+        const Entity::Module::Module result = _moduleDatabase.GetModuleByName(module.name);
 
         // assert
-        EXPECT_TRUE(result.name == SERVICE);
+        BOOST_CHECK_EQUAL(result.name, MODULE);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleGetByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleGetByIdMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
 
         // act
-        Entity::Module::Module result = _moduleDatabase.GetModuleById(module.oid);
+        const Entity::Module::Module result = _moduleDatabase.GetModuleById(module.oid);
 
         // assert
-        EXPECT_TRUE(result.name == SERVICE);
+        BOOST_CHECK_EQUAL(result.name, MODULE);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleUpdateMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
         module.state = Entity::Module::ModuleState::STOPPED;
 
         // act
-        Entity::Module::Module result = _moduleDatabase.UpdateModule(module);
+        const Entity::Module::Module result = _moduleDatabase.UpdateModule(module);
 
         // assert
-        EXPECT_TRUE(result.state == Entity::Module::ModuleState::STOPPED);
+        BOOST_CHECK_EQUAL(result.state == Entity::Module::ModuleState::STOPPED, true);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleListTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleListMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         _moduleDatabase.CreateModule(module);
 
         // act
-        Entity::Module::ModuleList result = _moduleDatabase.ListModules();
+        const Entity::Module::ModuleList result = _moduleDatabase.ListModules();
 
         // assert
-        EXPECT_EQ(1, result.size());
+        BOOST_CHECK_EQUAL(1, result.size());
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleDeleteMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
 
         // act
         _moduleDatabase.DeleteModule(module);
-        int count = _moduleDatabase.ModuleCount();
+        const int count = _moduleDatabase.ModuleCount();
 
         // assert
-        EXPECT_EQ(0, count);
+        BOOST_CHECK_EQUAL(0, count);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleSetStatusTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleSetStatusMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
 
         // act
-        _moduleDatabase.SetState(SERVICE, Entity::Module::ModuleState::STOPPED);
-        Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(SERVICE);
+        _moduleDatabase.SetState(MODULE, Entity::Module::ModuleState::STOPPED);
+        const Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(MODULE);
 
         // assert
-        EXPECT_EQ(updatedModule.state, Entity::Module::ModuleState::STOPPED);
+        BOOST_CHECK_EQUAL(updatedModule.state == Entity::Module::ModuleState::STOPPED, true);
     }
 
-    TEST_F(ModuleMemoryDbTest, ModuleSetPortTest) {
+    BOOST_FIXTURE_TEST_CASE(ModuleSetPortMTest, ModuleMemoryDbTest) {
 
         // arrange
-        Entity::Module::Module module = {.name = SERVICE, .state = Entity::Module::ModuleState::RUNNING};
+        Entity::Module::Module module = {.name = MODULE, .state = Entity::Module::ModuleState::RUNNING};
         module = _moduleDatabase.CreateModule(module);
 
         // act
-        _moduleDatabase.SetPort(SERVICE, 9999);
-        Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(SERVICE);
+        _moduleDatabase.SetPort(MODULE, 9999);
+        const Entity::Module::Module updatedModule = _moduleDatabase.GetModuleByName(MODULE);
 
         // assert
-        EXPECT_EQ(updatedModule.port, 9999);
+        BOOST_CHECK_EQUAL(updatedModule.port, 9999);
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_MODULEMEMORYDBTEST_H
+#endif// AWMOCK_CORE_MODULE_MEMORYDB_TEST_H

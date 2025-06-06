@@ -5,10 +5,6 @@
 #ifndef AWMOCK_CORE_DATETIME_UTILS_TEST_H
 #define AWMOCK_CORE_DATETIME_UTILS_TEST_H
 
-// GTest includes
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 // Local includes
 #include <awsmock/core/DateTimeUtils.h>
 
@@ -16,38 +12,29 @@ namespace AwsMock::Core {
 
     using std::chrono::system_clock;
 
-    class DateTimeUtilsTest : public ::testing::Test {
-
-      public:
-
-        static system_clock::time_point createDateTime() {
-            return DateTimeUtils::LocalDateTimeNow();
-        }
-    };
-
-    TEST_F(DateTimeUtilsTest, ConvertToUtcTest) {
+    BOOST_AUTO_TEST_CASE(ConvertToUtcTest) {
 
         // arrange
-        const system_clock::time_point localTime = createDateTime();
+        const system_clock::time_point localTime = DateTimeUtils::LocalDateTimeNow();
 
         // act
         const system_clock::time_point utcTime = DateTimeUtils::ConvertToUtc(localTime);
 
         // assert
-        EXPECT_EQ(7200, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
+        BOOST_CHECK_EQUAL(7200, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
     }
 
-    TEST_F(DateTimeUtilsTest, UtcOffsetTest) {
+    BOOST_AUTO_TEST_CASE(UtcOffsetTest) {
 
         // arrange
-        const system_clock::time_point localTime = createDateTime();
-        const system_clock::time_point utcTime = DateTimeUtils::ConvertToUtc(createDateTime());
+        const system_clock::time_point localTime = DateTimeUtils::LocalDateTimeNow();
+        const system_clock::time_point utcTime = DateTimeUtils::ConvertToUtc(DateTimeUtils::LocalDateTimeNow());
 
         // act
-        long offset = DateTimeUtils::UtcOffset();
+        const long offset = DateTimeUtils::UtcOffset();
 
         // assert
-        EXPECT_EQ(offset, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
+        BOOST_CHECK_EQUAL(offset, std::chrono::duration_cast<std::chrono::seconds>(localTime - utcTime).count());
     }
 
 }// namespace AwsMock::Core

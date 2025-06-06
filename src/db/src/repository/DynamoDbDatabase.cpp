@@ -10,7 +10,23 @@ namespace AwsMock::Database {
     using bsoncxx::builder::basic::make_array;
     using bsoncxx::builder::basic::make_document;
 
-    DynamoDbDatabase::DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {}
+    DynamoDbDatabase::DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {
+
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _dynamoDbCounterMap = _segment.find<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME).first;
+        if (!_dynamoDbCounterMap) {
+            _dynamoDbCounterMap = _segment.construct<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
+        }
+
+        // Initialize the counters
+        for (const auto &table: ListTables()) {
+            DynamoDbMonitoringCounter counter;
+            counter.items = CountItems(table.region, table.name);
+            counter.size = GetTableSize(table.region, table.name);
+            _dynamoDbCounterMap->insert_or_assign(table.name, counter);
+        }
+        log_debug << "DynamoDb counters initialized" << _dynamoDbCounterMap->size();
+    }
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateTable(Entity::DynamoDb::Table &table) const {
 
@@ -160,8 +176,8 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    for (const auto [column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -207,6 +223,32 @@ namespace AwsMock::Database {
             }
         }
         return _memoryDb.CountTables(region);
+    }
+
+    long DynamoDbDatabase::GetTableSize(const std::string &region, const std::string &tableName) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+
+            try {
+                mongocxx::pipeline p{};
+                p.match(make_document(kvp("region", region), kvp("name", tableName)));
+                p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
+                p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
+                auto totalSizeCursor = _itemCollection.aggregate(p);
+                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                    return t["totalSize"].get_int64().value;
+                }
+                return 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.GetTableSize(region);
     }
 
     Entity::DynamoDb::Table DynamoDbDatabase::CreateOrUpdateTable(Entity::DynamoDb::Table &table) const {

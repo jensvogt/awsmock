@@ -12,7 +12,6 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
 
@@ -25,7 +24,12 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Queue final : Common::BaseEntity<Queue> {
+    struct Queue /*final : Common::BaseEntity<Queue>*/ {
+
+        /**
+         * Region
+         */
+        std::string region;
 
         /**
          * ID
@@ -110,7 +114,7 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document.
          */
         Queue FromDocument(const std::optional<view> &mResult);
-
+        /*
       private:
 
         friend Queue tag_invoke(boost::json::value_to_tag<Queue>, boost::json::value const &v) {
@@ -153,7 +157,7 @@ namespace AwsMock::Database::Entity::SQS {
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
-        }
+        }*/
     };
 
     typedef std::vector<Queue> QueueList;

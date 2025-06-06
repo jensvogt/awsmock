@@ -25,14 +25,14 @@ namespace AwsMock::Dto::KMS {
             {ExpirationModel::KEY_MATERIAL_EXPIRES, "KEY_MATERIAL_EXPIRES"},
             {ExpirationModel::KEY_MATERIAL_DOES_NOT_EXPIRE, "KEY_MATERIAL_DOES_NOT_EXPIRE"}};
 
-    [[maybe_unused]] static std::string ExpirationModelToString(ExpirationModel expirationModel) {
+    [[maybe_unused]] static std::string ExpirationModelToString(const ExpirationModel &expirationModel) {
         return ExpirationModelNames[expirationModel];
     }
 
     [[maybe_unused]] static ExpirationModel ExpirationModelFromString(const std::string &expirationModel) {
-        for (auto &it: ExpirationModelNames) {
-            if (it.second == expirationModel) {
-                return it.first;
+        for (auto &[fst, snd]: ExpirationModelNames) {
+            if (snd == expirationModel) {
+                return fst;
             }
         }
         return ExpirationModel::KEY_MATERIAL_DOES_NOT_EXPIRE;

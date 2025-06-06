@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/sqs/RedrivePolicy.h>
 
 namespace AwsMock::Database::Entity::SQS {
@@ -20,7 +19,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueAttribute final : Common::BaseEntity<QueueAttribute> {
+    struct QueueAttribute /*final : Common::BaseEntity<QueueAttribute>*/ {
 
         /**
          * Delay seconds
@@ -98,7 +97,7 @@ namespace AwsMock::Database::Entity::SQS {
         std::string redriveAllowPolicy;
 
         /**
-         * Number of message counter
+         * Number of messages
          */
         long approximateNumberOfMessages = 0;
 
@@ -122,7 +121,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
          * Converts the MongoDB document to an entity
@@ -130,7 +129,7 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document view.
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
-
+        /*
       private:
 
         friend QueueAttribute tag_invoke(boost::json::value_to_tag<QueueAttribute>, boost::json::value const &v) {
@@ -168,7 +167,7 @@ namespace AwsMock::Database::Entity::SQS {
                     {"approximateNumberOfMessagesDelayed", obj.approximateNumberOfMessagesDelayed},
                     {"approximateNumberOfMessagesNotVisible", obj.approximateNumberOfMessagesNotVisible},
             };
-        }
+        }*/
     };
 
 }// namespace AwsMock::Database::Entity::SQS

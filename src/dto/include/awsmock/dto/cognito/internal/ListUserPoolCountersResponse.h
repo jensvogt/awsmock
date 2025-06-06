@@ -36,8 +36,8 @@ namespace AwsMock::Dto::Cognito {
         friend ListUserPoolCountersResponse tag_invoke(boost::json::value_to_tag<ListUserPoolCountersResponse>, boost::json::value const &v) {
             ListUserPoolCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
-            if (Core::Json::AttributeExists(v, "userPools")) {
-                r.userPoolCounters = boost::json::value_to<std::vector<UserPoolCounter>>(v.at("userPools"));
+            if (Core::Json::AttributeExists(v, "userPoolCounters")) {
+                r.userPoolCounters = boost::json::value_to<std::vector<UserPoolCounter>>(v.at("userPoolCounters"));
             }
             return r;
         }

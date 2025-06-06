@@ -9,17 +9,18 @@
 // C++ standard includes
 #include <string>
 
-// Boost includes
-#include <boost/algorithm/string/find.hpp>
+// AwsMock includes
+#include "SecretValue.h"
 
-// AwsMoc includes
+
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/secretsmanager/model/RotationRules.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Secrets list filter
+     * @brief Secrets list filter
      *
      * Example:
      * @code{.json}
@@ -57,7 +58,7 @@ namespace AwsMock::Dto::SecretsManager {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Secret {
+    struct Secret final : Common::BaseCounter<Secret> {
 
         /**
          * AWS ARN
@@ -135,39 +136,123 @@ namespace AwsMock::Dto::SecretsManager {
         RotationRules rotationRules;
 
         /**
+         * Secret values
+         */
+        std::vector<SecretValue> secretValues;
+
+        /**
          * @brief Converts the DTO to a JSON object.
          *
          * @return DTO as JSON object.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+                Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
+                Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
+                Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyId", kmsKeyId);
+                Core::Bson::BsonUtils::SetStringValue(document, "OwningService", owningService);
+                Core::Bson::BsonUtils::SetStringValue(document, "PrimaryRegion", primaryRegion);
+                Core::Bson::BsonUtils::SetLongValue(document, "CreatedDate", createdDate);
+                Core::Bson::BsonUtils::SetLongValue(document, "DeletedDate", deletedDate);
+                Core::Bson::BsonUtils::SetLongValue(document, "LastAccessedDate", lastAccessedDate);
+                Core::Bson::BsonUtils::SetLongValue(document, "LastChangedDate", lastChangedDate);
+                Core::Bson::BsonUtils::SetLongValue(document, "LastRotatedDate", lastRotatedDate);
+                Core::Bson::BsonUtils::SetLongValue(document, "NextRotatedDate", nextRotatedDate);
+                Core::Bson::BsonUtils::SetBoolValue(document, "RotationEnabled", rotationEnabled);
+                Core::Bson::BsonUtils::SetStringValue(document, "RotationLambdaARN", rotationLambdaARN);
+
+                document.append(kvp("RotationRules", rotationRules.ToDocument()));
+
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Converts the JSON object to DTO.
          *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+                arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
+                description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
+                kmsKeyId = Core::Bson::BsonUtils::GetStringValue(document, "KmsKeyId");
+                owningService = Core::Bson::BsonUtils::GetStringValue(document, "OwningService");
+                primaryRegion = Core::Bson::BsonUtils::GetStringValue(document, "PrimaryRegion");
+                createdDate = Core::Bson::BsonUtils::GetLongValue(document, "CreatedDate");
+                deletedDate = Core::Bson::BsonUtils::GetLongValue(document, "DeletedDate");
+                lastAccessedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastAccessedDate");
+                lastChangedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastChangedDate");
+                lastRotatedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastRotatedDate");
+                nextRotatedDate = Core::Bson::BsonUtils::GetLongValue(document, "NextRotatedDate");
+                rotationEnabled = Core::Bson::BsonUtils::GetBoolValue(document, "RotationEnabled");
+                rotationLambdaARN = Core::Bson::BsonUtils::GetStringValue(document, "RotationLambdaARN");
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Secret &f);
+                if (document.view().find("RotationRules") != document.view().end()) {
+                    rotationRules.FromDocument(document.view()["RotationRules"].get_document().value);
+                }
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend Secret tag_invoke(boost::json::value_to_tag<Secret>, boost::json::value const &v) {
+            Secret r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.arn = Core::Json::GetStringValue(v, "ARN");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
+            r.owningService = Core::Json::GetStringValue(v, "OwningService");
+            r.primaryRegion = Core::Json::GetStringValue(v, "PrimaryRegion");
+            r.createdDate = Core::Json::GetLongValue(v, "CreatedDate");
+            r.deletedDate = Core::Json::GetLongValue(v, "DeletedDate");
+            r.lastAccessedDate = Core::Json::GetLongValue(v, "LastAccessedDate");
+            r.lastChangedDate = Core::Json::GetLongValue(v, "LastChangedDate");
+            r.lastRotatedDate = Core::Json::GetLongValue(v, "LastRotatedDate");
+            r.nextRotatedDate = Core::Json::GetLongValue(v, "NextRotatedDate");
+            r.rotationEnabled = Core::Json::GetLongValue(v, "RotationEnabled");
+            r.rotationLambdaARN = Core::Json::GetLongValue(v, "RotationLambdaARN");
+            r.rotationRules = boost::json::value_to<RotationRules>(v.at("NextRotatedDate"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Secret const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"ARN", obj.arn},
+                    {"Description", obj.description},
+                    {"KmsKeyId", obj.kmsKeyId},
+                    {"OwningService", obj.owningService},
+                    {"PrimaryRegion", obj.primaryRegion},
+                    {"CreatedDate", obj.createdDate},
+                    {"DeletedDate", obj.deletedDate},
+                    {"LastAccessedDate", obj.lastAccessedDate},
+                    {"LastChangedDate", obj.lastChangedDate},
+                    {"LastRotatedDate", obj.lastRotatedDate},
+                    {"NextRotatedDate", obj.nextRotatedDate},
+                    {"RotationEnabled", obj.rotationEnabled},
+                    {"RotationLambdaARN", obj.rotationLambdaARN},
+                    {"RotationRules", boost::json::value_from(obj.rotationRules)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

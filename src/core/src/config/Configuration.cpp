@@ -88,9 +88,9 @@ namespace AwsMock::Core {
 #else
         DefineProperty<std::string>("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "/Usr/local/awsmock/data/lambda");
 #endif
-        DefineProperty<int>("awsmock.modules.lambda.monitoring.period", "AWSMOCK_MODULES_LAMBDA_MONITORING_PERIOD", 300);
-        DefineProperty<int>("awsmock.modules.lambda.remove.period", "AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD", 300);
-        DefineProperty<int>("awsmock.modules.lambda.counter.period", "AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.lambda.log-retention-period", "AWSMOCK_MODULES_LAMBDA_LOG_RETENTION_PERIOD", 1);
+        DefineProperty<int>("awsmock.modules.lambda.remove-period", "AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD", 3600);
+        DefineProperty<int>("awsmock.modules.lambda.counter-period", "AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD", 300);
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.java11", "AWSMOCK_MODULES_LAMBDA_JAVA11", "public.ecr.aws/lambda/java:11");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.java17", "AWSMOCK_MODULES_LAMBDA_JAVA17", "public.ecr.aws/lambda/java:17");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.java21", "AWSMOCK_MODULES_LAMBDA_JAVA21", "public.ecr.aws/lambda/java:21");
@@ -224,12 +224,12 @@ namespace AwsMock::Core {
 
     void Configuration::SetFilename(const std::string &filename) {
         if (filename.empty()) {
-            log_error << "Empty configuration filename, name: " << filename;
+            log_error << "Empty configuration filename";
             throw CoreException("Empty configuration filename");
         }
         if (!FileUtils::FileExists(filename)) {
             log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
-            return;
+            throw CoreException("Configuration file '" + filename + "' does not exist. Will use default.");
         }
 
         // Save file name

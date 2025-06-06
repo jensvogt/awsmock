@@ -120,6 +120,11 @@ namespace AwsMock::Core::Bson {
     }
 
     struct BsonUtils {
+        static void SetOidValue(document &document, const std::string &name, const std::string &value) {
+            if (!value.empty()) {
+                document.append(kvp(name, bsoncxx::oid(value)));
+            }
+        }
         static void SetStringValue(document &document, const std::string &name, const std::string &value) {
             if (!value.empty()) {
                 document.append(kvp(name, value));

@@ -644,8 +644,8 @@ namespace AwsMock::Core {
      * @return SQS queue ARN
      */
     inline std::string CreateSQSQueueArn(const std::string &queueName) {
-        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -694,7 +694,7 @@ namespace AwsMock::Core {
     }
 
     /**
-     * Spring cloud sends the queueName, the queueUrl, or the queueArn.
+     * @brief Spring cloud sends the queueName, the queueUrl, or the queueArn.
      *
      * @param queue from Spring cloud request
      * @return queue URL

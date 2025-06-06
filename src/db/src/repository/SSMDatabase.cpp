@@ -189,11 +189,8 @@ namespace AwsMock::Database {
                 log_error << "SSM database exception: " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
-
-        } else {
-
-            return _memoryDb.UpdateParameter(parameter);
         }
+        return _memoryDb.UpdateParameter(parameter);
     }
 
     Entity::SSM::Parameter SSMDatabase::UpsertParameter(Entity::SSM::Parameter &parameter) const {

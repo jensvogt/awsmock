@@ -9,10 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/dto/cognito/model/UserContextData.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -43,7 +42,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RespondToAuthChallengeRequest final : Common::BaseDto<RespondToAuthChallengeRequest> {
+    struct RespondToAuthChallengeRequest final : Common::BaseCounter<RespondToAuthChallengeRequest> {
 
         /**
          * The app client ID.
@@ -62,7 +61,7 @@ namespace AwsMock::Dto::Cognito {
          *
          * The challenge name. For more information, see InitiateAuth.
          */
-        ChallengeName challengeName;
+        ChallengeName challengeName = ChallengeName::CUSTOM_CHALLENGE;
 
         /**
          * The responses to the challenge that you received in the previous request. Each challenge has its own required response parameters. The
@@ -85,56 +84,54 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return user ID
          */
-        std::string GetUserName();
+        std::string GetUserName() {
+            return challengeResponses["USERNAME"];
+        }
 
         /**
          * @brief Returns the user password
          *
          * @return user password
          */
-        std::string GetPasswordClaim_Signature();
+        std::string GetPasswordClaim_Signature() {
+            return challengeResponses["PASSWORD_CLAIM_SIGNATURE"];
+        }
 
         /**
          * @brief Returns the client secret from the AuthParameters
          *
          * @return client secret
          */
-        std::string GetPasswordClaimSecretBlock();
+        std::string GetPasswordClaimSecretBlock() {
+            return challengeResponses["PASSWORD_CLAIM_SECRET_BLOCK"];
+        }
 
-        /**
-         * @brief Returns the username
-         *
-         * @return user ID
-         */
-        std::string GetUserId();
+      private:
 
-        /**
-         * @brief Returns the user password
-         *
-         * @return user password
-         */
-        std::string GetPassword();
+        friend RespondToAuthChallengeRequest tag_invoke(boost::json::value_to_tag<RespondToAuthChallengeRequest>, boost::json::value const &v) {
+            RespondToAuthChallengeRequest r;
+            r.clientId = Core::Json::GetStringValue(v, "ClientId");
+            r.session = Core::Json::GetStringValue(v, "Session");
+            r.challengeName = ChallengeNameFromString(Core::Json::GetStringValue(v, "ChallengeName"));
+            r.challengeResponses = boost::json::value_to<std::map<std::string, std::string>>(v.at("ChallengeResponses"));
+            r.clientMetaData = boost::json::value_to<std::map<std::string, std::string>>(v.at("ChallengeResponses"));
+            r.userContextData = boost::json::value_to<UserContextData>(v.at("UserContextData"));
+            return r;
+        }
 
-        /**
-         * @brief Returns the client secret from the AuthParameters
-         *
-         * @return client secret
-         */
-        std::string GetClientSecret();
-
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RespondToAuthChallengeRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ClientId", obj.clientId},
+                    {"Session", obj.session},
+                    {"ChallengeName", ChallengeNameToString(obj.challengeName)},
+                    {"ChallengeResponses", boost::json::value_from(obj.challengeResponses)},
+                    {"ClientMetaData", boost::json::value_from(obj.clientMetaData)},
+                    {"UserContextData", boost::json::value_from(obj.userContextData)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

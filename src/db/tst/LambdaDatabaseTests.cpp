@@ -2,14 +2,10 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_LAMBDADATABASETEST_H
-#define AWMOCK_CORE_LAMBDADATABASETEST_H
-
-// GTest includes
-#include <gtest/gtest.h>
+#ifndef AWMOCK_CORE_LAMBDA_DATABASE_TEST_H
+#define AWMOCK_CORE_LAMBDA_DATABASE_TEST_H
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/LambdaDatabase.h>
 
@@ -21,147 +17,187 @@
 
 namespace AwsMock::Database {
 
-    class LambdaDatabaseTest : public ::testing::Test {
+    struct LambdaDatabaseTest {
 
-      protected:
-
-        void SetUp() override {
+        LambdaDatabaseTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
             _accountId = _configuration.GetValue<std::string>("awsmock.access.account-id");
         }
 
-        void TearDown() override {
-            _lambdaDatabase.DeleteAllLambdas();
+        ~LambdaDatabaseTest() {
+            long count = _lambdaDatabase.DeleteAllLambdas();
+            log_debug << "Lambdas deleted, count: " << count;
+            count = _lambdaDatabase.DeleteAllResultsCounters();
+            log_debug << "Lambda results deleted, count: " << count;
+        }
+
+        [[nodiscard]] Entity::Lambda::LambdaResult createDefaultLambdaResult(const std::string &arn) const {
+            Entity::Lambda::LambdaResult lambdaResult;
+            lambdaResult.region = _region;
+            lambdaResult.lambdaName = FUNCTION;
+            lambdaResult.lambdaArn = arn;
+            lambdaResult.runtime = "Java21";
+            lambdaResult.requestBody = "requestBody";
+            lambdaResult.responseBody = "responseBody";
+            return lambdaResult;
         }
 
         std::string _region;
         std::string _accountId;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(true);
-        LambdaDatabase &_lambdaDatabase = LambdaDatabase::instance();
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
+        LambdaDatabase _lambdaDatabase = LambdaDatabase();
     };
 
-    TEST_F(LambdaDatabaseTest, LambdaCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaCreateTest, LambdaDatabaseTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
 
         // act
-        Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
+        const Entity::Lambda::Lambda result = _lambdaDatabase.CreateLambda(lambda);
 
         // assert
-        EXPECT_TRUE(result.function == FUNCTION);
-        EXPECT_TRUE(result.runtime == RUNTIME);
-        EXPECT_TRUE(result.role == ROLE);
-        EXPECT_TRUE(result.handler == HANDLER);
+        BOOST_CHECK_EQUAL(result.function, FUNCTION);
+        BOOST_CHECK_EQUAL(result.runtime, RUNTIME);
+        BOOST_CHECK_EQUAL(result.role, ROLE);
+        BOOST_CHECK_EQUAL(result.handler, HANDLER);
     }
 
-    TEST_F(LambdaDatabaseTest, LambdaCountTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaCountTest, LambdaDatabaseTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
-        _lambdaDatabase.CreateLambda(lambda);
-
-        // act
-        long result = _lambdaDatabase.LambdaCount(lambda.region);
-
-        // assert
-        EXPECT_EQ(1, result);
-    }
-
-    TEST_F(LambdaDatabaseTest, LambdaExistsTest) {
-
-        // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
-        _lambdaDatabase.CreateLambda(lambda);
-
-        // act
-        bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
-
-        // assert
-        EXPECT_TRUE(result);
-    }
-
-    TEST_F(LambdaDatabaseTest, LambdaGetByIdTest) {
-
-        // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaById(lambda.oid);
+        const long result = _lambdaDatabase.LambdaCount(lambda.region);
 
         // assert
-        EXPECT_EQ(result.oid, lambda.oid);
+        BOOST_CHECK_EQUAL(1, result);
     }
 
-    TEST_F(LambdaDatabaseTest, LambdaGetByArnTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaExistsTest, LambdaDatabaseTest) {
 
         // arrange
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaByArn(arn);
+        const bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
 
         // assert
-        EXPECT_EQ(result.arn, lambda.arn);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(LambdaDatabaseTest, LambdaUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaGetByIdTest, LambdaDatabaseTest) {
 
         // arrange
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
+
+        // act
+        const Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaById(lambda.oid);
+
+        // assert
+        BOOST_CHECK_EQUAL(result.oid, lambda.oid);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(LambdaGetByArnTest, LambdaDatabaseTest) {
+
+        // arrange
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
+
+        // act
+        const Entity::Lambda::Lambda result = _lambdaDatabase.GetLambdaByArn(arn);
+
+        // assert
+        BOOST_CHECK_EQUAL(result.arn, lambda.arn);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(LambdaUpdateTest, LambdaDatabaseTest) {
+
+        // arrange
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
         lambda.role = "new_role";
-        Entity::Lambda::Lambda result = _lambdaDatabase.UpdateLambda(lambda);
+        const Entity::Lambda::Lambda result = _lambdaDatabase.UpdateLambda(lambda);
 
         // assert
-        EXPECT_EQ(result.role, lambda.role);
+        BOOST_CHECK_EQUAL(result.role, lambda.role);
     }
 
-    TEST_F(LambdaDatabaseTest, LambdaListTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaListTest, LambdaDatabaseTest) {
 
         // arrange
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .codeSize = 1000};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
-        std::vector<Entity::Lambda::Lambda> result = _lambdaDatabase.ListLambdas(lambda.region);
+        const std::vector<Entity::Lambda::Lambda> result = _lambdaDatabase.ListLambdas(lambda.region);
 
         // assert
-        EXPECT_EQ(1, result.size());
-        EXPECT_TRUE(result[0].runtime == RUNTIME);
-        EXPECT_TRUE(result[0].role == ROLE);
-        EXPECT_TRUE(result[0].handler == HANDLER);
+        BOOST_CHECK_EQUAL(1, result.size());
+        BOOST_CHECK_EQUAL(result[0].runtime, RUNTIME);
+        BOOST_CHECK_EQUAL(result[0].role, ROLE);
+        BOOST_CHECK_EQUAL(result[0].handler, HANDLER);
     }
 
-    TEST_F(LambdaDatabaseTest, LambdaDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(LambdaDeleteTest, LambdaDatabaseTest) {
 
         // arrange
-        std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
-        Entity::Lambda::Lambda
-                lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
         lambda = _lambdaDatabase.CreateLambda(lambda);
 
         // act
         _lambdaDatabase.DeleteLambda(lambda.function);
-        bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
+        const bool result = _lambdaDatabase.LambdaExists(_region, FUNCTION, RUNTIME);
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(LambdaResultCreateTest, LambdaDatabaseTest) {
+
+        // arrange
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
+        Entity::Lambda::LambdaResult lambdaResult = createDefaultLambdaResult(lambda.arn);
+        lambdaResult = _lambdaDatabase.CreateLambdaResult(lambdaResult);
+
+        // act
+        const long count = _lambdaDatabase.LambdaResultsCount(lambda.arn);
+        const bool result = _lambdaDatabase.LambdaResultExists(lambdaResult.oid);
+
+        // assert
+        BOOST_CHECK_EQUAL(result, true);
+        BOOST_CHECK_EQUAL(count, 1);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(LambdaResultDeleteTest, LambdaDatabaseTest) {
+
+        // arrange
+        const std::string arn = Core::AwsUtils::CreateLambdaArn(_region, _accountId, FUNCTION);
+        Entity::Lambda::Lambda lambda = {.region = _region, .function = FUNCTION, .runtime = RUNTIME, .role = ROLE, .handler = HANDLER, .arn = arn};
+        lambda = _lambdaDatabase.CreateLambda(lambda);
+        Entity::Lambda::LambdaResult lambdaResult = createDefaultLambdaResult(lambda.arn);
+        lambdaResult = _lambdaDatabase.CreateLambdaResult(lambdaResult);
+
+        // act
+        const long count = _lambdaDatabase.DeleteResultsCounter(lambdaResult.oid);
+        const bool result = _lambdaDatabase.LambdaResultExists(lambdaResult.oid);
+
+        // assert
+        BOOST_CHECK_EQUAL(result, false);
+        BOOST_CHECK_EQUAL(count, 1);
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_LAMBDADATABASETEST_H
+#endif// AWMOCK_CORE_LAMBDA_DATABASE_TEST_H

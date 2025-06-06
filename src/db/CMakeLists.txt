@@ -14,7 +14,8 @@ set(S3_SOURCES src/entity/s3/Bucket.cpp src/entity/s3/BucketNotification.cpp src
         src/entity/s3/BucketEncryption.cpp)
 set(LAMBDA_SOURCES src/entity/lambda/Tags.cpp src/entity/lambda/Environment.cpp src/entity/lambda/Lambda.cpp
         src/entity/lambda/Code.cpp src/entity/lambda/EphemeralStorage.cpp src/repository/LambdaDatabase.cpp
-        src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp src/entity/lambda/EventSourceMapping.cpp)
+        src/memorydb/LambdaMemoryDb.cpp src/entity/lambda/Instance.cpp src/entity/lambda/EventSourceMapping.cpp
+        src/entity/lambda/LambdaResult.cpp)
 set(TRANSFER_SOURCES src/repository/TransferDatabase.cpp src/entity/transfer/User.cpp src/entity/transfer/Transfer.cpp
         src/memorydb/TransferMemoryDb.cpp)
 set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp src/entity/cognito/UserPoolClient.cpp
@@ -22,8 +23,9 @@ set(COGNITO_SOURCES src/entity/cognito/UserPool.cpp src/entity/cognito/User.cpp 
 set(DYNAMODB_SOURCES src/entity/dynamodb/Item.cpp src/entity/dynamodb/Table.cpp src/entity/dynamodb/AttributeValue.cpp
         src/entity/dynamodb/ProvisionedThroughput.cpp src/repository/DynamoDbDatabase.cpp
         src/memorydb/DynamoDbMemoryDb.cpp)
-set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/RotationRules.cpp
-        src/repository/SecretsManagerDatabase.cpp src/memorydb/SecretsManagerMemoryDb.cpp)
+set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secretsmanager/SecretVersion.cpp
+        src/entity/secretsmanager/RotationRules.cpp src/repository/SecretsManagerDatabase.cpp
+        src/memorydb/SecretsManagerMemoryDb.cpp)
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
 set(SSM_SOURCES src/entity/ssm/Parameter.cpp src/repository/SSMDatabase.cpp src/memorydb/SSMMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
@@ -43,18 +45,14 @@ endif ()
 include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 
 # Shared library
-if (NOT WIN32)
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
             include/awsmock/utils/SqsUtils.h
             src/utils/SqsUtils.cpp)
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (NOT WIN32)
-    target_link_libraries(${LIBRARY_STATIC} awsmockcore_static mongocxx bsoncxx boost_filesystem boost_url boost_thread
-            boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

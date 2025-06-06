@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.4.0](https://github.com/jensvogt/awsmock/compare/v1.3.1...v1.4.0) (2025-06-04)
+
+
+### Features
+
+* **1251-show-lambda-logs:** fix lambda details page ([da01080](https://github.com/jensvogt/awsmock/commit/da01080e8a296836f97a92a9aaedf0c92c5b71c4))
+
+## [1.3.1](https://github.com/jensvogt/awsmock/compare/v1.3.0...v1.3.1) (2025-05-25)
+
+
+### Bug Fixes
+
+* **1219-dynamodb-resolve-host-exception:** new DyanmoDB get/put item JSON schema ([17c8d20](https://github.com/jensvogt/awsmock/commit/17c8d206cce3186d96bc95214f9de5333f6d45e2))
+* **1219-dynamodb-resolve-host-exception:** streamline dynamodb DTOs ([d764196](https://github.com/jensvogt/awsmock/commit/d76419657b50403d90af91b6238f2e394265d2ea))
+* **1219-dynamodb-resolve-host-exception:** streamline dynamodb DTOs ([8725fad](https://github.com/jensvogt/awsmock/commit/8725fad0507d37cf0bcf920f29fb98421fc90bf0))
+* **1219-dynamodb-resolve-host-exception:** streamline dynamodb DTOs ([55b934c](https://github.com/jensvogt/awsmock/commit/55b934c7705a091f796858d0056afafa3c7db557))
+
 ## [1.3.0](https://github.com/jensvogt/awsmock/compare/v1.2.5...v1.3.0) (2025-05-18)
 
 

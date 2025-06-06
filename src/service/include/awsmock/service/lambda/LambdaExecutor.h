@@ -7,7 +7,6 @@
 
 // C++ include
 #include <chrono>
-#include <utility>
 
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
@@ -29,7 +28,7 @@ namespace AwsMock::Service {
      *
      * The executor is launched asynchronously. As the dockerized lambda runtime using AWS RIE only allows the execution of a lambda function at a time, the lambda function invocation will be
      * queued up in a Poco notification queue and executed one by one. Each invocation will wait for the finishing of the last invocation request. The lambda image can run on a remote docker
-     * instance. In this case the hostname on the invocation request has to be filled in. Default is 'localhost'.
+     * instance. In this case, the hostname on the invocation request has to be filled in. The default is 'localhost'.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -45,7 +44,7 @@ namespace AwsMock::Service {
         /**
          * @brief Executes a lambda function
          *
-         * @param oid ID of the function
+         * @param lambda lambda function
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
@@ -53,7 +52,7 @@ namespace AwsMock::Service {
          * @param functionName lambda function name
          * @param receiptHandle receipt handle of the message which triggered the invocation
          */
-        void operator()(const std::string &oid, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
+        void operator()(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
 
       private:
 

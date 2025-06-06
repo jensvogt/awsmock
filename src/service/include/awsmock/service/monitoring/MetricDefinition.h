@@ -53,6 +53,7 @@
 #define LAMBDA_SERVICE_COUNTER "lambda_service_counter"
 #define LAMBDA_INVOCATION_TIMER "lambda_invocation_timer"
 #define LAMBDA_INVOCATION_COUNT "lambda_invocation_counter"
+#define LAMBDA_INSTANCES_COUNT "lambda_instances_counter"
 
 // Dynamodb
 #define DYNAMODB_TABLE_COUNT "dynamodb_table_counter"

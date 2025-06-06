@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/utils/SortColumn.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -21,36 +19,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolRequest : Common::BaseDto<ListUserPoolRequest> {
+    struct ListUserPoolRequest final : Common::BaseCounter<ListUserPoolRequest> {
 
         /**
          * Page size
          */
-        int pageSize{};
+        long maxResults{};
 
-        /**
-         * Page index
-         */
-        int pageIndex{};
+      private:
 
-        /**
-         * Page index
-         */
-        std::vector<Database::SortColumn> sortColumns{};
+        friend ListUserPoolRequest tag_invoke(boost::json::value_to_tag<ListUserPoolRequest>, boost::json::value const &v) {
+            ListUserPoolRequest r;
+            r.maxResults = Core::Json::GetLongValue(v, "MaxResults");
+            return r;
+        }
 
-        /**
-         * Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"MaxResults", obj.maxResults},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

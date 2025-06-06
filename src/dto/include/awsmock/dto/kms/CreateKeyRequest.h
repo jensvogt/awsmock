@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyUsage.h>
 
@@ -44,7 +42,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateKeyRequest final : Common::BaseDto<CreateKeyRequest> {
+    struct CreateKeyRequest final : Common::BaseCounter<CreateKeyRequest> {
 
         /**
          * Key specification
@@ -96,19 +94,40 @@ namespace AwsMock::Dto::KMS {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend CreateKeyRequest tag_invoke(boost::json::value_to_tag<CreateKeyRequest>, boost::json::value const &v) {
+            CreateKeyRequest r;
+            r.keySpec = KeySpecFromString(Core::Json::GetStringValue(v, "KeySpec"));
+            r.keyUsage = KeyUsageFromString(Core::Json::GetStringValue(v, "KeyUsage"));
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.customKeyStoreId = Core::Json::GetStringValue(v, "CustomKeyStoreId");
+            r.multiRegion = Core::Json::GetBoolValue(v, "MultiRegion");
+            r.bypassPolicyLockoutSafetyCheck = Core::Json::GetBoolValue(v, "BypassPolicyLockoutSafetyCheck");
+            r.origin = Core::Json::GetStringValue(v, "Origin");
+            r.policy = Core::Json::GetStringValue(v, "Policy");
+            r.xksKeyId = Core::Json::GetStringValue(v, "XksKeyId");
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateKeyRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"keySpec", KeySpecToString(obj.keySpec)},
+                    {"keyUsage", KeyUsageToString(obj.keyUsage)},
+                    {"description", obj.description},
+                    {"customKeyStoreId", obj.customKeyStoreId},
+                    {"multiRegion", obj.multiRegion},
+                    {"bypassPolicyLockoutSafetyCheck", obj.bypassPolicyLockoutSafetyCheck},
+                    {"origin", obj.bypassPolicyLockoutSafetyCheck},
+                    {"policy", obj.policy},
+                    {"xksKeyId", obj.xksKeyId},
+                    {"tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

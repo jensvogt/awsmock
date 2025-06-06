@@ -29,12 +29,12 @@ namespace AwsMock::Database {
       public:
 
         /**
-         * Constructor
+         * @brief Constructor
          */
         SecretsManagerMemoryDb() = default;
 
         /**
-         * Singleton instance
+         * @brief Singleton instance
          */
         static SecretsManagerMemoryDb &instance() {
             static SecretsManagerMemoryDb secretsManagerMemoryDb;
@@ -42,7 +42,7 @@ namespace AwsMock::Database {
         }
 
         /**
-         * Secret exists
+         * @brief Secret exists by name and region
          *
          * @param region AWS region
          * @param name secret name
@@ -52,7 +52,7 @@ namespace AwsMock::Database {
         bool SecretExists(const std::string &region, const std::string &name);
 
         /**
-         * Secret exists
+         * @brief Secret exists by secret
          *
          * @param secret secret entity
          * @return true if secret exists
@@ -61,7 +61,7 @@ namespace AwsMock::Database {
         bool SecretExists(const Entity::SecretsManager::Secret &secret);
 
         /**
-         * Secret exists
+         * @brief Secret exists by secret ID
          *
          * @param secretId secret ID
          * @return true if secret exists
@@ -70,7 +70,16 @@ namespace AwsMock::Database {
         bool SecretExists(const std::string &secretId);
 
         /**
-         * Returns the secret by userPoolId
+         * @brief Secret exists by ARN
+         *
+         * @param arn secret ARN
+         * @return true if secret exists
+         * @throws DatabaseException
+         */
+        bool SecretExistsByArn(const std::string &arn) const;
+
+        /**
+         * @brief Returns the secret by userPoolId
          *
          * @param oid secret oid
          * @return secret, if existing
@@ -79,7 +88,7 @@ namespace AwsMock::Database {
         Entity::SecretsManager::Secret GetSecretById(const std::string &oid);
 
         /**
-         * Returns the secret by region and name.
+         * @brief Returns the secret by region and name.
          *
          * @param region AWS region
          * @param name secret name
@@ -88,7 +97,7 @@ namespace AwsMock::Database {
         Entity::SecretsManager::Secret GetSecretByRegionName(const std::string &region, const std::string &name);
 
         /**
-         * Returns the secret by secret ID.
+         * @brief Returns the secret by secret ID.
          *
          * @param secretId secret ID
          * @return secret entity
@@ -96,7 +105,16 @@ namespace AwsMock::Database {
         Entity::SecretsManager::Secret GetSecretBySecretId(const std::string &secretId);
 
         /**
-         * Creates a new secret in the secrets manager collection
+         * @brief Returns the secret by AWS ARN
+         *
+         * @param arn secret ARN
+         * @return secret, if existing
+         * @throws DatabaseException
+         */
+        Entity::SecretsManager::Secret GetSecretByArn(const std::string &arn);
+
+        /**
+         * @brief Creates a new secret in the secrets manager collection
          *
          * @param secret secret entity
          * @return created secret entity
@@ -105,7 +123,7 @@ namespace AwsMock::Database {
         Entity::SecretsManager::Secret CreateSecret(const Entity::SecretsManager::Secret &secret);
 
         /**
-         * Updates an existing secret
+         * @brief Updates an existing secret
          *
          * @param secret secret entity
          * @return updated secret entity
@@ -114,7 +132,7 @@ namespace AwsMock::Database {
         Entity::SecretsManager::Secret UpdateSecret(const Entity::SecretsManager::Secret &secret);
 
         /**
-         * Returns a list of secrets
+         * @brief Returns a list of secrets
          *
          * @return list of available secrets
          * @throws DatabaseException
@@ -122,7 +140,7 @@ namespace AwsMock::Database {
         Entity::SecretsManager::SecretList ListSecrets() const;
 
         /**
-         * Returns the total number of secrets
+         * @brief Returns the total number of secrets
          *
          * @param region AWS region
          * @return total number of secrets
@@ -131,7 +149,7 @@ namespace AwsMock::Database {
         long CountSecrets(const std::string &region = {}) const;
 
         /**
-         * Delete a secret.
+         * @brief Delete a secret.
          *
          * @param secret secret entity
          * @throws DatabaseException
@@ -139,7 +157,7 @@ namespace AwsMock::Database {
         void DeleteSecret(const Entity::SecretsManager::Secret &secret);
 
         /**
-         * Delete all secret.
+         * @brief Delete all secret.
          *
          * @return number of entities deleted
          * @throws DatabaseException

@@ -10,10 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/AuthenticationResult.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -44,7 +42,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct InitiateAuthResponse final : Common::BaseDto<InitiateAuthResponse> {
+    struct InitiateAuthResponse final : Common::BaseCounter<InitiateAuthResponse> {
 
         /**
          * Authentication result
@@ -76,12 +74,32 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> challengeParameters;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend InitiateAuthResponse tag_invoke(boost::json::value_to_tag<InitiateAuthResponse>, boost::json::value const &v) {
+            InitiateAuthResponse r;
+            r.authenticationResult = boost::json::value_to<AuthenticationResult>(v.at("AuthenticationResult"));
+            r.availableChallenges = boost::json::value_to<std::vector<std::string>>(v.at("AvailableChallenges"));
+            r.session = Core::Json::GetStringValue(v, "Session");
+            r.clientId = Core::Json::GetStringValue(v, "ClientId");
+            r.challengeName = Core::Json::GetStringValue(v, "ChallengeName");
+            r.challengeParameters = boost::json::value_to<std::map<std::string, std::string>>(v.at("ChallengeParameters"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, InitiateAuthResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"AuthenticationResult", boost::json::value_from(obj.authenticationResult)},
+                    {"AvailableChallenges", boost::json::value_from(obj.availableChallenges)},
+                    {"Session", obj.session},
+                    {"ClientId", obj.clientId},
+                    {"ChallengeName", obj.challengeName},
+                    {"ChallengeParameters", boost::json::value_from(obj.challengeParameters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

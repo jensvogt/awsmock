@@ -58,7 +58,7 @@ namespace AwsMock::Database {
             }
 
             const int64_t count = _queueCollection.count_documents(query.extract());
-            log_trace << "Queue exists: " << std::boolalpha << count;
+            log_trace << "Queue exists: " << std::boolalpha << (count > 0);
             return count > 0;
         }
         return _memoryDb.QueueUrlExists(region, queueUrl);
@@ -214,7 +214,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
             if (!queueName.empty()) {
-                query.append(kvp("queueName", queueName));
+                query.append(kvp("name", queueName));
             }
 
             if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
@@ -404,7 +404,7 @@ namespace AwsMock::Database {
                 queue.modified = system_clock::now();
                 const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
                 session.commit_transaction();
-                log_trace << "Queue updated: " << queue.ToString();
+                log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
                 if (mResult) {
                     queue.FromDocument(mResult->view());
@@ -742,7 +742,7 @@ namespace AwsMock::Database {
 
                 if (mResult) {
                     message.FromDocument(mResult->view());
-                    log_trace << "Message updated: " << message.ToString();
+                    log_trace << "Message updated: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
                     return message;
                 }
                 return {};
@@ -1428,13 +1428,7 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        for (const auto &key: *_sqsCounterMap | std::views::keys) {
-            (*_sqsCounterMap)[key].messages = 0;
-            (*_sqsCounterMap)[key].initial = 0;
-            (*_sqsCounterMap)[key].invisible = 0;
-            (*_sqsCounterMap)[key].delayed = 0;
-            (*_sqsCounterMap)[key].size = 0;
-        }
+        _sqsCounterMap->clear();
         return deleted;
     }
 }// namespace AwsMock::Database

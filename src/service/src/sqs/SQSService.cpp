@@ -2,9 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/utils/SqsUtils.h"
-
-
 #include <awsmock/service/sqs/SQSService.h>
 
 namespace AwsMock::Service {
@@ -74,7 +71,7 @@ namespace AwsMock::Service {
             queue.attributes = attributes;
             queue.tags = request.tags;
             queue = _sqsDatabase.CreateQueue(queue);
-            log_trace << "SQS queue created: " << queue.ToString();
+            log_trace << "SQS queue created: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
             Dto::SQS::CreateQueueResponse response = {
                     .region = queue.region,
@@ -562,7 +559,7 @@ namespace AwsMock::Service {
         try {
             // Get the queue
             Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
-            log_trace << "Got queue: " << queue.ToString();
+            log_trace << "Got queue: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
             // Reset all userAttributes
             if (!request.attributes["Policy"].empty()) {
@@ -588,7 +585,7 @@ namespace AwsMock::Service {
 
             // Update database
             queue = _sqsDatabase.UpdateQueue(queue);
-            log_trace << "Queue updated: " << queue.ToString();
+            log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -609,7 +606,7 @@ namespace AwsMock::Service {
         try {
             // Get the message
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
-            log_trace << "Got message: " << message.ToString();
+            log_trace << "Got message: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
 
             // Set as attribute
             message.attributes["VisibilityTimeout"] = std::to_string(request.visibilityTimeout);
@@ -617,7 +614,7 @@ namespace AwsMock::Service {
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
-            log_trace << "Message updated: " << message.ToString();
+            log_trace << "Message updated: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

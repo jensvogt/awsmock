@@ -2,15 +2,11 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_S3DATABASETEST_H
-#define AWMOCK_CORE_S3DATABASETEST_H
+#ifndef AWMOCK_CORE_S3_DATABASE_TEST_H
+#define AWMOCK_CORE_S3_DATABASE_TEST_H
 
 // C++ standard includes
 #include <iostream>
-#include <vector>
-
-// GTest includes
-#include <gtest/gtest.h>
 
 // Local includes
 #include <awsmock/core/TestUtils.h>
@@ -26,19 +22,13 @@
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
+    struct S3DatabaseTest {
 
-    class S3DatabaseTest : public ::testing::Test {
-
-      protected:
-
-        void SetUp() override {
+        S3DatabaseTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
         }
 
-        void TearDown() override {
+        ~S3DatabaseTest() {
             long count = _s3Database.DeleteAllBuckets();
             log_debug << "S3 buckets deleted, count: " << count;
             count = _s3Database.DeleteAllObjects();
@@ -50,7 +40,7 @@ namespace AwsMock::Database {
         S3Database _s3Database = S3Database();
     };
 
-    TEST_F(S3DatabaseTest, BucketCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketCreateTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -59,11 +49,11 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.CreateBucket(bucket);
 
         // assert
-        EXPECT_TRUE(result.name == BUCKET);
-        EXPECT_TRUE(result.region == _region);
+        BOOST_CHECK_EQUAL(result.name, BUCKET);
+        BOOST_CHECK_EQUAL(result.region, _region);
     }
 
-    TEST_F(S3DatabaseTest, BucketCountTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketCountTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -73,11 +63,11 @@ namespace AwsMock::Database {
         const long result = _s3Database.BucketCount();
 
         // assert
-        EXPECT_EQ(1, result);
-        EXPECT_FALSE(bucket.name.empty());
+        BOOST_CHECK_EQUAL(1, result);
+        BOOST_CHECK_EQUAL(bucket.name.empty(), false);
     }
 
-    TEST_F(S3DatabaseTest, BucketExistsTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketExistsTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -87,10 +77,10 @@ namespace AwsMock::Database {
         const bool result = _s3Database.BucketExists(bucket);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(S3DatabaseTest, BucketByRegionNameTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketByRegionNameTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -100,11 +90,11 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.GetBucketByRegionName(bucket.region, bucket.name);
 
         // assert
-        EXPECT_TRUE(result.name == bucket.name);
-        EXPECT_TRUE(result.region == _region);
+        BOOST_CHECK_EQUAL(result.name, bucket.name);
+        BOOST_CHECK_EQUAL(result.region, _region);
     }
 
-    TEST_F(S3DatabaseTest, BucketGetByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketGetByIdTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -114,10 +104,10 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.GetBucketById(bucket.oid);
 
         // assert
-        EXPECT_EQ(result.oid, bucket.oid);
+        BOOST_CHECK_EQUAL(result.oid, bucket.oid);
     }
 
-    TEST_F(S3DatabaseTest, BucketListTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketListTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -127,10 +117,10 @@ namespace AwsMock::Database {
         const Entity::S3::BucketList result = _s3Database.ListBuckets();
 
         // assert
-        EXPECT_EQ(result.size(), 1);
+        BOOST_CHECK_EQUAL(result.size(), 1);
     }
 
-    TEST_F(S3DatabaseTest, BucketListObjectTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketListObjectTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -145,13 +135,13 @@ namespace AwsMock::Database {
         const Entity::S3::ObjectList result2 = _s3Database.ListBucket(bucket.name, "test1");
 
         // assert
-        EXPECT_EQ(result1.size(), 2);
-        EXPECT_TRUE(result1[0].key == OBJECT);
-        EXPECT_EQ(result2.size(), 1);
-        EXPECT_STREQ(result2[0].key.c_str(), (std::string("test1/") + std::string(OBJECT)).c_str());
+        BOOST_CHECK_EQUAL(result1.size(), 2);
+        BOOST_CHECK_EQUAL(result1[0].key, OBJECT);
+        BOOST_CHECK_EQUAL(result2.size(), 1);
+        BOOST_CHECK_EQUAL(result2[0].key, std::string("test1/") + std::string(OBJECT));
     }
 
-    TEST_F(S3DatabaseTest, BucketSizeTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketSizeTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -165,10 +155,10 @@ namespace AwsMock::Database {
         const long totalSize = _s3Database.GetBucketSize(_region, BUCKET);
 
         // assert
-        EXPECT_EQ(totalSize, 10);
+        BOOST_CHECK_EQUAL(totalSize, 10);
     }
 
-    TEST_F(S3DatabaseTest, BucketHasObjetsTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketHasObjetsTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -182,38 +172,38 @@ namespace AwsMock::Database {
         const bool result = _s3Database.HasObjects(bucket);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(S3DatabaseTest, BucketDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketDeleteTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
         bucket = _s3Database.CreateBucket(bucket);
 
         // act
-        EXPECT_NO_THROW({ _s3Database.DeleteBucket(bucket); });
+        BOOST_CHECK_NO_THROW({ _s3Database.DeleteBucket(bucket); });
         const bool result = _s3Database.BucketExists({.region = bucket.region, .name = bucket.name});
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
-    TEST_F(S3DatabaseTest, BucketDeleteAllTest) {
+    BOOST_FIXTURE_TEST_CASE(BucketDeleteAllTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
         bucket = _s3Database.CreateBucket(bucket);
 
         // act
-        EXPECT_NO_THROW({ _s3Database.DeleteAllBuckets(); });
+        BOOST_CHECK_NO_THROW({ _s3Database.DeleteAllBuckets(); });
         const bool result = _s3Database.BucketExists({.region = bucket.region, .name = bucket.name});
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
-    TEST_F(S3DatabaseTest, ObjectExistsTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectExistsTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -225,10 +215,10 @@ namespace AwsMock::Database {
         const bool result = _s3Database.ObjectExists(object);
 
         // assert
-        EXPECT_TRUE(result);
+        BOOST_CHECK_EQUAL(result, true);
     }
 
-    TEST_F(S3DatabaseTest, ObjectCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectCreateTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -237,13 +227,13 @@ namespace AwsMock::Database {
         object = _s3Database.CreateObject(object);
 
         // act
-        Entity::S3::Object result = _s3Database.GetObject(_region, object.bucket, object.key);
+        const Entity::S3::Object result = _s3Database.GetObject(_region, object.bucket, object.key);
 
         // assert
-        EXPECT_STREQ(result.key.c_str(), object.key.c_str());
+        BOOST_CHECK_EQUAL(result.key, object.key);
     }
 
-    TEST_F(S3DatabaseTest, ObjectUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectUpdateTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -253,13 +243,13 @@ namespace AwsMock::Database {
         Entity::S3::Object updateObject = {.bucket = bucket.name, .owner = OWNER, .size = object.size + 10};
 
         // act
-        Entity::S3::Object result = _s3Database.UpdateObject(updateObject);
+        const Entity::S3::Object result = _s3Database.UpdateObject(updateObject);
 
         // assert
-        EXPECT_EQ(15, result.size);
+        BOOST_CHECK_EQUAL(15, result.size);
     }
 
-    TEST_F(S3DatabaseTest, ObjectByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectByIdTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -268,13 +258,13 @@ namespace AwsMock::Database {
         object = _s3Database.CreateObject(object);
 
         // act
-        Entity::S3::Object result = _s3Database.GetObjectById(object.oid);
+        const Entity::S3::Object result = _s3Database.GetObjectById(object.oid);
 
         // assert
-        EXPECT_TRUE(result.oid == object.oid);
+        BOOST_CHECK_EQUAL(result.oid, object.oid);
     }
 
-    TEST_F(S3DatabaseTest, ObjectDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectDeleteTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -283,14 +273,14 @@ namespace AwsMock::Database {
         object = _s3Database.CreateObject(object);
 
         // act
-        EXPECT_NO_THROW({ _s3Database.DeleteObject(object); });
+        BOOST_CHECK_NO_THROW({ _s3Database.DeleteObject(object); });
         const bool result = _s3Database.ObjectExists({.region = object.region, .bucket = object.bucket, .key = object.key});
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
-    TEST_F(S3DatabaseTest, ObjectBucketCountTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectBucketCountTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -306,10 +296,10 @@ namespace AwsMock::Database {
         const long result = _s3Database.ObjectCount(bucket.region, {}, bucket.name);
 
         // assert
-        EXPECT_EQ(10, result);
+        BOOST_CHECK_EQUAL(10, result);
     }
 
-    TEST_F(S3DatabaseTest, ObjectListTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectListTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -325,10 +315,10 @@ namespace AwsMock::Database {
         const Entity::S3::ObjectList result = _s3Database.ListObjects();
 
         // assert
-        EXPECT_EQ(10, result.size());
+        BOOST_CHECK_EQUAL(10, result.size());
     }
 
-    TEST_F(S3DatabaseTest, ObjectDeleteManyTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectDeleteManyTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -344,14 +334,14 @@ namespace AwsMock::Database {
         }
 
         // act
-        EXPECT_NO_THROW({ _s3Database.DeleteObjects(_region, bucket.name, keys); });
+        BOOST_CHECK_NO_THROW({ _s3Database.DeleteObjects(_region, bucket.name, keys); });
         const bool result = _s3Database.ObjectCount(bucket.region, bucket.name);
 
         // assert
-        EXPECT_EQ(0, result);
+        BOOST_CHECK_EQUAL(0, result);
     }
 
-    TEST_F(S3DatabaseTest, ObjectDeleteAllTest) {
+    BOOST_FIXTURE_TEST_CASE(ObjectDeleteAllTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -360,14 +350,14 @@ namespace AwsMock::Database {
         object = _s3Database.CreateObject(object);
 
         // act
-        EXPECT_NO_THROW({ _s3Database.DeleteAllObjects(); });
+        BOOST_CHECK_NO_THROW({ _s3Database.DeleteAllObjects(); });
         const bool result = _s3Database.ObjectExists({.region = object.region, .bucket = object.bucket, .key = object.key});
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
-    TEST_F(S3DatabaseTest, CreateNotificationTest) {
+    BOOST_FIXTURE_TEST_CASE(CreateNotificationTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -378,10 +368,10 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.CreateBucketNotification(bucket, notification);
 
         // assert
-        EXPECT_EQ(4, result.notifications.size());
+        BOOST_CHECK_EQUAL(4, result.notifications.size());
     }
 
-    TEST_F(S3DatabaseTest, CreateNotificationPutTest) {
+    BOOST_FIXTURE_TEST_CASE(CreateNotificationPutTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -392,10 +382,10 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.CreateBucketNotification(bucket, notification);
 
         // assert
-        EXPECT_EQ(1, result.notifications.size());
+        BOOST_CHECK_EQUAL(1, result.notifications.size());
     }
 
-    TEST_F(S3DatabaseTest, CreateNotificationTwiceTest) {
+    BOOST_FIXTURE_TEST_CASE(CreateNotificationTwiceTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -407,10 +397,10 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.CreateBucketNotification(bucket, notification);
 
         // assert
-        EXPECT_EQ(1, result.notifications.size());
+        BOOST_CHECK_EQUAL(1, result.notifications.size());
     }
 
-    TEST_F(S3DatabaseTest, DeleteNotificationTest) {
+    BOOST_FIXTURE_TEST_CASE(DeleteNotificationTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -422,10 +412,10 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.DeleteBucketNotifications(bucket, notification);
 
         // assert
-        EXPECT_TRUE(result.notifications.empty());
+        BOOST_CHECK_EQUAL(result.notifications.empty(), true);
     }
 
-    TEST_F(S3DatabaseTest, DeleteNotificationPutTest) {
+    BOOST_FIXTURE_TEST_CASE(DeleteNotificationPutTest, S3DatabaseTest) {
 
         // arrange
         Entity::S3::Bucket bucket = {.region = _region, .name = BUCKET, .owner = OWNER};
@@ -438,9 +428,9 @@ namespace AwsMock::Database {
         const Entity::S3::Bucket result = _s3Database.DeleteBucketNotifications(bucket, deleteNotification);
 
         // assert
-        EXPECT_EQ(0, result.notifications.size());
+        BOOST_CHECK_EQUAL(0, result.notifications.size());
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_S3DATABASETEST_H
+#endif// AWMOCK_CORE_S3_DATABASE_TEST_H

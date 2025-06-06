@@ -2,14 +2,8 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_CORE_SNSMEMORYDBTEST_H
-#define AWMOCK_CORE_SNSMEMORYDBTEST_H
-
-// C++ includes
-#include <chrono>
-
-// GTest includes
-#include <gtest/gtest.h>
+#ifndef AWMOCK_CORE_SNS_MEMORYDB_TEST_H
+#define AWMOCK_CORE_SNS_MEMORYDB_TEST_H
 
 // Local includes
 #include <awsmock/core/TestUtils.h>
@@ -25,29 +19,25 @@
 
 namespace AwsMock::Database {
 
-    using std::chrono::system_clock;
+    struct SNSMemoryDbTest {
 
-    class SNSMemoryDbTest : public ::testing::Test {
-
-      protected:
-
-        void SetUp() override {
+        SNSMemoryDbTest() {
             _region = _configuration.GetValue<std::string>("awsmock.region");
-            Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", false);
         }
 
-        void TearDown() override {
-            const long count = _snsDatabase.DeleteAllTopics();
-            log_info << "Topics deleted, count: " << count;
-            _snsDatabase.DeleteAllMessages();
+        ~SNSMemoryDbTest() {
+            long count = _snsDatabase.DeleteAllTopics();
+            log_debug << "SNS topics deleted, count: " << count;
+            count = _snsDatabase.DeleteAllMessages();
+            log_debug << "SNS messages deleted, count: " << count;
         }
 
         std::string _region;
-        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration(false);
+        Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         SNSDatabase &_snsDatabase = SNSDatabase::instance();
     };
 
-    TEST_F(SNSMemoryDbTest, TopicCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicCreateMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
@@ -56,25 +46,25 @@ namespace AwsMock::Database {
         const Entity::SNS::Topic result = _snsDatabase.CreateTopic(topic);
 
         // assert
-        EXPECT_TRUE(result.topicName == TOPIC);
-        EXPECT_TRUE(result.region == REGION);
-        EXPECT_FALSE(result.oid.empty());
+        BOOST_CHECK_EQUAL(result.topicName, TOPIC);
+        BOOST_CHECK_EQUAL(result.region, REGION);
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicGetByIdTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicGetByIdMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
+        const Entity::SNS::Topic result = _snsDatabase.GetTopicById(topic.oid);
 
         // assert
-        EXPECT_TRUE(result.topicArn == topic.topicArn);
+        BOOST_CHECK_EQUAL(result.topicArn, topic.topicArn);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicGetByArnTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicGetByArnMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
@@ -84,24 +74,25 @@ namespace AwsMock::Database {
         const Entity::SNS::Topic result = _snsDatabase.GetTopicByArn(topic.topicArn);
 
         // assert
-        EXPECT_TRUE(result.topicArn == topic.topicArn);
+        BOOST_CHECK_EQUAL(result.topicArn, topic.topicArn);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicUpdateTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicUpdateMTest, SNSDatabaseTest) {
 
         // arrange
-        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
+        Entity::SNS::Topic topic{.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
-        topic.topicArn = Core::AwsUtils::CreateSNSTopicArn(_region, "000000000000", topic.topicName);
+        const std::string url = "http://localhost:4567/" + topic.topicName;
+        topic.topicUrl = url;
         const Entity::SNS::Topic result = _snsDatabase.UpdateTopic(topic);
 
         // assert
-        EXPECT_TRUE(result.topicUrl == topic.topicUrl);
+        BOOST_CHECK_EQUAL(result.topicUrl, topic.topicUrl);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicCountTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicCountMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
@@ -111,10 +102,10 @@ namespace AwsMock::Database {
         const long result = _snsDatabase.CountTopics(topic.region);
 
         // assert
-        EXPECT_EQ(1, result);
+        BOOST_CHECK_EQUAL(1, result);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicListTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicListMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
@@ -124,13 +115,13 @@ namespace AwsMock::Database {
         const Entity::SNS::TopicList result = _snsDatabase.ListTopics(topic.region);
 
         // assert
-        EXPECT_EQ(result.size(), 1);
+        BOOST_CHECK_EQUAL(result.size(), 1);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicGetBySubscriptionArnTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicGetBySubscriptionArnMTest, SNSDatabaseTest) {
 
         // arrange
-        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
+        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
         topic = _snsDatabase.CreateTopic(topic);
         topic.subscriptions.push_back({.protocol = "sqs", .endpoint = QUEUE_URL, .subscriptionArn = SUBSCRIPTION_ARN});
         topic = _snsDatabase.UpdateTopic(topic);
@@ -139,25 +130,25 @@ namespace AwsMock::Database {
         const Entity::SNS::TopicList result = _snsDatabase.GetTopicsBySubscriptionArn(SUBSCRIPTION_ARN);
 
         // assert
-        EXPECT_EQ(result.size(), 1);
-        EXPECT_TRUE(result[0].topicName == TOPIC);
+        BOOST_CHECK_EQUAL(1, result.size());
+        BOOST_CHECK_EQUAL(result[0].topicName, TOPIC);
     }
 
-    TEST_F(SNSMemoryDbTest, TopicDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(TopicDeleteMTest, SNSDatabaseTest) {
 
         // arrange
-        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
+        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
         topic = _snsDatabase.CreateTopic(topic);
 
         // act
         _snsDatabase.DeleteTopic(topic);
-        bool result = _snsDatabase.TopicExists(topic.region, topic.topicName);
+        const bool result = _snsDatabase.TopicExists(topic.region, topic.topicName);
 
         // assert
-        EXPECT_FALSE(result);
+        BOOST_CHECK_EQUAL(result, false);
     }
 
-    TEST_F(SNSMemoryDbTest, MessageCreateTest) {
+    BOOST_FIXTURE_TEST_CASE(MessageCreateMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
@@ -165,14 +156,14 @@ namespace AwsMock::Database {
         Entity::SNS::Message message = {.region = _region, .topicArn = topic.topicArn, .message = BODY};
 
         // act
-        Entity::SNS::Message result = _snsDatabase.CreateMessage(message);
+        const Entity::SNS::Message result = _snsDatabase.CreateMessage(message);
 
         // assert
-        EXPECT_FALSE(result.oid.empty());
-        EXPECT_TRUE(result.message == BODY);
+        BOOST_CHECK_EQUAL(result.oid.empty(), false);
+        BOOST_CHECK_EQUAL(result.message, BODY);
     }
 
-    TEST_F(SNSMemoryDbTest, MessageCountTest) {
+    BOOST_FIXTURE_TEST_CASE(MessageCountMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
@@ -181,13 +172,13 @@ namespace AwsMock::Database {
         message = _snsDatabase.CreateMessage(message);
 
         // act
-        long result = _snsDatabase.CountMessages(topic.topicArn);
+        const long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
-        EXPECT_EQ(1, result);
+        BOOST_CHECK_EQUAL(1, result);
     }
 
-    TEST_F(SNSMemoryDbTest, MessageDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(MessageDeleteMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
@@ -197,13 +188,13 @@ namespace AwsMock::Database {
 
         // act
         _snsDatabase.DeleteMessage(message);
-        long result = _snsDatabase.CountMessages(topic.topicArn);
+        const long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
-        EXPECT_EQ(0, result);
+        BOOST_CHECK_EQUAL(0, result);
     }
 
-    TEST_F(SNSMemoryDbTest, MessagesDeleteTest) {
+    BOOST_FIXTURE_TEST_CASE(MessagesDeleteMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
@@ -218,13 +209,13 @@ namespace AwsMock::Database {
 
         // act
         _snsDatabase.DeleteMessages(_region, TOPIC_ARN, messageIds);
-        long result = _snsDatabase.CountMessages(topic.topicArn);
+        const long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
-        EXPECT_EQ(0, result);
+        BOOST_CHECK_EQUAL(0, result);
     }
 
-    TEST_F(SNSMemoryDbTest, MessageDeleteAllTest) {
+    BOOST_FIXTURE_TEST_CASE(MessageDeleteAllMTest, SNSDatabaseTest) {
 
         // arrange
         Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
@@ -233,13 +224,14 @@ namespace AwsMock::Database {
         message = _snsDatabase.CreateMessage(message);
 
         // act
-        _snsDatabase.DeleteAllMessages();
-        long result = _snsDatabase.CountMessages(topic.topicArn);
+        const long count = _snsDatabase.DeleteAllMessages();
+        const long result = _snsDatabase.CountMessages(topic.topicArn);
 
         // assert
-        EXPECT_EQ(0, result);
+        BOOST_CHECK_EQUAL(0, result);
+        BOOST_CHECK_EQUAL(1, count);
     }
 
 }// namespace AwsMock::Database
 
-#endif// AWMOCK_CORE_SNSMEMORYDBTEST_H
+#endif// AWMOCK_CORE_SNS_MEMORYDB_TEST_H

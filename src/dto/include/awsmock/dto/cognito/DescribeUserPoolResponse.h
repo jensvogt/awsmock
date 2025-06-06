@@ -154,19 +154,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeUserPoolResponse final : Common::BaseDto<DescribeUserPoolResponse> {
+    struct DescribeUserPoolResponse final : Common::BaseCounter<DescribeUserPoolResponse> {
 
         /**
          * User pool
          */
         UserPool userPool;
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend DescribeUserPoolResponse tag_invoke(boost::json::value_to_tag<DescribeUserPoolResponse>, boost::json::value const &v) {
+            DescribeUserPoolResponse r;
+            r.userPool = boost::json::value_to<UserPool>(v.at("UserPool"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeUserPoolResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPool", boost::json::value_from(obj.userPool)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

@@ -10,9 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/EncryptionAlgorithm.h>
 
 namespace AwsMock::Dto::KMS {
@@ -36,7 +34,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EncryptRequest : Common::BaseDto<EncryptRequest> {
+    struct EncryptRequest final : Common::BaseCounter<EncryptRequest> {
 
         /**
          * Key ID
@@ -50,7 +48,7 @@ namespace AwsMock::Dto::KMS {
          * The plain text is Base64 encoded in case of AWS CLI, plain otherwise.
          * </p>
          */
-        std::string plainText;
+        std::string plaintext;
 
         /**
          * Encryption algorithm
@@ -67,19 +65,32 @@ namespace AwsMock::Dto::KMS {
          */
         bool dryRun = false;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-        */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend EncryptRequest tag_invoke(boost::json::value_to_tag<EncryptRequest>, boost::json::value const &v) {
+            EncryptRequest r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.plaintext = Core::Json::GetStringValue(v, "Plaintext");
+            r.encryptionAlgorithm = EncryptionAlgorithmsFromString(Core::Json::GetStringValue(v, "EncryptionAlgorithm"));
+            r.dryRun = Core::Json::GetBoolValue(v, "DryRun");
+            if (Core::Json::AttributeExists(v, "GrantTokens")) {
+                r.grantTokens = boost::json::value_to<std::vector<std::string>>(v.at("GrantTokens"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EncryptRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"Plaintext", obj.plaintext},
+                    {"EncryptionAlgorithm", EncryptionAlgorithmsToString(obj.encryptionAlgorithm)},
+                    {"GrantTokens", boost::json::value_from(obj.grantTokens)},
+                    {"DryRun", obj.dryRun},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

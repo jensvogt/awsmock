@@ -36,14 +36,14 @@ namespace AwsMock::Dto::Cognito {
             {ChallengeName::MFA_SETUP, "MFA_SETUP"},
     };
 
-    [[maybe_unused]] static std::string ChallengeNameToString(ChallengeName challengeName) {
+    [[maybe_unused]] static std::string ChallengeNameToString(const ChallengeName &challengeName) {
         return ChallengeNameNames[challengeName];
     }
 
     [[maybe_unused]] static ChallengeName ChallengeNameFromString(const std::string &challengeName) {
-        for (auto &it: ChallengeNameNames) {
-            if (it.second == challengeName) {
-                return it.first;
+        for (auto &[fst, snd]: ChallengeNameNames) {
+            if (snd == challengeName) {
+                return fst;
             }
         }
         return ChallengeName::CUSTOM_CHALLENGE;

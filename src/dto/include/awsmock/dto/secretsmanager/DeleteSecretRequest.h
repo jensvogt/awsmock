@@ -9,47 +9,62 @@
 #include <string>
 
 // AwsMoc includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
-    struct DeleteSecretRequest {
+    /**
+     * @brief Delete secret request
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "ForceDeleteWithoutRecovery": boolean,
+     *   "RecoveryWindowInDays": number,
+     *   "SecretId": "string"
+     * }
+     * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct DeleteSecretRequest final : Common::BaseCounter<DeleteSecretRequest> {
 
         /**
-         * Region
+         * Secret ID; can be the name of the secret or ARN
          */
-        std::string region;
+        std::string secretId;
 
         /**
-         * Secret name
+         * Force deletion
          */
-        std::string name;
+        bool forceDeleteWithoutRecovery = false;
 
         /**
-         * AWS request ID
+         * Recovery windows in days
          */
-        std::string requestId;
+        long recoveryWindowInDays{};
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend DeleteSecretRequest tag_invoke(boost::json::value_to_tag<DeleteSecretRequest>, boost::json::value const &v) {
+            DeleteSecretRequest r;
+            r.secretId = Core::Json::GetStringValue(v, "SecretId");
+            r.forceDeleteWithoutRecovery = Core::Json::GetBoolValue(v, "ForceDeleteWithoutRecovery");
+            r.recoveryWindowInDays = Core::Json::GetLongValue(v, "RecoveryWindowInDays");
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteSecretRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteSecretRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"SecretId", obj.secretId},
+                    {"ForceDeleteWithoutRecovery", obj.forceDeleteWithoutRecovery},
+                    {"RecoveryWindowInDays", obj.recoveryWindowInDays},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SecretsManager

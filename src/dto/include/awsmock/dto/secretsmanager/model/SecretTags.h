@@ -15,7 +15,7 @@
 namespace AwsMock::Dto::SecretsManager {
 
     /**
-     * Secret tags
+     * @brief Secret tags
      *
      * Example:
      * @code{.json}
