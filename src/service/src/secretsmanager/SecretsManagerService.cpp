@@ -446,22 +446,6 @@ namespace AwsMock::Service {
                     boost::thread t(boost::ref(secretRotation), secret, request.clientRequestToken);
                     t.detach();
                     log_debug << "Secret rotation started, secretId: " << request.secretId;
-
-                    // Get lambda function from database
-                    /*const Database::Entity::Lambda::Lambda lambda = Database::LambdaDatabase::instance().GetLambdaByArn(secret.rotationLambdaARN);
-                    log_debug << "Secret rotation starting, lambda: " << lambda.function;
-
-                    CreateSecret(secret, lambda, request.clientRequestToken);
-                    log_debug << "Secret created, arn: " << secret.arn;
-
-                    SetSecret(secret, lambda, request.clientRequestToken);
-                    log_debug << "Secret set in resource, arn: " << secret.arn;
-
-                    TestSecret(secret, lambda, request.clientRequestToken);
-                    log_debug << "Secret testet, arn: " << secret.arn;
-
-                    FinishSecret(secret, lambda, request.clientRequestToken);
-                    log_debug << "Secret testet, arn: " << secret.arn;*/
                 }
             }
 

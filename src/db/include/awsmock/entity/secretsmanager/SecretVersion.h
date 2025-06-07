@@ -46,6 +46,16 @@ namespace AwsMock::Database::Entity::SecretsManager {
         std::vector<std::string> stages;
 
         /**
+         * Created timestamp
+         */
+        system_clock::time_point created = system_clock::now();
+
+        /**
+         * Last access timestamp
+         */
+        system_clock::time_point lastAccessed = system_clock::now();
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
