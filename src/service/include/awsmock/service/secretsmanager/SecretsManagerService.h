@@ -9,6 +9,10 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h"
+#include "awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -35,42 +39,17 @@
 #include <awsmock/dto/secretsmanager/internal/ListSecretCountersResponse.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersRequest.h>
 #include <awsmock/dto/secretsmanager/internal/ListSecretVersionCountersResponse.h>
+#include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsRequest.h>
+#include <awsmock/dto/secretsmanager/internal/UpdateSecretDetailsResponse.h>
+#include <awsmock/dto/secretsmanager/mapper/Mapper.h>
 #include <awsmock/dto/secretsmanager/model/VersionStage.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/lambda/LambdaService.h>
+#include <awsmock/service/secretsmanager/SecretRotation.h>
 
 namespace AwsMock::Service {
-
-    enum TaskType {
-        createSecret,
-        setSecret,
-        testSecret,
-        finishSecret,
-        unknown
-    };
-
-    static std::map<TaskType, std::string> TaskTypeNames{
-            {createSecret, "createSecret"},
-            {setSecret, "setSecret"},
-            {testSecret, "testSecret"},
-            {finishSecret, "finishSecret"},
-            {unknown, "unknown"},
-    };
-
-    [[maybe_unused]] static std::string TaskTypeToString(const TaskType taskType) {
-        return TaskTypeNames[taskType];
-    }
-
-    [[maybe_unused]] static TaskType TaskTypeFromString(const std::string &taskType) {
-        for (auto &[fst, snd]: TaskTypeNames) {
-            if (snd == taskType) {
-                return fst;
-            }
-        }
-        return unknown;
-    }
 
     /**
      * @brief Secrets manager service.
@@ -149,6 +128,14 @@ namespace AwsMock::Service {
          * @return UpdateSecretResponse
          */
         [[nodiscard]] Dto::SecretsManager::UpdateSecretResponse UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const;
+
+        /**
+         * @brief Updates an existing secret
+         *
+         * @param request update secret request
+         * @return UpdateSecretResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::UpdateSecretDetailsResponse UpdateSecretDetails(const Dto::SecretsManager::UpdateSecretDetailsRequest &request) const;
 
         /**
          * @brief Rotates an existing secret

@@ -81,32 +81,32 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Creation date
          */
-        long createdDate = 0;
+        system_clock::time_point createdDate;
 
         /**
          * Deleted date
          */
-        long deletedDate = 0;
+        system_clock::time_point deletedDate;
 
         /**
          * Last access date
          */
-        long lastAccessedDate = 0;
+        system_clock::time_point lastAccessedDate;
 
         /**
          * Last changed date
          */
-        long lastChangedDate = 0;
+        system_clock::time_point lastChangedDate;
 
         /**
          * Last rotation date
          */
-        long lastRotatedDate = 0;
+        system_clock::time_point lastRotatedDate;
 
         /**
          * Next rotation date
          */
-        long nextRotatedDate = 0;
+        system_clock::time_point nextRotatedDate;
 
         /**
          * Next rotation date

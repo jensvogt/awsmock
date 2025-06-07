@@ -55,7 +55,7 @@ namespace AwsMock::Dto::SecretsManager {
             try {
 
                 document document;
-                Core::Bson::BsonUtils::SetIntValue(document, "AutomaticallyAfterDays", automaticallyAfterDays);
+                Core::Bson::BsonUtils::SetLongValue(document, "AutomaticallyAfterDays", automaticallyAfterDays);
                 Core::Bson::BsonUtils::SetStringValue(document, "Duration", duration);
                 Core::Bson::BsonUtils::SetStringValue(document, "ScheduleExpression", scheduleExpression);
                 return document.extract();
@@ -97,9 +97,6 @@ namespace AwsMock::Dto::SecretsManager {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RotationRules const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
                     {"AutomaticallyAfterDays", obj.automaticallyAfterDays},
                     {"Duration", obj.duration},
                     {"ScheduleExpression", obj.scheduleExpression},

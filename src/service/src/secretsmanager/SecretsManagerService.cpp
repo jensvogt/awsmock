@@ -63,7 +63,7 @@ namespace AwsMock::Service {
 
             secret.secretId = request.name + "-" + Core::StringUtils::GenerateRandomHexString(6);
             secret.arn = Core::AwsUtils::CreateSecretArn(request.region, _accountId, secret.secretId);
-            secret.createdDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.createdDate = system_clock::now();
             secret.description = request.description;
             secret.versionIdsToStages.versions[versionId] = {Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT)};
             secret.versions[versionId] = version;
@@ -104,7 +104,7 @@ namespace AwsMock::Service {
             response.region = secret.region;
             response.name = secret.name;
             response.arn = secret.arn;
-            response.deletedDate = secret.deletedDate;
+            response.deletedDate = Core::DateTimeUtils::UnixTimestamp(secret.deletedDate);
             response.description = secret.description;
             response.kmsKeyId = secret.kmsKeyId;
             response.rotationEnabled = secret.rotationEnabled;
@@ -154,7 +154,7 @@ namespace AwsMock::Service {
             response.name = secret.name;
             response.arn = secret.arn;
             response.versionId = versionId;
-            response.createdDate = secret.createdDate;
+            response.createdDate = Core::DateTimeUtils::UnixTimestamp(secret.createdDate);
             response.versionStages = secret.versionIdsToStages.versions[request.versionId];
 
             if (!secret.kmsKeyId.empty()) {
@@ -174,7 +174,7 @@ namespace AwsMock::Service {
             log_debug << "Get secret value, secretId: " << request.secretId;
 
             // Update database
-            secret.lastAccessedDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.lastAccessedDate = system_clock::now();
             secret = _secretsManagerDatabase.UpdateSecret(secret);
             log_trace << "Secret updated, secretId: " << secret.oid;
 
@@ -320,16 +320,9 @@ namespace AwsMock::Service {
             Dto::SecretsManager::GetSecretDetailsResponse response;
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretBySecretId(request.secretId);
 
-            // TODO: use mapper
             // Convert to DTO
             log_debug << "Get secret details, secretId: " << request.secretId;
-            response.secretId = secret.secretId;
-            response.secretName = secret.name;
-            response.secretArn = secret.arn;
-            response.secretString = GetSecretString(secret);
-            response.created = secret.created;
-            response.modified = secret.modified;
-            return response;
+            return Dto::SecretsManager::Mapper::map(secret, GetSecretString(secret));
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Get secret details failed, message: " + exc.message();
@@ -363,19 +356,50 @@ namespace AwsMock::Service {
             secret.kmsKeyId = request.kmsKeyId;
             secret.versions[versionId] = version;
             secret.description = request.description;
-            secret.lastChangedDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.lastChangedDate = system_clock::now();
             secret.ResetVersions(versionId);
 
             secret = _secretsManagerDatabase.UpdateSecret(secret);
 
             // Convert to DTO
-            log_debug << "Database secret described, secretId: " << request.secretId;
+            log_debug << "Database secret updated, secretId: " << request.secretId;
             Dto::SecretsManager::UpdateSecretResponse response;
             response.region = secret.region;
             response.name = secret.name;
             response.arn = secret.arn;
             response.versionId = versionId;
             return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "Secret update failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    Dto::SecretsManager::UpdateSecretDetailsResponse SecretsManagerService::UpdateSecretDetails(const Dto::SecretsManager::UpdateSecretDetailsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
+        log_trace << "Update secret details request: " << request;
+
+        // Check bucket existence
+        if (!_secretsManagerDatabase.SecretExists(request.secretDetails.secretId)) {
+            log_warning << "Secret does not exist, secretId: " << request.secretDetails.secretId;
+            throw Core::ServiceException("Secret does not exist, secretId: " + request.secretDetails.secretId);
+        }
+
+        try {
+
+            // Get the object from the database
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretBySecretId(request.secretDetails.secretId);
+
+            // Updates are only possible on certain fields
+            secret.rotationRules = Dto::SecretsManager::Mapper::map(request.secretDetails.rotationRules);
+            secret.rotationLambdaARN = request.secretDetails.rotationLambdaARN;
+            secret = _secretsManagerDatabase.UpdateSecret(secret);
+
+            // Convert to DTO
+            log_debug << "Database secret updated, secretId: " << request.secretDetails.secretId;
+            return Dto::SecretsManager::Mapper::mapUpdate(secret, GetSecretString(secret));
 
         } catch (Core::DatabaseException &exc) {
             log_error << "Secret describe secret failed, message: " + exc.message();
@@ -401,7 +425,7 @@ namespace AwsMock::Service {
 
             // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
-            secret.lastRotatedDate = Core::DateTimeUtils::UnixTimestampNow();
+            secret.lastRotatedDate = system_clock::now();
             secret.rotationLambdaARN = request.rotationLambdaARN;
             secret.rotationEnabled = true;
 
@@ -418,8 +442,13 @@ namespace AwsMock::Service {
             if (request.rotateImmediately) {
                 if (!secret.rotationLambdaARN.empty()) {
 
+                    SecretRotation secretRotation;
+                    boost::thread t(boost::ref(secretRotation), secret, request.clientRequestToken);
+                    t.detach();
+                    log_debug << "Secret rotation started, secretId: " << request.secretId;
+
                     // Get lambda function from database
-                    const Database::Entity::Lambda::Lambda lambda = Database::LambdaDatabase::instance().GetLambdaByArn(secret.rotationLambdaARN);
+                    /*const Database::Entity::Lambda::Lambda lambda = Database::LambdaDatabase::instance().GetLambdaByArn(secret.rotationLambdaARN);
                     log_debug << "Secret rotation starting, lambda: " << lambda.function;
 
                     CreateSecret(secret, lambda, request.clientRequestToken);
@@ -432,7 +461,7 @@ namespace AwsMock::Service {
                     log_debug << "Secret testet, arn: " << secret.arn;
 
                     FinishSecret(secret, lambda, request.clientRequestToken);
-                    log_debug << "Secret testet, arn: " << secret.arn;
+                    log_debug << "Secret testet, arn: " << secret.arn;*/
                 }
             }
 
@@ -477,7 +506,7 @@ namespace AwsMock::Service {
             response.region = request.region;
             response.name = secret.name;
             response.arn = secret.arn;
-            response.deletionDate = static_cast<double>(Core::DateTimeUtils::UnixTimestampNow() - secret.lastRotatedDate);
+            response.deletionDate = system_clock::now();
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -547,7 +576,7 @@ namespace AwsMock::Service {
         kmsRequest.description = "KMS key for secret " + secret.name;
         kmsRequest.keySpec = Dto::KMS::KeySpec::SYMMETRIC_DEFAULT;
         kmsRequest.keyUsage = Dto::KMS::KeyUsage::ENCRYPT_DECRYPT;
-        Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
+        const Dto::KMS::CreateKeyResponse kmsResponse = _kmsService.CreateKey(kmsRequest);
         _kmsService.WaitForAesKey(kmsResponse.key.keyId, 5);
         secret.kmsKeyId = kmsResponse.key.keyId;
     }

@@ -9,8 +9,10 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
 
 namespace AwsMock::Service {
@@ -63,7 +65,7 @@ namespace AwsMock::Service {
          * @param secret to create
          * @param clientRequestToken client request token
          */
-        void operator()(const Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
+        void operator()(Database::Entity::SecretsManager::Secret &secret, const std::string &clientRequestToken) const;
 
       private:
 
@@ -74,7 +76,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        void CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
+        static void CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
 
         /**
          * @brief Set a secret in the resource
@@ -83,7 +85,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        void SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
+        static void SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
 
         /**
          * @brief Test the new secret
@@ -92,7 +94,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        void TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
+        static void TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
 
         /**
          * @brief Finish secret rotation
@@ -101,7 +103,7 @@ namespace AwsMock::Service {
          * @param lambda lambda function to invoke
          * @param clientRequestToken client request token
          */
-        void FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const;
+        static void FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken);
 
         /**
          * @brief Send a lambda invocation request
@@ -109,17 +111,15 @@ namespace AwsMock::Service {
          * @param lambda lambda entity
          * @param body message body
          */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) const;
+        static void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body);
 
         /**
-         * Lambda service
+         * @brief Calculates the next rotation date
+         *
+         * @param secret secret entity
+         * @return next rotation datetime
          */
-        LambdaService _lambdaService;
-
-        /**
-         * Lambda service
-         */
-        Database::LambdaDatabase _lambdaDatabase = std::move(Database::LambdaDatabase::instance());
+        static system_clock::time_point GetNextRotationDate(const Database::Entity::SecretsManager::Secret &secret);
     };
 
 }// namespace AwsMock::Service

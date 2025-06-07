@@ -54,6 +54,7 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
+set(SECRETSMANAGER_SOURCES src/secretsmanager/mapper/Mapper.cpp)
 set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
         src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
         src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
@@ -66,7 +67,7 @@ set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
-        ${MONITORING_SOURCES})
+        ${SECRETSMANAGER_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)
@@ -81,7 +82,9 @@ if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/dto/secretsmanager/model/VersionStage.h)
+            include/awsmock/dto/secretsmanager/model/VersionStage.h
+            src/secretsmanager/mapper/Mapper.cpp
+            include/awsmock/dto/secretsmanager/mapper/Mapper.h)
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
