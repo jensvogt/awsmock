@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -32,7 +30,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SignUpResponse final : Common::BaseDto<SignUpResponse> {
+    struct SignUpResponse final : Common::BaseCounter<SignUpResponse> {
 
         /**
          * User substitution
@@ -46,21 +44,26 @@ namespace AwsMock::Dto::Cognito {
          *
          * A response from the server indicating that a user registration has been confirmed.
          */
-        bool userConfirmed;
+        bool userConfirmed = false;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend SignUpResponse tag_invoke(boost::json::value_to_tag<SignUpResponse>, boost::json::value const &v) {
+            SignUpResponse r;
+            r.userSub = Core::Json::GetStringValue(v, "UserSub");
+            r.userConfirmed = Core::Json::GetBoolValue(v, "UserConfirmed");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SignUpResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserSub", obj.userSub},
+                    {"UserConfirmed", obj.userConfirmed},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

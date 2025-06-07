@@ -504,14 +504,14 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void ContainerService::StartDockerContainer(const std::string &id) const {
+    void ContainerService::StartDockerContainer(const std::string &containerId, const std::string &containerName) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
+            log_warning << "Start container failed, id: " << containerName << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-        log_debug << "Docker container started, id: " << id;
+        log_debug << "Docker container started, name: " << containerName << ", id: " << containerId;
     }
 
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {
@@ -540,12 +540,12 @@ namespace AwsMock::Service {
         RestartDockerContainer(container.id);
     }
 
-    void ContainerService::RestartDockerContainer(const std::string &id) const {
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/restart"); statusCode != http::status::no_content) {
+    void ContainerService::RestartDockerContainer(const std::string &containerId) const {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/restart"); statusCode != http::status::no_content) {
             log_warning << "Restart container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-        log_debug << "Docker container restarted, id: " << id;
+        log_debug << "Docker container restarted, id: " << containerId;
     }
 
     void ContainerService::StopContainer(const Dto::Docker::Container &container) const {

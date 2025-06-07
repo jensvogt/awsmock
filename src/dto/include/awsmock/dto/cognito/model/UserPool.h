@@ -27,12 +27,17 @@ namespace AwsMock::Dto::Cognito {
         /**
          * ID
          */
-        std::string oid;
+        std::string userPoolId;
 
         /**
          * Name
          */
         std::string name;
+
+        /**
+         * AWS ARN
+         */
+        std::string arn;
 
         /**
          * Created
@@ -54,9 +59,10 @@ namespace AwsMock::Dto::Cognito {
             try {
 
                 document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "id", oid);
+                Core::Bson::BsonUtils::SetStringValue(document, "userPoolId", userPoolId);
                 Core::Bson::BsonUtils::SetStringValue(document, "region", region);
                 Core::Bson::BsonUtils::SetStringValue(document, "name", name);
+                Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
                 Core::Bson::BsonUtils::SetDateValue(document, "created", created);
                 Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
                 return document.extract();
@@ -71,8 +77,9 @@ namespace AwsMock::Dto::Cognito {
 
         friend UserPool tag_invoke(boost::json::value_to_tag<UserPool>, boost::json::value const &v) {
             UserPool r;
-            r.oid = Core::Json::GetStringValue(v, "Id");
+            r.userPoolId = Core::Json::GetStringValue(v, "Id");
             r.name = Core::Json::GetStringValue(v, "Name");
+            r.arn = Core::Json::GetStringValue(v, "Arn");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
             return r;
@@ -83,8 +90,9 @@ namespace AwsMock::Dto::Cognito {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Id", obj.oid},
+                    {"Id", obj.userPoolId},
                     {"Name", obj.name},
+                    {"Arn", obj.arn},
                     {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"LastModified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

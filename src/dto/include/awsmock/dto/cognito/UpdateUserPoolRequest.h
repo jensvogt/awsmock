@@ -10,9 +10,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -122,7 +120,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UpdateUserPoolRequest : Common::BaseDto<UpdateUserPoolRequest> {
+    struct UpdateUserPoolRequest final : Common::BaseCounter<UpdateUserPoolRequest> {
 
         /**
          * User pool ID
@@ -134,19 +132,24 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend UpdateUserPoolRequest tag_invoke(boost::json::value_to_tag<UpdateUserPoolRequest>, boost::json::value const &v) {
+            UpdateUserPoolRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateUserPoolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito
