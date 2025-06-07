@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/cognito/User.h>
 
 namespace AwsMock::Dto::Cognito {
@@ -26,7 +27,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ValidationData {
+    struct ValidationData final : Common::BaseCounter<ValidationData> {
 
         /**
          * User attribute name
@@ -43,35 +44,57 @@ namespace AwsMock::Dto::Cognito {
          *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
+
+            try {
+
+                name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
+                attributeValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Convert to a JSON string.
          *
          * @return user pools json string
          */
-        [[nodiscard]] std::string ToJson() const;
+        view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return user pools json string
-         */
-        view_or_value<view, value> ToDocument() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
+                Core::Bson::BsonUtils::SetStringValue(document, "Value", attributeValue);
+                return document.extract();
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ValidationData &r);
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend ValidationData tag_invoke(boost::json::value_to_tag<ValidationData>, boost::json::value const &v) {
+            ValidationData r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.attributeValue = Core::Json::GetStringValue(v, "Value");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ValidationData const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"Value", obj.attributeValue},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

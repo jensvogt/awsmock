@@ -36,14 +36,14 @@ namespace AwsMock::Dto::Cognito {
             {AuthFlowType::ADMIN_USER_PASSWORD_AUTH, "ADMIN_USER_PASSWORD_AUTH"},
     };
 
-    [[maybe_unused]] static std::string AuthFlowTypeToString(AuthFlowType authFlowType) {
+    [[maybe_unused]] static std::string AuthFlowTypeToString(const AuthFlowType &authFlowType) {
         return AuthFlowTypeNames[authFlowType];
     }
 
     [[maybe_unused]] static AuthFlowType AuthFlowTypeFromString(const std::string &authFlowType) {
-        for (auto &it: AuthFlowTypeNames) {
-            if (it.second == authFlowType) {
-                return it.first;
+        for (auto &[fst, snd]: AuthFlowTypeNames) {
+            if (snd == authFlowType) {
+                return fst;
             }
         }
         return AuthFlowType::USER_PASSWORD_AUTH;

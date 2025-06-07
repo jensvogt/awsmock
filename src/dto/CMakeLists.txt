@@ -6,7 +6,7 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/Services.cpp src/module/model/Infrastructure.cpp src/common/SNSClientCommand.cpp
         src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
         src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
-        src/common/MonitoringClientCommand.cpp)
+        src/common/MonitoringClientCommand.cpp src/common/CognitoClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
@@ -48,11 +48,7 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
         src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp
         src/lambda/model/EventSourceMapping.cpp src/lambda/DeleteFunctionRequest.cpp)
-set(COGNITO_SOURCES src/common/CognitoClientCommand.cpp src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp
-        src/cognito/model/CustomSmsSender.cpp src/cognito/model/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp
-        src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/UpdateUserPoolRequest.cpp
-        src/cognito/UpdateUserPoolClientRequest.cpp src/cognito/UpdateUserPoolDomainRequest.cpp
-        src/cognito/UpdateUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp)
+set(COGNITO_SOURCES src/cognito/mapper/Mapper.cpp)
 set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp

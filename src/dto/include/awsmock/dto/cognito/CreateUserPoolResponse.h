@@ -9,6 +9,10 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/entity/cognito/UserPool.h"
+#include "model/UserPool.h"
+
+
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -158,25 +162,13 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Name of the user pool
          */
-        std::string name;
-
-        /**
-         * User pool ARN
-         */
-        std::string arn;
-
-        /**
-         * User pool ID
-         */
-        std::string userPoolId;
+        UserPool userPool;
 
       private:
 
         friend CreateUserPoolResponse tag_invoke(boost::json::value_to_tag<CreateUserPoolResponse>, boost::json::value const &v) {
             CreateUserPoolResponse r;
-            r.name = Core::Json::GetStringValue(v, "Name");
-            r.arn = Core::Json::GetStringValue(v, "Arn");
-            r.userPoolId = Core::Json::GetStringValue(v, "Id");
+            r.userPool = boost::json::value_to<UserPool>(v.at("UserPool"));
             return r;
         }
 
@@ -185,9 +177,7 @@ namespace AwsMock::Dto::Cognito {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Name", obj.name},
-                    {"Arn", obj.arn},
-                    {"Id", obj.userPoolId},
+                    {"UserPool", boost::json::value_from(obj.userPool)},
             };
         }
     };
