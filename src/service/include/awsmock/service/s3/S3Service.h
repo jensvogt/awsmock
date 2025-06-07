@@ -118,7 +118,7 @@ namespace AwsMock::Service {
          * @brief Returns the S3 bucket.
          *
          * @par
-         * The full bucket, with all attributes and notifications is returned.
+         * The full bucket, with all attributes and notifications, is returned.
          *
          * @param request get bucket request
          * @return GetBucketResponse

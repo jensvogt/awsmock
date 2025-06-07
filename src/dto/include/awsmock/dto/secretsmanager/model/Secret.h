@@ -93,32 +93,32 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Creation date
          */
-        long createdDate = 0;
+        system_clock::time_point createdDate;
 
         /**
          * Deleted date
          */
-        long deletedDate = 0;
+        system_clock::time_point deletedDate;
 
         /**
          * Last access date
          */
-        long lastAccessedDate = 0;
+        system_clock::time_point lastAccessedDate;
 
         /**
          * Last changed date
          */
-        long lastChangedDate = 0;
+        system_clock::time_point lastChangedDate;
 
         /**
          * Last rotation date
          */
-        long lastRotatedDate = 0;
+        system_clock::time_point lastRotatedDate;
 
         /**
          * Next rotation date
          */
-        long nextRotatedDate = 0;
+        system_clock::time_point nextRotatedDate;
 
         /**
          * Next rotation date
@@ -156,12 +156,12 @@ namespace AwsMock::Dto::SecretsManager {
                 Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyId", kmsKeyId);
                 Core::Bson::BsonUtils::SetStringValue(document, "OwningService", owningService);
                 Core::Bson::BsonUtils::SetStringValue(document, "PrimaryRegion", primaryRegion);
-                Core::Bson::BsonUtils::SetLongValue(document, "CreatedDate", createdDate);
-                Core::Bson::BsonUtils::SetLongValue(document, "DeletedDate", deletedDate);
-                Core::Bson::BsonUtils::SetLongValue(document, "LastAccessedDate", lastAccessedDate);
-                Core::Bson::BsonUtils::SetLongValue(document, "LastChangedDate", lastChangedDate);
-                Core::Bson::BsonUtils::SetLongValue(document, "LastRotatedDate", lastRotatedDate);
-                Core::Bson::BsonUtils::SetLongValue(document, "NextRotatedDate", nextRotatedDate);
+                Core::Bson::BsonUtils::SetDateValue(document, "CreatedDate", createdDate);
+                Core::Bson::BsonUtils::SetDateValue(document, "DeletedDate", deletedDate);
+                Core::Bson::BsonUtils::SetDateValue(document, "LastAccessedDate", lastAccessedDate);
+                Core::Bson::BsonUtils::SetDateValue(document, "LastChangedDate", lastChangedDate);
+                Core::Bson::BsonUtils::SetDateValue(document, "LastRotatedDate", lastRotatedDate);
+                Core::Bson::BsonUtils::SetDateValue(document, "NextRotatedDate", nextRotatedDate);
                 Core::Bson::BsonUtils::SetBoolValue(document, "RotationEnabled", rotationEnabled);
                 Core::Bson::BsonUtils::SetStringValue(document, "RotationLambdaARN", rotationLambdaARN);
 
@@ -190,12 +190,12 @@ namespace AwsMock::Dto::SecretsManager {
                 kmsKeyId = Core::Bson::BsonUtils::GetStringValue(document, "KmsKeyId");
                 owningService = Core::Bson::BsonUtils::GetStringValue(document, "OwningService");
                 primaryRegion = Core::Bson::BsonUtils::GetStringValue(document, "PrimaryRegion");
-                createdDate = Core::Bson::BsonUtils::GetLongValue(document, "CreatedDate");
-                deletedDate = Core::Bson::BsonUtils::GetLongValue(document, "DeletedDate");
-                lastAccessedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastAccessedDate");
-                lastChangedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastChangedDate");
-                lastRotatedDate = Core::Bson::BsonUtils::GetLongValue(document, "LastRotatedDate");
-                nextRotatedDate = Core::Bson::BsonUtils::GetLongValue(document, "NextRotatedDate");
+                createdDate = Core::Bson::BsonUtils::GetDateValue(document, "CreatedDate");
+                deletedDate = Core::Bson::BsonUtils::GetDateValue(document, "DeletedDate");
+                lastAccessedDate = Core::Bson::BsonUtils::GetDateValue(document, "LastAccessedDate");
+                lastChangedDate = Core::Bson::BsonUtils::GetDateValue(document, "LastChangedDate");
+                lastRotatedDate = Core::Bson::BsonUtils::GetDateValue(document, "LastRotatedDate");
+                nextRotatedDate = Core::Bson::BsonUtils::GetDateValue(document, "NextRotatedDate");
                 rotationEnabled = Core::Bson::BsonUtils::GetBoolValue(document, "RotationEnabled");
                 rotationLambdaARN = Core::Bson::BsonUtils::GetStringValue(document, "RotationLambdaARN");
 
@@ -219,15 +219,15 @@ namespace AwsMock::Dto::SecretsManager {
             r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
             r.owningService = Core::Json::GetStringValue(v, "OwningService");
             r.primaryRegion = Core::Json::GetStringValue(v, "PrimaryRegion");
-            r.createdDate = Core::Json::GetLongValue(v, "CreatedDate");
-            r.deletedDate = Core::Json::GetLongValue(v, "DeletedDate");
-            r.lastAccessedDate = Core::Json::GetLongValue(v, "LastAccessedDate");
-            r.lastChangedDate = Core::Json::GetLongValue(v, "LastChangedDate");
-            r.lastRotatedDate = Core::Json::GetLongValue(v, "LastRotatedDate");
-            r.nextRotatedDate = Core::Json::GetLongValue(v, "NextRotatedDate");
-            r.rotationEnabled = Core::Json::GetLongValue(v, "RotationEnabled");
-            r.rotationLambdaARN = Core::Json::GetLongValue(v, "RotationLambdaARN");
-            r.rotationRules = boost::json::value_to<RotationRules>(v.at("NextRotatedDate"));
+            r.createdDate = Core::Json::GetUnixTimestampValue(v, "CreatedDate");
+            r.deletedDate = Core::Json::GetUnixTimestampValue(v, "DeletedDate");
+            r.lastAccessedDate = Core::Json::GetUnixTimestampValue(v, "LastAccessedDate");
+            r.lastChangedDate = Core::Json::GetUnixTimestampValue(v, "LastChangedDate");
+            r.lastRotatedDate = Core::Json::GetUnixTimestampValue(v, "LastRotatedDate");
+            r.nextRotatedDate = Core::Json::GetUnixTimestampValue(v, "NextRotatedDate");
+            r.rotationEnabled = Core::Json::GetBoolValue(v, "RotationEnabled");
+            r.rotationLambdaARN = Core::Json::GetStringValue(v, "RotationLambdaARN");
+            r.rotationRules = boost::json::value_to<RotationRules>(v.at("RotationRules"));
             return r;
         }
 
@@ -242,12 +242,12 @@ namespace AwsMock::Dto::SecretsManager {
                     {"KmsKeyId", obj.kmsKeyId},
                     {"OwningService", obj.owningService},
                     {"PrimaryRegion", obj.primaryRegion},
-                    {"CreatedDate", obj.createdDate},
-                    {"DeletedDate", obj.deletedDate},
-                    {"LastAccessedDate", obj.lastAccessedDate},
-                    {"LastChangedDate", obj.lastChangedDate},
-                    {"LastRotatedDate", obj.lastRotatedDate},
-                    {"NextRotatedDate", obj.nextRotatedDate},
+                    {"CreatedDate", Core::DateTimeUtils::UnixTimestamp(obj.createdDate)},
+                    {"DeletedDate", Core::DateTimeUtils::UnixTimestamp(obj.deletedDate)},
+                    {"LastAccessedDate", Core::DateTimeUtils::UnixTimestamp(obj.lastAccessedDate)},
+                    {"LastChangedDate", Core::DateTimeUtils::UnixTimestamp(obj.lastChangedDate)},
+                    {"LastRotatedDate", Core::DateTimeUtils::UnixTimestamp(obj.lastRotatedDate)},
+                    {"NextRotatedDate", Core::DateTimeUtils::UnixTimestamp(obj.nextRotatedDate)},
                     {"RotationEnabled", obj.rotationEnabled},
                     {"RotationLambdaARN", obj.rotationLambdaARN},
                     {"RotationRules", boost::json::value_from(obj.rotationRules)},

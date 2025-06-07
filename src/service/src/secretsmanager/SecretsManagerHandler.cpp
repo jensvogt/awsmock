@@ -53,6 +53,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
+                case Dto::Common::SecretsManagerCommandType::UPDATE_SECRET_DETAILS: {
+
+                    Dto::SecretsManager::UpdateSecretDetailsRequest secretsManagerRequest = Dto::SecretsManager::UpdateSecretDetailsRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::UpdateSecretDetailsResponse secretsManagerResponse = _secretsManagerService.UpdateSecretDetails(secretsManagerRequest);
+                    log_info << "Secret details updated, secretId: " << secretsManagerRequest.secretDetails.secretId;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
                 case Dto::Common::SecretsManagerCommandType::ROTATE_SECRET: {
 
                     Dto::SecretsManager::RotateSecretRequest secretsManagerRequest = Dto::SecretsManager::RotateSecretRequest::FromJson(clientCommand);

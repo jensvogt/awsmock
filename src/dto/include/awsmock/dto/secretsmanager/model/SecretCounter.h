@@ -73,34 +73,39 @@ namespace AwsMock::Dto::SecretsManager {
         std::string secretId;
 
         /**
+         * Secret string
+         */
+        std::string secretString;
+
+        /**
          * Creation date
          */
-        long createdDate = 0;
+        system_clock::time_point createdDate;
 
         /**
          * Deleted date
          */
-        long deletedDate = 0;
+        system_clock::time_point deletedDate;
 
         /**
          * Last access date
          */
-        long lastAccessedDate = 0;
+        system_clock::time_point lastAccessedDate;
 
         /**
          * Last changed date
          */
-        long lastChangedDate = 0;
+        system_clock::time_point lastChangedDate;
 
         /**
          * Last rotation date
          */
-        long lastRotatedDate = 0;
+        system_clock::time_point lastRotatedDate;
 
         /**
          * Next rotation date
          */
-        long nextRotatedDate = 0;
+        system_clock::time_point nextRotatedDate;
 
         /**
          * Next rotation date
@@ -134,17 +139,18 @@ namespace AwsMock::Dto::SecretsManager {
             r.secretName = Core::Json::GetStringValue(v, "secretName");
             r.secretArn = Core::Json::GetStringValue(v, "secretArn");
             r.secretId = Core::Json::GetStringValue(v, "secretId");
-            r.createdDate = Core::Json::GetLongValue(v, "createdDate");
-            r.deletedDate = Core::Json::GetLongValue(v, "deletedDate");
-            r.lastAccessedDate = Core::Json::GetLongValue(v, "lastAccessedDate");
-            r.lastChangedDate = Core::Json::GetLongValue(v, "lastChangedDate");
-            r.lastRotatedDate = Core::Json::GetLongValue(v, "lastRotatedDate");
-            r.nextRotatedDate = Core::Json::GetLongValue(v, "nextRotatedDate");
-            r.rotationEnabled = Core::Json::GetLongValue(v, "rotationEnabled");
+            r.secretString = Core::Json::GetStringValue(v, "secretString");
+            r.createdDate = Core::Json::GetDatetimeValue(v, "createdDate");
+            r.deletedDate = Core::Json::GetDatetimeValue(v, "deletedDate");
+            r.lastAccessedDate = Core::Json::GetDatetimeValue(v, "lastAccessedDate");
+            r.lastChangedDate = Core::Json::GetDatetimeValue(v, "lastChangedDate");
+            r.lastRotatedDate = Core::Json::GetDatetimeValue(v, "lastRotatedDate");
+            r.nextRotatedDate = Core::Json::GetDatetimeValue(v, "nextRotatedDate");
+            r.rotationEnabled = Core::Json::GetBoolValue(v, "rotationEnabled");
             r.rotationLambdaARN = Core::Json::GetStringValue(v, "rotationLambdaARN");
-            r.rotationRules = boost::json::value_to<RotationRules>(v.at("nextRotatedDate"));
-            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
-            r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            r.rotationRules = boost::json::value_to<RotationRules>(v.at("rotationRules"));
+            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.modified = Core::Json::GetDatetimeValue(v, "modified");
             return r;
         }
 
@@ -156,12 +162,13 @@ namespace AwsMock::Dto::SecretsManager {
                     {"secretName", obj.secretName},
                     {"secretArn", obj.secretArn},
                     {"secretId", obj.secretId},
-                    {"createdDate", obj.createdDate},
-                    {"deletedDate", obj.deletedDate},
-                    {"lastAccessedDate", obj.lastAccessedDate},
-                    {"lastChangedDate", obj.lastChangedDate},
-                    {"lastRotatedDate", obj.lastRotatedDate},
-                    {"nextRotatedDate", obj.nextRotatedDate},
+                    {"secretString", obj.secretString},
+                    {"createdDate", Core::DateTimeUtils::ToISO8601(obj.createdDate)},
+                    {"deletedDate", Core::DateTimeUtils::ToISO8601(obj.deletedDate)},
+                    {"lastAccessedDate", Core::DateTimeUtils::ToISO8601(obj.lastAccessedDate)},
+                    {"lastChangedDate", Core::DateTimeUtils::ToISO8601(obj.lastChangedDate)},
+                    {"lastRotatedDate", Core::DateTimeUtils::ToISO8601(obj.lastRotatedDate)},
+                    {"nextRotatedDate", Core::DateTimeUtils::ToISO8601(obj.nextRotatedDate)},
                     {"rotationEnabled", obj.rotationEnabled},
                     {"rotationLambdaARN", obj.rotationLambdaARN},
                     {"rotationRules", boost::json::value_from(obj.rotationRules)},
