@@ -16,6 +16,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
         document secretVersionDoc;
         secretVersionDoc.append(kvp("secretString", secretString));
         secretVersionDoc.append(kvp("secretBinary", secretBinary));
+        secretVersionDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+        secretVersionDoc.append(kvp("lastAccessed", bsoncxx::types::b_date(lastAccessed)));
         secretVersionDoc.append(kvp("stages", stagesArray.extract()));
 
         return secretVersionDoc.extract();
@@ -26,6 +28,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
         try {
             secretString = Core::Bson::BsonUtils::GetStringValue(mResult, "secretString");
             secretBinary = Core::Bson::BsonUtils::GetStringValue(mResult, "secretBinary");
+            created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            lastAccessed = Core::Bson::BsonUtils::GetDateValue(mResult, "lastAccessed");
 
             // Get stages
             if (mResult.value().find("stages") != mResult.value().end()) {
