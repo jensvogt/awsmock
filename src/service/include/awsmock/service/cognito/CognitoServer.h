@@ -33,11 +33,6 @@ namespace AwsMock::Service {
          */
         explicit CognitoServer(Core::PeriodicScheduler &scheduler);
 
-        /**
-         * Shutdown server
-         */
-        void Shutdown() override;
-
       private:
 
         /**

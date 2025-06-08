@@ -2,6 +2,10 @@
 // Created by vogje01 on 20/12/2023.
 //
 
+#include "awsmock/dto/module/ExportInfrastructureRequest.h"
+#include "awsmock/service/module/ModuleService.h"
+
+
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 
 namespace AwsMock::Service {
@@ -9,6 +13,8 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
+        _backup = configuration.GetValue<bool>("awsmock.modules.dynamodb.backup");
+        _backupDir = configuration.GetValue<std::string>("awsmock.backup-dir");
         _workerPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.worker.period");
         _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.monitoring.period");
         _containerName = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.name");
@@ -17,6 +23,7 @@ namespace AwsMock::Service {
         _imageName = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.image-name");
         _imageTag = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.image-tag");
         _region = configuration.GetValue<std::string>("awsmock.region");
+        _dataDir = configuration.GetValue<std::string>("awsmock.modules.dynamodb.data-dir");
         log_debug << "DynamoDB docker endpoint: " << _containerHost << ":" << _containerPort;
 
         // Check module active
@@ -36,8 +43,8 @@ namespace AwsMock::Service {
         scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing
-        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod);
-        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod);
+        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 10);
+        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, 10);
 
         // Set running
         SetRunning();
@@ -63,7 +70,8 @@ namespace AwsMock::Service {
 
         // Check docker image
         if (!_containerService.ImageExists(_imageName, _imageTag)) {
-            const std::string output = _containerService.BuildImage(_imageName, _imageTag, DYNAMODB_DOCKER_FILE);
+            const std::string dockerString = WriteDockerFile();
+            const std::string output = _containerService.BuildImage(_imageName, _imageTag, dockerString);
             log_trace << "Image " << _imageName << " output: " << output;
         }
 
@@ -167,10 +175,8 @@ namespace AwsMock::Service {
                     Dto::DynamoDb::ScanRequest scanRequest;
                     scanRequest.region = _region;
                     scanRequest.tableName = tableName;
-                    //scanRequest.PrepareRequest();
                     Dto::DynamoDb::ScanResponse scanResponse = _dynamoDbService.Scan(scanRequest);
                     scanResponse.region = _region;
-                    //scanResponse.PrepareResponse(table);
 
                     if (!scanResponse.items.empty()) {
                         for (auto &item: scanResponse.items) {
@@ -201,6 +207,16 @@ namespace AwsMock::Service {
         }
     }
 
+    std::string DynamoDbServer::WriteDockerFile() {
+        std::stringstream ss;
+        ss << "FROM amazon/dynamodb-local:latest" << std::endl;
+        ss << "VOLUME /usr/local/awsmock/data/dynamodb /home/dynamodblocal/data" << std::endl;
+        ss << "WORKDIR /home/dynamodblocal" << std::endl;
+        ss << "EXPOSE 8000 8000" << std::endl;
+        ss << R"(ENTRYPOINT ["java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar", "-sharedDb"])";
+        return ss.str();
+    }
+
     void DynamoDbServer::UpdateCounter() const {
         log_trace << "Dynamodb monitoring starting";
 
@@ -211,4 +227,35 @@ namespace AwsMock::Service {
 
         log_trace << "DynamoDb monitoring finished";
     }
+
+    void DynamoDbServer::Shutdown() {
+        log_debug << "DynamoDb server shutdown, region: " << _region;
+
+        if (_backup) {
+            log_info << "Creating backup of DynamoDb Tables";
+
+            // Create export request
+            Dto::Module::ExportInfrastructureRequest request;
+            request.includeObjects = true;
+            request.prettyPrint = true;
+            request.modules.emplace_back("dynamodb");
+
+            // Do the actual export
+            Dto::Module::ExportInfrastructureResponse response = ModuleService::ExportInfrastructure(request);
+
+            // Write the backup file
+            std::ofstream backupFile(_backupDir + Core::FileUtils::separator() + "dynamodb.json");
+            backupFile << response.ToJson();
+            backupFile.close();
+        }
+
+        // Stop detached instances
+        for (const auto &instance: ContainerService::instance().ListContainerByImageName(_imageName, _imageTag)) {
+            ContainerService::instance().StopContainer(instance.id);
+            ContainerService::instance().DeleteContainer(instance.id);
+            log_debug << "Detached dynamodb instances cleaned up, id: " << instance.id;
+        }
+        log_info << "All dynamodb instances stopped";
+    }
+
 }// namespace AwsMock::Service

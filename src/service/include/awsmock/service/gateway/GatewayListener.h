@@ -39,7 +39,7 @@ namespace AwsMock::Service {
         GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint);
 
         /**
-         * @brief Start accepting incoming connections
+         * @brief Start accepting incoming connections,
          *
          * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
          * for single-threaded contexts, this example code is written to be thread-safe by default.

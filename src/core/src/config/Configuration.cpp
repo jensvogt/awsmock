@@ -27,9 +27,11 @@ namespace AwsMock::Core {
 #ifdef _WIN32
         DefineProperty<std::string>("awsmock.data-dir", "AWSMOCK_DATA_DIR", "C:/Program Files (x86)/awsmock/data/");
         DefineProperty<std::string>("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "C:/Program Files (x86)/awsmock/tmp/");
+        DefineProperty<std::string>("awsmock.backup-dir", "AWSMOCK_BACKUP_DIR", "C:/Program Files (x86)/awsmock/data/backup");
 #else
         DefineProperty<std::string>("awsmock.data-dir", "AWSMOCK_DATA_DIR", "/usr/local/awsmock/data");
         DefineProperty<std::string>("awsmock.temp-dir", "AWSMOCK_TEMP_DIR", "/usr/local/awsmock/tmp");
+        DefineProperty<std::string>("awsmock.backup-dir", "AWSMOCK_BACKUP_DIR", "/usr/local/awsmock/data/backup");
 #endif
         DefineProperty<bool>("awsmock.json.pretty", "AWSMOCK_PRETTY", false);
         DefineProperty<bool>("awsmock.aws.signature.verify", "AWSMOCK_VERIFY_SIGNATURE", false);
@@ -134,6 +136,7 @@ namespace AwsMock::Core {
 
         // DynamoDB
         DefineProperty<bool>("awsmock.modules.dynamodb.active", "AWSMOCK_MODULES_DYNAMODB_ACTIVE", true);
+        DefineProperty<bool>("awsmock.modules.dynamodb.backup", "AWSMOCK_MODULES_DYNAMODB_BACKUP", true);
         DefineProperty<int>("awsmock.modules.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.dynamodb.worker.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineProperty<std::string>("awsmock.modules.dynamodb.container.host", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_HOST", "localhost");
@@ -141,6 +144,7 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.dynamodb.container.name", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_NAME", "dynamodb-local");
         DefineProperty<std::string>("awsmock.modules.dynamodb.container.image-name", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_IMAGE_NAME", "docker.io/library/dynamodb-local");
         DefineProperty<std::string>("awsmock.modules.dynamodb.container.image-tag", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_IMAGE_TAG", "latest");
+        DefineProperty<std::string>("awsmock.modules.dynamodb.container.data-dir", "AWSMOCK_MODULES_DYNAMODB_DATA_DIR", "/usr/local/awsmock/data/dynamodb");
 
         // SecretsManager
         DefineProperty<bool>("awsmock.modules.secretsmanager.active", "AWSMOCK_MODULES_SECRETSMANAGER_ACTIVE", true);
