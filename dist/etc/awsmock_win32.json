@@ -10,6 +10,7 @@
     },
     "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\",
     "temp-dir": "C:\\Program Files (x86)\\awsmock\\tmp\\",
+    "backup-dir": "C:\\Program Files (x86)\\awsmock\\data\\backup",
     "shm-size": 65536,
     "json": {
       "pretty": false
@@ -133,6 +134,8 @@
       },
       "dynamodb": {
         "active": true,
+        "backup": true,
+        "data-dir": "/usr/local/awsmock/data/dynamodb",
         "monitoring": {
           "period": 300
         },

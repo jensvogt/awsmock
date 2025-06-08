@@ -67,6 +67,14 @@ namespace AwsMock::Service {
                 ContainerService::instance().DeleteContainer(instance.containerId);
                 log_debug << "Lambda instances cleaned up, id: " << instance.containerId;
             }
+
+            // Stop detached instances
+            for (const auto &instance: ContainerService::instance().ListContainerByImageName(lambda.function, lambda.dockerTag)) {
+                ContainerService::instance().StopContainer(instance.id);
+                ContainerService::instance().DeleteContainer(instance.id);
+                log_debug << "Detached lambda instances cleaned up, id: " << instance.id;
+            }
+
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_debug << "Lambda cleaned up, name: " << lambda.function;

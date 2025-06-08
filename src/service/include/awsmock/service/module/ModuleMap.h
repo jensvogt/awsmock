@@ -9,9 +9,6 @@
 #include <map>
 #include <string>
 
-// Boost includes
-#include <boost/asio/thread_pool.hpp>
-
 // AwsMock includes
 #include <awsmock/service/common/AbstractServer.h>
 
@@ -24,7 +21,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        ModuleMap();
+        ModuleMap() = default;
 
         /**
          * @brief Singleton instance
@@ -59,18 +56,25 @@ namespace AwsMock::Service {
         bool HasModule(const std::string &name) const;
 
         /**
-         * @brief Returns the module mpa
+         * @brief Returns the module map
          *
          * @return full module map
          */
         std::map<std::string, std::shared_ptr<AbstractServer>> GetModuleMap();
+
+        /**
+         * @brief Returns the module map size
+         *
+         * @return module map size
+         */
+        int GetSize() const;
 
       private:
 
         /**
          * Map
          */
-        std::map<std::string, std::shared_ptr<AbstractServer>> moduleMap;
+        std::map<std::string, std::shared_ptr<AbstractServer>> _moduleMap;
     };
 }// namespace AwsMock::Service
 #endif//AWSMOCK_SERVICE_MODULE_MAP_H
