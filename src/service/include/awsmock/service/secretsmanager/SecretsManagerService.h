@@ -29,6 +29,8 @@
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
+#include <awsmock/dto/secretsmanager/PutSecretValueRequest.h>
+#include <awsmock/dto/secretsmanager/PutSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/RotateSecretRequest.h>
 #include <awsmock/dto/secretsmanager/RotateSecretResponse.h>
 #include <awsmock/dto/secretsmanager/UpdateSecretRequest.h>
@@ -88,6 +90,14 @@ namespace AwsMock::Service {
          * @return GetSecretValueResponse
          */
         [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;
+
+        /**
+         * @brief Puts a secret value
+         *
+         * @param request put secret value request
+         * @return PutSecretValueResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::PutSecretValueResponse PutSecretValue(const Dto::SecretsManager::PutSecretValueRequest &request) const;
 
         /**
          * @brief List existing secrets

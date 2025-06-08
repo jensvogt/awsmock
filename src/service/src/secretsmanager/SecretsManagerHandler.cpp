@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::DeleteSecretRequest secretsManagerRequest = Dto::SecretsManager::DeleteSecretRequest::FromJson(clientCommand);
                     Dto::SecretsManager::DeleteSecretResponse secretsManagerResponse = _secretsManagerService.DeleteSecret(secretsManagerRequest);
-                    log_info << "Secret deleted, secretId: " << secretsManagerResponse.name;
+                    log_info << "Secret deleted, name: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::DescribeSecretRequest secretsManagerRequest = Dto::SecretsManager::DescribeSecretRequest::FromJson(clientCommand);
                     Dto::SecretsManager::DescribeSecretResponse secretsManagerResponse = _secretsManagerService.DescribeSecret(secretsManagerRequest);
-                    log_info << "Secret described, response: " << secretsManagerResponse;
+                    log_info << "Secret described, name: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
@@ -41,7 +41,15 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::GetSecretValueRequest secretsManagerRequest = Dto::SecretsManager::GetSecretValueRequest::FromJson(clientCommand);
                     Dto::SecretsManager::GetSecretValueResponse secretsManagerResponse = _secretsManagerService.GetSecretValue(secretsManagerRequest);
-                    log_info << "Secret get value, secretId: " << secretsManagerResponse.name;
+                    log_info << "Secret get value, name: " << secretsManagerResponse.name;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
+                case Dto::Common::SecretsManagerCommandType::PUT_SECRET_VALUE: {
+
+                    Dto::SecretsManager::PutSecretValueRequest secretsManagerRequest = Dto::SecretsManager::PutSecretValueRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::PutSecretValueResponse secretsManagerResponse = _secretsManagerService.PutSecretValue(secretsManagerRequest);
+                    log_info << "Secret put value, name: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
@@ -49,7 +57,7 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::UpdateSecretRequest secretsManagerRequest = Dto::SecretsManager::UpdateSecretRequest::FromJson(clientCommand);
                     Dto::SecretsManager::UpdateSecretResponse secretsManagerResponse = _secretsManagerService.UpdateSecret(secretsManagerRequest);
-                    log_info << "Secret updated, secretId: " << secretsManagerResponse.name;
+                    log_info << "Secret updated, name: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
@@ -65,7 +73,7 @@ namespace AwsMock::Service {
 
                     Dto::SecretsManager::RotateSecretRequest secretsManagerRequest = Dto::SecretsManager::RotateSecretRequest::FromJson(clientCommand);
                     Dto::SecretsManager::RotateSecretResponse secretsManagerResponse = _secretsManagerService.RotateSecret(secretsManagerRequest);
-                    log_info << "Secret rotated, secretId: " << secretsManagerResponse.arn;
+                    log_info << "Secret rotated, name: " << secretsManagerResponse.name;
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 

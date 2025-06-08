@@ -147,7 +147,15 @@ namespace AwsMock::Service {
                 log_warning << "Secret version does not exist, versionId: " << request.versionId;
                 throw Core::ServiceException("Secret version does not exist, versionId: " + request.versionId);
             }
-            std::string versionId = request.versionId.empty() ? secret.GetCurrentVersionId() : request.versionId;
+
+            std::string versionId;
+            if (!request.versionId.empty()) {
+                versionId = request.versionId;
+            } else if (!request.versionStage.empty()) {
+                versionId = secret.GetVersionIdByStage(request.versionStage);
+            } else {
+                versionId = secret.GetVersionIdByStage(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
+            }
             Database::Entity::SecretsManager::SecretVersion version = secret.versions[versionId];
 
             // Convert to DTO
@@ -155,7 +163,7 @@ namespace AwsMock::Service {
             response.arn = secret.arn;
             response.versionId = versionId;
             response.createdDate = Core::DateTimeUtils::UnixTimestamp(secret.createdDate);
-            response.versionStages = secret.versionIdsToStages.versions[request.versionId];
+            response.versionStages = secret.versions[request.versionId].stages;
 
             if (!secret.kmsKeyId.empty()) {
                 Dto::KMS::DecryptRequest decryptRequest;
@@ -163,6 +171,7 @@ namespace AwsMock::Service {
                 decryptRequest.ciphertext = version.secretString;
                 Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
                 response.secretString = Core::Crypto::Base64Decode(kmsResponse.plaintext);
+                log_warning << "Secret string, stage: " << request.versionStage << ": " << response.secretString;
             } /*else if (!secret.secretString.empty()) {
                 std::string base64Decoded = Core::Crypto::Base64Decode(secret.secretString);
                 int len = (int) base64Decoded.length();
@@ -172,6 +181,71 @@ namespace AwsMock::Service {
                 log_warning << "Neither string nor binary, secretId: " << request.secretId;
             }
             log_debug << "Get secret value, secretId: " << request.secretId;
+
+            // Update database
+            secret.lastAccessedDate = system_clock::now();
+            secret = _secretsManagerDatabase.UpdateSecret(secret);
+            log_trace << "Secret updated, secretId: " << secret.secretId;
+
+            return response;
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "Secret describe secret failed, message: " + exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
+    Dto::SecretsManager::PutSecretValueResponse SecretsManagerService::PutSecretValue(const Dto::SecretsManager::PutSecretValueRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
+        Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
+        log_trace << "Put secret value request: " << request.ToString();
+
+        // Check whether we have a name of ARN
+        std::string arn = Core::StringUtils::Contains(request.secretId, ":") ? request.secretId : Core::AwsUtils::CreateSecretArn(request.region, _accountId, request.secretId);
+
+        // Check bucket existence
+        if (!_secretsManagerDatabase.SecretExistsByArn(arn)) {
+            log_warning << "Secret does not exist, arn: " << arn;
+            throw Core::ServiceException("Secret does not exist, arn: " + arn);
+        }
+
+        try {
+            Dto::SecretsManager::PutSecretValueResponse response;
+
+            // Get the object from the database
+            Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
+
+            std::string currentVersionId = secret.GetCurrentVersionId();
+            secret.versions[currentVersionId].stages.clear();
+            secret.versions[currentVersionId].stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSPREVIOUS));
+
+            Database::Entity::SecretsManager::SecretVersion newVersion;
+            newVersion.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
+
+            if (!secret.kmsKeyId.empty()) {
+                Dto::KMS::EncryptRequest encryptRequest;
+                encryptRequest.keyId = secret.kmsKeyId;
+                encryptRequest.plaintext = request.secretString;
+                Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
+                newVersion.secretString = Core::Crypto::Base64Decode(kmsResponse.ciphertext);
+            } else if (!request.secretBinary.empty()) {
+                Dto::KMS::EncryptRequest encryptRequest;
+                encryptRequest.keyId = secret.kmsKeyId;
+                encryptRequest.plaintext = newVersion.secretBinary;
+                Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
+                newVersion.secretBinary = kmsResponse.ciphertext;
+            } else {
+                log_warning << "Neither string nor binary, secretId: " << request.secretId;
+            }
+            secret.versions[request.clientRequestToken] = newVersion;
+
+            // Convert to DTO
+            response.arn = secret.arn;
+            response.name = secret.name;
+            response.versionId = request.clientRequestToken;
+            response.versionStages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
+
+            log_debug << "Put secret value, secretId: " << request.secretId;
 
             // Update database
             secret.lastAccessedDate = system_clock::now();
