@@ -261,7 +261,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaInstanceCountersRequest lambdaRequest = Dto::Lambda::ListLambdaInstanceCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaInstanceCountersResponse lambdaResponse = _lambdaService.ListLambdaInstanceCounters(lambdaRequest);
                 log_trace << "Lambda instance counters list";
-                log_info << lambdaResponse.ToJson();
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
 
