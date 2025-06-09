@@ -29,6 +29,7 @@ namespace AwsMock::Service {
             {createSecret, "createSecret"},
             {setSecret, "setSecret"},
             {testSecret, "testSecret"},
+            {finishSecret, "finishSecret"},
             {unknown, "unknown"},
     };
 

@@ -47,7 +47,7 @@ namespace AwsMock::Service {
         invocationRequest.region = secret.region;
         invocationRequest.clientRequestToken = clientRequestToken;
         invocationRequest.requestId = clientRequestToken;
-        invocationRequest.step = TaskTypeToString(createSecret);
+        invocationRequest.step = TaskTypeToString(setSecret);
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         invocationRequest.region = secret.region;
         invocationRequest.clientRequestToken = clientRequestToken;
         invocationRequest.requestId = clientRequestToken;
-        invocationRequest.step = TaskTypeToString(testSecret);
+        invocationRequest.step = TaskTypeToString(finishSecret);
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 

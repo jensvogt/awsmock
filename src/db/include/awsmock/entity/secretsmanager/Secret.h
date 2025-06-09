@@ -119,11 +119,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         std::string rotationLambdaARN;
 
         /**
-         * Version ID stages
-         */
-        VersionIdsToStages versionIdsToStages;
-
-        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -183,7 +178,42 @@ namespace AwsMock::Database::Entity::SecretsManager {
         }
 
         /**
-         * @brief Resets all verions to AWSPREVIOUS, except the one with the given versionID.
+         * @brief Returns the previous version.
+         *
+         * @return previous version, or empty object
+         */
+        [[nodiscard]] std::string GetPreviousVersionId() const {
+
+            const auto it =
+                    std::ranges::find_if(versions, [](const std::pair<std::string, SecretVersion> &version) {
+                        return std::ranges::find(version.second.stages, "AWSPREVIOUS") != version.second.stages.end();
+                    });
+            if (it != versions.end()) {
+                return it->first;
+            }
+            return {};
+        }
+
+
+        /**
+         * @brief Returns the previous version.
+         *
+         * @return previous version, or empty object
+         */
+        [[nodiscard]] std::string GetVersionIdByStage(const std::string &stage) const {
+
+            const auto it =
+                    std::ranges::find_if(versions, [stage](const std::pair<std::string, SecretVersion> &version) {
+                        return std::ranges::find(version.second.stages, stage) != version.second.stages.end();
+                    });
+            if (it != versions.end()) {
+                return it->first;
+            }
+            return {};
+        }
+
+        /**
+         * @brief Resets all versions to AWSPREVIOUS, except the one with the given versionID.
          *
          * @param versionId current version ID
          */

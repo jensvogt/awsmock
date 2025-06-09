@@ -36,13 +36,15 @@ namespace AwsMock::Dto::Common {
         DELETE_SECRET,
         DESCRIBE_SECRET,
         GET_SECRET_VALUE,
+        PUT_SECRET_VALUE,
         UPDATE_SECRET,
         ROTATE_SECRET,
         LIST_SECRETS,
+        LIST_SECRET_VERSION_IDS,
         LIST_SECRET_COUNTERS,
+        LIST_SECRET_VERSIONS,
         GET_SECRET_DETAILS,
         UPDATE_SECRET_DETAILS,
-        LIST_SECRET_VERSIONS,
         UNKNOWN
     };
 
@@ -51,13 +53,15 @@ namespace AwsMock::Dto::Common {
             {SecretsManagerCommandType::DELETE_SECRET, "DeleteSecret"},
             {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
             {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
+            {SecretsManagerCommandType::PUT_SECRET_VALUE, "PutSecretValue"},
             {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
             {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
             {SecretsManagerCommandType::LIST_SECRETS, "ListSecrets"},
+            {SecretsManagerCommandType::LIST_SECRET_VERSION_IDS, "ListSecretVersionIds"},
             {SecretsManagerCommandType::LIST_SECRET_COUNTERS, "ListSecretCounters"},
+            {SecretsManagerCommandType::LIST_SECRET_VERSIONS, "ListSecretVersions"},
             {SecretsManagerCommandType::GET_SECRET_DETAILS, "GetSecretDetails"},
             {SecretsManagerCommandType::UPDATE_SECRET_DETAILS, "UpdateDetailsSecret"},
-            {SecretsManagerCommandType::LIST_SECRET_VERSIONS, "ListSecretVersions"},
             {SecretsManagerCommandType::UNKNOWN, "Unknown"},
     };
 

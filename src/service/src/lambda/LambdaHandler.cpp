@@ -256,6 +256,14 @@ namespace AwsMock::Service {
                 return SendOkResponse(request);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_INSTANCE_COUNTERS) {
+
+                Dto::Lambda::ListLambdaInstanceCountersRequest lambdaRequest = Dto::Lambda::ListLambdaInstanceCountersRequest::FromJson(clientCommand);
+                Dto::Lambda::ListLambdaInstanceCountersResponse lambdaResponse = _lambdaService.ListLambdaInstanceCounters(lambdaRequest);
+                log_trace << "Lambda instance counters list";
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::ResetFunctionCountersRequest lambdaRequest = Dto::Lambda::ResetFunctionCountersRequest::FromJson(clientCommand);
@@ -319,9 +327,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
 
-                Dto::Lambda::StartFunctionRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::StartFunctionRequest lambdaRequest = Dto::Lambda::StartFunctionRequest::FromJson(clientCommand);
                 _lambdaService.StartFunction(lambdaRequest);
                 log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
 
@@ -330,20 +336,25 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_FUNCTION) {
 
-                Dto::Lambda::StopFunctionRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::StopFunctionRequest lambdaRequest = Dto::Lambda::StopFunctionRequest::FromJson(clientCommand);
                 _lambdaService.StopFunction(lambdaRequest);
                 log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
 
                 return SendOkResponse(request);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA_INSTANCE) {
+
+                Dto::Lambda::StopLambdaInstanceRequest lambdaRequest = Dto::Lambda::StopLambdaInstanceRequest::FromJson(clientCommand);
+                _lambdaService.StopLambdaInstance(lambdaRequest);
+                log_trace << "Stop lambda instance, functionArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
+
+                return SendOkResponse(request);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_IMAGE) {
 
-                Dto::Lambda::DeleteImageRequest lambdaRequest;
-                lambdaRequest.FromJson(clientCommand.payload);
-
+                Dto::Lambda::DeleteImageRequest lambdaRequest = Dto::Lambda::DeleteImageRequest::FromJson(clientCommand);
                 _lambdaService.DeleteImage(lambdaRequest);
                 log_trace << "Delete image, functionArn: " << lambdaRequest.functionArn;
 

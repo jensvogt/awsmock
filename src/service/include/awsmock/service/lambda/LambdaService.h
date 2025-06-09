@@ -51,6 +51,8 @@
 #include <awsmock/dto/lambda/internal/ListLambdaArnsResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaTagCountersRequest.h>
@@ -58,6 +60,7 @@
 #include <awsmock/dto/lambda/internal/ResetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/StartFunctionRequest.h>
 #include <awsmock/dto/lambda/internal/StopFunctionRequest.h>
+#include <awsmock/dto/lambda/internal/StopLambdaInstanceRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
@@ -148,6 +151,16 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::ListFunctionCountersResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaTagCountersResponse ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const;
+
+        /**
+         * @brief List lambda instances counters
+         *
+         * @param request list lambda instances counters request
+         * @return ListFunctionCountersResponse
+         * @see Dto::Lambda::ListLambdaInstanceCountersRequest
+         * @see Dto::Lambda::ListFunctionCountersResponse
+         */
+        [[nodiscard]] Dto::Lambda::ListLambdaInstanceCountersResponse ListLambdaInstanceCounters(const Dto::Lambda::ListLambdaInstanceCountersRequest &request) const;
 
         /**
          * @brief List lambda environment counters
@@ -377,6 +390,15 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::StopFunctionRequest
          */
         void StopFunction(const Dto::Lambda::StopFunctionRequest &request) const;
+
+        /**
+         * @brief Stops the lambda instance
+         *
+         * @param request stop lambda instance request
+         * @throws Core::ServiceException
+         * @see Dto::Lambda::StopFunctionInstanceRequest
+         */
+        void StopLambdaInstance(const Dto::Lambda::StopLambdaInstanceRequest &request) const;
 
         /**
          * @brief Delete lambda function
