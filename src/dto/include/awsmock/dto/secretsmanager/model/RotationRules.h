@@ -33,7 +33,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Automatic rotation period
          */
-        long automaticallyAfterDays{};
+        long automaticallyAfterDays = 0;
 
         /**
          * Duration
@@ -75,9 +75,9 @@ namespace AwsMock::Dto::SecretsManager {
 
             try {
 
-                automaticallyAfterDays = Core::Bson::BsonUtils::GetIntValue(document, "Duration");
+                automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(document, "AutomaticallyAfterDays");
                 duration = Core::Bson::BsonUtils::GetStringValue(document, "Duration");
-                scheduleExpression = Core::Bson::BsonUtils::GetStringValue(document, "scheduleExpression");
+                scheduleExpression = Core::Bson::BsonUtils::GetStringValue(document, "ScheduleExpression");
 
             } catch (bsoncxx::exception &exc) {
                 log_error << exc.what();

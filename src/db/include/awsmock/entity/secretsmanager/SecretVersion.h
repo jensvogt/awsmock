@@ -10,9 +10,6 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/entity/s3/BucketNotification.h"
-
-
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/entity/common/BaseEntity.h>

@@ -85,6 +85,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, secretsManagerResponse.ToJson());
                 }
 
+                case Dto::Common::SecretsManagerCommandType::LIST_SECRET_VERSION_IDS: {
+
+                    Dto::SecretsManager::ListSecretVersionIdsRequest secretsManagerRequest = Dto::SecretsManager::ListSecretVersionIdsRequest::FromJson(clientCommand);
+                    Dto::SecretsManager::ListSecretVersionIdsResponse secretsManagerResponse = _secretsManagerService.ListSecretVersionIds(secretsManagerRequest);
+                    log_info << "Secrets version Ids listed, region: " << secretsManagerResponse.region;
+                    return SendOkResponse(request, secretsManagerResponse.ToJson());
+                }
+
                 case Dto::Common::SecretsManagerCommandType::LIST_SECRET_COUNTERS: {
 
                     Dto::SecretsManager::ListSecretCountersRequest secretsManagerRequest = Dto::SecretsManager::ListSecretCountersRequest::FromJson(clientCommand);

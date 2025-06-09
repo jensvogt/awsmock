@@ -30,7 +30,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Automatic rotation period
          */
-        long automaticallyAfterDays;
+        long automaticallyAfterDays{};
 
         /**
          * Duration

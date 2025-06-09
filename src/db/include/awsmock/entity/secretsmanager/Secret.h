@@ -119,11 +119,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         std::string rotationLambdaARN;
 
         /**
-         * Version ID stages
-         */
-        VersionIdsToStages versionIdsToStages;
-
-        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -218,7 +213,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         }
 
         /**
-         * @brief Resets all verions to AWSPREVIOUS, except the one with the given versionID.
+         * @brief Resets all versions to AWSPREVIOUS, except the one with the given versionID.
          *
          * @param versionId current version ID
          */

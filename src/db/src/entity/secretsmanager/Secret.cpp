@@ -13,15 +13,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         rotationRulesDoc.append(kvp("duration", rotationRules.duration));
         rotationRulesDoc.append(kvp("scheduleExpression", rotationRules.scheduleExpression));
 
-        document versionIdStageDoc;
-        for (const auto &key: versionIdsToStages.versions | std::views::keys) {
-            array versionStateArray;
-            for (const auto &stage: versionIdsToStages.versions.at(key)) {
-                versionStateArray.append(stage);
-            }
-            versionIdStageDoc.append(kvp(key, versionStateArray));
-        }
-
         document versionsDoc;
         for (const auto &[fst, snd]: versions) {
             versionsDoc.append(kvp(fst, snd.ToDocument()));
@@ -46,7 +37,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
         secretDoc.append(kvp("rotationEnabled", rotationEnabled));
         secretDoc.append(kvp("rotationLambdaARN", rotationLambdaARN));
         secretDoc.append(kvp("rotationRules", rotationRulesDoc.extract()));
-        secretDoc.append(kvp("versionIdsToStages", versionIdStageDoc.extract()));
         secretDoc.append(kvp("created", bsoncxx::types::b_date(created)));
         secretDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -92,18 +82,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 rotationRules.automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(rotationView, "automaticallyAfterDays");
                 rotationRules.duration = Core::Bson::BsonUtils::GetStringValue(rotationView, "duration");
                 rotationRules.scheduleExpression = Core::Bson::BsonUtils::GetStringValue(rotationView, "scheduleExpression");
-            }
-
-            // Get version stages
-            if (mResult.value().find("versionIdsToStages") != mResult.value().end()) {
-                for (const view versionStagesView = mResult.value()["versionIdsToStages"].get_document().value; const auto &element: versionStagesView) {
-                    std::string versionId = bsoncxx::string::to_string(element.key());
-                    std::vector<std::string> stages;
-                    for (const auto &stage: versionStagesView[versionId].get_array().value) {
-                        stages.push_back(bsoncxx::string::to_string(stage.get_string().value));
-                    }
-                    versionIdsToStages.versions.emplace(versionId, stages);
-                }
             }
 
         } catch (const bsoncxx::exception &exc) {

@@ -27,6 +27,8 @@
 #include <awsmock/dto/secretsmanager/GetSecretValueRequest.h>
 #include <awsmock/dto/secretsmanager/GetSecretValueResponse.h>
 #include <awsmock/dto/secretsmanager/LambdaInvocationRequest.h>
+#include <awsmock/dto/secretsmanager/ListSecretVersionIdsRequest.h>
+#include <awsmock/dto/secretsmanager/ListSecretVersionIdsResponse.h>
 #include <awsmock/dto/secretsmanager/ListSecretsRequest.h>
 #include <awsmock/dto/secretsmanager/ListSecretsResponse.h>
 #include <awsmock/dto/secretsmanager/PutSecretValueRequest.h>
@@ -106,6 +108,14 @@ namespace AwsMock::Service {
          * @return ListSecretsResponse
          */
         [[nodiscard]] Dto::SecretsManager::ListSecretsResponse ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const;
+
+        /**
+         * @brief List secret version IDs
+         *
+         * @param request list secret versions request
+         * @return ListSecretVersionIdsResponse
+         */
+        [[nodiscard]] Dto::SecretsManager::ListSecretVersionIdsResponse ListSecretVersionIds(const Dto::SecretsManager::ListSecretVersionIdsRequest &request) const;
 
         /**
          * @brief List secret counters
@@ -224,6 +234,15 @@ namespace AwsMock::Service {
          * @param secretString secret string
          */
         void EncryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const;
+
+        /**
+         * @brief Decrypt the secret string using the given KMS key.
+         *
+         * @param version secret version
+         * @param kmsKeyId KMS key ID
+         * @param secretString secret string
+         */
+        void DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const;
 
         /**
          * @brief Returns the decrypted raw secret string
