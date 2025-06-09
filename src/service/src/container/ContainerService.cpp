@@ -14,7 +14,9 @@ namespace AwsMock::Service {
             {"python3.10", "public.ecr.aws/lambda/python:3.10"},
             {"python3.11", "public.ecr.aws/lambda/python:3.11"},
             {"python3.12", "public.ecr.aws/lambda/python:3.12"},
+            {"nodejs18.x", "public.ecr.aws/lambda/nodejs:18"},
             {"nodejs20.x", "public.ecr.aws/lambda/nodejs:20"},
+            {"nodejs22.x", "public.ecr.aws/lambda/nodejs:22"},
             {"provided.al2", "public.ecr.aws/lambda/provided:al2"},
             {"provided.al2023", "public.ecr.aws/lambda/provided:al2023"},
             {"provided.latest", "public.ecr.aws/lambda/provided:latest"},
@@ -680,6 +682,14 @@ namespace AwsMock::Service {
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
+            ofs << "CMD [\"" + handler + "\"]" << std::endl;
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
+            ofs << "FROM " << supportedRuntime << std::endl;
+            for (const auto &[fst, snd]: environment) {
+                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+            }
+            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
+            ofs << "COPY dist/app.mjs ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;
