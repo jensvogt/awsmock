@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/jensvogt/awsmock/compare/v1.4.0...v1.5.0) (2025-06-09)
+
+
+### Features
+
+* **1275-add-secretmanager-rotation:** add nodejs22 lambda support ([f2f1e5b](https://github.com/jensvogt/awsmock/commit/f2f1e5b107a8bea681db335c425ada89c4c21ba6))
+
 ## [1.4.0](https://github.com/jensvogt/awsmock/compare/v1.3.1...v1.4.0) (2025-06-04)
 
 
