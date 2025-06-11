@@ -17,8 +17,9 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
-#include <awsmock/service/secretsmanager/SecretsManagerMonitoring.h>
+#include <awsmock/service/monitoring/MetricService.h>
 
 #define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
 
@@ -29,7 +30,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SecretsManagerServer : public AbstractServer {
+    class SecretsManagerServer final : public AbstractServer {
 
       public:
 
@@ -41,9 +42,19 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Monitoring
+         * @brief Update counters
          */
-        SecretsManagerMonitoring _secretsManagerMonitoring;
+        void UpdateCounter() const;
+
+        /**
+         * @brief Database connection
+         */
+        Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+
+        /**
+         * @brief Metric service
+         */
+        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * Monitoring period

@@ -9,10 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserPool.h>
-#include <awsmock/dto/common/BaseDto.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -21,7 +18,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListUserPoolResponse : Common::BaseDto<ListUserPoolResponse> {
+    struct ListUserPoolResponse final : Common::BaseCounter<ListUserPoolResponse> {
 
         /**
          * User pool entities
@@ -31,14 +28,26 @@ namespace AwsMock::Dto::Cognito {
         /**
          * Total number of user pools
          */
-        long total;
+        long total{};
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return user pools json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend ListUserPoolResponse tag_invoke(boost::json::value_to_tag<ListUserPoolResponse>, boost::json::value const &v) {
+            ListUserPoolResponse r;
+            r.userPools = boost::json::value_to<std::vector<UserPool>>(v.at("UserPools"));
+            r.total = Core::Json::GetLongValue(v, "Total");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListUserPoolResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPools", boost::json::value_from(obj.userPools)},
+                    {"Total", obj.total},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

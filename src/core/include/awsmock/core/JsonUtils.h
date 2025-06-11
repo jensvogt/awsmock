@@ -80,6 +80,20 @@ namespace AwsMock::Core::Json {
         return {defaultValue};
     }
 
+    inline system_clock::time_point GetDatetimeValue(const boost::json::value &value, const std::string &name) {
+        if (AttributeExists(value, name)) {
+            return DateTimeUtils::FromISO8601(value.at(name).as_string().data());
+        }
+        return {};
+    }
+
+    inline system_clock::time_point GetUnixTimestampValue(const boost::json::value &value, const std::string &name, const system_clock::time_point &defaultValue = {}) {
+        if (AttributeExists(value, name)) {
+            return DateTimeUtils::FromUnixTimestamp(value.as_int64());
+        }
+        return {defaultValue};
+    }
+
     inline bool findObject(boost::json::value &value, const std::string &name) {
         return value.as_object().if_contains(name);
     }

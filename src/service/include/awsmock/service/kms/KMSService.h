@@ -32,7 +32,6 @@
 #include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
-#include <awsmock/dto/kms/model/ListKey.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>

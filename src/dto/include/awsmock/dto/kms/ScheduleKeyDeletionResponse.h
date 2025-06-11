@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -30,7 +28,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ScheduledKeyDeletionResponse : Common::BaseDto<ScheduledKeyDeletionResponse> {
+    struct ScheduledKeyDeletionResponse final : Common::BaseCounter<ScheduledKeyDeletionResponse> {
 
         /**
          * Deletion date as timestamp
@@ -50,14 +48,30 @@ namespace AwsMock::Dto::KMS {
         /**
          * Pending window in days
          */
-        int pendingWindowInDays;
+        long pendingWindowInDays;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend ScheduledKeyDeletionResponse tag_invoke(boost::json::value_to_tag<ScheduledKeyDeletionResponse>, boost::json::value const &v) {
+            ScheduledKeyDeletionResponse r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.keyState = Core::Json::GetStringValue(v, "KeyState");
+            r.deletionDate = Core::Json::GetLongValue(v, "DeletionDate");
+            r.pendingWindowInDays = Core::Json::GetLongValue(v, "PendingWindowInDays");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ScheduledKeyDeletionResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"KeyState", obj.keyState},
+                    {"DeletionDate", obj.deletionDate},
+                    {"PendingWindowInDays", obj.pendingWindowInDays},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

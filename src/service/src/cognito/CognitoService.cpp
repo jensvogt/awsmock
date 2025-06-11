@@ -37,9 +37,9 @@ namespace AwsMock::Service {
             userPool = _database.CreateUserPool(userPool);
             response.requestId = request.requestId;
             response.region = userPool.region;
-            response.name = userPool.name;
-            response.arn = userPool.arn;
-            response.userPoolId = userPool.userPoolId;
+            response.userPool.name = userPool.name;
+            response.userPool.arn = userPool.arn;
+            response.userPool.userPoolId = userPool.userPoolId;
             log_trace << "Create user pool outcome: " + response.ToJson();
             return response;
 
@@ -80,13 +80,12 @@ namespace AwsMock::Service {
     Dto::Cognito::ListUserPoolResponse CognitoService::ListUserPools(const Dto::Cognito::ListUserPoolRequest &request) const {
         Monitoring::MetricServiceTimer measure(COGNITO_SERVICE_TIMER, "action", "list_user_pool");
         Monitoring::MetricService::instance().IncrementCounter(COGNITO_SERVICE_COUNTER, "action", "list_user_pool");
-        log_debug << "List user pools request, pageSize: " << request.pageSize;
+        log_debug << "List user pools request, maxResults: " << request.maxResults;
 
         try {
-            const long total = _database.CountUserPools(request.region);
             const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
             log_trace << "Got user pool list count: " << userPools.size();
-            return Dto::Cognito::Mapper::map(request, userPools, total);
+            return Dto::Cognito::Mapper::map(request, userPools, request.maxResults);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -572,7 +571,7 @@ namespace AwsMock::Service {
         try {
             const long total = _database.CountUsers(request.region, request.userPoolId);
             const Database::Entity::Cognito::UserList users = _database.ListUsers(request.region, request.userPoolId);
-            response.users = users;
+            response.users = Dto::Cognito::Mapper::map(users);
             response.total = total;
 
             log_trace << "Users list outcome: " + response.ToJson();

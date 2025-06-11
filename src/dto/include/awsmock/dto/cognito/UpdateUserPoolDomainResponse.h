@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -29,26 +27,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UpdateUserPoolDomainResponse : Common::BaseDto<UpdateUserPoolDomainResponse> {
+    struct UpdateUserPoolDomainResponse final : Common::BaseCounter<UpdateUserPoolDomainResponse> {
 
         /**
          * User pool ID
          */
         std::string cloudFrontDomain;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend UpdateUserPoolDomainResponse tag_invoke(boost::json::value_to_tag<UpdateUserPoolDomainResponse>, boost::json::value const &v) {
+            UpdateUserPoolDomainResponse r;
+            r.cloudFrontDomain = Core::Json::GetStringValue(v, "CloudFrontDomain");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateUserPoolDomainResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"CloudFrontDomain", obj.cloudFrontDomain},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

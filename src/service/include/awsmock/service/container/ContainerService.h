@@ -326,28 +326,29 @@ namespace AwsMock::Service {
         /**
          * @brief Start the container
          *
-         * @param id container ID
+         * @param containerId container ID
+         * @param containerName name of the container
          */
-        void StartDockerContainer(const std::string &id) const;
+        void StartDockerContainer(const std::string &containerId, const std::string &containerName) const;
 
         /**
          * @brief Restart the container
          *
-         * @param id container ID
+         * @param containerId container ID
          */
-        void RestartDockerContainer(const std::string &id) const;
+        void RestartDockerContainer(const std::string &containerId) const;
 
         /**
          * @brief Restart the container
          *
-         * @param container container
+         * @param container container DTO
          */
         void RestartContainer(const Dto::Docker::Container &container) const;
 
         /**
          * @brief Stops the container
          *
-         * @param container container
+         * @param container container DTO
          */
         void StopContainer(const Dto::Docker::Container &container) const;
 

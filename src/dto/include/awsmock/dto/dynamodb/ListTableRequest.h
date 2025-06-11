@@ -6,12 +6,13 @@
 #define AWSMOCK_DTO_DYNAMODB_LIST_TABLE_REQUEST_H
 
 // C++ standard includes
-#include <map>
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
+
+#define DEFAULT_TABLE_LIMIT 100
 
 namespace AwsMock::Dto::DynamoDb {
 
@@ -31,14 +32,14 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Limit, default is 100
          */
-        long limit = 100;
+        long limit = DEFAULT_TABLE_LIMIT;
 
       private:
 
         friend ListTableRequest tag_invoke(boost::json::value_to_tag<ListTableRequest>, boost::json::value const &v) {
             ListTableRequest r;
             r.exclusiveStartTableName = Core::Json::GetStringValue(v, "ExclusiveStartTableName");
-            r.limit = Core::Json::GetBoolValue(v, "Limit");
+            r.limit = Core::Json::GetLongValue(v, "Limit", DEFAULT_TABLE_LIMIT);
             return r;
         }
 

@@ -45,8 +45,8 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTableResponse const &obj) {
             jv = {
-                    {"tableNames", boost::json::value_from(obj.tableNames)},
-                    {"lastEvaluatedTableName", obj.lastEvaluatedTableName},
+                    {"TableNames", boost::json::value_from(obj.tableNames)},
+                    {"LastEvaluatedTableName", obj.lastEvaluatedTableName},
             };
         }
     };

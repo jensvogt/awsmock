@@ -10,6 +10,7 @@
     },
     "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\",
     "temp-dir": "C:\\Program Files (x86)\\awsmock\\tmp\\",
+    "backup-dir": "C:\\Program Files (x86)\\awsmock\\data\\backup",
     "shm-size": 65536,
     "json": {
       "pretty": false
@@ -86,11 +87,14 @@
           "java11": "public.ecr.aws/lambda/java:11",
           "java17": "public.ecr.aws/lambda/java:17",
           "java21": "public.ecr.aws/lambda/java:21",
-          "python3-8": "public.ecr.aws/lambda/python:3.8",
           "python3-9": "public.ecr.aws/lambda/python:3.9",
           "python3-10": "public.ecr.aws/lambda/python:3.10",
           "python3-11": "public.ecr.aws/lambda/python:3.11",
+          "python3-12": "public.ecr.aws/lambda/python:3.12",
+          "python3-13": "public.ecr.aws/lambda/python:3.13",
+          "nodejs18-x": "public.ecr.aws/lambda/nodejs:18",
           "nodejs20-x": "public.ecr.aws/lambda/nodejs:20",
+          "nodejs22-x": "public.ecr.aws/lambda/nodejs:22",
           "provided-al2": "public.ecr.aws/lambda/provided:al2",
           "provided-al2023": "public.ecr.aws/lambda/provided:al2023",
           "provided-latest": "public.ecr.aws/lambda/provided:latest",
@@ -133,6 +137,8 @@
       },
       "dynamodb": {
         "active": true,
+        "backup": true,
+        "data-dir": "/usr/local/awsmock/data/dynamodb",
         "monitoring": {
           "period": 300
         },

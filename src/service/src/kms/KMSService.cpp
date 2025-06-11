@@ -27,7 +27,9 @@ namespace AwsMock::Service {
             const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
             Dto::KMS::ListKeysResponse listKeysResponse;
             for (const auto &k: keyList) {
-                Dto::KMS::ListKey key = {.keyId = k.keyId, .keyArn = k.arn};
+                Dto::KMS::Key key;
+                key.keyId = k.keyId;
+                key.arn = k.arn;
                 listKeysResponse.keys.emplace_back(key);
             }
             log_debug << "List all keys, size: " << keyList.size();
@@ -66,13 +68,13 @@ namespace AwsMock::Service {
             CallAsyncCreateKey<std::string &>(keyId);
             log_debug << "KMS keyEntity creation started, keyId: " << keyId;
 
-            Dto::KMS::Key key = {
-                    .keyId = keyEntity.keyId,
-                    .arn = keyEntity.arn,
-                    .keySpec = Dto::KMS::KeySpecFromString(keyEntity.keySpec),
-                    .keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage),
-                    .keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState),
-                    .description = keyEntity.description};
+            Dto::KMS::Key key;
+            key.keyId = keyEntity.keyId;
+            key.arn = keyEntity.arn;
+            key.keySpec = Dto::KMS::KeySpecFromString(keyEntity.keySpec);
+            key.keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage);
+            key.keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState);
+            key.description = keyEntity.description;
             Dto::KMS::CreateKeyResponse response;
             response.key = key;
             return response;
@@ -155,16 +157,16 @@ namespace AwsMock::Service {
             Database::Entity::KMS::Key keyEntity = _kmsDatabase.GetKeyByKeyId(request.keyId);
             log_trace << "KMS key entity received: " << keyEntity.ToString();
 
-            Dto::KMS::Key key = {
-                    .keyId = keyEntity.keyId,
-                    .arn = keyEntity.arn,
-                    .keySpec = Dto::KMS::KeySpecFromString(keyEntity.keySpec),
-                    .keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage),
-                    .keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState),
-                    .description = keyEntity.description,
-                    .creationDate = Core::DateTimeUtils::UnixTimestamp(keyEntity.created),
-                    .deletionDate = Core::DateTimeUtils::UnixTimestamp(keyEntity.scheduledDeletion),
-                    .enabled = Core::StringUtils::Equals(keyEntity.keyState, Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED))};
+            Dto::KMS::Key key;
+            key.keyId = keyEntity.keyId;
+            key.arn = keyEntity.arn;
+            key.keySpec = Dto::KMS::KeySpecFromString(keyEntity.keySpec);
+            key.keyUsage = Dto::KMS::KeyUsageFromString(keyEntity.keyUsage);
+            key.keyState = Dto::KMS::KeyStateFromString(keyEntity.keyState);
+            key.description = keyEntity.description;
+            key.creationDate = Core::DateTimeUtils::UnixTimestamp(keyEntity.created);
+            key.deletionDate = Core::DateTimeUtils::UnixTimestamp(keyEntity.scheduledDeletion);
+            key.enabled = Core::StringUtils::Equals(keyEntity.keyState, Dto::KMS::KeyStateToString(Dto::KMS::KeyState::ENABLED));
             Dto::KMS::DescribeKeyResponse response;
             response.requestId = request.requestId;
             response.region = request.region;

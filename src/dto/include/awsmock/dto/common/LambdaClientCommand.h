@@ -56,7 +56,9 @@ namespace AwsMock::Dto::Common {
         TAIL_FUNCTION,
         START_FUNCTION,
         STOP_FUNCTION,
+        STOP_LAMBDA_INSTANCE,
         DELETE_IMAGE,
+        LIST_INSTANCE_COUNTERS,
         UNKNOWN
     };
 
@@ -79,6 +81,7 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::UPDATE_TAG, "update-function-tag"},
             {LambdaCommandType::LIST_ARNS, "list-arns"},
             {LambdaCommandType::LIST_ENVIRONMENT_COUNTERS, "list-environment-counters"},
+            {LambdaCommandType::LIST_INSTANCE_COUNTERS, "list-instance-counters"},
             {LambdaCommandType::ADD_ENVIRONMENT, "add-function-environment"},
             {LambdaCommandType::DELETE_ENVIRONMENT, "delete-function-environment"},
             {LambdaCommandType::UPDATE_ENVIRONMENT, "update-function-environment"},
@@ -89,6 +92,7 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::START_FUNCTION, "start-function"},
             {LambdaCommandType::TAIL_FUNCTION, "tail-function"},
             {LambdaCommandType::STOP_FUNCTION, "stop-function"},
+            {LambdaCommandType::STOP_LAMBDA_INSTANCE, "stop-instance"},
             {LambdaCommandType::DELETE_IMAGE, "delete-image"},
     };
 

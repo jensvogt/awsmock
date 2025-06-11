@@ -43,7 +43,7 @@ namespace AwsMock::Dto::SecretsManager {
         /**
          * Secret deletion date
          */
-        double deletionDate = -1;
+        system_clock::time_point deletionDate;
 
       private:
 
@@ -51,7 +51,7 @@ namespace AwsMock::Dto::SecretsManager {
             DeleteSecretResponse r;
             r.name = Core::Json::GetStringValue(v, "Name");
             r.arn = Core::Json::GetStringValue(v, "ARN");
-            r.deletionDate = Core::Json::GetDoubleValue(v, "DeletionDate");
+            r.deletionDate = Core::Json::GetUnixTimestampValue(v, "DeletionDate");
             return r;
         }
 
@@ -62,7 +62,7 @@ namespace AwsMock::Dto::SecretsManager {
                     {"RequestId", obj.requestId},
                     {"Name", obj.name},
                     {"ARN", obj.arn},
-                    {"DeletionDate", obj.deletionDate},
+                    {"DeletionDate", Core::DateTimeUtils::UnixTimestamp(obj.deletionDate)},
             };
         }
     };

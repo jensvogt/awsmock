@@ -21,12 +21,6 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
-#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                                \
-                             "VOLUME /usr/local/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
-                             "WORKDIR /home/dynamodblocal\n"                                      \
-                             "EXPOSE 8000 8000\n"                                                 \
-                             "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]\n"
-
 namespace AwsMock::Service {
 
     /**
@@ -42,6 +36,11 @@ namespace AwsMock::Service {
          * @brief Constructor
          */
         explicit DynamoDbServer(Core::PeriodicScheduler &scheduler);
+
+        /**
+         * @brief Gracefully shutdown the server
+         */
+        void Shutdown() override;
 
       private:
 
@@ -92,6 +91,11 @@ namespace AwsMock::Service {
         void SynchronizeItems() const;
 
         /**
+         * @brief Writes the docker file
+         */
+        static std::string WriteDockerFile();
+
+        /**
          * Container module (either docker or podman)
          */
         ContainerService &_containerService;
@@ -110,6 +114,22 @@ namespace AwsMock::Service {
          * Metric service
          */
         Monitoring::MetricService &_metricService;
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup the tables during shutdown.
+         */
+        bool _backup;
+
+        /**
+         * @brief Backup directory.
+         *
+         * @par
+         * Backups will be written to the specified directory
+         */
+        std::string _backupDir;
 
         /**
          * Monitoring period
@@ -150,6 +170,11 @@ namespace AwsMock::Service {
          * AWS region
          */
         std::string _region;
+
+        /**
+         * Data directory
+         */
+        std::string _dataDir;
     };
 
 }// namespace AwsMock::Service

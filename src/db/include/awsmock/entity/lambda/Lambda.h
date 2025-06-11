@@ -326,11 +326,21 @@ namespace AwsMock::Database::Entity::Lambda {
          * @brief Remove an instance from the instance list.
          *
          * @par
-         * The instance is identified by the containerId.
+         * The instance is identified by the instanceId.
          *
-         * @param instance
+         * @param instance lambda instance
          */
         void RemoveInstance(const Instance &instance);
+
+        /**
+         * @brief Remove an instance from the instance list.
+         *
+         * @par
+         * The instance is identified by the instanceId.
+         *
+         * @param instanceId ID of the instance
+         */
+        void RemoveInstance(const std::string &instanceId);
 
         /**
          * @brief CHecks for any lambda instance with state 'inactive'.

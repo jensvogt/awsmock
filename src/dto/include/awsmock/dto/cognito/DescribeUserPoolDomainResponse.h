@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -38,7 +36,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeUserPoolDomainResponse : Common::BaseDto<DescribeUserPoolDomainResponse> {
+    struct DescribeUserPoolDomainResponse final : Common::BaseCounter<DescribeUserPoolDomainResponse> {
 
         /**
          * User pool ID
@@ -65,12 +63,30 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string version;
 
-        /**
-         * @brief Convert to a JSON string.
-         *
-         * @return json string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend DescribeUserPoolDomainResponse tag_invoke(boost::json::value_to_tag<DescribeUserPoolDomainResponse>, boost::json::value const &v) {
+            DescribeUserPoolDomainResponse r;
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.domain = Core::Json::GetStringValue(v, "Domain");
+            r.s3Bucket = Core::Json::GetStringValue(v, "S3Bucket");
+            r.status = Core::Json::GetStringValue(v, "Status");
+            r.version = Core::Json::GetStringValue(v, "Version");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeUserPoolDomainResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"Domain", obj.domain},
+                    {"S3Bucket", obj.s3Bucket},
+                    {"Status", obj.status},
+                    {"Version", obj.version},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

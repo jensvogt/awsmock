@@ -26,11 +26,6 @@ namespace AwsMock::Service {
         log_debug << "Cognito server started";
     }
 
-    void CognitoServer::Shutdown() {
-        _scheduler.Shutdown();
-        log_info << "Cognito scheduler shutdown";
-    }
-
     void CognitoServer::UpdateCounter() const {
         log_trace << "Cognito monitoring starting";
 

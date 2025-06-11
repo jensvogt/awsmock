@@ -14,7 +14,9 @@ namespace AwsMock::Service {
             {"python3.10", "public.ecr.aws/lambda/python:3.10"},
             {"python3.11", "public.ecr.aws/lambda/python:3.11"},
             {"python3.12", "public.ecr.aws/lambda/python:3.12"},
+            {"nodejs18.x", "public.ecr.aws/lambda/nodejs:18"},
             {"nodejs20.x", "public.ecr.aws/lambda/nodejs:20"},
+            {"nodejs22.x", "public.ecr.aws/lambda/nodejs:22"},
             {"provided.al2", "public.ecr.aws/lambda/provided:al2"},
             {"provided.al2023", "public.ecr.aws/lambda/provided:al2023"},
             {"provided.latest", "public.ecr.aws/lambda/provided:latest"},
@@ -504,14 +506,14 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void ContainerService::StartDockerContainer(const std::string &id) const {
+    void ContainerService::StartDockerContainer(const std::string &containerId, const std::string &containerName) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
+            log_warning << "Start container failed, id: " << containerName << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-        log_debug << "Docker container started, id: " << id;
+        log_debug << "Docker container started, name: " << containerName << ", id: " << containerId;
     }
 
     bool ContainerService::IsContainerRunning(const std::string &containerId) const {
@@ -540,12 +542,12 @@ namespace AwsMock::Service {
         RestartDockerContainer(container.id);
     }
 
-    void ContainerService::RestartDockerContainer(const std::string &id) const {
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/restart"); statusCode != http::status::no_content) {
+    void ContainerService::RestartDockerContainer(const std::string &containerId) const {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/restart"); statusCode != http::status::no_content) {
             log_warning << "Restart container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-        log_debug << "Docker container restarted, id: " << id;
+        log_debug << "Docker container restarted, id: " << containerId;
     }
 
     void ContainerService::StopContainer(const Dto::Docker::Container &container) const {
@@ -680,6 +682,14 @@ namespace AwsMock::Service {
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
+            ofs << "CMD [\"" + handler + "\"]" << std::endl;
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
+            ofs << "FROM " << supportedRuntime << std::endl;
+            for (const auto &[fst, snd]: environment) {
+                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+            }
+            ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
+            ofs << "COPY dist/app.mjs ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;

@@ -10,9 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/secretsmanager/model/RotationRules.h>
 
 namespace AwsMock::Dto::SecretsManager {
 
@@ -51,6 +50,31 @@ namespace AwsMock::Dto::SecretsManager {
         std::string secretString;
 
         /**
+         * Rotation rules
+         */
+        RotationRules rotationRules;
+
+        /**
+         * Rotation lambda ARN
+         */
+        std::string rotationLambdaARN;
+
+        /**
+         * Last rotation timestamp
+         */
+        system_clock::time_point lastRotatedDate;
+
+        /**
+         * Next rotation timestamp
+         */
+        system_clock::time_point nextRotatedDate;
+
+        /**
+         * Last access timestamp
+         */
+        system_clock::time_point lastAccessedDate;
+
+        /**
          * Created timestamp
          */
         system_clock::time_point created;
@@ -69,6 +93,11 @@ namespace AwsMock::Dto::SecretsManager {
             r.secretArn = Core::Json::GetStringValue(v, "secretArn");
             r.secretId = Core::Json::GetStringValue(v, "secretId");
             r.secretString = Core::Json::GetStringValue(v, "secretString");
+            r.rotationLambdaARN = Core::Json::GetStringValue(v, "rotationLambdaARN");
+            r.rotationRules = boost::json::value_to<RotationRules>(v.at("rotationRules"));
+            r.lastRotatedDate = Core::DateTimeUtils::FromISO8601(v.at("lastRotatedDate").as_string().data());
+            r.nextRotatedDate = Core::DateTimeUtils::FromISO8601(v.at("nextRotatedDate").as_string().data());
+            r.lastAccessedDate = Core::DateTimeUtils::FromISO8601(v.at("lastAccessedDate").as_string().data());
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
@@ -84,6 +113,11 @@ namespace AwsMock::Dto::SecretsManager {
                     {"secretArn", obj.secretArn},
                     {"secretId", obj.secretId},
                     {"secretString", obj.secretString},
+                    {"rotationLambdaARN", obj.rotationLambdaARN},
+                    {"rotationRules", boost::json::value_from(obj.rotationRules)},
+                    {"lastRotatedDate", Core::DateTimeUtils::ToISO8601(obj.lastRotatedDate)},
+                    {"nextRotatedDate", Core::DateTimeUtils::ToISO8601(obj.nextRotatedDate)},
+                    {"lastAccessedDate", Core::DateTimeUtils::ToISO8601(obj.lastAccessedDate)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

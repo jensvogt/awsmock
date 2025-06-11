@@ -10,10 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/kms/model/ListKey.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/kms/model/Key.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -36,12 +34,12 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListKeysResponse : Common::BaseDto<ListKeysResponse> {
+    struct ListKeysResponse final : Common::BaseCounter<ListKeysResponse> {
 
         /**
          * Key
          */
-        std::vector<ListKey> keys;
+        std::vector<Key> keys;
 
         /**
          * Next marker for paging
@@ -53,19 +51,26 @@ namespace AwsMock::Dto::KMS {
          */
         bool truncated = false;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend ListKeysResponse tag_invoke(boost::json::value_to_tag<ListKeysResponse>, boost::json::value const &v) {
+            ListKeysResponse r;
+            r.nextMarker = Core::Json::GetLongValue(v, "NextMarker");
+            r.truncated = Core::Json::GetBoolValue(v, "Truncated");
+            r.keys = boost::json::value_to<std::vector<Key>>(v.at("Keys"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListKeysResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"NextMarker", obj.nextMarker},
+                    {"Truncated", obj.truncated},
+                    {"Keys", boost::json::value_from(obj.keys)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

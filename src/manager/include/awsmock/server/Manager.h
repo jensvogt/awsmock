@@ -6,9 +6,9 @@
 #define AWSMOCK_MANAGER_H
 
 // Boost includes
+#include <boost/interprocess/interprocess_fwd.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
-#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
@@ -27,6 +27,27 @@
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Manager {
+
+    class WorkGuardManager {
+
+        boost::asio::io_context &ioContext_;
+        std::unique_ptr<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> workGuard_;
+
+      public:
+
+        explicit WorkGuardManager(boost::asio::io_context &ctx) : ioContext_(ctx),
+                                                                  workGuard_(std::make_unique<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>>(ioContext_.get_executor())) {}
+
+        void stop() {
+            workGuard_.reset();
+        }
+
+        void restart() {
+            if (!workGuard_) {
+                workGuard_ = std::make_unique<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>>(ioContext_.get_executor());
+            }
+        }
+    };
 
     /**
      * @brief Main application class for the awsmock manager.
@@ -49,7 +70,7 @@ namespace AwsMock::Manager {
 
       public:
 
-        Manager() = default;
+        Manager() = default;//: guard(_ios) {};
 
         /**
          * @brief Initialization
@@ -64,10 +85,10 @@ namespace AwsMock::Manager {
         /**
          * @brief Stop processing-
          */
-        void Stop() { _running = false; };
+        void Stop() { /*_ios.stop();*/ };
 
         /**
-         * @brief Automatically loading init file
+         * @brief Automatically loading the init file
          *
          * @par
          * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup. If a directory
@@ -79,7 +100,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Stops all currently running modules.
          */
-        static void StopModules();
+        static void StopModules(Service::ModuleMap &moduleMap);
 
       private:
 
@@ -121,12 +142,7 @@ namespace AwsMock::Manager {
         /**
          * Global shared memory segment
          */
-        std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
-
-        /**
-         * Running flag
-         */
-        bool _running = false;
+        std::unique_ptr<boost::interprocess::managed_shared_memory> _shm;
     };
 
 }// namespace AwsMock::Manager

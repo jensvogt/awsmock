@@ -2,6 +2,9 @@
 // Created by vogje01 on 03/06/2023.
 //
 
+#include "awsmock/service/monitoring/MetricDefinition.h"
+
+
 #include <awsmock/service/secretsmanager/SecretsManagerServer.h>
 
 namespace AwsMock::Service {
@@ -21,10 +24,16 @@ namespace AwsMock::Service {
         log_info << "SecretsManager server starting";
 
         // Start secrets manager monitoring update counters
-        scheduler.AddTask("monitoring-sns-counters", [this] { this->_secretsManagerMonitoring.UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("monitoring-sns-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Set running
         SetRunning();
+    }
+
+    void SecretsManagerServer::UpdateCounter() const {
+        const long secrets = _secretsManagerDatabase.CountSecrets();
+        _metricService.SetGauge(SECRETSMANAGER_SECRETS_COUNT, {}, {}, static_cast<double>(secrets));
+        log_trace << "Secrets manager update counter finished";
     }
 
 }// namespace AwsMock::Service

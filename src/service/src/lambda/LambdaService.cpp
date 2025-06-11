@@ -18,13 +18,6 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambdaEntity = {};
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
-        // Create a response, if inactive
-        if (lambdaEntity.state == Database::Entity::Lambda::LambdaState::Inactive) {
-            Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
-            log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
-            return response;
-        }
-
         std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 
@@ -306,6 +299,66 @@ namespace AwsMock::Service {
             response.tagCounters = std::vector(tags.begin() + request.pageIndex * request.pageSize, endArray);
 
             log_trace << "Lambda list tags counters, result: " << response.ToString();
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::Lambda::ListLambdaInstanceCountersResponse LambdaService::ListLambdaInstanceCounters(const Dto::Lambda::ListLambdaInstanceCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_instance_counters");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_instance_counters");
+        log_debug << "List lambda instance counters request, lambdaArn: " << request.lambdaArn;
+
+        try {
+
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+
+            Dto::Lambda::ListLambdaInstanceCountersResponse response;
+            response.total = static_cast<long>(lambda.instances.size());
+
+            for (const auto &instance: lambda.instances) {
+                Dto::Lambda::InstanceCounter instanceCounter;
+                instanceCounter.instanceId = instance.instanceId;
+                instanceCounter.containerId = instance.containerId;
+                instanceCounter.status = Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status);
+                response.instanceCounters.emplace_back(instanceCounter);
+            }
+
+            // Sorting
+            if (request.sortColumns.at(0).column == "instanceId") {
+                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.instanceId <= b.instanceId;
+                    }
+                    return a.instanceId > b.instanceId;
+                });
+            } else if (request.sortColumns.at(0).column == "containerId") {
+                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.containerId <= b.containerId;
+                    }
+                    return a.containerId > b.containerId;
+                });
+            } else if (request.sortColumns.at(0).column == "status") {
+                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.status <= b.status;
+                    }
+                    return a.status > b.status;
+                });
+            }
+
+            // Paging
+            auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
+                endArray = response.instanceCounters.end();
+            }
+            response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
+
+            log_trace << "Lambda list instances counters, result: " << response.ToString();
             return response;
 
         } catch (bsoncxx::exception &exc) {
@@ -780,7 +833,7 @@ namespace AwsMock::Service {
         // Get lambda function
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
 
-        // CHeck state
+        // Check state
         if (lambda.state == Database::Entity::Lambda::Inactive) {
             log_info << "Lambda function already running, functionArn: " << request.functionArn;
             return;
@@ -804,6 +857,45 @@ namespace AwsMock::Service {
         // Prune containers
         dockerService.PruneContainers();
         log_info << "Lambda function stopped, functionArn: " + lambda.arn;
+    }
+
+    void LambdaService::StopLambdaInstance(const Dto::Lambda::StopLambdaInstanceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_instance");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_instance");
+        log_debug << "Stop instance, functionArn: " + request.functionArn << ", instanceId: " + request.instanceId;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_error << "Lambda function does not exist, functionArn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, functionArn: " + request.functionArn);
+        }
+
+        // Get lambda function
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+
+        // Check state
+        if (lambda.state == Database::Entity::Lambda::Inactive) {
+            log_info << "Lambda function not running, functionArn: " << request.functionArn;
+            return;
+        }
+
+        // Delete the containers, if existing
+        const ContainerService &dockerService = ContainerService::instance();
+        for (const auto &instance: lambda.instances) {
+            if (instance.instanceId == request.instanceId && dockerService.ContainerExists(instance.containerId)) {
+                Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
+                dockerService.StopContainer(container.id);
+                dockerService.DeleteContainer(container);
+                log_debug << "Docker container stopped and deleted, containerId: " + container.id;
+            }
+        }
+
+        // Update state
+        lambda.RemoveInstance(request.instanceId);
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        // Prune containers
+        dockerService.PruneContainers();
+        log_info << "Lambda instance stopped, functionArn: " + lambda.arn << ", instanceId: " + request.instanceId;
     }
 
     void LambdaService::DeleteImage(const Dto::Lambda::DeleteImageRequest &request) const {

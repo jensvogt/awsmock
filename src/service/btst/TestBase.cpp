@@ -128,7 +128,7 @@ namespace AwsMock::Service {
 
         // Start the docker container, in case it is not already running.
         if (const Dto::Docker::Container container = containerService.GetFirstContainerByImageName(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION); container.state != "running") {
-            containerService.StartDockerContainer(container.id);
+            containerService.StartDockerContainer(container.id, container.names.at(0));
             log_info << "Test docker container started";
         } else {
             log_info << "Test docker container already running";

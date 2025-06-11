@@ -204,7 +204,7 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
+                const auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
                 log_trace << "Module updated: " << module.ToString();
 
                 if (mResult) {
@@ -227,7 +227,8 @@ namespace AwsMock::Database {
     Entity::Module::Module ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
 
         if (HasDatabase()) {
-
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
             auto session = client->start_session();
@@ -235,15 +236,20 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", ModuleStateToString(state))))));
+                const auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", ModuleStateToString(state))))), opts);
                 log_trace << "Module state updated, name: " << name << " state: " << ModuleStateToString(state);
                 session.commit_transaction();
+                if (mResult) {
+                    Entity::Module::Module module;
+                    module.FromDocument(mResult->view());
+                    return module;
+                }
+                return {};
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set module state failed, error: " << e.what();
                 session.abort_transaction();
             }
-            return GetModuleByName(name);
         }
         return _memoryDb.SetState(name, state);
     }
