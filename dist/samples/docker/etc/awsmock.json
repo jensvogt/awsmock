@@ -137,7 +137,10 @@
       },
       "dynamodb": {
         "active": true,
-        "backup": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?"
+        },
         "data-dir": "/usr/local/awsmock/data/dynamodb",
         "monitoring": {
           "period": 300

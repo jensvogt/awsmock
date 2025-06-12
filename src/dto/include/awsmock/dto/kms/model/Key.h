@@ -98,7 +98,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Multi region
          */
-        bool multiRegion{};
+        bool multiRegion = false;
 
         /**
          * Description
@@ -118,7 +118,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Enabled flag
          */
-        bool enabled{};
+        bool enabled = true;
 
         /**
          * Origin
@@ -204,7 +204,7 @@ namespace AwsMock::Dto::KMS {
         friend Key tag_invoke(boost::json::value_to_tag<Key>, boost::json::value const &v) {
             Key r;
             r.keyId = Core::Json::GetStringValue(v, "KeyId");
-            r.arn = Core::Json::GetStringValue(v, "Arn");
+            r.arn = Core::Json::GetStringValue(v, "KeyArn");
             r.keySpec = KeySpecFromString(Core::Json::GetStringValue(v, "KeySpec"));
             r.keyUsage = KeyUsageFromString(Core::Json::GetStringValue(v, "KeyUsage"));
             r.keyState = KeyStateFromString(Core::Json::GetStringValue(v, "KeyState"));
@@ -229,7 +229,7 @@ namespace AwsMock::Dto::KMS {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"KeyId", obj.keyId},
-                    {"Arn", obj.arn},
+                    {"KeyArn", obj.arn},
                     {"KeySpec", KeySpecToString(obj.keySpec)},
                     {"KeyUsage", KeyUsageToString(obj.keyUsage)},
                     {"MultiRegion", obj.multiRegion},

@@ -1,5 +1,10 @@
 
+#include "awsmock/core/CronUtils.h"
+
+
 #include <awsmock/core/scheduler/PeriodicTask.h>
+
+#include <utility>
 
 namespace AwsMock::Core {
 
@@ -12,6 +17,15 @@ namespace AwsMock::Core {
         post(ioService, [this] { start(); });
     }
 
+    PeriodicTask::PeriodicTask(boost::asio::io_context &ioService, std::string const &name, std::string cronExpression, handler_fn task)
+        : ioService(ioService), timer(ioService), task(std::move(task)), name(name), _cronExpression(std::move(cronExpression)) {
+
+        log_debug << "Create CronTask '" << name << "'";
+
+        // Schedule start to be run by the _io_service
+        post(ioService, [this] { startCron(); });
+    }
+
     [[maybe_unused]] void PeriodicTask::execute(boost::system::error_code const &e) {
 
         if (e != boost::asio::error::operation_aborted) {
@@ -21,6 +35,20 @@ namespace AwsMock::Core {
             task();
 
             timer.expires_at(timer.expires_at() + boost::posix_time::seconds(interval));
+            start_wait();
+        }
+    }
+
+    [[maybe_unused]] void PeriodicTask::executeCron(boost::system::error_code const &e) {
+
+        if (e != boost::asio::error::operation_aborted) {
+
+            log_debug << "Execute PeriodicTask '" << name << "'";
+
+            task();
+
+            _delay = CronUtils::GetNextExecutionTimeSeconds(_cronExpression);
+            timer.expires_at(timer.expires_at() + boost::posix_time::seconds(_delay));
             start_wait();
         }
     }
@@ -40,8 +68,20 @@ namespace AwsMock::Core {
         start_wait();
     }
 
+    void PeriodicTask::startCron() {
+        log_debug << "Start CronTask '" << name << "'";
+
+        _delay = CronUtils::GetNextExecutionTimeSeconds(_cronExpression);
+        timer.expires_from_now(boost::posix_time::seconds(_delay));
+        start_wait_cron();
+    }
+
     [[maybe_unused]] void PeriodicTask::start_wait() {
         timer.async_wait(boost::bind(&PeriodicTask::execute, this, boost::asio::placeholders::error));
+    }
+
+    [[maybe_unused]] void PeriodicTask::start_wait_cron() {
+        timer.async_wait(boost::bind(&PeriodicTask::executeCron, this, boost::asio::placeholders::error));
     }
 
 }// namespace AwsMock::Core

@@ -45,6 +45,15 @@ namespace AwsMock::Core {
         void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, int interval, int delay = 0);
 
         /**
+         * @brief Add a cron task to the scheduler
+         *
+         * @param name name of the task
+         * @param task task function
+         * @param cronExpression cron expression
+         */
+        void AddTask(std::string const &name, PeriodicTask::handler_fn const &task, const std::string &cronExpression);
+
+        /**
          * @brief Shutdown the scheduler
          */
         void Shutdown() const;

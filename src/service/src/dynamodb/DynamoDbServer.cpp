@@ -2,6 +2,7 @@
 // Created by vogje01 on 20/12/2023.
 //
 
+#include "awsmock/core/BackupUtils.h"
 #include "awsmock/dto/module/ExportInfrastructureRequest.h"
 #include "awsmock/service/module/ModuleService.h"
 
@@ -13,8 +14,8 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _backup = configuration.GetValue<bool>("awsmock.modules.dynamodb.backup");
-        _backupDir = configuration.GetValue<std::string>("awsmock.backup-dir");
+        _backupActive = configuration.GetValue<bool>("awsmock.modules.dynamodb.backup.active");
+        _backupCron = configuration.GetValue<std::string>("awsmock.modules.dynamodb.backup.cron");
         _workerPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.worker.period");
         _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.dynamodb.monitoring.period");
         _containerName = configuration.GetValue<std::string>("awsmock.modules.dynamodb.container.name");
@@ -40,11 +41,16 @@ namespace AwsMock::Service {
         StartLocalDynamoDb();
 
         // Start DynamoDB monitoring update counters
-        scheduler.AddTask("monitoring-dynamodb-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing
         scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 10);
         scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, 10);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("dynamodb-backup", [this] { this->BackupDynamoDb(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -182,8 +188,8 @@ namespace AwsMock::Service {
                         for (auto &item: scanResponse.items) {
                             /*Database::Entity::DynamoDb::Item itemEntity = Dto::DynamoDb::Mapper::map(item);
                             itemEntity = _dynamoDbDatabase.CreateOrUpdateItem(itemEntity);
-                            log_trace << "Item synchronized, item: " << item.oid;
-                            size += item.ToJson().size();*/
+                            log_trace << "Item synchronized, item: " << itemEntity.oid;
+                            size += item.size();*/
                         }
                     }
 
@@ -228,26 +234,12 @@ namespace AwsMock::Service {
         log_trace << "DynamoDb monitoring finished";
     }
 
+    void DynamoDbServer::BackupDynamoDb() {
+        ModuleService::BackupModule("dynamodb", true);
+    }
+
     void DynamoDbServer::Shutdown() {
         log_debug << "DynamoDb server shutdown, region: " << _region;
-
-        if (_backup) {
-            log_info << "Creating backup of DynamoDb Tables";
-
-            // Create export request
-            Dto::Module::ExportInfrastructureRequest request;
-            request.includeObjects = true;
-            request.prettyPrint = true;
-            request.modules.emplace_back("dynamodb");
-
-            // Do the actual export
-            Dto::Module::ExportInfrastructureResponse response = ModuleService::ExportInfrastructure(request);
-
-            // Write the backup file
-            std::ofstream backupFile(_backupDir + Core::FileUtils::separator() + "dynamodb.json");
-            backupFile << response.ToJson();
-            backupFile.close();
-        }
 
         // Stop detached instances
         for (const auto &instance: ContainerService::instance().ListContainerByImageName(_imageName, _imageTag)) {

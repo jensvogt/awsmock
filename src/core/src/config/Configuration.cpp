@@ -136,7 +136,8 @@ namespace AwsMock::Core {
 
         // DynamoDB
         DefineProperty<bool>("awsmock.modules.dynamodb.active", "AWSMOCK_MODULES_DYNAMODB_ACTIVE", true);
-        DefineProperty<bool>("awsmock.modules.dynamodb.backup", "AWSMOCK_MODULES_DYNAMODB_BACKUP", true);
+        DefineProperty<bool>("awsmock.modules.dynamodb.backup.active", "AWSMOCK_MODULES_DYNAMODB_BACKUP_ACTIVE", true);
+        DefineProperty<std::string>("awsmock.modules.dynamodb.backup.cron", "AWSMOCK_MODULES_DYNAMODB_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.dynamodb.worker.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineProperty<std::string>("awsmock.modules.dynamodb.container.host", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_HOST", "localhost");
@@ -153,7 +154,7 @@ namespace AwsMock::Core {
 
         // KMS
         DefineProperty<bool>("awsmock.modules.kms.active", "AWSMOCK_MODULES_KMS_ACTIVE", true);
-        DefineProperty<int>("awsmock.modules.kms.monitoring.period", "AWSMOCK_SERVICEK_KMS_MONITORING_PERIOD", 300);
+        DefineProperty<int>("awsmock.modules.kms.monitoring.period", "AWSMOCK_SERVICE_KMS_MONITORING_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.kms.remove.period", "AWSMOCK_WORKER_KMS_REMOVE_PERIOD", 300);
 
         // Docker

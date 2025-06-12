@@ -2,6 +2,9 @@
 // Created by vogje01 on 06/06/2023.
 //
 
+#include "awsmock/core/BackupUtils.h"
+
+
 #include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Service {
@@ -389,5 +392,26 @@ namespace AwsMock::Service {
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
             }
         }
+    }
+
+    void ModuleService::BackupModule(const std::string &module, bool includeObjects) {
+
+        // Backup file name
+        std::string backupFilename = Core::BackupUtils::GetBackupFilename(module);
+        log_info << "Creating backup of module, name: " << module << ", file: " << backupFilename;
+
+        // Create export request
+        Dto::Module::ExportInfrastructureRequest request;
+        request.includeObjects = includeObjects;
+        request.prettyPrint = true;
+        request.modules.emplace_back(module);
+
+        // Do the actual export
+        Dto::Module::ExportInfrastructureResponse response = ModuleService::ExportInfrastructure(request);
+
+        // Write the backup file
+        std::ofstream backupFile(backupFilename);
+        backupFile << response.ToJson();
+        backupFile.close();
     }
 }// namespace AwsMock::Service

@@ -59,7 +59,7 @@ namespace AwsMock::Service {
          *
          * @return list of all modules
          */
-        Database::Entity::Module::ModuleList ListModules() const;
+        [[nodiscard]] Database::Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Starts a module
@@ -109,7 +109,7 @@ namespace AwsMock::Service {
          * @brief Cleans the current infrastructure.
          *
          * @par
-         * All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.
+         * All SQS queues, SNS topics, S3 buckets, etc. will be deleted, as well as all objects.
          *
          * @param request clean infrastructure request
          */
@@ -124,6 +124,14 @@ namespace AwsMock::Service {
          * @param request clean infrastructure request
          */
         static void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request);
+
+        /**
+         * @brief Backup infrastructure
+         *
+         * @param module module name
+         * @param includeObjects include all objects
+         */
+        static void BackupModule(const std::string &module, bool includeObjects = false);
 
       private:
 

@@ -13,6 +13,10 @@ namespace AwsMock::Service {
         _bodyLimit = configuration.GetValue<int>("awsmock.gateway.http.max-body");
         _timeout = configuration.GetValue<int>("awsmock.gateway.http.timeout");
         _verifySignature = configuration.GetValue<bool>("awsmock.aws.signature.verify");
+
+        // Default region, user, will be overwritten by authorized requests
+        _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        _user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
     };
 
     void GatewaySession::Run() {
@@ -116,7 +120,6 @@ namespace AwsMock::Service {
         }
 
         std::shared_ptr<AbstractHandler> handler;
-        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
@@ -138,7 +141,7 @@ namespace AwsMock::Service {
             // Get the module from the authorization key, or the target header field.
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
-            region = authKey.region;
+            _region = authKey.region;
             handler = GatewayRouter::instance().GetHandler(authKey.module);
             if (!handler) {
                 log_error << "Handler not found, target: " << authKey.module;
@@ -152,27 +155,27 @@ namespace AwsMock::Service {
                 case http::verb::get: {
                     Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                    return handler->HandleGetRequest(request, region, "none");
+                    return handler->HandleGetRequest(request, _region, _user);
                 }
                 case http::verb::put: {
                     Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                    return handler->HandlePutRequest(request, region, "none");
+                    return handler->HandlePutRequest(request, _region, _user);
                 }
                 case http::verb::post: {
                     Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                    return handler->HandlePostRequest(request, region, "none");
+                    return handler->HandlePostRequest(request, _region, _user);
                 }
                 case http::verb::delete_: {
                     Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                    return handler->HandleDeleteRequest(request, region, "none");
+                    return handler->HandleDeleteRequest(request, _region, _user);
                 }
                 case http::verb::head: {
                     Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                    return handler->HandleHeadRequest(request, region, "none");
+                    return handler->HandleHeadRequest(request, _region, _user);
                 }
                 default:;
             }

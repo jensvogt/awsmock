@@ -10,6 +10,7 @@ namespace AwsMock::Core {
     int LogStream::logCount = DEFAULT_LOG_COUNT;
     std::string LogStream::logDir;
     std::string LogStream::logPrefix;
+    std::string LogStream::_severity;
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> LogStream::console_sink;
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
 
@@ -110,6 +111,7 @@ namespace AwsMock::Core {
     }
 
     void LogStream::SetSeverity(const std::string &severity) {
+        _severity = severity;
         boost::log::trivial::severity_level lvl;
         from_string(severity.c_str(), severity.length(), lvl);
         console_sink->set_filter(boost::log::trivial::severity >= lvl);
@@ -125,11 +127,17 @@ namespace AwsMock::Core {
                 boost::log::keywords::target_file_name = dir + FileUtils::separator() + prefix + "_%N.log",
                 boost::log::keywords::format = &LogFormatter);
 
+        // Set level
+        boost::log::trivial::severity_level lvl;
+        from_string(_severity.c_str(), _severity.length(), lvl);
+        file_sink->set_filter(boost::log::trivial::severity >= lvl);
+
         file_sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
                 boost::log::keywords::target = dir,
                 boost::log::keywords::max_files = count));
 
         file_sink->locked_backend()->scan_for_files();
+
         log_info << "Start logging to file, dir:" << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
 

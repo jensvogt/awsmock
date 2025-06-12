@@ -55,7 +55,7 @@ namespace AwsMock::Dto::KMS {
 
         friend ListKeysResponse tag_invoke(boost::json::value_to_tag<ListKeysResponse>, boost::json::value const &v) {
             ListKeysResponse r;
-            r.nextMarker = Core::Json::GetLongValue(v, "NextMarker");
+            r.nextMarker = Core::Json::GetStringValue(v, "NextMarker");
             r.truncated = Core::Json::GetBoolValue(v, "Truncated");
             r.keys = boost::json::value_to<std::vector<Key>>(v.at("Keys"));
             return r;

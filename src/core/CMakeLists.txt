@@ -8,7 +8,7 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
         src/utils/MemoryMappedFile.cpp src/utils/XmlUtils.cpp src/utils/UnixSocket.cpp src/utils/HttpSocket.cpp
         src/utils/JwtUtils.cpp src/scheduler/PeriodicTask.cpp src/scheduler/PeriodicScheduler.cpp
         src/config/Configuration.cpp src/utils/SrpUtils.cpp src/utils/DomainSocket.cpp
-        src/utils/WindowsSocket.cpp)
+        src/utils/WindowsSocket.cpp src/utils/CronUtils.cpp)
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp src/exception/ServiceException.cpp
         src/exception/JsonException.cpp src/exception/NotFoundException.cpp src/exception/ForbiddenException.cpp
         src/exception/UnauthorizedException.cpp src/exception/BadRequestException.cpp)
@@ -27,7 +27,10 @@ if (WIN32)
     target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR})
 else ()
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/core/BackupUtils.h
+            src/utils/BackupUtils.cpp
+            include/awsmock/core/Cron.h)
     target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY} PUBLIC mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
