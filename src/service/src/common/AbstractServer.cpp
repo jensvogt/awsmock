@@ -28,4 +28,5 @@ namespace AwsMock::Service {
     void AbstractServer::Shutdown() {
     }
 
+
 }// namespace AwsMock::Service

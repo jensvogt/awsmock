@@ -9,6 +9,7 @@
 
 #include "AwsUtilsTests.cpp"
 #include "ConfigurationTests.cpp"
+#include "CronUtilsTests.cpp"
 #include "CryptoUtilsTest.cpp"
 #include "DateTimeUtilsTests.cpp"
 #include "DirUtilsTests.cpp"

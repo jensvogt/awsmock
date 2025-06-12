@@ -5,7 +5,6 @@
 #ifndef AWSMOCK_SERVICE_ABSTRACT_SERVER_H
 #define AWSMOCK_SERVICE_ABSTRACT_SERVER_H
 
-
 // C++ standard includes
 #include <string>
 

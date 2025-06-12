@@ -5,23 +5,6 @@
 #include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
-    std::map<std::string, std::string> ContainerService::_supportedRuntimes = {
-            {"java11", "public.ecr.aws/lambda/java:11"},
-            {"java17", "public.ecr.aws/lambda/java:17"},
-            {"java21", "public.ecr.aws/lambda/java:21.2024.11.22.15"},
-            {"python3.8", "public.ecr.aws/lambda/python:3.8"},
-            {"python3.9", "public.ecr.aws/lambda/python:3.9"},
-            {"python3.10", "public.ecr.aws/lambda/python:3.10"},
-            {"python3.11", "public.ecr.aws/lambda/python:3.11"},
-            {"python3.12", "public.ecr.aws/lambda/python:3.12"},
-            {"nodejs18.x", "public.ecr.aws/lambda/nodejs:18"},
-            {"nodejs20.x", "public.ecr.aws/lambda/nodejs:20"},
-            {"nodejs22.x", "public.ecr.aws/lambda/nodejs:22"},
-            {"provided.al2", "public.ecr.aws/lambda/provided:al2"},
-            {"provided.al2023", "public.ecr.aws/lambda/provided:al2023"},
-            {"provided.latest", "public.ecr.aws/lambda/provided:latest"},
-            {"go", "public.ecr.aws/lambda/provided:al2023"},
-    };
 
     boost::mutex ContainerService::_dockerServiceMutex;
 
@@ -314,7 +297,7 @@ namespace AwsMock::Service {
 
         Dto::Docker::ListContainerResponse response(body);
         if (response.containerList.empty()) {
-            log_warning << "Docker container not found, id: " << containerId;
+            log_info << "Docker container not found, id: " << containerId;
             return {};
         }
 
@@ -577,14 +560,14 @@ namespace AwsMock::Service {
         return logMessages;
     }
 
-    void ContainerService::StopContainer(const std::string &id) const {
+    void ContainerService::StopContainer(const std::string &containerId) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + id + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/stop"); statusCode != http::status::no_content && statusCode != http::status::not_modified) {
             log_warning << "Stop container failed, statusCode: " << statusCode;
             return;
         }
-        log_debug << "Docker container stopped, id: " << id;
+        log_debug << "Docker container stopped, id: " << containerId;
     }
 
     void ContainerService::DeleteContainer(const Dto::Docker::Container &container) const {
@@ -629,19 +612,20 @@ namespace AwsMock::Service {
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
         Core::StringUtils::Replace(providedRuntime, ".", "-");
         auto supportedRuntime = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.runtime." + providedRuntime);
+        auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         log_debug << "Using supported runtime, runtime: " << supportedRuntime;
 
         std::string awsConfig = codeDir + Core::FileUtils::separator() + "config";
         std::ofstream awsOfs(awsConfig);
         awsOfs << "[default]" << std::endl;
-        awsOfs << "region=" << Core::Configuration::instance().GetValue<std::string>("awsmock.region") << std::endl;
+        awsOfs << "region=" << region << std::endl;
         awsOfs << "output=json" << std::endl;
         awsOfs.close();
 
         std::string awsCredentials = codeDir + Core::FileUtils::separator() + "credentials";
         std::ofstream awsCredOfs(awsCredentials);
         awsCredOfs << "[default]" << std::endl;
-        awsCredOfs << "region=" << Core::Configuration::instance().GetValue<std::string>("awsmock.region") << std::endl;
+        awsCredOfs << "region=" << region << std::endl;
         awsCredOfs << "aws_access_key_id=none" << std::endl;
         awsCredOfs << "aws_secret_access_key=none" << std::endl;
         awsCredOfs << "aws_session_token=none" << std::endl;
@@ -652,16 +636,12 @@ namespace AwsMock::Service {
         std::ofstream ofs(dockerFilename);
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            AddEnvironment(ofs, environment);
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            AddEnvironment(ofs, environment);
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
@@ -673,9 +653,7 @@ namespace AwsMock::Service {
             ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            AddEnvironment(ofs, environment);
             ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "RUN pip install -r requirements.txt" << std::endl;
             ofs << "RUN mkdir -p /root/.aws" << std::endl;
@@ -684,26 +662,21 @@ namespace AwsMock::Service {
             ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
+            std::string handlerFile = GetHandlerFileNodeJs22(handler);
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            AddEnvironment(ofs, environment);
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
-            ofs << "COPY dist/app.mjs ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "COPY " << handlerFile << " ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            AddEnvironment(ofs, environment);
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
             ofs << "COPY index.js ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "go")) {
             ofs << "FROM " << supportedRuntime << std::endl;
-            for (const auto &[fst, snd]: environment) {
-                ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
-            }
+            AddEnvironment(ofs, environment);
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 755 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
@@ -727,5 +700,16 @@ namespace AwsMock::Service {
             return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
         }
         return Core::Configuration::instance().GetValue<std::string>("awsmock.podman.network-name");
+    }
+
+    std::string ContainerService::GetHandlerFileNodeJs22(const std::string &handler) {
+        const std::string prefix = handler.substr(0, handler.find('.'));
+        return prefix + ".mjs";
+    }
+
+    void ContainerService::AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment) {
+        for (const auto &[fst, snd]: environment) {
+            ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
+        }
     }
 }// namespace AwsMock::Service

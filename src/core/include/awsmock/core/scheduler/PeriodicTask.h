@@ -28,20 +28,62 @@ namespace AwsMock::Core {
 
         PeriodicTask(boost::asio::io_context &ioService, std::string const &name, int interval, handler_fn task, int delay);
 
+        PeriodicTask(boost::asio::io_context &ioService, std::string const &name, std::string cronExpression, handler_fn task);
+
         [[maybe_unused]] void execute(boost::system::error_code const &e);
+
+        [[maybe_unused]] void executeCron(boost::system::error_code const &e);
 
         void start();
 
+        void startCron();
+
       private:
 
+        /**
+         * Wait for the delay
+         */
         [[maybe_unused]] void start_wait();
 
+        /**
+         * Wait for the cron delay
+         */
+        [[maybe_unused]] void start_wait_cron();
+
+        /**
+         * IO context
+         */
         boost::asio::io_context &ioService;
+
+        /**
+         * Timer
+         */
         boost::asio::deadline_timer timer;
+
+        /**
+         * Task handler
+         */
         handler_fn task;
+
+        /**
+         * Task name
+         */
         std::string name;
-        int interval;
-        int _delay;
+
+        /**
+         * Interval in seconds
+         */
+        long interval{};
+
+        /**
+         * Initial delay
+         */
+        long _delay{};
+
+        /**
+         * Cron expression
+         */
+        std::string _cronExpression;
     };
 
 }// namespace AwsMock::Core

@@ -566,7 +566,7 @@ namespace AwsMock::Core {
         return out;
     }
 
-    EVP_PKEY *Crypto::GenerateRsaKeys(unsigned int keyLength) {
+    EVP_PKEY *Crypto::GenerateRsaKeys(const unsigned int keyLength) {
         EVP_PKEY *pRSA = EVP_RSA_gen(keyLength);
         if (!pRSA) {
             log_error << "Could not generate RSA key, length: " << keyLength;
