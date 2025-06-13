@@ -8,9 +8,11 @@ namespace AwsMock::Service {
     LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _counterPeriod = configuration.GetValue<int>("awsmock.modules.lambda.counter-period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
         _lifetime = configuration.GetValue<int>("awsmock.modules.lambda.lifetime");
-        _logRetentionPeriod = configuration.GetValue<int>("awsmock.modules.lambda.log-retention-period");
+        _logRetentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.log-retention-period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.lambda.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.backup.cron");
         log_debug << "Lambda remove period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
         // Directories
@@ -40,16 +42,21 @@ namespace AwsMock::Service {
         CreateContainers();
 
         // Start lambda monitoring update counters
-        scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _counterPeriod);
+        scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _lifetime);
+        scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _lifetime);
         log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _lifetime;
 
         // Start the delete old lambda logs
-        scheduler.AddTask("remove-lambda-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
+        scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
         log_debug << "Lambda task started, name remove-lambda-logs, period: " << _logRetentionPeriod;
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("lambda-backup", [this] { this->BackupLambda(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -212,6 +219,10 @@ namespace AwsMock::Service {
         } catch (Core::ServiceException &e) {
             log_error << e.message();
         }
+    }
+
+    void LambdaServer::BackupLambda() {
+        ModuleService::BackupModule("lambda");
     }
 
 }// namespace AwsMock::Service

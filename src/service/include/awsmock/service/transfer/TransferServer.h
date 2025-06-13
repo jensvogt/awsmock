@@ -18,6 +18,7 @@
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
 #include <awsmock/sftpserver/SftpServer.h>
 
@@ -95,6 +96,11 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
+         * @brief Backup the transfer server
+         */
+        static void BackupTransfer();
+
+        /**
          * Transfer database
          */
         Database::TransferDatabase &_transferDatabase;
@@ -143,6 +149,24 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * @brief Transfer server backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Transfer server backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * List of transfer servers

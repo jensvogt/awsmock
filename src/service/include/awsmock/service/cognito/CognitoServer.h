@@ -14,6 +14,7 @@
 #include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -41,6 +42,11 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
+         * @brief Backup the cognito objects
+         */
+        void BackupCognito();
+
+        /**
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
@@ -49,6 +55,24 @@ namespace AwsMock::Service {
          * @brief Database connection
          */
         Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Dynamo DB backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Cognito module name

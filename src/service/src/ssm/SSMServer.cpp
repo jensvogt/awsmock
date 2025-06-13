@@ -9,9 +9,10 @@ namespace AwsMock::Service {
     SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms") {
 
         // HTTP manager configuration
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _workerPeriod = configuration.GetValue<int>("awsmock.modules.ssm.worker.period");
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.ssm.monitoring.period");
+        _workerPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.ssm.worker.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.ssm.monitoring.period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.transfer.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.backup.cron");
         log_debug << "SSM server initialized";
 
         // Check module active
@@ -23,7 +24,12 @@ namespace AwsMock::Service {
 
         // Monitoring
         // Start SNS monitoring update counters
-        scheduler.AddTask("monitoring-ssm-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("ssm-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("ssm-backup", [this] { BackupSsm(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -39,6 +45,10 @@ namespace AwsMock::Service {
         _metricService.SetGauge(SSM_PARAMETER_COUNT, {}, {}, parameters);
 
         log_trace << "SSM monitoring finished";
+    }
+
+    void SSMServer::BackupSsm() {
+        ModuleService::BackupModule("ssm", true);
     }
 
 }// namespace AwsMock::Service
