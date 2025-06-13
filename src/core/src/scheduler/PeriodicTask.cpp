@@ -49,7 +49,7 @@ namespace AwsMock::Core {
 
             _delay = CronUtils::GetNextExecutionTimeSeconds(_cronExpression);
             timer.expires_at(timer.expires_at() + boost::posix_time::seconds(_delay));
-            start_wait();
+            start_wait_cron();
         }
     }
 

@@ -13,6 +13,8 @@
 
 namespace AwsMock::Core {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief Backup utilities
      *
