@@ -13,8 +13,11 @@ namespace AwsMock::Core {
     }
 
     std::string BackupUtils::GetTimestamp() {
-        std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-        return std::format("{:%Y%m%d%H%M}", now);
+        const std::time_t now = std::time(nullptr);
+        const tm *temp = localtime(&now);
+        char buffer[15];
+        strftime(buffer, sizeof(buffer), "%Y%m%d%H%M", temp);
+        return {buffer};
     }
 
 }// namespace AwsMock::Core
