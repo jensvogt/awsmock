@@ -407,7 +407,7 @@ namespace AwsMock::Service {
         request.modules.emplace_back(module);
 
         // Do the actual export
-        Dto::Module::ExportInfrastructureResponse response = ModuleService::ExportInfrastructure(request);
+        Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure(request);
 
         // Write the backup file
         std::ofstream backupFile(backupFilename);

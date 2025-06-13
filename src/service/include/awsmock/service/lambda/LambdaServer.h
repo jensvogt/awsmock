@@ -19,6 +19,7 @@
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
@@ -97,6 +98,11 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
+         * @brief Backup the Lambda objects
+         */
+        static void BackupLambda();
+
+        /**
          * Lambda database
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -115,6 +121,24 @@ namespace AwsMock::Service {
          * Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Dynamo DB backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Data dir

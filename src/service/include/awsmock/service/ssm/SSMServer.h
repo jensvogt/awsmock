@@ -14,6 +14,7 @@
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -41,6 +42,11 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
+         * @brief Backup the SSM objects
+         */
+        static void BackupSsm();
+
+        /**
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
@@ -49,6 +55,24 @@ namespace AwsMock::Service {
          * @brief Database connection
          */
         Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
+
+        /**
+         * @brief SSM server backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief SSM server backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * @brief SSM server period
