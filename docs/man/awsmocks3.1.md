@@ -78,8 +78,10 @@ If you want ot use host-style location requests, you need to se tup the clients 
         .build();
 ```
 
-Here the endpoint needs to have a ```s3``` prefix and the region should be included in the URL. Additionally, you need to
-provide a DNS settings, which routes all S3 request to awsmock. This is most easily done using a ```dnsmasq``` implementation:
+Here the endpoint needs to have a ```s3``` prefix and the region should be included in the URL. Additionally, you need
+to
+provide a DNS settings, which routes all S3 request to awsmock. This is most easily done using a ```dnsmasq```
+implementation:
 
 ```
 sudo apt install dnsmasq 
@@ -229,10 +231,12 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```,
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
+```awsmocklambda(1)```,
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
+```awsmocksqs(1)```,
 ```awsmocksqs(1)```

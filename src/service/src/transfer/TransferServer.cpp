@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
+    TransferServer::TransferServer(Core::Scheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
 
         // REST manager configuration
         _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");

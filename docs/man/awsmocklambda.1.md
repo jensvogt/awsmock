@@ -242,7 +242,7 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 

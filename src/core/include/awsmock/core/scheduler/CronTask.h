@@ -2,12 +2,13 @@
 // Created by vogje01 on 10/7/24.
 //
 
-#ifndef AWSMOCK_CORE_PERIODIC_TASK_H
-#define AWSMOCK_CORE_PERIODIC_TASK_H
+#ifndef AWSMOCK_CORE_CRON_TASK_H
+#define AWSMOCK_CORE_CRON_TASK_H
 
 // C++ includes
 #include <functional>
 #include <string>
+#include <utility>
 
 // Boost includes
 #include <boost/asio.hpp>
@@ -16,24 +17,25 @@
 #include <boost/noncopyable.hpp>
 
 // AwsMock includes
+#include <awsmock/core/CronUtils.h>
 #include <awsmock/core/LogStream.h>
 
 namespace AwsMock::Core {
 
     /**
-     * @brief Periodic task
+     * @brief Cron task
      *
      * @par
-     * This class starts a task which will be repeated after each interval. The periodic interval must be given in seconds, together with an initial delay in seconds.
+     * This class starts a task according to a cron schedule
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class PeriodicTask : boost::noncopyable {
+    class CronTask : boost::noncopyable {
 
       public:
 
         /**
-         * Task handler
+         * @Brief Handler function
          */
         typedef std::function<void()> handler_fn;
 
@@ -42,28 +44,26 @@ namespace AwsMock::Core {
          *
          * @param ioService boost IO context
          * @param name task name
-         * @param interval periodic interval in seconds
+         * @param cronExpression cron expression
          * @param task task
-         * @param delay initial delay in seconds
          */
-        PeriodicTask(boost::asio::io_context &ioService, std::string const &name, int interval, handler_fn task, int delay);
+        CronTask(boost::asio::io_context &ioService, std::string const &name, std::string cronExpression, handler_fn task);
 
         /**
-         * @brief Execute the task by calling the handler functor.
-         *
+         * @brief Execute task
          * @param e error code
          */
         [[maybe_unused]] void Execute(boost::system::error_code const &e);
 
         /**
-         * @brief Start the task scheduler
+         * @brief Start the task
          */
         void Start();
 
       private:
 
         /**
-         * Wait for the delay
+         * Wait for the cron delay
          */
         [[maybe_unused]] void StartWait();
 
@@ -88,14 +88,14 @@ namespace AwsMock::Core {
         std::string _name;
 
         /**
-         * Interval in seconds
+         * Next execution wait time in seconds
          */
-        long _interval{};
+        long _next{};
 
         /**
-         * Initial delay
+         * Cron expression
          */
-        long _delay{};
+        std::string _cronExpression;
     };
 
 }// namespace AwsMock::Core

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
+    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns") {
 
         // Configuration
         _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete.period");

@@ -7,8 +7,8 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSServer(Core::PeriodicScheduler &scheduler);
+        explicit SQSServer(Core::Scheduler &scheduler);
 
       private:
 

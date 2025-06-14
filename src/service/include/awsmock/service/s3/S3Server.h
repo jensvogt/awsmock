@@ -13,8 +13,8 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Server(Core::PeriodicScheduler &scheduler);
+        explicit S3Server(Core::Scheduler &scheduler);
 
       private:
 

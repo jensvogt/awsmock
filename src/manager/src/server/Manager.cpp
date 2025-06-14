@@ -141,7 +141,7 @@ namespace AwsMock::Manager {
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
-        Core::PeriodicScheduler scheduler(_ios);
+        Core::Scheduler scheduler(_ios);
         const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
 

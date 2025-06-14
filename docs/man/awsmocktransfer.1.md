@@ -28,7 +28,7 @@ Currently only IPv4 is supported, so if you need to connect to the transfer serv
 sure you set the host to ```127.0.0.1```, instead of ```localhost```, because sometimes on some Linux machines
 ```localhost``` is resolved to the IPv6 address.
 
-AwsMOck transfer manager supports FTP and SFTP. Usually ```awsmock``` is running as normal user, and the default
+AwsMock transfer manager supports FTP and SFTP. Usually ```awsmock``` is running as normal user, and the default
 configuration file configures the ports to be 2121 for FTP and 2222 for SFTP. If ouy need to use the standard ports
 (21 for FTP and 22 for SFTP), you need to run the ```awsmockmgr``` as root user. AwsMock transfer manager does not
 support FTP over TLS (as filezilla is using it).
@@ -129,7 +129,7 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 

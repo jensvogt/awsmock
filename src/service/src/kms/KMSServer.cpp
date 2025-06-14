@@ -9,7 +9,7 @@
 
 namespace AwsMock::Service {
 
-    KMSServer::KMSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // HTTP manager configuration
         _removePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.kms.remove.period");

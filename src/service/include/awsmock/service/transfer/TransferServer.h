@@ -12,8 +12,8 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferServer(Core::PeriodicScheduler &scheduler);
+        explicit TransferServer(Core::Scheduler &scheduler);
 
       private:
 

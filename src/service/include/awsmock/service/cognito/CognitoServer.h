@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit CognitoServer(Core::PeriodicScheduler &scheduler);
+        explicit CognitoServer(Core::Scheduler &scheduler);
 
       private:
 
@@ -87,7 +87,7 @@ namespace AwsMock::Service {
         /**
          * Asynchronous task scheduler
          */
-        Core::PeriodicScheduler &_scheduler;
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

@@ -182,10 +182,12 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 
-```awsmockmgr(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```,
+```awsmockmgr(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
+```awsmocklambda(1)```,
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
+```awsmocksqs(1)```,
 ```awsmockssm(1)```

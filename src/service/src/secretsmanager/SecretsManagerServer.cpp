@@ -9,7 +9,7 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::PeriodicScheduler &scheduler) : AbstractServer("secretsmanager") {
+    SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager") {
 
         // Manager configuration
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.secretsmanager.monitoring.period");

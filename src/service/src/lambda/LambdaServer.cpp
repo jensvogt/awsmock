@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
