@@ -16,18 +16,20 @@
 #include <boost/system/error_code.hpp>
 
 // AwsMock includes
+#include <awsmock/core/CronUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/scheduler/CronTask.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 
 namespace AwsMock::Core {
 
     using std::chrono::system_clock;
 
-    class PeriodicScheduler : boost::noncopyable {
+    class Scheduler : boost::noncopyable {
 
       public:
 
-        explicit PeriodicScheduler(boost::asio::io_context &io_service);
+        explicit Scheduler(boost::asio::io_context &io_service);
 
         /**
          * @brief Main routine
@@ -66,9 +68,14 @@ namespace AwsMock::Core {
         boost::asio::io_context &_io_service;
 
         /**
-         * Task list
+         * Periodic task list
          */
-        std::map<std::string, std::unique_ptr<PeriodicTask>> _tasks;
+        std::map<std::string, std::unique_ptr<PeriodicTask>> _periodicTasks;
+
+        /**
+         * Cron task list
+         */
+        std::map<std::string, std::unique_ptr<CronTask>> _cronTasks;
     };
 
 }// namespace AwsMock::Core

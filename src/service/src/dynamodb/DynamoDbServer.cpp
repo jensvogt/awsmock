@@ -10,7 +10,7 @@
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 
 namespace AwsMock::Service {
-    DynamoDbServer::DynamoDbServer(Core::PeriodicScheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
+    DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
 
         // Get HTTP configuration values
         const Core::Configuration &configuration = Core::Configuration::instance();

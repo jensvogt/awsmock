@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SSMServer::SSMServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms") {
+    SSMServer::SSMServer(Core::Scheduler &scheduler) : AbstractServer("kms") {
 
         // HTTP manager configuration
         _workerPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.ssm.worker.period");

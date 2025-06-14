@@ -413,5 +413,8 @@ namespace AwsMock::Service {
         std::ofstream backupFile(backupFilename);
         backupFile << response.ToJson();
         backupFile.close();
+
+        // Sleep for a while, otherwise cron will execute at the same time again
+        std::this_thread::sleep_for(std::chrono::minutes(1));
     }
 }// namespace AwsMock::Service

@@ -9,7 +9,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::PeriodicScheduler &scheduler) : AbstractServer("s3") {
+    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3") {
 
         // Get HTTP configuration values
         _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync.period");

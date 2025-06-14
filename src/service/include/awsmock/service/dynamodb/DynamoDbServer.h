@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbServer(Core::PeriodicScheduler &scheduler);
+        explicit DynamoDbServer(Core::Scheduler &scheduler);
 
         /**
          * @brief Gracefully shutdown the server

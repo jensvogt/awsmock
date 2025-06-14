@@ -5,7 +5,7 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 namespace AwsMock::Service {
-    SQSServer::SQSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sqs") {
+    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs") {
 
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring.period");
         _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset.period");
