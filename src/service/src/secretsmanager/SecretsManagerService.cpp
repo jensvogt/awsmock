@@ -162,15 +162,10 @@ namespace AwsMock::Service {
             response.arn = secret.arn;
             response.versionId = versionId;
             response.createdDate = Core::DateTimeUtils::UnixTimestamp(secret.createdDate);
-            response.versionStages = secret.versions[request.versionId].stages;
+            response.versionStages = secret.versions[versionId].stages;
 
             if (!secret.kmsKeyId.empty()) {
-                DecryptSecret(version, secret.kmsKeyId, version.secretString);
-                Dto::KMS::DecryptRequest decryptRequest;
-                decryptRequest.keyId = secret.kmsKeyId;
-                decryptRequest.ciphertext = version.secretString;
-                Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
-                response.secretString = Core::Crypto::Base64Decode(kmsResponse.plaintext);
+                response.secretString = DecryptSecret(version, secret.kmsKeyId, version.secretString);
                 log_warning << "Secret string, stage: " << request.versionStage << ": " << response.secretString;
             } else if (!version.secretString.empty()) {
                 response.secretBinary = Core::Crypto::Base64Decode(version.secretBinary);
@@ -684,12 +679,12 @@ namespace AwsMock::Service {
         version.secretString = encryptResponse.ciphertext;
     }
 
-    void SecretsManagerService::DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {
+    std::string SecretsManagerService::DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {
         Dto::KMS::DecryptRequest decryptRequest;
         decryptRequest.keyId = kmsKeyId;
-        decryptRequest.ciphertext = Core::Crypto::Base64Decode(secretString);
+        decryptRequest.ciphertext = secretString;
         const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
-        version.secretString = decryptResponse.plaintext;
+        return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 
     std::string SecretsManagerService::GetSecretString(Database::Entity::SecretsManager::Secret &secret) const {
