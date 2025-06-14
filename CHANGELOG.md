@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.5.1](https://github.com/jensvogt/awsmock/compare/v1.5.0...v1.5.1) (2025-06-14)
+
+
+### Bug Fixes
+
+* **1275-add-secretmanager-rotation:** backup for all modules ([8568ae3](https://github.com/jensvogt/awsmock/commit/8568ae3c8d23c303aab8190e6e8774b4e0bf1fdb))
+* **1275-add-secretmanager-rotation:** fix bug in backup ([2659282](https://github.com/jensvogt/awsmock/commit/2659282f99dbceeb53e459a5a354a202d4525c51))
+* **1275-add-secretmanager-rotation:** fix bug in logging, add backup via cron ([8e4775f](https://github.com/jensvogt/awsmock/commit/8e4775fffef3ccfabd04c6cb6de31d7abfbfd230))
+* **1275-add-secretmanager-rotation:** remove python 3.8 lambda support, add python 3.12, 3.13 ([fa8a083](https://github.com/jensvogt/awsmock/commit/fa8a08329afb3ed12d5437d1867d9e85ef0c1260))
+
 ## [1.5.0](https://github.com/jensvogt/awsmock/compare/v1.4.0...v1.5.0) (2025-06-09)
 
 
