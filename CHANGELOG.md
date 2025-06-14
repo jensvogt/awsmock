@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.2](https://github.com/jensvogt/awsmock/compare/v1.5.1...v1.5.2) (2025-06-14)
+
+
+### Bug Fixes
+
+* **1288-kms-ui-pages:** add top-x counters for ui charts ([40c13ec](https://github.com/jensvogt/awsmock/commit/40c13eca2073db7eeb29fee504bdbbc95d6e0889))
+* **1288-kms-ui-pages:** fix bug in SQS message redrive ([2bb44e0](https://github.com/jensvogt/awsmock/commit/2bb44e02aff7d81d9d7624d171bc8b4677283441))
+
 ## [1.5.1](https://github.com/jensvogt/awsmock/compare/v1.5.0...v1.5.1) (2025-06-14)
 
 
