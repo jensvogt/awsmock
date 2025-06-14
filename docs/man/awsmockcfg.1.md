@@ -34,8 +34,8 @@ AWSMOCK_LOG_LEVEL=debug
 
 ## VARIABLES
 
-The following lists show all variables in the configurcation file, their corresponding environment variable and the
-meaning of the variable, together with its default value.
+The following lists show all variables in the configuration file, their corresponding environment variable, the
+meaning of the variable, and the default value.
 
 ### General variables
 
@@ -86,8 +86,8 @@ awsmock.gateway.timeout                           AWSMOCK_MODULES_GATEWAY_TIMEOU
 ### S3 module variables
 
 ```
-awsmock.modules.s3.active                         AWSMOCK_MODULES_S3_ACTIVE                         activation flag
-awsmock.modules.s3.backup.active                  AWSMOCK_MODULES_S3_BACKUP_ACTIVE                  backup activation flag
+awsmock.modules.s3.active                         AWSMOCK_MODULES_S3_ACTIVE                         activation flag, default: true
+awsmock.modules.s3.backup.active                  AWSMOCK_MODULES_S3_BACKUP_ACTIVE                  backup activation flag, default: true
 awsmock.modules.s3.backup.cron                    AWSMOCK_MODULES_S3_BACKUP_CRON                    backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.s3.data-dir                       AWSMOCK_MODULES_S3_DATA_DIR                       data directory, default: /usr/local/awsmock/data/s3
 awsmock.modules.s3.monitoring.period              AWSMOCK_MODULES_S3_MONITORING_PERIOD              monitoring period in seconds, default: 900
@@ -98,8 +98,8 @@ awsmock.modules.s3.sync.period                    AWSMOCK_MODULES_S3_SYNCH_PERIO
 ### SQS module variables
 
 ```
-awsmock.modules.sqs.active                        AWSMOCK_MODULES_SQS_ACTIVE                        activation flag
-awsmock.modules.sqs.backup.active                 AWSMOCK_MODULES_SQS_BACKUP_ACTIVE                 backup activation flag
+awsmock.modules.sqs.active                        AWSMOCK_MODULES_SQS_ACTIVE                        activation flag, default: true
+awsmock.modules.sqs.backup.active                 AWSMOCK_MODULES_SQS_BACKUP_ACTIVE                 backup activation flag, default: true
 awsmock.modules.sqs.backup.cron                   AWSMOCK_MODULES_SQS_BACKUP_CRON                   backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.sqs.monitoring.period             AWSMOCK_MODULES_SQS_MONITORING_PERIOD             monitoring period in seconds, default: 300
 awsmock.modules.sqs.reset.period                  AWSMOCK_MODULES_SQS_RESET_PERIOD                  message reset period in seconds, default: 30
@@ -110,8 +110,8 @@ awsmock.modules.sqs.receive-poll                  AWSMOCK_MODULES_SQS_RECEIVE_PO
 ### SNS module variables
 
 ```
-awsmock.modules.sns.active                        AWSMOCK_MODULES_SNS_ACTIVE                        activation flag
-awsmock.modules.sns.backup.active                 AWSMOCK_MODULES_SNS_BACKUP_ACTIVE                 backup activation flag
+awsmock.modules.sns.active                        AWSMOCK_MODULES_SNS_ACTIVE                        activation flag, default: true
+awsmock.modules.sns.backup.active                 AWSMOCK_MODULES_SNS_BACKUP_ACTIVE                 backup activation flag, default: true
 awsmock.modules.sns.backup.cron                   AWSMOCK_MODULES_SNS_BACKUP_CRON                   backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.sns.monitoring.period             AWSMOCK_MODULES_SNS_MONITORING_PERIOD             monitoring timeout period in seconds, default: 300
 awsmock.modules.sns.delete.period                 AWSMOCK_MODULES_SNS_DELETE_PERIOD                 message delete period in seconds, default: 300
@@ -122,8 +122,8 @@ awsmock.modules.sns.timeout                       AWSMOCK_MODULES_SNS_TIMEOUT   
 ### Lambda module variables
 
 ```
-awsmock.modules.lambda.active                     AWSMOCK_MODULES_LAMBDA_ACTIVE                     activation flag
-awsmock.modules.lambda.backup.active              AWSMOCK_MODULES_LAMBDA_BACKUP_ACTIVE              backup activation flag
+awsmock.modules.lambda.active                     AWSMOCK_MODULES_LAMBDA_ACTIVE                     activation flag, default: true
+awsmock.modules.lambda.backup.active              AWSMOCK_MODULES_LAMBDA_BACKUP_ACTIVE              backup activation flag, default: true
 awsmock.modules.lambda.backup.cron                AWSMOCK_MODULES_LAMBDA_BACKUP_CRON                backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.lambda.lifetime                   AWSMOCK_MODULES_LAMBDA_LIFETIME                   function lifetime perios in seconds, default: 3600
 awsmock.modules.lambda.data-dir                   AWSMOCK_MODULES_LAMBDA_DATA_DIR                   function data directory, default: /usr/local/awsmock/data/lambda
@@ -150,8 +150,8 @@ awsmock.modules.lambda.runtime.go                 AWSMOCK_MODULES_LAMBDA_RUNTIME
 ### KMS module variables
 
 ```
-awsmock.modules.kms.active                        AWSMOCK_MODULES_KMS_ACTIVE                        module activation
-awsmock.modules.kms.backup.active                 AWSMOCK_MODULES_KMS_BACKUP_ACTIVE                 backup activation flag
+awsmock.modules.kms.active                        AWSMOCK_MODULES_KMS_ACTIVE                        module activation, default: true
+awsmock.modules.kms.backup.active                 AWSMOCK_MODULES_KMS_BACKUP_ACTIVE                 backup activation flag, default: true
 awsmock.modules.kms.backup.cron                   AWSMOCK_MODULES_KMS_BACKUP_CRON                   backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.kms.monitoring.period             AWSMOCK_MODULES_KMS_PERIOD                        monitoring polling period in seconds, default: 300
 awsmock.modules.kms.remove.period                 AWSMOCK_MODULES_KMS_REMOVE_PERIOD                 key removal period in seconds, default: 300 
@@ -160,8 +160,8 @@ awsmock.modules.kms.remove.period                 AWSMOCK_MODULES_KMS_REMOVE_PER
 ### SSM module variables
 
 ```
-awsmock.modules.ssm.active                        AWSMOCK_MODULES_SSM_ACTIVE                        module activation
-awsmock.modules.ssm.backup.active                 AWSMOCK_MODULES_SSM_BACKUP_ACTIVE                 backup activation flag
+awsmock.modules.ssm.active                        AWSMOCK_MODULES_SSM_ACTIVE                        module activation, default: true
+awsmock.modules.ssm.backup.active                 AWSMOCK_MODULES_SSM_BACKUP_ACTIVE                 backup activation flag, default: true
 awsmock.modules.ssm.backup.cron                   AWSMOCK_MODULES_SSM_BACKUP_CRON                   backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.ssm.monitoring.period             AWSMOCK_MODULES_SSM_PERIOD                        monitoring polling period in seconds, default: 300
 awsmock.modules.ssm.remove.period                 AWSMOCK_MODULES_SSM_REMOVE_PERIOD                 parameter removal period in seconds, default: 300 
@@ -170,8 +170,8 @@ awsmock.modules.ssm.remove.period                 AWSMOCK_MODULES_SSM_REMOVE_PER
 ### Secrets Manager module variables
 
 ```
-awsmock.modules.secretsmanager.active             AWSMOCK_MODULES_SECRETSMANAGER_ACTIVE             module activation
-awsmock.modules.secretsmanager.backup.active      AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_ACTIVE      backup activation flag
+awsmock.modules.secretsmanager.active             AWSMOCK_MODULES_SECRETSMANAGER_ACTIVE             module activation, default: true
+awsmock.modules.secretsmanager.backup.active      AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_ACTIVE      backup activation flag, default: true
 awsmock.modules.secretsmanager.backup.cron        AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_CRON        backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.secretsmanager.monitoring.period  AWSMOCK_MODULES_SECRETSMANAGER_MONIOTRING_PERIOD  monitoring polling period in seconds, default: 300
 awsmock.modules.secretsmanager.worker.period      AWSMOCK_MODULES_SECRETSMANAGER_WORKER_PERIOD      parameter remove period in seconds, default: 300 

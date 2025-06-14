@@ -26,7 +26,7 @@ namespace AwsMock::Core {
     long CronUtils::GetNextExecutionTimeSeconds(const std::string &cron) {
         const system_clock::time_point nextExecutionTime = GetNextExecutionTime(cron);
         if (const long next = duration_cast<std::chrono::seconds>(nextExecutionTime - system_clock::now()).count(); next < 1) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(2));
         }
         return duration_cast<std::chrono::seconds>(nextExecutionTime - system_clock::now()).count();
     }

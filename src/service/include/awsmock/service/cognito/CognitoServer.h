@@ -44,7 +44,7 @@ namespace AwsMock::Service {
         /**
          * @brief Backup the cognito objects
          */
-        void BackupCognito();
+        static void BackupCognito();
 
         /**
          * @brief Metric service

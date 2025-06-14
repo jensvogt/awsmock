@@ -83,17 +83,17 @@ namespace AwsMock::Dto::KMS {
         /**
          * Key specification
          */
-        KeySpec keySpec;
+        KeySpec keySpec = KeySpec::SYMMETRIC_DEFAULT;
 
         /**
          * Key usage
          */
-        KeyUsage keyUsage;
+        KeyUsage keyUsage = KeyUsage::ENCRYPT_DECRYPT;
 
         /**
          * Key state
          */
-        KeyState keyState;
+        KeyState keyState = KeyState::UNAVAILABLE;
 
         /**
          * Multi region
@@ -123,7 +123,7 @@ namespace AwsMock::Dto::KMS {
         /**
          * Origin
          */
-        Origin origin;
+        Origin origin = Origin::AWS_KMS;
 
         /**
          * Encryption algorithms
