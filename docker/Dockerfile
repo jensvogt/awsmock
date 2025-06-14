@@ -39,6 +39,7 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/data/lambda && \
     mkdir -p /usr/local/awsmock/data/transfer && \
     mkdir -p /usr/local/awsmock/data/dynamodb && \
+    mkdir -p /usr/local/awsmock/data/backup && \
     mkdir -p /usr/local/awsmock/data/tmp && \
     mkdir -p /usr/local/awsmock/bin && \
     mkdir -p /usr/local/awsmock/lib && \

@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("cognito-backup", [this] { this->BackupCognito(); }, _backupCron);
+            scheduler.AddTask("cognito-backup", [this] { BackupCognito(); }, _backupCron);
         }
 
         // Set running
@@ -43,10 +43,14 @@ namespace AwsMock::Service {
 
         // Count users per user pool
         for (auto &userPool: _cognitoDatabase.ListUserPools()) {
-            std::string labelValue = userPool.name;
-
             const long usersPerUserPool = _cognitoDatabase.CountUsers(userPool.region, userPool.userPoolId);
-            _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", labelValue, usersPerUserPool);
+            _metricService.SetGauge(COGNITO_USER_BY_USERPOOL_COUNT, "userPool", userPool.name, static_cast<double>(usersPerUserPool));
+        }
+
+        // Count users per user group
+        for (auto &group: _cognitoDatabase.ListGroups()) {
+            const long usersPerGroup = _cognitoDatabase.CountUsers(group.region, group.userPoolId, group.groupName);
+            _metricService.SetGauge(COGNITO_USER_BY_GROUP_COUNT, "group", group.groupName, static_cast<double>(usersPerGroup));
         }
         log_trace << "Cognito monitoring finished";
     }

@@ -276,7 +276,7 @@
       "doc-root": "/usr/local/awsmock/frontend"
     },
     "logging": {
-      "level": "debug",
+      "level": "info",
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",
       "file-size": 10485760,
