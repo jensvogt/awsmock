@@ -241,8 +241,9 @@ namespace AwsMock::Service {
          * @param version secret version
          * @param kmsKeyId KMS key ID
          * @param secretString secret string
+         * @return secret string
          */
-        void DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const;
+        std::string DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const;
 
         /**
          * @brief Returns the decrypted raw secret string
