@@ -984,9 +984,15 @@ namespace AwsMock::Service {
             log_debug << "Bucket received, region:" << bucket.region << " bucket: " << bucket.name;
 
             // Add notification configurations
-            if (!request.queueConfigurations.empty()) { PutQueueNotificationConfigurations(bucket, request.queueConfigurations); }
-            if (!request.topicConfigurations.empty()) { PutTopicNotificationConfigurations(bucket, request.topicConfigurations); }
-            if (!request.lambdaConfigurations.empty()) { PutLambdaNotificationConfigurations(bucket, request.lambdaConfigurations); }
+            if (!request.queueConfigurations.empty()) {
+                PutQueueNotificationConfigurations(bucket, request.queueConfigurations);
+            }
+            if (!request.topicConfigurations.empty()) {
+                PutTopicNotificationConfigurations(bucket, request.topicConfigurations);
+            }
+            if (!request.lambdaConfigurations.empty()) {
+                PutLambdaNotificationConfigurations(bucket, request.lambdaConfigurations);
+            }
 
             // Update database
             bucket = _database.UpdateBucket(bucket);
@@ -1384,7 +1390,9 @@ namespace AwsMock::Service {
             Database::Entity::S3::LambdaNotification lambdaNotification = {.id = attrId, .lambdaArn = lambdaConfiguration.lambdaArn};
 
             // Get events
-            for (const auto &event: lambdaConfiguration.events) { lambdaNotification.events.emplace_back(Dto::S3::EventTypeToString(event)); }
+            for (const auto &event: lambdaConfiguration.events) {
+                lambdaNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+            }
 
             // Get filter rules
             for (const auto &filterRule: lambdaConfiguration.filterRules) {
@@ -1392,6 +1400,10 @@ namespace AwsMock::Service {
                 lambdaNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.lambdaNotifications.emplace_back(lambdaNotification);
+
+            // TODO: Add lambda event source mapping
+            //_lambdaService.
+
             log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
         }
     }

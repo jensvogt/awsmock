@@ -36,6 +36,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
+                case Dto::Common::SNSCommandType::LIST_TOPIC_ARNS: {
+
+                    Dto::SNS::ListTopicArnsResponse snsResponse = _snsService.ListTopicArns(clientCommand.region);
+
+                    log_info << "List topic ARNs";
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
 
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");

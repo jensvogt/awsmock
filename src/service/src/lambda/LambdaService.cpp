@@ -199,11 +199,63 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::AddLambdaEnvironment(const Dto::Lambda::AddFunctionEnvironmentRequest &request) const {
+    Dto::Lambda::ListLambdaEventSourceCountersResponse LambdaService::ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_event_source_counters");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_event_source_counters");
+        log_debug << "List lambda event source counters request, lambdaArn: " << request.lambdaArn;
+
+        try {
+
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+
+            Dto::Lambda::ListLambdaEventSourceCountersResponse response;
+            response.total = static_cast<long>(lambda.eventSources.size());
+
+            // Map to DTO
+            std::vector<Dto::Lambda::EventSourceMapping> eventSources = Dto::Lambda::Mapper::mapCounters(lambda.arn, lambda.eventSources);
+
+            // Sorting
+            if (request.sortColumns.at(0).column == "eventSourceArn") {
+                std::ranges::sort(eventSources, [request](const Dto::Lambda::EventSourceMapping &a, const Dto::Lambda::EventSourceMapping &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.eventSourceArn <= b.eventSourceArn;
+                    }
+                    return a.eventSourceArn > b.eventSourceArn;
+                });
+            } else if (request.sortColumns.at(0).column == "uuid") {
+                std::ranges::sort(eventSources, [request](const Dto::Lambda::EventSourceMapping &a, const Dto::Lambda::EventSourceMapping &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.uuid <= b.uuid;
+                    }
+                    return a.uuid > b.uuid;
+                });
+            }
+
+            // Paging
+            auto endArray = eventSources.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > eventSources.size()) {
+                endArray = eventSources.end();
+            }
+            response.eventSourceCounters = std::vector(eventSources.begin() + request.pageIndex * request.pageSize, endArray);
+
+            log_trace << "Lambda list event source counters, result: " << response.ToString();
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::AddLambdaEnvironment(const Dto::Lambda::AddEnvironmentRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_lambda_environment");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_lambda_environment");
         log_debug << "List lambda environment counters request, functionArn: " << request.functionArn;
 
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
+        }
         try {
 
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
@@ -222,6 +274,10 @@ namespace AwsMock::Service {
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "update_lambda_environment");
         log_debug << "Update lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey << ", value: " << request.environmentValue;
 
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
+        }
         try {
 
             Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
@@ -235,10 +291,15 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::DeleteLambdaEnvironment(const Dto::Lambda::DeleteFunctionEnvironmentRequest &request) const {
+    void LambdaService::DeleteLambdaEnvironment(const Dto::Lambda::DeleteEnvironmentRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_environment");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_environment");
         log_debug << "Delete lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
+        }
 
         try {
 
@@ -250,6 +311,63 @@ namespace AwsMock::Service {
             });
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda environments deleted, lambdaArn: " << lambda.arn << " count: " << count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::AddEventSource(const Dto::Lambda::AddEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_event_source");
+        log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
+        }
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            Database::Entity::Lambda::EventSourceMapping eventSourceMapping;
+            eventSourceMapping.type = request.type;
+            eventSourceMapping.eventSourceArn = request.eventSourceArn;
+            eventSourceMapping.batchSize = request.batchSize;
+            eventSourceMapping.maximumBatchingWindowInSeconds = request.maximumBatchingWindowInSeconds;
+            eventSourceMapping.enabled = request.enabled;
+            eventSourceMapping.uuid = request.uuid.empty() ? Core::StringUtils::CreateRandomUuid() : request.uuid;
+
+            lambda.eventSources.emplace_back(eventSourceMapping);
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda event sources added, lambdaArn: " << lambda.arn;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::DeleteEventSource(const Dto::Lambda::DeleteEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_event_source");
+        log_debug << "Delete lambda event source request, functionArn: " << request.functionArn << ", eventSourceArn: " << request.eventSourceArn;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
+        }
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            std::string eventSourceArn = request.eventSourceArn;
+            const auto count = std::erase_if(lambda.eventSources, [eventSourceArn](const auto &item) {
+                return item.eventSourceArn == eventSourceArn;
+            });
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda event sources deleted, lambdaArn: " << lambda.arn << " count: " << count;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -367,7 +485,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::AddLambdaTag(const Dto::Lambda::AddFunctionTagRequest &request) const {
+    void LambdaService::AddLambdaTag(const Dto::Lambda::AddTagRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_lambda_tag");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_lambda_tag");
         log_debug << "List lambda tag counters request, functionArn: " << request.functionArn;
@@ -403,7 +521,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::DeleteLambdaTag(const Dto::Lambda::DeleteFunctionTagRequest &request) const {
+    void LambdaService::DeleteLambdaTag(const Dto::Lambda::DeleteTagRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_tag");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_tag");
         log_debug << "Delete lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey;
@@ -690,7 +808,7 @@ namespace AwsMock::Service {
         // Get the existing entity
         const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
-        return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
+        return Dto::Lambda::Mapper::map(lambdaEntity.eventSources);
     }
 
     Dto::Lambda::ListLambdaArnsResponse LambdaService::ListLambdaArns() const {

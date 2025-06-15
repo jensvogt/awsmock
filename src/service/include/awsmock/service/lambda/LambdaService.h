@@ -35,13 +35,15 @@
 #include <awsmock/dto/lambda/ListEventSourceMappingsResponse.h>
 #include <awsmock/dto/lambda/ListFunctionResponse.h>
 #include <awsmock/dto/lambda/ListTagsResponse.h>
-#include <awsmock/dto/lambda/internal/AddFunctionEnvironmentRequest.h>
-#include <awsmock/dto/lambda/internal/AddFunctionTagRequest.h>
-#include <awsmock/dto/lambda/internal/DeleteFunctionEnvironmentRequest.h>
-#include <awsmock/dto/lambda/internal/DeleteFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/AddEnvironmentRequest.h>
+#include <awsmock/dto/lambda/internal/AddEventSourceRequest.h>
+#include <awsmock/dto/lambda/internal/AddTagRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteEnvironmentRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteEventSourceRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteImageRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteLambdaResultCounterRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteLambdaResultCountersRequest.h>
+#include <awsmock/dto/lambda/internal/DeleteTagRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/internal/GetLambdaResultCounterRequest.h>
@@ -51,6 +53,8 @@
 #include <awsmock/dto/lambda/internal/ListLambdaArnsResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersRequest.h>
@@ -173,12 +177,22 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Lambda::ListLambdaEnvironmentCountersResponse ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const;
 
         /**
+         * @brief List lambda event source counters
+         *
+         * @param request list lambda event source counters request
+         * @return ListLambdaEventSourceCountersResponse
+         * @see ListLambdaEventSourceCountersRequest
+         * @see ListLambdaEventSourceCountersResponse
+         */
+        [[nodiscard]] Dto::Lambda::ListLambdaEventSourceCountersResponse ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const;
+
+        /**
          * @brief Add a lambda environment variable
          *
          * @param request add lambda environment variable request
          * @see Dto::Lambda::AddFunctionTagRequest
          */
-        void AddLambdaEnvironment(const Dto::Lambda::AddFunctionEnvironmentRequest &request) const;
+        void AddLambdaEnvironment(const Dto::Lambda::AddEnvironmentRequest &request) const;
 
         /**
          * @brief Update a lambda environment variable
@@ -194,7 +208,23 @@ namespace AwsMock::Service {
          * @param request delete lambda environment variable request
          * @see Dto::Lambda::DeleteFunctionEnvironmentRequest
          */
-        void DeleteLambdaEnvironment(const Dto::Lambda::DeleteFunctionEnvironmentRequest &request) const;
+        void DeleteLambdaEnvironment(const Dto::Lambda::DeleteEnvironmentRequest &request) const;
+
+        /**
+         * @brief Add a lambda event source
+         *
+         * @param request add lambda vent source request
+         * @see Dto::Lambda::AddEventSourceRequest
+         */
+        void AddEventSource(const Dto::Lambda::AddEventSourceRequest &request) const;
+
+        /**
+         * @brief Delete a lambda event source
+         *
+         * @param request delete lambda event source request
+         * @see Dto::Lambda::DeleteEventSourceRequest
+         */
+        void DeleteEventSource(const Dto::Lambda::DeleteEventSourceRequest &request) const;
 
         /**
          * @brief Add a lambda tags
@@ -202,7 +232,7 @@ namespace AwsMock::Service {
          * @param request add lambda tags request
          * @see Dto::Lambda::AddFunctionTagRequest
          */
-        void AddLambdaTag(const Dto::Lambda::AddFunctionTagRequest &request) const;
+        void AddLambdaTag(const Dto::Lambda::AddTagRequest &request) const;
 
         /**
          * @brief Update a lambda tags
@@ -218,7 +248,7 @@ namespace AwsMock::Service {
          * @param request delete lambda tags request
          * @see Dto::Lambda::DeleteFunctionTagRequest
          */
-        void DeleteLambdaTag(const Dto::Lambda::DeleteFunctionTagRequest &request) const;
+        void DeleteLambdaTag(const Dto::Lambda::DeleteTagRequest &request) const;
 
         /**
          * @brief Invoke SQS function.

@@ -27,7 +27,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteFunctionTagRequest final : Common::BaseCounter<DeleteFunctionTagRequest> {
+    struct DeleteTagRequest final : Common::BaseCounter<DeleteTagRequest> {
 
         /**
          * Lambda function ARN
@@ -41,14 +41,14 @@ namespace AwsMock::Dto::Lambda {
 
       private:
 
-        friend DeleteFunctionTagRequest tag_invoke(boost::json::value_to_tag<DeleteFunctionTagRequest>, boost::json::value const &v) {
-            DeleteFunctionTagRequest r;
+        friend DeleteTagRequest tag_invoke(boost::json::value_to_tag<DeleteTagRequest>, boost::json::value const &v) {
+            DeleteTagRequest r;
             r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
             r.tagKey = Core::Json::GetStringValue(v, "Key");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteFunctionTagRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteTagRequest const &obj) {
             jv = {
                     {"FunctionArn", obj.functionArn},
                     {"Key", obj.tagKey},

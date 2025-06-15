@@ -8,6 +8,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
     void EventSourceMapping::FromDocument(const std::optional<view> &mResult) {
 
+        type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
         eventSourceArn = Core::Bson::BsonUtils::GetStringValue(mResult, "eventSourceArn");
         batchSize = Core::Bson::BsonUtils::GetIntValue(mResult, "batchSize");
         maximumBatchingWindowInSeconds = Core::Bson::BsonUtils::GetIntValue(mResult, "maximumBatchingWindowInSeconds");
@@ -18,6 +19,7 @@ namespace AwsMock::Database::Entity::Lambda {
     view_or_value<view, value> EventSourceMapping::ToDocument() const {
 
         document eventSourceMappingDoc{};
+        eventSourceMappingDoc.append(kvp("type", type));
         eventSourceMappingDoc.append(kvp("eventSourceArn", eventSourceArn));
         eventSourceMappingDoc.append(kvp("batchSize", batchSize));
         eventSourceMappingDoc.append(kvp("maximumBatchingWindowInSeconds", maximumBatchingWindowInSeconds));

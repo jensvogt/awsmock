@@ -49,7 +49,7 @@ namespace AwsMock::Service {
                     lambdaRequest.requestId = clientCommand.requestId;
 
                     Dto::Lambda::ListEventSourceMappingsResponse lambdaResponse = _lambdaService.ListEventSourceMappings(lambdaRequest);
-
+                    log_info << "Event source mappings" << lambdaResponse;
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_ENVIRONMENT) {
 
-                Dto::Lambda::AddFunctionEnvironmentRequest lambdaRequest = Dto::Lambda::AddFunctionEnvironmentRequest::FromJson(clientCommand);
+                Dto::Lambda::AddEnvironmentRequest lambdaRequest = Dto::Lambda::AddEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.AddLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment added, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
@@ -213,7 +213,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_ENVIRONMENT) {
 
-                Dto::Lambda::DeleteFunctionEnvironmentRequest lambdaRequest = Dto::Lambda::DeleteFunctionEnvironmentRequest::FromJson(clientCommand);
+                Dto::Lambda::DeleteEnvironmentRequest lambdaRequest = Dto::Lambda::DeleteEnvironmentRequest::FromJson(clientCommand);
                 _lambdaService.DeleteLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment deleted, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
@@ -231,7 +231,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_TAG) {
 
-                Dto::Lambda::AddFunctionTagRequest lambdaRequest = Dto::Lambda::AddFunctionTagRequest::FromJson(clientCommand);
+                Dto::Lambda::AddTagRequest lambdaRequest = Dto::Lambda::AddTagRequest::FromJson(clientCommand);
                 _lambdaService.AddLambdaTag(lambdaRequest);
                 log_info << "Lambda tag added";
 
@@ -249,7 +249,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_TAG) {
 
-                Dto::Lambda::DeleteFunctionTagRequest lambdaRequest = Dto::Lambda::DeleteFunctionTagRequest::FromJson(clientCommand);
+                Dto::Lambda::DeleteTagRequest lambdaRequest = Dto::Lambda::DeleteTagRequest::FromJson(clientCommand);
                 _lambdaService.DeleteLambdaTag(lambdaRequest);
                 log_info << "Lambda tag deleted";
 
@@ -321,6 +321,33 @@ namespace AwsMock::Service {
                 Dto::Lambda::DeleteLambdaResultCountersRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCountersRequest::FromJson(clientCommand);
                 long count = _lambdaService.DeleteLambdaResultCounters(lambdaRequest);
                 log_trace << "Delete lambda result counters, count: " << count;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_COUNTERS) {
+
+                Dto::Lambda::ListLambdaEventSourceCountersRequest lambdaRequest = Dto::Lambda::ListLambdaEventSourceCountersRequest::FromJson(clientCommand);
+                Dto::Lambda::ListLambdaEventSourceCountersResponse lambdaResponse = _lambdaService.ListLambdaEventSourceCounters(lambdaRequest);
+                log_trace << "Lambda event source counters list, count: " << lambdaResponse.eventSourceCounters.size();
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_EVENT_SOURCE_COUNTER) {
+
+                Dto::Lambda::AddEventSourceRequest lambdaRequest = Dto::Lambda::AddEventSourceRequest::FromJson(clientCommand);
+                _lambdaService.AddEventSource(lambdaRequest);
+                log_trace << "Add event source, functionArn: " << lambdaRequest.functionArn;
+
+                return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_EVENT_SOURCE_COUNTER) {
+
+                Dto::Lambda::DeleteEventSourceRequest lambdaRequest = Dto::Lambda::DeleteEventSourceRequest::FromJson(clientCommand);
+                _lambdaService.DeleteEventSource(lambdaRequest);
+                log_trace << "Delete event source, functionArn: " << lambdaRequest.functionArn;
 
                 return SendOkResponse(request);
             }

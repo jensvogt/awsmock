@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct AddFunctionTagRequest final : Common::BaseCounter<AddFunctionTagRequest> {
+    struct AddTagRequest final : Common::BaseCounter<AddTagRequest> {
 
         /**
          * Lambda function ARN
@@ -47,15 +47,15 @@ namespace AwsMock::Dto::Lambda {
 
       private:
 
-        friend AddFunctionTagRequest tag_invoke(boost::json::value_to_tag<AddFunctionTagRequest>, boost::json::value const &v) {
-            AddFunctionTagRequest r;
+        friend AddTagRequest tag_invoke(boost::json::value_to_tag<AddTagRequest>, boost::json::value const &v) {
+            AddTagRequest r;
             r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
             r.tagKey = Core::Json::GetStringValue(v, "Key");
             r.tagValue = Core::Json::GetStringValue(v, "Value");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AddFunctionTagRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AddTagRequest const &obj) {
             jv = {
                     {"FunctionArn", obj.functionArn},
                     {"Key", obj.tagKey},
