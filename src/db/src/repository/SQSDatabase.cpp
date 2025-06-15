@@ -293,13 +293,14 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
 
             const document query = {};
-            opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
                 for (const auto &[column, sortDirection]: sortColumns) {
                     sort.append(kvp(column, sortDirection));
                 }
                 opts.sort(sort.extract());
+            } else {
+                opts.sort(make_document(kvp("_id", 1)));
             }
 
             for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {

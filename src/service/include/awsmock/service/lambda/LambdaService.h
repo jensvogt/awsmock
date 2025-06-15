@@ -51,6 +51,8 @@
 #include <awsmock/dto/lambda/internal/ListLambdaArnsResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEnvironmentCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersRequest.h>
@@ -171,6 +173,16 @@ namespace AwsMock::Service {
          * @see ListLambdaEnvironmentCountersResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaEnvironmentCountersResponse ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const;
+
+        /**
+         * @brief List lambda event source counters
+         *
+         * @param request list lambda event source counters request
+         * @return ListLambdaEventSourceCountersResponse
+         * @see ListLambdaEventSourceCountersRequest
+         * @see ListLambdaEventSourceCountersResponse
+         */
+        [[nodiscard]] Dto::Lambda::ListLambdaEventSourceCountersResponse ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const;
 
         /**
          * @brief Add a lambda environment variable

@@ -49,7 +49,7 @@ namespace AwsMock::Service {
                     lambdaRequest.requestId = clientCommand.requestId;
 
                     Dto::Lambda::ListEventSourceMappingsResponse lambdaResponse = _lambdaService.ListEventSourceMappings(lambdaRequest);
-
+                    log_info << "Event source mappings" << lambdaResponse;
                     return SendOkResponse(request, lambdaResponse.ToJson());
                 }
 
@@ -323,6 +323,15 @@ namespace AwsMock::Service {
                 log_trace << "Delete lambda result counters, count: " << count;
 
                 return SendOkResponse(request);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_COUNTERS) {
+
+                Dto::Lambda::ListLambdaEventSourceCountersRequest lambdaRequest = Dto::Lambda::ListLambdaEventSourceCountersRequest::FromJson(clientCommand);
+                Dto::Lambda::ListLambdaEventSourceCountersResponse lambdaResponse = _lambdaService.ListLambdaEventSourceCounters(lambdaRequest);
+                log_trace << "Lambda event source counters list, count: " << lambdaResponse.eventSourceCounters.size();
+
+                return SendOkResponse(request, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {

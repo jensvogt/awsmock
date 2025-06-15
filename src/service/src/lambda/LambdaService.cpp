@@ -199,6 +199,54 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Lambda::ListLambdaEventSourceCountersResponse LambdaService::ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_event_source_counters");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_event_source_counters");
+        log_debug << "List lambda event source counters request, lambdaArn: " << request.lambdaArn;
+
+        try {
+
+            const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.lambdaArn);
+
+            Dto::Lambda::ListLambdaEventSourceCountersResponse response;
+            response.total = static_cast<long>(lambda.eventSources.size());
+
+            // Map to DTO
+            std::vector<Dto::Lambda::EventSourceMapping> eventSources = Dto::Lambda::Mapper::mapCounters(lambda.arn, lambda.eventSources);
+
+            // Sorting
+            if (request.sortColumns.at(0).column == "eventSourceArn") {
+                std::ranges::sort(eventSources, [request](const Dto::Lambda::EventSourceMapping &a, const Dto::Lambda::EventSourceMapping &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.eventSourceArn <= b.eventSourceArn;
+                    }
+                    return a.eventSourceArn > b.eventSourceArn;
+                });
+            } else if (request.sortColumns.at(0).column == "uuid") {
+                std::ranges::sort(eventSources, [request](const Dto::Lambda::EventSourceMapping &a, const Dto::Lambda::EventSourceMapping &b) {
+                    if (request.sortColumns.at(0).sortDirection == -1) {
+                        return a.uuid <= b.uuid;
+                    }
+                    return a.uuid > b.uuid;
+                });
+            }
+
+            // Paging
+            auto endArray = eventSources.begin() + request.pageSize * (request.pageIndex + 1);
+            if (request.pageSize * (request.pageIndex + 1) > eventSources.size()) {
+                endArray = eventSources.end();
+            }
+            response.eventSourceCounters = std::vector(eventSources.begin() + request.pageIndex * request.pageSize, endArray);
+
+            log_trace << "Lambda list event source counters, result: " << response.ToString();
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     void LambdaService::AddLambdaEnvironment(const Dto::Lambda::AddFunctionEnvironmentRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_lambda_environment");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_lambda_environment");
@@ -690,7 +738,7 @@ namespace AwsMock::Service {
         // Get the existing entity
         const Database::Entity::Lambda::Lambda lambdaEntity = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
 
-        return Dto::Lambda::Mapper::map(lambdaEntity.arn, lambdaEntity.eventSources);
+        return Dto::Lambda::Mapper::map(lambdaEntity.eventSources);
     }
 
     Dto::Lambda::ListLambdaArnsResponse LambdaService::ListLambdaArns() const {
