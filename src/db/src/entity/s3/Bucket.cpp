@@ -183,18 +183,4 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    std::string Bucket::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string Bucket::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Bucket &b) {
-        os << "Bucket=" << to_json(b.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::S3

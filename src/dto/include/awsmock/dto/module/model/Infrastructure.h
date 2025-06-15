@@ -49,7 +49,7 @@ namespace AwsMock::Dto::Module {
         /**
          * @brief S3 objects
          */
-        Database::Entity::S3::ObjectList s3Objects;
+        std::vector<Database::Entity::S3::Object> s3Objects;
 
         /**
          * @brief SQS queues

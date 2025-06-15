@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     view_or_value<view, value> TopicNotification::ToDocument() const {
-        auto topicNotificationDoc = bsoncxx::builder::basic::document{};
+        auto topicNotificationDoc = document{};
         topicNotificationDoc.append(kvp("id", id));
         topicNotificationDoc.append(kvp("topicArn", topicArn));
 
@@ -59,14 +59,4 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
-    std::string TopicNotification::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const TopicNotification &n) {
-        os << "TopicNotification=" << to_json(n.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::S3

@@ -92,7 +92,7 @@ namespace AwsMock::Service {
 
         // act
         std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
-        const Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
+        const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket("test-bucket");
 
         // assert
         BOOST_CHECK_EQUAL(1, objectList.size());
@@ -122,7 +122,7 @@ namespace AwsMock::Service {
 
         // act
         std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", TEST_BUCKET + "/" + filename, TEST_BUCKET + "/test/" + filename, "--endpoint", _endpoint});
-        const Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
+        const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(2, objectList.size());
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
 
         // act
         std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mv", TEST_BUCKET + "/" + objectName, TEST_BUCKET + "/test/" + objectName, "--endpoint", _endpoint});
-        const Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
+        const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(1, objectList.size());
@@ -163,7 +163,7 @@ namespace AwsMock::Service {
 
         //aws s3api complete-multipart-upload --multipart-upload file://fileparts.json --bucket DOC-EXAMPLE-BUCKET --key large_BOOST_FIXTURE_TEST_CASEile --upload-userPoolId exampleTUVGeKAk3Ob7qMynRKqe3ROcavPRwg92eA6JPD4ybIGRxJx9R0VbgkrnOVphZFK59KCYJAO1PXlrBSW7vcH7ANHZwTTf0ovqe6XPYHwsSp7eTRnXB1qjx40Tk
         std::string output4 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3api", "complete-multipart-upload", "--bucket", "test-bucket", "--key", "multipart-upload.json", "--upload-id", s3Result.uploadId, "--endpoint", _endpoint});
-        Database::Entity::S3::ObjectList objectList = _database.ListBucket(TEST_BUCKET_NAME);
+        std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(TEST_BUCKET_NAME);
 
         // assert
         BOOST_CHECK_EQUAL(1, objectList.size());
@@ -179,7 +179,7 @@ namespace AwsMock::Service {
 
         // act
         std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "rm", TEST_BUCKET + "/" + filename, "--endpoint", _endpoint});
-        const Database::Entity::S3::ObjectList objectList = _database.ListBucket("test-bucket");
+        const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket("test-bucket");
 
         // assert
         BOOST_CHECK_EQUAL(0, objectList.size());
