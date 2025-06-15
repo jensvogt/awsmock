@@ -87,6 +87,7 @@ namespace AwsMock::Dto::Lambda {
         ListEventSourceMappingsResponse response;
         for (auto &eventSourceMapping: eventSourceMappings) {
             EventSourceMapping eventSourceMappingDto;
+            eventSourceMappingDto.type = eventSourceMapping.type;
             eventSourceMappingDto.eventSourceArn = eventSourceMapping.eventSourceArn;
             eventSourceMappingDto.batchSize = eventSourceMapping.batchSize;
             eventSourceMappingDto.maximumBatchingWindowInSeconds = eventSourceMapping.maximumBatchingWindowInSeconds;
@@ -99,6 +100,7 @@ namespace AwsMock::Dto::Lambda {
     EventSourceMapping Mapper::map(const std::string &functionArn, const Database::Entity::Lambda::EventSourceMapping &eventSourceMappings) {
         EventSourceMapping eventSourceMappingDto;
         eventSourceMappingDto.functionArn = functionArn;
+        eventSourceMappingDto.type = eventSourceMappings.type;
         eventSourceMappingDto.eventSourceArn = eventSourceMappings.eventSourceArn;
         eventSourceMappingDto.batchSize = eventSourceMappings.batchSize;
         eventSourceMappingDto.maximumBatchingWindowInSeconds = eventSourceMappings.maximumBatchingWindowInSeconds;

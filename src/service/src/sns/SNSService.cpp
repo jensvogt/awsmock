@@ -73,6 +73,29 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::ListTopicArnsResponse SNSService::ListTopicArns(const std::string &region) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_topics");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topics");
+        log_trace << "List all topic ARNs request, region: " << region;
+
+        try {
+
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
+
+            Dto::SNS::ListTopicArnsResponse listTopicArnsResponse;
+            for (const auto &it: topicList) {
+                listTopicArnsResponse.topicArns.emplace_back(it.topicArn);
+            }
+            log_trace << "SNS list topic ARNs response: " << listTopicArnsResponse.ToJson();
+
+            return listTopicArnsResponse;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topic ARNs request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_topic_counters");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topic_counters");

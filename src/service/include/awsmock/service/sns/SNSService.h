@@ -22,6 +22,7 @@
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicArnsResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
@@ -103,6 +104,15 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListTopicsResponse ListTopics(const std::string &region) const;
 
         /**
+         * @brief Returns a list of all available topic ARNs
+         *
+         * @param region AWS region
+         * @return ListTopicArnsResponse
+         * @see ListTopicArnsResponse
+         */
+        [[nodiscard]] Dto::SNS::ListTopicArnsResponse ListTopicArns(const std::string &region) const;
+
+        /**
          * @brief Returns a list of all topic counters
          *
          * @param request List topic counters request
@@ -113,7 +123,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const;
 
         /**
-         * @brief Publish a message to a SNS topic
+         * @brief Publish a message to an SNS topic
          *
          * @param request AWS region
          * @return PublishResponse

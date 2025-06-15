@@ -19,6 +19,11 @@ namespace AwsMock::Dto::Lambda {
     struct EventSourceMapping final : Common::BaseCounter<EventSourceMapping> {
 
         /**
+         * Type
+         */
+        std::string type;
+
+        /**
          * Lambda function ARN
          */
         std::string functionArn;
@@ -53,6 +58,7 @@ namespace AwsMock::Dto::Lambda {
             try {
 
                 document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Type", type);
                 Core::Bson::BsonUtils::SetStringValue(document, "FunctionArn", functionArn);
                 Core::Bson::BsonUtils::SetStringValue(document, "EventSourceArn", eventSourceArn);
                 Core::Bson::BsonUtils::SetLongValue(document, "BatchSize", batchSize);
@@ -70,6 +76,7 @@ namespace AwsMock::Dto::Lambda {
 
         friend EventSourceMapping tag_invoke(boost::json::value_to_tag<EventSourceMapping>, boost::json::value const &v) {
             EventSourceMapping r;
+            r.type = Core::Json::GetStringValue(v, "Type");
             r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
             r.eventSourceArn = Core::Json::GetStringValue(v, "EventSourceArn");
             r.batchSize = Core::Json::GetLongValue(v, "BatchSize");
@@ -80,6 +87,7 @@ namespace AwsMock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventSourceMapping const &obj) {
             jv = {
+                    {"Type", obj.type},
                     {"FunctionArn", obj.functionArn},
                     {"EventSourceArn", obj.eventSourceArn},
                     {"BatchSize", obj.batchSize},

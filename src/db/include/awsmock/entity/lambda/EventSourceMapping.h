@@ -26,19 +26,24 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string eventSourceArn;
 
         /**
+         * Event source type; can be one of SQS, SNS, S3
+         */
+        std::string type;
+
+        /**
          * Batch size
          */
-        int batchSize;
+        long batchSize = 10;
 
         /**
          * Maximum BatchingWindowInSeconds
          */
-        int maximumBatchingWindowInSeconds;
+        long maximumBatchingWindowInSeconds = 5;
 
         /**
          * Enabled
          */
-        bool enabled;
+        bool enabled = false;
 
         /**
          * UUID
