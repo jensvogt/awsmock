@@ -8,37 +8,23 @@
 // C++ includes
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/s3/FilterRule.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-
     /**
-     * S3 bucket lambda notification entity.
+     * @brief S3 bucket lambda notification entity.
      *
-     * <p>
+     * @par
      * This is a child object of the bucket entity.
-     * </p>
      *
      * @see AwsMock::Database::Entity::Bucket
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaNotification {
+    struct LambdaNotification final : Common::BaseEntity<LambdaNotification> {
 
         /**
          * ID
@@ -73,28 +59,14 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * Converts the MongoDB document to an entity
          *
          * @param mResult MongoDB document.
          */
-        LambdaNotification FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const LambdaNotification &q);
+        LambdaNotification FromDocument(const std::optional<view> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::S3

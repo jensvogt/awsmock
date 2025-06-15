@@ -16,32 +16,20 @@
 #include <map>
 #include <string>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief S3 object entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Object {
+    struct Object final : Common::BaseEntity<Object> {
 
         /**
          * ID
@@ -128,7 +116,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -136,33 +124,7 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param object object entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Object &object);
     };
-
-    typedef Object Object;
-    typedef std::vector<Object> ObjectList;
 
 }// namespace AwsMock::Database::Entity::S3
 

@@ -10,23 +10,16 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-
     /**
-     * S3 bucket notification entity
+     * @brief S3 bucket notification entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BucketNotification {
+    struct BucketNotification final : Common::BaseEntity<BucketNotification> {
 
         /**
          * Event
@@ -53,21 +46,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const BucketNotification &q);
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
     };
 
 }// namespace AwsMock::Database::Entity::S3

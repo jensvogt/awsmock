@@ -12,16 +12,9 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::S3 {
-
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
 
     /**
      * @brief S3 bucket encryption entity.
@@ -30,7 +23,7 @@ namespace AwsMock::Database::Entity::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BucketEncryption {
+    struct BucketEncryption final : Common::BaseEntity<BucketEncryption> {
 
         /**
          * SSE algorithm
@@ -47,7 +40,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * Converts the MongoDB document to an entity
@@ -55,20 +48,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const BucketEncryption &q);
     };
 
 }// namespace AwsMock::Database::Entity::S3

@@ -3,7 +3,7 @@
 
 namespace AwsMock::Dto::S3 {
 
-    ListBucketResponse::ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList) {
+    ListBucketResponse::ListBucketResponse(const std::string &bucket, const std::vector<Database::Entity::S3::Object> &objectList) {
 
         maxKeys = 1000;
         name = bucket;

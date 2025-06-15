@@ -17,15 +17,4 @@ namespace AwsMock::Database::Entity::S3 {
         return notificationDoc;
     }
 
-    std::string BucketNotification::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const BucketNotification &q) {
-        os << "BucketNotification=" << bsoncxx::to_json(q.ToDocument());
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::S3

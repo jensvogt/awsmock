@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -81,7 +81,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListEventSourceMappingsRequest final : Common::BaseDto<ListEventSourceMappingsRequest> {
+    struct ListEventSourceMappingsRequest final : Common::BaseCounter<ListEventSourceMappingsRequest> {
 
         /**
          * Name of the function

@@ -91,12 +91,12 @@ namespace AwsMock::Dto::S3 {
 
     auto Mapper::map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaConfigurationEntities) -> std::vector<LambdaConfiguration> {
         std::vector<LambdaConfiguration> lambdaConfigurations;
-        for (const auto &[id, events, lambdaArn, filterRules]: lambdaConfigurationEntities) {
+        for (const auto &lambdaConfigurationEntity: lambdaConfigurationEntities) {
             LambdaConfiguration lambdaConfiguration;
-            lambdaConfiguration.id = id;
-            lambdaConfiguration.lambdaArn = lambdaArn;
-            lambdaConfiguration.events = map(events);
-            lambdaConfiguration.filterRules = map(filterRules);
+            lambdaConfiguration.id = lambdaConfigurationEntity.id;
+            lambdaConfiguration.lambdaArn = lambdaConfigurationEntity.lambdaArn;
+            lambdaConfiguration.events = map(lambdaConfigurationEntity.events);
+            lambdaConfiguration.filterRules = map(lambdaConfigurationEntity.filterRules);
             lambdaConfigurations.emplace_back(lambdaConfiguration);
         }
         return lambdaConfigurations;
@@ -104,12 +104,12 @@ namespace AwsMock::Dto::S3 {
 
     std::vector<QueueConfiguration> Mapper::map(const std::vector<Database::Entity::S3::QueueNotification> &queueConfigurationEntities) {
         std::vector<QueueConfiguration> queueConfigurations;
-        for (const auto &[id, events, queueArn, filterRules]: queueConfigurationEntities) {
+        for (const auto &queueConfigurationEntity: queueConfigurationEntities) {
             QueueConfiguration queueConfiguration;
-            queueConfiguration.id = id;
-            queueConfiguration.queueArn = queueArn;
-            queueConfiguration.events = map(events);
-            queueConfiguration.filterRules = map(filterRules);
+            queueConfiguration.id = queueConfigurationEntity.id;
+            queueConfiguration.queueArn = queueConfigurationEntity.queueArn;
+            queueConfiguration.events = map(queueConfigurationEntity.events);
+            queueConfiguration.filterRules = map(queueConfigurationEntity.filterRules);
             queueConfigurations.emplace_back(queueConfiguration);
         }
         return queueConfigurations;
@@ -117,12 +117,12 @@ namespace AwsMock::Dto::S3 {
 
     std::vector<TopicConfiguration> Mapper::map(const std::vector<Database::Entity::S3::TopicNotification> &topicConfigurationEntities) {
         std::vector<TopicConfiguration> topicConfigurations;
-        for (const auto &[id, events, topicArn, filterRules]: topicConfigurationEntities) {
+        for (const auto &topicConfigurationEntity: topicConfigurationEntities) {
             TopicConfiguration topicConfiguration;
-            topicConfiguration.id = id;
-            topicConfiguration.topicArn = topicArn;
-            topicConfiguration.events = map(events);
-            topicConfiguration.filterRules = map(filterRules);
+            topicConfiguration.id = topicConfigurationEntity.id;
+            topicConfiguration.topicArn = topicConfigurationEntity.topicArn;
+            topicConfiguration.events = map(topicConfigurationEntity.events);
+            topicConfiguration.filterRules = map(topicConfigurationEntity.filterRules);
             topicConfigurations.emplace_back(topicConfiguration);
         }
         return topicConfigurations;
@@ -138,10 +138,10 @@ namespace AwsMock::Dto::S3 {
 
     std::vector<FilterRule> Mapper::map(const std::vector<Database::Entity::S3::FilterRule> &filterRulesEntities) {
         std::vector<FilterRule> filterRuleDtos;
-        for (const auto &[name, value]: filterRulesEntities) {
+        for (const auto &filterRulesEntity: filterRulesEntities) {
             FilterRule filterRuleDto;
-            filterRuleDto.name = NameTypeFromString(name);
-            filterRuleDto.filterValue = value;
+            filterRuleDto.name = NameTypeFromString(filterRulesEntity.name);
+            filterRuleDto.filterValue = filterRulesEntity.value;
             filterRuleDtos.emplace_back(filterRuleDto);
         }
         return filterRuleDtos;
