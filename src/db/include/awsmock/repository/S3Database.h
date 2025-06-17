@@ -80,7 +80,16 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const Entity::S3::Bucket &bucket) const;
+        [[nodiscard]] bool BucketExists(const Entity::S3::Bucket &bucket) const;
+
+        /**
+         * @brief Bucket exists by ARN
+         *
+         * @param bucketArn AWS ARN
+         * @return true if bucket exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] bool BucketExists(const std::string &bucketArn) const;
 
         /**
          * @brief Returns the total number of buckets
@@ -90,7 +99,7 @@ namespace AwsMock::Database {
          * @return total number of buckets
          * @throws DatabaseException
          */
-        long BucketCount(const std::string &region = {}, const std::string &prefix = {}) const;
+        [[nodiscard]] long BucketCount(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -99,7 +108,7 @@ namespace AwsMock::Database {
          * @return bucket, if existing
          * @throws DatabaseException
          */
-        Entity::S3::Bucket GetBucketById(bsoncxx::oid oid) const;
+        [[nodiscard]] Entity::S3::Bucket GetBucketById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -117,7 +126,15 @@ namespace AwsMock::Database {
          * @param name bucket name
          * @return bucket entity
          */
-        Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name) const;
+        [[nodiscard]] Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name) const;
+
+        /**
+         * @brief Returns the bucket by AWS ARN
+         *
+         * @param bucketArn AWS region
+         * @return bucket entity
+         */
+        Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn) const;
 
         /**
          * @brief Create a new bucket in the S3 bucket table

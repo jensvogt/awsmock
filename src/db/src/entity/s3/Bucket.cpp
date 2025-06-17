@@ -42,6 +42,12 @@ namespace AwsMock::Database::Entity::S3 {
                }) != topicNotifications.end();
     }
 
+    bool Bucket::HasLambdaNotification(const std::string &lambdaArn) const {
+        return std::ranges::find_if(lambdaNotifications, [lambdaArn](const LambdaNotification &notification) {
+                   return notification.lambdaArn == lambdaArn;
+               }) != lambdaNotifications.end();
+    }
+
     bool Bucket::HasLambdaNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(lambdaNotifications, [event](const LambdaNotification &notification) {
                    return std::ranges::find(notification.events, event) != notification.events.end();
@@ -58,12 +64,6 @@ namespace AwsMock::Database::Entity::S3 {
         return std::ranges::find_if(topicNotifications, [event](const TopicNotification &notification) {
                    return std::ranges::find(notification.events, event) != notification.events.end();
                }) != topicNotifications.end();
-    }
-
-    bool Bucket::HasLambdaNotification(const std::string &lambdaArn) const {
-        return std::ranges::find_if(lambdaNotifications, [lambdaArn](const LambdaNotification &notification) {
-                   return notification.lambdaArn == lambdaArn;
-               }) != lambdaNotifications.end();
     }
 
     bool Bucket::HasEncryption() const {
@@ -94,6 +94,16 @@ namespace AwsMock::Database::Entity::S3 {
         return *std::ranges::find_if(lambdaNotifications, [eventName](const LambdaNotification &eventNotification) {
             return std::ranges::find(eventNotification.events, eventName) != eventNotification.events.end();
         });
+    }
+
+    LambdaNotification Bucket::GetLambdaNotificationByArn(const std::string &arn) {
+        const auto it = std::ranges::find_if(lambdaNotifications, [arn](const LambdaNotification &eventNotification) {
+            return eventNotification.lambdaArn == arn;
+        });
+        if (it != lambdaNotifications.end()) {
+            return *it;
+        }
+        return {};
     }
 
     bool Bucket::IsVersioned() const {

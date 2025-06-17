@@ -10,6 +10,7 @@
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 
 namespace AwsMock::Service {
+
     DynamoDbServer::DynamoDbServer(Core::Scheduler &scheduler) : AbstractServer("dynamodb"), _containerService(ContainerService::instance()), _dynamoDbDatabase(Database::DynamoDbDatabase::instance()), _metricService(Monitoring::MetricService::instance()) {
 
         // Get HTTP configuration values
@@ -44,8 +45,8 @@ namespace AwsMock::Service {
         scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing
-        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 10);
-        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, 10);
+        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 20);
+        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, 20);
 
         // Start backup
         if (_backupActive) {

@@ -56,7 +56,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Name
          */
-        NameType name;
+        NameType name = NameType::prefix;
 
         /**
          * Value

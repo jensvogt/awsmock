@@ -42,6 +42,7 @@
 #include <awsmock/dto/s3/GetObjectRequest.h>
 #include <awsmock/dto/s3/GetObjectResponse.h>
 #include <awsmock/dto/s3/ListAllBucketResponse.h>
+#include <awsmock/dto/s3/ListBucketArnsResponse.h>
 #include <awsmock/dto/s3/ListBucketRequest.h>
 #include <awsmock/dto/s3/ListBucketResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
@@ -182,6 +183,13 @@ namespace AwsMock::Service {
          * @return ListBucketCounterResponse
          */
         [[nodiscard]] Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const;
+
+        /**
+         * @brief Lists bucket ARNs
+         *
+         * @return ListBucketArnsResponse
+         */
+        [[nodiscard]] Dto::S3::ListBucketArnsResponse ListBucketArns() const;
 
         /**
          * @brief Put bucket versioning

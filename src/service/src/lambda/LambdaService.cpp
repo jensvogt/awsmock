@@ -339,6 +339,9 @@ namespace AwsMock::Service {
             eventSourceMapping.enabled = request.enabled;
             eventSourceMapping.uuid = request.uuid.empty() ? Core::StringUtils::CreateRandomUuid() : request.uuid;
 
+            // If type is SQS, create SQS notification configuration
+            CreateResourceNotification(request);
+
             lambda.eventSources.emplace_back(eventSourceMapping);
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda event sources added, lambdaArn: " << lambda.arn;
@@ -1185,4 +1188,89 @@ namespace AwsMock::Service {
 
         log_info << "Done cleanup docker, function: " << lambda.function;
     }
+
+    void LambdaService::CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const {
+
+        if (request.type == "S3") {
+
+            if (!_s3Database.BucketExists(request.eventSourceArn)) {
+                log_error << "S3 bucket does not exist: " << request.eventSourceArn;
+                throw Core::ServiceException("S3 bucket does not exist: " + request.eventSourceArn);
+            }
+            Database::Entity::S3::Bucket bucket = _s3Database.GetBucketByArn(request.eventSourceArn);
+
+            if (bucket.HasLambdaNotification(request.functionArn)) {
+                log_error << "S3 bucket has already notification to function: " << request.functionArn;
+                throw Core::ServiceException("S3 bucket has already notification to function: " + request.functionArn);
+            }
+
+            // Convert filter rules
+            Database::Entity::S3::FilterRule filterRule;
+            filterRule.name = request.filterRuleType;
+            filterRule.value = request.filterRuleValue;
+            std::vector<Database::Entity::S3::FilterRule> filterRules;
+            filterRules.emplace_back(filterRule);
+
+            // Check for update
+            Database::Entity::S3::LambdaNotification lambdaNotification;
+            lambdaNotification.lambdaArn = request.functionArn;
+            lambdaNotification.events = request.events;
+            lambdaNotification.filterRules = filterRules;
+
+            // Send S3 put notification request
+            bucket.lambdaNotifications.emplace_back(lambdaNotification);
+            _s3Database.CreateOrUpdateBucket(bucket);
+
+        } else if (request.type == "SQS") {
+
+            if (!_sqsDatabase.QueueArnExists(request.eventSourceArn)) {
+                log_error << "SQS queue does not exist: " << request.eventSourceArn;
+                throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
+            }
+
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.eventSourceArn);
+
+            // Convert filter rules
+            Database::Entity::S3::FilterRule filterRule;
+            filterRule.name = request.filterRuleType;
+            filterRule.value = request.filterRuleValue;
+            std::vector<Database::Entity::S3::FilterRule> filterRules;
+            filterRules.emplace_back(filterRule);
+
+            // Create lambda notification
+            Database::Entity::S3::LambdaNotification lambdaNotification;
+            lambdaNotification.lambdaArn = request.eventSourceArn;
+            lambdaNotification.events = request.events;
+            lambdaNotification.filterRules = filterRules;
+
+            // Send S3 put notification request
+            _sqsDatabase.CreateOrUpdateQueue(queue);
+
+        } else if (request.type == "SNS") {
+
+            if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
+                log_error << "SNS topic does not exist: " << request.eventSourceArn;
+                throw Core::ServiceException("Bucket does not exist: " + request.eventSourceArn);
+            }
+
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.eventSourceArn);
+
+            // Convert filter rules
+            Database::Entity::S3::FilterRule filterRule;
+            filterRule.name = request.filterRuleType;
+            filterRule.value = request.filterRuleValue;
+            std::vector<Database::Entity::S3::FilterRule> filterRules;
+            filterRules.emplace_back(filterRule);
+
+            // Create lambda notification
+            Database::Entity::S3::LambdaNotification lambdaNotification;
+            lambdaNotification.lambdaArn = request.eventSourceArn;
+            lambdaNotification.events = request.events;
+            lambdaNotification.filterRules = filterRules;
+
+            // Send S3 put notification request
+            _snsDatabase.CreateOrUpdateTopic(topic);
+        }
+    }
+
 }// namespace AwsMock::Service
