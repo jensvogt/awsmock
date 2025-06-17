@@ -10,6 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/service/lambda/LambdaService.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>

@@ -66,6 +66,15 @@ namespace AwsMock::Database {
         bool BucketExists(const Entity::S3::Bucket &bucket);
 
         /**
+         * @brief Bucket exists by ARN
+         *
+         * @param bucketArn AWS ARN
+         * @return true if bucket exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] bool BucketExists(const std::string &bucketArn) const;
+
+        /**
          * @brief Returns the bucket by userPoolId
          *
          * @param oid bucket oid
@@ -82,6 +91,14 @@ namespace AwsMock::Database {
          * @return bucket entity
          */
         Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Returns the bucket by AWS ARN
+         *
+         * @param bucketArn AWS region
+         * @return bucket entity
+         */
+        Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn);
 
         /**
          * @brief Create a new bucket in the S3 bucket table

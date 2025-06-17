@@ -8,7 +8,7 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
         src/utils/MemoryMappedFile.cpp src/utils/XmlUtils.cpp src/utils/UnixSocket.cpp src/utils/HttpSocket.cpp
         src/utils/JwtUtils.cpp src/scheduler/PeriodicTask.cpp src/scheduler/Scheduler.cpp
         src/config/Configuration.cpp src/utils/SrpUtils.cpp src/utils/DomainSocket.cpp src/scheduler/CronTask.cpp
-        src/utils/WindowsSocket.cpp src/utils/CronUtils.cpp)
+        src/utils/WindowsSocket.cpp src/utils/CronUtils.cpp src/scheduler/OneTimeTask.cpp)
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp src/exception/ServiceException.cpp
         src/exception/JsonException.cpp src/exception/NotFoundException.cpp src/exception/ForbiddenException.cpp
         src/exception/UnauthorizedException.cpp src/exception/BadRequestException.cpp)

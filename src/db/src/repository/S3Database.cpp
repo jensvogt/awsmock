@@ -49,6 +49,27 @@ namespace AwsMock::Database {
         return _memoryDb.BucketExists(region, name);
     }
 
+    bool S3Database::BucketExists(const std::string &bucketArn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
+
+                const int64_t count = _bucketCollection.count_documents(make_document(kvp("arn", bucketArn)));
+                log_trace << "Bucket exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.BucketExists(bucketArn);
+    }
+
     bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) const {
         return BucketExists(bucket.region, bucket.name);
     }
@@ -123,6 +144,18 @@ namespace AwsMock::Database {
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
         const auto mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
+        Entity::S3::Bucket result;
+        result.FromDocument(mResult->view());
+
+        return result;
+    }
+
+    Entity::S3::Bucket S3Database::GetBucketByArn(const std::string &bucketArn) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
+
+        const auto mResult = _bucketCollection.find_one(make_document(kvp("arn", bucketArn)));
         Entity::S3::Bucket result;
         result.FromDocument(mResult->view());
 

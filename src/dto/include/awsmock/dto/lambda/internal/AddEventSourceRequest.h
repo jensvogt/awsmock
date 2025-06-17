@@ -49,6 +49,21 @@ namespace AwsMock::Dto::Lambda {
         std::string eventSourceArn;
 
         /**
+         * Events, comma separated list of S3 events
+         */
+        std::vector<std::string> events;
+
+        /**
+         * Filter rule type; can either prefix or postfix
+         */
+        std::string filterRuleType;
+
+        /**
+         * Filter rule type value
+         */
+        std::string filterRuleValue;
+
+        /**
          * Batch size
          */
         long batchSize = 10;
@@ -75,6 +90,9 @@ namespace AwsMock::Dto::Lambda {
             r.type = Core::Json::GetStringValue(v, "Type");
             r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
             r.eventSourceArn = Core::Json::GetStringValue(v, "EventSourceArn");
+            r.events = boost::json::value_to<std::vector<std::string>>(v.at("Events"));
+            r.filterRuleType = Core::Json::GetStringValue(v, "FilterRuleType");
+            r.filterRuleValue = Core::Json::GetStringValue(v, "FilterRuleValue");
             r.batchSize = Core::Json::GetLongValue(v, "BatchSize");
             r.maximumBatchingWindowInSeconds = Core::Json::GetLongValue(v, "MaximumBatchingWindowInSeconds");
             r.uuid = Core::Json::GetStringValue(v, "UUID");
@@ -87,6 +105,9 @@ namespace AwsMock::Dto::Lambda {
                     {"Type", obj.type},
                     {"FunctionArn", obj.functionArn},
                     {"EventSourceArn", obj.eventSourceArn},
+                    {"Events", boost::json::value_from(obj.events)},
+                    {"FilterRuleType", obj.filterRuleType},
+                    {"FilterRuleValue", obj.filterRuleValue},
                     {"BatchSize", obj.batchSize},
                     {"MaximumBatchingWindowInSeconds", obj.maximumBatchingWindowInSeconds},
                     {"UUID", obj.uuid},

@@ -70,10 +70,12 @@
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
+#include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/repository/LambdaDatabase.h>
+#include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/lambda/LambdaCreator.h>
 #include <awsmock/service/lambda/LambdaExecutor.h>
@@ -118,7 +120,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()) {};
+        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()) {};
 
         /**
          * @brief Create lambda function
@@ -548,14 +550,31 @@ namespace AwsMock::Service {
         [[nodiscard]] std::string GetLambdaCodeFromS3(const Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
+         * @brief Depending on the type, create a SQS notification configuration, SNS notification or S3 notification configuration
+         *
+         * @param request add event notification request
+         */
+        void CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const;
+
+        /**
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
 
         /**
-         * Lambda database connection
+         * S3 database connection
          */
         Database::S3Database &_s3Database;
+
+        /**
+         * SQS database connection
+         */
+        Database::SQSDatabase &_sqsDatabase;
+
+        /**
+         * SQS database connection
+         */
+        Database::SNSDatabase &_snsDatabase;
 
         /**
          * Mutex

@@ -281,11 +281,32 @@ namespace AwsMock::Service {
                 bucketCounter.modified = bucket.modified;
                 listAllBucketResponse.bucketCounters.emplace_back(bucketCounter);
             }
-            log_debug << "Count all buckets, size: " << bucketList.size();
+            log_debug << "List bucket counters, size: " << bucketList.size();
 
             return listAllBucketResponse;
         } catch (bsoncxx::exception &ex) {
-            log_error << "S3 Create Bucket failed, message: " << ex.what();
+            log_error << "S3 list bucket counters failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::S3::ListBucketArnsResponse S3Service::ListBucketArns() const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "list_bucket_arns");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "list_bucket_arns");
+        log_trace << "List buckets ARNs request";
+
+        try {
+            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets();
+
+            Dto::S3::ListBucketArnsResponse listBucketArnsResponse;
+            for (const auto &bucket: bucketList) {
+                listBucketArnsResponse.bucketArns.emplace_back(bucket.arn);
+            }
+            log_debug << "List bucket ARNs, size: " << bucketList.size();
+            return listBucketArnsResponse;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "S3 list bucket ARNs failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

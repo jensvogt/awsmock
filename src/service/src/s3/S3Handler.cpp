@@ -517,10 +517,18 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::LIST_BUCKET_COUNTERS: {
 
-                    // Get object request
+                    // Get bucket counter request
                     Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(clientCommand);
                     Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
                     log_info << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
+
+                case Dto::Common::S3CommandType::LIST_BUCKET_ARNS: {
+
+                    // Get bucket ARNs request
+                    Dto::S3::ListBucketArnsResponse s3Response = _s3Service.ListBucketArns();
+                    log_info << "List bucket arns, total: " << s3Response.bucketArns.size();
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
