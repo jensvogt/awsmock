@@ -592,6 +592,33 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SQS::GetEventSourceResponse SQSService::GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_event_source");
+        log_trace << "Get event source request, sqsRequest: " << request.ToString();
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.eventSourceArn)) {
+            log_warning << "Queue does not exists, arn: " << request.eventSourceArn;
+            throw Core::NotFoundException("Queue does not exists, arn: " + request.eventSourceArn);
+        }
+
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.eventSourceArn);
+            log_debug << "Queue returned, queue: " << queue.name;
+
+            Dto::SQS::GetEventSourceResponse response;
+            response.lambdaConfiguration.arn = queue.queueArn;
+            response.lambdaConfiguration.enabled = true;
+            response.lambdaConfiguration.uuid = queue.oid;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get event source failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     void SQSService::SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "set_visibility_timeout");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "set_visibility_timeout");

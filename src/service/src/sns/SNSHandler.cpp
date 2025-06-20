@@ -269,6 +269,15 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::GET_EVENT_SOURCE: {
+
+                    Dto::SNS::GetEventSourceRequest snsRequest = Dto::SNS::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::SNS::GetEventSourceResponse snsResponse = _snsService.GetEventSource(snsRequest);
+                    log_info << "Get event source, arn: " << snsRequest.eventSourceArn;
+
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";

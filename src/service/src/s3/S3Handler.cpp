@@ -175,7 +175,7 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
-                // Delete object (rm) with recursive option, issues first a list request
+                // Delete an object (rm) with recursive option, issues first a list request
                 case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
                     Dto::S3::ListBucketRequest s3Request;
@@ -610,6 +610,15 @@ namespace AwsMock::Service {
                     _s3Service.UpdateObject(s3Request);
 
                     log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::S3CommandType::GET_EVENT_SOURCE: {
+
+                    Dto::S3::GetEventSourceRequest s3Request = Dto::S3::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::S3::GetEventSourceResponse s3Response = _s3Service.GetEventSource(s3Request);
+                    log_trace << "Get event source, functionArn: " << s3Request.functionArn;
+
                     return SendOkResponse(request);
                 }
 

@@ -282,6 +282,15 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::GET_EVENT_SOURCE: {
+
+                    Dto::SQS::GetEventSourceRequest sqsRequest = Dto::SQS::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::SQS::GetEventSourceResponse sqsResponse = _sqsService.GetEventSource(sqsRequest);
+                    log_info << "Get event source, arn: " << sqsRequest.eventSourceArn;
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
 
                     Dto::SQS::DeleteMessageRequest sqsRequest = Dto::SQS::DeleteMessageRequest::FromJson(clientCommand);

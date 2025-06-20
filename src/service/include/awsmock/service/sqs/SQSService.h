@@ -49,6 +49,8 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
+#include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
+#include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
@@ -186,6 +188,13 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
 
+        /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::SQS::GetEventSourceResponse GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const;
         /**
          * @brief Set queue userAttributes
          *

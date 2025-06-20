@@ -75,6 +75,15 @@ namespace AwsMock::Dto::S3 {
          */
         static Bucket map(const Database::Entity::S3::Bucket &bucketEntity);
 
+        /**
+         * @brief Maps a S3 queue configuration entity to a queue configuration DTO
+         *
+         * @param lambdaConfigurationEntity lambda configuration entities
+         * @return LambdaConfiguration DTOs
+         * @see LambdaConfiguration
+         */
+        static LambdaConfiguration map(const Database::Entity::S3::LambdaNotification &lambdaConfigurationEntity);
+
       private:
 
         /**

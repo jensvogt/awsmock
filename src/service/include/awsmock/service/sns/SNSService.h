@@ -10,9 +10,6 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/service/lambda/LambdaService.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -41,6 +38,8 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
+#include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
@@ -61,6 +60,7 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
@@ -241,6 +241,14 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         [[nodiscard]] long PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
+
+        /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::SNS::GetEventSourceResponse GetEventSource(const Dto::SNS::GetEventSourceRequest &request) const;
 
         /**
          * @brief Delete a topic
