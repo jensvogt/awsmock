@@ -92,14 +92,18 @@ namespace AwsMock::Dto::S3 {
     auto Mapper::map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaConfigurationEntities) -> std::vector<LambdaConfiguration> {
         std::vector<LambdaConfiguration> lambdaConfigurations;
         for (const auto &lambdaConfigurationEntity: lambdaConfigurationEntities) {
-            LambdaConfiguration lambdaConfiguration;
-            lambdaConfiguration.id = lambdaConfigurationEntity.id;
-            lambdaConfiguration.lambdaArn = lambdaConfigurationEntity.lambdaArn;
-            lambdaConfiguration.events = map(lambdaConfigurationEntity.events);
-            lambdaConfiguration.filterRules = map(lambdaConfigurationEntity.filterRules);
-            lambdaConfigurations.emplace_back(lambdaConfiguration);
+            lambdaConfigurations.emplace_back(map(lambdaConfigurationEntity));
         }
         return lambdaConfigurations;
+    }
+
+    auto Mapper::map(const Database::Entity::S3::LambdaNotification &lambdaConfigurationEntity) -> LambdaConfiguration {
+        LambdaConfiguration lambdaConfiguration;
+        lambdaConfiguration.id = lambdaConfigurationEntity.id;
+        lambdaConfiguration.lambdaArn = lambdaConfigurationEntity.lambdaArn;
+        lambdaConfiguration.events = map(lambdaConfigurationEntity.events);
+        lambdaConfiguration.filterRules = map(lambdaConfigurationEntity.filterRules);
+        return lambdaConfiguration;
     }
 
     std::vector<QueueConfiguration> Mapper::map(const std::vector<Database::Entity::S3::QueueNotification> &queueConfigurationEntities) {

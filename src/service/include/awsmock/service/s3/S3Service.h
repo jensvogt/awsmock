@@ -37,6 +37,8 @@
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
 #include <awsmock/dto/s3/GetBucketRequest.h>
 #include <awsmock/dto/s3/GetBucketResponse.h>
+#include <awsmock/dto/s3/GetEventSourceRequest.h>
+#include <awsmock/dto/s3/GetEventSourceResponse.h>
 #include <awsmock/dto/s3/GetMetadataRequest.h>
 #include <awsmock/dto/s3/GetMetadataResponse.h>
 #include <awsmock/dto/s3/GetObjectRequest.h>
@@ -239,6 +241,14 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const;
 
         /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::S3::GetEventSourceResponse GetEventSource(const Dto::S3::GetEventSourceRequest &request) const;
+
+        /**
          * @brief Get an object
          *
          * @param request put object request
@@ -366,7 +376,7 @@ namespace AwsMock::Service {
          *
          * @param request bucket delete request.
          */
-        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
+        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
       private:
 
@@ -474,7 +484,7 @@ namespace AwsMock::Service {
          *
          * @param bucket S3 bucket name
          */
-        void DeleteBucket(const std::string &bucket);
+        static void DeleteBucket(const std::string &bucket);
 
         /**
          * @brief Save a versioned S3 object.

@@ -62,6 +62,7 @@ namespace AwsMock::Dto::Common {
         DELETE_ATTRIBUTE,
         UPDATE_DLQ,
         RESEND_MESSAGE,
+        GET_EVENT_SOURCE,
         UNKNOWN
     };
 
@@ -97,6 +98,7 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::UPDATE_DLQ, "update-dlq"},
             {SqsCommandType::REDRIVE_MESSAGES, "redrive-messages"},
             {SqsCommandType::RESEND_MESSAGE, "resend-message"},
+            {SqsCommandType::GET_EVENT_SOURCE, "get-event-source"},
             {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
     };

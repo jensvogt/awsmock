@@ -138,6 +138,32 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::S3::GetEventSourceResponse S3Service::GetEventSource(const Dto::S3::GetEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_event_source");
+        log_trace << "Get event source request, s3Request: " << request.ToString();
+
+        // Check existence
+        if (!_database.BucketExists(request.eventSourceArn)) {
+            log_warning << "Bucket does not exists, arn: " << request.eventSourceArn;
+            throw Core::NotFoundException("Bucket does not exists, arn: " + request.eventSourceArn);
+        }
+
+        try {
+            Database::Entity::S3::Bucket bucket = _database.GetBucketByArn(request.eventSourceArn);
+            log_debug << "Bucket returned, bucket: " << bucket.name;
+
+            Dto::S3::GetEventSourceResponse response;
+            Database::Entity::S3::LambdaNotification lambdaNotification = bucket.GetLambdaNotification(request.functionArn);
+            response.lambdaConfiguration = Dto::S3::Mapper::map(bucket.GetLambdaNotification(request.functionArn));
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get event source failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::S3::GetMetadataResponse S3Service::GetObjectMetadata(const Dto::S3::GetMetadataRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_object_metadata");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_object_metadata");
@@ -881,7 +907,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) {
+    void S3Service::DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "delete_bucket");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "delete_bucket");
         log_trace << "Delete bucket request, name: " << request.bucket;

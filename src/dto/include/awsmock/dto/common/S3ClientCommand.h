@@ -60,6 +60,7 @@ namespace AwsMock::Dto::Common {
         PUT_BUCKET_ENCRYPTION,
         PUT_BUCKET_VERSIONING,
         GET_OBJECT_COUNTER,
+        GET_EVENT_SOURCE,
         TOUCH_OBJECT,
         UPDATE_OBJECT,
         UNKNOWN
@@ -94,6 +95,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::PUT_BUCKET_ENCRYPTION, "PurBucketEncryption"},
             {S3CommandType::PUT_BUCKET_VERSIONING, "PutBucketVersionint"},
             {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
+            {S3CommandType::GET_EVENT_SOURCE, "GetEventSource"},
             {S3CommandType::TOUCH_OBJECT, "TouchObject"},
             {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
     };
