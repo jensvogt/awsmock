@@ -14,7 +14,7 @@ namespace AwsMock::Service {
         _timeout = configuration.GetValue<int>("awsmock.gateway.http.timeout");
         _verifySignature = configuration.GetValue<bool>("awsmock.aws.signature.verify");
 
-        // Default region, user, will be overwritten by authorized requests
+        // Defaults for region and user; will be overwritten by authorized requests
         _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         _user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
     };

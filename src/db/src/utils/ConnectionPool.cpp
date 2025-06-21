@@ -17,7 +17,8 @@ namespace AwsMock::Database {
 
         // MongoDB URL
         mongocxx::uri _uri("mongodb://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
-        log_info << "Using MongoDB database url: " << _uri.to_string();
+        const mongocxx::uri loggingUri("mongodb://" + user + ":********@" + host + ":" + std::to_string(port) + "/?maxPoolSize=" + std::to_string(poolSize));
+        log_info << "Using MongoDB database url: " << loggingUri.to_string();
 
         // Create a connection pool
         _instance = std::make_shared<mongocxx::instance>();

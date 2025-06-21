@@ -33,20 +33,22 @@ namespace AwsMock::Core {
     void PeriodicTask::Start() {
         log_debug << "Start PeriodicTask '" << _name << "'";
 
-        // Wait for first execution time
+        // Wait for the first execution time
         if (_delay > 0) {
-            std::this_thread::sleep_for(std::chrono::seconds(_delay));
+            _timer.expires_from_now(boost::posix_time::seconds(_delay));
+            StartWait();
+        } else {
+            _task();
+            _timer.expires_from_now(boost::posix_time::seconds(_interval));
+            StartWait();
         }
-
-        // Uncomment if you want to call the handler on startup (i.e. at time 0)
-        _task();
-
-        _timer.expires_from_now(boost::posix_time::seconds(_interval));
-        StartWait();
     }
 
     void PeriodicTask::StartWait() {
-        _timer.async_wait(boost::bind(&PeriodicTask::Execute, this, boost::asio::placeholders::error));
+        auto callback = [this](const boost::system::error_code &error) {
+            Execute(error);
+        };
+        _timer.async_wait(callback);
     }
 
 }// namespace AwsMock::Core
