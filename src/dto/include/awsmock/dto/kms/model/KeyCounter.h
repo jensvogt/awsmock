@@ -97,13 +97,14 @@ namespace AwsMock::Dto::KMS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, KeyCounter const &obj) {
             jv = {
-                    {"Region", obj.region},
-                    {"User", obj.user},
-                    {"RequestId", obj.requestId},
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
                     {"keyId", obj.keyId},
                     {"keyArn", obj.arn},
                     {"keySpec", KeySpecToString(obj.keySpec)},
                     {"keyUsage", KeyUsageToString(obj.keyUsage)},
+                    {"keyState", KeyStateToString(obj.keyState)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

@@ -53,6 +53,7 @@ namespace AwsMock::Service {
                     Dto::KMS::DescribeKeyRequest kmsRequest = Dto::KMS::DescribeKeyRequest::FromJson(clientCommand);
                     Dto::KMS::DescribeKeyResponse kmsResponse = _kmsService.DescribeKey(kmsRequest);
                     log_info << "Describe key received, count: " << kmsResponse.key.keyId;
+                    log_info << "Describe key received, count: " << kmsResponse.key;
 
                     return SendOkResponse(request, kmsResponse.ToJson());
                 }
@@ -73,6 +74,15 @@ namespace AwsMock::Service {
 
                     log_info << "Decrypt received, size: " << kmsResponse.plaintext.length();
                     return SendOkResponse(request, kmsResponse.ToJson());
+                }
+
+                case Dto::Common::KMSCommandType::DELETE_KEY: {
+
+                    Dto::KMS::DeleteKeyRequest kmsRequest = Dto::KMS::DeleteKeyRequest::FromJson(clientCommand);
+                    _kmsService.DeleteKey(kmsRequest);
+
+                    log_info << "Key deleted, size: " << kmsRequest.keyId;
+                    return SendOkResponse(request);
                 }
 
                 default:

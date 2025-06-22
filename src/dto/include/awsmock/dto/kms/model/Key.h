@@ -232,6 +232,7 @@ namespace AwsMock::Dto::KMS {
                     {"KeyArn", obj.arn},
                     {"KeySpec", KeySpecToString(obj.keySpec)},
                     {"KeyUsage", KeyUsageToString(obj.keyUsage)},
+                    {"KeyState", KeyStateToString(obj.keyState)},
                     {"MultiRegion", obj.multiRegion},
                     {"Description", obj.description},
                     {"CreationDate", obj.creationDate},

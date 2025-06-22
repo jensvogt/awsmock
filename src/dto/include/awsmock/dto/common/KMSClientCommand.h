@@ -34,6 +34,7 @@ namespace AwsMock::Dto::Common {
         LIST_KEYS,
         ENCRYPT,
         DECRYPT,
+        DELETE_KEY,
         LIST_KEY_COUNTERS,
         UNKNOWN
     };
@@ -42,6 +43,7 @@ namespace AwsMock::Dto::Common {
             {KMSCommandType::CREATE_KEY, "create-key"},
             {KMSCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
             {KMSCommandType::DESCRIBE_KEY, "describe-key"},
+            {KMSCommandType::DELETE_KEY, "delete-key"},
             {KMSCommandType::ENCRYPT, "encrypt"},
             {KMSCommandType::DECRYPT, "decrypt"},
             {KMSCommandType::LIST_KEYS, "list-keys"},

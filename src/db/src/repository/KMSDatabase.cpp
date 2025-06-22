@@ -236,7 +236,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _keyCollection.delete_one(make_document(kvp("name", key.keyId)));
+                const auto delete_many_result = _keyCollection.delete_one(make_document(kvp("keyId", key.keyId)));
                 session.commit_transaction();
                 log_debug << "KMS key deleted, count: " << delete_many_result->deleted_count();
 
