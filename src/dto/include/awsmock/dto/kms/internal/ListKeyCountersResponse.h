@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/kms/model/Key.h>
+#include <awsmock/dto/kms/model/KeyCounter.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -36,9 +37,9 @@ namespace AwsMock::Dto::KMS {
     struct ListKeyCountersResponse final : Common::BaseCounter<ListKeyCountersResponse> {
 
         /**
-         * Key
+         * Key counters
          */
-        std::vector<Key> keys;
+        std::vector<KeyCounter> keyCounters;
 
         /**
          * Total number of keys
@@ -50,7 +51,7 @@ namespace AwsMock::Dto::KMS {
         friend ListKeyCountersResponse tag_invoke(boost::json::value_to_tag<ListKeyCountersResponse>, boost::json::value const &v) {
             ListKeyCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
-            r.keys = boost::json::value_to<std::vector<Key>>(v.at("keys"));
+            r.keyCounters = boost::json::value_to<std::vector<KeyCounter>>(v.at("keyCounters"));
             return r;
         }
 
@@ -60,7 +61,7 @@ namespace AwsMock::Dto::KMS {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"total", obj.total},
-                    {"keys", boost::json::value_from(obj.keys)},
+                    {"keyCounters", boost::json::value_from(obj.keyCounters)},
             };
         }
     };

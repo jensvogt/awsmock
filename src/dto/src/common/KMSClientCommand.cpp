@@ -33,8 +33,15 @@ namespace AwsMock::Dto::Common {
 
     std::string KMSClientCommand::GetCommandFromHeader(const http::request<http::dynamic_body> &request) {
 
-        const std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-        const std::string cmd = Core::StringUtils::Split(headerValue, '.')[1];
+        std::string cmd;
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
+
+            cmd = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action");
+
+        } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
+
+            cmd = Core::StringUtils::Split(request["X-Amz-Target"], '.')[1];
+        }
         return Core::StringUtils::ToSnakeCase(cmd);
     }
 

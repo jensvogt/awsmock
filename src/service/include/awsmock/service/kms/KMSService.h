@@ -31,7 +31,10 @@
 #include <awsmock/dto/kms/ListKeysResponse.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
+#include <awsmock/dto/kms/internal/ListKeyCountersRequest.h>
+#include <awsmock/dto/kms/internal/ListKeyCountersResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
+#include <awsmock/dto/kms/model/KeyCounter.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
@@ -61,18 +64,29 @@ namespace AwsMock::Service {
         /**
          * @brief List all keys
          *
-         * @param request list queue request
+         * @param request list keys request
          * @return ListKeysResponse
          * @throws Core::DatabaseException
          * @see Dto::KMS::ListKeysRequest
          * @see Dto::KMS::ListKeysResponse
          */
-        Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
+        [[nodiscard]] Dto::KMS::ListKeysResponse ListKeys(const Dto::KMS::ListKeysRequest &request) const;
+
+        /**
+         * @brief List all key counters
+         *
+         * @param request list key counters request
+         * @return ListKeysResponse
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::ListKeysRequest
+         * @see Dto::KMS::ListKeysResponse
+         */
+        [[nodiscard]] Dto::KMS::ListKeyCountersResponse ListKeyCounters(const Dto::KMS::ListKeyCountersRequest &request) const;
 
         /**
          * @brief Creates a new key
          *
-         * @param request create key request
+         * @param request create a key request
          * @return CreateKeyResponse
          * @see Dto::KMS::CreateKeyRequest
          * @see Dto::KMS::CreateKeyResponse
