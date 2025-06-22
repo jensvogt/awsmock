@@ -42,6 +42,15 @@ namespace AwsMock::Core {
          */
         static std::string GetBackupFilename(const std::string &module);
 
+        /**
+         * @brief Returns a list of backup files for a module.
+         *
+         * @param module module name
+         * @param retention number of backup files to keep
+         * @return list of backup files
+         */
+        static std::vector<std::string> GetBackupFiles(const std::string &module, int retention);
+
       private:
 
         /**

@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BackupUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
@@ -132,6 +133,13 @@ namespace AwsMock::Service {
          * @param includeObjects include all objects
          */
         static void BackupModule(const std::string &module, bool includeObjects = false);
+
+        /**
+         * @brief Cleanup backups, keep only the number of backups which are defined in the module retention property
+         *
+         * @param module module name
+         */
+        static void BackupRetention(const std::string &module);
 
       private:
 
