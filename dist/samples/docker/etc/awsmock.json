@@ -44,7 +44,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "data-dir": "/usr/local/awsmock/data/s3",
         "counter": {
@@ -58,7 +59,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "monitoring": {
           "period": 300
@@ -75,7 +77,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "timeout": 14,
         "monitoring": {
@@ -92,7 +95,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "lifetime": 3600,
         "data-dir": "/usr/local/awsmock/data/lambda",
@@ -121,7 +125,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "bucket": "transfer-server",
         "data-dir": "/usr/local/awsmock/data/transfer",
@@ -153,7 +158,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "monitoring": {
           "period": 300
@@ -163,7 +169,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "data-dir": "/usr/local/awsmock/data/dynamodb",
         "monitoring": {
@@ -184,7 +191,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "monitoring": {
           "period": 300
@@ -197,7 +205,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "monitoring": {
           "period": 300
@@ -210,7 +219,8 @@
         "active": true,
         "backup": {
           "active": true,
-          "cron": "0 0 0 * * ?"
+          "cron": "0 0 0 * * ?",
+          "count": 5
         },
         "monitoring": {
           "period": 300

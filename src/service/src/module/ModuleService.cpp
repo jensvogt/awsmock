@@ -2,9 +2,6 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include "awsmock/core/BackupUtils.h"
-
-
 #include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Service {
@@ -414,7 +411,21 @@ namespace AwsMock::Service {
         backupFile << response.ToJson();
         backupFile.close();
 
+        // Backup retention
+        BackupRetention(module);
+
         // Sleep for a while, otherwise cron will execute at the same time again
-        std::this_thread::sleep_for(std::chrono::minutes(1));
+        std::this_thread::sleep_for(std::chrono::minutes(5));
+    }
+
+    void ModuleService::BackupRetention(const std::string &module) {
+
+        // Get the file list
+        const int retention = Core::Configuration::instance().GetValue<int>("awsmock.modules." + module + ".backup.count");
+        const std::vector<std::string> backupList = Core::BackupUtils::GetBackupFiles(module, retention);
+        log_info << "Cleanup backup files, module: " << module << ", count: " << backupList.size();
+        for (const auto &file: backupList) {
+            Core::FileUtils::DeleteFile(file);
+        }
     }
 }// namespace AwsMock::Service

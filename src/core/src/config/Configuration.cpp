@@ -62,6 +62,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.s3.active", "AWSMOCK_MODULES_S3_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.s3.backup.active", "AWSMOCK_MODULES_S3_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.s3.backup.cron", "AWSMOCK_MODULES_S3_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.s3.backup.count", "AWSMOCK_MODULES_S3_BACKUP_COUNT", 5);
 #ifdef _WIN32
         DefineProperty<std::string>("awsmock.modules.s3.data-dir", "AWSMOCK_MODULES_S3_DATA_DIR", "C:/Program Files (x86)/awsmock/data/s3");
 #else
@@ -76,6 +77,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.sqs.active", "AWSMOCK_MODULES_SQS_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.sqs.backup.active", "AWSMOCK_MODULES_SQS_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.sqs.backup.cron", "AWSMOCK_MODULES_SQS_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.sqs.backup.count", "AWSMOCK_MODULES_SQS_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.sqs.monitoring.period", "AWSMOCK_MONITORING_SQS_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.sqs.reset.period", "AWSMOCK_WORKER_SQS_RESET_PERIOD", 30);
         DefineProperty<int>("awsmock.modules.sqs.counter.period", "AWSMOCK_WORKER_SQS_COUNTER_PERIOD", 30);
@@ -85,6 +87,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.sns.active", "AWSMOCK_MODULES_SNS_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.sns.backup.active", "AWSMOCK_MODULES_SNS_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.sns.backup.cron", "AWSMOCK_MODULES_SNS_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.sns.backup.count", "AWSMOCK_MODULES_SNS_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.sns.timeout", "AWSMOCK_MODULES_SNS_TIMEOUT", 14);
         DefineProperty<int>("awsmock.modules.sns.monitoring.period", "AWSMOCK_SNS_MONITORING_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.sns.delete.period", "AWSMOCK_SNS_DELETE_PERIOD", 300);
@@ -94,6 +97,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.lambda.active", "AWSMOCK_MODULES_LAMBDA_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.lambda.backup.active", "AWSMOCK_MODULES_LAMBDA_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.lambda.backup.cron", "AWSMOCK_MODULES_LAMBDA_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.lambda.backup.count", "AWSMOCK_MODULES_LAMBDA_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.lambda.lifetime", "AWSMOCK_MODULES_LAMBDA_LIFETIME", 3600);
 #ifdef _WIN32
         DefineProperty<std::string>("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "C:/Program Files (x86)/awsmock/data/lambda");
@@ -120,6 +124,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.transfer.active", "AWSMOCK_MODULES_TRANSFER_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.transfer.backup.active", "AWSMOCK_MODULES_TRANSFER_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.transfer.backup.cron", "AWSMOCK_MODULES_TRANSFER_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.transfer.backup.count", "AWSMOCK_MODULES_TRANSFER_BACKUP_COUNT", 5);
         DefineProperty<std::string>("awsmock.modules.transfer.bucket", "AWSMOCK_MODULES_TRANSFER_BUCKET", "transfer-server");
 #ifdef _WIN32
         DefineProperty<std::string>("awsmock.modules.transfer.data-dir", "AWSMOCK_MODULES_TRANSFER_DATA_DIR", "C:/Program Files (x86)/awsmock/data/transfer");
@@ -146,6 +151,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.cognito.active", "AWSMOCK_MODULES_COGNITO_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.cognito.backup.active", "AWSMOCK_MODULES_COGNITO_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.cognito.backup.cron", "AWSMOCK_MODULES_COGNITO_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.cognito.backup.count", "AWSMOCK_MODULES_COGNITO_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.cognito.counter-period", "AWSMOCK_MODULES_COGNITO_COUNTER_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.cognito.monitoring.period", "AWSMOCK_MODULES_COGNITO_MONITORING_PERIOD", 300);
 
@@ -153,6 +159,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.dynamodb.active", "AWSMOCK_MODULES_DYNAMODB_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.dynamodb.backup.active", "AWSMOCK_MODULES_DYNAMODB_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.dynamodb.backup.cron", "AWSMOCK_MODULES_DYNAMODB_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.dynamodb.backup.count", "AWSMOCK_MODULES_DYNAMODB_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.dynamodb.monitoring.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.dynamodb.worker.period", "AWSMOCK_MONITORING_DYNAMODB_PERIOD", 300);
         DefineProperty<std::string>("awsmock.modules.dynamodb.container.host", "AWSMOCK_MODULES_DYNAMODB_CONTAINER_HOST", "localhost");
@@ -166,6 +173,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.secretsmanager.active", "AWSMOCK_MODULES_SECRETSMANAGER_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.secretsmanager.backup.active", "AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.secretsmanager.backup.cron", "AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.secretsmanager.backup.count", "AWSMOCK_MODULES_SECRETSMANAGER_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.secretsmanager.monitoring.period", "AWSMOCK_MODULES_SECRETSMANAGER_MONITORING_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.secretsmanager.worker.period", "AWSMOCK_MODULES_SECRETSMANAGER_WORKER_PERIOD", 300);
 
@@ -173,6 +181,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.kms.active", "AWSMOCK_MODULES_KMS_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.kms.backup.active", "AWSMOCK_MODULES_KMS_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.kms.backup.cron", "AWSMOCK_MODULES_KMS_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.kms.backup.count", "AWSMOCK_MODULES_KMS_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.kms.monitoring.period", "AWSMOCK_SERVICE_KMS_MONITORING_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.kms.remove.period", "AWSMOCK_WORKER_KMS_REMOVE_PERIOD", 300);
 
@@ -180,6 +189,7 @@ namespace AwsMock::Core {
         DefineProperty<bool>("awsmock.modules.ssm.active", "AWSMOCK_MODULES_SSM_ACTIVE", true);
         DefineProperty<bool>("awsmock.modules.ssm.backup.active", "AWSMOCK_MODULES_SSM_BACKUP_ACTIVE", true);
         DefineProperty<std::string>("awsmock.modules.ssm.backup.cron", "AWSMOCK_MODULES_SSM_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.ssm.backup.count", "AWSMOCK_MODULES_SSM_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.ssm.monitoring.period", "AWSMOCK_SERVICE_SSM_MONITORING_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.ssm.remove.period", "AWSMOCK_WORKER_SSM_REMOVE_PERIOD", 300);
 
