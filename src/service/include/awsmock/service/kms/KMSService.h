@@ -19,6 +19,7 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
 #include <awsmock/dto/kms/DecryptRequest.h>
@@ -31,6 +32,7 @@
 #include <awsmock/dto/kms/ListKeysResponse.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
+#include <awsmock/dto/kms/internal/DeleteKeyRequest.h>
 #include <awsmock/dto/kms/internal/ListKeyCountersRequest.h>
 #include <awsmock/dto/kms/internal/ListKeyCountersResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
@@ -91,7 +93,7 @@ namespace AwsMock::Service {
          * @see Dto::KMS::CreateKeyRequest
          * @see Dto::KMS::CreateKeyResponse
          */
-        Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
+        [[nodiscard]] Dto::KMS::CreateKeyResponse CreateKey(const Dto::KMS::CreateKeyRequest &request) const;
 
         /**
          * @brief Wait for the asynchronous key creation
@@ -117,7 +119,7 @@ namespace AwsMock::Service {
          * @throws Core::DatabaseException
          * @see Dto::KMS::ScheduledKeyDeletionResponse
          */
-        Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
+        [[nodiscard]] Dto::KMS::ScheduledKeyDeletionResponse ScheduleKeyDeletion(const Dto::KMS::ScheduleKeyDeletionRequest &request) const;
 
         /**
          * @brief Describe a key
@@ -150,7 +152,16 @@ namespace AwsMock::Service {
          * @see Dto::KMS::DecryptRequest
          * @see Dto::KMS::DecryptResponse
          */
-        Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
+        [[nodiscard]] Dto::KMS::DecryptResponse Decrypt(const Dto::KMS::DecryptRequest &request) const;
+
+        /**
+         * @brief Deletes a key
+         *
+         * @param request delete key request
+         * @throws Core::DatabaseException, Core::ServiceException
+         * @see Dto::KMS::DecryptRequest
+         */
+        void DeleteKey(const Dto::KMS::DeleteKeyRequest &request) const;
 
       private:
 

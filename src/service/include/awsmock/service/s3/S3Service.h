@@ -23,6 +23,7 @@
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
 #include <awsmock/dto/s3/CopyObjectRequest.h>
@@ -181,10 +182,10 @@ namespace AwsMock::Service {
         /**
          * @brief Lists bucket counters
          *
-         * @param s3Request S3 list bucket counters request
+         * @param request S3 list bucket counters request
          * @return ListBucketCounterResponse
          */
-        [[nodiscard]] Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const;
+        [[nodiscard]] Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &request) const;
 
         /**
          * @brief Lists bucket ARNs

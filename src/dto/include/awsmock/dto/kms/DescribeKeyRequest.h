@@ -44,7 +44,9 @@ namespace AwsMock::Dto::KMS {
         friend DescribeKeyRequest tag_invoke(boost::json::value_to_tag<DescribeKeyRequest>, boost::json::value const &v) {
             DescribeKeyRequest r;
             r.keyId = Core::Json::GetStringValue(v, "KeyId");
-            r.grantTokens = boost::json::value_to<std::vector<std::string>>(v.at("GrantTokens"));
+            if (Core::Json::AttributeExists(v, "GrantTokens")) {
+                r.grantTokens = boost::json::value_to<std::vector<std::string>>(v.at("GrantTokens"));
+            }
             return r;
         }
 

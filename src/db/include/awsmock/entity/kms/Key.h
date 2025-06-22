@@ -118,7 +118,7 @@ namespace AwsMock::Database::Entity::KMS {
         /**
          * Pending window in days
          */
-        int pendingWindowInDays;
+        long pendingWindowInDays;
 
         /**
          * Scheduled deletion datetime

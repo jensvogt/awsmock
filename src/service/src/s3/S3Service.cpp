@@ -279,23 +279,16 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::ListBucketCounterResponse S3Service::ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const {
+    Dto::S3::ListBucketCounterResponse S3Service::ListBucketCounters(const Dto::S3::ListBucketCounterRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "list_bucket_counters");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "list_bucket_counters");
         log_trace << "List buckets counters request";
 
         try {
-            std::vector<Database::SortColumn> sortColumns;
-            for (const auto &sc: s3Request.sortColumns) {
-                Database::SortColumn sortColumn;
-                sortColumn.column = sc.column;
-                sortColumn.sortDirection = sc.sortDirection;
-                sortColumns.push_back(sortColumn);
-            }
-            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets(s3Request.region, s3Request.prefix, s3Request.pageSize, s3Request.pageIndex, sortColumns);
+            const Database::Entity::S3::BucketList bucketList = _database.ListBuckets(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
 
             Dto::S3::ListBucketCounterResponse listAllBucketResponse;
-            listAllBucketResponse.total = _database.BucketCount(s3Request.region, s3Request.prefix);
+            listAllBucketResponse.total = _database.BucketCount(request.region, request.prefix);
 
             for (const auto &bucket: bucketList) {
                 Dto::S3::BucketCounter bucketCounter;
