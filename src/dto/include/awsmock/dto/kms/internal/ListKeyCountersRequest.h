@@ -20,19 +20,20 @@ namespace AwsMock::Dto::KMS {
      * Example:
      * @code{.json}
      * {
-     *   "Limit": number,
-     *   "Marker": "string"
+     *   "prefix": "string",
+     *   "pageSize": number,
+     *   "pageIndex": number,
+     *   "sortColumns": |
+     *     {
+     *        "column": "string",
+     *        "direction": number
+     *     }
      * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct ListKeyCountersRequest final : Common::BaseCounter<ListKeyCountersRequest> {
-
-        /**
-         * Region
-         */
-        std::string region;
 
         /**
          * Prefix
@@ -58,7 +59,6 @@ namespace AwsMock::Dto::KMS {
 
         friend ListKeyCountersRequest tag_invoke(boost::json::value_to_tag<ListKeyCountersRequest>, boost::json::value const &v) {
             ListKeyCountersRequest r;
-            r.region = Core::Json::GetStringValue(v, "region");
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
@@ -69,6 +69,8 @@ namespace AwsMock::Dto::KMS {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListKeyCountersRequest const &obj) {
             jv = {
                     {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},

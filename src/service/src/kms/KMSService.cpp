@@ -42,6 +42,44 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::KMS::ListKeyCountersResponse KMSService::ListKeyCounters(const Dto::KMS::ListKeyCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "list_key_counters");
+        log_trace << "List key counters request: " << request;
+
+        try {
+            Dto::KMS::ListKeyCountersResponse listKeyCountersResponse;
+            std::vector<Database::SortColumn> sortColumns;
+            for (const auto &sc: request.sortColumns) {
+                Database::SortColumn sortColumn;
+                sortColumn.column = sc.column;
+                sortColumn.sortDirection = sc.sortDirection;
+                sortColumns.push_back(sortColumn);
+            }
+
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys(request.region, request.prefix, request.pageSize, request.pageIndex, sortColumns);
+            listKeyCountersResponse.total = _kmsDatabase.CountKeys();
+
+            for (const auto &k: keyList) {
+                Dto::KMS::KeyCounter key;
+                key.keyId = k.keyId;
+                key.arn = k.arn;
+                key.keyUsage = Dto::KMS::KeyUsageFromString(k.keyUsage);
+                key.keySpec = Dto::KMS::KeySpecFromString(k.keySpec);
+                key.keyState = Dto::KMS::KeyStateFromString(k.keyState);
+                key.created = k.created;
+                key.modified = k.modified;
+                listKeyCountersResponse.keyCounters.emplace_back(key);
+            }
+            log_debug << "List all key counters, size: " << keyList.size();
+
+            return listKeyCountersResponse;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "create_key");
         log_trace << "Create key request: " << request;

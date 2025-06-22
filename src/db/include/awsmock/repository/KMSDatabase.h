@@ -9,25 +9,17 @@
 #include <string>
 #include <vector>
 
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/KMSMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
-
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::builder::stream::document;
 
     /**
      * @brief KMS MongoDB database.
@@ -91,9 +83,13 @@ namespace AwsMock::Database {
          * @brief List all keys
          *
          * @param region AWS region
+         * @param prefix key prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sorting
          * @return KeyList
          */
-        Entity::KMS::KeyList ListKeys(const std::string &region = {}) const;
+        Entity::KMS::KeyList ListKeys(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns the total number of keys
