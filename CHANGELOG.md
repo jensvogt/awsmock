@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.2](https://github.com/jensvogt/awsmock/compare/v1.5.1...v1.5.2) (2025-06-20)
+
+
+### Bug Fixes
+
+* **1288-add-lambda-event-source:** add lambda event sources ([3199f42](https://github.com/jensvogt/awsmock/commit/3199f42409eae93920cae904239292b4935378be))
+* **1288-add-lambda-event-source:** add lambda event sources ([85210fc](https://github.com/jensvogt/awsmock/commit/85210fcc1e3da1d79786d2286eb3217c4005b550))
+* **1288-add-lambda-event-source:** add lambda event sources ([ad93c1e](https://github.com/jensvogt/awsmock/commit/ad93c1e878ee4ffb567a933f14ed84785b29b79a))
+* **1288-kms-ui-pages:** add top-x counters for ui charts ([40c13ec](https://github.com/jensvogt/awsmock/commit/40c13eca2073db7eeb29fee504bdbbc95d6e0889))
+* **1288-kms-ui-pages:** fix bug in SQS message redrive ([2bb44e0](https://github.com/jensvogt/awsmock/commit/2bb44e02aff7d81d9d7624d171bc8b4677283441))
+
 ## [1.5.1](https://github.com/jensvogt/awsmock/compare/v1.5.0...v1.5.1) (2025-06-14)
 
 
