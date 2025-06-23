@@ -156,6 +156,12 @@ namespace AwsMock::Dto::Common {
 
       private:
 
+        /**
+         * brief Deserialization
+         *
+         * @param v boost variant
+         * @return
+         */
         friend BaseCounter tag_invoke(boost::json::value_to_tag<BaseCounter>, boost::json::value const &v) {
             BaseCounter r;
             r.region = v.at("region").as_string();
@@ -164,6 +170,12 @@ namespace AwsMock::Dto::Common {
             return r;
         }
 
+        /**
+         * brief Serialization
+         *
+         * @param jv boost json value
+         * @param obj object to serialize
+         */
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BaseCounter const &obj) {
             jv = {
                     {"region", obj.region},
