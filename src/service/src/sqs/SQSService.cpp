@@ -1088,6 +1088,33 @@ namespace AwsMock::Service {
         }
     }
 
+    void SQSService::AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "add_message_attribute");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "add_message_attribute");
+        log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
+
+        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+
+        try {
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
+
+            // Add attributes
+            Database::Entity::SQS::MessageAttribute messageAttribute;
+            messageAttribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(request.dataType);
+            messageAttribute.stringValue = request.value;
+            message.messageAttributes[request.name] = messageAttribute;
+            message = _sqsDatabase.UpdateMessage(message);
+            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void SQSService::DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "delete_message_attribute");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "delete_message_attribute");
@@ -1102,7 +1129,7 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
 
             // Update attributes
-            message.attributes.erase(request.name);
+            message.messageAttributes.erase(request.name);
             message = _sqsDatabase.UpdateMessage(message);
             log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
 

@@ -92,8 +92,8 @@ namespace AwsMock::Dto::SQS {
 
         friend UpdateMessageRequest tag_invoke(boost::json::value_to_tag<UpdateMessageRequest>, boost::json::value const &v) {
             UpdateMessageRequest r;
-            r.messageId = Core::Json::GetStringValue(v, "messageId");
-            if (Core::Json::AttributeExists(v, "messageAttributes")) {
+            r.messageId = Core::Json::GetStringValue(v, "MessageId");
+            if (Core::Json::AttributeExists(v, "MessageAttributes")) {
                 r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
             }
             return r;
@@ -101,11 +101,11 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateMessageRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"messageId", obj.messageId},
-                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"MessageId", obj.messageId},
+                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
             };
         }
     };

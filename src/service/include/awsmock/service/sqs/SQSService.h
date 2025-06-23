@@ -17,6 +17,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/sqs/AddAttributeRequest.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -340,6 +341,14 @@ namespace AwsMock::Service {
         * @throws ServiceException
         */
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
+
+        /**
+         * @brief Adds a message attribute
+         *
+         * @param request add message attribute request DTO
+         * @throws ServiceException
+         */
+        void AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const;
 
         /**
          * @brief Deletes a message attribute
