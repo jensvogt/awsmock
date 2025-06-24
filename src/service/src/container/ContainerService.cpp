@@ -665,8 +665,9 @@ namespace AwsMock::Service {
             std::string handlerFile = GetHandlerFileNodeJs22(handler);
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
+            ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/dist" << std::endl;
             ofs << "COPY node_modules/ ${LAMBDA_TASK_ROOT}/node_modules/" << std::endl;
-            ofs << "COPY " << handlerFile << " ${LAMBDA_TASK_ROOT}" << std::endl;
+            ofs << "COPY " << handlerFile << " ${LAMBDA_TASK_ROOT}/dist" << std::endl;
             ofs << "CMD [\"" + handler + "\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs")) {
             ofs << "FROM " << supportedRuntime << std::endl;
