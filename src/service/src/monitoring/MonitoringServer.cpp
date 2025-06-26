@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    MonitoringServer::MonitoringServer(Core::PeriodicScheduler &scheduler) : AbstractServer("monitoring") {
+    MonitoringServer::MonitoringServer(Core::Scheduler &scheduler) : AbstractServer("monitoring") {
 
         Monitoring::MetricService::instance().Initialize();
         const int period = Core::Configuration::instance().GetValue<int>("awsmock.monitoring.period");

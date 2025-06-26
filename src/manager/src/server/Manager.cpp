@@ -67,21 +67,24 @@ namespace AwsMock::Manager {
         log_info << "Autoload finished";
     }
 
-    void Manager::StopModules() {
-        log_info << "Stopping services";
+    void Manager::StopModules(Service::ModuleMap &moduleMap) {
+        log_info << "Stopping modules";
 
-        Service::ModuleMap moduleMap = Service::ModuleMap::instance();
+        log_info << "Found modules, count: " << moduleMap.GetSize();
+        int i = 0;
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
+            log_info << "Stopping module " << i << " module: " << module.name;
             if (module.state == Database::Entity::Module::ModuleState::RUNNING) {
                 moduleDatabase.SetState(module.name, Database::Entity::Module::ModuleState::STOPPED);
                 if (moduleMap.HasModule(module.name)) {
-                    log_info << "Stopping module: " << module.name;
                     moduleMap.GetModule(module.name)->Shutdown();
-                    log_info << "Module " << module.name << " stopped";
+                    log_info << "Module " << i << ": " << module.name << " stopped";
                 }
             }
+            i++;
         }
+        log_info << "All modules stopped, count: " << moduleMap.GetSize();
     }
 
     void Manager::LoadModulesFromConfiguration() {
@@ -127,32 +130,19 @@ namespace AwsMock::Manager {
 
         // Create a managed shared memory segment.
         boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_SEGMENT_NAME);
-        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, shmSize, nullptr, unrestricted_permissions);
+        _shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, shmSize, nullptr, unrestricted_permissions);
     }
 
     void Manager::Run() {
 
-        // Set the running flag
-        _running = true;
-
-        // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::io_context ios;
-        boost::asio::signal_set signals(ios, SIGINT, SIGTERM);
-        signals.async_wait([&](beast::error_code const &, int) {
-            // Stop the `io_context`. This will cause `run()` to return immediately,
-            // eventually destroying the `io_context` and all the sockets in it.
-            log_info << "Manager stopped on signal";
-            StopModules();
-            _running = false;
-            ios.stop();
-        });
-        log_info << "Signal handler installed";
+        boost::asio::io_context _ios;
+        WorkGuardManager guard(_ios);
 
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
-        Core::PeriodicScheduler scheduler(ios);
-        auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
+        Core::Scheduler scheduler(_ios);
+        const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
 
         // Load available modules from configuration file
@@ -164,7 +154,7 @@ namespace AwsMock::Manager {
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ios));
+                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(_ios));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -187,6 +177,7 @@ namespace AwsMock::Manager {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             }
         }
+        log_info << "Module started, count: " << moduleMap.GetSize();
 
         // Auto load init file
         AutoLoad();
@@ -194,12 +185,24 @@ namespace AwsMock::Manager {
         // Start listener threads
         const int numProcs = Core::SystemUtils::GetNumberOfCores();
         for (auto i = 0; i < numProcs; i++) {
-            _threadGroup.create_thread([&ios] { return ios.run(); });
+            _threadGroup.create_thread([&_ios] { return _ios.run(); });
         }
 
+        // Capture SIGINT and SIGTERM to perform a clean shutdown
+        boost::asio::signal_set signals(_ios, SIGINT, SIGTERM);
+        signals.async_wait([&](beast::error_code const &, int) {
+            // Stop the `io_context`. This will cause `run()` to return immediately,
+            // eventually destroying the `io_context` and all the sockets in it.
+            log_info << "Backend stopping on signal";
+            StopModules(moduleMap);
+            _ios.stop();
+            log_info << "Backend IO context stopped";
+            log_info << "So long, and thanks for all the fish!";
+        });
+        log_info << "Manager signal handler installed";
+
         // Start IO context
-        ios.run();
-        log_info << "So long, and thanks for all the fish!";
+        _ios.run();
     }
 
 }// namespace AwsMock::Manager

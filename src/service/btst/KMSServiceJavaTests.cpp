@@ -46,8 +46,7 @@ namespace AwsMock::Service {
         // act
         const Core::HttpSocketResponse result = SendPostCommand(_kmsBaseUrl + "createSymmetricKey?keySpec=" + KeySpecToString(Dto::KMS::KeySpec::SYMMETRIC_DEFAULT) + "&keyUsage=" + KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT) + "&description=Description", {}, TEST_PORT);
         BOOST_CHECK_EQUAL(result.statusCode, http::status::ok);
-        Dto::KMS::Key response;
-        response.FromJson(result.body);
+        const Dto::KMS::Key response = Dto::KMS::Key::FromJson(result.body);
 
         // assert
         BOOST_CHECK_EQUAL(response.keyId.empty(), false);

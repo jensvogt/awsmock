@@ -9,13 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteAttributeRequest {
+    struct DeleteAttributeRequest final : Common::BaseCounter<DeleteAttributeRequest> {
 
         /**
          * Message ID
@@ -27,33 +26,24 @@ namespace AwsMock::Dto::SQS {
          */
         std::string name;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend DeleteAttributeRequest tag_invoke(boost::json::value_to_tag<DeleteAttributeRequest>, boost::json::value const &v) {
+            DeleteAttributeRequest r;
+            r.messageId = Core::Json::GetStringValue(v, "messageId");
+            r.name = Core::Json::GetStringValue(v, "name");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteAttributeRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteAttributeRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"messageId", obj.messageId},
+                    {"name", obj.name},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

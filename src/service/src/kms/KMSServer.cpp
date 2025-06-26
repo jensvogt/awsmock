@@ -2,16 +2,20 @@
 // Created by vogje01 on 03/06/2023.
 //
 
+#include "awsmock/service/module/ModuleService.h"
+
+
 #include <awsmock/service/kms/KMSServer.h>
 
 namespace AwsMock::Service {
 
-    KMSServer::KMSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()) {
+    KMSServer::KMSServer(Core::Scheduler &scheduler) : AbstractServer("kms"), _kmsDatabase(Database::KMSDatabase::instance()) {
 
         // HTTP manager configuration
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _removePeriod = configuration.GetValue<int>("awsmock.modules.kms.remove.period");
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.kms.monitoring.period");
+        _removePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.kms.remove.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.kms.monitoring.period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.kms.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.kms.backup.cron");
         log_debug << "KMS server initialized";
 
         // Check module active
@@ -22,10 +26,15 @@ namespace AwsMock::Service {
         log_info << "KMS module starting";
 
         // Start lambda monitoring update counters
-        scheduler.AddTask("monitoring-kms-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("kms-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start the deleting old keys task
         scheduler.AddTask("kms-delete-keys", [this] { this->DeleteKeys(); }, _removePeriod);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("kms-backup", [this] { this->BackupKms(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -53,5 +62,9 @@ namespace AwsMock::Service {
             }
         }
         log_trace << "Finished key deletion";
+    }
+
+    void KMSServer::BackupKms() {
+        ModuleService::BackupModule("cognito", true);
     }
 }// namespace AwsMock::Service

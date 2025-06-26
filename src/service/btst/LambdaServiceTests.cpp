@@ -29,7 +29,10 @@ namespace AwsMock::Service {
             try {
                 Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest = {.functionName = FUNCTION_NAME, .qualifier = "latest"};
                 _lambdaService.DeleteFunction({.region = REGION, .functionName = FUNCTION_NAME, .qualifier = "latest"});
-                _s3Database.DeleteBucket({.region = REGION, .name = "lambda"});
+                Database::Entity::S3::Bucket bucket;
+                bucket.region = REGION;
+                bucket.name = "lambda";
+                _s3Database.DeleteBucket(bucket);
             } catch (Core::ServiceException &ex) {
                 // Do nothing
             }

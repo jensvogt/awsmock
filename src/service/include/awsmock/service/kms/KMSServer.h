@@ -10,11 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/kms/KMSMonitoring.h>
 #include <awsmock/service/kms/KMSWorker.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
@@ -31,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit KMSServer(Core::PeriodicScheduler &scheduler);
+        explicit KMSServer(Core::Scheduler &scheduler);
 
       private:
 
@@ -44,6 +45,11 @@ namespace AwsMock::Service {
          * @brief Delete keys which are pending for deletion
          */
         void DeleteKeys() const;
+
+        /**
+         * @brief Backup the KMS objects
+         */
+        void BackupKms();
 
         /**
          * KMS database
@@ -64,6 +70,24 @@ namespace AwsMock::Service {
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Dynamo DB backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * @brief KMS server period

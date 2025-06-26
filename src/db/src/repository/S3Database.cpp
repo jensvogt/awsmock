@@ -49,6 +49,27 @@ namespace AwsMock::Database {
         return _memoryDb.BucketExists(region, name);
     }
 
+    bool S3Database::BucketExists(const std::string &bucketArn) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
+
+                const int64_t count = _bucketCollection.count_documents(make_document(kvp("arn", bucketArn)));
+                log_trace << "Bucket exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.BucketExists(bucketArn);
+    }
+
     bool S3Database::BucketExists(const Entity::S3::Bucket &bucket) const {
         return BucketExists(bucket.region, bucket.name);
     }
@@ -123,6 +144,18 @@ namespace AwsMock::Database {
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
 
         const auto mResult = _bucketCollection.find_one(make_document(kvp("_id", oid)));
+        Entity::S3::Bucket result;
+        result.FromDocument(mResult->view());
+
+        return result;
+    }
+
+    Entity::S3::Bucket S3Database::GetBucketByArn(const std::string &bucketArn) const {
+
+        const auto client = ConnectionPool::instance().GetConnection();
+        mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
+
+        const auto mResult = _bucketCollection.find_one(make_document(kvp("arn", bucketArn)));
         Entity::S3::Bucket result;
         result.FromDocument(mResult->view());
 
@@ -406,9 +439,9 @@ namespace AwsMock::Database {
     }
 
     // TODO: Combine with Listobject
-    Entity::S3::ObjectList S3Database::ListBucket(const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3Database::ListBucket(const std::string &bucket, const std::string &prefix) const {
 
-        Entity::S3::ObjectList objectList;
+        std::vector<Entity::S3::Object> objectList;
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -764,10 +797,10 @@ namespace AwsMock::Database {
         return {};
     }
 
-    Entity::S3::ObjectList S3Database::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3Database::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
 
         if (HasDatabase()) {
-            Entity::S3::ObjectList objectList;
+            std::vector<Entity::S3::Object> objectList;
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_objectCollectionName];
@@ -828,9 +861,9 @@ namespace AwsMock::Database {
         return _memoryDb.ObjectCount(region, bucket);
     }
 
-    Entity::S3::ObjectList S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::S3::Object> S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        Entity::S3::ObjectList objectList;
+        std::vector<Entity::S3::Object> objectList;
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -1002,11 +1035,11 @@ namespace AwsMock::Database {
 
             for (const auto &it: allowedEvents) {
 
-                Entity::S3::BucketNotification notification = {
-                        .event = it,
-                        .notificationId = bucketNotification.notificationId,
-                        .queueArn = bucketNotification.queueArn,
-                        .lambdaArn = bucketNotification.lambdaArn};
+                Entity::S3::BucketNotification notification;
+                notification.event = it;
+                notification.notificationId = bucketNotification.notificationId;
+                notification.queueArn = bucketNotification.queueArn;
+                notification.lambdaArn = bucketNotification.lambdaArn;
                 internBucket.notifications.emplace_back(notification);
             }
 

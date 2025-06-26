@@ -18,7 +18,7 @@ namespace AwsMock::Service {
 
                     Dto::Cognito::CreateUserPoolRequest cognitoRequest = Dto::Cognito::CreateUserPoolRequest::FromJson(clientCommand);
                     Dto::Cognito::CreateUserPoolResponse serviceResponse = _cognitoService.CreateUserPool(cognitoRequest);
-                    log_info << "User pool created, userPoolId: " << serviceResponse.userPoolId;
+                    log_info << "User pool created, userPoolId: " << serviceResponse.userPool.userPoolId;
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -31,15 +31,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::UPDATE_USER_POOL_DOMAIN: {
-                    Dto::Cognito::UpdateUserPoolDomainRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
 
+                    Dto::Cognito::UpdateUserPoolDomainRequest cognitoRequest = Dto::Cognito::UpdateUserPoolDomainRequest::FromJson(clientCommand);
                     Dto::Cognito::UpdateUserPoolDomainResponse cognitoResponse = _cognitoService.UpdateUserPoolDomain(cognitoRequest);
                     log_info << "User pool domain updated, domain: " << cognitoResponse.cloudFrontDomain;
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
@@ -68,14 +63,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::UPDATE_USER_POOL: {
-                    Dto::Cognito::UpdateUserPoolRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::UpdateUserPoolRequest cognitoRequest = Dto::Cognito::UpdateUserPoolRequest::FromJson(clientCommand);
                     _cognitoService.UpdateUserPool(cognitoRequest);
                     log_info << "User pool updated, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request);
                 }
 
@@ -92,19 +83,14 @@ namespace AwsMock::Service {
                     Dto::Cognito::DescribeUserPoolClientRequest cognitoRequest = Dto::Cognito::DescribeUserPoolClientRequest::FromJson(clientCommand);
                     Dto::Cognito::DescribeUserPoolClientResponse cognitoResponse = _cognitoService.DescribeUserPoolClient(cognitoRequest);
                     log_info << "Describe user pool client, userPoolId: " << cognitoResponse.userPoolClient.userPoolId << " clientId: " << cognitoResponse.userPoolClient.clientId;
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
                 case Dto::Common::CognitoCommandType::UPDATE_USER_POOL_CLIENT: {
-                    Dto::Cognito::UpdateUserPoolClientRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::UpdateUserPoolClientRequest cognitoRequest = Dto::Cognito::UpdateUserPoolClientRequest::FromJson(clientCommand);
                     _cognitoService.UpdateUserPoolClient(cognitoRequest);
                     log_info << "User pool client updated, userPoolId: " << cognitoRequest.userPoolId << " clientId: " << cognitoRequest.clientId;
-
                     return SendOkResponse(request);
                 }
 
@@ -145,7 +131,6 @@ namespace AwsMock::Service {
                     Dto::Cognito::ListUserCountersRequest cognitoRequest = Dto::Cognito::ListUserCountersRequest::FromJson(clientCommand);
                     Dto::Cognito::ListUserCountersResponse cognitoResponse = _cognitoService.ListUserCounters(cognitoRequest);
                     log_info << "User counters listed, userPoolId: " << cognitoRequest.userPoolId << " count: " << cognitoResponse.users.size();
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
@@ -179,7 +164,6 @@ namespace AwsMock::Service {
                     Dto::Cognito::AdminRemoveUserFromGroupRequest cognitoRequest = Dto::Cognito::AdminRemoveUserFromGroupRequest::FromJson(clientCommand);
                     _cognitoService.AdminRemoveUserFromGroup(cognitoRequest);
                     log_info << "Remove user from group, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request);
                 }
 
@@ -192,14 +176,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::SIGN_UP: {
-                    Dto::Cognito::SignUpRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::SignUpRequest cognitoRequest = Dto::Cognito::SignUpRequest::FromJson(clientCommand);
                     Dto::Cognito::SignUpResponse cognitoResponse = _cognitoService.SignUp(cognitoRequest);
                     log_info << "Sign up user, user: " << cognitoRequest.user << " clientId: " << cognitoRequest.clientId;
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
@@ -208,7 +188,6 @@ namespace AwsMock::Service {
                     Dto::Cognito::AdminConfirmUserRequest cognitoRequest = Dto::Cognito::AdminConfirmUserRequest::FromJson(clientCommand);
                     _cognitoService.ConfirmUser(cognitoRequest);
                     log_info << "User confirmed, userPoolId: " << cognitoRequest.userPoolId << " userName: " << cognitoRequest.userName;
-
                     return SendOkResponse(request);
                 }
 
@@ -221,14 +200,10 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::CognitoCommandType::RESPOND_TO_AUTH_CHALLENGE: {
-                    Dto::Cognito::RespondToAuthChallengeRequest cognitoRequest{};
-                    cognitoRequest.FromJson(clientCommand.payload);
-                    cognitoRequest.region = clientCommand.region;
-                    cognitoRequest.requestId = clientCommand.requestId;
-                    cognitoRequest.user = clientCommand.user;
+
+                    Dto::Cognito::RespondToAuthChallengeRequest cognitoRequest = Dto::Cognito::RespondToAuthChallengeRequest::FromJson(clientCommand);
                     Dto::Cognito::RespondToAuthChallengeResponse cognitoResponse = _cognitoService.RespondToAuthChallenge(cognitoRequest);
                     log_info << "Respond to auth challenge, clientId: " << cognitoRequest.clientId << " json: " << cognitoResponse.ToJson();
-
                     return SendOkResponse(request, cognitoResponse.ToJson(), headers);
                 }
 
@@ -253,7 +228,6 @@ namespace AwsMock::Service {
                     Dto::Cognito::AdminGetUserRequest cognitoRequest = Dto::Cognito::AdminGetUserRequest::FromJson(clientCommand);
                     Dto::Cognito::AdminGetUserResponse cognitoResponse = _cognitoService.AdminGetUser(cognitoRequest);
                     log_info << "User returned, userPoolId: " << cognitoRequest.userPoolId << " username: " << cognitoRequest.user;
-
                     return SendOkResponse(request, cognitoResponse.ToJson());
                 }
 
@@ -279,7 +253,6 @@ namespace AwsMock::Service {
                     Dto::Cognito::AdminDeleteUserRequest cognitoRequest = Dto::Cognito::AdminDeleteUserRequest::FromJson(clientCommand);
                     _cognitoService.AdminDeleteUser(cognitoRequest);
                     log_info << "User deleted, userPoolId: " << cognitoRequest.userPoolId << " user: " << cognitoRequest.user;
-
                     return SendOkResponse(request);
                 }
 
@@ -288,7 +261,6 @@ namespace AwsMock::Service {
                     Dto::Cognito::AdminAddUserToGroupRequest cognitoRequest = Dto::Cognito::AdminAddUserToGroupRequest::FromJson(clientCommand);
                     _cognitoService.AdminAddUserToGroup(cognitoRequest);
                     log_info << "Add user to group, userPoolId: " << cognitoRequest.userPoolId;
-
                     return SendOkResponse(request);
                 }
 

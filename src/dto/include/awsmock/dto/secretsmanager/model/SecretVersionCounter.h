@@ -44,12 +44,23 @@ namespace AwsMock::Dto::SecretsManager {
          */
         std::vector<std::string> states;
 
+        /**
+         * Created timestamp
+         */
+        system_clock::time_point created;
+
+        /**
+         * Last accessed
+         */
+        system_clock::time_point lastAccessed;
+
       private:
 
         friend SecretVersionCounter tag_invoke(boost::json::value_to_tag<SecretVersionCounter>, boost::json::value const &v) {
             SecretVersionCounter r;
             r.versionId = Core::Json::GetStringValue(v, "secretName");
             r.states = boost::json::value_to<std::vector<std::string>>(v.at("states"));
+            r.created = Core::Json::GetDatetimeValue(v, "created");
             return r;
         }
 

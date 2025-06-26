@@ -7,10 +7,11 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -28,7 +29,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSServer(Core::PeriodicScheduler &scheduler);
+        explicit SQSServer(Core::Scheduler &scheduler);
 
       private:
 
@@ -62,6 +63,11 @@ namespace AwsMock::Service {
         void SetDlq() const;
 
         /**
+         * @brief Backup the SQS queues and messages
+         */
+        static void BackupSqs();
+
+        /**
          * Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
@@ -85,6 +91,24 @@ namespace AwsMock::Service {
          * SQS adjust counter period
          */
         int _counterPeriod;
+
+        /**
+         * @brief SQS backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief SQS backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Shared memory segment

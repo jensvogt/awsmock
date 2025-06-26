@@ -127,6 +127,11 @@ namespace AwsMock::Core {
         static std::string logPrefix;
 
         /**
+         * Severity
+         */
+        static std::string _severity;
+
+        /**
          * Console appender
          */
         static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> console_sink;

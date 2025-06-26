@@ -282,6 +282,15 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::GET_EVENT_SOURCE: {
+
+                    Dto::SQS::GetEventSourceRequest sqsRequest = Dto::SQS::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::SQS::GetEventSourceResponse sqsResponse = _sqsService.GetEventSource(sqsRequest);
+                    log_info << "Get event source, arn: " << sqsRequest.eventSourceArn;
+
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
 
                     Dto::SQS::DeleteMessageRequest sqsRequest = Dto::SQS::DeleteMessageRequest::FromJson(clientCommand);
@@ -303,13 +312,20 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
                 }
 
+                case Dto::Common::SqsCommandType::ADD_ATTRIBUTE: {
+
+                    Dto::SQS::AddAttributeRequest sqsRequest = Dto::SQS::AddAttributeRequest::FromJson(clientCommand);
+                    _sqsService.AddMessageAttribute(sqsRequest);
+                    log_info << "Add message attribute, messageId: " << sqsRequest.messageId << ", name: " << sqsRequest.name;
+
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_ATTRIBUTE: {
 
-                    Dto::SQS::DeleteAttributeRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-
+                    Dto::SQS::DeleteAttributeRequest sqsRequest = Dto::SQS::DeleteAttributeRequest::FromJson(clientCommand);
                     _sqsService.DeleteMessageAttribute(sqsRequest);
-                    log_info << "Delete message attribute, messageId: " << sqsRequest.messageId;
+                    log_info << "Delete message attribute, messageId: " << sqsRequest.messageId << ", name: " << sqsRequest.name;
 
                     return SendOkResponse(request);
                 }

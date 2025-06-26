@@ -592,6 +592,33 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SQS::GetEventSourceResponse SQSService::GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_event_source");
+        log_trace << "Get event source request, sqsRequest: " << request.ToString();
+
+        // Check existence
+        if (!_sqsDatabase.QueueArnExists(request.eventSourceArn)) {
+            log_warning << "Queue does not exists, arn: " << request.eventSourceArn;
+            throw Core::NotFoundException("Queue does not exists, arn: " + request.eventSourceArn);
+        }
+
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.eventSourceArn);
+            log_debug << "Queue returned, queue: " << queue.name;
+
+            Dto::SQS::GetEventSourceResponse response;
+            response.lambdaConfiguration.arn = queue.queueArn;
+            response.lambdaConfiguration.enabled = true;
+            response.lambdaConfiguration.uuid = queue.oid;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get event source failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     void SQSService::SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "set_visibility_timeout");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "set_visibility_timeout");
@@ -1061,6 +1088,33 @@ namespace AwsMock::Service {
         }
     }
 
+    void SQSService::AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "add_message_attribute");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "add_message_attribute");
+        log_trace << "Delete message attribute request, messageId: " << request.messageId << ", name: " << request.name;
+
+        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+
+        try {
+            Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
+
+            // Add attributes
+            Database::Entity::SQS::MessageAttribute messageAttribute;
+            messageAttribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(request.dataType);
+            messageAttribute.stringValue = request.value;
+            message.messageAttributes[request.name] = messageAttribute;
+            message = _sqsDatabase.UpdateMessage(message);
+            log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void SQSService::DeleteMessageAttribute(const Dto::SQS::DeleteAttributeRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "delete_message_attribute");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "delete_message_attribute");
@@ -1075,7 +1129,7 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
 
             // Update attributes
-            message.attributes.erase(request.name);
+            message.messageAttributes.erase(request.name);
             message = _sqsDatabase.UpdateMessage(message);
             log_debug << "Message attribute deleted, messageId: " << message.messageId << ", name: " << request.name;
 

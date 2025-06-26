@@ -37,9 +37,9 @@ namespace AwsMock::Service {
             userPool = _database.CreateUserPool(userPool);
             response.requestId = request.requestId;
             response.region = userPool.region;
-            response.name = userPool.name;
-            response.arn = userPool.arn;
-            response.userPoolId = userPool.userPoolId;
+            response.userPool.name = userPool.name;
+            response.userPool.arn = userPool.arn;
+            response.userPool.userPoolId = userPool.userPoolId;
             log_trace << "Create user pool outcome: " + response.ToJson();
             return response;
 

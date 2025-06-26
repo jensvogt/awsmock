@@ -10,6 +10,7 @@
     },
     "data-dir": "/usr/local/awsmock/data",
     "temp-dir": "/usr/local/awsmock/tmp",
+    "backup-dir": "/usr/local/awsmock/data/backup",
     "shm-size": 65536,
     "json": {
       "pretty": false
@@ -41,6 +42,11 @@
     "modules": {
       "s3": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "data-dir": "/usr/local/awsmock/data/s3",
         "counter": {
           "period": "10"
@@ -51,6 +57,11 @@
       },
       "sqs": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "monitoring": {
           "period": 300
         },
@@ -64,6 +75,11 @@
       },
       "sns": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "timeout": 14,
         "monitoring": {
           "period": 300
@@ -77,6 +93,11 @@
       },
       "lambda": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "lifetime": 3600,
         "data-dir": "/usr/local/awsmock/data/lambda",
         "remove-period": 3600,
@@ -86,11 +107,14 @@
           "java11": "public.ecr.aws/lambda/java:11",
           "java17": "public.ecr.aws/lambda/java:17",
           "java21": "public.ecr.aws/lambda/java:21",
-          "python3-8": "public.ecr.aws/lambda/python:3.8",
           "python3-9": "public.ecr.aws/lambda/python:3.9",
           "python3-10": "public.ecr.aws/lambda/python:3.10",
           "python3-11": "public.ecr.aws/lambda/python:3.11",
+          "python3-12": "public.ecr.aws/lambda/python:3.12",
+          "python3-13": "public.ecr.aws/lambda/python:3.13",
+          "nodejs18-x": "public.ecr.aws/lambda/nodejs:18",
           "nodejs20-x": "public.ecr.aws/lambda/nodejs:20",
+          "nodejs22-x": "public.ecr.aws/lambda/nodejs:22",
           "provided-al2": "public.ecr.aws/lambda/provided:al2",
           "provided-al2023": "public.ecr.aws/lambda/provided:al2023",
           "provided-latest": "public.ecr.aws/lambda/provided:latest",
@@ -99,6 +123,11 @@
       },
       "transfer": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "bucket": "transfer-server",
         "data-dir": "/usr/local/awsmock/data/transfer",
         "monitoring": {
@@ -127,12 +156,23 @@
       },
       "cognito": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "monitoring": {
           "period": 300
         }
       },
       "dynamodb": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "data-dir": "/usr/local/awsmock/data/dynamodb",
         "monitoring": {
           "period": 300
         },
@@ -149,6 +189,11 @@
       },
       "secretsmanager": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "monitoring": {
           "period": 300
         },
@@ -158,6 +203,25 @@
       },
       "kms": {
         "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring": {
+          "period": 300
+        },
+        "remove": {
+          "period": 300
+        }
+      },
+      "ssm": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "monitoring": {
           "period": 300
         },

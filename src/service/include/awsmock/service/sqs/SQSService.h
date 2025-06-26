@@ -17,6 +17,7 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/sqs/AddAttributeRequest.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -49,6 +50,8 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
+#include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
+#include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
@@ -186,6 +189,13 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
 
+        /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::SQS::GetEventSourceResponse GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const;
         /**
          * @brief Set queue userAttributes
          *
@@ -331,6 +341,14 @@ namespace AwsMock::Service {
         * @throws ServiceException
         */
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
+
+        /**
+         * @brief Adds a message attribute
+         *
+         * @param request add message attribute request DTO
+         * @throws ServiceException
+         */
+        void AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const;
 
         /**
          * @brief Deletes a message attribute

@@ -6,7 +6,7 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/Services.cpp src/module/model/Infrastructure.cpp src/common/SNSClientCommand.cpp
         src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
         src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
-        src/common/MonitoringClientCommand.cpp)
+        src/common/MonitoringClientCommand.cpp src/common/CognitoClientCommand.cpp)
 set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
@@ -17,7 +17,7 @@ set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp s
         src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp
         src/sqs/ListQueueTagsRequest.cpp src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
         src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp
-        src/sqs/DeleteAttributeRequest.cpp)
+)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
@@ -47,17 +47,14 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp src/lambda/model/Configuration.cpp
         src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
         src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp
-        src/lambda/model/EventSourceMapping.cpp src/lambda/DeleteFunctionRequest.cpp)
-set(COGNITO_SOURCES src/common/CognitoClientCommand.cpp src/cognito/model/LambdaConfig.cpp src/cognito/model/CustomEmailSender.cpp
-        src/cognito/model/CustomSmsSender.cpp src/cognito/model/PreTokenGenerationConfig.cpp src/cognito/mapper/Mapper.cpp
-        src/cognito/SignUpRequest.cpp src/cognito/SignUpResponse.cpp src/cognito/UpdateUserPoolRequest.cpp
-        src/cognito/UpdateUserPoolClientRequest.cpp src/cognito/UpdateUserPoolDomainRequest.cpp
-        src/cognito/UpdateUserPoolDomainResponse.cpp src/cognito/model/ValidationData.cpp)
+        src/lambda/DeleteFunctionRequest.cpp)
+set(COGNITO_SOURCES src/cognito/mapper/Mapper.cpp)
 set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
         src/transfer/StopServerRequest.cpp src/transfer/mapper/Mapper.cpp src/transfer/GetServerDetailsRequest.cpp
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
+set(SECRETSMANAGER_SOURCES src/secretsmanager/mapper/Mapper.cpp)
 set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
         src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
         src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
@@ -70,7 +67,7 @@ set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
-        ${MONITORING_SOURCES})
+        ${SECRETSMANAGER_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)
@@ -85,7 +82,9 @@ if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/dto/secretsmanager/model/VersionStage.h)
+            include/awsmock/dto/secretsmanager/model/VersionStage.h
+            src/secretsmanager/mapper/Mapper.cpp
+            include/awsmock/dto/secretsmanager/mapper/Mapper.h)
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

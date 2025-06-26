@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CustomEmailSender final : Common::BaseDto<CustomEmailSender> {
+    struct CustomEmailSender final : Common::BaseCounter<CustomEmailSender> {
 
         /**
          * Lambda ARN
@@ -45,14 +45,39 @@ namespace AwsMock::Dto::Cognito {
          *
          * @return JSON object
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+            try {
+
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "lambdaArn", lambdaArn);
+                Core::Bson::BsonUtils::SetStringValue(document, "lambdaVersion", lambdaVersion);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend CustomEmailSender tag_invoke(boost::json::value_to_tag<CustomEmailSender>, boost::json::value const &v) {
+            CustomEmailSender r;
+            r.lambdaArn = Core::Json::GetStringValue(v, "LambdaArn");
+            r.lambdaVersion = Core::Json::GetStringValue(v, "LambdaVersion");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CustomEmailSender const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"LambdaArn", obj.lambdaArn},
+                    {"LambdaVersion", obj.lambdaVersion},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

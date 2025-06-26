@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.5.2](https://github.com/jensvogt/awsmock/compare/v1.5.1...v1.5.2) (2025-06-20)
+
+
+### Bug Fixes
+
+* **1288-add-lambda-event-source:** add lambda event sources ([3199f42](https://github.com/jensvogt/awsmock/commit/3199f42409eae93920cae904239292b4935378be))
+* **1288-add-lambda-event-source:** add lambda event sources ([85210fc](https://github.com/jensvogt/awsmock/commit/85210fcc1e3da1d79786d2286eb3217c4005b550))
+* **1288-add-lambda-event-source:** add lambda event sources ([ad93c1e](https://github.com/jensvogt/awsmock/commit/ad93c1e878ee4ffb567a933f14ed84785b29b79a))
+* **1288-kms-ui-pages:** add top-x counters for ui charts ([40c13ec](https://github.com/jensvogt/awsmock/commit/40c13eca2073db7eeb29fee504bdbbc95d6e0889))
+* **1288-kms-ui-pages:** fix bug in SQS message redrive ([2bb44e0](https://github.com/jensvogt/awsmock/commit/2bb44e02aff7d81d9d7624d171bc8b4677283441))
+
+## [1.5.1](https://github.com/jensvogt/awsmock/compare/v1.5.0...v1.5.1) (2025-06-14)
+
+
+### Bug Fixes
+
+* **1275-add-secretmanager-rotation:** backup for all modules ([8568ae3](https://github.com/jensvogt/awsmock/commit/8568ae3c8d23c303aab8190e6e8774b4e0bf1fdb))
+* **1275-add-secretmanager-rotation:** fix bug in backup ([2659282](https://github.com/jensvogt/awsmock/commit/2659282f99dbceeb53e459a5a354a202d4525c51))
+* **1275-add-secretmanager-rotation:** fix bug in logging, add backup via cron ([8e4775f](https://github.com/jensvogt/awsmock/commit/8e4775fffef3ccfabd04c6cb6de31d7abfbfd230))
+* **1275-add-secretmanager-rotation:** remove python 3.8 lambda support, add python 3.12, 3.13 ([fa8a083](https://github.com/jensvogt/awsmock/commit/fa8a08329afb3ed12d5437d1867d9e85ef0c1260))
+
+## [1.5.0](https://github.com/jensvogt/awsmock/compare/v1.4.0...v1.5.0) (2025-06-09)
+
+
+### Features
+
+* **1275-add-secretmanager-rotation:** add nodejs22 lambda support ([f2f1e5b](https://github.com/jensvogt/awsmock/commit/f2f1e5b107a8bea681db335c425ada89c4c21ba6))
+
 ## [1.4.0](https://github.com/jensvogt/awsmock/compare/v1.3.1...v1.4.0) (2025-06-04)
 
 

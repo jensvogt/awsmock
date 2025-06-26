@@ -107,7 +107,9 @@ namespace AwsMock::Dto::KMS {
             r.origin = Core::Json::GetStringValue(v, "Origin");
             r.policy = Core::Json::GetStringValue(v, "Policy");
             r.xksKeyId = Core::Json::GetStringValue(v, "XksKeyId");
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
             return r;
         }
 

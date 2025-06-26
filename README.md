@@ -187,10 +187,15 @@ As already said, this can be a time-consuming procedure, depending on your machi
 #### Building the frontend from source:
 
 IN order to build the frontend, you need Node.js >16.0. The sourcecode is located at
-```http://github.com/jensvogt/awsmock-ui```. To build the frontend part, use:
 
 ```
-npm run build --prod
+http://github.com/jensvogt/awsmock-ui
+```
+
+To build the frontend part, use:
+
+```
+npm run build --omit-dev
 ```
 
 and copy the result to ```$HOME/awsmock/frontend```.
@@ -268,7 +273,7 @@ sudo usermod -a -G docker <userName>
 
 this will add ```<userName>``` to the docker group and the manager can access the docker daemon REST APIs. After that
 you
-can start the manager as normal foreground process:
+can start the manager as a normal foreground process:
 
 ```
 /usr/local/bin/awsmockmgr --loglevel debug
@@ -325,7 +330,7 @@ AwsMock can be installed as a Windows service. In order to install the AwsMock m
 "C:\Program Files (x86)\awsmock\bin\awsmockmgr.exe" --install
 ```
 
-### Compiling on Windows
+### Building on Windows
 
 AwsMock uses the MSVC C++ compiler (Microsoft Visual Studio 2019). In order to compile AwsMock on Windows install the
 prerequisites:
@@ -351,7 +356,7 @@ See the detailed installation instructions coming with the different packages.
 On macOS the manager can be run as a normal process. A macOS port can be installed using the normal development setup.
 Start the manager as ```awsmockmgr```. The frontend is available at ```http://localhost:4567```
 
-### Compiling on MacOS
+### Building on MacOS
 
 In order to compile AwsMock on macOS, install the prerequisites (if not already existing):
 
@@ -382,8 +387,7 @@ sudo make install
 ```
 
 This will compile and install the backend executables into ```/usr/local/awsmock/bin``` and the libraries in
-```/usr/local/awsmock/lib```. The configuration file should be installed as ```/usr/local/awsmock/etc/awsmock.json```:
-```cp dist/etc/awsmock.json /etc```
+```/usr/local/awsmock/lib```.
 
 Download the frontend code
 

@@ -390,4 +390,42 @@ namespace AwsMock::Service {
             }
         }
     }
+
+    void ModuleService::BackupModule(const std::string &module, bool includeObjects) {
+
+        // Backup file name
+        std::string backupFilename = Core::BackupUtils::GetBackupFilename(module);
+        log_info << "Creating backup of module, name: " << module << ", file: " << backupFilename;
+
+        // Create export request
+        Dto::Module::ExportInfrastructureRequest request;
+        request.includeObjects = includeObjects;
+        request.prettyPrint = true;
+        request.modules.emplace_back(module);
+
+        // Do the actual export
+        Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure(request);
+
+        // Write the backup file
+        std::ofstream backupFile(backupFilename);
+        backupFile << response.ToJson();
+        backupFile.close();
+
+        // Backup retention
+        BackupRetention(module);
+
+        // Sleep for a while, otherwise cron will execute at the same time again
+        std::this_thread::sleep_for(std::chrono::minutes(5));
+    }
+
+    void ModuleService::BackupRetention(const std::string &module) {
+
+        // Get the file list
+        const int retention = Core::Configuration::instance().GetValue<int>("awsmock.modules." + module + ".backup.count");
+        const std::vector<std::string> backupList = Core::BackupUtils::GetBackupFiles(module, retention);
+        log_info << "Cleanup backup files, module: " << module << ", count: " << backupList.size();
+        for (const auto &file: backupList) {
+            Core::FileUtils::DeleteFile(file);
+        }
+    }
 }// namespace AwsMock::Service

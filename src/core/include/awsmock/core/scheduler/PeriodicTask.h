@@ -20,28 +20,82 @@
 
 namespace AwsMock::Core {
 
+    /**
+     * @brief Periodic task
+     *
+     * @par
+     * This class starts a task which will be repeated after each interval. The periodic interval must be given in seconds, together with an initial delay in seconds.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class PeriodicTask : boost::noncopyable {
 
       public:
 
+        /**
+         * Task handler
+         */
         typedef std::function<void()> handler_fn;
 
+        /**
+         * @brief Constructor
+         *
+         * @param ioService boost IO context
+         * @param name task name
+         * @param interval periodic interval in seconds
+         * @param task task
+         * @param delay initial delay in seconds
+         */
         PeriodicTask(boost::asio::io_context &ioService, std::string const &name, int interval, handler_fn task, int delay);
 
-        [[maybe_unused]] void execute(boost::system::error_code const &e);
+        /**
+         * @brief Execute the task by calling the handler functor.
+         *
+         * @param e error code
+         */
+        [[maybe_unused]] void Execute(boost::system::error_code const &e);
 
-        void start();
+        /**
+         * @brief Start the task scheduler
+         */
+        void Start();
 
       private:
 
-        [[maybe_unused]] void start_wait();
+        /**
+         * Wait for the delay
+         */
+        [[maybe_unused]] void StartWait();
 
-        boost::asio::io_context &ioService;
-        boost::asio::deadline_timer timer;
-        handler_fn task;
-        std::string name;
-        int interval;
-        int _delay;
+        /**
+         * IO context
+         */
+        boost::asio::io_context &_ios;
+
+        /**
+         * Timer
+         */
+        boost::asio::deadline_timer _timer;
+
+        /**
+         * Task handler
+         */
+        handler_fn _task;
+
+        /**
+         * Task name
+         */
+        std::string _name;
+
+        /**
+         * Interval in seconds
+         */
+        long _interval{};
+
+        /**
+         * Initial delay
+         */
+        long _delay{};
     };
 
 }// namespace AwsMock::Core

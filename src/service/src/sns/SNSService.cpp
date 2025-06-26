@@ -73,6 +73,29 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::ListTopicArnsResponse SNSService::ListTopicArns(const std::string &region) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_topics");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topics");
+        log_trace << "List all topic ARNs request, region: " << region;
+
+        try {
+
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
+
+            Dto::SNS::ListTopicArnsResponse listTopicArnsResponse;
+            for (const auto &it: topicList) {
+                listTopicArnsResponse.topicArns.emplace_back(it.topicArn);
+            }
+            log_trace << "SNS list topic ARNs response: " << listTopicArnsResponse.ToJson();
+
+            return listTopicArnsResponse;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topic ARNs request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_topic_counters");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topic_counters");
@@ -88,6 +111,33 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SNS::GetEventSourceResponse SNSService::GetEventSource(const Dto::SNS::GetEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_event_source");
+        log_trace << "Get event source request, snsRequest: " << request.ToString();
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
+            log_warning << "Topic does not exists, arn: " << request.eventSourceArn;
+            throw Core::NotFoundException("Topic does not exists, arn: " + request.eventSourceArn);
+        }
+
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.eventSourceArn);
+            log_debug << "Topic returned, topic: " << topic.topicName;
+
+            Dto::SNS::GetEventSourceResponse response;
+            response.lambdaConfiguration.arn = topic.topicArn;
+            response.lambdaConfiguration.enabled = true;
+            response.lambdaConfiguration.uuid = topic.oid;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get event source failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }

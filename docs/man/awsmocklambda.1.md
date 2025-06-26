@@ -23,18 +23,18 @@ AwsMock supports lambda, allowing you to use the Lambda API to create, deploy, a
 supported APIs are available on our Lambda coverage page, which provides information on the extent of Lambda’s
 integration with AwsMock.
 
-Internally AwsMock will create and start a docker image of the function code using the AWS supplied RIE (Runtime
+Internally, AwsMock will create and start a docker image of the function code using the AWS supplied RIE (Runtime
 Interface Emulator) environment. The Lambda Runtime Interface Emulator is a proxy for Lambda’s Runtime and Extensions
 APIs, which allows customers to locally test their Lambda function packaged as a container image. It is a lightweight
 web-server that converts HTTP requests to JSON events and maintains functional parity with the Lambda Runtime API in
 the cloud. It allows you to locally test your functions using familiar tools such as cURL and the Docker CLI (when
-testing functions packaged as container images). It also simplifies running your application on additional computes.
+testing functions packaged as container images). It also simplifies running your application on additional computing.
 
 You can include the Lambda Runtime Interface Emulator in your container image to have it accept HTTP requests instead
 of the JSON events required for deployment to Lambda. This component does not emulate Lambda’s orchestrator, or security
 and authentication configurations. You can get started by downloading and installing it on your local machine. When the
 Lambda Runtime API emulator is executed, a ```/2015-03-31/functions/function/invocations``` endpoint will be stood up
-within the container that you post data to it in order to invoke your function for testing.
+within the container that you post data to it to invoke your function for testing.
 
 Orchestration is done through different docker images. A maximal concurrency of 1000 is supported. Each invocation will
 be sent to an idle instance of the lambda function. If no idle function docker container can be found, a new docker
@@ -45,10 +45,10 @@ Default is 3600 seconds.
 
 The lambda functions are executed inside the RIE (Runtime Interface Emulator). Lambdas run as docker container using
 port 8080 as REST API port for invocation requests. The internal port 8080 are connected to the host via a port
-forwarding, therefore the host port is randomly chosen between 32768 and 65536. You can see the docker host port via the
-```docker ps``` command.
+forwarding, therefore, the host port is randomly chosen between 32768 and 65536. You can see the docker host port via
+the ```docker ps``` command.
 
-To see the output of the lambdas function (if its logs to standard output ), use the docker command:
+To see the output of the lambdas function (if its logs to standard output), use the docker command:
 
 ```
 shell> docker ps
@@ -57,7 +57,8 @@ ecbb2e08c5f4   python-events:latest                 "/lambda-entrypoint.…"   4
 shell> docker logs -f ecbb2e08c5f4
 ```
 
-This will show the logs online.
+This will show the logs online. You can also see the invocation requests, the function outcome and the docker container
+logs using the awsmock UI.
 
 The Lambda module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
 corresponding man page ```awslocal(1)```.
@@ -66,21 +67,20 @@ corresponding man page ```awslocal(1)```.
 
 The following lambda runtimes are supported:
 
-- java8: AWS Java 8 runtime
 - java11: AWS Java 11 runtime
 - java17: AWS Java 17 runtime
 - java21: AWS Java 21 runtime
-- python 3.8: AWS Python 3.8 runtime (if possible don't use, it will be deprecated soon)
 - python 3.9: AWS Python 3.9 runtime
 - python 3.10: AWS Python 3.10 runtime
 - python 3.11: AWS Python 3.11 runtime
 - python 3.12: AWS Python 3.12 runtime
+- python 3.13: AWS Python 3.13 runtime
 - provided: Amazon Linux (for C++ lambdas)
 - provided.al2023: Amazon Linux 2023 (for C++ lambdas)
 - go1.x: AWS Go runtime
-- nodejs.16: AWS Node.js 16 runtime (if possible don't use, it will be deprecated soon)
 - nodejs.18: AWS Node.js 18 runtime
 - nodejs.20: AWS Node.js 20 runtime
+- nodejs.22: AWS Node.js 22 runtime
 
 For a list of supported runtimes
 see [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html).
@@ -211,6 +211,22 @@ aws lambda invoke \
   out.json
 ```
 
+To list the event sources of a lambda function
+
+```
+awslocal lambda list-event-source-mappings --function-name test-lambda
+{
+    "EventSourceMappings": [
+        {
+            "UUID": "2657ede5-12dd-41e5-a021-524a8b59e0d6",
+            "BatchSize": 10,
+            "MaximumBatchingWindowInSeconds": 5,
+            "EventSourceArn": "arn:aws:sqs:eu-central-1:000000000000:test-queue"
+        }
+    ]
+}
+```
+
 See the sample directory for more details on how to invoke a lambda function.
 
 To delete a lambda function:
@@ -224,7 +240,7 @@ This will stop the docker container and remove the image from the docker environ
 ## FRONTEND
 
 The frontend has some more functionalities, which are not included in the AWS CLI. Using the frontend on
-```http://localhost:4567```, you can start/stop the lambda function as well as monitor the number of invocation and the
+```http://localhost:4567```, you can start/stop the lambda function as well as monitor the number of invocations and the
 average runtime in milliseconds. To update a lambda function (replacement of the lambda function code), use the update
 function in the lambda function list.
 
@@ -242,12 +258,10 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```,
-```awsmocksns(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
-```awsmocksqs(1)```,
-```awsmockssm(1)```
+```awsmockcfg(1)```, ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```,
+```awsmocksqs(1)```, ```awsmocksns(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```,
+```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```, ```awsmockssm(1)```
