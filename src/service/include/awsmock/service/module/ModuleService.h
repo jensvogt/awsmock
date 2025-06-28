@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/BackupUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
@@ -59,7 +60,7 @@ namespace AwsMock::Service {
          *
          * @return list of all modules
          */
-        Database::Entity::Module::ModuleList ListModules() const;
+        [[nodiscard]] Database::Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Starts a module
@@ -109,7 +110,7 @@ namespace AwsMock::Service {
          * @brief Cleans the current infrastructure.
          *
          * @par
-         * All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.
+         * All SQS queues, SNS topics, S3 buckets, etc. will be deleted, as well as all objects.
          *
          * @param request clean infrastructure request
          */
@@ -124,6 +125,21 @@ namespace AwsMock::Service {
          * @param request clean infrastructure request
          */
         static void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request);
+
+        /**
+         * @brief Backup infrastructure
+         *
+         * @param module module name
+         * @param includeObjects include all objects
+         */
+        static void BackupModule(const std::string &module, bool includeObjects = false);
+
+        /**
+         * @brief Cleanup backups, keep only the number of backups which are defined in the module retention property
+         *
+         * @param module module name
+         */
+        static void BackupRetention(const std::string &module);
 
       private:
 

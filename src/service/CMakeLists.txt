@@ -13,8 +13,7 @@ set(COGNITO_SOURCES src/cognito/CognitoHandler.cpp src/cognito/CognitoHandler.cp
 set(TRANSFER_SOURCES src/transfer/TransferServer.cpp src/transfer/TransferHandler.cpp src/transfer/TransferService.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/DynamoDbServer.cpp src/dynamodb/DynamoDbHandler.cpp src/dynamodb/DynamoDbService.cpp)
 set(SECRETMANAGER_SOURCES src/secretsmanager/SecretsManagerServer.cpp src/secretsmanager/SecretsManagerHandler.cpp
-        src/secretsmanager/SecretsManagerService.cpp src/secretsmanager/SecretsManagerMonitoring.cpp
-)
+        src/secretsmanager/SecretsManagerService.cpp src/secretsmanager/SecretRotation.cpp)
 set(KMS_SOURCES src/kms/KMSServer.cpp src/kms/KMSHandler.cpp src/kms/KMSService.cpp
         src/kms/KMSCreator.cpp)
 set(SSM_SOURCES src/ssm/SSMServer.cpp src/ssm/SSMHandler.cpp src/ssm/SSMService.cpp)
@@ -44,18 +43,12 @@ endif ()
 include_directories(./include ../core/include ../db/include ../dto/include ${EXTERNAL_INCLUDE_DIR} ${BSONCXX_INCLUDE_DIR}
         ${MONGOCXX_INCLUDE_DIR})
 
-# Shared library
-if (NOT WIN32)
+# Library
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale boost_thread boost_filesystem
             ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull boost_log boost_log_setup ssh)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-if (NOT WIN32)
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static boost_locale
-            boost_thread boost_filesystem boost_log boost_log_setup jwt-cpp ssl crypto archive magic
-            prometheus-cpp-core prometheus-cpp-pull ssh)
 endif ()

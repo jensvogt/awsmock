@@ -8,7 +8,6 @@ namespace AwsMock::Dto::Docker {
 
     std::string CreateContainerRequest::ToJson() const {
 
-
         try {
 
             document rootDocument;
@@ -16,6 +15,7 @@ namespace AwsMock::Dto::Docker {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Domainname", domainName);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "User", user);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Image", image);
+            Core::Bson::BsonUtils::SetBoolValue(rootDocument, "Tty", tty);
 
             if (!environment.empty()) {
                 array envArray;

@@ -14,8 +14,10 @@ namespace AwsMock::Database::Entity::Lambda {
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "name", lambdaName);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "arn", lambdaArn);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "runtime", runtime);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "containerId", containerId);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "requestBody", requestBody);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "responseBody", responseBody);
+        Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "logMessages", logMessages);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "statusCode", httpStatusCode);
         Core::Bson::BsonUtils::SetStringValue(lambdaDocResult, "lambdaStatus", LambdaInstanceStatusToString(lambdaStatus));
         Core::Bson::BsonUtils::SetDateValue(lambdaDocResult, "timestamp", timestamp);
@@ -30,9 +32,11 @@ namespace AwsMock::Database::Entity::Lambda {
         lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         lambdaName = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         runtime = Core::Bson::BsonUtils::GetStringValue(mResult, "runtime");
+        containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
         httpStatusCode = Core::Bson::BsonUtils::GetStringValue(mResult, "statusCode");
         requestBody = Core::Bson::BsonUtils::GetStringValue(mResult, "requestBody");
         responseBody = Core::Bson::BsonUtils::GetStringValue(mResult, "responseBody");
+        logMessages = Core::Bson::BsonUtils::GetStringValue(mResult, "logMessages");
         lambdaStatus = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "lambdaStatus"));
         timestamp = Core::Bson::BsonUtils::GetDateValue(mResult, "timestamp");
     }

@@ -27,14 +27,4 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    std::string BucketEncryption::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const BucketEncryption &n) {
-        os << "BucketEncryption=" << to_json(n.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::S3

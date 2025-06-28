@@ -2,17 +2,16 @@
 // Created by vogje01 on 02/06/2023.
 //
 
-#ifndef AWMOCK_KMS_SERVER_CLI_TEST_H
-#define AWMOCK_KMS_SERVER_CLI_TEST_H
-
 // AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
+#include <awsmock/repository/KMSDatabase.h>
+#include <awsmock/service/kms/KMSService.h>
+
+// Test includes
 #include "TestBase.h"
 #include <awsmock/core/TestUtils.h>
-#include <awsmock/repository/S3Database.h>
-#include <awsmock/service/cognito/CognitoServer.h>
-#include <awsmock/service/cognito/CognitoService.h>
-#include <awsmock/service/gateway/GatewayServer.h>
 
+#define BOOST_TEST_MODULE KMSServiceCliTests
 #define PLAIN_TEXT_BASE64 std::string("VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==")
 
 namespace AwsMock::Service {
@@ -30,17 +29,12 @@ namespace AwsMock::Service {
             // General configuration
             _region = GetRegion();
             _endpoint = GetEndpoint();
+
+            // ReSharper disable once CppExpressionWithoutSideEffects
+            _database.DeleteAllKeys();
         }
 
-        ~KMSServiceCliTests() {
-            const long count = _database.DeleteAllKeys();
-            log_debug << "KMS keys deleted, count: " << count;
-            StopGateway();
-        }
-
-        boost::thread _thread;
         std::string _endpoint, _region;
-        boost::asio::io_context _ios{10};
         Core::Configuration &_configuration = Core::TestUtils::GetTestConfiguration();
         Database::KMSDatabase &_database = Database::KMSDatabase::instance();
     };
@@ -54,7 +48,7 @@ namespace AwsMock::Service {
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
 
         // assert
-        BOOST_CHECK_EQUAL(keyList.size() > 0, true);
+        BOOST_CHECK_EQUAL(keyList.empty(), false);
         BOOST_CHECK_EQUAL(keyList.at(0).arn.empty(), false);
         BOOST_CHECK_EQUAL(keyList.at(0).keySpec == Dto::KMS::KeySpecToString(Dto::KMS::KeySpec::SYMMETRIC_DEFAULT), true);
         BOOST_CHECK_EQUAL(keyList.at(0).keyUsage == Dto::KMS::KeyUsageToString(Dto::KMS::KeyUsage::ENCRYPT_DECRYPT), true);
@@ -129,8 +123,7 @@ namespace AwsMock::Service {
 
         // act
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "encrypt", "--key-id", keyId, "--plaintext", PLAIN_TEXT_BASE64, "--endpoint", _endpoint});
-        Dto::KMS::EncryptResponse response;
-        response.FromJson(output2);
+        const Dto::KMS::EncryptResponse response = Dto::KMS::EncryptResponse::FromJson(output2);
 
         // assert
         BOOST_CHECK_EQUAL(output2.empty(), false);
@@ -144,13 +137,11 @@ namespace AwsMock::Service {
         const std::vector<Database::Entity::KMS::Key> keyList = _database.ListKeys();
         const std::string keyId = keyList.at(0).keyId;
         const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "encrypt", "--key-id", keyId, "--plaintext", PLAIN_TEXT_BASE64, "--endpoint", _endpoint});
-        Dto::KMS::EncryptResponse response1;
-        response1.FromJson(output2);
+        Dto::KMS::EncryptResponse response1 = Dto::KMS::EncryptResponse::FromJson(output2);
 
         // act
         const std::string output3 = Core::TestUtils::SendCliCommand(AWS_CMD, {"kms", "decrypt", "--key-id", keyId, "--ciphertext-blob", response1.ciphertext, "--endpoint", _endpoint});
-        Dto::KMS::DecryptResponse response2;
-        response2.FromJson(output3);
+        Dto::KMS::DecryptResponse response2 = Dto::KMS::DecryptResponse::FromJson(output3);
 
         // assert
         BOOST_CHECK_EQUAL(output3.empty(), false);
@@ -158,5 +149,3 @@ namespace AwsMock::Service {
     }
 
 }// namespace AwsMock::Service
-
-#endif// AWMOCK_KMS_SERVER_CLI_TEST_H

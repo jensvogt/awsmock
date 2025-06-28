@@ -273,14 +273,14 @@ namespace AwsMock::Database {
          * @return number of deleted queues
          * @throws DatabaseException
          */
-        [[nodiscard]] long DeleteQueue(const Entity::SQS::Queue &queue) const;
+        long DeleteQueue(const Entity::SQS::Queue &queue) const;
 
         /**
          * @brief Deletes all queues
          *
          * @return number of deleted queues
          */
-        [[nodiscard]] long DeleteAllQueues() const;
+        long DeleteAllQueues() const;
 
         /**
          * @brief Creates a new message in the SQS message table
@@ -485,7 +485,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteMessages(const std::string &queueArn) const;
+        long DeleteMessages(const std::string &queueArn) const;
 
         /**
          * @brief Deletes a message.
@@ -494,7 +494,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteMessage(const Entity::SQS::Message &message) const;
+        long DeleteMessage(const Entity::SQS::Message &message) const;
 
         /**
          * @brief Deletes a message by its receipt handle.
@@ -503,7 +503,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteMessage(const std::string &receiptHandle) const;
+        long DeleteMessage(const std::string &receiptHandle) const;
 
         /**
          * @brief Deletes a resources.
@@ -511,7 +511,7 @@ namespace AwsMock::Database {
          * @return total number of messages deleted
          * @throws Core::DatabaseException
          */
-        [[nodiscard]] long DeleteAllMessages() const;
+        long DeleteAllMessages() const;
 
       private:
 

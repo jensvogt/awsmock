@@ -9,11 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/UserAttribute.h>
 #include <awsmock/dto/cognito/model/UserContextData.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -53,7 +51,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SignUpRequest : Common::BaseDto<SignUpRequest> {
+    struct SignUpRequest final : Common::BaseCounter<SignUpRequest> {
 
         /**
          * Client ID
@@ -105,19 +103,34 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> clientMetadata;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend SignUpRequest tag_invoke(boost::json::value_to_tag<SignUpRequest>, boost::json::value const &v) {
+            SignUpRequest r;
+            r.clientId = Core::Json::GetStringValue(v, "ClientId");
+            r.userName = Core::Json::GetStringValue(v, "UserName");
+            r.password = Core::Json::GetStringValue(v, "Password");
+            r.secretHash = Core::Json::GetStringValue(v, "SecretHash");
+            r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v.at("UserAttributes"));
+            r.clientMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("ClientMetadata"));
+            r.userContextData = boost::json::value_to<UserContextData>(v.at("UserContextData"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SignUpRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"ClientId", obj.clientId},
+                    {"UserName", obj.userName},
+                    {"Password", obj.password},
+                    {"SecretHash", obj.secretHash},
+                    {"UserAttributes", boost::json::value_from(obj.userAttributes)},
+                    {"clientMetadata", boost::json::value_from(obj.clientMetadata)},
+                    {"UserContextData", boost::json::value_from(obj.userContextData)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

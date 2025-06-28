@@ -23,6 +23,7 @@
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
 #include <awsmock/dto/s3/CopyObjectRequest.h>
@@ -37,11 +38,14 @@
 #include <awsmock/dto/s3/DeleteObjectsResponse.h>
 #include <awsmock/dto/s3/GetBucketRequest.h>
 #include <awsmock/dto/s3/GetBucketResponse.h>
+#include <awsmock/dto/s3/GetEventSourceRequest.h>
+#include <awsmock/dto/s3/GetEventSourceResponse.h>
 #include <awsmock/dto/s3/GetMetadataRequest.h>
 #include <awsmock/dto/s3/GetMetadataResponse.h>
 #include <awsmock/dto/s3/GetObjectRequest.h>
 #include <awsmock/dto/s3/GetObjectResponse.h>
 #include <awsmock/dto/s3/ListAllBucketResponse.h>
+#include <awsmock/dto/s3/ListBucketArnsResponse.h>
 #include <awsmock/dto/s3/ListBucketRequest.h>
 #include <awsmock/dto/s3/ListBucketResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
@@ -118,7 +122,7 @@ namespace AwsMock::Service {
          * @brief Returns the S3 bucket.
          *
          * @par
-         * The full bucket, with all attributes and notifications is returned.
+         * The full bucket, with all attributes and notifications, is returned.
          *
          * @param request get bucket request
          * @return GetBucketResponse
@@ -178,10 +182,17 @@ namespace AwsMock::Service {
         /**
          * @brief Lists bucket counters
          *
-         * @param s3Request S3 list bucket counters request
+         * @param request S3 list bucket counters request
          * @return ListBucketCounterResponse
          */
-        [[nodiscard]] Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &s3Request) const;
+        [[nodiscard]] Dto::S3::ListBucketCounterResponse ListBucketCounters(const Dto::S3::ListBucketCounterRequest &request) const;
+
+        /**
+         * @brief Lists bucket ARNs
+         *
+         * @return ListBucketArnsResponse
+         */
+        [[nodiscard]] Dto::S3::ListBucketArnsResponse ListBucketArns() const;
 
         /**
          * @brief Put bucket versioning
@@ -229,6 +240,14 @@ namespace AwsMock::Service {
          * @return Dto::S3::CreateMultipartUploadResult
          */
         [[nodiscard]] Dto::S3::CompleteMultipartUploadResult CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const;
+
+        /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::S3::GetEventSourceResponse GetEventSource(const Dto::S3::GetEventSourceRequest &request) const;
 
         /**
          * @brief Get an object
@@ -358,7 +377,7 @@ namespace AwsMock::Service {
          *
          * @param request bucket delete request.
          */
-        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request);
+        void DeleteBucket(const Dto::S3::DeleteBucketRequest &request) const;
 
       private:
 
@@ -466,7 +485,7 @@ namespace AwsMock::Service {
          *
          * @param bucket S3 bucket name
          */
-        void DeleteBucket(const std::string &bucket);
+        static void DeleteBucket(const std::string &bucket);
 
         /**
          * @brief Save a versioned S3 object.

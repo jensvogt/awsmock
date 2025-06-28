@@ -88,7 +88,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetKeyByKeyId(keyId);
     }
 
-    Entity::KMS::KeyList KMSDatabase::ListKeys(const std::string &region) const {
+    Entity::KMS::KeyList KMSDatabase::ListKeys(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         Entity::KMS::KeyList keyList;
         if (HasDatabase()) {
@@ -96,20 +96,34 @@ namespace AwsMock::Database {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _keyCollection = (*client)[_databaseName][_keyCollectionName];
 
-            if (region.empty()) {
-
-                for (auto keyCursor = _keyCollection.find({}); const auto &key: keyCursor) {
-                    Entity::KMS::Key result;
-                    result.FromDocument(key);
-                    keyList.push_back(result);
+            mongocxx::options::find opts;
+            if (!sortColumns.empty()) {
+                bsoncxx::builder::basic::document sort = {};
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    sort.append(kvp(column, sortDirection));
                 }
-            } else {
+                opts.sort(sort.extract());
+            }
+            if (pageSize > 0) {
+                opts.skip(pageSize * pageIndex);
+            }
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+            }
 
-                for (auto keyCursor = _keyCollection.find(make_document(kvp("region", region))); const auto &key: keyCursor) {
-                    Entity::KMS::Key result;
-                    result.FromDocument(key);
-                    keyList.push_back(result);
-                }
+            bsoncxx::builder::basic::document query = {};
+            if (!region.empty()) {
+                query.append(kvp("region", region));
+            }
+            if (!prefix.empty()) {
+                query.append(kvp("keyId", make_document(kvp("$regex", "^" + prefix))));
+            }
+
+
+            for (auto keyCursor = _keyCollection.find(query.extract(), opts); const auto &key: keyCursor) {
+                Entity::KMS::Key result;
+                result.FromDocument(key);
+                keyList.push_back(result);
             }
 
         } else {
@@ -222,7 +236,7 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _keyCollection.delete_one(make_document(kvp("name", key.keyId)));
+                const auto delete_many_result = _keyCollection.delete_one(make_document(kvp("keyId", key.keyId)));
                 session.commit_transaction();
                 log_debug << "KMS key deleted, count: " << delete_many_result->deleted_count();
 
@@ -251,7 +265,6 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = _keyCollection.delete_many({});
                 session.commit_transaction();
-                log_debug << "All KMS keys deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {

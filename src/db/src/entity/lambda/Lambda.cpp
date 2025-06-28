@@ -35,6 +35,10 @@ namespace AwsMock::Database::Entity::Lambda {
         return it->second;
     }
 
+    bool Lambda::HasInstance(const std::string &instanceId) {
+        return std::ranges::find(instances, instanceId, &Instance::instanceId) != instances.end();
+    }
+
     Instance Lambda::GetInstance(const std::string &instanceId) {
         if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
             return *it;
@@ -44,8 +48,11 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     void Lambda::RemoveInstance(const Instance &instance) {
-        std::string id = instance.instanceId;
-        instances.erase(std::ranges::remove_if(instances, [&id](const Instance &instance) { return id == instance.instanceId; }).begin(), instances.end());
+        RemoveInstance(instance.instanceId);
+    }
+
+    void Lambda::RemoveInstance(const std::string &instanceId) {
+        instances.erase(std::ranges::remove_if(instances, [&instanceId](const Instance &i) { return instanceId == i.instanceId; }).begin(), instances.end());
     }
 
     view_or_value<view, value> Lambda::ToDocument() const {

@@ -58,7 +58,7 @@ namespace AwsMock::Database {
             }
 
             const int64_t count = _queueCollection.count_documents(query.extract());
-            log_trace << "Queue exists: " << std::boolalpha << count;
+            log_trace << "Queue exists: " << std::boolalpha << (count > 0);
             return count > 0;
         }
         return _memoryDb.QueueUrlExists(region, queueUrl);
@@ -214,7 +214,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
             if (!queueName.empty()) {
-                query.append(kvp("queueName", queueName));
+                query.append(kvp("name", queueName));
             }
 
             if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
@@ -293,13 +293,14 @@ namespace AwsMock::Database {
             mongocxx::collection _queueCollection = (*client)[_databaseName][_queueCollectionName];
 
             const document query = {};
-            opts.sort(make_document(kvp("_id", 1)));
             if (!sortColumns.empty()) {
                 document sort;
                 for (const auto &[column, sortDirection]: sortColumns) {
                     sort.append(kvp(column, sortDirection));
                 }
                 opts.sort(sort.extract());
+            } else {
+                opts.sort(make_document(kvp("_id", 1)));
             }
 
             for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
@@ -1082,6 +1083,7 @@ namespace AwsMock::Database {
                 setQuery.append(kvp("queueName", originalQueue.name));
                 setQuery.append(kvp("retries", 0));
                 setQuery.append(kvp("reset", bsoncxx::types::b_date(newReset)));
+                setQuery.append(kvp("receiptHandle", ""));
                 setQuery.append(kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)));
 
                 document updateQuery;
@@ -1105,7 +1107,9 @@ namespace AwsMock::Database {
 
         // Update the counter-map
         if (updated > 0) {
+            (*_sqsCounterMap)[originalQueue.queueArn].messages += updated;
             (*_sqsCounterMap)[originalQueue.queueArn].initial += updated;
+            (*_sqsCounterMap)[dlqQueue.queueArn].messages -= updated;
             (*_sqsCounterMap)[dlqQueue.queueArn].initial -= updated;
         }
         return updated;
@@ -1428,13 +1432,7 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        for (const auto &key: *_sqsCounterMap | std::views::keys) {
-            (*_sqsCounterMap)[key].messages = 0;
-            (*_sqsCounterMap)[key].initial = 0;
-            (*_sqsCounterMap)[key].invisible = 0;
-            (*_sqsCounterMap)[key].delayed = 0;
-            (*_sqsCounterMap)[key].size = 0;
-        }
+        _sqsCounterMap->clear();
         return deleted;
     }
 }// namespace AwsMock::Database

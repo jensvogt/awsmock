@@ -167,7 +167,9 @@ namespace AwsMock::Dto::Cognito {
             CreateUserPoolRequest r;
             r.name = Core::Json::GetStringValue(v, "PoolName");
             r.domain = Core::Json::GetStringValue(v, "Domain");
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
             return r;
         }
 
@@ -176,7 +178,7 @@ namespace AwsMock::Dto::Cognito {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Name", obj.name},
+                    {"PoolName", obj.name},
                     {"Domain", obj.domain},
                     {"Tags", boost::json::value_from(obj.tags)},
             };

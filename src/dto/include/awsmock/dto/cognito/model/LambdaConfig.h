@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LambdaConfig {
+    struct LambdaConfig final : Common::BaseCounter<LambdaConfig> {
 
         /**
          * Create authentication challenge
@@ -123,26 +123,48 @@ namespace AwsMock::Dto::Cognito {
          */
         std::string verifyAuthChallengeResponse;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend LambdaConfig tag_invoke(boost::json::value_to_tag<LambdaConfig>, boost::json::value const &v) {
+            LambdaConfig r;
+            r.createAuthChallenge = Core::Json::GetStringValue(v, "CreateAuthChallenge");
+            r.customMessage = Core::Json::GetStringValue(v, "CustomMessage");
+            r.customEmailSender = boost::json::value_to<CustomEmailSender>(v.at("CustomMessage"));
+            r.customSmsSender = boost::json::value_to<CustomSmsSender>(v.at("CustomSmsSender"));
+            r.defineAuthChallenge = Core::Json::GetStringValue(v, "DefineAuthChallenge");
+            r.kmsKeyId = Core::Json::GetStringValue(v, "KmsKeyId");
+            r.postAuthentication = Core::Json::GetStringValue(v, "PostAuthentication");
+            r.postConfirmation = Core::Json::GetStringValue(v, "PostConfirmation");
+            r.preAuthentication = Core::Json::GetStringValue(v, "PreAuthentication");
+            r.preSignUp = Core::Json::GetStringValue(v, "PreSignUp");
+            r.preTokenGeneration = Core::Json::GetStringValue(v, "PreTokenGeneration");
+            r.preTokenGenerationConfig = boost::json::value_to<PreTokenGenerationConfig>(v.at("PreTokenGenerationConfig"));
+            r.userMigration = Core::Json::GetStringValue(v, "UserMigration");
+            r.verifyAuthChallengeResponse = Core::Json::GetStringValue(v, "VerifyAuthChallengeResponse");
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const LambdaConfig &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LambdaConfig const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"CreateAuthChallenge", obj.createAuthChallenge},
+                    {"CustomMessage", obj.customMessage},
+                    {"CustomEmailSender", boost::json::value_from(obj.customEmailSender)},
+                    {"CustomSmsSender", boost::json::value_from(obj.customSmsSender)},
+                    {"DefineAuthChallenge", obj.defineAuthChallenge},
+                    {"KmsKeyId", obj.kmsKeyId},
+                    {"PostAuthentication", obj.postAuthentication},
+                    {"PostConfirmation", obj.postConfirmation},
+                    {"PreAuthentication", obj.preAuthentication},
+                    {"PreSignUp", obj.preSignUp},
+                    {"PreTokenGeneration", obj.preTokenGeneration},
+                    {"PreTokenGenerationConfig", boost::json::value_from(obj.preTokenGenerationConfig)},
+                    {"UserMigration", obj.userMigration},
+                    {"VerifyAuthChallengeResponse", obj.verifyAuthChallengeResponse},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

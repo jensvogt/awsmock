@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_MONITORING_SERVER_H
 
 // AwsMock includes
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringServer(Core::PeriodicScheduler &scheduler);
+        explicit MonitoringServer(Core::Scheduler &scheduler);
 
         /**
        * @brief Delete monitoring data older than the retention period.

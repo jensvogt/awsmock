@@ -6,10 +6,6 @@
 
 namespace AwsMock::Database::Entity::S3 {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-
     bool Bucket::HasNotification(const std::string &eventName) {
         return std::ranges::find_if(notifications, [eventName](const BucketNotification &eventNotification) {
                    return eventNotification.event == eventName;
@@ -46,6 +42,12 @@ namespace AwsMock::Database::Entity::S3 {
                }) != topicNotifications.end();
     }
 
+    bool Bucket::HasLambdaNotification(const std::string &lambdaArn) const {
+        return std::ranges::find_if(lambdaNotifications, [lambdaArn](const LambdaNotification &notification) {
+                   return notification.lambdaArn == lambdaArn;
+               }) != lambdaNotifications.end();
+    }
+
     bool Bucket::HasLambdaNotificationEvent(const std::string &event) const {
         return std::ranges::find_if(lambdaNotifications, [event](const LambdaNotification &notification) {
                    return std::ranges::find(notification.events, event) != notification.events.end();
@@ -62,12 +64,6 @@ namespace AwsMock::Database::Entity::S3 {
         return std::ranges::find_if(topicNotifications, [event](const TopicNotification &notification) {
                    return std::ranges::find(notification.events, event) != notification.events.end();
                }) != topicNotifications.end();
-    }
-
-    bool Bucket::HasLambdaNotification(const std::string &lambdaArn) const {
-        return std::ranges::find_if(lambdaNotifications, [lambdaArn](const LambdaNotification &notification) {
-                   return notification.lambdaArn == lambdaArn;
-               }) != lambdaNotifications.end();
     }
 
     bool Bucket::HasEncryption() const {
@@ -100,13 +96,23 @@ namespace AwsMock::Database::Entity::S3 {
         });
     }
 
+    LambdaNotification Bucket::GetLambdaNotificationByArn(const std::string &arn) {
+        const auto it = std::ranges::find_if(lambdaNotifications, [arn](const LambdaNotification &eventNotification) {
+            return eventNotification.lambdaArn == arn;
+        });
+        if (it != lambdaNotifications.end()) {
+            return *it;
+        }
+        return {};
+    }
+
     bool Bucket::IsVersioned() const {
         return versionStatus == ENABLED;
     }
 
     view_or_value<view, value> Bucket::ToDocument() const {
 
-        // Bucket notification are deprecated, should be removed at a certain point
+        // Bucket notifications are deprecated, should be removed at a certain point
         auto notificationsDoc = array{};
         for (const auto &notification: notifications) {
             notificationsDoc.append(notification.ToDocument());
@@ -158,7 +164,7 @@ namespace AwsMock::Database::Entity::S3 {
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
         keys = Core::Bson::BsonUtils::GetLongValue(mResult.value()["keys"]);
-        versionStatus = BucketVersionStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "arn"));
+        versionStatus = BucketVersionStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "versionStatus"));
         created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
         modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
 
@@ -187,18 +193,4 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    std::string Bucket::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string Bucket::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Bucket &b) {
-        os << "Bucket=" << to_json(b.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::S3

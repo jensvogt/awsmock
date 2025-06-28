@@ -36,9 +36,15 @@ namespace AwsMock::Dto::Common {
         DELETE_SECRET,
         DESCRIBE_SECRET,
         GET_SECRET_VALUE,
+        PUT_SECRET_VALUE,
         UPDATE_SECRET,
         ROTATE_SECRET,
         LIST_SECRETS,
+        LIST_SECRET_VERSION_IDS,
+        LIST_SECRET_COUNTERS,
+        LIST_SECRET_VERSIONS,
+        GET_SECRET_DETAILS,
+        UPDATE_SECRET_DETAILS,
         UNKNOWN
     };
 
@@ -47,20 +53,26 @@ namespace AwsMock::Dto::Common {
             {SecretsManagerCommandType::DELETE_SECRET, "DeleteSecret"},
             {SecretsManagerCommandType::DESCRIBE_SECRET, "DescribeSecret"},
             {SecretsManagerCommandType::GET_SECRET_VALUE, "GetSecretValue"},
+            {SecretsManagerCommandType::PUT_SECRET_VALUE, "PutSecretValue"},
             {SecretsManagerCommandType::UPDATE_SECRET, "UpdateSecret"},
             {SecretsManagerCommandType::ROTATE_SECRET, "RotateSecret"},
             {SecretsManagerCommandType::LIST_SECRETS, "ListSecrets"},
+            {SecretsManagerCommandType::LIST_SECRET_VERSION_IDS, "ListSecretVersionIds"},
+            {SecretsManagerCommandType::LIST_SECRET_COUNTERS, "ListSecretCounters"},
+            {SecretsManagerCommandType::LIST_SECRET_VERSIONS, "ListSecretVersions"},
+            {SecretsManagerCommandType::GET_SECRET_DETAILS, "GetSecretDetails"},
+            {SecretsManagerCommandType::UPDATE_SECRET_DETAILS, "UpdateDetailsSecret"},
             {SecretsManagerCommandType::UNKNOWN, "Unknown"},
     };
 
-    [[maybe_unused]] static std::string SecretsManagerCommandTypeToString(SecretsManagerCommandType commandType) {
+    [[maybe_unused]] static std::string SecretsManagerCommandTypeToString(const SecretsManagerCommandType &commandType) {
         return SecretsManagerCommandTypeNames[commandType];
     }
 
     [[maybe_unused]] static SecretsManagerCommandType SecretsManagerCommandTypeFromString(const std::string &commandType) {
-        for (auto &it: SecretsManagerCommandTypeNames) {
-            if (Core::StringUtils::StartsWith(commandType, it.second)) {
-                return it.first;
+        for (auto &[fst, snd]: SecretsManagerCommandTypeNames) {
+            if (Core::StringUtils::StartsWith(commandType, snd)) {
+                return fst;
             }
         }
         return SecretsManagerCommandType::UNKNOWN;

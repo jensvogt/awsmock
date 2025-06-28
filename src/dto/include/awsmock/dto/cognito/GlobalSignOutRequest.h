@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -37,26 +35,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GlobalSignOutRequest final : Common::BaseDto<GlobalSignOutRequest> {
+    struct GlobalSignOutRequest final : Common::BaseCounter<GlobalSignOutRequest> {
 
         /**
          * A valid access token that Amazon Cognito issued to the user who you want to sign out.
          */
         std::string accessToken;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend GlobalSignOutRequest tag_invoke(boost::json::value_to_tag<GlobalSignOutRequest>, boost::json::value const &v) {
+            GlobalSignOutRequest r;
+            r.accessToken = Core::Json::GetStringValue(v, "AccessToken");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GlobalSignOutRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"AccessToken", obj.accessToken},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

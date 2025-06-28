@@ -21,15 +21,4 @@ namespace AwsMock::Database::Entity::S3 {
         value = Core::Bson::BsonUtils::GetStringValue(mResult["value"]);
     }
 
-    std::string FilterRule::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const FilterRule &n) {
-        os << "FilterRule=" << to_json(n.ToDocument());
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::S3

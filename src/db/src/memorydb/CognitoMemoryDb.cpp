@@ -244,29 +244,20 @@ namespace AwsMock::Database {
         return it->second;
     }
 
-    long CognitoMemoryDb::CountUsers(const std::string &region, const std::string &userPoolId) const {
+    long CognitoMemoryDb::CountUsers(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
 
         long count = 0;
-        if (!region.empty() && !userPoolId.empty()) {
 
-            for (const auto &val: _users | std::views::values) {
-                if (val.region == region && val.userPoolId == userPoolId) {
-                    count++;
-                }
-            }
-
-        } else if (!region.empty()) {
-
-            for (const auto &val: _users | std::views::values) {
-                if (val.region == region) {
-                    count++;
-                }
-            }
-
-        } else {
-
-            count = static_cast<long>(_users.size());
-        }
+        count = std::ranges::count_if(_users,
+                                      [region, userPoolId](const std::pair<std::string, Entity::Cognito::User> &obj) {
+                                          if (!region.empty() && obj.second.region == region) {
+                                              return true;
+                                          }
+                                          if (!region.empty() && obj.second.region == region && !userPoolId.empty() && obj.second.userPoolId == userPoolId) {
+                                              return true;
+                                          }
+                                          return false;
+                                      });
 
         log_trace << "Count user pools, size: " << count;
         return count;

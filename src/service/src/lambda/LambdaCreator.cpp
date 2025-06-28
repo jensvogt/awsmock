@@ -31,6 +31,8 @@ namespace AwsMock::Service {
         // Docker tag
         if (lambdaEntity.dockerTag.empty()) {
             lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
+            lambdaEntity.tags["dockerTag"] = lambdaEntity.dockerTag;
+            lambdaEntity.tags["version"] = lambdaEntity.dockerTag;
             log_debug << "Using docker tag: " << lambdaEntity.dockerTag;
         }
 
@@ -47,12 +49,11 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        const Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
         Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
 
         // Start the docker container, in case it is not already running.
         if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
-            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id);
+            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             log_debug << "Lambda docker container started, containerId: " << inspectContainerResponse.id;
         }
@@ -60,6 +61,7 @@ namespace AwsMock::Service {
         // Get the public port
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         instance.instanceId = instanceId;
+        log_info << "Inspect docker container, JSON: " << inspectContainerResponse.ToJson();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(8080);
             instance.status = Database::Entity::Lambda::InstanceIdle;
@@ -70,7 +72,7 @@ namespace AwsMock::Service {
         }
 
         // Save size in entity
-        lambdaEntity.containerSize = container.sizeRootFs;
+        lambdaEntity.containerSize = inspectContainerResponse.sizeRootFs;
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {

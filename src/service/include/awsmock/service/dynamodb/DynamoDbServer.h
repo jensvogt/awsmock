@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
@@ -20,12 +20,6 @@
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
-
-#define DYNAMODB_DOCKER_FILE "FROM amazon/dynamodb-local:latest\n"                                \
-                             "VOLUME /usr/local/awsmock/data/dynamodb /home/dynamodblocal/data\n" \
-                             "WORKDIR /home/dynamodblocal\n"                                      \
-                             "EXPOSE 8000 8000\n"                                                 \
-                             "ENTRYPOINT [\"java\", \"-Djava.library.path=./DynamoDBLocal_lib\", \"-jar\", \"DynamoDBLocal.jar\", \"-sharedDb\"]\n"
 
 namespace AwsMock::Service {
 
@@ -41,7 +35,12 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbServer(Core::PeriodicScheduler &scheduler);
+        explicit DynamoDbServer(Core::Scheduler &scheduler);
+
+        /**
+         * @brief Gracefully shutdown the server
+         */
+        void Shutdown() override;
 
       private:
 
@@ -92,6 +91,16 @@ namespace AwsMock::Service {
         void SynchronizeItems() const;
 
         /**
+         * @brief Backup the dynamoDb tables and items
+         */
+        static void BackupDynamoDb();
+
+        /**
+         * @brief Writes the docker file
+         */
+        static std::string WriteDockerFile();
+
+        /**
          * Container module (either docker or podman)
          */
         ContainerService &_containerService;
@@ -110,6 +119,24 @@ namespace AwsMock::Service {
          * Metric service
          */
         Monitoring::MetricService &_metricService;
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Dynamo DB backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Monitoring period
@@ -150,6 +177,11 @@ namespace AwsMock::Service {
          * AWS region
          */
         std::string _region;
+
+        /**
+         * Data directory
+         */
+        std::string _dataDir;
     };
 
 }// namespace AwsMock::Service

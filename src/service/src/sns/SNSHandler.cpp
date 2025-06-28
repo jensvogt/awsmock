@@ -36,6 +36,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
+                case Dto::Common::SNSCommandType::LIST_TOPIC_ARNS: {
+
+                    Dto::SNS::ListTopicArnsResponse snsResponse = _snsService.ListTopicArns(clientCommand.region);
+
+                    log_info << "List topic ARNs";
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
 
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
@@ -258,6 +266,15 @@ namespace AwsMock::Service {
                     Dto::SNS::ListTagCountersRequest snsRequest = Dto::SNS::ListTagCountersRequest::FromJson(clientCommand);
                     Dto::SNS::ListTagCountersResponse snsResponse = _snsService.ListTagCounters(snsRequest);
                     log_trace << "List tags counters, topicArn: " << snsRequest.topicArn << " count: " << snsResponse.tagCounters.size();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
+                case Dto::Common::SNSCommandType::GET_EVENT_SOURCE: {
+
+                    Dto::SNS::GetEventSourceRequest snsRequest = Dto::SNS::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::SNS::GetEventSourceResponse snsResponse = _snsService.GetEventSource(snsRequest);
+                    log_info << "Get event source, arn: " << snsRequest.eventSourceArn;
+
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 

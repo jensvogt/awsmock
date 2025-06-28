@@ -471,9 +471,8 @@ namespace AwsMock::Core {
         const size_t size = boost::beast::detail::base64::decoded_size(encodedString.length());
         const auto bytes = static_cast<char *>(malloc(size));
         const auto [fst, snd] = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
-        bytes[fst] = '\0';
         std::stringstream ofs;
-        ofs << bytes;
+        ofs.write(bytes, fst);
         free(bytes);
         return ofs.str();
     }
@@ -567,7 +566,7 @@ namespace AwsMock::Core {
         return out;
     }
 
-    EVP_PKEY *Crypto::GenerateRsaKeys(unsigned int keyLength) {
+    EVP_PKEY *Crypto::GenerateRsaKeys(const unsigned int keyLength) {
         EVP_PKEY *pRSA = EVP_RSA_gen(keyLength);
         if (!pRSA) {
             log_error << "Could not generate RSA key, length: " << keyLength;

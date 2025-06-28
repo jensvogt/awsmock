@@ -14,11 +14,14 @@ footer: awsmocksqs $version$
 
 ## DESCRIPTION
 
-AWS Systems Manager unterstützt Sie bei der zentralen Anzeige, Verwaltung und dem Betrieb skalierbarer Knoten in lokalen und AWS Multicloud-Umgebungen. Mit der
-Einführung einer einheitlichen Konsolenoberfläche konsolidiert Systems Manager verschiedene Tools, mit denen Sie allgemeine Knotenaufgaben in allen AWS-Konten Regionen
+AWS Systems Manager unterstützt Sie bei der zentralen Anzeige, Verwaltung und dem Betrieb skalierbarer Knoten in lokalen
+und AWS Multicloud-Umgebungen. Mit der
+Einführung einer einheitlichen Konsolenoberfläche konsolidiert Systems Manager verschiedene Tools, mit denen Sie
+allgemeine Knotenaufgaben in allen AWS-Konten Regionen
 erledigen können.
 
-The SSM module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the corresponding man page ```awslocal(1)```.
+The SSM module can be configured using the ```awslocal``` command. For details of the ```awslocal``` command see the
+corresponding man page ```awslocal(1)```.
 
 ## COMMANDS
 
@@ -83,9 +86,11 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```, ```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```,
+```awsmocklambda(1)```,
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
+```awsmocksqs(1)```

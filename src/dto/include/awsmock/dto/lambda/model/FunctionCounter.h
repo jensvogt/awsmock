@@ -186,7 +186,7 @@ namespace AwsMock::Dto::Lambda {
                     {"stateReasonCode", obj.stateReasonCode},
                     {"timeout", obj.timeout},
                     {"environment", boost::json::value_from(obj.environment)},
-                    {"invocations", obj.invocations},
+                    {"instances", obj.instances},
                     {"invocations", obj.invocations},
                     {"averageRuntime", obj.averageRuntime},
                     {"lastModified", obj.averageRuntime},

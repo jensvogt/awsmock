@@ -2,10 +2,6 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#include "awsmock/dto/lambda/intern/ListLambdaResultCountersResponse.h"
-#include "awsmock/entity/lambda/LambdaResult.h"
-
-
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -87,11 +83,11 @@ namespace AwsMock::Dto::Lambda {
         return eventSourceMapping;
     }
 
-    ListEventSourceMappingsResponse Mapper::map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings) {
+    ListEventSourceMappingsResponse Mapper::map(const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings) {
         ListEventSourceMappingsResponse response;
         for (auto &eventSourceMapping: eventSourceMappings) {
             EventSourceMapping eventSourceMappingDto;
-            eventSourceMappingDto.functionArn = functionArn;
+            eventSourceMappingDto.type = eventSourceMapping.type;
             eventSourceMappingDto.eventSourceArn = eventSourceMapping.eventSourceArn;
             eventSourceMappingDto.batchSize = eventSourceMapping.batchSize;
             eventSourceMappingDto.maximumBatchingWindowInSeconds = eventSourceMapping.maximumBatchingWindowInSeconds;
@@ -99,6 +95,25 @@ namespace AwsMock::Dto::Lambda {
             response.eventSourceMappings.emplace_back(eventSourceMappingDto);
         }
         return response;
+    }
+
+    EventSourceMapping Mapper::map(const std::string &functionArn, const Database::Entity::Lambda::EventSourceMapping &eventSourceMappings) {
+        EventSourceMapping eventSourceMappingDto;
+        eventSourceMappingDto.functionArn = functionArn;
+        eventSourceMappingDto.type = eventSourceMappings.type;
+        eventSourceMappingDto.eventSourceArn = eventSourceMappings.eventSourceArn;
+        eventSourceMappingDto.batchSize = eventSourceMappings.batchSize;
+        eventSourceMappingDto.maximumBatchingWindowInSeconds = eventSourceMappings.maximumBatchingWindowInSeconds;
+        eventSourceMappingDto.uuid = eventSourceMappings.uuid;
+        return eventSourceMappingDto;
+    }
+
+    std::vector<EventSourceMapping> Mapper::mapCounters(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappingEntities) {
+        std::vector<EventSourceMapping> eventSourceMappings;
+        for (const auto &eventSourceMapping: eventSourceMappingEntities) {
+            eventSourceMappings.emplace_back(map(functionArn, eventSourceMapping));
+        }
+        return eventSourceMappings;
     }
 
     ListFunctionCountersResponse Mapper::map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
@@ -126,8 +141,10 @@ namespace AwsMock::Dto::Lambda {
         counter.lambdaArn = resultEntity.lambdaArn;
         counter.lambdaName = resultEntity.lambdaName;
         counter.runtime = resultEntity.runtime;
+        counter.containerId = resultEntity.containerId;
         counter.requestBody = resultEntity.requestBody;
         counter.responseBody = resultEntity.responseBody;
+        counter.logMessages = resultEntity.logMessages;
         counter.lambdaStatus = resultEntity.lambdaStatus;
         counter.httpStatusCode = resultEntity.httpStatusCode;
         counter.timestamp = resultEntity.timestamp;

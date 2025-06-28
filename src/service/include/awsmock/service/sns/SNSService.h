@@ -10,6 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/service/lambda/LambdaService.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
@@ -22,6 +25,7 @@
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicArnsResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
@@ -37,6 +41,8 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
+#include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
@@ -57,6 +63,7 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
@@ -103,6 +110,15 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListTopicsResponse ListTopics(const std::string &region) const;
 
         /**
+         * @brief Returns a list of all available topic ARNs
+         *
+         * @param region AWS region
+         * @return ListTopicArnsResponse
+         * @see ListTopicArnsResponse
+         */
+        [[nodiscard]] Dto::SNS::ListTopicArnsResponse ListTopicArns(const std::string &region) const;
+
+        /**
          * @brief Returns a list of all topic counters
          *
          * @param request List topic counters request
@@ -113,7 +129,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const;
 
         /**
-         * @brief Publish a message to a SNS topic
+         * @brief Publish a message to an SNS topic
          *
          * @param request AWS region
          * @return PublishResponse
@@ -228,6 +244,14 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         [[nodiscard]] long PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
+
+        /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::SNS::GetEventSourceResponse GetEventSource(const Dto::SNS::GetEventSourceRequest &request) const;
 
         /**
          * @brief Delete a topic

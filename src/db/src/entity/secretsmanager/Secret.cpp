@@ -13,18 +13,9 @@ namespace AwsMock::Database::Entity::SecretsManager {
         rotationRulesDoc.append(kvp("duration", rotationRules.duration));
         rotationRulesDoc.append(kvp("scheduleExpression", rotationRules.scheduleExpression));
 
-        document versionIdStageDoc;
-        for (const auto &key: versionIdsToStages.versions | std::views::keys) {
-            array versionStateArray;
-            for (const auto &stage: versionIdsToStages.versions.at(key)) {
-                versionStateArray.append(stage);
-            }
-            versionIdStageDoc.append(kvp(key, versionStateArray));
-        }
-
-        array versionsArray;
-        for (const auto &version: versions) {
-            versionsArray.append(version.ToDocument());
+        document versionsDoc;
+        for (const auto &[fst, snd]: versions) {
+            versionsDoc.append(kvp(fst, snd.ToDocument()));
         }
 
         document secretDoc;
@@ -33,20 +24,19 @@ namespace AwsMock::Database::Entity::SecretsManager {
         secretDoc.append(kvp("arn", arn));
         secretDoc.append(kvp("secretId", secretId));
         secretDoc.append(kvp("kmsKeyId", kmsKeyId));
-        secretDoc.append(kvp("versions", versionsArray.extract()));
+        secretDoc.append(kvp("versions", versionsDoc.extract()));
         secretDoc.append(kvp("description", description));
         secretDoc.append(kvp("owningService", owningService));
         secretDoc.append(kvp("primaryRegion", primaryRegion));
-        secretDoc.append(kvp("createdDate", static_cast<bsoncxx::types::b_int64>(createdDate)));
-        secretDoc.append(kvp("deletedDate", static_cast<bsoncxx::types::b_int64>(deletedDate)));
-        secretDoc.append(kvp("lastAccessedDate", static_cast<bsoncxx::types::b_int64>(lastAccessedDate)));
-        secretDoc.append(kvp("lastChangedDate", static_cast<bsoncxx::types::b_int64>(lastChangedDate)));
-        secretDoc.append(kvp("lastRotatedDate", static_cast<bsoncxx::types::b_int64>(lastRotatedDate)));
-        secretDoc.append(kvp("nextRotatedDate", static_cast<bsoncxx::types::b_int64>(nextRotatedDate)));
+        secretDoc.append(kvp("createdDate", bsoncxx::types::b_date(createdDate)));
+        secretDoc.append(kvp("deletedDate", bsoncxx::types::b_date(deletedDate)));
+        secretDoc.append(kvp("lastAccessedDate", bsoncxx::types::b_date(lastAccessedDate)));
+        secretDoc.append(kvp("lastChangedDate", bsoncxx::types::b_date(lastChangedDate)));
+        secretDoc.append(kvp("lastRotatedDate", bsoncxx::types::b_date(lastRotatedDate)));
+        secretDoc.append(kvp("nextRotatedDate", bsoncxx::types::b_date(nextRotatedDate)));
         secretDoc.append(kvp("rotationEnabled", rotationEnabled));
         secretDoc.append(kvp("rotationLambdaARN", rotationLambdaARN));
         secretDoc.append(kvp("rotationRules", rotationRulesDoc.extract()));
-        secretDoc.append(kvp("versionIdsToStages", versionIdStageDoc.extract()));
         secretDoc.append(kvp("created", bsoncxx::types::b_date(created)));
         secretDoc.append(kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -65,12 +55,12 @@ namespace AwsMock::Database::Entity::SecretsManager {
             description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
             owningService = Core::Bson::BsonUtils::GetStringValue(mResult, "owningService");
             primaryRegion = Core::Bson::BsonUtils::GetStringValue(mResult, "primaryRegion");
-            createdDate = Core::Bson::BsonUtils::GetLongValue(mResult, "createdDate");
-            deletedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "deletedDate");
-            lastAccessedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastAccessedDate");
-            lastChangedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastChangedDate");
-            lastRotatedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "lastRotatedDate");
-            nextRotatedDate = Core::Bson::BsonUtils::GetLongValue(mResult, "nextRotatedDate");
+            createdDate = Core::Bson::BsonUtils::GetDateValue(mResult, "createdDate");
+            deletedDate = Core::Bson::BsonUtils::GetDateValue(mResult, "deletedDate");
+            lastAccessedDate = Core::Bson::BsonUtils::GetDateValue(mResult, "lastAccessedDate");
+            lastChangedDate = Core::Bson::BsonUtils::GetDateValue(mResult, "lastChangedDate");
+            lastRotatedDate = Core::Bson::BsonUtils::GetDateValue(mResult, "lastRotatedDate");
+            nextRotatedDate = Core::Bson::BsonUtils::GetDateValue(mResult, "nextRotatedDate");
             rotationEnabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "rotationEnabled");
             rotationLambdaARN = Core::Bson::BsonUtils::GetStringValue(mResult, "rotationLambdaARN");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
@@ -78,10 +68,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
 
             // Get versions
             if (mResult.value().find("versions") != mResult.value().end()) {
-                for (const view versionsView = mResult.value()["versions"].get_array().value; const auto &element: versionsView) {
+                for (const view versionsView = mResult.value()["versions"].get_document().value; const auto &element: versionsView) {
+                    std::string versionId = bsoncxx::string::to_string(element.key());
                     SecretVersion version;
                     version.FromDocument(element.get_document().value);
-                    versions.push_back(version);
+                    versions[versionId] = version;
                 }
             }
 
@@ -91,18 +82,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
                 rotationRules.automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(rotationView, "automaticallyAfterDays");
                 rotationRules.duration = Core::Bson::BsonUtils::GetStringValue(rotationView, "duration");
                 rotationRules.scheduleExpression = Core::Bson::BsonUtils::GetStringValue(rotationView, "scheduleExpression");
-            }
-
-            // Get version stages
-            if (mResult.value().find("versionIdsToStages") != mResult.value().end()) {
-                for (const view versionStagesView = mResult.value()["versionIdsToStages"].get_document().value; const auto &element: versionStagesView) {
-                    std::string versionId = bsoncxx::string::to_string(element.key());
-                    std::vector<std::string> stages;
-                    for (const auto &stage: versionStagesView[versionId].get_array().value) {
-                        stages.push_back(bsoncxx::string::to_string(stage.get_string().value));
-                    }
-                    versionIdsToStages.versions.emplace(versionId, stages);
-                }
             }
 
         } catch (const bsoncxx::exception &exc) {

@@ -56,7 +56,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Secret string
          */
-        std::vector<SecretVersion> versions;
+        std::map<std::string, SecretVersion> versions;
 
         /**
          * Description
@@ -81,32 +81,32 @@ namespace AwsMock::Database::Entity::SecretsManager {
         /**
          * Creation date
          */
-        long createdDate = 0;
+        system_clock::time_point createdDate;
 
         /**
          * Deleted date
          */
-        long deletedDate = 0;
+        system_clock::time_point deletedDate;
 
         /**
          * Last access date
          */
-        long lastAccessedDate = 0;
+        system_clock::time_point lastAccessedDate;
 
         /**
          * Last changed date
          */
-        long lastChangedDate = 0;
+        system_clock::time_point lastChangedDate;
 
         /**
          * Last rotation date
          */
-        long lastRotatedDate = 0;
+        system_clock::time_point lastRotatedDate;
 
         /**
          * Next rotation date
          */
-        long nextRotatedDate = 0;
+        system_clock::time_point nextRotatedDate;
 
         /**
          * Next rotation date
@@ -117,11 +117,6 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * Rotation lambda ARN
          */
         std::string rotationLambdaARN;
-
-        /**
-         * Version ID stages
-         */
-        VersionIdsToStages versionIdsToStages;
 
         /**
          * Creation date
@@ -140,8 +135,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
          * @return true, if found, otherwise false
          */
         [[nodiscard]] bool HasVersion(const std::string &versionId) const {
-            return std::ranges::find_if(versions, [versionId](const SecretVersion &version) {
-                       return version.versionId == versionId;
+            return std::ranges::find_if(versions, [versionId](const std::pair<std::string, SecretVersion> &version) {
+                       return version.first == versionId;
                    }) != versions.end();
         }
 
@@ -156,11 +151,11 @@ namespace AwsMock::Database::Entity::SecretsManager {
          */
         [[nodiscard]] SecretVersion GetVersion(const std::string &versionId) const {
             const auto it =
-                    std::ranges::find_if(versions, [versionId](const SecretVersion &version) {
-                        return version.versionId == versionId;
+                    std::ranges::find_if(versions, [versionId](const std::pair<std::string, SecretVersion> &version) {
+                        return version.first == versionId;
                     });
             if (it != versions.end()) {
-                return *it;
+                return it->second;
             }
             return {};
         }
@@ -170,28 +165,63 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @return current version, or empty object
          */
-        [[nodiscard]] SecretVersion GetCurrent() const {
+        [[nodiscard]] std::string GetCurrentVersionId() const {
 
             const auto it =
-                    std::ranges::find_if(versions, [](const SecretVersion &version) {
-                        return std::ranges::find(version.stages, "AWSCURRENT") != version.stages.end();
+                    std::ranges::find_if(versions, [](const std::pair<std::string, SecretVersion> &version) {
+                        return std::ranges::find(version.second.stages, "AWSCURRENT") != version.second.stages.end();
                     });
             if (it != versions.end()) {
-                return *it;
+                return it->first;
             }
             return {};
         }
 
         /**
-         * @brief Resets all verions to AWSPREVIOUS, except the one with the given versionID.
+         * @brief Returns the previous version.
+         *
+         * @return previous version, or empty object
+         */
+        [[nodiscard]] std::string GetPreviousVersionId() const {
+
+            const auto it =
+                    std::ranges::find_if(versions, [](const std::pair<std::string, SecretVersion> &version) {
+                        return std::ranges::find(version.second.stages, "AWSPREVIOUS") != version.second.stages.end();
+                    });
+            if (it != versions.end()) {
+                return it->first;
+            }
+            return {};
+        }
+
+
+        /**
+         * @brief Returns the previous version.
+         *
+         * @return previous version, or empty object
+         */
+        [[nodiscard]] std::string GetVersionIdByStage(const std::string &stage) const {
+
+            const auto it =
+                    std::ranges::find_if(versions, [stage](const std::pair<std::string, SecretVersion> &version) {
+                        return std::ranges::find(version.second.stages, stage) != version.second.stages.end();
+                    });
+            if (it != versions.end()) {
+                return it->first;
+            }
+            return {};
+        }
+
+        /**
+         * @brief Resets all versions to AWSPREVIOUS, except the one with the given versionID.
          *
          * @param versionId current version ID
          */
         void ResetVersions(const std::string &versionId) {
-            for (auto &version: versions) {
-                if (version.versionId != versionId) {
-                    version.stages.clear();
-                    version.stages.push_back("AWSPREVIOUS");
+            for (auto &[fst, snd]: versions) {
+                if (fst != versionId) {
+                    snd.stages.clear();
+                    snd.stages.push_back("AWSPREVIOUS");
                 }
             }
         }

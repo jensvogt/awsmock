@@ -9,10 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/cognito/model/TokenValidityUnits.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -61,7 +59,7 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UpdateUserPoolClientRequest : Common::BaseDto<UpdateUserPoolClientRequest> {
+    struct UpdateUserPoolClientRequest final : Common::BaseCounter<UpdateUserPoolClientRequest> {
 
         /**
          * User pool ID
@@ -103,19 +101,36 @@ namespace AwsMock::Dto::Cognito {
          */
         TokenValidityUnits tokenValidityUnits;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend UpdateUserPoolClientRequest tag_invoke(boost::json::value_to_tag<UpdateUserPoolClientRequest>, boost::json::value const &v) {
+            UpdateUserPoolClientRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.clientId = Core::Json::GetStringValue(v, "ClientId");
+            r.clientName = Core::Json::GetStringValue(v, "ClientName");
+            r.accessTokenValidity = Core::Json::GetLongValue(v, "AccessTokenValidity");
+            r.idTokenValidity = Core::Json::GetLongValue(v, "IdTokenValidity");
+            r.refreshTokenValidity = Core::Json::GetLongValue(v, "RefreshTokenValidity");
+            r.authSessionValidity = Core::Json::GetLongValue(v, "AuthSessionValidity");
+            r.tokenValidityUnits = boost::json::value_to<TokenValidityUnits>(v.at("TokenValidityUnits"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateUserPoolClientRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"ClientId", obj.clientId},
+                    {"ClientName", obj.clientName},
+                    {"AccessTokenValidity", obj.accessTokenValidity},
+                    {"IdTokenValidity", obj.idTokenValidity},
+                    {"RefreshTokenValidity", obj.refreshTokenValidity},
+                    {"AuthSessionValidity", obj.authSessionValidity},
+                    {"TokenValidityUnits", boost::json::value_from(obj.tokenValidityUnits)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

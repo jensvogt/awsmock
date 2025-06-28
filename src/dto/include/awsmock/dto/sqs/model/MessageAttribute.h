@@ -40,7 +40,6 @@ namespace AwsMock::Dto::SQS {
         MessageAttributeDataType dataType{};
 
         /**
-         * @brief Convert from JSON string
          * @brief Convert from JSON document
          *
          * @param jsonObject attribute object

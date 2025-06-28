@@ -12,6 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/sns/model/MessageAttribute.h>
 #include <awsmock/dto/sns/model/MessageAttributeDataType.h>
 
 namespace AwsMock::Dto::SNS {
@@ -47,7 +48,7 @@ namespace AwsMock::Dto::SNS {
          * @brief Returns the MD5 sum of all attributes (system attributes).
          *
          * @param attributes map of attributes
-         * @return MD5 sum of attributes string
+         * @return MD5 sum of attribute string
          */
         static std::string GetMd5Attributes(const std::map<std::string, std::string> &attributes);
 

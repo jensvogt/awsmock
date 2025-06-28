@@ -4,6 +4,7 @@
 
 // AwsMock includes
 #include <awsmock/service/frontend/FrontendServer.h>
+#include <boost/asio/signal_set.hpp>
 
 namespace AwsMock::Service::Frontend {
 
@@ -30,11 +31,19 @@ namespace AwsMock::Service::Frontend {
                 workers.emplace_back(acceptor, doc_root);
                 workers.back().Start();
             }
+            // Capture SIGINT and SIGTERM to perform a clean shutdown
+            boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
+            signals.async_wait([&](beast::error_code const &, int) {
+                // Stop the `io_context`. This will cause `run()` to return immediately,
+                // eventually destroying the `io_context` and all the sockets in it.
+                log_info << "Frontend stopping on signal";
+                ioc.stop();
+                log_info << "Frontend IO context stopped";
+            });
+            log_info << "Frontend signal handler installed";
 
             log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
-            while (_running) {
-                ioc.poll();
-            }
+            ioc.run();
 
         } catch (const std::exception &e) {
             log_error << "Error: " << e.what() << std::endl;

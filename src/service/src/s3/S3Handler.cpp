@@ -175,7 +175,7 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, s3Response.ToXml());
                 }
 
-                // Delete object (rm) with recursive option, issues first a list request
+                // Delete an object (rm) with recursive option, issues first a list request
                 case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
                     Dto::S3::ListBucketRequest s3Request;
@@ -517,10 +517,18 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::LIST_BUCKET_COUNTERS: {
 
-                    // Get object request
+                    // Get bucket counter request
                     Dto::S3::ListBucketCounterRequest s3Request = Dto::S3::ListBucketCounterRequest::FromJson(clientCommand);
                     Dto::S3::ListBucketCounterResponse s3Response = _s3Service.ListBucketCounters(s3Request);
                     log_info << "List bucket counters, total: " << s3Response.total << ", count: " << s3Response.bucketCounters.size();
+                    return SendOkResponse(request, s3Response.ToJson());
+                }
+
+                case Dto::Common::S3CommandType::LIST_BUCKET_ARNS: {
+
+                    // Get bucket ARNs request
+                    Dto::S3::ListBucketArnsResponse s3Response = _s3Service.ListBucketArns();
+                    log_info << "List bucket arns, total: " << s3Response.bucketArns.size();
                     return SendOkResponse(request, s3Response.ToJson());
                 }
 
@@ -602,6 +610,15 @@ namespace AwsMock::Service {
                     _s3Service.UpdateObject(s3Request);
 
                     log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::S3CommandType::GET_EVENT_SOURCE: {
+
+                    Dto::S3::GetEventSourceRequest s3Request = Dto::S3::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::S3::GetEventSourceResponse s3Response = _s3Service.GetEventSource(s3Request);
+                    log_trace << "Get event source, functionArn: " << s3Request.functionArn;
+
                     return SendOkResponse(request);
                 }
 
@@ -762,8 +779,6 @@ namespace AwsMock::Service {
     }
 
     long S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
-
-        // std::string str = buffers_to_string(request.body());
 
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
 

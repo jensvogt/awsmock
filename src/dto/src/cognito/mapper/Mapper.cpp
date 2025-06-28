@@ -96,12 +96,9 @@ namespace AwsMock::Dto::Cognito {
 
     UserPool Mapper::map(const Database::Entity::Cognito::UserPool &userPoolEntity) {
         UserPool userPoolDto;
-        userPoolDto.userPoolId = userPoolEntity.userPoolId;
+        userPoolDto.user = userPoolEntity.userPoolId;
         userPoolDto.region = userPoolEntity.region;
         userPoolDto.name = userPoolEntity.name;
-        userPoolDto.userPoolId = userPoolEntity.userPoolId;
-        userPoolDto.arn = userPoolEntity.arn;
-        userPoolDto.domain = userPoolEntity.domain.domain;
         userPoolDto.created = userPoolEntity.created;
         userPoolDto.modified = userPoolEntity.modified;
         return userPoolDto;

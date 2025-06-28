@@ -6,9 +6,9 @@ set(UTILS_SOURCES src/utils/StringUtils.cpp src/utils/FileUtils.cpp src/utils/Di
         src/utils/CryptoUtils.cpp src/utils/AwsUtils.cpp src/utils/SystemUtils.cpp src/utils/TarUtils.cpp
         src/utils/RandomUtils.cpp src/utils/TestUtils.cpp src/utils/HttpUtils.cpp src/utils/NumberUtils.cpp
         src/utils/MemoryMappedFile.cpp src/utils/XmlUtils.cpp src/utils/UnixSocket.cpp src/utils/HttpSocket.cpp
-        src/utils/JwtUtils.cpp src/scheduler/PeriodicTask.cpp src/scheduler/PeriodicScheduler.cpp
-        src/config/Configuration.cpp src/utils/SrpUtils.cpp src/utils/DomainSocket.cpp
-        src/utils/WindowsSocket.cpp)
+        src/utils/JwtUtils.cpp src/scheduler/PeriodicTask.cpp src/scheduler/Scheduler.cpp
+        src/config/Configuration.cpp src/utils/SrpUtils.cpp src/utils/DomainSocket.cpp src/scheduler/CronTask.cpp
+        src/utils/WindowsSocket.cpp src/utils/CronUtils.cpp src/scheduler/OneTimeTask.cpp)
 set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseException.cpp src/exception/ServiceException.cpp
         src/exception/JsonException.cpp src/exception/NotFoundException.cpp src/exception/ForbiddenException.cpp
         src/exception/UnauthorizedException.cpp src/exception/BadRequestException.cpp)
@@ -22,22 +22,19 @@ if (NOT WIN32)
 endif ()
 
 # Shared library
-if (NOT WIN32)
+if (WIN32)
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR})
+else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/core/TypeName.h)
+            include/awsmock/core/BackupUtils.h
+            src/utils/BackupUtils.cpp
+            include/awsmock/core/Cron.h
+            include/awsmock/core/PagingUtils.h)
     target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY} PUBLIC mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_log boost_log_setup boost_process ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-endif ()
-
-# Static library
-add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
-        ${EXTERNAL_INCLUDE_DIR})
-if (NOT WIN32)
-    target_link_directories(${LIBRARY_STATIC} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY_STATIC} mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
-            boost_log boost_log_setup boost_process ssl crypto archive magic)
 endif ()

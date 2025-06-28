@@ -74,7 +74,7 @@ namespace AwsMock::Dto::SecretsManager {
         friend GetSecretValueResponse tag_invoke(boost::json::value_to_tag<GetSecretValueResponse>, boost::json::value const &v) {
             GetSecretValueResponse r;
             r.name = Core::Json::GetStringValue(v, "Name");
-            r.versionId = Core::Json::GetStringValue(v, "VersionId");
+            r.arn = Core::Json::GetStringValue(v, "ARN");
             r.createdDate = Core::Json::GetLongValue(v, "CreatedDate");
             r.secretString = Core::Json::GetStringValue(v, "SecretString");
             r.secretBinary = Core::Json::GetStringValue(v, "SecretBinary");
@@ -89,6 +89,7 @@ namespace AwsMock::Dto::SecretsManager {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"Name", obj.name},
+                    {"ARN", obj.arn},
                     {"CreatedDate", obj.createdDate},
                     {"SecretString", obj.secretString},
                     {"SecretBinary", obj.secretBinary},

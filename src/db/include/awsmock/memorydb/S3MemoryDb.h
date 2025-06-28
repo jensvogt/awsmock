@@ -66,6 +66,15 @@ namespace AwsMock::Database {
         bool BucketExists(const Entity::S3::Bucket &bucket);
 
         /**
+         * @brief Bucket exists by ARN
+         *
+         * @param bucketArn AWS ARN
+         * @return true if bucket exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] bool BucketExists(const std::string &bucketArn) const;
+
+        /**
          * @brief Returns the bucket by userPoolId
          *
          * @param oid bucket oid
@@ -82,6 +91,14 @@ namespace AwsMock::Database {
          * @return bucket entity
          */
         Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Returns the bucket by AWS ARN
+         *
+         * @param bucketArn AWS region
+         * @return bucket entity
+         */
+        Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn);
 
         /**
          * @brief Create a new bucket in the S3 bucket table
@@ -151,7 +168,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
+        std::vector<Entity::S3::Object> ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
 
         /**
          * @brief Returns the total number of buckets
@@ -196,7 +213,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        [[nodiscard]] Entity::S3::ObjectList ListObjects(const std::string &prefix = {}) const;
+        [[nodiscard]] std::vector<Entity::S3::Object> ListObjects(const std::string &prefix = {}) const;
 
         /**
          * @brief Gets a list of versioned objects
@@ -207,7 +224,7 @@ namespace AwsMock::Database {
          * @return list of S3 object
          * @throws DatabaseException
          */
-        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
+        std::vector<Entity::S3::Object> ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
 
         /**
          * @brief Delete a bucket.

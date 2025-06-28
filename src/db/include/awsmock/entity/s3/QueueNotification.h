@@ -25,14 +25,13 @@ namespace AwsMock::Database::Entity::S3 {
     /**
      * @brief S3 bucket queue notification entity
      *
-     * <p>
+     * @par
      * This is a child object of the bucket entity.
-     * </p>
      *
      * @see AwsMock::Database::Entity::Bucket
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueNotification {
+    struct QueueNotification final : Common::BaseEntity<QueueNotification> {
 
         /**
          * ID
@@ -67,7 +66,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -75,20 +74,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         QueueNotification FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const QueueNotification &q);
     };
 
 }// namespace AwsMock::Database::Entity::S3

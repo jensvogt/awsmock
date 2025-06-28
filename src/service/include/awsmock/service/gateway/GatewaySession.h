@@ -177,6 +177,16 @@ namespace AwsMock::Service {
         bool _verifySignature;
 
         /**
+         * Default region
+         */
+        std::string _region;
+
+        /**
+         * Default user
+         */
+        std::string _user;
+
+        /**
          * HTTP request queue
          */
         std::queue<http::message_generator> _response_queue;

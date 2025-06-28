@@ -1,0 +1,10 @@
+{
+  "file_type": {
+    "StringValue": "FILE_TYPE",
+    "DataType": "string"
+  },
+  "file_origin": {
+    "StringValue": "FILE_ORIGIN",
+    "DataType": "string"
+  }
+}

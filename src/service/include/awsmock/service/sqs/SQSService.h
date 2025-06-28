@@ -13,10 +13,12 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/sqs/AddAttributeRequest.h>
 #include <awsmock/dto/sqs/ChangeMessageVisibilityRequest.h>
 #include <awsmock/dto/sqs/CreateQueueRequest.h>
 #include <awsmock/dto/sqs/CreateQueueResponse.h>
@@ -49,10 +51,18 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
+#include <awsmock/dto/sqs/internal/AddDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sqs/internal/DeleteDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
+#include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
+#include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListMessageAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
@@ -62,6 +72,7 @@
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ResendMessageRequest.h>
+#include <awsmock/dto/sqs/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateMessageRequest.h>
 #include <awsmock/dto/sqs/mapper/Mapper.h>
@@ -142,6 +153,16 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SQS::ListQueueTagsResponse ListQueueTags(const Dto::SQS::ListQueueTagsRequest &request) const;
 
         /**
+         * @brief Returns a list of all default message attribute counters
+         *
+         * @param request list default message attribute counters request
+         * @return ListDefaultMessageAttributeCountersResponse
+         * @see ListDefaultMessageAttributeCountersRequest
+         * @see ListDefaultMessageAttributeCountersResponse
+         */
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse ListDefaultMessageAttributeCounters(const Dto::SQS::ListDefaultMessageAttributeCountersRequest &request) const;
+
+        /**
          * @brief Purge a queue.
          *
          * @param request purge queue request
@@ -187,12 +208,47 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SQS::GetQueueAttributesResponse GetQueueAttributes(const Dto::SQS::GetQueueAttributesRequest &request) const;
 
         /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::SQS::GetEventSourceResponse GetEventSource(const Dto::SQS::GetEventSourceRequest &request) const;
+
+        /**
          * @brief Set queue userAttributes
          *
          * @param request put queue sqs request
          * @throws ServiceException
          */
         void SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
+
+        /**
+         * @brief Adds a default attribute
+         *
+         * @param request add default attribute request
+         * @return updated message attribute counters response
+         * @throws ServiceException
+         */
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse AddDefaultMessageAttribute(const Dto::SQS::AddDefaultMessageAttributeRequest &request) const;
+
+        /**
+         * @brief Updates a default attribute
+         *
+         * @param request update default attribute request
+         * @return updated message attribute counters response
+         * @throws ServiceException
+         */
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse UpdateDefaultMessageAttribute(const Dto::SQS::UpdateDefaultMessageAttributeRequest &request) const;
+
+        /**
+         * @brief Delete a default attribute
+         *
+         * @param request update default attribute request
+         * @return updated message attribute counters response
+         * @throws ServiceException
+         */
+        [[nodiscard]] Dto::SQS::ListDefaultMessageAttributeCountersResponse DeleteDefaultMessageAttribute(const Dto::SQS::DeleteDefaultMessageAttributeRequest &request) const;
 
         /**
          * @brief Sets the message visibility timeout.
@@ -300,6 +356,16 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SQS::ListMessageCountersResponse ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const;
 
         /**
+         * @brief Returns a list SQS message attributes
+         *
+         * @param request list message attributes request
+         * @return ListMessageAttributesResponse
+         * @throws ServiceException
+         * @see ListMessageAttributeCountersResponse
+         */
+        [[nodiscard]] Dto::SQS::ListMessageAttributeCountersResponse ListMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const;
+
+        /**
          * @brief Updates a message
          *
          * @param request update message request DTO
@@ -331,6 +397,14 @@ namespace AwsMock::Service {
         * @throws ServiceException
         */
         void DeleteMessage(const Dto::SQS::DeleteMessageRequest &request) const;
+
+        /**
+         * @brief Adds a message attribute
+         *
+         * @param request add message attribute request DTO
+         * @throws ServiceException
+         */
+        void AddMessageAttribute(const Dto::SQS::AddAttributeRequest &request) const;
 
         /**
          * @brief Deletes a message attribute

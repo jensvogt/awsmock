@@ -12,12 +12,13 @@
 
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/s3/CreateBucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
 #include <awsmock/sftpserver/SftpServer.h>
 
@@ -35,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferServer(Core::PeriodicScheduler &scheduler);
+        explicit TransferServer(Core::Scheduler &scheduler);
 
       private:
 
@@ -95,6 +96,11 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
+         * @brief Backup the transfer server
+         */
+        static void BackupTransfer();
+
+        /**
          * Transfer database
          */
         Database::TransferDatabase &_transferDatabase;
@@ -143,6 +149,24 @@ namespace AwsMock::Service {
          * Monitoring period
          */
         int _monitoringPeriod;
+
+        /**
+         * @brief Transfer server backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Transfer server backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * List of transfer servers

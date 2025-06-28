@@ -33,12 +33,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Function count
          */
-        int functionCount;
+        long functionCount{};
 
         /**
          * Total code size
          */
-        int totalCodeSize;
+        long totalCodeSize{};
 
         /**
          * Convert to a JSON object

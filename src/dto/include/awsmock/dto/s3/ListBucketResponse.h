@@ -103,7 +103,7 @@ namespace AwsMock::Dto::S3 {
          * @param bucket bucket
          * @param objectList object list
          */
-        ListBucketResponse(const std::string &bucket, const Database::Entity::S3::ObjectList &objectList);
+        ListBucketResponse(const std::string &bucket, const std::vector<Database::Entity::S3::Object> &objectList);
 
         /**
          * @brief Convert to XML representation

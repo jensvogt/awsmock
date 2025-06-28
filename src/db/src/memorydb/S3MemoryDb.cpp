@@ -21,6 +21,14 @@ namespace AwsMock::Database {
         return BucketExists(bucket.region, bucket.name);
     }
 
+    bool S3MemoryDb::BucketExists(const std::string &bucketArn) const {
+
+        return std::ranges::find_if(_buckets,
+                                    [bucketArn](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+                                        return bucket.second.arn == bucketArn;
+                                    }) != _buckets.end();
+    }
+
     Entity::S3::Bucket S3MemoryDb::GetBucketById(const std::string &oid) {
 
         const auto it = std::ranges::find_if(_buckets, [oid](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
@@ -41,6 +49,22 @@ namespace AwsMock::Database {
         const auto it = std::ranges::find_if(_buckets,
                                              [region, name](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
                                                  return bucket.second.region == region && bucket.second.name == name;
+                                             });
+
+        if (it != _buckets.end()) {
+            it->second.oid = it->first;
+            return it->second;
+        }
+        return {};
+    }
+
+    Entity::S3::Bucket S3MemoryDb::GetBucketByArn(const std::string &bucketArn) {
+
+        Entity::S3::Bucket result;
+
+        const auto it = std::ranges::find_if(_buckets,
+                                             [bucketArn](const std::pair<std::string, Entity::S3::Bucket> &bucket) {
+                                                 return bucket.second.arn == bucketArn;
                                              });
 
         if (it != _buckets.end()) {
@@ -139,9 +163,9 @@ namespace AwsMock::Database {
         return static_cast<long>(_buckets.size());
     }
 
-    Entity::S3::ObjectList S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MemoryDb::ListBucket(const std::string &bucket, const std::string &prefix) const {
 
-        Entity::S3::ObjectList objectList;
+        std::vector<Entity::S3::Object> objectList;
 
         if (prefix.empty()) {
 
@@ -352,9 +376,9 @@ namespace AwsMock::Database {
         return count;
     }
 
-    Entity::S3::ObjectList S3MemoryDb::ListObjects(const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MemoryDb::ListObjects(const std::string &prefix) const {
 
-        Entity::S3::ObjectList objectList;
+        std::vector<Entity::S3::Object> objectList;
         if (prefix.empty()) {
             for (const auto &val: _objects | std::views::values) {
                 objectList.emplace_back(val);
@@ -371,9 +395,9 @@ namespace AwsMock::Database {
         return objectList;
     }
 
-    Entity::S3::ObjectList S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
+    std::vector<Entity::S3::Object> S3MemoryDb::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
 
-        Entity::S3::ObjectList objectList;
+        std::vector<Entity::S3::Object> objectList;
         if (prefix.empty()) {
             for (const auto &val: _objects | std::views::values) {
                 if (val.region == region && val.bucket == bucket) {

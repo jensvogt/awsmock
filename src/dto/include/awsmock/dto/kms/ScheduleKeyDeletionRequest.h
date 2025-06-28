@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::KMS {
 
@@ -28,7 +26,7 @@ namespace AwsMock::Dto::KMS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ScheduleKeyDeletionRequest : Common::BaseDto<ScheduleKeyDeletionRequest> {
+    struct ScheduleKeyDeletionRequest final : Common::BaseCounter<ScheduleKeyDeletionRequest> {
 
         /**
          * Key ID
@@ -38,21 +36,26 @@ namespace AwsMock::Dto::KMS {
         /**
          * Pending window in days
          */
-        int pendingWindowInDays = 30;
+        long pendingWindowInDays = 30;
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend ScheduleKeyDeletionRequest tag_invoke(boost::json::value_to_tag<ScheduleKeyDeletionRequest>, boost::json::value const &v) {
+            ScheduleKeyDeletionRequest r;
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.pendingWindowInDays = Core::Json::GetLongValue(v, "PendingWindowInDays");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ScheduleKeyDeletionRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"KeyId", obj.keyId},
+                    {"PendingWindowInDays", obj.pendingWindowInDays},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::KMS

@@ -59,6 +59,16 @@ namespace AwsMock::Dto::Docker {
         HostConfig hostConfig;
 
         /**
+         * he total size of all files in the read-only layers from the image that the container uses. These layers can be shared between containers.
+         */
+        long sizeRootFs;
+
+        /**
+         * The size of files that have been created or changed by this container.
+         */
+        long sizeRw;
+
+        /**
          * @brief Convert to a JSON string
          *
          * @param jsonString JSON string

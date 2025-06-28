@@ -460,6 +460,16 @@ namespace AwsMock::Core {
           */
         static std::string GetS3PathStyleObjectKey(const std::string &url);
 
+        /**
+         * @brief Extracts the bucket name of an ARN
+         *
+         * @param arn S3 resource ARN
+         * @return bucket name
+         */
+        static std::string GetBucketNameFromArn(const std::string &arn) {
+            return arn.substr(arn.find_last_of(":") + 1);
+        }
+
       private:
 
         /**
@@ -694,7 +704,7 @@ namespace AwsMock::Core {
     }
 
     /**
-     * Spring cloud sends the queueName, the queueUrl, or the queueArn.
+     * @brief Spring cloud sends the queueName, the queueUrl, or the queueArn.
      *
      * @param queue from Spring cloud request
      * @return queue URL

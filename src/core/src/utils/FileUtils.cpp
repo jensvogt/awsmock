@@ -362,11 +362,11 @@ namespace AwsMock::Core {
             log_error << "Empty filename";
             return;
         }
-        if (std::filesystem::exists(fileName)) {
-            std::filesystem::remove(fileName);
+        if (!std::filesystem::exists(fileName)) {
+            log_warning << "File does not exist: " << fileName;
             return;
         }
-        log_warning << "File does not exist: " << fileName;
+        std::filesystem::remove(fileName);
     }
 
     bool FileUtils::Touch(const std::string &fileName) {

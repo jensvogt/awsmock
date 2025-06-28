@@ -97,6 +97,17 @@ namespace AwsMock::Core {
         return tokens;
     }
 
+    std::vector<std::string> StringUtils::SplitOnNewline(const std::string &s) {
+        std::vector<std::string> tokens;
+        std::stringstream check1(s);
+        std::string intermediate;
+        while (getline(check1, intermediate, '\r')) {
+            intermediate = StripLineEndings(intermediate);
+            tokens.push_back(intermediate);
+        }
+        return tokens;
+    }
+
     std::string StringUtils::Join(const std::vector<std::string> &vec, const std::string &delimiter, const int startIndex) {
         std::string result;
         for (int i = startIndex; i < vec.size(); i++) {
@@ -242,6 +253,11 @@ namespace AwsMock::Core {
 
     std::string StringUtils::StripChunkSignature(const std::string &input) {
         const std::regex regex("(^|\r\n)[0-9a-fA-F]+;chunk-signature=[0-9a-f]{64}(\r\n)(\r\n$)?", std::regex_constants::icase);
+        return std::regex_replace(input, regex, "");
+    }
+
+    std::string StringUtils::RemoveColorCoding(const std::string &input) {
+        const std::regex regex(R"(\x1b\[[\d;]*?m)", std::regex_constants::icase);
         return std::regex_replace(input, regex, "");
     }
 

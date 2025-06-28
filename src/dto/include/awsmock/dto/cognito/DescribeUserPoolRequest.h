@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Cognito {
 
@@ -29,26 +27,29 @@ namespace AwsMock::Dto::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DescribeUserPoolRequest final : Common::BaseDto<DescribeUserPoolRequest> {
+    struct DescribeUserPoolRequest final : Common::BaseCounter<DescribeUserPoolRequest> {
 
         /**
          * User pool ID
          */
         std::string userPoolId;
 
-        /**
-         * @brief Convert from a JSON object.
-         *
-         * @param jsonString json string object
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend DescribeUserPoolRequest tag_invoke(boost::json::value_to_tag<DescribeUserPoolRequest>, boost::json::value const &v) {
+            DescribeUserPoolRequest r;
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeUserPoolRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Cognito

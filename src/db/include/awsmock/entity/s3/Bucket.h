@@ -18,6 +18,8 @@
 
 // AwsMock include
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/StringUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/s3/BucketEncryption.h>
 #include <awsmock/entity/s3/BucketNotification.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
@@ -26,11 +28,6 @@
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::S3 {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Versioning status
@@ -47,13 +44,13 @@ namespace AwsMock::Database::Entity::S3 {
             {DISABLED, "disabled"},
     };
 
-    [[maybe_unused]] static std::string BucketVersionStatusToString(BucketVersionStatus bucketVersionStatus) {
+    [[maybe_unused]] static std::string BucketVersionStatusToString(const BucketVersionStatus bucketVersionStatus) {
         return BucketVersionStatusNames[bucketVersionStatus];
     }
 
     [[maybe_unused]] static BucketVersionStatus BucketVersionStatusFromString(const std::string &bucketVersionStatus) {
         for (auto &[fst, snd]: BucketVersionStatusNames) {
-            if (snd == bucketVersionStatus) {
+            if (Core::StringUtils::EqualsIgnoreCase(snd, bucketVersionStatus)) {
                 return fst;
             }
         }
@@ -65,7 +62,7 @@ namespace AwsMock::Database::Entity::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Bucket {
+    struct Bucket final : Common::BaseEntity<Bucket> {
 
         /**
          * ID
@@ -162,7 +159,7 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * @brief Checks whether a topic notification with the given ID exists.
          *
-         * @param id other topic notification id.
+         * @param id another topic notification id.
          * @return true if notification with the given ID exists.
          */
         bool HasTopicNotificationId(const std::string &id);
@@ -264,6 +261,14 @@ namespace AwsMock::Database::Entity::S3 {
         LambdaNotification GetLambdaNotification(const std::string &eventName);
 
         /**
+         * @brief Returns a given lambda notification by function arn
+         *
+         * @param arn function ARN
+         * @return found notification or notifications.end().
+         */
+        LambdaNotification GetLambdaNotificationByArn(const std::string &arn);
+
+        /**
          * @brief Returns a boolean indicating the versioning state
          */
         [[nodiscard]] bool IsVersioned() const;
@@ -273,7 +278,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -281,29 +286,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         [[maybe_unused]] void FromDocument(std::optional<view> mResult);
-
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param bucket bucket entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Bucket &bucket);
     };
 
     typedef std::vector<Bucket> BucketList;
