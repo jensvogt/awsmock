@@ -8,20 +8,15 @@
 // C++ standard includes
 #include <map>
 #include <string>
+#include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/sqs/model/QueueAttribute.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct CreateQueueRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct CreateQueueRequest final : Common::BaseCounter<CreateQueueRequest> {
 
         /**
          * Queue name
@@ -41,45 +36,40 @@ namespace AwsMock::Dto::SQS {
         /**
          * Attributes
          */
-        QueueAttributeList attributes;
+        std::vector<QueueAttribute> attributes;
 
         /**
          * Tags
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend CreateQueueRequest tag_invoke(boost::json::value_to_tag<CreateQueueRequest>, boost::json::value const &v) {
+            CreateQueueRequest r;
+            r.queueName = Core::Json::GetStringValue(v, "QueueName");
+            r.queueUrl = Core::CreateSQSQueueUrl(Core::Json::GetStringValue(v, "QueueName"));
+            r.owner = Core::Json::GetStringValue(v, "Owner");
+            if (Core::Json::AttributeExists(v, "Attributes")) {
+                r.attributes = boost::json::value_to<std::vector<QueueAttribute>>(v.at("Attributes"));
+            }
+            if (Core::Json::AttributeExists(v, "Tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateQueueRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateQueueRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueName", obj.queueName},
+                    {"QueueUrl", obj.queueUrl},
+                    {"Attributes", boost::json::value_from(obj.attributes)},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -2,9 +2,6 @@
 // Created by vogje01 on 5/10/24.
 //
 
-#include "awsmock/utils/SqsUtils.h"
-
-
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 
 namespace AwsMock::Dto::SQS {

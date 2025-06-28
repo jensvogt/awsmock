@@ -9,9 +9,11 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/model/AttributeCounter.h>
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Dto::SQS {
 
