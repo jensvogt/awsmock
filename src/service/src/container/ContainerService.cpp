@@ -27,6 +27,13 @@ namespace AwsMock::Service {
 
         const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
         if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/images/json?all=true&filters=" + filters, {}, {}); statusCode == http::status::ok) {
+            Dto::Docker::ListImageResponse response;
+            response.FromJson(body);
+            if (response.imageList.empty()) {
+                log_debug << "Docker image not found, name: " << name << ":" << tag;
+                return false;
+            }
+            log_debug << "Docker image found, name: " << name << ":" << tag;
             return true;
         }
         log_error << "Image exists request failed";
