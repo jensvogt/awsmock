@@ -5,6 +5,7 @@
 #include <awsmock/service/sqs/SQSService.h>
 
 namespace AwsMock::Service {
+
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "create_queue");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "create_queue");
@@ -17,12 +18,13 @@ namespace AwsMock::Service {
         if (_sqsDatabase.QueueArnExists(queueArn)) {
             log_warning << "Queue exists already, region: " << request.region << " queueUrl: " << request.queueUrl;
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
-            return {
-                    .region = queue.region,
-                    .name = queue.name,
-                    .owner = queue.owner,
-                    .queueUrl = queue.queueUrl,
-                    .queueArn = queue.queueArn};
+            Dto::SQS::CreateQueueResponse response;
+            response.region = queue.region;
+            response.queueName = queue.name;
+            response.owner = queue.owner;
+            response.queueUrl = queue.queueUrl;
+            response.queueArn = queue.queueArn;
+            return response;
         }
 
         try {
@@ -30,37 +32,38 @@ namespace AwsMock::Service {
             const std::string queueUrl = Core::CreateSQSQueueUrl(request.queueName);
 
             Database::Entity::SQS::QueueAttribute attributes;
-            for (const auto &[attributeName, attributeValue]: request.attributes) {
-                if (attributeName == "DelaySeconds") {
-                    attributes.delaySeconds = std::stoi(attributeValue);
+            for (const auto &attribute: request.attributes) {
+                if (attribute.attributeName == "DelaySeconds") {
+                    attributes.delaySeconds = std::stoi(attribute.attributeValue);
                 }
-                if (attributeName == "MaxMessageSize") {
-                    attributes.maxMessageSize = std::stoi(attributeValue);
+                if (attribute.attributeName == "MaxMessageSize") {
+                    attributes.maxMessageSize = std::stoi(attribute.attributeValue);
                 }
-                if (attributeName == "MessageRetentionPeriod") {
-                    attributes.messageRetentionPeriod = std::stoi(attributeValue);
+                if (attribute.attributeName == "MessageRetentionPeriod") {
+                    attributes.messageRetentionPeriod = std::stoi(attribute.attributeValue);
                 }
-                if (attributeName == "VisibilityTimeout") {
-                    attributes.visibilityTimeout = std::stoi(attributeValue);
+                if (attribute.attributeName == "VisibilityTimeout") {
+                    attributes.visibilityTimeout = std::stoi(attribute.attributeValue);
                 }
-                if (attributeName == "Policy") {
-                    attributes.policy = attributeValue;
+                if (attribute.attributeName == "Policy") {
+                    attributes.policy = attribute.attributeValue;
                 }
-                if (attributeName == "RedrivePolicy") {
-                    attributes.redrivePolicy.FromJson(attributeValue);
+                if (attribute.attributeName == "RedrivePolicy") {
+                    attributes.redrivePolicy.FromJson(attribute.attributeValue);
                 }
-                if (attributeName == "RedriveAllowPolicy") {
-                    attributes.redriveAllowPolicy = attributeValue;
+                if (attribute.attributeName == "RedriveAllowPolicy") {
+                    attributes.redriveAllowPolicy = attribute.attributeValue;
                 }
-                if (attributeName == "ReceiveMessageWaitTime") {
-                    attributes.receiveMessageWaitTime = std::stoi(attributeValue);
+                if (attribute.attributeName == "ReceiveMessageWaitTime") {
+                    attributes.receiveMessageWaitTime = std::stoi(attribute.attributeValue);
                 }
-                if (attributeName == "QueueArn") {
-                    attributes.queueArn = attributeValue;
+                if (attribute.attributeName == "QueueArn") {
+                    attributes.queueArn = attribute.attributeValue;
                 }
             }
             attributes.queueArn = queueArn;
 
+            // TODO:: Use mapper
             // Update database
             Database::Entity::SQS::Queue queue;
             queue.region = request.region;
@@ -73,13 +76,15 @@ namespace AwsMock::Service {
             queue = _sqsDatabase.CreateQueue(queue);
             log_trace << "SQS queue created: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
-            Dto::SQS::CreateQueueResponse response = {
-                    .region = queue.region,
-                    .name = queue.name,
-                    .owner = queue.owner,
-                    .queueUrl = queue.queueUrl,
-                    .queueArn = queue.queueArn};
+            // TODO:: Use mapper
+            Dto::SQS::CreateQueueResponse response;
+            response.region = queue.region;
+            response.queueName = queue.name;
+            response.queueUrl = queue.queueUrl;
+            response.queueArn = queue.queueArn;
+            response.owner = queue.owner;
             return response;
+
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
@@ -716,6 +721,125 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::ListDefaultMessageAttributeCounters(const Dto::SQS::ListDefaultMessageAttributeCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_default_message_attribute_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "list_default_message_attribute_counters");
+        log_trace << "List message counters request";
+
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        try {
+            const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+
+            Dto::SQS::ListDefaultMessageAttributeCountersResponse response;
+            response.total = static_cast<long>(queue.defaultMessageAttributes.size());
+            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+            response.attributeCounters = Core::PageMap<std::string, Dto::SQS::MessageAttribute>(response.attributeCounters, request.pageSize, request.pageIndex);
+            return response;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::AddDefaultMessageAttribute(const Dto::SQS::AddDefaultMessageAttributeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "add_default_message_attribute");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "add_default_message_attribute");
+        log_trace << "Add default message attribute request, queueArn: " << request.queueArn;
+
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        Dto::SQS::ListDefaultMessageAttributeCountersResponse response;
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+
+            // Add attributes
+            Database::Entity::SQS::MessageAttribute messageAttribute;
+            messageAttribute.stringValue = request.messageAttribute.stringValue;
+            messageAttribute.dataType = Database::Entity::SQS::MessageAttributeTypeFromString(Dto::SQS::MessageAttributeDataTypeToString(request.messageAttribute.dataType));
+            queue.defaultMessageAttributes[request.name] = messageAttribute;
+            queue = _sqsDatabase.UpdateQueue(queue);
+
+            response.total = static_cast<long>(queue.defaultMessageAttributes.size());
+            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+
+            log_debug << "Default message attribute added, queueArn: " << queue.queueArn << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+        return response;
+    }
+
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::UpdateDefaultMessageAttribute(const Dto::SQS::UpdateDefaultMessageAttributeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "update_default_message_attribute");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "update_default_message_attribute");
+        log_trace << "Update default message attribute request, queueArn: " << request.queueArn;
+
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        Dto::SQS::ListDefaultMessageAttributeCountersResponse response;
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+
+            // Delete a default message attributes
+            queue.defaultMessageAttributes[request.name].stringValue = request.value;
+            queue.defaultMessageAttributes[request.name].dataType = Database::Entity::SQS::MessageAttributeTypeFromString(request.dataType);
+            queue = _sqsDatabase.UpdateQueue(queue);
+
+            response.total = static_cast<long>(queue.defaultMessageAttributes.size());
+            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+
+            log_debug << "Default message attribute updated, queueArn: " << queue.queueArn << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+        return response;
+    }
+
+    Dto::SQS::ListDefaultMessageAttributeCountersResponse SQSService::DeleteDefaultMessageAttribute(const Dto::SQS::DeleteDefaultMessageAttributeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "delete_default_message_attribute");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "delete_default_message_attribute");
+        log_trace << "Delete default message attribute request, queueArn: " << request.queueArn;
+
+        if (!_sqsDatabase.QueueArnExists(request.queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << request.queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + request.queueArn);
+        }
+
+        Dto::SQS::ListDefaultMessageAttributeCountersResponse response;
+        try {
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(request.queueArn);
+
+            // Delete a default message attributes
+            queue.defaultMessageAttributes.erase(request.name);
+            queue = _sqsDatabase.UpdateQueue(queue);
+
+            response.total = static_cast<long>(queue.defaultMessageAttributes.size());
+            response.attributeCounters = Dto::SQS::Mapper::map(queue.defaultMessageAttributes);
+
+            log_debug << "Default message attribute deleted, queueArn: " << queue.queueArn << ", name: " << request.name;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+        return response;
+    }
+
     void SQSService::UpdateDql(const Dto::SQS::UpdateDqlRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "update_dlq");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "update_dlq");
@@ -804,6 +928,11 @@ namespace AwsMock::Service {
             message.attributes["ApproximateReceivedCount"] = std::to_string(0);
             message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
             message.attributes["SenderId"] = request.user;
+
+            // Default message attributes
+            if (!queue.defaultMessageAttributes.empty()) {
+                message.messageAttributes.insert(queue.defaultMessageAttributes.begin(), queue.defaultMessageAttributes.end());
+            }
 
             // Set delay
             if (queue.attributes.delaySeconds > 0) {
@@ -997,12 +1126,13 @@ namespace AwsMock::Service {
     Dto::SQS::ListMessageCountersResponse SQSService::ListMessageCounters(const Dto::SQS::ListMessageCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_message_counters");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "list_message_counters");
-        log_trace << "List message counters request";
+        log_trace << "List message counters request, queueArn: " << request.queueArn;
 
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn, request.prefix);
 
             const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            log_trace << "List message counters request, queueArn: " << request.queueArn << ", count: " << messages.size();
             return Dto::SQS::Mapper::map(messages, total);
 
         } catch (Core::DatabaseException &ex) {
@@ -1058,6 +1188,30 @@ namespace AwsMock::Service {
 
             // Check lambda notification
             CheckLambdaNotifications(request.queueArn, message);
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    Dto::SQS::ListMessageAttributeCountersResponse SQSService::ListMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_message_attribute_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "list_message_attribute_counters");
+        log_trace << "List message counters request";
+
+        if (!_sqsDatabase.MessageExistsByMessageId(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+        try {
+            const Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByMessageId(request.messageId);
+
+            Dto::SQS::ListMessageAttributeCountersResponse response;
+            response.total = static_cast<long>(message.messageAttributes.size());
+            response.messageAttributeCounters = Dto::SQS::Mapper::map(message.messageAttributes);
+            response.messageAttributeCounters = Core::PageMap<std::string, Dto::SQS::MessageAttribute>(response.messageAttributeCounters, request.pageSize, request.pageIndex);
+            return response;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

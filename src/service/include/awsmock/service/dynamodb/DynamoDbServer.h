@@ -93,7 +93,7 @@ namespace AwsMock::Service {
         /**
          * @brief Backup the dynamoDb tables and items
          */
-        void BackupDynamoDb();
+        static void BackupDynamoDb();
 
         /**
          * @brief Writes the docker file

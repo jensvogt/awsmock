@@ -31,8 +31,9 @@ namespace AwsMock::Service {
     /**
      * @brief AWS SQS mock handler.
      *
-     * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
-     * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
+     * @par
+     * The SQS request are coming in two different flavors. Using the AWS CLI, the queue URL is part of the HTTP parameters in the body of the message. Both are
+     * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
