@@ -61,6 +61,7 @@ namespace AwsMock::Service {
         // Get the public port
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         instance.instanceId = instanceId;
+        log_info << "Inspect docker container, JSON: " << inspectContainerResponse.ToJson();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(8080);
             instance.status = Database::Entity::Lambda::InstanceIdle;

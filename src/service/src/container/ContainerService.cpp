@@ -25,24 +25,9 @@ namespace AwsMock::Service {
     bool ContainerService::ImageExists(const std::string &name, const std::string &tag) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
-        if (_isDocker) {
-            const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
-            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/images/json?all=true&filters=" + filters, {}, {}); statusCode == http::status::ok) {
-                Dto::Docker::ListImageResponse response;
-                response.FromJson(body);
-                if (response.imageList.empty()) {
-                    log_debug << "Docker image not found, name: " << name << ":" << tag;
-                } else {
-                    log_debug << "Docker image found, name: " << name << ":" << tag;
-                }
-                return !response.imageList.empty();
-            }
-        } else {
-            if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/v5.0.0/libpod/images/" + name + "/exists");
-                statusCode == http::status::no_content) {
-                log_debug << "Podman image found, name: " << name << ":" << tag;
-                return true;
-            }
+        const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + ":" + tag + "\"]}");
+        if (const auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/images/json?all=true&filters=" + filters, {}, {}); statusCode == http::status::ok) {
+            return true;
         }
         log_error << "Image exists request failed";
         return false;
