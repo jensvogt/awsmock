@@ -28,6 +28,8 @@ namespace AwsMock::Service {
 
     void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode) {
 
+        const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
+
         // Docker tag
         if (lambdaEntity.dockerTag.empty()) {
             lambdaEntity.dockerTag = GetDockerTag(lambdaEntity);
@@ -63,7 +65,7 @@ namespace AwsMock::Service {
         instance.instanceId = instanceId;
         log_info << "Inspect docker container, JSON: " << inspectContainerResponse.ToJson();
         if (!inspectContainerResponse.id.empty()) {
-            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(8080);
+            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
             instance.status = Database::Entity::Lambda::InstanceIdle;
             instance.containerId = inspectContainerResponse.id;
             instance.containerName = containerName;

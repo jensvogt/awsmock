@@ -103,6 +103,7 @@
         "remove-period": 3600,
         "counter-period": 300,
         "log-retention-period": 1,
+        "private-port": 8080,
         "runtime": {
           "java11": "public.ecr.aws/lambda/java:11",
           "java17": "public.ecr.aws/lambda/java:17",
