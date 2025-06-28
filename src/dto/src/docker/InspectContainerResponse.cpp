@@ -19,6 +19,8 @@ namespace AwsMock::Dto::Docker {
             name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
             path = Core::Bson::BsonUtils::GetStringValue(document, "Path");
             image = Core::Bson::BsonUtils::GetStringValue(document, "Image");
+            sizeRootFs = Core::Bson::BsonUtils::GetLongValue(document, "SizeRootFs");
+            sizeRw = Core::Bson::BsonUtils::GetLongValue(document, "SizeRw");
 
             // State
             if (document.view().find("State") != document.view().end()) {
@@ -44,6 +46,8 @@ namespace AwsMock::Dto::Docker {
             Core::Bson::BsonUtils::SetStringValue(document, "Name", name);
             Core::Bson::BsonUtils::SetStringValue(document, "Path", path);
             Core::Bson::BsonUtils::SetStringValue(document, "Image", image);
+            Core::Bson::BsonUtils::SetLongValue(document, "SizeRootFs", sizeRootFs);
+            Core::Bson::BsonUtils::SetLongValue(document, "SizeRw", sizeRw);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {
