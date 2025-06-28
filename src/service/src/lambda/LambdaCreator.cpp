@@ -57,13 +57,12 @@ namespace AwsMock::Service {
         if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
             ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
-            log_debug << "Lambda docker container started, containerId: " << inspectContainerResponse.id;
+            log_info << "Lambda docker container started, function: " << lambdaEntity.function << ", containerId: " << inspectContainerResponse.id;
         }
 
         // Get the public port
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         instance.instanceId = instanceId;
-        log_info << "Inspect docker container, JSON: " << inspectContainerResponse.ToJson();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
             instance.status = Database::Entity::Lambda::InstanceIdle;
@@ -78,6 +77,8 @@ namespace AwsMock::Service {
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
+
+        log_info << "Creating docker image, function: " << lambdaEntity.function;
 
         std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
@@ -105,7 +106,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaCreator::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
-
+        log_info << "Creating docker container, function: " << lambdaEntity.function << " hostPort: " << hostPort << " dockerTag: " << dockerTag;
         try {
 
             const std::string containerName = lambdaEntity.function + "-" + instanceId;

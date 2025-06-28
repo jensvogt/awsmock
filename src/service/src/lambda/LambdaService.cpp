@@ -64,14 +64,9 @@ namespace AwsMock::Service {
             instanceId = Core::StringUtils::GenerateRandomHexString(8);
             boost::thread t(boost::ref(lambdaCreator), zippedCode, lambdaEntity.oid, instanceId);
             t.detach();
-            log_debug << "Lambda create started, function: " << lambdaEntity.function;
+            log_debug << "Lambda creation started, function: " << lambdaEntity.function;
         }
-
-        // Create response
-        Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
-        log_info << "Function created, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
-
-        return response;
+        return Dto::Lambda::Mapper::map(request, lambdaEntity);
     }
 
     void LambdaService::UploadFunctionCode(const Dto::Lambda::UploadFunctionCodeRequest &request) const {
@@ -101,7 +96,7 @@ namespace AwsMock::Service {
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
-        // Create lambda function asynchronously
+        // Create the lambda function asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         LambdaCreator lambdaCreator;
         boost::thread t(boost::ref(lambdaCreator), request.functionCode, lambda.oid, instanceId);
