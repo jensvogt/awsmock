@@ -104,6 +104,7 @@ namespace AwsMock::Core {
 #else
         DefineProperty<std::string>("awsmock.modules.lambda.data-dir", "AWSMOCK_MODULES_LAMBDA_DATADIR", "/Usr/local/awsmock/data/lambda");
 #endif
+        DefineProperty<int>("awsmock.modules.lambda.private-port", "AWSMOCK_MODULES_LAMBDA_PRIVATE_PORT", 8080);
         DefineProperty<int>("awsmock.modules.lambda.log-retention-period", "AWSMOCK_MODULES_LAMBDA_LOG_RETENTION_PERIOD", 1);
         DefineProperty<int>("awsmock.modules.lambda.remove-period", "AWSMOCK_MODULES_LAMBDA_REMOVE_PERIOD", 3600);
         DefineProperty<int>("awsmock.modules.lambda.counter-period", "AWSMOCK_MODULES_LAMBDA_COUNTER_PERIOD", 300);
