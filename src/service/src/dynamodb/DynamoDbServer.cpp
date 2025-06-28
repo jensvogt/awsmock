@@ -50,7 +50,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("dynamodb-backup", [this] { this->BackupDynamoDb(); }, _backupCron);
+            scheduler.AddTask("dynamodb-backup", [this] { BackupDynamoDb(); }, _backupCron);
         }
 
         // Set running
@@ -243,11 +243,11 @@ namespace AwsMock::Service {
         log_debug << "DynamoDb server shutdown, region: " << _region;
 
         // Stop detached instances
-        for (const auto &instance: ContainerService::instance().ListContainerByImageName(_imageName, _imageTag)) {
+        /*for (const auto &instance: ContainerService::instance().ListContainerByImageName(_imageName, _imageTag)) {
             ContainerService::instance().StopContainer(instance.id);
             ContainerService::instance().DeleteContainer(instance.id);
             log_debug << "Detached dynamodb instances cleaned up, id: " << instance.id;
-        }
+        }*/
         log_info << "All dynamodb instances stopped";
     }
 

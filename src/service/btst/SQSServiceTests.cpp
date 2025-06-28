@@ -45,20 +45,30 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(QueueCreateTest, SQSServiceTest) {
 
         // arrange
-        const Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest request;
+        request.region = REGION;
+        request.queueName = QUEUE;
+        request.queueUrl = QUEUE_URL;
+        request.owner = OWNER;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
         const Dto::SQS::CreateQueueResponse response = _service.CreateQueue(request);
 
         // assert
-        BOOST_CHECK_EQUAL(response.name, QUEUE);
+        BOOST_CHECK_EQUAL(response.queueName, QUEUE);
         BOOST_CHECK_EQUAL(response.region, REGION);
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueListTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest request;
+        request.region = REGION;
+        request.queueName = QUEUE;
+        request.queueUrl = QUEUE_URL;
+        request.owner = OWNER;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
         Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
 
@@ -84,7 +94,12 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(QueueNotExistenceTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest request = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest request;
+        request.region = REGION;
+        request.queueName = QUEUE;
+        request.queueUrl = QUEUE_URL;
+        request.owner = OWNER;
+        request.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
         Dto::SQS::GetQueueDetailsRequest getQueueDetailsRequest;
         getQueueDetailsRequest.region = REGION;
@@ -103,7 +118,10 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(QueueGetDetailsTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.owner = OWNER;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest sendMessageRequest;
@@ -127,7 +145,10 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(QueueListArnsTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.owner = OWNER;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
 
@@ -142,7 +163,10 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(QueueListCountersTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.owner = OWNER;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::SendMessageRequest sendMessageRequest;
@@ -165,7 +189,11 @@ namespace AwsMock::Service {
 
         // arrange
         std::map<std::string, std::string> inputTags = {{"version", "1.0"}};
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER, .tags = inputTags};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.owner = OWNER;
+        queueRequest.tags = inputTags;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         Dto::SQS::ListQueueTagsRequest listQueueTagsRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl};
@@ -182,7 +210,10 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(QueueDeleteTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.owner = OWNER;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
 
@@ -200,7 +231,10 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(MessageCreateTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
@@ -226,7 +260,10 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(MessagesCreateTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
@@ -262,7 +299,12 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(MessageReceiveTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 
@@ -287,7 +329,12 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(MessageDeleteTest, SQSServiceTest) {
 
         // arrange
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
         std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
 

@@ -13,20 +13,16 @@
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct CreateQueueResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct CreateQueueResponse final : Common::BaseCounter<CreateQueueResponse> {
 
         /**
          * Name
          */
-        std::string name;
+        std::string queueName;
 
         /**
          * Owner
@@ -44,39 +40,48 @@ namespace AwsMock::Dto::SQS {
         std::string queueArn;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateQueueResponse &r);
+                boost::property_tree::ptree pt;
+                pt.put("CreateQueueResponse.CreateQueueResult.QueueName", queueName);
+                pt.put("CreateQueueResponse.CreateQueueResult.QueueUrl", queueUrl);
+                pt.put("CreateQueueResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
+                return Core::XmlUtils::ToXmlString(pt);
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend CreateQueueResponse tag_invoke(boost::json::value_to_tag<CreateQueueResponse>, boost::json::value const &v) {
+            CreateQueueResponse r;
+            r.queueName = Core::Json::GetStringValue(v, "QueueName");
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            r.queueArn = Core::Json::GetStringValue(v, "QueueArn");
+            r.owner = Core::Json::GetStringValue(v, "Owner");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateQueueResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueName", obj.queueName},
+                    {"QueueUrl", obj.queueUrl},
+                    {"QueueArn", obj.queueArn},
+                    {"Owner", obj.owner},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

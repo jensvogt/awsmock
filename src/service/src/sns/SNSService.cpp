@@ -2,6 +2,7 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/core/PagingUtils.h"
 #include "awsmock/dto/dynamodb/mapper/Mapper.h"
 
 
@@ -517,11 +518,7 @@ namespace AwsMock::Service {
             attributeCounter.attributeValue = topic.topicAttribute.tracingConfig;
             response.attributeCounters.emplace_back(attributeCounter);
 
-            auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > 11) {
-                endArray = response.attributeCounters.end();
-            }
-            response.attributeCounters = std::vector(response.attributeCounters.begin() + request.pageSize * request.pageIndex, endArray);
+            response.attributeCounters = Core::PageVector<Dto::SNS::AttributeCounter>(response.attributeCounters, request.pageSize, request.pageIndex);
             return response;
 
         } catch (bsoncxx::exception &ex) {
