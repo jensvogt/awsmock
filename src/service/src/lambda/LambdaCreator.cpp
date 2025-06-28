@@ -49,7 +49,6 @@ namespace AwsMock::Service {
         }
 
         // Get docker container
-        const Dto::Docker::Container container = ContainerService::instance().GetContainerById(containerName);
         Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
 
         // Start the docker container, in case it is not already running.
@@ -72,7 +71,7 @@ namespace AwsMock::Service {
         }
 
         // Save size in entity
-        lambdaEntity.containerSize = container.sizeRootFs;
+        lambdaEntity.containerSize = inspectContainerResponse.sizeRootFs;
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {

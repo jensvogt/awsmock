@@ -291,7 +291,7 @@ namespace AwsMock::Service {
         const std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + containerId + "\"]}");
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters);
         if (statusCode != http::status::ok) {
-            log_warning << "Get docker container by name failed, statusCode: " << statusCode;
+            log_warning << "Get docker container by ID failed, statusCode: " << statusCode;
             return {};
         }
 
@@ -337,7 +337,7 @@ namespace AwsMock::Service {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 
         Dto::Docker::InspectContainerResponse inspectContainerResponse{};
-        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json");
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
             log_warning << "Get container by name failed, state: " << statusCode;
             return inspectContainerResponse;
