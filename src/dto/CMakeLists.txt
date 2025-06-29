@@ -10,14 +10,11 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
 set(SQS_SOURCES src/sqs/model/MessageAttribute.cpp
         src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
         src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
-        src/sqs/DeleteQueueRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp
-        src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/model/EventNotification.cpp
+        src/sqs/DeleteQueueRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/model/EventNotification.cpp
         src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp
         src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp
-        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesResponse.cpp
-        src/sqs/ListQueueTagsRequest.cpp src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
-        src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp
-)
+        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesResponse.cpp src/sqs/ListQueueTagsRequest.cpp
+        src/sqs/ListQueueTagsResponse.cpp src/sqs/mapper/Mapper.cpp)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
