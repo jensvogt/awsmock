@@ -16,6 +16,10 @@ namespace AwsMock::Database {
         }
 
         // Initialize the counters
+        InitializeCounters();
+    }
+
+    void SQSDatabase::InitializeCounters() const {
         for (const auto &queue: ListQueues()) {
             QueueMonitoringCounter counter;
             counter.initial = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
@@ -857,9 +861,7 @@ namespace AwsMock::Database {
                 log_info << "Imported messages: " << result->inserted_count();
 
                 // Update the counter-map
-                (*_sqsCounterMap)[queueArn].messages += result->inserted_count();
-                (*_sqsCounterMap)[queueArn].initial += result->inserted_count();
-                (*_sqsCounterMap)[queueArn].size += messageArray.length();
+                InitializeCounters();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();

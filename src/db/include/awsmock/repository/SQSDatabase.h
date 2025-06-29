@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SQS_DATABASE_H
 
 // C++ standard includes
+#include <queue>
 #include <string>
 
 // Boost includes
@@ -480,7 +481,7 @@ namespace AwsMock::Database {
 
         /**
          * @brief Import messages via bulk updates
-         *
+7         *
          * @param queueArn queue ARN
          * @param messageArray
          */
@@ -522,6 +523,11 @@ namespace AwsMock::Database {
         long DeleteAllMessages() const;
 
       private:
+
+        /**
+         * @brief Initialize the counter-map.
+         */
+        void InitializeCounters() const;
 
         /**
          * Database name

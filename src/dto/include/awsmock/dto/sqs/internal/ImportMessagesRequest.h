@@ -9,10 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
 
