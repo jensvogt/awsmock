@@ -11,16 +11,11 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
+#include <awsmock/dto/sqs/model/DeleteMessageBatchEntry.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct DeleteMessageBatchRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct DeleteMessageBatchRequest final : Common::BaseCounter<DeleteMessageBatchRequest> {
 
         /**
          * Queue URL
@@ -30,45 +25,35 @@ namespace AwsMock::Dto::SQS {
         /**
          * Entries
          */
-        DeleteMessageBatchEntries deleteMessageBatchEntries;
+        std::vector<DeleteMessageBatchEntry> deleteMessageBatchEntries;
 
         /**
          * Resource
          */
         std::string resource = "SQS";
 
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend DeleteMessageBatchRequest tag_invoke(boost::json::value_to_tag<DeleteMessageBatchRequest>, boost::json::value const &v) {
+            DeleteMessageBatchRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            r.resource = Core::Json::GetStringValue(v, "Resource");
+            if (Core::Json::AttributeExists(v, "DeleteMessageBatchEntries")) {
+                r.deleteMessageBatchEntries = boost::json::value_to<std::vector<DeleteMessageBatchEntry>>(v.at("DeleteMessageBatchEntries"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO from a JSON representation.
-         *
-         * @param jsonString HTTP message body.
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMessageBatchRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueUrl", obj.queueUrl},
+                    {"Resource", obj.resource},
+                    {"DeleteMessageBatchEntries", boost::json::value_from(obj.deleteMessageBatchEntries)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

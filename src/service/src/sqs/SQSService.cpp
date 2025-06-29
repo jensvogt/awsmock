@@ -1337,21 +1337,23 @@ namespace AwsMock::Service {
         try {
             long deleted = 0;
             Dto::SQS::DeleteMessageBatchResponse deleteMessageBatchResponse;
-            for (const auto &[id, receiptHandle]: request.deleteMessageBatchEntries) {
-                if (!_sqsDatabase.MessageExists(receiptHandle)) {
+            for (const auto &d: request.deleteMessageBatchEntries) {
+                if (!_sqsDatabase.MessageExists(d.receiptHandle)) {
 
-                    log_warning << "Message does not exist, receiptHandle: " << receiptHandle.substr(0, 40);
-                    Dto::SQS::BatchResultErrorEntry failure = {.id = id};
+                    log_warning << "Message does not exist, receiptHandle: " << d.receiptHandle.substr(0, 40);
+                    Dto::SQS::BatchResultErrorEntry failure;
+                    failure.id = d.id;
                     deleteMessageBatchResponse.failed.emplace_back(failure);
 
                 } else {
 
                     // Delete from database
-                    deleted += _sqsDatabase.DeleteMessage(receiptHandle);
+                    deleted += _sqsDatabase.DeleteMessage(d.receiptHandle);
 
                     // Successful
-                    Dto::SQS::DeleteMessageBatchResultEntry success = {.id = id};
-                    deleteMessageBatchResponse.successFull.emplace_back(success);
+                    Dto::SQS::DeleteMessageBatchResultEntry success;
+                    success.id = d.id;
+                    deleteMessageBatchResponse.successfull.emplace_back(success);
                 }
             }
 
