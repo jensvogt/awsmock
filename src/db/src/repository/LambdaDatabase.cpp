@@ -17,7 +17,7 @@ namespace AwsMock::Database {
         // Initialize the counters
         for (const auto &lambda: ListLambdas()) {
             LambdaMonitoringCounter counter;
-            counter.instances = lambda.instances.size();
+            counter.instances = static_cast<long>(lambda.instances.size());
             counter.invocations = lambda.invocations;
             counter.averageRuntime = lambda.averageRuntime;
             _lambdaCounterMap->insert_or_assign(lambda.arn, counter);

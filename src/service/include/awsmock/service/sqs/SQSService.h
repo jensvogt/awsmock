@@ -53,10 +53,12 @@
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
 #include <awsmock/dto/sqs/internal/AddDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/DeleteDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sqs/internal/ExportMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
+#include <awsmock/dto/sqs/internal/ImportMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
@@ -381,6 +383,23 @@ namespace AwsMock::Service {
          * @see ResendMessage
          */
         void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+
+        /**
+         * @brief Export messages
+         *
+         * @param request export messages request
+         * @return message list as BSON string
+         * @throws ServiceException
+         */
+        [[nodiscard]] std::string ExportMessages(const Dto::SQS::ExportMessagesRequest &request) const;
+
+        /**
+         * @brief Import messages
+         *
+         * @param request import message request
+         * @throws ServiceException
+         */
+        void ImportMessages(const Dto::SQS::ImportMessagesRequest &request) const;
 
         /**
          * @brief Updates a DQL subscription

@@ -30,11 +30,11 @@ namespace AwsMock::Service {
      *
      * @par
      * Once the lambdas are written to the lambda directory, the creator decodes the lambda and check for a existing image in the docker registry. If it find a image, it will
-     * create a docker container and starts it. Otherwise, a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
+     * create a docker container and start it. Otherwise, a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
      * Dockerfile for that runtime. Then a container is created and started.
      *
      * @par
-     * To see the running container simply issue a 'docker ps'. The container has a name of 'lambda-function-name:version. The docker tag is taken from the lambda function
+     * To see the running container, issue a 'docker ps'. The container has a name of 'lambda-function-name:version. The docker tag is taken from the lambda function
      * tags. If a 'version' or 'dockerTag' exists in the lambda function, this is taken as the docker tag. Otherwise, 'latest' is used. If it is a function, which is loaded
      * from a versioned S3 bucket/key, the version tag of the S3 object is taken.
      *
@@ -59,7 +59,7 @@ namespace AwsMock::Service {
         explicit LambdaCreator() = default;
 
         /**
-         * @brief Create new lambda function
+         * @brief Create a new lambda function
          *
          * @param functionCode zipped and BASE64 encoded function code
          * @param functionId lambda function OID
