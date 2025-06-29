@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.3](https://github.com/jensvogt/awsmock/compare/v1.5.2...v1.5.3) (2025-06-28)
+
+
+### Bug Fixes
+
+* **1289-backup count:** add key management key details ([691ce78](https://github.com/jensvogt/awsmock/commit/691ce781e67a53f86b16697395dfeca19cfcfa35))
+* **1289-backup count:** add key management list ([c914425](https://github.com/jensvogt/awsmock/commit/c9144252d162f2c1bb1002ee98da7b077809b06a))
+* **1289-backup count:** add SQS queue default message attributes ([bc45367](https://github.com/jensvogt/awsmock/commit/bc4536760602561e9b96639ad988a460996b4b32))
+* **1289-backup count:** fix backup cleanup ([a6fe366](https://github.com/jensvogt/awsmock/commit/a6fe366862e18543b077ef96ed16f30f0629f45e))
+* **1289-backup count:** fix bug in SQS message attribute list ([504814f](https://github.com/jensvogt/awsmock/commit/504814f72c24b56ef0688d581b3a1f2ac3d50c2e))
+* **1289-backup count:** fix bug lambda upload ([226a9e8](https://github.com/jensvogt/awsmock/commit/226a9e80edd92855257be7638faf3fc6af307876))
+* **1289-backup count:** fix tests ([c43cd3c](https://github.com/jensvogt/awsmock/commit/c43cd3ca76f4f2d0f9e364be7a10bdb8e2727ca4))
+
 ## [1.5.2](https://github.com/jensvogt/awsmock/compare/v1.5.1...v1.5.2) (2025-06-20)
 
 
