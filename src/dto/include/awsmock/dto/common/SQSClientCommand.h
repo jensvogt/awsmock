@@ -69,6 +69,8 @@ namespace AwsMock::Dto::Common {
         UPDATE_DLQ,
         RESEND_MESSAGE,
         GET_EVENT_SOURCE,
+        EXPORT_MESSAGES,
+        IMPORT_MESSAGES,
         UNKNOWN
     };
 
@@ -113,6 +115,8 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
             {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
+            {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
+            {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
     };
 
     [[maybe_unused]] static std::string SqsCommandTypeToString(SqsCommandType commandType) {

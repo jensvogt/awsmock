@@ -514,7 +514,7 @@ namespace AwsMock::Database {
                 p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 if (auto totalSizeCursor = _objectCollection.aggregate(p); !totalSizeCursor.begin()->empty()) {
-                    if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                    if (const auto t = *totalSizeCursor.begin(); !t.empty() && t["totalSize"].type() == bsoncxx::type::k_int64) {
                         return t["totalSize"].get_int64().value;
                     }
                 }
@@ -832,6 +832,41 @@ namespace AwsMock::Database {
         }
         log_trace << "Got message list, size: " << messageList.size();
         return messageList;
+    }
+
+    void SQSDatabase::ImportMessages(const std::string &queueArn, const value &messageArray) const {
+
+        Entity::SQS::MessageList messageList;
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            const auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+            auto session = client->start_session();
+
+            try {
+                session.start_transaction();
+                auto collection = mongocxx::collection{messageCollection};
+                auto bulk = collection.create_bulk_write();
+
+                for (const auto &message: messageArray) {
+                    const mongocxx::model::insert_one insert_op{message.get_document().view()};
+                    bulk.append(insert_op);
+                }
+                const auto result = bulk.execute();
+                session.commit_transaction();
+                log_info << "Imported messages: " << result->inserted_count();
+
+                // Update the counter-map
+                (*_sqsCounterMap)[queueArn].messages += result->inserted_count();
+                (*_sqsCounterMap)[queueArn].initial += result->inserted_count();
+                (*_sqsCounterMap)[queueArn].size += messageArray.length();
+
+            } catch (mongocxx::exception &e) {
+                log_error << "Collection transaction exception: " << e.what();
+                session.abort_transaction();
+                throw Core::DatabaseException(e.what());
+            }
+        }
     }
 
     void SQSDatabase::ReceiveMessages(const std::string &queueArn, const long visibility, const long maxResult, const std::string &dlQueueArn, const long maxRetries, Entity::SQS::MessageList &messageList) const {

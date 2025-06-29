@@ -442,7 +442,7 @@ namespace AwsMock::Database {
         [[nodiscard]] long MessageRetention(const std::string &queueArn, long retentionPeriod) const;
 
         /**
-         * @brief  Count the number of message by state
+         * @brief  Count the number of messages by state
          *
          * @param queueArn ARN of the queue
          * @param prefix message ID prefix
@@ -477,6 +477,14 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         [[nodiscard]] Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime() const;
+
+        /**
+         * @brief Import messages via bulk updates
+         *
+         * @param queueArn queue ARN
+         * @param messageArray
+         */
+        void ImportMessages(const std::string &queueArn, const value &messageArray) const;
 
         /**
          * @brief Deletes all messages of a queue
