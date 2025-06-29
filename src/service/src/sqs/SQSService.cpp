@@ -1099,7 +1099,7 @@ namespace AwsMock::Service {
                     {},
                     request.pageSize,
                     request.pageIndex,
-                    request.sortColumns);
+                    Dto::Common::Mapper::map(request.sortColumns));
 
             Dto::SQS::ListMessagesResponse listMessagesResponse;
             listMessagesResponse.total = total;
@@ -1212,6 +1212,41 @@ namespace AwsMock::Service {
             response.messageAttributeCounters = Dto::SQS::Mapper::map(message.messageAttributes);
             response.messageAttributeCounters = Core::PageMap<std::string, Dto::SQS::MessageAttribute>(response.messageAttributeCounters, request.pageSize, request.pageIndex);
             return response;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    std::string SQSService::ExportMessages(const Dto::SQS::ExportMessagesRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "export_messages");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "export_messages");
+        log_trace << "Export all messages request";
+
+        try {
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, {}, -1, -1, {});
+
+            array listMessagesResponse;
+            for (const auto &message: messages) {
+                listMessagesResponse.append(message.ToDocument());
+            }
+            return Core::Bson::BsonUtils::ToJsonString(listMessagesResponse);
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::ImportMessages(const Dto::SQS::ImportMessagesRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "import_messages");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "import_messages");
+        log_trace << "Export all messages request";
+
+        try {
+            const value messageArray = bsoncxx::from_json(request.messages);
+            _sqsDatabase.ImportMessages(request.queueArn, messageArray);
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();

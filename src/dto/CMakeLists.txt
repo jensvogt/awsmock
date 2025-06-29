@@ -14,7 +14,7 @@ set(SQS_SOURCES src/sqs/model/MessageAttribute.cpp
         src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/model/EventNotification.cpp
         src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp
         src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp
-        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp
+        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesResponse.cpp
         src/sqs/ListQueueTagsRequest.cpp src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
         src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp
 )
