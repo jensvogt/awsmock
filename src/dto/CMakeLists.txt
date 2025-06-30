@@ -50,10 +50,7 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/mapper/Mapper.cpp)
-set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
-        src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
-        src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
-        src/ssm/DescribeParametersResponse.cpp)
+set(SSM_SOURCES src/ssm/mapper/Mapper.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
         src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp

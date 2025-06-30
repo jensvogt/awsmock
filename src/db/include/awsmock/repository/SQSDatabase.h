@@ -279,10 +279,10 @@ namespace AwsMock::Database {
         Entity::SQS::Message CreateMessage(Entity::SQS::Message &message) const;
 
         /**
-         * @brief Checks whether the message exists by receipt handle.
+         * @brief Checks whether the message exists by the receipt handle.
          *
          * @param receiptHandle SQS message receipt handle
-         * @return true if message exists, otherwise false
+         * @return true, if the message exists, otherwise false
          * @throws Core::DatabaseException
          */
         [[nodiscard]] bool MessageExists(const std::string &receiptHandle) const;

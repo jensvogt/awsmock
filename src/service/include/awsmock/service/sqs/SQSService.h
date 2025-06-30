@@ -64,11 +64,11 @@
 #include <awsmock/dto/sqs/internal/ListMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListParameterCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueArnsResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersResponse.h>
-#include <awsmock/dto/sqs/internal/ListQueueCountersRequest.h>
-#include <awsmock/dto/sqs/internal/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagsRequest.h>
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListParameterCountersResponse ListQueueCounters(const Dto::SQS::ListParameterCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags

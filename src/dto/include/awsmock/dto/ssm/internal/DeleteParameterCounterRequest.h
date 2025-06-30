@@ -2,19 +2,32 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_SSM_DELETE_PARAMETER_COUNTER_REQUEST_H
+#define AWSMOCK_DTO_SSM_DELETE_PARAMETER_COUNTER_REQUEST_H
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/common/SortColumn.h>
-#include <awsmock/dto/sqs/model/QueueCounter.h>
+#include "awsmock/dto/common/SortColumn.h"
 
-namespace AwsMock::Dto::SQS {
 
-    struct ListQueueCountersRequest final : Common::BaseCounter<ListQueueCountersRequest> {
+#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
+
+namespace AwsMock::Dto::SSM {
+
+    /**
+     * @brief List all parameter response.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct DeleteParameterCounterRequest final : Common::BaseCounter<DeleteParameterCounterRequest> {
+
+        /**
+         * Parameter name
+         */
+        std::string name;
 
         /**
          * Prefix
@@ -38,8 +51,9 @@ namespace AwsMock::Dto::SQS {
 
       private:
 
-        friend ListQueueCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueCountersRequest>, boost::json::value const &v) {
-            ListQueueCountersRequest r;
+        friend DeleteParameterCounterRequest tag_invoke(boost::json::value_to_tag<DeleteParameterCounterRequest>, boost::json::value const &v) {
+            DeleteParameterCounterRequest r;
+            r.name = Core::Json::GetStringValue(v, "name");
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
@@ -49,11 +63,12 @@ namespace AwsMock::Dto::SQS {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueueCountersRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteParameterCounterRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
+                    {"name", obj.name},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},
@@ -62,6 +77,6 @@ namespace AwsMock::Dto::SQS {
         }
     };
 
-}// namespace AwsMock::Dto::SQS
+}// namespace AwsMock::Dto::SSM
 
-#endif// AWSMOCK_DTO_SQS_LIST_QUEUE_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_SSM_DELETE_PARAMETER_COUNTER_REQUEST_H

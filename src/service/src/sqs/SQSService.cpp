@@ -143,7 +143,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::ListQueueCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const {
+    Dto::SQS::ListParameterCountersResponse SQSService::ListQueueCounters(const Dto::SQS::ListParameterCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_queue_counters");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "list_queue_counters");
         log_trace << "List all queues counters request";
@@ -156,7 +156,7 @@ namespace AwsMock::Service {
                     Dto::Common::Mapper::map(request.sortColumns),
                     request.region);
 
-            Dto::SQS::ListQueueCountersResponse listQueueResponse;
+            Dto::SQS::ListParameterCountersResponse listQueueResponse;
             listQueueResponse.total = _sqsDatabase.CountQueues(request.prefix, request.region);
             for (const auto &queue: queueList) {
                 Dto::SQS::QueueCounter counter;
@@ -173,7 +173,7 @@ namespace AwsMock::Service {
                 counter.isDlq = queue.isDlq;
                 counter.created = queue.created;
                 counter.modified = queue.modified;
-                listQueueResponse.queueCounters.emplace_back(counter);
+                listQueueResponse.parameterCounters.emplace_back(counter);
             }
             log_trace << "SQS create queue counters list response: " << listQueueResponse.ToJson();
             return listQueueResponse;

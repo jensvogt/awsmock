@@ -6,9 +6,9 @@
 
 namespace AwsMock::Dto::SSM {
 
-    Dto::SSM::Parameter Mapper::map(const Database::Entity::SSM::Parameter &parameterEntity) {
+    Parameter Mapper::map(const Database::Entity::SSM::Parameter &parameterEntity) {
 
-        Dto::SSM::Parameter responseDto;
+        Parameter responseDto;
         responseDto.region = parameterEntity.region;
         responseDto.name = parameterEntity.parameterName;
         responseDto.parameterValue = parameterEntity.parameterValue;
@@ -16,26 +16,47 @@ namespace AwsMock::Dto::SSM {
         responseDto.arn = parameterEntity.arn;
         responseDto.tier = parameterEntity.tier;
         responseDto.type = ParameterTypeFromString(parameterEntity.type);
-        for (const auto &tag: parameterEntity.tags) {
-            responseDto.tags[tag.first] = tag.second;
+        responseDto.created = parameterEntity.created;
+        responseDto.modified = parameterEntity.modified;
+        for (const auto &[fst, snd]: parameterEntity.tags) {
+            responseDto.tags[fst] = snd;
         }
         return responseDto;
     }
 
-    Dto::SSM::GetParameterResponse Mapper::map(const GetParameterRequest &request, const Database::Entity::SSM::Parameter &parameterEntity) {
+    std::vector<Parameter> Mapper::map(const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
 
-        Dto::SSM::GetParameterResponse response;
+        std::vector<Parameter> parameters;
+        for (const auto &parameterEntity: parameterEntities) {
+            parameters.emplace_back(map(parameterEntity));
+        }
+        return parameters;
+    }
+
+    GetParameterResponse Mapper::map(const GetParameterRequest &request, const Database::Entity::SSM::Parameter &parameterEntity) {
+
+        GetParameterResponse response;
         response.region = request.region;
         response.parameter = map(parameterEntity);
         return response;
     }
 
-    Dto::SSM::DescribeParametersResponse Mapper::map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
-        Dto::SSM::DescribeParametersResponse response;
+    DescribeParametersResponse Mapper::map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
+        DescribeParametersResponse response;
         response.region = request.region;
         for (const auto &parameterEntity: parameterEntities) {
-            Dto::SSM::Parameter parameter = map(parameterEntity);
+            Parameter parameter = map(parameterEntity);
             response.parameters.emplace_back(parameter);
+        }
+        return response;
+    }
+
+    ListParameterCountersResponse Mapper::map(const ListParameterCountersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
+        ListParameterCountersResponse response;
+        response.region = request.region;
+        for (const auto &parameterEntity: parameterEntities) {
+            Parameter parameter = map(parameterEntity);
+            response.parameterCounters.emplace_back(parameter);
         }
         return response;
     }
