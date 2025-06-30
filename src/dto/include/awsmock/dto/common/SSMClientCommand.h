@@ -35,6 +35,7 @@ namespace AwsMock::Dto::Common {
         DELETE_PARAMETER,
         // AwsMock internal
         LIST_PARAMETER_COUNTERS,
+        GET_PARAMETER_COUNTER,
         DELETE_PARAMETER_COUNTER,
         UNKNOWN
     };
@@ -46,6 +47,7 @@ namespace AwsMock::Dto::Common {
             {SSMCommandType::DELETE_PARAMETER, "delete-parameter"},
             // AwsMock internal
             {SSMCommandType::LIST_PARAMETER_COUNTERS, "list-parameter-counters"},
+            {SSMCommandType::GET_PARAMETER_COUNTER, "get-parameter-counter"},
             {SSMCommandType::DELETE_PARAMETER_COUNTER, "delete-parameter-counter"},
             {SSMCommandType::UNKNOWN, "unknown"},
     };

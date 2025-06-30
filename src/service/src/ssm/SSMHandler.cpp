@@ -1,4 +1,8 @@
 
+#include "awsmock/dto/ssm/internal/GetParameterCounterRequest.h"
+#include "awsmock/dto/ssm/internal/GetParameterCounterResponse.h"
+
+
 #include <awsmock/service/ssm/SSMHandler.h>
 
 namespace AwsMock::Service {
@@ -25,6 +29,14 @@ namespace AwsMock::Service {
 
                     Dto::SSM::GetParameterRequest ssmRequest = Dto::SSM::GetParameterRequest::FromJson(clientCommand);
                     Dto::SSM::GetParameterResponse ssmResponse = _ssmService.GetParameter(ssmRequest);
+                    log_info << "Parameter found, name: " << ssmRequest.name;
+                    return SendOkResponse(request, ssmResponse.ToJson());
+                }
+
+                case Dto::Common::SSMCommandType::GET_PARAMETER_COUNTER: {
+
+                    Dto::SSM::GetParameterCounterRequest ssmRequest = Dto::SSM::GetParameterCounterRequest::FromJson(clientCommand);
+                    Dto::SSM::GetParameterCounterResponse ssmResponse = _ssmService.GetParameterCounter(ssmRequest);
                     log_info << "Parameter found, name: " << ssmRequest.name;
                     return SendOkResponse(request, ssmResponse.ToJson());
                 }

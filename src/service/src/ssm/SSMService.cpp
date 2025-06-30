@@ -79,6 +79,29 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SSM::GetParameterCounterResponse SSMService::GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
+        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
+        log_trace << "Get parameter counter request: " << request.ToString();
+
+        if (!_ssmDatabase.ParameterExists(request.name)) {
+            log_error << "Parameter does not exist, name: " << request.name;
+            throw Core::ServiceException("Parameter does not exist, name: " + request.name);
+        }
+
+        try {
+            // Get from the database
+            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            log_trace << "SSM parameter found: " << parameterEntity.ToString();
+
+            return Dto::SSM::Mapper::map(request, parameterEntity);
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "SSM get parameter failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "describe_parameters");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "describe_parameters");
