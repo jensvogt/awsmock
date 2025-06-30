@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.5.4](https://github.com/jensvogt/awsmock/compare/v1.5.3...v1.5.4) (2025-06-30)
+
+
+### Bug Fixes
+
+* **1289-backup count:** fix import/export issues ([1920c94](https://github.com/jensvogt/awsmock/commit/1920c9461fc34185ffd7b2f92b82ce9d7cbd5a26))
+* **1289-backup count:** fix SQS batch delete bug ([8aa6682](https://github.com/jensvogt/awsmock/commit/8aa66824c4cde479df355d9f0e763c12c3f85937))
+* **development:** add SSM parameters ([fc28618](https://github.com/jensvogt/awsmock/commit/fc28618fcbb803d3bac67b65505e0b5247ef1590))
+* **development:** add SSM parameters details ([af88bdd](https://github.com/jensvogt/awsmock/commit/af88bdd21bb70130f04c5181f223dc59083bcbac))
+
 ## [1.5.3](https://github.com/jensvogt/awsmock/compare/v1.5.2...v1.5.3) (2025-06-28)
 
 ### Bug Fixes
