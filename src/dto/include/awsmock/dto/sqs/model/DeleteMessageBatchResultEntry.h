@@ -25,6 +25,21 @@ namespace AwsMock::Dto::SQS {
      */
     struct DeleteMessageBatchResultEntry final : Common::BaseCounter<DeleteMessageBatchResultEntry> {
 
+
+        /**
+         * @brief Default constructor
+         */
+        explicit DeleteMessageBatchResultEntry() = default;
+
+        /**
+         * @brief Constructor
+         *
+         * @param id message ID
+         */
+        explicit DeleteMessageBatchResultEntry(const std::string &id) {
+            this->id = id;
+        }
+
         /**
          * Id
          */

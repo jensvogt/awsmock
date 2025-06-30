@@ -11,14 +11,11 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct GetQueueAttributesResponse {
+    struct GetQueueAttributesResponse final : Common::BaseCounter<GetQueueAttributesResponse> {
 
         /**
          * Attributes
@@ -30,38 +27,26 @@ namespace AwsMock::Dto::SQS {
          */
         std::string resource = "SQS";
 
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend GetQueueAttributesResponse tag_invoke(boost::json::value_to_tag<GetQueueAttributesResponse>, boost::json::value const &v) {
+            GetQueueAttributesResponse r;
+            r.resource = Core::Json::GetStringValue(v, "Resource");
+            if (Core::Json::AttributeExists(v, "AttributeNames")) {
+                r.attributes = boost::json::value_to<std::vector<std::pair<std::string, std::string>>>(v.at("Attributes"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetQueueAttributesResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetQueueAttributesResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Resource", obj.resource},
+                    {"AttributeNames", boost::json::value_from(obj.attributes)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS
