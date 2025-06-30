@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SQS_DATABASE_H
 
 // C++ standard includes
+#include <queue>
 #include <string>
 
 // Boost includes
