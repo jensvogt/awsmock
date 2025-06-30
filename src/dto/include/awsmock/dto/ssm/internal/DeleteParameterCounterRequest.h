@@ -9,16 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/common/SortColumn.h"
-
-
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::SSM {
 
     /**
-     * @brief List all parameter response.
+     * @brief List all parameter request.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

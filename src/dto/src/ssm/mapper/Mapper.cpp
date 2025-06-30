@@ -41,6 +41,14 @@ namespace AwsMock::Dto::SSM {
         return response;
     }
 
+    GetParameterCounterResponse Mapper::map(const GetParameterCounterRequest &request, const Database::Entity::SSM::Parameter &parameterEntity) {
+
+        GetParameterCounterResponse response;
+        response.region = request.region;
+        response.parameter = map(parameterEntity);
+        return response;
+    }
+
     DescribeParametersResponse Mapper::map(const DescribeParametersRequest &request, const std::vector<Database::Entity::SSM::Parameter> &parameterEntities) {
         DescribeParametersResponse response;
         response.region = request.region;

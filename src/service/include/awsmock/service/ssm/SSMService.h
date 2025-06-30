@@ -21,6 +21,8 @@
 #include <awsmock/dto/ssm/PutParameterRequest.h>
 #include <awsmock/dto/ssm/PutParameterResponse.h>
 #include <awsmock/dto/ssm/internal/DeleteParameterCounterRequest.h>
+#include <awsmock/dto/ssm/internal/GetParameterCounterRequest.h>
+#include <awsmock/dto/ssm/internal/GetParameterCounterResponse.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersRequest.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
@@ -60,7 +62,7 @@ namespace AwsMock::Service {
         Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
 
         /**
-         * @brief Returns a new parameter
+         * @brief Returns a parameter
          *
          * @param request get parameter request
          * @return GetParameterResponse
@@ -68,6 +70,16 @@ namespace AwsMock::Service {
          * @see Dto::SSM::GetParameterResponse
          */
         Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
+
+        /**
+         * @brief Returns a parameter counter
+         *
+         * @param request get parameter request
+         * @return GetParameterResponse
+         * @see Dto::SSM::GetParameterRequest
+         * @see Dto::SSM::GetParameterResponse
+         */
+        Dto::SSM::GetParameterCounterResponse GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const;
 
         /**
          * @brief Describe the parameters
@@ -103,7 +115,7 @@ namespace AwsMock::Service {
          * @param request delete parameter request
          * @see Dto::SSM::DeleteParameterRequest
          */
-        Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
+        [[nodiscard]] Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
 
       private:
 

@@ -10,6 +10,8 @@
 #include <awsmock/dto/ssm/DescribeParametersResponse.h>
 #include <awsmock/dto/ssm/GetParameterRequest.h>
 #include <awsmock/dto/ssm/GetParameterResponse.h>
+#include <awsmock/dto/ssm/internal/GetParameterCounterRequest.h>
+#include <awsmock/dto/ssm/internal/GetParameterCounterResponse.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersRequest.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
@@ -54,6 +56,19 @@ namespace AwsMock::Dto::SSM {
          * @see GetParameterResponse
          */
         static GetParameterResponse map(const GetParameterRequest &request, const Database::Entity::SSM::Parameter &parameter);
+
+        /**
+         * @brief Maps an SSM parameter entity to a parameter response
+         *
+         * @par
+         * Some values will be pulled over from the request.
+         *
+         * @param parameter SSM parameter
+         * @param request request struct
+         * @return GetParameterResponse
+         * @see GetParameterResponse
+         */
+        static GetParameterCounterResponse map(const GetParameterCounterRequest &request, const Database::Entity::SSM::Parameter &parameter);
 
         /**
          * @brief Maps a list of SSM parameter entities to a parameter describe response
