@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/repository/SQSDatabase.h>
-#include <queue>
 
 namespace AwsMock::Database {
 

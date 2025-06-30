@@ -37,21 +37,7 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
-    /*
-    struct QueueMonitoringCounter {
-        long initial{};
-        long invisible{};
-        long delayed{};
-        long messages{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
 
-    using SqsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, QueueMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using SqsCounterMapType = boost::container::map<std::string, QueueMonitoringCounter, std::less<std::string>, SqsShmAllocator>;
-
-    static constexpr auto SQS_COUNTER_MAP_NAME = "SqsQueueCounter";
-*/
     /**
      * @brief SQS MongoDB database.
      *
@@ -494,7 +480,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessages(const std::string &queueArn) const;
+        auto DeleteMessages(const std::string &queueArn) const -> long;
 
         /**
          * @brief Deletes a message.
@@ -503,7 +489,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const Entity::SQS::Message &message) const;
+        auto DeleteMessage(const Entity::SQS::Message &message) const -> long;
 
         /**
          * @brief Deletes a message by its receipt handle.
@@ -512,7 +498,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const std::string &receiptHandle) const;
+        auto DeleteMessage(const std::string &receiptHandle) const -> long;
 
         /**
          * @brief Deletes a resources.
@@ -520,7 +506,7 @@ namespace AwsMock::Database {
          * @return total number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteAllMessages() const;
+        auto DeleteAllMessages() const -> long;
 
       private:
 

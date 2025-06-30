@@ -9,11 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
 
@@ -35,52 +31,6 @@ namespace AwsMock::Dto::SQS {
          * Successful
          */
         std::vector<DeleteMessageBatchResultEntry> successfull;
-
-        /**
-         * Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const {
-
-            try {
-
-                boost::property_tree::ptree pt;
-
-                // Failed
-                if (failed.empty()) {
-                    boost::property_tree::ptree failedArray;
-                    for (const auto &f: failed) {
-                        boost::property_tree::ptree element;
-                        element.put("Id", f.id);
-                        element.put("Code", f.code);
-                        element.put("SenderFault", f.senderFault);
-                        element.put("Message", f.message);
-                        failedArray.push_back(std::make_pair("", element));
-                    }
-                    pt.add_child("DeleteMessageBatchResponse.DeleteMessageBatchResult.Failed", failedArray);
-                }
-
-                // Successful
-                if (successfull.empty()) {
-                    boost::property_tree::ptree successArray;
-                    for (const auto &s: successfull) {
-                        boost::property_tree::ptree element;
-                        element.put("Id", s.id);
-                        successArray.push_back(std::make_pair("", element));
-                    }
-                    pt.add_child("DeleteMessageBatchResponse.DeleteMessageBatchResult.Successful", successArray);
-                }
-
-                // Metadata
-                pt.put("DeleteMessageBatchResponse.ResponseMetadata.RequestId", requestId);
-                return Core::XmlUtils::ToXmlString(pt);
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
 
       private:
 

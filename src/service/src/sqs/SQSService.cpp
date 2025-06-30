@@ -455,16 +455,18 @@ namespace AwsMock::Service {
         // Check existence
         if (!_sqsDatabase.QueueUrlExists(request.region, queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueName: " << request.queueName << " queueUrl: " << queueUrl;
-            throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueName: " + request.queueName + " queueUrl: " +
-                    queueUrl);
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueName: " + request.queueName + " queueUrl: " + queueUrl);
         }
 
         try {
+
             // Get queue
             const Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, queueUrl);
             log_debug << "SQS get queue URL, region: " << request.region << " queueName: " << queue.queueUrl;
-            return {.queueUrl = queue.queueUrl};
+            Dto::SQS::GetQueueUrlResponse response;
+            response.queueUrl = queue.queueUrl;
+            return response;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -479,8 +481,7 @@ namespace AwsMock::Service {
         // Check existence
         if (!_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
             log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException(
-                    "Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
         }
 
         try {
@@ -1335,29 +1336,22 @@ namespace AwsMock::Service {
 
         const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
         try {
-            long deleted = 0;
             Dto::SQS::DeleteMessageBatchResponse deleteMessageBatchResponse;
             for (const auto &d: request.deleteMessageBatchEntries) {
                 if (!_sqsDatabase.MessageExists(d.receiptHandle)) {
 
                     log_warning << "Message does not exist, receiptHandle: " << d.receiptHandle.substr(0, 40);
-                    Dto::SQS::BatchResultErrorEntry failure;
-                    failure.id = d.id;
-                    deleteMessageBatchResponse.failed.emplace_back(failure);
+                    deleteMessageBatchResponse.failed.emplace_back(Dto::SQS::BatchResultErrorEntry{d.id});
 
                 } else {
 
                     // Delete from database
-                    deleted += _sqsDatabase.DeleteMessage(d.receiptHandle);
-
-                    // Successful
-                    Dto::SQS::DeleteMessageBatchResultEntry success;
-                    success.id = d.id;
-                    deleteMessageBatchResponse.successfull.emplace_back(success);
+                    _sqsDatabase.DeleteMessage(d.receiptHandle);
+                    deleteMessageBatchResponse.successfull.emplace_back(Dto::SQS::DeleteMessageBatchResultEntry{d.id});
                 }
             }
 
-            log_debug << "Message batch deleted, count: " << deleted;
+            log_debug << "Message batch deleted, success: " << deleteMessageBatchResponse.successfull.size() << ", failure: " << deleteMessageBatchResponse.failed.size();
             return deleteMessageBatchResponse;
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
