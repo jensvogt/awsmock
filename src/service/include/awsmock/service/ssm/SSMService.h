@@ -20,6 +20,9 @@
 #include <awsmock/dto/ssm/GetParameterResponse.h>
 #include <awsmock/dto/ssm/PutParameterRequest.h>
 #include <awsmock/dto/ssm/PutParameterResponse.h>
+#include <awsmock/dto/ssm/internal/DeleteParameterCounterRequest.h>
+#include <awsmock/dto/ssm/internal/ListParameterCountersRequest.h>
+#include <awsmock/dto/ssm/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
@@ -51,8 +54,8 @@ namespace AwsMock::Service {
          *
          * @param request put parameter request
          * @return PutParameterResponse
-         * @see Dto::KMS::PutParameterRequest
-         * @see Dto::KMS::PutParameterResponse
+         * @see Dto::SSM::PutParameterRequest
+         * @see Dto::SSM::PutParameterResponse
          */
         Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
 
@@ -61,8 +64,8 @@ namespace AwsMock::Service {
          *
          * @param request get parameter request
          * @return GetParameterResponse
-         * @see Dto::KMS::GetParameterRequest
-         * @see Dto::KMS::GetParameterResponse
+         * @see Dto::SSM::GetParameterRequest
+         * @see Dto::SSM::GetParameterResponse
          */
         Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
 
@@ -71,18 +74,36 @@ namespace AwsMock::Service {
          *
          * @param request describe parameters request
          * @return describe parameters response
-         * @see Dto::KMS::DescribeParametersRequest
-         * @see Dto::KMS::DescribeParametersResponse
+         * @see Dto::SSM::DescribeParametersRequest
+         * @see Dto::SSM::DescribeParametersResponse
          */
         Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
+
+        /**
+         * @brief List all parameter counters
+         *
+         * @param request list parameter counters request
+         * @return list parameter counters response
+         * @see Dto::SSM::ListParameterCountersRequest
+         * @see Dto::SSM::ListParameterCountersResponse
+         */
+        Dto::SSM::ListParameterCountersResponse ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const;
 
         /**
          * @brief Deletes a parameter
          *
          * @param request delete parameter request
-         * @see Dto::KMS::DeleteParameterRequest
+         * @see Dto::SSM::DeleteParameterRequest
          */
         void DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const;
+
+        /**
+         * @brief Deletes a parameter from the frontend
+         *
+         * @param request delete parameter request
+         * @see Dto::SSM::DeleteParameterRequest
+         */
+        Dto::SSM::ListParameterCountersResponse DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const;
 
       private:
 

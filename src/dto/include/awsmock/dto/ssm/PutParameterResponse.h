@@ -9,17 +9,16 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SSM {
 
-    struct PutParameterResponse {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    /**
+     * @brief Put parameter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct PutParameterResponse final : Common::BaseCounter<PutParameterResponse> {
 
         /**
          * Parameter tier
@@ -29,40 +28,26 @@ namespace AwsMock::Dto::SSM {
         /**
          * Parameter version
          */
-        int version = 0;
+        long version = 0;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend PutParameterResponse tag_invoke(boost::json::value_to_tag<PutParameterResponse>, boost::json::value const &v) {
+            PutParameterResponse r;
+            r.tier = Core::Json::GetStringValue(v, "Tier");
+            r.version = Core::Json::GetLongValue(v, "Version");
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PutParameterResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutParameterResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Tier", obj.tier},
+                    {"Version", obj.version},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SSM

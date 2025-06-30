@@ -9,17 +9,17 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SSM {
 
-    struct GetParameterRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    /**
+     * @brief Get parameter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct GetParameterRequest final : Common::BaseCounter<GetParameterRequest> {
 
         /**
          * Parameter name
@@ -29,40 +29,26 @@ namespace AwsMock::Dto::SSM {
         /**
          * WIth description
          */
-        bool withDescription;
+        bool withDescription = false;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend GetParameterRequest tag_invoke(boost::json::value_to_tag<GetParameterRequest>, boost::json::value const &v) {
+            GetParameterRequest r;
+            r.name = Core::Json::GetLongValue(v, "Name");
+            r.withDescription = Core::Json::GetBoolValue(v, "WithDescription");
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetParameterRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetParameterRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"WithDescription", obj.withDescription},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SSM

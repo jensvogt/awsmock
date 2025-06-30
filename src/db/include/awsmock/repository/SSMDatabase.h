@@ -16,6 +16,7 @@
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/memorydb/SSMMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
 
 namespace AwsMock::Database {
 
@@ -81,17 +82,23 @@ namespace AwsMock::Database {
          * @brief List all parameters
          *
          * @param region AWS region
+         * @param prefix name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sort columns list
          * @return ParameterList
          */
-        Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
+        Entity::SSM::ParameterList ListParameters(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Returns the total number of parameters
          *
+         * @param region AWS region
+         * @param prefix name prefix
          * @return total number of parameters
          * @throws DatabaseException
          */
-        long CountParameters() const;
+        long CountParameters(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Create a new parameter in the ssm parameter table
