@@ -6,6 +6,48 @@
 
 namespace AwsMock::Dto::SQS {
 
+    Queue Mapper::map(const Database::Entity::SQS::Queue &queueEntity) {
+
+        Queue queueDto;
+        queueDto.name = queueEntity.name;
+        queueDto.owner = queueEntity.owner;
+        queueDto.queueArn = queueEntity.queueArn;
+        queueDto.queueUrl = queueEntity.queueUrl;
+        queueDto.size = queueEntity.size;
+        queueDto.mainQueue = queueEntity.mainQueue;
+        queueDto.tags = queueEntity.tags;
+        queueDto.isDlq = queueEntity.isDlq;
+        queueDto.created = queueEntity.created;
+        queueDto.modified = queueEntity.modified;
+        queueDto.attributes.delaySeconds = queueEntity.attributes.delaySeconds;
+        queueDto.attributes.maxMessageSize = queueEntity.attributes.maxMessageSize;
+        queueDto.attributes.messageRetentionPeriod = queueEntity.attributes.messageRetentionPeriod;
+        queueDto.attributes.approximateNumberOfMessages = queueEntity.attributes.approximateNumberOfMessages;
+        queueDto.attributes.approximateNumberOfMessagesDelayed = queueEntity.attributes.approximateNumberOfMessagesDelayed;
+        queueDto.attributes.approximateNumberOfMessagesNotVisible = queueEntity.attributes.approximateNumberOfMessagesNotVisible;
+        queueDto.attributes.receiveMessageWaitTime = queueEntity.attributes.receiveMessageWaitTime;
+        queueDto.attributes.visibilityTimeout = queueEntity.attributes.visibilityTimeout;
+        queueDto.attributes.policy = queueEntity.attributes.policy;
+        queueDto.attributes.redriveAllowPolicy = queueEntity.attributes.redriveAllowPolicy;
+        queueDto.attributes.queueArn = queueEntity.attributes.queueArn;
+        for (const auto &[fst, snd]: queueEntity.defaultMessageAttributes) {
+            MessageAttribute attribute;
+            attribute.stringValue = snd.stringValue;
+            attribute.stringListValues = snd.stringListValues;
+            attribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SQS::MessageAttributeTypeToString(snd.dataType));
+            queueDto.defaultMessageAttributes[fst] = attribute;
+        }
+        return queueDto;
+    }
+
+    std::vector<Queue> Mapper::map(const std::vector<Database::Entity::SQS::Queue> &queueEntities) {
+        std::vector<Queue> queueDtos;
+        for (const auto &queueEntity: queueEntities) {
+            queueDtos.emplace_back(map(queueEntity));
+        }
+        return queueDtos;
+    }
+
     Database::Entity::SQS::Message Mapper::map(const SendMessageRequest &request) {
 
         Database::Entity::SQS::Message messageEntity;

@@ -33,8 +33,6 @@
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
-#include <awsmock/dto/sqs/ListMessagesRequest.h>
-#include <awsmock/dto/sqs/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
@@ -64,6 +62,8 @@
 #include <awsmock/dto/sqs/internal/ListMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/internal/ListParameterCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueArnsResponse.h>

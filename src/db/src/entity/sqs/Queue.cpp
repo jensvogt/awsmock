@@ -29,6 +29,7 @@ namespace AwsMock::Database::Entity::SQS {
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueUrl", queueUrl);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueArn", queueArn);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "attributes", attributes.ToDocument());
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "tags", tagsDoc);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "defaultMessageAttributes", defaultMessageAttributeDoc);

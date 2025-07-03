@@ -55,12 +55,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct SendMessageBatchRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct SendMessageBatchRequest final : Common::BaseCounter<SendMessageBatchRequest> {
 
         /**
          * Queue URL
@@ -72,38 +67,26 @@ namespace AwsMock::Dto::SQS {
          */
         std::vector<MessageEntry> entries;
 
-        /**
-         * Request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Converts the JSON string to a DTO
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend SendMessageBatchRequest tag_invoke(boost::json::value_to_tag<SendMessageBatchRequest>, boost::json::value const &v) {
+            SendMessageBatchRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            if (Core::Json::AttributeExists(v, "Entries")) {
+                r.entries = boost::json::value_to<std::vector<MessageEntry>>(v.at("Entries"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, SendMessageBatchRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SendMessageBatchRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueUrl", obj.queueUrl},
+                    {"Entries", boost::json::value_from(obj.entries)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

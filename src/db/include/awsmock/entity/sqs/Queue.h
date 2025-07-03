@@ -88,6 +88,11 @@ namespace AwsMock::Database::Entity::SQS {
         bool isDlq = false;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Main queue for this DLQ
          */
         std::string mainQueue;

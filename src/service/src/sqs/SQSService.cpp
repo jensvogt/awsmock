@@ -107,16 +107,16 @@ namespace AwsMock::Service {
                         {},
                         request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
-                Dto::SQS::ListQueuesResponse listQueueResponse = {
-                        .queueList = queueList,
-                        .nextToken = nextToken,
-                        .total = total};
-                log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
+                Dto::SQS::ListQueuesResponse listQueueResponse;
+                listQueueResponse.queueList = Dto::SQS::Mapper::map(queueList);
+                listQueueResponse.nextToken = nextToken;
+                listQueueResponse.total = total;
+                log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
                 return listQueueResponse;
             }
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
             Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList};
-            log_trace << "SQS create queue list response: " << listQueueResponse.ToXml();
+            log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
