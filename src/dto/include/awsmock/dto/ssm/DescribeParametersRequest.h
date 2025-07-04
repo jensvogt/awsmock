@@ -9,18 +9,17 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/ssm/model/ParameterFilter.h>
 
 namespace AwsMock::Dto::SSM {
 
-    struct DescribeParametersRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    /**
+     * @brief Describe parameter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct DescribeParametersRequest final : Common::BaseCounter<DescribeParametersRequest> {
 
         /**
          * Filters to limit the request results.
@@ -30,45 +29,35 @@ namespace AwsMock::Dto::SSM {
         /**
          * The maximum number of items to return for this call. The call also returns a token that you can specify in a subsequent call to get the next set of results.
          */
-        int maxResults;
+        long maxResults{};
 
         /**
          * The token for the next set of items to return. (You received this token from a previous call.)
          */
         std::string nextToken;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend DescribeParametersRequest tag_invoke(boost::json::value_to_tag<DescribeParametersRequest>, boost::json::value const &v) {
+            DescribeParametersRequest r;
+            r.maxResults = Core::Json::GetLongValue(v, "MaxResults");
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            if (Core::Json::AttributeExists(v, "ParameterFilters")) {
+                r.parameterFilters = boost::json::value_to<std::vector<ParameterFilter>>(v.at("ParameterFilters"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DescribeParametersRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DescribeParametersRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"MaxResults", obj.maxResults},
+                    {"NextToken", obj.nextToken},
+                    {"ParameterFilters", boost::json::value_from(obj.parameterFilters)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SSM

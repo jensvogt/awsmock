@@ -62,6 +62,11 @@ namespace AwsMock::Dto::SQS {
         std::string md5Sum;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Message size
          */
         long size = 0;

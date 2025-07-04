@@ -14,15 +14,31 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
     /**
-     * @brief Send when successful delete was processed.
+     * @brief Sent when successful delete was processed.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteMessageBatchResultEntry {
+    struct DeleteMessageBatchResultEntry final : Common::BaseCounter<DeleteMessageBatchResultEntry> {
+
+
+        /**
+         * @brief Default constructor
+         */
+        explicit DeleteMessageBatchResultEntry() = default;
+
+        /**
+         * @brief Constructor
+         *
+         * @param id message ID
+         */
+        explicit DeleteMessageBatchResultEntry(const std::string &id) {
+            this->id = id;
+        }
 
         /**
          * Id
@@ -30,32 +46,37 @@ namespace AwsMock::Dto::SQS {
         std::string id;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string
          */
-        view_or_value<view, value> ToDocument() const;
+        view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchResultEntry &r);
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend DeleteMessageBatchResultEntry tag_invoke(boost::json::value_to_tag<DeleteMessageBatchResultEntry>, boost::json::value const &v) {
+            DeleteMessageBatchResultEntry r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMessageBatchResultEntry const &obj) {
+            jv = {
+                    {"Id", obj.id},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

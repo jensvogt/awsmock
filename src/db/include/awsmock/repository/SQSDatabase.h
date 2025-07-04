@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_SQS_DATABASE_H
 
 // C++ standard includes
+#include <queue>
 #include <string>
 
 // Boost includes
@@ -36,21 +37,7 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
-    /*
-    struct QueueMonitoringCounter {
-        long initial{};
-        long invisible{};
-        long delayed{};
-        long messages{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
 
-    using SqsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, QueueMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using SqsCounterMapType = boost::container::map<std::string, QueueMonitoringCounter, std::less<std::string>, SqsShmAllocator>;
-
-    static constexpr auto SQS_COUNTER_MAP_NAME = "SqsQueueCounter";
-*/
     /**
      * @brief SQS MongoDB database.
      *
@@ -292,10 +279,10 @@ namespace AwsMock::Database {
         Entity::SQS::Message CreateMessage(Entity::SQS::Message &message) const;
 
         /**
-         * @brief Checks whether the message exists by receipt handle.
+         * @brief Checks whether the message exists by the receipt handle.
          *
          * @param receiptHandle SQS message receipt handle
-         * @return true if message exists, otherwise false
+         * @return true, if the message exists, otherwise false
          * @throws Core::DatabaseException
          */
         [[nodiscard]] bool MessageExists(const std::string &receiptHandle) const;
@@ -442,7 +429,7 @@ namespace AwsMock::Database {
         [[nodiscard]] long MessageRetention(const std::string &queueArn, long retentionPeriod) const;
 
         /**
-         * @brief  Count the number of message by state
+         * @brief  Count the number of messages by state
          *
          * @param queueArn ARN of the queue
          * @param prefix message ID prefix
@@ -479,13 +466,21 @@ namespace AwsMock::Database {
         [[nodiscard]] Entity::SQS::MessageWaitTime GetAverageMessageWaitingTime() const;
 
         /**
+         * @brief Import messages via bulk updates
+7         *
+         * @param queueArn queue ARN
+         * @param messageArray
+         */
+        void ImportMessages(const std::string &queueArn, const value &messageArray) const;
+
+        /**
          * @brief Deletes all messages of a queue
          *
          * @param queueArn message queue ARN to delete messages from
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessages(const std::string &queueArn) const;
+        auto DeleteMessages(const std::string &queueArn) const -> long;
 
         /**
          * @brief Deletes a message.
@@ -494,7 +489,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const Entity::SQS::Message &message) const;
+        auto DeleteMessage(const Entity::SQS::Message &message) const -> long;
 
         /**
          * @brief Deletes a message by its receipt handle.
@@ -503,7 +498,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteMessage(const std::string &receiptHandle) const;
+        auto DeleteMessage(const std::string &receiptHandle) const -> long;
 
         /**
          * @brief Deletes a resources.
@@ -511,9 +506,14 @@ namespace AwsMock::Database {
          * @return total number of messages deleted
          * @throws Core::DatabaseException
          */
-        long DeleteAllMessages() const;
+        auto DeleteAllMessages() const -> long;
 
       private:
+
+        /**
+         * @brief Initialize the counter-map.
+         */
+        void InitializeCounters() const;
 
         /**
          * Database name

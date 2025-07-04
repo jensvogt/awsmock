@@ -32,6 +32,11 @@ namespace AwsMock::Dto::SNS {
         std::string message;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Message attributes
          */
         MessageAttributeList messageAttributes;

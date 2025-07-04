@@ -33,13 +33,8 @@
 #include <awsmock/dto/sqs/GetQueueAttributesResponse.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
-#include <awsmock/dto/sqs/ListMessagesRequest.h>
-#include <awsmock/dto/sqs/ListMessagesResponse.h>
-#include <awsmock/dto/sqs/ListQueueArnsResponse.h>
 #include <awsmock/dto/sqs/ListQueueRequest.h>
 #include <awsmock/dto/sqs/ListQueueResponse.h>
-#include <awsmock/dto/sqs/ListQueueTagsRequest.h>
-#include <awsmock/dto/sqs/ListQueueTagsResponse.h>
 #include <awsmock/dto/sqs/PurgeQueueRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageRequest.h>
 #include <awsmock/dto/sqs/ReceiveMessageResponse.h>
@@ -53,10 +48,12 @@
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
 #include <awsmock/dto/sqs/internal/AddDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/DeleteDefaultMessageAttributeRequest.h>
+#include <awsmock/dto/sqs/internal/ExportMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sqs/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsRequest.h>
 #include <awsmock/dto/sqs/internal/GetQueueDetailsResponse.h>
+#include <awsmock/dto/sqs/internal/ImportMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListLambdaTriggerCountersRequest.h>
@@ -65,12 +62,17 @@
 #include <awsmock/dto/sqs/internal/ListMessageAttributeCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
+#include <awsmock/dto/sqs/internal/ListParameterCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListParameterCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueArnsResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersResponse.h>
-#include <awsmock/dto/sqs/internal/ListQueueCountersRequest.h>
-#include <awsmock/dto/sqs/internal/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueTagsRequest.h>
+#include <awsmock/dto/sqs/internal/ListQueueTagsResponse.h>
 #include <awsmock/dto/sqs/internal/ResendMessageRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
@@ -140,7 +142,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListParameterCountersResponse ListQueueCounters(const Dto::SQS::ListParameterCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags
@@ -381,6 +383,23 @@ namespace AwsMock::Service {
          * @see ResendMessage
          */
         void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+
+        /**
+         * @brief Export messages
+         *
+         * @param request export messages request
+         * @return message list as BSON string
+         * @throws ServiceException
+         */
+        [[nodiscard]] std::string ExportMessages(const Dto::SQS::ExportMessagesRequest &request) const;
+
+        /**
+         * @brief Import messages
+         *
+         * @param request import message request
+         * @throws ServiceException
+         */
+        void ImportMessages(const Dto::SQS::ImportMessagesRequest &request) const;
 
         /**
          * @brief Updates a DQL subscription

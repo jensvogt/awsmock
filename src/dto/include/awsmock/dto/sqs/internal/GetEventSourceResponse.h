@@ -17,7 +17,6 @@ namespace AwsMock::Dto::SQS {
     /**
      * @brief Get the event source as lambda configuration
      *
-     *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct GetEventSourceResponse final : Common::BaseCounter<GetEventSourceResponse> {

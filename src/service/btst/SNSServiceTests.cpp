@@ -292,9 +292,11 @@ namespace AwsMock::Service {
 
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
 
-        Dto::SQS::GetQueueUrlRequest queueUrlRequest = {.region = REGION, .queueName = QUEUE};
-        auto [queueUrl] = _sqsService.GetQueueUrl(queueUrlRequest);
-        std::string resultQueueUrl = queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _sqsService.GetQueueUrl(getQueueUrlRequest).queueUrl;
+        const std::string &resultQueueUrl = queueUrl;
 
         Dto::SNS::SubscribeRequest subscribeRequest;
         subscribeRequest.region = REGION;

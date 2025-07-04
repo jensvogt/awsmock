@@ -21,7 +21,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const system_clock::time_point datetime = CronUtils::GetNextExecutionTime("0 0 0 * * ?");
+        const system_clock::time_point datetime = CronUtils::GetNextExecutionTime("0 0 0 * * ?") + std::chrono::hours(2);
         const system_clock::time_point midnight = std::chrono::ceil<std::chrono::days>(system_clock::now());
 
         // assert
@@ -33,7 +33,7 @@ namespace AwsMock::Core {
         // arrange
 
         // act
-        const long datetimeSeconds = CronUtils::GetNextExecutionTimeSeconds("0 0 0 * * ?");
+        const long datetimeSeconds = CronUtils::GetNextExecutionTimeSeconds("0 0 0 * * ?") + 7200;
         const system_clock::time_point midnight = std::chrono::ceil<std::chrono::days>(system_clock::now());
         const long seconds = std::chrono::duration_cast<std::chrono::seconds>(midnight - system_clock::now()).count();
 

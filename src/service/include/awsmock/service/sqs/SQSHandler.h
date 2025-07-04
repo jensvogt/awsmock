@@ -12,10 +12,13 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
-#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
+#include <awsmock/dto/sqs/model/DeleteMessageBatchEntry.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>

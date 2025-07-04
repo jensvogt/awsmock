@@ -7,17 +7,7 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
         src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
         src/common/MonitoringClientCommand.cpp src/common/CognitoClientCommand.cpp)
-set(SQS_SOURCES src/sqs/model/MessageAttribute.cpp
-        src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
-        src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
-        src/sqs/DeleteQueueRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp
-        src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/model/EventNotification.cpp
-        src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp
-        src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp
-        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp
-        src/sqs/ListQueueTagsRequest.cpp src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
-        src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp
-)
+set(SQS_SOURCES src/sqs/mapper/Mapper.cpp)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
         src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
@@ -55,10 +45,7 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/mapper/Mapper.cpp)
-set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
-        src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
-        src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
-        src/ssm/DescribeParametersResponse.cpp)
+set(SSM_SOURCES src/ssm/mapper/Mapper.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
         src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp

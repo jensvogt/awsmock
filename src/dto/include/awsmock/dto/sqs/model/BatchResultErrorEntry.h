@@ -18,11 +18,25 @@
 namespace AwsMock::Dto::SQS {
 
     /**
-     * @brief Send when a delete batch error occurs.
+     * @brief Sent when a delete batch error occurs.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct BatchResultErrorEntry {
+    struct BatchResultErrorEntry final : Common::BaseCounter<BatchResultErrorEntry> {
+
+        /**
+         * @brief Default constructor
+         */
+        BatchResultErrorEntry() = default;
+
+        /**
+         * @brief Constructor
+         *
+         * @param id message ID
+         */
+        explicit BatchResultErrorEntry(const std::string &id) {
+            this->id = id;
+        }
 
         /**
          * Id
@@ -37,7 +51,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Sender fault
          */
-        bool senderFault;
+        bool senderFault = false;
 
         /**
          * Error message
@@ -45,32 +59,47 @@ namespace AwsMock::Dto::SQS {
         std::string message;
 
         /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Converts the DTO to a JSON representation.
          *
          * @return DTO as string
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const BatchResultErrorEntry &r);
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
+                Core::Bson::BsonUtils::SetStringValue(document, "Code", code);
+                Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
+                Core::Bson::BsonUtils::SetBoolValue(document, "SenderFault", senderFault);
+
+                return document.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend BatchResultErrorEntry tag_invoke(boost::json::value_to_tag<BatchResultErrorEntry>, boost::json::value const &v) {
+            BatchResultErrorEntry r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.code = Core::Json::GetStringValue(v, "Code");
+            r.senderFault = Core::Json::GetBoolValue(v, "SenderFault");
+            r.message = Core::Json::GetStringValue(v, "Message");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, BatchResultErrorEntry const &obj) {
+            jv = {
+                    {"Id", obj.id},
+                    {"Code", obj.code},
+                    {"SenderFault", obj.senderFault},
+                    {"Message", obj.message},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS
