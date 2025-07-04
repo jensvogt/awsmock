@@ -73,6 +73,7 @@
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagsRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagsResponse.h>
+#include <awsmock/dto/sqs/internal/ReloadCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ResendMessageRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/UpdateDqlRequest.h>
@@ -441,6 +442,13 @@ namespace AwsMock::Service {
          * @throws ServiceException
          */
         [[nodiscard]] Dto::SQS::DeleteMessageBatchResponse DeleteMessageBatch(const Dto::SQS::DeleteMessageBatchRequest &request) const;
+
+        /**
+         * @brief Reload the SQS queue counters
+         *
+         * @param request reload counters request
+         */
+        void ReloadCounters(const Dto::SQS::ReloadCountersRequest &request) const;
 
       private:
 

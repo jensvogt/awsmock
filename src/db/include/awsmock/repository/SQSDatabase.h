@@ -508,12 +508,13 @@ namespace AwsMock::Database {
          */
         auto DeleteAllMessages() const -> long;
 
-      private:
 
         /**
          * @brief Initialize the counter-map.
          */
         void InitializeCounters() const;
+
+      private:
 
         /**
          * Database name
