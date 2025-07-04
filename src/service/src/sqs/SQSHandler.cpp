@@ -325,6 +325,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::RELOAD_COUNTERS: {
+
+                    Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
+                    _sqsService.ReloadCounters(sqsRequest);
+                    log_info << "Reload counters";
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::UNKNOWN: {
 
                     log_error << "Unknown method";

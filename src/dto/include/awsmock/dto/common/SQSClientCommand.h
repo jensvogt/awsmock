@@ -71,6 +71,7 @@ namespace AwsMock::Dto::Common {
         GET_EVENT_SOURCE,
         EXPORT_MESSAGES,
         IMPORT_MESSAGES,
+        RELOAD_COUNTERS,
         UNKNOWN
     };
 
@@ -117,9 +118,10 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
             {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
             {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
+            {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
     };
 
-    [[maybe_unused]] static std::string SqsCommandTypeToString(SqsCommandType commandType) {
+    [[maybe_unused]] static std::string SqsCommandTypeToString(const SqsCommandType &commandType) {
         return SqsCommandTypeNames[commandType];
     }
 

@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueAttribute /*final : Common::BaseEntity<QueueAttribute>*/ {
+    struct QueueAttribute {
 
         /**
          * Delay seconds
@@ -129,45 +129,6 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document view.
          */
         [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
-        /*
-      private:
-
-        friend QueueAttribute tag_invoke(boost::json::value_to_tag<QueueAttribute>, boost::json::value const &v) {
-            QueueAttribute r;
-            r.queueArn = v.at("queueArn").as_string();
-            r.delaySeconds = v.at("delaySeconds").as_int64();
-            r.maxMessageSize = v.at("maxMessageSize").as_int64();
-            r.messageRetentionPeriod = v.at("messageRetentionPeriod").as_int64();
-            r.receiveMessageWaitTime = v.at("receiveMessageWaitTime").as_int64();
-            r.visibilityTimeout = v.at("visibilityTimeout").as_int64();
-            r.policy = v.at("policy").as_string();
-            r.redrivePolicy = boost::json::value_to<RedrivePolicy>(v.at("redrivePolicy"));
-            r.redriveAllowPolicy = v.at("redriveAllowPolicy").as_string();
-            r.approximateNumberOfMessages = v.at("approximateNumberOfMessages").as_int64();
-            r.approximateNumberOfMessagesDelayed = v.at("approximateNumberOfMessagesDelayed").as_int64();
-            r.approximateNumberOfMessagesNotVisible = v.at("approximateNumberOfMessagesNotVisible").as_int64();
-            return r;
-        }
-
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueueAttribute const &obj) {
-            jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"queueArn", obj.queueArn},
-                    {"delaySeconds", obj.delaySeconds},
-                    {"maxMessageSize", obj.maxMessageSize},
-                    {"messageRetentionPeriod", obj.messageRetentionPeriod},
-                    {"receiveMessageWaitTime", obj.receiveMessageWaitTime},
-                    {"visibilityTimeout", obj.visibilityTimeout},
-                    {"policy", obj.policy},
-                    {"redrivePolicy", boost::json::value_from(obj.redrivePolicy)},
-                    {"redriveAllowPolicy", obj.redriveAllowPolicy},
-                    {"approximateNumberOfMessages", obj.approximateNumberOfMessages},
-                    {"approximateNumberOfMessagesDelayed", obj.approximateNumberOfMessagesDelayed},
-                    {"approximateNumberOfMessagesNotVisible", obj.approximateNumberOfMessagesNotVisible},
-            };
-        }*/
     };
 
 }// namespace AwsMock::Database::Entity::SQS
