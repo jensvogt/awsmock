@@ -29,10 +29,8 @@ namespace AwsMock::Service {
 
             if (target == "TransferService.CreateProtocol") {
 
-                Dto::Transfer::CreateProtocolRequest transferRequest;
-                transferRequest.FromJson(body);
+                Dto::Transfer::CreateProtocolRequest transferRequest = Dto::Transfer::CreateProtocolRequest::FromJson(body);
                 transferRequest.region = region;
-
                 _transferService.CreateProtocol(transferRequest);
                 return SendOkResponse(request);
             }
