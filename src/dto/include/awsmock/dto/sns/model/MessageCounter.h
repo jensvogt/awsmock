@@ -35,6 +35,11 @@ namespace AwsMock::Dto::SNS {
         std::string message;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Size
          */
         long size{};

@@ -6,12 +6,17 @@
 #define AWSMOCK_DTO_SQS_MAPPER_H
 
 // AwsMock includes
+#include "awsmock/dto/sqs/model/Queue.h"
+#include "awsmock/entity/sqs/Queue.h"
+
+
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/model/AttributeCounter.h>
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
+#include <awsmock/dto/sqs/model/Queue.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/utils/SqsUtils.h>
 
@@ -36,6 +41,33 @@ namespace AwsMock::Dto::SQS {
          * @see ListObjectVersionsResponse
          */
         static Database::Entity::SQS::Message map(const SendMessageRequest &request);
+
+        /**
+         * @brief Maps a SQS queue entity list to a SQS queue DTO
+         *
+         * @param queueEntity queue entity
+         * @return queue DTO
+         * @see Queue
+         */
+        static Queue map(const Database::Entity::SQS::Queue &queueEntity);
+
+        /**
+         * @brief Maps a list of SQS queue entity to a list of SQS queue DTO
+         *
+         * @param queueEntities list of queue entity
+         * @return queue DTO
+         * @see Queue
+         */
+        static std::vector<Queue> map(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
+
+        /**
+         * @brief Maps a list of SQS queue entity to a list of SQS queue URLs
+         *
+         * @param queueEntities list of queue entity
+         * @return queue URLs
+         * @see Queue
+         */
+        static std::vector<std::string> mapUrls(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
 
         /**
          * @brief Maps a SQS message entity to a SQS send message response DTO

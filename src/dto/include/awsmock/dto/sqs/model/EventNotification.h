@@ -46,40 +46,31 @@ namespace AwsMock::Dto::SQS {
      * }
      * @endcode
      */
-    struct EventNotification {
+    struct EventNotification final : Common::BaseCounter<EventNotification> {
 
         /**
          * S3 event record
          */
-        std::vector<Record> records;
+        std::vector<EventRecord> records;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param jsonString JSON string.
-         */
-        void FromJson(const std::string &jsonString);
+        friend EventNotification tag_invoke(boost::json::value_to_tag<EventNotification>, boost::json::value const &v) {
+            EventNotification r;
+            if (Core::Json::AttributeExists(v, "records")) {
+                r.records = boost::json::value_to<std::vector<EventRecord>>(v.at("records"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const EventNotification &e);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventNotification const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"records", boost::json::value_from(obj.records)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

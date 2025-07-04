@@ -342,7 +342,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
 
-            for (auto queueCursor = _queueCollection.find(query.view()); auto queue: queueCursor) {
+            for (auto queueCursor = _queueCollection.find(query.extract()); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
                 queueList.push_back(result);

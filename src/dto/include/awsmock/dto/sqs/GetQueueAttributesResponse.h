@@ -32,7 +32,7 @@ namespace AwsMock::Dto::SQS {
         friend GetQueueAttributesResponse tag_invoke(boost::json::value_to_tag<GetQueueAttributesResponse>, boost::json::value const &v) {
             GetQueueAttributesResponse r;
             r.resource = Core::Json::GetStringValue(v, "Resource");
-            if (Core::Json::AttributeExists(v, "AttributeNames")) {
+            if (Core::Json::AttributeExists(v, "Attributes")) {
                 r.attributes = boost::json::value_to<std::vector<std::pair<std::string, std::string>>>(v.at("Attributes"));
             }
             return r;
@@ -43,9 +43,15 @@ namespace AwsMock::Dto::SQS {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Resource", obj.resource},
-                    {"AttributeNames", boost::json::value_from(obj.attributes)},
-            };
+                    {"Resource", obj.resource}};
+
+            if (!obj.attributes.empty()) {
+                boost::json::object jvAttribute;
+                for (const auto &[fst, snd]: obj.attributes) {
+                    jvAttribute[fst] = snd;
+                }
+                jv.as_object()["Attributes"] = jvAttribute;
+            }
         }
     };
 

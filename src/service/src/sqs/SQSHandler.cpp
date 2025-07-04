@@ -1,6 +1,4 @@
 
-#include "awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h"
-
 
 #include <awsmock/service/sqs/SQSHandler.h>
 
@@ -37,7 +35,6 @@ namespace AwsMock::Service {
                     Dto::SQS::GetQueueAttributesRequest sqsRequest = Dto::SQS::GetQueueAttributesRequest::FromJson(clientCommand);
                     Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
                     log_info << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl;
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -85,13 +82,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_TAGS: {
 
-                    Dto::SQS::ListQueueTagsRequest sqsRequest{};
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::ListQueueTagsRequest sqsRequest = Dto::SQS::ListQueueTagsRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueueTagsResponse sqsResponse = _sqsService.ListQueueTags(sqsRequest);
                     log_info << "List queue tags";
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -115,15 +108,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUES: {
 
-                    Dto::SQS::ListQueuesRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
-                    std::string tmp = Core::HttpUtils::GetBodyAsString(request);
-
+                    Dto::SQS::ListQueuesRequest sqsRequest = Dto::SQS::ListQueuesRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueuesResponse sqsResponse = _sqsService.ListQueues(sqsRequest);
                     log_info << "List queues, count: " << sqsResponse.total;
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -161,14 +148,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::DELETE_QUEUE: {
 
-                    Dto::SQS::DeleteQueueRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
+                    Dto::SQS::DeleteQueueRequest sqsRequest = Dto::SQS::DeleteQueueRequest::FromJson(clientCommand);
                     Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
                     log_info << "Delete queue, queueUrl: " << sqsRequest.queueUrl;
-
-                    // Empty response
                     return SendOkResponse(request);
                 }
 
@@ -183,14 +165,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE_BATCH: {
 
-                    Dto::SQS::SendMessageBatchRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
-                    // Call service
+                    Dto::SQS::SendMessageBatchRequest sqsRequest = Dto::SQS::SendMessageBatchRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageBatchResponse sqsResponse = _sqsService.SendMessageBatch(sqsRequest);
                     log_info << "SQS message batch send, successful: " << sqsResponse.successful.size() << " failed: " << sqsResponse.failed.size();
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
