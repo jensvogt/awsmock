@@ -61,6 +61,15 @@ namespace AwsMock::Dto::SQS {
         static std::vector<Queue> map(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
 
         /**
+         * @brief Maps a list of SQS queue entity to a list of SQS queue URLs
+         *
+         * @param queueEntities list of queue entity
+         * @return queue URLs
+         * @see Queue
+         */
+        static std::vector<std::string> mapUrls(const std::vector<Database::Entity::SQS::Queue> &queueEntities);
+
+        /**
          * @brief Maps a SQS message entity to a SQS send message response DTO
          *
          * Some values will be pulled over from the request.

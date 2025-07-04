@@ -19,17 +19,33 @@ namespace AwsMock::Dto::SQS {
         queueDto.isDlq = queueEntity.isDlq;
         queueDto.created = queueEntity.created;
         queueDto.modified = queueEntity.modified;
-        queueDto.attributes.delaySeconds = queueEntity.attributes.delaySeconds;
-        queueDto.attributes.maxMessageSize = queueEntity.attributes.maxMessageSize;
-        queueDto.attributes.messageRetentionPeriod = queueEntity.attributes.messageRetentionPeriod;
-        queueDto.attributes.approximateNumberOfMessages = queueEntity.attributes.approximateNumberOfMessages;
-        queueDto.attributes.approximateNumberOfMessagesDelayed = queueEntity.attributes.approximateNumberOfMessagesDelayed;
-        queueDto.attributes.approximateNumberOfMessagesNotVisible = queueEntity.attributes.approximateNumberOfMessagesNotVisible;
-        queueDto.attributes.receiveMessageWaitTime = queueEntity.attributes.receiveMessageWaitTime;
-        queueDto.attributes.visibilityTimeout = queueEntity.attributes.visibilityTimeout;
-        queueDto.attributes.policy = queueEntity.attributes.policy;
-        queueDto.attributes.redriveAllowPolicy = queueEntity.attributes.redriveAllowPolicy;
-        queueDto.attributes.queueArn = queueEntity.attributes.queueArn;
+
+        queueDto.attributes.attributeName = "DelaySeconds";
+        queueDto.attributes.attributeValue = queueEntity.attributes.delaySeconds;
+        queueDto.attributes.attributeName = "MaxMessageSize";
+        queueDto.attributes.attributeValue = queueEntity.attributes.maxMessageSize;
+        queueDto.attributes.attributeName = "MessageRetentionPeriod";
+        queueDto.attributes.attributeValue = queueEntity.attributes.messageRetentionPeriod;
+        queueDto.attributes.attributeName = "VisibilityTimeout";
+        queueDto.attributes.attributeValue = queueEntity.attributes.visibilityTimeout;
+        queueDto.attributes.attributeName = "ReceiveMessageWaitTimeSeconds";
+        queueDto.attributes.attributeValue = queueEntity.attributes.receiveMessageWaitTime;
+        queueDto.attributes.attributeName = "CreatedTimestamp";
+        queueDto.attributes.attributeValue = Core::DateTimeUtils::UnixTimestamp(queueEntity.created);
+        queueDto.attributes.attributeName = "LastModifiedTimestamp";
+        queueDto.attributes.attributeValue = Core::DateTimeUtils::UnixTimestamp(queueEntity.modified);
+        queueDto.attributes.attributeName = "ApproximateNumberOfMessages";
+        queueDto.attributes.attributeValue = queueEntity.attributes.approximateNumberOfMessages;
+        queueDto.attributes.attributeName = "ApproximateNumberOfMessagesDelayed";
+        queueDto.attributes.attributeValue = queueEntity.attributes.approximateNumberOfMessagesDelayed;
+        queueDto.attributes.attributeName = "ApproximateNumberOfMessagesNotVisible";
+        queueDto.attributes.attributeValue = queueEntity.attributes.approximateNumberOfMessagesNotVisible;
+        queueDto.attributes.attributeName = "Policy";
+        queueDto.attributes.attributeValue = queueEntity.attributes.policy;
+        queueDto.attributes.attributeName = "RedriveAllowPolicy";
+        queueDto.attributes.attributeValue = queueEntity.attributes.redriveAllowPolicy;
+        queueDto.attributes.attributeName = "QueueArn";
+        queueDto.attributes.attributeValue = queueEntity.attributes.queueArn;
         for (const auto &[fst, snd]: queueEntity.defaultMessageAttributes) {
             MessageAttribute attribute;
             attribute.stringValue = snd.stringValue;
@@ -46,6 +62,14 @@ namespace AwsMock::Dto::SQS {
             queueDtos.emplace_back(map(queueEntity));
         }
         return queueDtos;
+    }
+
+    std::vector<std::string> Mapper::mapUrls(const std::vector<Database::Entity::SQS::Queue> &queueEntities) {
+        std::vector<std::string> queueUrls;
+        for (const auto &queueEntity: queueEntities) {
+            queueUrls.emplace_back(queueEntity.queueUrl);
+        }
+        return queueUrls;
     }
 
     Database::Entity::SQS::Message Mapper::map(const SendMessageRequest &request) {

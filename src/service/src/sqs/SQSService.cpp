@@ -97,25 +97,20 @@ namespace AwsMock::Service {
         log_trace << "List all queues request, region: " << request.region;
 
         try {
+            Dto::SQS::ListQueuesResponse listQueueResponse;
+            listQueueResponse.total = _sqsDatabase.CountQueues(request.region);
             if (request.maxResults > 0) {
                 // Get the total number
-                const long total = _sqsDatabase.CountQueues(request.region);
-                const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(
-                        request.queueNamePrefix,
-                        request.maxResults,
-                        0,
-                        {},
-                        request.region);
+                const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.queueNamePrefix, request.maxResults, 0, {}, request.region);
                 const std::string nextToken = static_cast<long>(queueList.size()) > 0 ? queueList.back().oid : "";
-                Dto::SQS::ListQueuesResponse listQueueResponse;
-                listQueueResponse.queueList = Dto::SQS::Mapper::map(queueList);
+                listQueueResponse.queueUrls = Dto::SQS::Mapper::mapUrls(queueList);
                 listQueueResponse.nextToken = nextToken;
-                listQueueResponse.total = total;
                 log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
                 return listQueueResponse;
             }
             const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.region);
-            Dto::SQS::ListQueuesResponse listQueueResponse = {.queueList = queueList};
+            listQueueResponse.queueUrls = Dto::SQS::Mapper::mapUrls(queueList);
+
             log_trace << "SQS create queue list response: " << listQueueResponse.ToJson();
             return listQueueResponse;
         } catch (Core::DatabaseException &exc) {
@@ -130,7 +125,7 @@ namespace AwsMock::Service {
         log_trace << "List all queues ARNs request";
 
         try {
-            Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
             Dto::SQS::ListQueueArnsResponse listQueueResponse;
             for (const auto &queue: queueList) {
                 listQueueResponse.queueArns.emplace_back(queue.queueArn);
@@ -899,7 +894,10 @@ namespace AwsMock::Service {
             deleted = _sqsDatabase.DeleteQueue(queue);
             log_debug << "Queue deleted, queue: " << request.queueUrl << " count:" << deleted;
 
-            return {.region = request.region, .queueUrl = request.queueUrl, .requestId = request.requestId};
+            Dto::SQS::DeleteQueueResponse response;
+            response.queueUrl = request.queueUrl;
+            return response;
+
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
             throw Core::ServiceException(ex.message());
@@ -990,23 +988,19 @@ namespace AwsMock::Service {
                 Dto::SQS::SendMessageRequest entryRequest;
                 entryRequest.region = request.region;
                 entryRequest.queueUrl = request.queueUrl;
+
                 // TODO: fix when batch request is new JSON
                 //entryRequest.messageSystemAttributes = entry.messageSystemAttributes;
                 entryRequest.messageAttributes = entry.messageAttributes;
                 entryRequest.body = entry.body;
-                try {
-                    Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
-                    Dto::SQS::MessageSuccessful s = {
-                            .id = entry.id,
-                            .messageId = response.messageId,
-                            .md5Body = response.md5Body,
-                            .md5MessageAttributes = response.md5MessageAttributes,
-                            .md5SystemAttributes = response.md5MessageSystemAttributes};
-                    sqsResponse.successful.emplace_back(s);
-                } catch (Core::DatabaseException &exc) {
-                    Dto::SQS::MessageFailed f = {.id = Core::StringUtils::CreateRandomUuid(), .message = exc.message(), .senderFault = false};
-                    sqsResponse.failed.emplace_back(f);
-                }
+
+                Dto::SQS::SendMessageResponse response = SendMessage(entryRequest);
+                Dto::SQS::MessageSuccessful s;
+                s.messageId = response.messageId;
+                s.md5Body = response.md5Body;
+                s.md5MessageAttributes = response.md5MessageAttributes;
+                s.md5SystemAttributes = response.md5MessageSystemAttributes;
+                sqsResponse.successful.emplace_back(s);
             }
             return sqsResponse;
         } catch (Core::DatabaseException &ex) {
@@ -1382,16 +1376,16 @@ namespace AwsMock::Service {
         const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
 
         // Create the event record
-        Dto::SQS::Record record = {
-                .region = lambda.region,
-                .messageId = message.messageId,
-                .receiptHandle = message.receiptHandle,
-                .body = message.body,
-                .attributes = message.attributes,
-                .messageAttributes = Dto::SQS::Mapper::map(message.messageAttributes),
-                .md5Sum = message.md5Body,
-                .eventSource = "aws:sqs",
-                .eventSourceArn = eventSourceArn};
+        Dto::SQS::EventRecord record;
+        record.region = lambda.region;
+        record.messageId = message.messageId;
+        record.receiptHandle = message.receiptHandle;
+        record.body = message.body;
+        record.attributes = message.attributes;
+        record.messageAttributes = Dto::SQS::Mapper::map(message.messageAttributes);
+        record.md5Sum = message.md5Body;
+        record.eventSource = "aws:sqs";
+        record.eventSourceArn = eventSourceArn;
 
         Dto::SQS::EventNotification eventNotification;
         eventNotification.records.emplace_back(record);

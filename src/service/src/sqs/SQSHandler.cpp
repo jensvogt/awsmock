@@ -35,7 +35,6 @@ namespace AwsMock::Service {
                     Dto::SQS::GetQueueAttributesRequest sqsRequest = Dto::SQS::GetQueueAttributesRequest::FromJson(clientCommand);
                     Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
                     log_info << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl;
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -166,14 +165,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::SEND_MESSAGE_BATCH: {
 
-                    Dto::SQS::SendMessageBatchRequest sqsRequest;
-                    sqsRequest.FromJson(clientCommand.payload);
-                    sqsRequest.region = clientCommand.region;
-
-                    // Call service
+                    Dto::SQS::SendMessageBatchRequest sqsRequest = Dto::SQS::SendMessageBatchRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageBatchResponse sqsResponse = _sqsService.SendMessageBatch(sqsRequest);
                     log_info << "SQS message batch send, successful: " << sqsResponse.successful.size() << " failed: " << sqsResponse.failed.size();
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 

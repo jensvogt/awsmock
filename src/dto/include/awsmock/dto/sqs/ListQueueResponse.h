@@ -27,7 +27,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * List of queues
          */
-        std::vector<Queue> queueList;
+        std::vector<std::string> queueUrls;
 
         /**
          * Next token
@@ -45,8 +45,8 @@ namespace AwsMock::Dto::SQS {
             ListQueuesResponse r;
             r.total = Core::Json::GetLongValue(v, "Total");
             r.nextToken = Core::Json::GetStringValue(v, "NextToken");
-            if (Core::Json::AttributeExists(v, "QueueUrl")) {
-                r.queueList = boost::json::value_to<std::vector<Queue>>(v.at("QueueUrl"));
+            if (Core::Json::AttributeExists(v, "QueueUrls")) {
+                r.queueUrls = boost::json::value_to<std::vector<std::string>>(v.at("QueueUrls"));
             }
             return r;
         }
@@ -58,7 +58,7 @@ namespace AwsMock::Dto::SQS {
                     {"RequestId", obj.requestId},
                     {"Total", obj.total},
                     {"NextToken", obj.nextToken},
-                    {"QueueUrl", boost::json::value_from(obj.queueList)},
+                    {"QueueUrls", boost::json::value_from(obj.queueUrls)},
             };
         }
     };
