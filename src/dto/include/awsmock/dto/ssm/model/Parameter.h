@@ -48,9 +48,9 @@ namespace AwsMock::Dto::SSM {
         ParameterType type = ParameterType::string;
 
         /**
-         * KMS key ID
+         * KMS key ARN
          */
-        std::string keyId;
+        std::string kmsKeyArn;
 
         /**
          * Parameter tier
@@ -91,7 +91,7 @@ namespace AwsMock::Dto::SSM {
                 Core::Bson::BsonUtils::SetStringValue(document, "Value", parameterValue);
                 Core::Bson::BsonUtils::SetStringValue(document, "Type", ParameterTypeToString(type));
                 Core::Bson::BsonUtils::SetStringValue(document, "Description", description);
-                Core::Bson::BsonUtils::SetStringValue(document, "KeyId", keyId);
+                Core::Bson::BsonUtils::SetStringValue(document, "KmsKeyArn", kmsKeyArn);
                 Core::Bson::BsonUtils::SetStringValue(document, "ARN", arn);
                 Core::Bson::BsonUtils::SetDateValue(document, "created", created);
                 Core::Bson::BsonUtils::SetDateValue(document, "modified", modified);
@@ -116,7 +116,7 @@ namespace AwsMock::Dto::SSM {
                 parameterValue = Core::Bson::BsonUtils::GetStringValue(document, "Value");
                 type = ParameterTypeFromString(Core::Bson::BsonUtils::GetStringValue(document, "Type"));
                 description = Core::Bson::BsonUtils::GetStringValue(document, "Description");
-                keyId = Core::Bson::BsonUtils::GetStringValue(document, "KeyId");
+                kmsKeyArn = Core::Bson::BsonUtils::GetStringValue(document, "kmsKeyArn");
                 arn = Core::Bson::BsonUtils::GetStringValue(document, "ARN");
                 created = Core::Bson::BsonUtils::GetDateValue(document, "created");
                 modified = Core::Bson::BsonUtils::GetDateValue(document, "created");
@@ -135,7 +135,7 @@ namespace AwsMock::Dto::SSM {
             r.parameterValue = Core::Json::GetStringValue(v, "value");
             r.description = Core::Json::GetStringValue(v, "description");
             r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "description"));
-            r.keyId = Core::Json::GetStringValue(v, "keyId");
+            r.kmsKeyArn = Core::Json::GetStringValue(v, "kmsKeyArn");
             r.arn = Core::Json::GetStringValue(v, "arn");
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
@@ -150,6 +150,8 @@ namespace AwsMock::Dto::SSM {
                     {"name", obj.name},
                     {"value", obj.parameterValue},
                     {"type", ParameterTypeToString(obj.type)},
+                    {"description", obj.description},
+                    {"kmsKeyArn", obj.kmsKeyArn},
                     {"arn", obj.arn},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},

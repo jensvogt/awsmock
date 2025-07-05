@@ -24,6 +24,7 @@ namespace AwsMock::Database::Entity::SSM {
         Core::Bson::BsonUtils::SetStringValue(parameterDocument, "tier", tier);
         Core::Bson::BsonUtils::SetIntValue(parameterDocument, "version", version);
         Core::Bson::BsonUtils::SetStringValue(parameterDocument, "arn", arn);
+        Core::Bson::BsonUtils::SetStringValue(parameterDocument, "kmsKeyArn", kmsKeyArn);
         Core::Bson::BsonUtils::SetDocumentValue(parameterDocument, "tags", tagsDoc);
         Core::Bson::BsonUtils::SetDateValue(parameterDocument, "created", created);
         Core::Bson::BsonUtils::SetDateValue(parameterDocument, "modified", modified);
@@ -41,6 +42,7 @@ namespace AwsMock::Database::Entity::SSM {
         tier = Core::Bson::BsonUtils::GetStringValue(mResult, "tier");
         version = Core::Bson::BsonUtils::GetIntValue(mResult, "version");
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
+        kmsKeyArn = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsKeyArn");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

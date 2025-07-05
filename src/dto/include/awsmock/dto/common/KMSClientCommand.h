@@ -36,6 +36,7 @@ namespace AwsMock::Dto::Common {
         DECRYPT,
         DELETE_KEY,
         LIST_KEY_COUNTERS,
+        LIST_KEY_ARNS,
         UNKNOWN
     };
 
@@ -48,6 +49,7 @@ namespace AwsMock::Dto::Common {
             {KMSCommandType::DECRYPT, "decrypt"},
             {KMSCommandType::LIST_KEYS, "list-keys"},
             {KMSCommandType::LIST_KEY_COUNTERS, "list-key-counters"},
+            {KMSCommandType::LIST_KEY_ARNS, "list-key-arns"},
     };
 
     [[maybe_unused]] static std::string KMSCommandTypeToString(const KMSCommandType &commandType) {

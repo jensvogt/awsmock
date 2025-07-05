@@ -2,9 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/mapper/Mapper.h"
-
-
 #include <awsmock/service/ssm/SSMService.h>
 
 namespace AwsMock::Service {
@@ -56,6 +53,59 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SSM::ListParameterCountersResponse SSMService::CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const {
+        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "create_parameter");
+        Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "create_parameter");
+        log_trace << "Create parameter request: " << request.ToString();
+
+        if (_ssmDatabase.ParameterExists(request.name)) {
+            log_error << "Parameter exists already, name: " << request.name;
+            throw Core::ServiceException("Parameter exists already, name: " + request.name);
+        }
+
+        try {
+            // Update database
+            const std::string arn = Core::AwsUtils::CreateSSMParameterArn(request.region, _accountId, request.name);
+            Database::Entity::SSM::Parameter parameterEntity = {
+                    .region = request.region,
+                    .parameterName = request.name,
+                    .parameterValue = request.value,
+                    .description = request.description,
+                    .type = Dto::SSM::ParameterTypeToString(request.type),
+                    .version = 1,
+                    .arn = arn,
+                    .kmsKeyArn = request.kmsKeyArn,
+                    //.tags = request.tags,
+                    .created = system_clock::now(),
+                    .modified = system_clock::now(),
+            };
+
+            // Encrypt if KMS key provided
+            if (!request.kmsKeyArn.empty()) {
+                Dto::KMS::EncryptRequest encryptRequest;
+                encryptRequest.keyId = request.kmsKeyArn.substr(request.kmsKeyArn.find_last_of('/') + 1);
+                encryptRequest.plaintext = Core::Crypto::Base64Encode(request.value);
+                Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
+                parameterEntity.parameterValue = kmsResponse.ciphertext;
+            }
+
+            // Store in the database
+            parameterEntity = _ssmDatabase.CreateParameter(parameterEntity);
+            log_trace << "SSM parameter created: " << parameterEntity.ToString();
+
+            Dto::SSM::ListParameterCountersRequest listRequest;
+            listRequest.prefix = request.prefix;
+            listRequest.pageSize = request.pageSize;
+            listRequest.pageIndex = request.pageIndex;
+            listRequest.sortColumns = request.sortColumns;
+            return ListParameterCounters(listRequest);
+
+        } catch (Core::DatabaseException &exc) {
+            log_error << "SSM put parameter failed, message: " << exc.message();
+            throw Core::ServiceException(exc.message());
+        }
+    }
+
     Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
@@ -91,9 +141,17 @@ namespace AwsMock::Service {
 
         try {
             // Get from the database
-            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
             log_trace << "SSM parameter found: " << parameterEntity.ToString();
 
+            // Encrypt if KMS key provided
+            if (!parameterEntity.kmsKeyArn.empty()) {
+                Dto::KMS::DecryptRequest decryptRequest;
+                decryptRequest.keyId = parameterEntity.kmsKeyArn.substr(parameterEntity.kmsKeyArn.find_last_of('/') + 1);
+                decryptRequest.ciphertext = parameterEntity.parameterValue;
+                const Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
+                parameterEntity.parameterValue = kmsResponse.plaintext;
+            }
             return Dto::SSM::Mapper::map(request, parameterEntity);
 
         } catch (Core::DatabaseException &exc) {
@@ -185,10 +243,13 @@ namespace AwsMock::Service {
             // Get the list from the database
             const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             log_trace << "SSM parameters found: " << parameterEntities.size();
-            Dto::SSM::ListParameterCountersResponse response;
-            response.total = static_cast<long>(parameterEntities.size());
-            response.parameterCounters = Dto::SSM::Mapper::map(parameterEntities);
-            return response;
+
+            Dto::SSM::ListParameterCountersRequest listRequest;
+            listRequest.prefix = request.prefix;
+            listRequest.pageSize = request.pageSize;
+            listRequest.pageIndex = request.pageIndex;
+            listRequest.sortColumns = request.sortColumns;
+            return ListParameterCounters(listRequest);
 
         } catch (Core::DatabaseException &exc) {
             log_error << "SSM delete parameter failed, message: " << exc.message();
