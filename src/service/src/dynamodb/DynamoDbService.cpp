@@ -2,6 +2,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/dto/common/mapper/Mapper.h"
+
+
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace AwsMock::Service {
@@ -109,7 +112,7 @@ namespace AwsMock::Service {
 
             Dto::DynamoDb::ListTableCountersResponse tableResponse;
             tableResponse.total = _dynamoDbDatabase.CountTables(request.region, request.prefix);
-            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region); const auto &table: tables) {
+            for (std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns)); const auto &table: tables) {
                 Dto::DynamoDb::TableCounter tableCounter;
                 tableCounter.tableName = table.name;
                 tableCounter.items = table.itemCount;
