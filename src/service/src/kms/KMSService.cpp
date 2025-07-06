@@ -74,6 +74,28 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::KMS::ListKeyArnsResponse KMSService::ListKeyArns() const {
+        Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "list_key_arns");
+        Monitoring::MetricService::instance().IncrementCounter(KMS_SERVICE_TIMER, "action", "list_key_arns");
+        log_trace << "List key ARNs request";
+
+        try {
+            Dto::KMS::ListKeyArnsResponse listKeyArnsResponse;
+            const Database::Entity::KMS::KeyList keyList = _kmsDatabase.ListKeys();
+
+            for (const auto &k: keyList) {
+                listKeyArnsResponse.keyArns.emplace_back(k.arn);
+            }
+            log_debug << "List all key counters, size: " << keyList.size();
+
+            return listKeyArnsResponse;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     Dto::KMS::CreateKeyResponse KMSService::CreateKey(const Dto::KMS::CreateKeyRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "create_key");
         Monitoring::MetricService::instance().IncrementCounter(KMS_SERVICE_TIMER, "action", "create_key");

@@ -182,7 +182,7 @@ namespace AwsMock::Database {
                     opts.sort(sort.extract());
                 }
 
-                for (auto tableCursor = _tableCollection.find(query.extract()); auto table: tableCursor) {
+                for (auto tableCursor = _tableCollection.find(query.extract(), opts); auto table: tableCursor) {
                     Entity::DynamoDb::Table result;
                     result.FromDocument(table);
                     tables.push_back(result);

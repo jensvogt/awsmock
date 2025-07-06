@@ -37,9 +37,9 @@ namespace AwsMock::Dto::Common {
         }
 
         /**
-         * @brief Maps a single sort coumn DTo to an sort column entity
+         * @brief Maps a single sort coumn DTo to a sort column entity
          *
-         * @param sortColumnDtos sort column DTO list
+         * @param sortColumnDtos sort column DTOs
          * @return sort column entity.
          */
         static std::vector<Database::SortColumn> map(const std::vector<SortColumn> &sortColumnDtos) {

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.5](https://github.com/jensvogt/awsmock/compare/v1.5.4...v1.5.5) (2025-07-05)
+
+
+### Bug Fixes
+
+* **development:** add SSM parameter store add parameter dialog ([03b1110](https://github.com/jensvogt/awsmock/commit/03b111060cf8c468f620b7b0f36d5082508a9791))
+* **development:** fix dynamodb table paging ([71ed1a3](https://github.com/jensvogt/awsmock/commit/71ed1a36836282ecee4f57fba05063ebd3138f15))
+
 ## [1.5.4](https://github.com/jensvogt/awsmock/compare/v1.5.3...v1.5.4) (2025-06-30)
 
 

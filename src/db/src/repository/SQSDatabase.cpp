@@ -28,7 +28,7 @@ namespace AwsMock::Database {
             counter.size = GetQueueSize(queue.queueArn);
             _sqsCounterMap->insert_or_assign(queue.queueArn, counter);
         }
-        log_debug << "SQS queues counters initialized" << _sqsCounterMap->size();
+        log_debug << "SQS queues counters initialized: size: " << _sqsCounterMap->size();
     }
 
     bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) const {
@@ -1405,15 +1405,15 @@ namespace AwsMock::Database {
 
             try {
 
-                session.start_transaction();
                 if (const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle))); !findResult->empty()) {
                     message.FromDocument(findResult->view());
+                    session.start_transaction();
+                    const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
+                    deleted = result->deleted_count();
+                    session.commit_transaction();
                 }
-                const auto result = messageCollection.delete_one(make_document(kvp("receiptHandle", receiptHandle)));
-                session.commit_transaction();
 
-                log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << result->deleted_count();
-                deleted = result->deleted_count();
+                log_debug << "Messages deleted, receiptHandle: " << receiptHandle << ", count: " << deleted;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
@@ -1427,13 +1427,13 @@ namespace AwsMock::Database {
         // Update the counter-map
         if (deleted > 0) {
             (*_sqsCounterMap)[message.queueArn].size -= message.size;
-            (*_sqsCounterMap)[message.queueArn].messages--;
+            (*_sqsCounterMap)[message.queueArn].messages -= deleted;
             if (message.status == Entity::SQS::MessageStatus::INITIAL) {
-                (*_sqsCounterMap)[message.queueArn].initial--;
+                (*_sqsCounterMap)[message.queueArn].initial -= deleted;
             } else if (message.status == Entity::SQS::MessageStatus::DELAYED) {
-                (*_sqsCounterMap)[message.queueArn].delayed--;
+                (*_sqsCounterMap)[message.queueArn].delayed -= deleted;
             } else if (message.status == Entity::SQS::MessageStatus::INVISIBLE) {
-                (*_sqsCounterMap)[message.queueArn].invisible--;
+                (*_sqsCounterMap)[message.queueArn].invisible -= deleted;
             }
         }
         return deleted;
@@ -1453,10 +1453,10 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 const auto result = messageCollection.delete_many({});
-                session.commit_transaction();
-                log_debug << "All resources deleted, count: " << result->deleted_count();
-
                 deleted = result->deleted_count();
+                session.commit_transaction();
+                log_debug << "All resources deleted, count: " << deleted;
+
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

@@ -48,6 +48,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, kmsResponse.ToJson());
                 }
 
+                case Dto::Common::KMSCommandType::LIST_KEY_ARNS: {
+
+                    Dto::KMS::ListKeyArnsResponse kmsResponse = _kmsService.ListKeyArns();
+                    log_info << "List key ARNs received, count: " << kmsResponse.keyArns.size();
+
+                    return SendOkResponse(request, kmsResponse.ToJson());
+                }
+
                 case Dto::Common::KMSCommandType::DESCRIBE_KEY: {
 
                     Dto::KMS::DescribeKeyRequest kmsRequest = Dto::KMS::DescribeKeyRequest::FromJson(clientCommand);

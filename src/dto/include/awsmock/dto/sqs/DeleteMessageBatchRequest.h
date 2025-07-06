@@ -25,7 +25,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Entries
          */
-        std::vector<DeleteMessageBatchEntry> deleteMessageBatchEntries;
+        std::vector<DeleteMessageBatchEntry> entries;
 
         /**
          * Resource
@@ -38,8 +38,8 @@ namespace AwsMock::Dto::SQS {
             DeleteMessageBatchRequest r;
             r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
             r.resource = Core::Json::GetStringValue(v, "Resource");
-            if (Core::Json::AttributeExists(v, "DeleteMessageBatchEntries")) {
-                r.deleteMessageBatchEntries = boost::json::value_to<std::vector<DeleteMessageBatchEntry>>(v.at("DeleteMessageBatchEntries"));
+            if (Core::Json::AttributeExists(v, "Entries")) {
+                r.entries = boost::json::value_to<std::vector<DeleteMessageBatchEntry>>(v.at("Entries"));
             }
             return r;
         }
@@ -51,7 +51,7 @@ namespace AwsMock::Dto::SQS {
                     {"RequestId", obj.requestId},
                     {"QueueUrl", obj.queueUrl},
                     {"Resource", obj.resource},
-                    {"DeleteMessageBatchEntries", boost::json::value_from(obj.deleteMessageBatchEntries)},
+                    {"Entries", boost::json::value_from(obj.entries)},
             };
         }
     };

@@ -57,6 +57,22 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, ssmResponse.ToJson());
                 }
 
+                case Dto::Common::SSMCommandType::CREATE_PARAMETER_COUNTER: {
+
+                    Dto::SSM::CreateParameterCounterRequest ssmRequest = Dto::SSM::CreateParameterCounterRequest::FromJson(clientCommand);
+                    Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.CreateParameter(ssmRequest);
+                    log_info << "Parameter created, name: " << ssmRequest.name;
+                    return SendOkResponse(request, ssmResponse.ToJson());
+                }
+
+                case Dto::Common::SSMCommandType::UPDATE_PARAMETER_COUNTER: {
+
+                    Dto::SSM::UpdateParameterCounterRequest ssmRequest = Dto::SSM::UpdateParameterCounterRequest::FromJson(clientCommand);
+                    Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.UpdateParameter(ssmRequest);
+                    log_info << "Parameter updated, name: " << ssmRequest.name;
+                    return SendOkResponse(request, ssmResponse.ToJson());
+                }
+
                 case Dto::Common::SSMCommandType::DELETE_PARAMETER: {
 
                     Dto::SSM::DeleteParameterRequest ssmRequest = Dto::SSM::DeleteParameterRequest::FromJson(clientCommand);
@@ -70,7 +86,7 @@ namespace AwsMock::Service {
                     Dto::SSM::DeleteParameterCounterRequest ssmRequest = Dto::SSM::DeleteParameterCounterRequest::FromJson(clientCommand);
                     Dto::SSM::ListParameterCountersResponse ssmResponse = _ssmService.DeleteParameterCounter(ssmRequest);
                     log_info << "Parameter deleted, name: " << ssmRequest.name;
-                    return SendOkResponse(request);
+                    return SendOkResponse(request, ssmResponse.ToJson());
                 }
 
                 default:

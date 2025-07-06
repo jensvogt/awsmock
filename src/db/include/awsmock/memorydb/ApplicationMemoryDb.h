@@ -1,0 +1,101 @@
+//
+// Created by vogje01 on 29/05/2023.
+//
+
+#ifndef AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H
+#define AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H
+
+// C++ standard includes
+#include <string>
+
+// Boost includes
+#include <boost/thread/mutex.hpp>
+
+// AwsMock includes
+#include <awsmock/core/LogStream.h>
+#include <awsmock/entity/apps/Application.h>
+#include <awsmock/repository/Database.h>
+#include <awsmock/utils/SortColumn.h>
+
+namespace AwsMock::Database {
+
+    /**
+     * @brief Application in-memory database.
+     *
+     * @par
+     * Provides an in-memory database using a simple hash map. The key is a randomly generated UUID.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    class ApplicationMemoryDb {
+
+      public:
+
+        /**
+         * @brief Constructor
+         */
+        ApplicationMemoryDb() = default;
+
+        /**
+         * @brief Singleton instance
+         */
+        static ApplicationMemoryDb &instance() {
+            static ApplicationMemoryDb applicationMemoryDb;
+            return applicationMemoryDb;
+        }
+
+        /**
+         * @brief Check the existence of an application
+         *
+         * @param region AWS region name
+         * @param name application name
+         * @return true, if the application exists
+         * @throws DatabaseException
+         */
+        bool ApplicationExists(const std::string &region, const std::string &name);
+
+        /**
+         * @brief Returns an application entity by primary key
+         *
+         * @param oid application primary key
+         * @return application entity
+         * @throws DatabaseException
+         */
+        Entity::Apps::Application GetApplicationByOid(const std::string &oid);
+
+        /**
+         * @brief Create a new application
+         *
+         * @param application application entity to create
+         * @return created cognito user pool entity.
+         */
+        Entity::Apps::Application CreateApplication(const Entity::Apps::Application &application);
+
+        /**
+         * @brief Returns a list of cognito user pools.
+         *
+         * @param region AWS region name
+         * @param prefix name prtefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns vector of sort columns and direction
+         * @return list of cognito user pools
+         */
+        std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {});
+
+      private:
+
+        /**
+         * Application map
+         */
+        std::map<std::string, Entity::Apps::Application> _applications{};
+
+        /**
+         * Application mutex
+         */
+        static boost::mutex _applicationMutex;
+    };
+
+}// namespace AwsMock::Database
+
+#endif// AWSMOCK_REPOSITORY_APPLICATION_MEMORYDB_H

@@ -13,6 +13,7 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/ssm/DeleteParameterRequest.h>
 #include <awsmock/dto/ssm/DescribeParametersRequest.h>
 #include <awsmock/dto/ssm/DescribeParametersResponse.h>
@@ -20,13 +21,16 @@
 #include <awsmock/dto/ssm/GetParameterResponse.h>
 #include <awsmock/dto/ssm/PutParameterRequest.h>
 #include <awsmock/dto/ssm/PutParameterResponse.h>
+#include <awsmock/dto/ssm/internal/CreateParameterCounterRequest.h>
 #include <awsmock/dto/ssm/internal/DeleteParameterCounterRequest.h>
 #include <awsmock/dto/ssm/internal/GetParameterCounterRequest.h>
 #include <awsmock/dto/ssm/internal/GetParameterCounterResponse.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersRequest.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersResponse.h>
+#include <awsmock/dto/ssm/internal/UpdateParameterCounterRequest.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/SSMDatabase.h>
+#include <awsmock/service/kms/KMSService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
@@ -59,7 +63,7 @@ namespace AwsMock::Service {
          * @see Dto::SSM::PutParameterRequest
          * @see Dto::SSM::PutParameterResponse
          */
-        Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
+        [[nodiscard]] Dto::SSM::PutParameterResponse PutParameter(const Dto::SSM::PutParameterRequest &request) const;
 
         /**
          * @brief Returns a parameter
@@ -69,7 +73,7 @@ namespace AwsMock::Service {
          * @see Dto::SSM::GetParameterRequest
          * @see Dto::SSM::GetParameterResponse
          */
-        Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
+        [[nodiscard]] Dto::SSM::GetParameterResponse GetParameter(const Dto::SSM::GetParameterRequest &request) const;
 
         /**
          * @brief Returns a parameter counter
@@ -79,7 +83,7 @@ namespace AwsMock::Service {
          * @see Dto::SSM::GetParameterRequest
          * @see Dto::SSM::GetParameterResponse
          */
-        Dto::SSM::GetParameterCounterResponse GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const;
+        [[nodiscard]] Dto::SSM::GetParameterCounterResponse GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const;
 
         /**
          * @brief Describe the parameters
@@ -89,7 +93,7 @@ namespace AwsMock::Service {
          * @see Dto::SSM::DescribeParametersRequest
          * @see Dto::SSM::DescribeParametersResponse
          */
-        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
+        [[nodiscard]] Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
 
         /**
          * @brief List all parameter counters
@@ -99,7 +103,27 @@ namespace AwsMock::Service {
          * @see Dto::SSM::ListParameterCountersRequest
          * @see Dto::SSM::ListParameterCountersResponse
          */
-        Dto::SSM::ListParameterCountersResponse ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const;
+        [[nodiscard]] Dto::SSM::ListParameterCountersResponse ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const;
+
+        /**
+         * @brief Create a new parameter
+         *
+         * @param request create parameter request
+         * @return list parameter counters response
+         * @see Dto::SSM::CreateParameterCounterRequest
+         * @see Dto::SSM::ListParameterCountersResponse
+         */
+        [[nodiscard]] Dto::SSM::ListParameterCountersResponse CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const;
+
+        /**
+         * @brief Update a parameter
+         *
+         * @param request update parameter request
+         * @return list parameter counters response
+         * @see Dto::SSM::CreateParameterCounterRequest
+         * @see Dto::SSM::ListParameterCountersResponse
+         */
+        [[nodiscard]] Dto::SSM::ListParameterCountersResponse UpdateParameter(const Dto::SSM::UpdateParameterCounterRequest &request) const;
 
         /**
          * @brief Deletes a parameter
@@ -128,6 +152,11 @@ namespace AwsMock::Service {
          * Database connection
          */
         Database::SSMDatabase &_ssmDatabase;
+
+        /**
+         * KMS service
+         */
+        KMSService _kmsService;
     };
 
 }// namespace AwsMock::Service
