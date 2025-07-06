@@ -27,6 +27,7 @@
 #include <awsmock/dto/ssm/internal/GetParameterCounterResponse.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersRequest.h>
 #include <awsmock/dto/ssm/internal/ListParameterCountersResponse.h>
+#include <awsmock/dto/ssm/internal/UpdateParameterCounterRequest.h>
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/kms/KMSService.h>
@@ -92,7 +93,7 @@ namespace AwsMock::Service {
          * @see Dto::SSM::DescribeParametersRequest
          * @see Dto::SSM::DescribeParametersResponse
          */
-        Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
+        [[nodiscard]] Dto::SSM::DescribeParametersResponse DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const;
 
         /**
          * @brief List all parameter counters
@@ -107,12 +108,22 @@ namespace AwsMock::Service {
         /**
          * @brief Create a new parameter
          *
-         * @param request delete parameter request
+         * @param request create parameter request
          * @return list parameter counters response
          * @see Dto::SSM::CreateParameterCounterRequest
          * @see Dto::SSM::ListParameterCountersResponse
          */
-        Dto::SSM::ListParameterCountersResponse CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const;
+        [[nodiscard]] Dto::SSM::ListParameterCountersResponse CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const;
+
+        /**
+         * @brief Update a parameter
+         *
+         * @param request update parameter request
+         * @return list parameter counters response
+         * @see Dto::SSM::CreateParameterCounterRequest
+         * @see Dto::SSM::ListParameterCountersResponse
+         */
+        [[nodiscard]] Dto::SSM::ListParameterCountersResponse UpdateParameter(const Dto::SSM::UpdateParameterCounterRequest &request) const;
 
         /**
          * @brief Deletes a parameter
