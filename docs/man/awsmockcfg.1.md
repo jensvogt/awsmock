@@ -167,6 +167,16 @@ awsmock.modules.ssm.monitoring.period             AWSMOCK_MODULES_SSM_PERIOD    
 awsmock.modules.ssm.remove.period                 AWSMOCK_MODULES_SSM_REMOVE_PERIOD                 parameter removal period in seconds, default: 300 
 ```
 
+### Application module variables
+
+```
+awsmock.modules.application.active                AWSMOCK_MODULES_APPLICATION_ACTIVE               module activation, default: true
+awsmock.modules.application.backup.active         AWSMOCK_MODULES_APPLICATION_BACKUP_ACTIVE        backup activation flag, default: true
+awsmock.modules.application.backup.cron           AWSMOCK_MODULES_APPLICATION_BACKUP_CRON          backup cron expression, default: 0 0 0 * * ?
+awsmock.modules.application.monitoring.period     AWSMOCK_MODULES_APPLICATION_PERIOD               monitoring polling period in seconds, default: 300
+awsmock.modules.application.remove.period         AWSMOCK_MODULES_APPLICATION_REMOVE_PERIOD        parameter removal period in seconds, default: 300 
+```
+
 ### Secrets Manager module variables
 
 ```

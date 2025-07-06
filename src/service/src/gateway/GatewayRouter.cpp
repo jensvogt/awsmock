@@ -22,7 +22,8 @@ namespace AwsMock::Service {
                 {"ssm", std::make_shared<SSMHandler>()},
                 {"dynamodb", std::make_shared<DynamoDbHandler>()},
                 {"monitoring", std::make_shared<MonitoringHandler>()},
-                {"module", std::make_shared<ModuleHandler>()}};
+                {"module", std::make_shared<ModuleHandler>()},
+                {"application", std::make_shared<ApplicationHandler>()}};
     }
 
     std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey) {
