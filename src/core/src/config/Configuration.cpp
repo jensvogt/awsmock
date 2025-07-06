@@ -194,6 +194,13 @@ namespace AwsMock::Core {
         DefineProperty<int>("awsmock.modules.ssm.monitoring.period", "AWSMOCK_SERVICE_SSM_MONITORING_PERIOD", 300);
         DefineProperty<int>("awsmock.modules.ssm.remove.period", "AWSMOCK_WORKER_SSM_REMOVE_PERIOD", 300);
 
+        // Application
+        DefineProperty<bool>("awsmock.modules.application.active", "AWSMOCK_MODULES_APPLICATION_ACTIVE", true);
+        DefineProperty<bool>("awsmock.modules.application.backup.active", "AWSMOCK_MODULES_APPLICATION_BACKUP_ACTIVE", true);
+        DefineProperty<std::string>("awsmock.modules.application.backup.cron", "AWSMOCK_MODULES_APPLICATION_BACKUP_CRON", "0 0 0 * * ?");
+        DefineProperty<int>("awsmock.modules.application.backup.count", "AWSMOCK_MODULES_APPLICATION_BACKUP_COUNT", 5);
+        DefineProperty<int>("awsmock.modules.application.monitoring-period", "AWSMOCK_SERVICE_APPLICATION_MONITORING_PERIOD", 300);
+
         // Docker
         DefineProperty<bool>("awsmock.docker.active", "AWSMOCK_DOCKER_ACTIVE", true);
         DefineProperty<std::string>("awsmock.docker.network-mode", "AWSMOCK_DOCKER_NETWORK_MODE", "local");

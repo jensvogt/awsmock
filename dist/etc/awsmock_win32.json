@@ -223,6 +223,15 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
+        "monitoring-period": 300
+      },
+      "application": {
+        "active": true,
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
         "monitoring": {
           "period": 300
         },
