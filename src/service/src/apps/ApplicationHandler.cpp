@@ -34,6 +34,7 @@ namespace AwsMock::Service {
                     log_error << "Unknown action";
                     return SendBadRequestError(request, "Unknown action");
             }
+
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
