@@ -2,10 +2,6 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include "awsmock/core/exception/DatabaseException.h"
-#include "awsmock/entity/cognito/Group.h"
-
-
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 
 namespace AwsMock::Database {
@@ -28,11 +24,25 @@ namespace AwsMock::Database {
                                              });
 
         if (it == _applications.end()) {
-            log_error << "Get cognito user pool by oid failed, oid: " << oid;
-            throw Core::DatabaseException("Get cognito user pool by oid failed, oid: " + oid);
+            log_error << "Get application by oid failed, oid: " << oid;
+            throw Core::DatabaseException("Get application by oid failed, oid: " + oid);
         }
 
         it->second.oid = oid;
+        return it->second;
+    }
+
+    Entity::Apps::Application ApplicationMemoryDb::GetApplication(const std::string &region, const std::string &name) const {
+
+        const auto it = std::ranges::find_if(_applications,
+                                             [region, name](const std::pair<std::string, Entity::Apps::Application> &application) {
+                                                 return application.second.region == region && application.second.name == name;
+                                             });
+
+        if (it == _applications.end()) {
+            log_error << "Get application by name failed, region: " << region << ", name: " << name;
+            throw Core::DatabaseException("Get application by name failed, region: " + region + ", name: " + name);
+        }
         return it->second;
     }
 

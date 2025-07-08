@@ -62,6 +62,21 @@ namespace AwsMock::Dto::Apps {
         bool enabled = false;
 
         /**
+         * Environment
+         */
+        std::map<std::string, std::string> environment;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
+         * Options
+         */
+        std::map<std::string, std::string> options;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -70,7 +85,6 @@ namespace AwsMock::Dto::Apps {
          * Last modification date
          */
         system_clock::time_point modified = system_clock::now();
-
 
       private:
 
@@ -83,6 +97,17 @@ namespace AwsMock::Dto::Apps {
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            if (Core::Json::AttributeExists(v, "environment")) {
+                r.environment = boost::json::value_to<std::map<std::string, std::string>>(v, "environment");
+            }
+            if (Core::Json::AttributeExists(v, "tags")) {
+                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v, "tags");
+            }
+            if (Core::Json::AttributeExists(v, "options")) {
+                r.options = boost::json::value_to<std::map<std::string, std::string>>(v, "options");
+            }
             return r;
         }
 
@@ -98,6 +123,11 @@ namespace AwsMock::Dto::Apps {
                     {"containerId", obj.containerId},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"environment", boost::json::value_from(obj.environment)},
+                    {"tags", boost::json::value_from(obj.tags)},
+                    {"options", boost::json::value_from(obj.options)},
             };
         }
     };

@@ -50,6 +50,11 @@ namespace AwsMock::Service {
         static void BackupApplication();
 
         /**
+         * @brief Create a test application
+         */
+        void CreateTestApplication() const;
+
+        /**
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();

@@ -24,7 +24,7 @@ namespace AwsMock::Core {
         const auto backupDir = Configuration::instance().GetValue<std::string>("awsmock.backup-dir");
         std::vector<std::string> fileList = DirUtils::ListFilesByPrefix(backupDir, module + "-");
         std::ranges::sort(fileList);
-        if (retention > fileList.size()) {
+        if (fileList.size() > retention) {
             return {fileList.begin(), fileList.end() - retention};
         }
         return {};

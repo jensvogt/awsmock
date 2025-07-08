@@ -1,4 +1,5 @@
 
+
 #include <awsmock/service/apps/ApplicationHandler.h>
 
 namespace AwsMock::Service {
@@ -14,11 +15,20 @@ namespace AwsMock::Service {
         try {
 
             switch (clientCommand.command) {
+
                 case Dto::Common::ApplicationCommandType::CREATE_APPLICATION: {
 
                     Dto::Apps::CreateApplicationRequest serviceRequest = Dto::Apps::CreateApplicationRequest::FromJson(clientCommand);
-                    Dto::Apps::CreateApplicationResponse serviceResponse = _applicationService.CreateApplication(serviceRequest);
-                    log_info << "Application created, name: " << serviceResponse.application.name;
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.CreateApplication(serviceRequest);
+                    log_info << "Application created, name: " << serviceRequest.application.name;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApplicationCommandType::GET_APPLICATION: {
+
+                    Dto::Apps::GetApplicationRequest serviceRequest = Dto::Apps::GetApplicationRequest::FromJson(clientCommand);
+                    Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.GetApplication(serviceRequest);
+                    log_info << "Application retrieved, name: " << serviceRequest.name;
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
@@ -27,6 +37,14 @@ namespace AwsMock::Service {
                     Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.ListApplications(serviceRequest);
                     log_info << "Applications listed, region: " << serviceRequest.region;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApplicationCommandType::DELETE_APPLICATION: {
+
+                    Dto::Apps::DeleteApplicationRequest serviceRequest = Dto::Apps::DeleteApplicationRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.DeleteApplication(serviceRequest);
+                    log_info << "Application deleted, name: " << serviceRequest.name;
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
