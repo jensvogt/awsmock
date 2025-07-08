@@ -72,7 +72,7 @@ namespace AwsMock::Database {
          * @return application entity
          * @throws DatabaseException
          */
-        Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
+        [[nodiscard]] Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Create a new application
@@ -81,6 +81,14 @@ namespace AwsMock::Database {
          * @return created cognito user pool entity.
          */
         Entity::Apps::Application CreateApplication(const Entity::Apps::Application &application);
+
+        /**
+         * @brief Update an application
+         *
+         * @param application application entity to update
+         * @return updated application entity.
+         */
+        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application);
 
         /**
          * @brief Returns a list of cognito user pools.
@@ -93,6 +101,25 @@ namespace AwsMock::Database {
          * @return list of cognito user pools
          */
         std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {});
+
+        /**
+         * @brief Deletes an application
+         *
+         * @param region AWS region name
+         * @param name application name
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteApplication(const std::string &region, const std::string &name);
+
+
+        /**
+         * @brief Deletes all application
+         *
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteAllApplications();
 
       private:
 

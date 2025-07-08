@@ -43,6 +43,10 @@ namespace AwsMock::Dto::Module {
 
         // SSM
         Core::Bson::ToBsonArray(document, "ssm-parameters", ssmParameters);
+
+        // Applications
+        Core::Bson::ToBsonArray(document, "applications", applications);
+
         return document;
     }
 
@@ -89,6 +93,9 @@ namespace AwsMock::Dto::Module {
 
         // SSM
         Core::Bson::FromBsonArray(document, "ssm-parameters", &ssmParameters);
+
+        // Application
+        Core::Bson::FromBsonArray(document, "applications", &applications);
     }
 
 }// namespace AwsMock::Dto::Module

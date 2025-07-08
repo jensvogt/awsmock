@@ -61,6 +61,22 @@ namespace AwsMock::Database {
         Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const;
 
         /**
+         * @brief Update an application
+         *
+         * @param application application entity to update
+         * @return updated application entity.
+         */
+        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const;
+
+        /**
+         * @brief Import an application
+         *
+         * @param application application entity to import
+         * @return imported application entity.
+         */
+        Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const;
+
+        /**
          * @brief Get an application
          *
          * @param region AWS region
@@ -68,7 +84,7 @@ namespace AwsMock::Database {
          * @return application entity
          * @throws DatabaseException
          */
-        Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
+        [[nodiscard]] Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Returns a list of applications
@@ -91,6 +107,15 @@ namespace AwsMock::Database {
          * @throws DatabaseException
          */
         [[nodiscard]] long DeleteApplication(const std::string &region, const std::string &name) const;
+
+
+        /**
+         * @brief Deletes all application
+         *
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteAllApplications() const;
 
       private:
 

@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
+#include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
@@ -48,11 +49,6 @@ namespace AwsMock::Service {
          * @brief Backup the application objects
          */
         static void BackupApplication();
-
-        /**
-         * @brief Create a test application
-         */
-        void CreateTestApplication() const;
 
         /**
          * @brief Metric service

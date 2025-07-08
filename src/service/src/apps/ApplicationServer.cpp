@@ -2,9 +2,6 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/dto/apps/model/Status.h"
-
-
 #include <awsmock/service/apps/ApplicationServer.h>
 
 namespace AwsMock::Service {
@@ -31,9 +28,6 @@ namespace AwsMock::Service {
         if (_backupActive) {
             scheduler.AddTask("application-backup", [this] { BackupApplication(); }, _backupCron);
         }
-
-        // Create a test app
-        CreateTestApplication();
 
         // Set running
         SetRunning();
@@ -71,17 +65,4 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("application", true);
     }
 
-    void ApplicationServer::CreateTestApplication() const {
-        Database::Entity::Apps::Application application;
-        application.name = "test-application";
-        application.runtime = "Java21";
-        application.region = "eu-central-1";
-        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-        application.enabled = true;
-        application.environment["key"] = "value";
-        application.options["key"] = "value";
-        application.tags["key"] = "value";
-        _applicationDatabase.CreateApplication(application);
-        log_debug << "Test application created";
-    }
 }// namespace AwsMock::Service

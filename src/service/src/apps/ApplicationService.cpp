@@ -61,7 +61,7 @@ namespace AwsMock::Service {
             getRequest.region = request.region;
             getRequest.user = request.user;
             getRequest.application = Dto::Apps::Mapper::map(application);
-            log_trace << "Application retrived, application: " + application.ToJson();
+            log_trace << "Application retrieved, application: " + application.ToJson();
             return getRequest;
 
         } catch (bsoncxx::exception &exc) {
