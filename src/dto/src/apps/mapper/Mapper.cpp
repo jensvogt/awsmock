@@ -18,6 +18,9 @@ namespace AwsMock::Dto::Apps {
         applicationDto.enabled = applicationEntity.enabled;
         applicationDto.created = applicationEntity.created;
         applicationDto.modified = applicationEntity.modified;
+        applicationDto.environment = applicationEntity.environment;
+        applicationDto.tags = applicationEntity.tags;
+        applicationDto.options = applicationEntity.options;
         return applicationDto;
     }
 
@@ -41,6 +44,9 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.enabled = applicationDto.enabled;
         applicationEntity.created = applicationDto.created;
         applicationEntity.modified = applicationDto.modified;
+        applicationEntity.environment = applicationDto.environment;
+        applicationEntity.tags = applicationDto.tags;
+        applicationEntity.options = applicationDto.options;
         return applicationEntity;
     }
 

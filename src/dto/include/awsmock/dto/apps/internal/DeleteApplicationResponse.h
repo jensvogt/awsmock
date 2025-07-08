@@ -2,10 +2,11 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_CREATE_APPLICATION_RESPONSE_H
-#define AWSMOCK_DTO_APPS_CREATE_APPLICATION_RESPONSE_H
+#ifndef AWSMOCK_DTO_APPS_UPDATE_APPLICATION_RESPONSE_H
+#define AWSMOCK_DTO_APPS_UPDATE_APPLICATION_RESPONSE_H
 
 // AwsMock includes
+#include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Apps {
@@ -21,16 +22,31 @@ namespace AwsMock::Dto::Apps {
      *      "runtime": "string",
      *      "archive": "string",
      *      "enabled": boolean,
+     *      "environment": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *      }],
+     *      "tags": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *      }],
+     *      "options": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
      *   }
      * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateApplicationResponse final : Common::BaseCounter<CreateApplicationResponse> {
+    struct DeleteApplicationResponse final : Common::BaseCounter<DeleteApplicationResponse> {
 
         /**
-         * Applications
+         * Application entities
          */
         std::vector<Application> applications;
 
@@ -41,8 +57,8 @@ namespace AwsMock::Dto::Apps {
 
       private:
 
-        friend CreateApplicationResponse tag_invoke(boost::json::value_to_tag<CreateApplicationResponse>, boost::json::value const &v) {
-            CreateApplicationResponse r;
+        friend ListApplicationCountersResponse tag_invoke(boost::json::value_to_tag<ListApplicationCountersResponse>, boost::json::value const &v) {
+            ListApplicationCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
             if (Core::Json::AttributeExists(v, "applications")) {
                 r.applications = boost::json::value_to<std::vector<Application>>(v.at("applications"));
@@ -50,7 +66,7 @@ namespace AwsMock::Dto::Apps {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateApplicationResponse const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListApplicationCountersResponse const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},

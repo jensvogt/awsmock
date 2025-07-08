@@ -68,6 +68,21 @@ namespace AwsMock::Database::Entity::Apps {
         bool enabled;
 
         /**
+         * Environment
+         */
+        std::map<std::string, std::string> environment;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
+         * Options
+         */
+        std::map<std::string, std::string> options;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();

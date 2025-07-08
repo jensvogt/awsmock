@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_APPS_DELETE_APPLICATION_REQUEST_H
+#define AWSMOCK_DTO_APPS_DELETE_APPLICATION_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -16,11 +16,47 @@
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief List application counters request
+     * @brief Delete an application
+     *
+     * @par
+     * Request to create a new application.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "application":
+     *   {
+     *     "name": "string",
+     *     "runtime": "string",
+     *     "archive": number,
+     *     "enabled": "string",
+     *     "environment": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
+     *     "tags": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
+     *     "options": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
+     *   }
+     * }
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListApplicationCountersRequest final : Common::BaseCounter<ListApplicationCountersRequest> {
+    struct DeleteApplicationRequest final : Common::BaseCounter<DeleteApplicationRequest> {
+
+        /**
+         * Application name
+         */
+        std::string name;
 
         /**
          * Application name prefix
@@ -44,8 +80,9 @@ namespace AwsMock::Dto::Apps {
 
       private:
 
-        friend ListApplicationCountersRequest tag_invoke(boost::json::value_to_tag<ListApplicationCountersRequest>, boost::json::value const &v) {
-            ListApplicationCountersRequest r;
+        friend DeleteApplicationRequest tag_invoke(boost::json::value_to_tag<DeleteApplicationRequest>, boost::json::value const &v) {
+            DeleteApplicationRequest r;
+            r.name = Core::Json::GetStringValue(v, "name");
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
@@ -55,11 +92,12 @@ namespace AwsMock::Dto::Apps {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListApplicationCountersRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteApplicationRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
+                    {"name", obj.name},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},
@@ -70,4 +108,4 @@ namespace AwsMock::Dto::Apps {
 
 }// namespace AwsMock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_LIST_APPLICATION_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_APPS_DELETE_APPLICATION_REQUEST_H

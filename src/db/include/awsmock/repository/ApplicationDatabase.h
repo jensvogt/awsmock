@@ -46,7 +46,7 @@ namespace AwsMock::Database {
          * @brief Check existence of application
          *
          * @param region AWS region name
-         * @param name AWS application name
+         * @param name application name
          * @return true if, application exists
          * @throws DatabaseException
          */
@@ -61,16 +61,61 @@ namespace AwsMock::Database {
         Entity::Apps::Application CreateApplication(Entity::Apps::Application &application) const;
 
         /**
-         * @brief Returns a list of cognito user pools.
+         * @brief Update an application
+         *
+         * @param application application entity to update
+         * @return updated application entity.
+         */
+        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application) const;
+
+        /**
+         * @brief Import an application
+         *
+         * @param application application entity to import
+         * @return imported application entity.
+         */
+        Entity::Apps::Application ImportApplication(Entity::Apps::Application &application) const;
+
+        /**
+         * @brief Get an application
+         *
+         * @param region AWS region
+         * @param name application name
+         * @return application entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]] Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
+
+        /**
+         * @brief Returns a list of applications
          *
          * @param region AWS region name
          * @param prefix name prtefix
          * @param pageSize page size
          * @param pageIndex page index
          * @param sortColumns vector of sort columns and direction
-         * @return list of cognito user pools
+         * @return list of applications
          */
         std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
+
+        /**
+         * @brief Deletes an application
+         *
+         * @param region AWS region name
+         * @param name application name
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteApplication(const std::string &region, const std::string &name) const;
+
+
+        /**
+         * @brief Deletes all application
+         *
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteAllApplications() const;
 
       private:
 

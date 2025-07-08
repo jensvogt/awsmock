@@ -13,8 +13,12 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/apps/internal/CreateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/CreateApplicationResponse.h>
+#include <awsmock/dto/apps/internal/DeleteApplicationRequest.h>
+#include <awsmock/dto/apps/internal/GetApplicationRequest.h>
+#include <awsmock/dto/apps/internal/GetApplicationResponse.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
+#include <awsmock/dto/apps/mapper/Mapper.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
@@ -44,11 +48,21 @@ namespace AwsMock::Service {
          * @brief Create a new application
          *
          * @param request create application request
-         * @return CreateApplicationResponse DTO
+         * @return ListApplicationCountersResponse DTO
          * @see Dto::Apps::CreateApplicationRequest
-         * @see Dto::Apps::CreateApplicationResponse
+         * @see Dto::Apps::ListApplicationCountersResponse
          */
-        Dto::Apps::CreateApplicationResponse CreateApplication(const Dto::Apps::CreateApplicationRequest &request) const;
+        Dto::Apps::ListApplicationCountersResponse CreateApplication(const Dto::Apps::CreateApplicationRequest &request) const;
+
+        /**
+         * @brief Get an application
+         *
+         * @param request get application request
+         * @return GetApplicationResponse DTO
+         * @see Dto::Apps::GetApplicationRequest
+         * @see Dto::Apps::GetApplicationResponse
+         */
+        Dto::Apps::GetApplicationResponse GetApplication(const Dto::Apps::GetApplicationRequest &request) const;
 
         /**
          * @brief List all applications
@@ -59,6 +73,16 @@ namespace AwsMock::Service {
          * @see Dto::Apps::ListApplicationCountersResponse
          */
         Dto::Apps::ListApplicationCountersResponse ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const;
+
+        /**
+         * @brief Deletes an application
+         *
+         * @param request delete application request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::DeleteApplicationRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
       private:
 
