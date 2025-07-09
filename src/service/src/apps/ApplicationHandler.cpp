@@ -32,6 +32,23 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApplicationCommandType::UPDATE_APPLICATION: {
+
+                    Dto::Apps::UpdateApplicationRequest serviceRequest = Dto::Apps::UpdateApplicationRequest::FromJson(clientCommand);
+                    serviceRequest.application.region = region;
+                    Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.UpdateApplication(serviceRequest);
+                    log_info << "Application updated, name: " << serviceRequest.application.name;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApplicationCommandType::UPLOAD_APPLICATION: {
+
+                    Dto::Apps::UploadApplicationCodeRequest serviceRequest = Dto::Apps::UploadApplicationCodeRequest::FromJson(clientCommand);
+                    _applicationService.UploadApplicationCode(serviceRequest);
+                    log_info << "Upload application code, name: " << serviceRequest.applicationName;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::ApplicationCommandType::LIST_APPLICATIONS: {
 
                     Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
@@ -52,7 +69,6 @@ namespace AwsMock::Service {
                     log_error << "Unknown action";
                     return SendBadRequestError(request, "Unknown action");
             }
-
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());

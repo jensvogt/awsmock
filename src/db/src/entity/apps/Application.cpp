@@ -12,6 +12,7 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("region", region));
         applicationDocument.append(kvp("name", name));
         applicationDocument.append(kvp("runtime", runtime));
+        applicationDocument.append(kvp("type", type));
         applicationDocument.append(kvp("archive", archive));
         applicationDocument.append(kvp("version", version));
         applicationDocument.append(kvp("containerId", containerId));
@@ -56,6 +57,7 @@ namespace AwsMock::Database::Entity::Apps {
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         runtime = Core::Bson::BsonUtils::GetStringValue(mResult, "runtime");
+        type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
         archive = Core::Bson::BsonUtils::GetStringValue(mResult, "archive");
         version = Core::Bson::BsonUtils::GetStringValue(mResult, "version");
         containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
@@ -78,7 +80,7 @@ namespace AwsMock::Database::Entity::Apps {
             for (const view tagsObject = mResult.value()["tags"].get_document().value; const auto &t: tagsObject) {
                 const std::string key = bsoncxx::string::to_string(t.key());
                 const std::string value = bsoncxx::string::to_string(tagsObject[key].get_string().value);
-                environment[key] = value;
+                tags[key] = value;
             }
         }
 
@@ -87,7 +89,7 @@ namespace AwsMock::Database::Entity::Apps {
             for (const view optionsObject = mResult.value()["options"].get_document().value; const auto &o: optionsObject) {
                 const std::string key = bsoncxx::string::to_string(o.key());
                 const std::string value = bsoncxx::string::to_string(optionsObject[key].get_string().value);
-                environment[key] = value;
+                options[key] = value;
             }
         }
     }

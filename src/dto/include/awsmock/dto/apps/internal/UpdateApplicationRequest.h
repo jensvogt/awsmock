@@ -15,10 +15,10 @@
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief Create an application
+     * @brief Update an application
      *
      * @par
-     * Request to create a new application.
+     * Request to update an  application.
      *
      * Example:
      * @code{.json}
@@ -50,7 +50,7 @@ namespace AwsMock::Dto::Apps {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteApplicationRequest final : Common::BaseCounter<DeleteApplicationRequest> {
+    struct UpdateApplicationRequest final : Common::BaseCounter<UpdateApplicationRequest> {
 
         /**
          * UserPoolId
@@ -59,13 +59,13 @@ namespace AwsMock::Dto::Apps {
 
       private:
 
-        friend DeleteApplicationRequest tag_invoke(boost::json::value_to_tag<DeleteApplicationRequest>, boost::json::value const &v) {
-            DeleteApplicationRequest r;
+        friend UpdateApplicationRequest tag_invoke(boost::json::value_to_tag<UpdateApplicationRequest>, boost::json::value const &v) {
+            UpdateApplicationRequest r;
             r.application = boost::json::value_to<Application>(v.at("application"));
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteApplicationRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateApplicationRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},

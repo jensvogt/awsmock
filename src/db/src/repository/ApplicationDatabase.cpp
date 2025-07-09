@@ -154,7 +154,7 @@ namespace AwsMock::Database {
                 const auto mResult = _applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
                 session.commit_transaction();
 
-                if (mResult) {
+                if (mResult.has_value() && !mResult->empty()) {
                     log_trace << "Application updated: " << application.ToString();
                     application.FromDocument(mResult->view());
                     return application;

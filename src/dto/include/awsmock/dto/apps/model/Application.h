@@ -10,6 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include "RunType.h"
+
+
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/apps/model/Runtime.h>
 #include <awsmock/dto/apps/model/Status.h>
@@ -35,6 +38,11 @@ namespace AwsMock::Dto::Apps {
          * Application runtime
          */
         AppsRuntimeType runtime = AppsRuntimeType::UNKNOWN;
+
+        /**
+         * Application run type
+         */
+        AppsRunType runType = AppsRunType::UNKNOWN;
 
         /**
          * Application archive
@@ -92,22 +100,17 @@ namespace AwsMock::Dto::Apps {
             Application r;
             r.name = Core::Json::GetStringValue(v, "name");
             r.runtime = AppsRuntimeTypeFromString(Core::Json::GetStringValue(v, "runtime"));
+            r.runType = AppsRunTypeFromString(Core::Json::GetStringValue(v, "runType"));
             r.archive = Core::Json::GetStringValue(v, "archive");
             r.version = Core::Json::GetStringValue(v, "version");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
+            r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
+            r.options = Core::Json::GetMapFromObject<std::string, std::string>(v, "options");
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
-            if (Core::Json::AttributeExists(v, "environment")) {
-                r.environment = boost::json::value_to<std::map<std::string, std::string>>(v, "environment");
-            }
-            if (Core::Json::AttributeExists(v, "tags")) {
-                r.tags = boost::json::value_to<std::map<std::string, std::string>>(v, "tags");
-            }
-            if (Core::Json::AttributeExists(v, "options")) {
-                r.options = boost::json::value_to<std::map<std::string, std::string>>(v, "options");
-            }
             return r;
         }
 
@@ -118,6 +121,7 @@ namespace AwsMock::Dto::Apps {
                     {"requestId", obj.requestId},
                     {"name", obj.name},
                     {"runtime", AppsRuntimeTypeToString(obj.runtime)},
+                    {"runType", AppsRunTypeToString(obj.runType)},
                     {"archive", obj.archive},
                     {"version", obj.version},
                     {"containerId", obj.containerId},

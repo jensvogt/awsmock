@@ -27,6 +27,8 @@ namespace AwsMock::Dto::Common {
     enum class ApplicationCommandType {
         CREATE_APPLICATION,
         GET_APPLICATION,
+        UPDATE_APPLICATION,
+        UPLOAD_APPLICATION,
         LIST_APPLICATIONS,
         DELETE_APPLICATION,
         UNKNOWN
@@ -35,6 +37,8 @@ namespace AwsMock::Dto::Common {
     static std::map<ApplicationCommandType, std::string> ApplicationCommandTypeNames{
             {ApplicationCommandType::CREATE_APPLICATION, "create-application"},
             {ApplicationCommandType::GET_APPLICATION, "get-application"},
+            {ApplicationCommandType::UPDATE_APPLICATION, "update-application"},
+            {ApplicationCommandType::UPLOAD_APPLICATION, "upload-application"},
             {ApplicationCommandType::LIST_APPLICATIONS, "list-applications"},
             {ApplicationCommandType::DELETE_APPLICATION, "delete-application"},
             {ApplicationCommandType::UNKNOWN, "unknown"},
