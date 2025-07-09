@@ -18,6 +18,8 @@
 #include <awsmock/dto/apps/internal/GetApplicationResponse.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
+#include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
+#include <awsmock/dto/apps/internal/UploadApplicationCodeRequest.h>
 #include <awsmock/dto/apps/mapper/Mapper.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
@@ -65,6 +67,24 @@ namespace AwsMock::Service {
         Dto::Apps::GetApplicationResponse GetApplication(const Dto::Apps::GetApplicationRequest &request) const;
 
         /**
+         * @brief Update an application
+         *
+         * @param request update application request
+         * @return GetApplicationResponse DTO
+         * @see Dto::Apps::UpdateApplicationRequest
+         * @see Dto::Apps::GetApplicationResponse
+         */
+        [[nodiscard]] Dto::Apps::GetApplicationResponse UpdateApplication(const Dto::Apps::UpdateApplicationRequest &request) const;
+
+        /**
+         * @brief Upload application code
+         *
+         * @param request upload application code request
+         * @see Dto::Apps::UploadApplicationCode
+         */
+        void UploadApplicationCode(const Dto::Apps::UploadApplicationCodeRequest &request) const;
+
+        /**
          * @brief List all applications
          *
          * @param request list application request
@@ -72,7 +92,7 @@ namespace AwsMock::Service {
          * @see Dto::Apps::ListApplicationCountersRequest
          * @see Dto::Apps::ListApplicationCountersResponse
          */
-        Dto::Apps::ListApplicationCountersResponse ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const;
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const;
 
         /**
          * @brief Deletes an application
@@ -82,9 +102,18 @@ namespace AwsMock::Service {
          * @see Dto::Apps::DeleteApplicationRequest
          * @see Dto::Apps::ListApplicationCountersResponse
          */
-        Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse DeleteApplication(const Dto::Apps::DeleteApplicationRequest &request) const;
 
       private:
+
+        /**
+         * @brief Saves the Base64 file
+         *
+         * @param applicationCode base64 encoded application code
+         * @param application application entity
+         * @param version application version
+         */
+        static std::string WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version);
 
         /**
          * Database connection

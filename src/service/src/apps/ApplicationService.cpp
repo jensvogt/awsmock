@@ -70,6 +70,68 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::Apps::GetApplicationResponse ApplicationService::UpdateApplication(const Dto::Apps::UpdateApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "update_application");
+        Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "update_application");
+        log_debug << "Get application request, region:  " << request.region << " name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_error << "Application does not exist, region: " << request.region << " name: " << request.application.name;
+            throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.application.name);
+        }
+
+        try {
+            Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
+            application = _database.UpdateApplication(application);
+
+            Dto::Apps::GetApplicationResponse getRequest{};
+            getRequest.requestId = request.requestId;
+            getRequest.region = request.region;
+            getRequest.user = request.user;
+            getRequest.application = Dto::Apps::Mapper::map(application);
+            log_trace << "Application updated, application: " + application.ToJson();
+            return getRequest;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void ApplicationService::UploadApplicationCode(const Dto::Apps::UploadApplicationCodeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "upload_application_code");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "upload_application_code");
+        log_debug << "Upload application code request, name: " << request.applicationName;
+
+        if (!_database.ApplicationExists(request.region, request.applicationName)) {
+            log_warning << "Application does not exist, name: " << request.applicationName;
+            throw Core::ServiceException("Application does not exist, name: " + request.applicationName);
+        }
+
+        if (request.applicationCode.empty()) {
+            log_warning << "Application code is empty, name: " << request.applicationName;
+            throw Core::ServiceException("Lambda function code is empty, name: " + request.applicationName);
+        }
+
+        // Get application
+        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.applicationName);
+
+        // Save the base64 encoded file
+        std::string fullBase64File = WriteBase64File(request.applicationCode, application, request.version);
+
+        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
+        application.version = request.version;
+        application = _database.UpdateApplication(application);
+
+        // Create the lambda function asynchronously
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        //LambdaCreator lambdaCreator;
+        //boost::thread t(boost::ref(lambdaCreator), request.functionCode, lambda.oid, instanceId);
+        //t.detach();
+
+        log_debug << "Application code updated, name: " << request.applicationName;
+    }
+
     Dto::Apps::ListApplicationCountersResponse ApplicationService::ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "list_applications");
         Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "list_applications");
@@ -123,5 +185,39 @@ namespace AwsMock::Service {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
+    }
+
+    std::string ApplicationService::WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version) {
+
+        auto applicationDataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+
+        std::string base64File = application.name + "-" + version + ".b64";
+        std::string base64FullFile = applicationDataDir + Core::FileUtils::separator() + base64File;
+        log_debug << "Using Base64File: " << base64FullFile;
+
+        // If we do not have a local file already or the MD5 sum changed, write the Base64 encoded file to lambda dir
+        if (!Core::FileUtils::FileExists(base64FullFile)) {
+
+            std::ofstream ofs(base64FullFile);
+            ofs << applicationCode;
+            ofs.close();
+            log_debug << "New Base64 application file written: " << base64FullFile;
+
+        } else {
+
+            std::string md5sumFile = Core::Crypto::GetMd5FromFile(base64FullFile);
+            if (std::string md5sumString = Core::Crypto::GetMd5FromString(applicationCode); md5sumFile != md5sumString) {
+
+                std::ofstream ofs(base64FullFile);
+                ofs << applicationCode;
+                ofs.close();
+                log_debug << "Updated Base64 file written: " << base64FullFile;
+
+            } else {
+
+                log_debug << "New and original are equal: " << base64FullFile;
+            }
+        }
+        return base64FullFile;
     }
 }// namespace AwsMock::Service

@@ -11,6 +11,7 @@ namespace AwsMock::Dto::Apps {
         applicationDto.region = applicationEntity.region;
         applicationDto.name = applicationEntity.name;
         applicationDto.runtime = AppsRuntimeTypeFromString(applicationEntity.runtime);
+        applicationDto.runType = AppsRunTypeFromString(applicationEntity.type);
         applicationDto.archive = applicationEntity.archive;
         applicationDto.version = applicationEntity.version;
         applicationDto.containerId = applicationEntity.containerId;
@@ -37,6 +38,7 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.region = applicationDto.region;
         applicationEntity.name = applicationDto.name;
         applicationEntity.runtime = AppsRuntimeTypeToString(applicationDto.runtime);
+        applicationEntity.type = AppsRunTypeToString(applicationDto.runType);
         applicationEntity.archive = applicationDto.archive;
         applicationEntity.version = applicationDto.version;
         applicationEntity.containerId = applicationDto.containerId;

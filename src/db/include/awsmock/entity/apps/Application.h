@@ -43,6 +43,11 @@ namespace AwsMock::Database::Entity::Apps {
         std::string runtime;
 
         /**
+         * Application type
+         */
+        std::string type;
+
+        /**
          * Application archive
          */
         std::string archive;

@@ -232,6 +232,7 @@
       },
       "application": {
         "active": true,
+        "data-dir": "/usr/local/awsmock/data/application",
         "backup": {
           "active": true,
           "cron": "0 0 0 * * ?",
