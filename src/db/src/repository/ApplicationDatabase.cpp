@@ -137,6 +137,34 @@ namespace AwsMock::Database {
         return applications;
     }
 
+    long ApplicationDatabase::CountApplications(const std::string &region, const std::string &prefix) const {
+        if (HasDatabase()) {
+
+            try {
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _topicCollection = (*client)[_databaseName][_applicationCollectionName];
+
+                document query = {};
+
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                const long count = _topicCollection.count_documents(query.extract());
+                log_trace << "Count applications, result: " << count;
+                return count;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        return _memoryDb.CountApplications(region, prefix);
+    }
+
     Entity::Apps::Application ApplicationDatabase::UpdateApplication(Entity::Apps::Application &application) const {
 
         if (HasDatabase()) {

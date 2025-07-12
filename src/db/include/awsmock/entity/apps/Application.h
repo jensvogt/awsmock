@@ -48,6 +48,11 @@ namespace AwsMock::Database::Entity::Apps {
         std::string type;
 
         /**
+         * Private port. This is the internal port used by the application inside the docker image.
+         */
+        long privatePort;
+
+        /**
          * Application archive
          */
         std::string archive;
@@ -86,6 +91,26 @@ namespace AwsMock::Database::Entity::Apps {
          * Options
          */
         std::map<std::string, std::string> options;
+
+        /**
+         * Docker image ID
+         */
+        std::string imageId;
+
+        /**
+         * Docker image size
+         */
+        long imageSize;
+
+        /**
+         * MD5 of docker image
+         */
+        std::string imageMd5;
+
+        /**
+         * Last start time
+         */
+        system_clock::time_point lastStarted;
 
         /**
          * Creation date

@@ -12,11 +12,13 @@ namespace AwsMock::Dto::Apps {
         applicationDto.name = applicationEntity.name;
         applicationDto.runtime = AppsRuntimeTypeFromString(applicationEntity.runtime);
         applicationDto.runType = AppsRunTypeFromString(applicationEntity.type);
+        applicationDto.privatePort = applicationEntity.privatePort;
         applicationDto.archive = applicationEntity.archive;
         applicationDto.version = applicationEntity.version;
         applicationDto.containerId = applicationEntity.containerId;
         applicationDto.status = AppsStatusTypeFromString(applicationEntity.status);
         applicationDto.enabled = applicationEntity.enabled;
+        applicationDto.lastStarted = applicationEntity.lastStarted;
         applicationDto.created = applicationEntity.created;
         applicationDto.modified = applicationEntity.modified;
         applicationDto.environment = applicationEntity.environment;
@@ -39,11 +41,13 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.name = applicationDto.name;
         applicationEntity.runtime = AppsRuntimeTypeToString(applicationDto.runtime);
         applicationEntity.type = AppsRunTypeToString(applicationDto.runType);
+        applicationEntity.privatePort = applicationDto.privatePort;
         applicationEntity.archive = applicationDto.archive;
         applicationEntity.version = applicationDto.version;
         applicationEntity.containerId = applicationDto.containerId;
         applicationEntity.status = AppsStatusTypeToString(applicationDto.status);
         applicationEntity.enabled = applicationDto.enabled;
+        applicationEntity.lastStarted = applicationDto.lastStarted;
         applicationEntity.created = applicationDto.created;
         applicationEntity.modified = applicationDto.modified;
         applicationEntity.environment = applicationDto.environment;

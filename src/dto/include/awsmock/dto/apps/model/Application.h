@@ -45,6 +45,11 @@ namespace AwsMock::Dto::Apps {
         AppsRunType runType = AppsRunType::UNKNOWN;
 
         /**
+         * Application private port
+         */
+        long privatePort{};
+
+        /**
          * Application archive
          */
         std::string archive;
@@ -87,6 +92,11 @@ namespace AwsMock::Dto::Apps {
         /**
          * Creation date
          */
+        system_clock::time_point lastStarted;
+
+        /**
+         * Creation date
+         */
         system_clock::time_point created = system_clock::now();
 
         /**
@@ -101,6 +111,7 @@ namespace AwsMock::Dto::Apps {
             r.name = Core::Json::GetStringValue(v, "name");
             r.runtime = AppsRuntimeTypeFromString(Core::Json::GetStringValue(v, "runtime"));
             r.runType = AppsRunTypeFromString(Core::Json::GetStringValue(v, "runType"));
+            r.privatePort = Core::Json::GetLongValue(v, "privatePort");
             r.archive = Core::Json::GetStringValue(v, "archive");
             r.version = Core::Json::GetStringValue(v, "version");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
@@ -109,6 +120,7 @@ namespace AwsMock::Dto::Apps {
             r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
             r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
             r.options = Core::Json::GetMapFromObject<std::string, std::string>(v, "options");
+            r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             return r;
@@ -122,11 +134,13 @@ namespace AwsMock::Dto::Apps {
                     {"name", obj.name},
                     {"runtime", AppsRuntimeTypeToString(obj.runtime)},
                     {"runType", AppsRunTypeToString(obj.runType)},
+                    {"privatePort", obj.privatePort},
                     {"archive", obj.archive},
                     {"version", obj.version},
                     {"containerId", obj.containerId},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"environment", boost::json::value_from(obj.environment)},

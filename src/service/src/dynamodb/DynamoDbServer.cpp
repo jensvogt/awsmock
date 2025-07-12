@@ -78,7 +78,7 @@ namespace AwsMock::Service {
         // Check docker image
         if (!_containerService.ImageExists(_imageName, _imageTag)) {
             const std::string dockerString = WriteDockerFile();
-            const std::string output = _containerService.BuildImage(_imageName, _imageTag, dockerString);
+            const std::string output = _containerService.BuildDynamoDbImage(_imageName, _imageTag, dockerString);
             log_trace << "Image " << _imageName << " output: " << output;
         }
 

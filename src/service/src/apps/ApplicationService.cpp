@@ -3,6 +3,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/service/apps/ApplicationCreator.h"
+
+
 #include <awsmock/service/apps/ApplicationService.h>
 
 namespace AwsMock::Service {
@@ -117,19 +120,48 @@ namespace AwsMock::Service {
         Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.applicationName);
 
         // Save the base64 encoded file
-        std::string fullBase64File = WriteBase64File(request.applicationCode, application, request.version);
+        const std::string fullBase64File = WriteBase64File(request.applicationCode, application, request.version);
 
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
         application.version = request.version;
         application = _database.UpdateApplication(application);
 
-        // Create the lambda function asynchronously
+        // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        //LambdaCreator lambdaCreator;
-        //boost::thread t(boost::ref(lambdaCreator), request.functionCode, lambda.oid, instanceId);
-        //t.detach();
+        ApplicationCreator applicationCreator;
+        boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+        t.detach();
 
         log_debug << "Application code updated, name: " << request.applicationName;
+    }
+
+    void ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_application_code");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_application_code");
+        log_debug << "Upload application code request, name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.application.region, request.application.name)) {
+            log_warning << "Application does not exist, name: " << request.application.name;
+            throw Core::ServiceException("Application does not exist, name: " + request.application.name);
+        }
+
+        // Get application
+        Database::Entity::Apps::Application application = _database.GetApplication(request.application.region, request.application.name);
+
+        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
+        application = _database.UpdateApplication(application);
+
+        // Get code base64 file name
+        const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
+
+        // Create the application asynchronously
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        ApplicationCreator applicationCreator;
+        boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+        t.detach();
+
+        log_debug << "Application start initiated, name: " << request.application.name;
     }
 
     Dto::Apps::ListApplicationCountersResponse ApplicationService::ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const {
@@ -139,11 +171,13 @@ namespace AwsMock::Service {
 
         try {
 
+            Dto::Apps::ListApplicationCountersResponse response;
+
             const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region);
+            response.total = _database.CountApplications(request.region, request.prefix);
             log_trace << "Got applications, region: " << request.region;
 
             // Prepare response
-            Dto::Apps::ListApplicationCountersResponse response;
             response.region = request.region;
             response.user = request.user;
             response.requestId = request.requestId;
