@@ -115,7 +115,7 @@ namespace AwsMock::Service {
          *
          * @param name image name
          * @param tag image tags
-         * @return true if image exists, otherwise false
+         * @return true if an image exists, otherwise false
          */
         [[nodiscard]] bool ImageExists(const std::string &name, const std::string &tag) const;
 
@@ -124,7 +124,7 @@ namespace AwsMock::Service {
          *
          * @param name container name
          * @param tag container tags
-         * @param locked if true is already locked
+         * @param locked if true, is already locked
          * @return Image
          */
         [[nodiscard]] Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
@@ -140,7 +140,21 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+        [[nodiscard]] std::string BuildLambdaImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+
+        /**
+         * @brief Build a docker image for an application
+         *
+         * @param codeDir code directory
+         * @param name application name
+         * @param tag application version
+         * @param runtime application runtime
+         * @param archive application archive
+         * @param privatePort docker container private port
+         * @param environment runtime environment
+         * @return file size in bytes
+         */
+        [[nodiscard]] std::string BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, long privatePort, const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Build a docker image from a docker file
@@ -150,7 +164,7 @@ namespace AwsMock::Service {
          * @param dockerFile docker file
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
+        [[nodiscard]] std::string BuildDynamoDbImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
 
         /**
          * @brief Delete an image by name/tags.
@@ -164,7 +178,7 @@ namespace AwsMock::Service {
          *
          * @param name container name
          * @param tag container tags
-         * @return true if container exists, otherwise false
+         * @return true if the container exists, otherwise false
          */
         [[nodiscard]] bool ContainerExists(const std::string &name, const std::string &tag) const;
 
@@ -389,7 +403,7 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Write the docker file.
+         * @brief Write the lambda docker file.
          *
          * @param codeDir code directory
          * @param handler handler function
@@ -397,7 +411,19 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return return docker file path
          */
-        static std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+        static std::string WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+
+        /**
+         * @brief Write the application docker file.
+         *
+         * @param codeDir code directory
+         * @param archive application archive
+         * @param privatePort docker container internal port
+         * @param runtime docker image runtime
+         * @param environment runtime environment
+         * @return return docker file path
+         */
+        static std::string WriteApplicationDockerFile(const std::string &codeDir, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
         /**
          * @brief Write the compressed docker image file.

@@ -504,6 +504,11 @@ namespace AwsMock::Service {
             // Updates are only possible on certain fields
             secret.rotationRules = Dto::SecretsManager::Mapper::map(request.secretDetails.rotationRules);
             secret.rotationLambdaARN = request.secretDetails.rotationLambdaARN;
+            if (!request.secretDetails.secretString.empty()) {
+                Database::Entity::SecretsManager::SecretVersion version = secret.GetVersion(secret.GetCurrentVersionId());
+                EncryptSecret(version, secret.kmsKeyId, request.secretDetails.secretString);
+                secret.versions[secret.GetCurrentVersionId()] = version;
+            }
             secret = _secretsManagerDatabase.UpdateSecret(secret);
 
             // Convert to DTO

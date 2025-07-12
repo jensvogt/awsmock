@@ -13,11 +13,16 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("name", name));
         applicationDocument.append(kvp("runtime", runtime));
         applicationDocument.append(kvp("type", type));
+        applicationDocument.append(kvp("privatePort", privatePort));
         applicationDocument.append(kvp("archive", archive));
         applicationDocument.append(kvp("version", version));
         applicationDocument.append(kvp("containerId", containerId));
         applicationDocument.append(kvp("enabled", enabled));
         applicationDocument.append(kvp("status", status));
+        applicationDocument.append(kvp("imageId", imageId));
+        applicationDocument.append(kvp("imageSize", imageSize));
+        applicationDocument.append(kvp("imageMd5", imageMd5));
+        applicationDocument.append(kvp("lastStarted", bsoncxx::types::b_date(lastStarted)));
         applicationDocument.append(kvp("created", bsoncxx::types::b_date(created)));
         applicationDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
 
@@ -58,11 +63,16 @@ namespace AwsMock::Database::Entity::Apps {
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         runtime = Core::Bson::BsonUtils::GetStringValue(mResult, "runtime");
         type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
+        privatePort = Core::Bson::BsonUtils::GetLongValue(mResult, "privatePort");
         archive = Core::Bson::BsonUtils::GetStringValue(mResult, "archive");
         version = Core::Bson::BsonUtils::GetStringValue(mResult, "version");
         containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
+        imageId = Core::Bson::BsonUtils::GetStringValue(mResult, "imageId");
+        imageSize = Core::Bson::BsonUtils::GetLongValue(mResult, "imageSize");
+        imageMd5 = Core::Bson::BsonUtils::GetStringValue(mResult, "imageMd5");
+        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStarted");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

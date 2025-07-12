@@ -99,6 +99,15 @@ namespace AwsMock::Database {
         std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
+         * @brief Count all applications by region and prefix
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @return number of applications
+         */
+        long CountApplications(const std::string &region = {}, const std::string &prefix = {}) const;
+
+        /**
          * @brief Deletes an application
          *
          * @param region AWS region name

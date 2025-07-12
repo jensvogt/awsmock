@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "ApplicationService.h"
+
+
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/model/Status.h>
@@ -51,6 +54,11 @@ namespace AwsMock::Service {
         static void BackupApplication();
 
         /**
+         * @brief Start all enabled applications
+         */
+        void StartApplications() const;
+
+        /**
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
@@ -59,6 +67,11 @@ namespace AwsMock::Service {
          * @brief Database connection
          */
         Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+
+        /**
+         * Application service module
+         */
+        ApplicationService _applicationService;
 
         /**
          * @brief Dynamo DB backup flag.

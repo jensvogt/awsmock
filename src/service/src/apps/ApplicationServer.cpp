@@ -29,6 +29,9 @@ namespace AwsMock::Service {
             scheduler.AddTask("application-backup", [this] { BackupApplication(); }, _backupCron);
         }
 
+        // Start the application
+        StartApplications();
+
         // Set running
         SetRunning();
         log_debug << "Application server started";
@@ -58,6 +61,16 @@ namespace AwsMock::Service {
 
     void ApplicationServer::UpdateApplications() const {
         for (auto &application: _applicationDatabase.ListApplications()) {
+        }
+    }
+
+    void ApplicationServer::StartApplications() const {
+        for (const auto &application: _applicationDatabase.ListApplications()) {
+            if (application.enabled) {
+                Dto::Apps::StartApplicationRequest request;
+                request.application = Dto::Apps::Mapper::map(application);
+                _applicationService.StartApplication(request);
+            }
         }
     }
 

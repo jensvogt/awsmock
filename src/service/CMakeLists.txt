@@ -25,7 +25,8 @@ set(GATEWAY_SOURCES src/gateway/GatewayServer.cpp src/gateway/GatewaySession.cpp
 set(DOCKER_SOURCES src/container/ContainerService.cpp)
 set(MODULE_SOURCES src/module/ModuleService.cpp src/module/ModuleHandler.cpp src/module/ModuleMonitoring.cpp
         src/module/ModuleMap.cpp)
-set(APPLICATION_SOURCES src/apps/ApplicationHandler.cpp src/apps/ApplicationServer.cpp src/apps/ApplicationService.cpp)
+set(APPLICATION_SOURCES src/apps/ApplicationHandler.cpp src/apps/ApplicationServer.cpp src/apps/ApplicationService.cpp
+        src/apps/ApplicationCreator.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp
         src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp src/monitoring/MonitoringService.cpp
         src/monitoring/MetricCacheService.cpp)

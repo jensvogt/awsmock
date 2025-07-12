@@ -18,6 +18,7 @@
 #include <awsmock/dto/apps/internal/GetApplicationResponse.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
+#include <awsmock/dto/apps/internal/StartApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UploadApplicationCodeRequest.h>
 #include <awsmock/dto/apps/mapper/Mapper.h>
@@ -65,6 +66,14 @@ namespace AwsMock::Service {
          * @see Dto::Apps::GetApplicationResponse
          */
         Dto::Apps::GetApplicationResponse GetApplication(const Dto::Apps::GetApplicationRequest &request) const;
+
+        /**
+         * @brief Start an application
+         *
+         * @param request start application request
+         * @see Dto::Apps::StartApplicationRequest
+         */
+        void StartApplication(const Dto::Apps::StartApplicationRequest &request) const;
 
         /**
          * @brief Update an application

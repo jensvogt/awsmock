@@ -96,6 +96,24 @@ namespace AwsMock::Database {
         return applicationList;
     }
 
+    long ApplicationMemoryDb::CountApplications(const std::string &region, const std::string &prefix) const {
+
+        long count = 0;
+        if (region.empty()) {
+
+            count = static_cast<long>(_applications.size());
+
+        } else {
+
+            for (const auto &val: _applications | std::views::values) {
+                if (val.region == region) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     long ApplicationMemoryDb::DeleteApplication(const std::string &region, const std::string &name) {
         boost::mutex::scoped_lock lock(_applicationMutex);
 

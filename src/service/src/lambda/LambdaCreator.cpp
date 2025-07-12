@@ -92,7 +92,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda file unzipped, codeDir: " << codeDir;
 
         // Build the docker image using the docker module
-        const std::string imageFile = ContainerService::instance().BuildImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
+        const std::string imageFile = ContainerService::instance().BuildLambdaImage(codeDir, lambdaEntity.function, dockerTag, lambdaEntity.handler, lambdaEntity.runtime, lambdaEntity.environment.variables);
 
         // Get the image struct
         const Dto::Docker::Image image = ContainerService::instance().GetImageByName(lambdaEntity.function, dockerTag);
