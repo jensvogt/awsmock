@@ -13,7 +13,7 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cmake --build . --config Release -j 16 && \
     cmake --install . --config Release
 
-FROM node:21-bookworm AS buildfrontend
+FROM node:22-bookworm AS buildfrontend
 
 RUN apt update && apt-get install -y git
 
@@ -22,7 +22,7 @@ WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     cd /usr/src/awsmock-ui && \
     npm install -g @angular/cli && \
-    npm install && \
+    npm install --force && \
     npm run build --prod
 
 # Stick to alpine:latest
