@@ -2,21 +2,23 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_CREATE_APPLICATION_REQUEST_H
-#define AWSMOCK_DTO_APPS_CREATE_APPLICATION_REQUEST_H
+#ifndef AWSMOCK_DTO_APPS_STOP_APPLICATION_REQUEST_H
+#define AWSMOCK_DTO_APPS_STOP_APPLICATION_REQUEST_H
+
+// C++ standard includes
+#include <string>
 
 // AwsMock includes
 #include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief Create an application
+     * @brief Update an application
      *
      * @par
-     * Request to create a new application.
+     * Request to update an  application.
      *
      * Example:
      * @code{.json}
@@ -25,25 +27,37 @@ namespace AwsMock::Dto::Apps {
      *   {
      *     "name": "string",
      *     "runtime": "string",
+     *     "runType": "string",
+     *     "privatePort": number,
      *     "archive": number,
      *     "enabled": "string",
+     *     "environment": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
+     *     "tags": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
+     *     "options": [{
+     *        "key": "string",
+     *        "value": "string",
+     *        ...
+     *     }],
      *   }
      * }
      * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateApplicationRequest final : Common::BaseCounter<CreateApplicationRequest> {
+    struct StopApplicationRequest final : Common::BaseCounter<StopApplicationRequest> {
 
         /**
-         * Application
+         * UserPoolId
          */
         Application application;
-
-        /**
-         * Application code as base64 encoded string
-         */
-        std::string code;
 
         /**
          * Application name prefix
@@ -67,10 +81,9 @@ namespace AwsMock::Dto::Apps {
 
       private:
 
-        friend CreateApplicationRequest tag_invoke(boost::json::value_to_tag<CreateApplicationRequest>, boost::json::value const &v) {
-            CreateApplicationRequest r;
+        friend StopApplicationRequest tag_invoke(boost::json::value_to_tag<StopApplicationRequest>, boost::json::value const &v) {
+            StopApplicationRequest r;
             r.application = boost::json::value_to<Application>(v.at("application"));
-            r.code = Core::Json::GetStringValue(v, "code");
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
@@ -80,13 +93,12 @@ namespace AwsMock::Dto::Apps {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateApplicationRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, StopApplicationRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"application", boost::json::value_from(obj.application)},
-                    {"code", obj.code},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},
@@ -97,4 +109,4 @@ namespace AwsMock::Dto::Apps {
 
 }// namespace AwsMock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_CREATE_APPLICATION_REQUEST_H
+#endif// AWSMOCK_DTO_APPS_STOP_APPLICATION_REQUEST_H

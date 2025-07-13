@@ -50,7 +50,22 @@ namespace AwsMock::Database::Entity::Apps {
         /**
          * Private port. This is the internal port used by the application inside the docker image.
          */
-        long privatePort;
+        long privatePort{};
+
+        /**
+         * Public port. This is the host port used by the application inside the docker image.
+         */
+        long publicPort{};
+
+        /**
+         * Name of the container
+         */
+        std::string containerName;
+
+        /**
+         * ID of the container
+         */
+        std::string containerId;
 
         /**
          * Application archive
@@ -63,11 +78,6 @@ namespace AwsMock::Database::Entity::Apps {
         std::string version;
 
         /**
-         * Application docker container ID
-         */
-        std::string containerId;
-
-        /**
          * Application status
          */
         std::string status;
@@ -75,7 +85,7 @@ namespace AwsMock::Database::Entity::Apps {
         /**
          * Enabled
          */
-        bool enabled;
+        bool enabled = false;
 
         /**
          * Environment
@@ -88,11 +98,6 @@ namespace AwsMock::Database::Entity::Apps {
         std::map<std::string, std::string> tags;
 
         /**
-         * Options
-         */
-        std::map<std::string, std::string> options;
-
-        /**
          * Docker image ID
          */
         std::string imageId;
@@ -100,7 +105,7 @@ namespace AwsMock::Database::Entity::Apps {
         /**
          * Docker image size
          */
-        long imageSize;
+        long imageSize{};
 
         /**
          * MD5 of docker image

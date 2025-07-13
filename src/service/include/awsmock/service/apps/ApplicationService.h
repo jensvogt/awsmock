@@ -19,6 +19,7 @@
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
 #include <awsmock/dto/apps/internal/StartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StopApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UploadApplicationCodeRequest.h>
 #include <awsmock/dto/apps/mapper/Mapper.h>
@@ -73,7 +74,7 @@ namespace AwsMock::Service {
          * @param request start application request
          * @see Dto::Apps::StartApplicationRequest
          */
-        void StartApplication(const Dto::Apps::StartApplicationRequest &request) const;
+        //void StartApplication(const Dto::Apps::StopApplicationRequest &request) const;
 
         /**
          * @brief Update an application
@@ -102,6 +103,26 @@ namespace AwsMock::Service {
          * @see Dto::Apps::ListApplicationCountersResponse
          */
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const;
+
+        /**
+         * @brief Starts an application
+         *
+         * @param request start application request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::StartApplicationRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StartApplication(const Dto::Apps::StartApplicationRequest &request) const;
+
+        /**
+         * @brief Stops an application
+         *
+         * @param request stop application request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::StopApplicationRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopApplication(const Dto::Apps::StopApplicationRequest &request) const;
 
         /**
          * @brief Deletes an application

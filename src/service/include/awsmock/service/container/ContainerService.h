@@ -255,6 +255,23 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) const;
 
         /**
+         * @brief Creates a container for an application
+         *
+         * @par
+         * Supported standard values for the network mode are: bridge, host, none, and container:<name|id>. Any other value is taken as a custom network's name to which this container should connect to. FOr an
+         * application the port is not fixed, as for a lambda function, therefore, the container has to be supplied.
+         *
+         * @param imageName image name
+         * @param instanceName name of the instance
+         * @param tag image tags
+         * @param environment runtime environment variables
+         * @param hostPort external port of the application
+         * @param containerPort internal port of the application
+         * @return CreateContainerResponse
+         */
+        [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort, int containerPort) const;
+
+        /**
          * @brief Creates a container for a predefined image.
          *
          * @par

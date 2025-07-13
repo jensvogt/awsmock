@@ -17,9 +17,10 @@
 #include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 
-using std::chrono::system_clock;
 
 namespace AwsMock::Core::Json {
+
+    using std::chrono::system_clock;
 
     inline boost::json::value ParseJsonString(const std::string &jsonString) {
         boost::system::error_code ec;
