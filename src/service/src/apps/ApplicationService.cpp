@@ -132,6 +132,7 @@ namespace AwsMock::Service {
         // Save the base64 encoded file
         const std::string fullBase64File = WriteBase64File(request.applicationCode, application, request.version);
 
+        // Set status and version
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
         application.version = request.version;
         application = _database.UpdateApplication(application);
