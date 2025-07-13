@@ -159,6 +159,7 @@ namespace AwsMock::Service {
         // Get application
         Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
 
+        // Update status
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
         application = _database.UpdateApplication(application);
 
@@ -179,15 +180,17 @@ namespace AwsMock::Service {
         } else {
 
             Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
+
+            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
+            ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+
+            inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
             application.imageId = inspectContainerResponse.image.substr(7);
             application.containerId = inspectContainerResponse.id;
             application.containerName = inspectContainerResponse.name.substr(1);
             application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
             application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application = _database.UpdateApplication(application);
-
-            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
-            ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
 
             log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
         }
