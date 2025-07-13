@@ -59,11 +59,37 @@ namespace AwsMock::Dto::Apps {
          */
         Application application;
 
+        /**
+         * Application name prefix
+         */
+        std::string prefix;
+
+        /**
+         * Maximal number of results
+         */
+        long pageSize{};
+
+        /**
+         * Page index
+         */
+        long pageIndex{};
+
+        /**
+         * Sort columns
+         */
+        std::vector<Common::SortColumn> sortColumns;
+
       private:
 
         friend StartApplicationRequest tag_invoke(boost::json::value_to_tag<StartApplicationRequest>, boost::json::value const &v) {
             StartApplicationRequest r;
             r.application = boost::json::value_to<Application>(v.at("application"));
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
+            if (Core::Json::AttributeExists(v, "sortColumns")) {
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+            }
             return r;
         }
 
@@ -73,6 +99,10 @@ namespace AwsMock::Dto::Apps {
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"application", boost::json::value_from(obj.application)},
+                    {"prefix", obj.prefix},
+                    {"pageSize", obj.pageSize},
+                    {"pageIndex", obj.pageIndex},
+                    {"sortColumns", boost::json::value_from(obj.sortColumns)},
             };
         }
     };

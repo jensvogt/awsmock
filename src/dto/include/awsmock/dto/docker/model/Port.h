@@ -23,29 +23,14 @@ namespace AwsMock::Dto::Docker {
     struct Port {
 
         /**
-         * @brief Constructor
-         */
-        //explicit Port(const view_or_value<view, value> &object);
-
-        /**
          * Host IP address
          */
         std::string hostIp;
 
         /**
-         * Private port, means port inside the container
+         * Public port means port inside the container
          */
-        int privatePort{};
-
-        /**
-         * Public port, means port visible from docker host
-         */
-        int publicPort{};
-
-        /**
-         * Port type (tcp,udp, etc.)
-         */
-        std::string type;
+        int hostPort{};
 
         /**
          * @brief Convert to a JSON string

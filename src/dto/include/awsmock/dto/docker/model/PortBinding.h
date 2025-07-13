@@ -5,9 +5,7 @@
 #ifndef AWSMOCK_DTO_DOCKER_PORT_BINDING_H
 #define AWSMOCK_DTO_DOCKER_PORT_BINDING_H
 
-
 // C++ includes
-#include <chrono>
 #include <string>
 
 // AwsMock includes
@@ -16,8 +14,6 @@
 #include <awsmock/dto/docker/model/Port.h>
 
 namespace AwsMock::Dto::Docker {
-
-    using std::chrono::system_clock;
 
     /**
      * @brief Docker port binding object
@@ -43,10 +39,10 @@ namespace AwsMock::Dto::Docker {
                 ports = portMap[privatePort + "/tcp"];
             }
             const auto it = std::ranges::find_if(ports, [](const Port &port) {
-                return port.publicPort != 0;
+                return port.hostPort > 0;
             });
             if (it != ports.end()) {
-                return it->publicPort;
+                return it->hostPort;
             }
             return -1;
         };

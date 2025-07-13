@@ -57,6 +57,22 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApplicationCommandType::START_APPLICATION: {
+
+                    Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StartApplication(serviceRequest);
+                    log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
+
+                    Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StopApplication(serviceRequest);
+                    log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
                 case Dto::Common::ApplicationCommandType::DELETE_APPLICATION: {
 
                     Dto::Apps::DeleteApplicationRequest serviceRequest = Dto::Apps::DeleteApplicationRequest::FromJson(clientCommand);

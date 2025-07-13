@@ -37,14 +37,12 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing, get the current port from the docker container
-        // TODO fixme
-        //        Database::Entity::Apps::Instance instance;
-        const std::string containerName = applicationEntity.name + "-" + instanceId;
-        if (!ContainerService::instance().ContainerExistsByName(containerName)) {
+        if (!ContainerService::instance().ContainerExistsByImageName(applicationEntity.name, applicationEntity.version)) {
             CreateDockerContainer(applicationEntity, instanceId, CreateRandomHostPort(), applicationEntity.version);
         }
 
         // Get docker container
+        const std::string containerName = applicationEntity.name + "-" + instanceId;
         Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
 
         // Start the docker container, in case it is not already running.
@@ -55,22 +53,13 @@ namespace AwsMock::Service {
         }
 
         // Get the public port
-        // TODO fixme
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
-        // instance.instanceId = instanceId;
-        // if (!inspectContainerResponse.id.empty()) {
-        //     instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
-        //     //instance.status = Database::Entity::Apps::InstanceIdle;
-        //     instance.containerId = inspectContainerResponse.id;
-        //     instance.containerName = containerName;
-        //     instance.created = system_clock::now();
-        //     // TODO fixme
-        //     //applicationEntity.instances.emplace_back(instance);
-        // }
-
-        // Save size in entity
-        // TODO fixme
-        //        applicationEntity.containerSize = inspectContainerResponse.sizeRootFs;
+        if (!inspectContainerResponse.id.empty()) {
+            applicationEntity.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(applicationEntity.privatePort));
+            applicationEntity.containerId = inspectContainerResponse.id;
+            applicationEntity.containerName = inspectContainerResponse.name.substr(1);
+            applicationEntity.created = system_clock::now();
+        }
     }
 
     void ApplicationCreator::CreateDockerImage(const std::string &applicationCodeFile, Database::Entity::Apps::Application &applicationEntity, const std::string &dockerTag) {
@@ -107,8 +96,8 @@ namespace AwsMock::Service {
 
             const std::string containerName = applicationEntity.name + "-" + instanceId;
             const std::vector<std::string> environment = GetEnvironment(applicationEntity);
-            const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(applicationEntity.name, containerName, dockerTag, environment, hostPort);
-            log_debug << "Lambda container created, hostPort: " << hostPort << " containerId: " << containerCreateResponse.id;
+            const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(applicationEntity.name, containerName, dockerTag, environment, hostPort, applicationEntity.privatePort);
+            log_debug << "Application container created, hostPort: " << hostPort << " containerId: " << containerCreateResponse.id;
 
         } catch (std::exception &exc) {
             log_error << exc.what();

@@ -42,8 +42,8 @@ namespace AwsMock::Dto::Common {
             {ApplicationCommandType::UPDATE_APPLICATION, "update-application"},
             {ApplicationCommandType::UPLOAD_APPLICATION, "upload-application"},
             {ApplicationCommandType::LIST_APPLICATIONS, "list-applications"},
-            {ApplicationCommandType::START_APPLICATION, "start-applications"},
-            {ApplicationCommandType::STOP_APPLICATION, "stop-applications"},
+            {ApplicationCommandType::START_APPLICATION, "start-application"},
+            {ApplicationCommandType::STOP_APPLICATION, "stop-application"},
             {ApplicationCommandType::DELETE_APPLICATION, "delete-application"},
             {ApplicationCommandType::UNKNOWN, "unknown"},
     };

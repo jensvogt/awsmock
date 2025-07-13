@@ -75,9 +75,9 @@ namespace AwsMock::Service {
          *
          * @param instanceId name of the instance, application name + '-' + 8 random hex digits
          * @param applicationEntity application entity
-         * @param functionCode function code
+         * @param applicationCodeFile function code
          */
-        static void CreateInstance(const std::string &instanceId, Database::Entity::Apps::Application &applicationEntity, const std::string &functionCode);
+        static void CreateInstance(const std::string &instanceId, Database::Entity::Apps::Application &applicationEntity, const std::string &applicationCodeFile);
 
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder

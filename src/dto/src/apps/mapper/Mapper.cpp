@@ -13,9 +13,11 @@ namespace AwsMock::Dto::Apps {
         applicationDto.runtime = AppsRuntimeTypeFromString(applicationEntity.runtime);
         applicationDto.runType = AppsRunTypeFromString(applicationEntity.type);
         applicationDto.privatePort = applicationEntity.privatePort;
+        applicationDto.publicPort = applicationEntity.publicPort;
         applicationDto.archive = applicationEntity.archive;
         applicationDto.version = applicationEntity.version;
         applicationDto.containerId = applicationEntity.containerId;
+        applicationDto.containerName = applicationEntity.containerName;
         applicationDto.status = AppsStatusTypeFromString(applicationEntity.status);
         applicationDto.enabled = applicationEntity.enabled;
         applicationDto.lastStarted = applicationEntity.lastStarted;
@@ -23,7 +25,6 @@ namespace AwsMock::Dto::Apps {
         applicationDto.modified = applicationEntity.modified;
         applicationDto.environment = applicationEntity.environment;
         applicationDto.tags = applicationEntity.tags;
-        applicationDto.options = applicationEntity.options;
         return applicationDto;
     }
 
@@ -42,9 +43,11 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.runtime = AppsRuntimeTypeToString(applicationDto.runtime);
         applicationEntity.type = AppsRunTypeToString(applicationDto.runType);
         applicationEntity.privatePort = applicationDto.privatePort;
+        applicationEntity.publicPort = applicationDto.publicPort;
         applicationEntity.archive = applicationDto.archive;
         applicationEntity.version = applicationDto.version;
         applicationEntity.containerId = applicationDto.containerId;
+        applicationEntity.containerName = applicationDto.containerName;
         applicationEntity.status = AppsStatusTypeToString(applicationDto.status);
         applicationEntity.enabled = applicationDto.enabled;
         applicationEntity.lastStarted = applicationDto.lastStarted;
@@ -52,7 +55,6 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.modified = applicationDto.modified;
         applicationEntity.environment = applicationDto.environment;
         applicationEntity.tags = applicationDto.tags;
-        applicationEntity.options = applicationDto.options;
         return applicationEntity;
     }
 

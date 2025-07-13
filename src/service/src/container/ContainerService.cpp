@@ -413,6 +413,31 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort, const int containerPort) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        // Create the request
+        const Dto::Docker::CreateContainerRequest request = {
+                .hostName = instanceName,
+                .image = imageName + ":" + tag,
+                .networkMode = GetNetworkName(),
+                .environment = environment,
+                .containerPort = std::to_string(containerPort),
+                .hostPort = std::to_string(hostPort)};
+
+        auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
+        if (statusCode != http::status::created) {
+            log_info << "Create container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+            return {};
+        }
+
+        Dto::Docker::CreateContainerResponse response = {.hostPort = hostPort};
+        response.FromJson(body);
+
+        log_debug << "Docker container created, name: " << imageName << ":" << tag << " id: " << response.id;
+        return response;
+    }
+
     Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, const int hostPort, const int containerPort) const {
         boost::mutex::scoped_lock lock(_dockerServiceMutex);
 

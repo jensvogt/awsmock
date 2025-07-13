@@ -50,6 +50,11 @@ namespace AwsMock::Dto::Apps {
         long privatePort{};
 
         /**
+         * Application public port
+         */
+        long publicPort{};
+
+        /**
          * Application archive
          */
         std::string archive;
@@ -63,6 +68,11 @@ namespace AwsMock::Dto::Apps {
          * Application docker container ID
          */
         std::string containerId;
+
+        /**
+         * Application docker container name
+         */
+        std::string containerName;
 
         /**
          * Application status
@@ -83,11 +93,6 @@ namespace AwsMock::Dto::Apps {
          * Tags
          */
         std::map<std::string, std::string> tags;
-
-        /**
-         * Options
-         */
-        std::map<std::string, std::string> options;
 
         /**
          * Creation date
@@ -112,14 +117,15 @@ namespace AwsMock::Dto::Apps {
             r.runtime = AppsRuntimeTypeFromString(Core::Json::GetStringValue(v, "runtime"));
             r.runType = AppsRunTypeFromString(Core::Json::GetStringValue(v, "runType"));
             r.privatePort = Core::Json::GetLongValue(v, "privatePort");
+            r.publicPort = Core::Json::GetLongValue(v, "publicPort");
             r.archive = Core::Json::GetStringValue(v, "archive");
             r.version = Core::Json::GetStringValue(v, "version");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
+            r.containerName = Core::Json::GetStringValue(v, "containerName");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
             r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
-            r.options = Core::Json::GetMapFromObject<std::string, std::string>(v, "options");
             r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
@@ -135,9 +141,11 @@ namespace AwsMock::Dto::Apps {
                     {"runtime", AppsRuntimeTypeToString(obj.runtime)},
                     {"runType", AppsRunTypeToString(obj.runType)},
                     {"privatePort", obj.privatePort},
+                    {"publicPort", obj.publicPort},
                     {"archive", obj.archive},
                     {"version", obj.version},
                     {"containerId", obj.containerId},
+                    {"containerName", obj.containerName},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
                     {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
@@ -145,7 +153,6 @@ namespace AwsMock::Dto::Apps {
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"environment", boost::json::value_from(obj.environment)},
                     {"tags", boost::json::value_from(obj.tags)},
-                    {"options", boost::json::value_from(obj.options)},
             };
         }
     };

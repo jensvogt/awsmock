@@ -27,8 +27,18 @@ namespace AwsMock::Service {
         try {
             // Generate application ID
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
-
+            application.region = request.region;
+            application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
             application = _database.CreateApplication(application);
+
+            // Save the base64 encoded file
+            const std::string fullBase64File = WriteBase64File(request.code, application, request.application.version);
+
+            // Create the application asynchronously
+            const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            ApplicationCreator applicationCreator;
+            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+            t.detach();
 
             Dto::Apps::ListApplicationCountersRequest listRequest{};
             listRequest.requestId = request.requestId;
@@ -135,18 +145,18 @@ namespace AwsMock::Service {
         log_debug << "Application code updated, name: " << request.applicationName;
     }
 
-    void ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
-        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_application_code");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_application_code");
-        log_debug << "Upload application code request, name: " << request.application.name;
+    Dto::Apps::ListApplicationCountersResponse ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_application");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_application");
+        log_debug << "Start application request, name: " << request.application.name;
 
-        if (!_database.ApplicationExists(request.application.region, request.application.name)) {
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             throw Core::ServiceException("Application does not exist, name: " + request.application.name);
         }
 
         // Get application
-        Database::Entity::Apps::Application application = _database.GetApplication(request.application.region, request.application.name);
+        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
 
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
         application = _database.UpdateApplication(application);
@@ -155,13 +165,41 @@ namespace AwsMock::Service {
         const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
         const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
 
-        // Create the application asynchronously
-        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        ApplicationCreator applicationCreator;
-        boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-        t.detach();
+        // Check whether a container exists already
+        if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByImageName(application.name, application.version)) {
 
-        log_debug << "Application start initiated, name: " << request.application.name;
+            // Create the application asynchronously
+            const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            ApplicationCreator applicationCreator;
+            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+            t.detach();
+            log_debug << "Application start initiated, name: " << request.application.name;
+
+        } else {
+
+            Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
+            application.imageId = inspectContainerResponse.image.substr(7);
+            application.containerId = inspectContainerResponse.id;
+            application.containerName = inspectContainerResponse.name.substr(1);
+            application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
+            application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+            application = _database.UpdateApplication(application);
+
+            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
+            ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+
+            log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
+        }
+
+        Dto::Apps::ListApplicationCountersRequest listRequest{};
+        listRequest.requestId = request.requestId;
+        listRequest.region = request.region;
+        listRequest.user = request.user;
+        listRequest.prefix = request.prefix;
+        listRequest.pageSize = request.pageSize;
+        listRequest.pageIndex = request.pageIndex;
+        log_trace << "Application deleted, name: " + request.application.name;
+        return ListApplications(listRequest);
     }
 
     Dto::Apps::ListApplicationCountersResponse ApplicationService::ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const {
@@ -183,6 +221,46 @@ namespace AwsMock::Service {
             response.requestId = request.requestId;
             response.applications = Dto::Apps::Mapper::map(applications);
             return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::Apps::ListApplicationCountersResponse ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "stop_application");
+        Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "stop_application");
+        log_debug << "Stop application request, region:  " << request.region << " name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_error << "Application does not exist, region: " << request.region << " name: " << request.application.name;
+            throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.application.name);
+        }
+
+        try {
+            Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+
+            if (!ContainerService::instance().ContainerExistsByName(application.containerName)) {
+                log_warning << "Container does not exist, name: " << request.application.name;
+                throw Core::ServiceException("Container does not exist, name: " + request.application.name);
+            }
+
+            // Stop container
+            ContainerService::instance().StopContainer(application.containerName);
+            application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+            application = _database.UpdateApplication(application);
+            log_debug << "Application stopped, name: " << application.name;
+
+            Dto::Apps::ListApplicationCountersRequest listRequest{};
+            listRequest.requestId = request.requestId;
+            listRequest.region = request.region;
+            listRequest.user = request.user;
+            listRequest.prefix = request.prefix;
+            listRequest.pageSize = request.pageSize;
+            listRequest.pageIndex = request.pageIndex;
+            log_trace << "Application deleted, name: " + request.application.name;
+            return ListApplications(listRequest);
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

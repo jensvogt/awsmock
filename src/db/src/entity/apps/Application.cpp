@@ -14,9 +14,11 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("runtime", runtime));
         applicationDocument.append(kvp("type", type));
         applicationDocument.append(kvp("privatePort", privatePort));
+        applicationDocument.append(kvp("publicPort", publicPort));
         applicationDocument.append(kvp("archive", archive));
         applicationDocument.append(kvp("version", version));
         applicationDocument.append(kvp("containerId", containerId));
+        applicationDocument.append(kvp("containerName", containerName));
         applicationDocument.append(kvp("enabled", enabled));
         applicationDocument.append(kvp("status", status));
         applicationDocument.append(kvp("imageId", imageId));
@@ -44,15 +46,6 @@ namespace AwsMock::Database::Entity::Apps {
             applicationDocument.append(kvp("tags", tagsDoc));
         }
 
-        // Options
-        if (!options.empty()) {
-            document optionsDoc;
-            for (const auto &[fst, snd]: options) {
-                optionsDoc.append(kvp(fst, snd));
-            }
-            applicationDocument.append(kvp("options", optionsDoc));
-        }
-
         return applicationDocument.extract();
     }
 
@@ -64,9 +57,11 @@ namespace AwsMock::Database::Entity::Apps {
         runtime = Core::Bson::BsonUtils::GetStringValue(mResult, "runtime");
         type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
         privatePort = Core::Bson::BsonUtils::GetLongValue(mResult, "privatePort");
+        publicPort = Core::Bson::BsonUtils::GetLongValue(mResult, "publicPort");
         archive = Core::Bson::BsonUtils::GetStringValue(mResult, "archive");
         version = Core::Bson::BsonUtils::GetStringValue(mResult, "version");
         containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
+        containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
         imageId = Core::Bson::BsonUtils::GetStringValue(mResult, "imageId");
@@ -91,15 +86,6 @@ namespace AwsMock::Database::Entity::Apps {
                 const std::string key = bsoncxx::string::to_string(t.key());
                 const std::string value = bsoncxx::string::to_string(tagsObject[key].get_string().value);
                 tags[key] = value;
-            }
-        }
-
-        // Options
-        if (mResult.value().find("options") != mResult.value().end()) {
-            for (const view optionsObject = mResult.value()["options"].get_document().value; const auto &o: optionsObject) {
-                const std::string key = bsoncxx::string::to_string(o.key());
-                const std::string value = bsoncxx::string::to_string(optionsObject[key].get_string().value);
-                options[key] = value;
             }
         }
     }

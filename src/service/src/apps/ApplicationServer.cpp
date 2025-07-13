@@ -69,7 +69,9 @@ namespace AwsMock::Service {
             if (application.enabled) {
                 Dto::Apps::StartApplicationRequest request;
                 request.application = Dto::Apps::Mapper::map(application);
-                _applicationService.StartApplication(request);
+                request.region = application.region;
+                Dto::Apps::ListApplicationCountersResponse response = _applicationService.StartApplication(request);
+                log_info << "Application started, name: " << request.application.name << ", total: " << response.applications.size();
             }
         }
     }
