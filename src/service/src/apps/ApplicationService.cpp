@@ -226,9 +226,10 @@ namespace AwsMock::Service {
         } else {
 
             Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
-
-            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
-            ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+            if (inspectContainerResponse.state.status != "running") {
+                ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
+                ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+            }
 
             inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
             application.imageId = inspectContainerResponse.image;
