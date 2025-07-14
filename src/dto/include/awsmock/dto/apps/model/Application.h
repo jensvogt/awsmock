@@ -65,6 +65,11 @@ namespace AwsMock::Dto::Apps {
         std::string version;
 
         /**
+         * Application docker image ID
+         */
+        std::string imageId;
+
+        /**
          * Application docker container ID
          */
         std::string containerId;
@@ -83,6 +88,11 @@ namespace AwsMock::Dto::Apps {
          * Enabled
          */
         bool enabled = false;
+
+        /**
+         * Application description
+         */
+        std::string description;
 
         /**
          * Environment
@@ -120,10 +130,12 @@ namespace AwsMock::Dto::Apps {
             r.publicPort = Core::Json::GetLongValue(v, "publicPort");
             r.archive = Core::Json::GetStringValue(v, "archive");
             r.version = Core::Json::GetStringValue(v, "version");
+            r.imageId = Core::Json::GetStringValue(v, "imageId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.containerName = Core::Json::GetStringValue(v, "containerName");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.description = Core::Json::GetStringValue(v, "description");
             r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
             r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
             r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
@@ -144,10 +156,12 @@ namespace AwsMock::Dto::Apps {
                     {"publicPort", obj.publicPort},
                     {"archive", obj.archive},
                     {"version", obj.version},
+                    {"imageId", obj.imageId},
                     {"containerId", obj.containerId},
                     {"containerName", obj.containerName},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
+                    {"description", obj.description},
                     {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},

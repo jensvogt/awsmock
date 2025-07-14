@@ -24,6 +24,7 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("imageId", imageId));
         applicationDocument.append(kvp("imageSize", imageSize));
         applicationDocument.append(kvp("imageMd5", imageMd5));
+        applicationDocument.append(kvp("description", description));
         applicationDocument.append(kvp("lastStarted", bsoncxx::types::b_date(lastStarted)));
         applicationDocument.append(kvp("created", bsoncxx::types::b_date(created)));
         applicationDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
@@ -67,6 +68,7 @@ namespace AwsMock::Database::Entity::Apps {
         imageId = Core::Bson::BsonUtils::GetStringValue(mResult, "imageId");
         imageSize = Core::Bson::BsonUtils::GetLongValue(mResult, "imageSize");
         imageMd5 = Core::Bson::BsonUtils::GetStringValue(mResult, "imageMd5");
+        description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");
         lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult, "lastStarted");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");

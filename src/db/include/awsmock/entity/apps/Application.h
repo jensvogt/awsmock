@@ -88,6 +88,11 @@ namespace AwsMock::Database::Entity::Apps {
         bool enabled = false;
 
         /**
+         * Application description
+         */
+        std::string description;
+
+        /**
          * Environment
          */
         std::map<std::string, std::string> environment;
