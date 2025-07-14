@@ -18,6 +18,7 @@
 #include <awsmock/dto/apps/internal/GetApplicationResponse.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
+#include <awsmock/dto/apps/internal/RebuildApplicationRequest.h>
 #include <awsmock/dto/apps/internal/StartApplicationRequest.h>
 #include <awsmock/dto/apps/internal/StopApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
@@ -56,7 +57,7 @@ namespace AwsMock::Service {
          * @see Dto::Apps::CreateApplicationRequest
          * @see Dto::Apps::ListApplicationCountersResponse
          */
-        Dto::Apps::ListApplicationCountersResponse CreateApplication(const Dto::Apps::CreateApplicationRequest &request) const;
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse CreateApplication(const Dto::Apps::CreateApplicationRequest &request) const;
 
         /**
          * @brief Get an application
@@ -66,7 +67,7 @@ namespace AwsMock::Service {
          * @see Dto::Apps::GetApplicationRequest
          * @see Dto::Apps::GetApplicationResponse
          */
-        Dto::Apps::GetApplicationResponse GetApplication(const Dto::Apps::GetApplicationRequest &request) const;
+        [[nodiscard]] Dto::Apps::GetApplicationResponse GetApplication(const Dto::Apps::GetApplicationRequest &request) const;
 
         /**
          * @brief Start an application
@@ -125,6 +126,20 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopApplication(const Dto::Apps::StopApplicationRequest &request) const;
 
         /**
+         * @brief Rebuilds an application
+         *
+         * @par
+         * If a container is currently running, it will be stopped and removed. Also, the image will be removed first. Afterwards, the image is recreated and
+         * a new container is started with the new image.
+         *
+         * @param request rebuild application request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::RebuildApplicationCodeRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const;
+
+        /**
          * @brief Deletes an application
          *
          * @param request delete application request
@@ -144,6 +159,13 @@ namespace AwsMock::Service {
          * @param version application version
          */
         static std::string WriteBase64File(const std::string &applicationCode, Database::Entity::Apps::Application &application, const std::string &version);
+
+        /**
+         * @brief Stop any container, removes container and deletes the image
+         *
+         * @param application application entity
+         */
+        static void DeleteImage(const Database::Entity::Apps::Application &application);
 
         /**
          * Database connection

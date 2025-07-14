@@ -57,6 +57,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
+
+                    Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.RebuildApplication(serviceRequest);
+                    log_info << "Applications rebuild, region: " << serviceRequest.region;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);

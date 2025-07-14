@@ -169,6 +169,7 @@ namespace AwsMock::Database {
 
     Entity::Apps::Application ApplicationDatabase::UpdateApplication(Entity::Apps::Application &application) const {
 
+        application.modified = system_clock::now();
         if (HasDatabase()) {
 
             mongocxx::options::find_one_and_update opts{};
