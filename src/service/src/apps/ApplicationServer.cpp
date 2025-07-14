@@ -22,7 +22,7 @@ namespace AwsMock::Service {
 
         // Start application monitoring update counters
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
-        _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod);
+        _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod, _monitoringPeriod);
 
         // Start backup
         if (_backupActive) {
@@ -61,6 +61,14 @@ namespace AwsMock::Service {
 
     void ApplicationServer::UpdateApplications() const {
         for (auto &application: _applicationDatabase.ListApplications()) {
+            Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.name);
+            application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+            application.containerId = response.id;
+            application.containerName = response.name;
+            application.imageId = response.image;
+            application.imageSize = response.sizeRootFs;
+            application = _applicationDatabase.UpdateApplication(application);
+            log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
         }
     }
 
