@@ -137,13 +137,8 @@ namespace AwsMock::Service {
         application.version = request.version;
         application = _database.UpdateApplication(application);
 
-        if (ContainerService::instance().ContainerExistsByName(application.containerName)) {
-            ContainerService::instance().StopContainer(application.containerName);
-            ContainerService::instance().DeleteContainer(application.containerName);
-            log_info << "Container stopped, name: " << application.containerName;
-            ContainerService::instance().DeleteImage(application.imageId);
-            log_info << "Image deleted, name: " << application.name;
-        }
+        // Delete container and image
+        DeleteImage(application);
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
@@ -152,6 +147,49 @@ namespace AwsMock::Service {
         t.detach();
 
         log_debug << "Application code updated, name: " << request.applicationName;
+    }
+
+    Dto::Apps::ListApplicationCountersResponse ApplicationService::RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "rebuild_application");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "rebuild_application");
+        log_debug << "Rebuild application code request, name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_warning << "Application does not exist, name: " << request.application.name;
+            throw Core::ServiceException("Application does not exist, name: " + request.application.name);
+        }
+
+        // Get application
+        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+
+        // Set status and version
+        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
+        application = _database.UpdateApplication(application);
+
+        // Delete container and image
+        DeleteImage(application);
+
+        // Get the base64 encoded application code
+        const auto applicationDataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        const std::string base64File = application.name + "-" + application.version + ".b64";
+        std::string base64FullFile = applicationDataDir + Core::FileUtils::separator() + base64File;
+        log_debug << "Using Base64File: " << base64FullFile;
+
+        // Create the application asynchronously
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        ApplicationCreator applicationCreator;
+        boost::thread t(boost::ref(applicationCreator), base64FullFile, application.region, application.name, instanceId);
+        t.detach();
+
+        Dto::Apps::ListApplicationCountersRequest listRequest{};
+        listRequest.requestId = request.requestId;
+        listRequest.region = request.region;
+        listRequest.user = request.user;
+        listRequest.prefix = request.prefix;
+        listRequest.pageSize = request.pageSize;
+        listRequest.pageIndex = request.pageIndex;
+        log_debug << "Application rebuild, name: " << request.application.name;
+        return ListApplications(listRequest);
     }
 
     Dto::Apps::ListApplicationCountersResponse ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
@@ -343,5 +381,15 @@ namespace AwsMock::Service {
             }
         }
         return base64FullFile;
+    }
+
+    void ApplicationService::DeleteImage(const Database::Entity::Apps::Application &application) {
+        if (ContainerService::instance().ContainerExistsByName(application.containerName)) {
+            ContainerService::instance().StopContainer(application.containerName);
+            ContainerService::instance().DeleteContainer(application.containerName);
+            log_info << "Container stopped, name: " << application.containerName;
+            ContainerService::instance().DeleteImage(application.imageId);
+            log_info << "Image deleted, name: " << application.name;
+        }
     }
 }// namespace AwsMock::Service
