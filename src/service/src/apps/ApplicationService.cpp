@@ -231,7 +231,7 @@ namespace AwsMock::Service {
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
 
             inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
-            application.imageId = inspectContainerResponse.image.substr(7);
+            application.imageId = inspectContainerResponse.image;
             application.containerId = inspectContainerResponse.id;
             application.containerName = inspectContainerResponse.name.substr(1);
             application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
