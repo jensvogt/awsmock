@@ -59,7 +59,7 @@ namespace AwsMock::Dto::Docker {
         HostConfig hostConfig;
 
         /**
-         * he total size of all files in the read-only layers from the image that the container uses. These layers can be shared between containers.
+         * The total size of all files in the read-only layers from the image that the container uses. These layers can be shared between containers.
          */
         long sizeRootFs;
 
