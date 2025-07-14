@@ -137,6 +137,14 @@ namespace AwsMock::Service {
         application.version = request.version;
         application = _database.UpdateApplication(application);
 
+        if (ContainerService::instance().ContainerExistsByName(application.containerName)) {
+            ContainerService::instance().StopContainer(application.containerName);
+            ContainerService::instance().DeleteContainer(application.containerName);
+            log_info << "Container stopped, name: " << application.containerName;
+            ContainerService::instance().DeleteImage(application.imageId);
+            log_info << "Image deleted, name: " << application.name;
+        }
+
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         ApplicationCreator applicationCreator;
