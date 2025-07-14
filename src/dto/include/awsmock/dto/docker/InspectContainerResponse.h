@@ -69,6 +69,11 @@ namespace AwsMock::Dto::Docker {
         long sizeRw;
 
         /**
+         * Status of the HTTP call
+         */
+        boost::beast::http::status status;
+
+        /**
          * @brief Convert to a JSON string
          *
          * @param jsonString JSON string

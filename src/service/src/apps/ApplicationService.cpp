@@ -224,22 +224,24 @@ namespace AwsMock::Service {
             log_debug << "Application start initiated, name: " << request.application.name;
 
         } else {
-
             Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
-            if (inspectContainerResponse.state.status != "running") {
+            if (inspectContainerResponse.status == http::status::ok && inspectContainerResponse.state.status != "running") {
                 ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
                 ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             }
 
             inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
-            application.imageId = inspectContainerResponse.image;
-            application.containerId = inspectContainerResponse.id;
-            application.containerName = inspectContainerResponse.name.substr(1);
-            application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
-            application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-            application = _database.UpdateApplication(application);
-
-            log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
+            if (inspectContainerResponse.status == http::status::ok) {
+                application.imageId = inspectContainerResponse.image;
+                application.containerId = inspectContainerResponse.id;
+                application.containerName = inspectContainerResponse.name.substr(1);
+                application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
+                application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application = _database.UpdateApplication(application);
+                log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
+            } else {
+                log_error << "Could not get the status of the container, name: " << application.containerName;
+            }
         }
 
         Dto::Apps::ListApplicationCountersRequest listRequest{};

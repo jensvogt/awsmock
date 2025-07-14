@@ -345,6 +345,7 @@ namespace AwsMock::Service {
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
             log_warning << "Get container by name failed, state: " << statusCode;
+            inspectContainerResponse.status = statusCode;
             return inspectContainerResponse;
         }
 
