@@ -670,6 +670,10 @@ namespace AwsMock::Service {
             AddEnvironment(ofs, environment);
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
+        } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "postgres")) {
+            ofs << "FROM " << supportedRuntime << std::endl;
+            AddEnvironment(ofs, environment);
+            ofs << "CMD [ \"" + handler + "\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
