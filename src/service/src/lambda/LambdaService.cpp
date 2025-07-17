@@ -653,8 +653,7 @@ namespace AwsMock::Service {
 
                 // Create lambda
                 LambdaCreator lambdaCreator;
-                boost::thread t(boost::ref(lambdaCreator), lambda.code.zipFile, lambda.oid, instanceId);
-                t.join();
+                lambdaCreator(lambda.code.zipFile, lambda.oid, instanceId);
 
                 // Replace lambda
                 lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
@@ -667,7 +666,7 @@ namespace AwsMock::Service {
 
         Database::Entity::Lambda::Instance instance = lambda.GetInstance(instanceId);
 
-        // Get the hostname; the hostname is different from a manager running as a Linux host and a manager running as docker container.
+        // Get the hostname; the hostname is different from a manager running as a Linux host and a manager running as a docker container.
         std::string hostName = GetHostname(instance);
         int port = GetContainerPort(instance);
 

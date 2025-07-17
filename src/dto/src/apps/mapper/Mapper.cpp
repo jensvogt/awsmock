@@ -27,6 +27,7 @@ namespace AwsMock::Dto::Apps {
         applicationDto.modified = applicationEntity.modified;
         applicationDto.environment = applicationEntity.environment;
         applicationDto.tags = applicationEntity.tags;
+        applicationDto.dependencies = applicationEntity.dependencies;
         return applicationDto;
     }
 
@@ -59,6 +60,7 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.modified = applicationDto.modified;
         applicationEntity.environment = applicationDto.environment;
         applicationEntity.tags = applicationDto.tags;
+        applicationEntity.dependencies = applicationDto.dependencies;
         return applicationEntity;
     }
 

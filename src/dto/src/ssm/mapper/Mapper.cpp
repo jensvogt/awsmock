@@ -19,8 +19,10 @@ namespace AwsMock::Dto::SSM {
         responseDto.kmsKeyArn = parameterEntity.kmsKeyArn;
         responseDto.created = parameterEntity.created;
         responseDto.modified = parameterEntity.modified;
-        for (const auto &[fst, snd]: parameterEntity.tags) {
-            responseDto.tags[fst] = snd;
+        if (!parameterEntity.tags.empty()) {
+            for (const auto &[fst, snd]: parameterEntity.tags) {
+                responseDto.tags[fst] = snd;
+            }
         }
         return responseDto;
     }

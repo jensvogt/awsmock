@@ -29,6 +29,11 @@ namespace AwsMock::Dto::Docker {
         std::vector<Container> containerList;
 
         /**
+         * HTTP status
+         */
+        boost::beast::http::status status;
+
+        /**
          * @brief Constructor
          */
         explicit ListContainerResponse(const std::string &body);

@@ -103,6 +103,11 @@ namespace AwsMock::Database::Entity::Apps {
         std::map<std::string, std::string> tags;
 
         /**
+         * Application dependencies
+         */
+        std::vector<std::string> dependencies;
+
+        /**
          * Docker image ID
          */
         std::string imageId;

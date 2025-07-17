@@ -2,6 +2,9 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/dto/common/SSMClientCommand.h"
+
+
 #include <awsmock/service/ssm/SSMService.h>
 
 namespace AwsMock::Service {
@@ -156,7 +159,7 @@ namespace AwsMock::Service {
     Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
-        log_trace << "Get parameter request: " << request.ToString();
+        log_trace << "Get parameter request, name: " << request.name;
 
         if (!_ssmDatabase.ParameterExists(request.name)) {
             log_error << "Parameter does not exist, name: " << request.name;
@@ -165,9 +168,15 @@ namespace AwsMock::Service {
 
         try {
             // Get from the database
-            const Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
+            Database::Entity::SSM::Parameter parameterEntity = _ssmDatabase.GetParameterByName(request.name);
             log_trace << "SSM parameter found: " << parameterEntity.ToString();
-
+            if (request.withDecryption) {
+                Dto::KMS::DecryptRequest decryptRequest;
+                decryptRequest.keyId = parameterEntity.kmsKeyArn.substr(parameterEntity.kmsKeyArn.find_last_of('/') + 1);
+                decryptRequest.ciphertext = parameterEntity.parameterValue;
+                const Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
+                parameterEntity.parameterValue = Core::Crypto::Base64Decode(kmsResponse.plaintext);
+            }
             return Dto::SSM::Mapper::map(request, parameterEntity);
 
         } catch (Core::DatabaseException &exc) {
@@ -228,15 +237,24 @@ namespace AwsMock::Service {
     Dto::SSM::ListParameterCountersResponse SSMService::ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
-        log_trace << "List parameter counters request: " << request.ToString();
+        log_trace << "List parameter counters region: " << request.region << ", prefix: " << request.prefix;
 
         try {
             Dto::SSM::ListParameterCountersResponse response;
 
             // Get from the database
-            Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SSM::ParameterList parameterEntities = _ssmDatabase.ListParameters(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             response.total = _ssmDatabase.CountParameters(request.region, request.prefix);
             response.parameterCounters = Dto::SSM::Mapper::map(parameterEntities);
+            for (auto &p: response.parameterCounters) {
+                if (p.type == Dto::SSM::ParameterType::secureString) {
+                    Dto::KMS::DecryptRequest decryptRequest;
+                    decryptRequest.keyId = p.kmsKeyArn.substr(p.kmsKeyArn.find_last_of('/') + 1);
+                    decryptRequest.ciphertext = p.parameterValue;
+                    const Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
+                    p.parameterValue = Core::Crypto::Base64Decode(kmsResponse.plaintext);
+                }
+            }
             log_trace << "SSM parameters found: " << parameterEntities.size();
 
             return response;

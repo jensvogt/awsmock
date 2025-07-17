@@ -47,6 +47,15 @@ namespace AwsMock::Database::Entity::Apps {
             applicationDocument.append(kvp("tags", tagsDoc));
         }
 
+        // Dependencies
+        if (!dependencies.empty()) {
+            array dependenciesArray;
+            for (const auto &dependency: dependencies) {
+                dependenciesArray.append(dependency);
+            }
+            applicationDocument.append(kvp("dependencies", dependenciesArray));
+        }
+
         return applicationDocument.extract();
     }
 
@@ -88,6 +97,15 @@ namespace AwsMock::Database::Entity::Apps {
                 const std::string key = bsoncxx::string::to_string(t.key());
                 const std::string value = bsoncxx::string::to_string(tagsObject[key].get_string().value);
                 tags[key] = value;
+            }
+        }
+
+        // Dependencies
+        if (mResult.value().find("dependencies") != mResult.value().end()) {
+            for (const view dependenciesArray = mResult.value()["dependencies"].get_array().value; const auto &d: dependenciesArray) {
+                if (std::ranges::find(dependencies, d.get_string().value) == dependencies.end()) {
+                    dependencies.emplace_back(d.get_string().value);
+                }
             }
         }
     }
