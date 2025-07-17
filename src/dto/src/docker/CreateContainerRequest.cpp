@@ -41,11 +41,6 @@ namespace AwsMock::Dto::Docker {
             array hostArray;
             hostArray.append(hostPortObject);
 
-            // DNS array
-            /*array dnsArray;
-            dnsArray.append("8.8.8.8");
-            hostConfigObject.append(kvp("Dns", dnsArray));*/
-
             // Port bindings
             document portBindingsObject;
             portBindingsObject.append(kvp(containerPort, hostArray));
@@ -53,9 +48,9 @@ namespace AwsMock::Dto::Docker {
 
             // Hosts docker internal, localstack (for localstack compatibility) and awsmock are routed to the docker host
             array extraHostsArray;
-            extraHostsArray.append("host.docker.internal:host-gateway");
-            extraHostsArray.append("awsmock:host-gateway");
-            extraHostsArray.append("localstack:host-gateway");
+            extraHostsArray.append("host.docker.internal:172.17.0.1");
+            extraHostsArray.append("awsmock:172.17.0.1");
+            extraHostsArray.append("localstack:172.17.0.1");
 
             hostConfigObject.append(kvp("ExtraHosts", extraHostsArray));
             hostConfigObject.append(kvp("NetworkMode", networkMode));
