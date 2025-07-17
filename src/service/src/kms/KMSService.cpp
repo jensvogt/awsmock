@@ -422,7 +422,7 @@ namespace AwsMock::Service {
                 unsigned char *rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLen, rawKey);
                 log_debug << "Decrypted plaintext, length: " << ciphertextLen;
 
-                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext)});
+                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext), static_cast<size_t>(ciphertextLen - 1)});
             }
 
             case Dto::KMS::KeySpec::RSA_2048:

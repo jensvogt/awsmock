@@ -323,8 +323,7 @@ namespace AwsMock::Core {
         p_len += *len;
 
         EVP_CIPHER_CTX_free(ctx);
-
-        plaintext[p_len] = '\0';
+        *len = p_len;
         return plaintext;
     }
 
