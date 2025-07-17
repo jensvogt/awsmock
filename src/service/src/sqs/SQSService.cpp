@@ -1347,8 +1347,9 @@ namespace AwsMock::Service {
                 } else {
 
                     // Delete from database
-                    _sqsDatabase.DeleteMessage(d.receiptHandle);
+                    const long count = _sqsDatabase.DeleteMessage(d.receiptHandle);
                     deleteMessageBatchResponse.successfull.emplace_back(d.id);
+                    log_trace << "Message deleted, receiptHandle: " << d.receiptHandle.substr(0, 40) << " deleted: " << count;
                 }
             }
 

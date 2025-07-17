@@ -10,10 +10,9 @@
 #include <string>
 
 // AwsMock includes
-#include "RunType.h"
-
-
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/apps/model/RunType.h>
 #include <awsmock/dto/apps/model/Runtime.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -95,6 +94,11 @@ namespace AwsMock::Dto::Apps {
         std::string description;
 
         /**
+         * Application docker file
+         */
+        std::string dockerFile;
+
+        /**
          * Environment
          */
         std::map<std::string, std::string> environment;
@@ -103,6 +107,11 @@ namespace AwsMock::Dto::Apps {
          * Tags
          */
         std::map<std::string, std::string> tags;
+
+        /**
+         * Dependencies
+         */
+        std::vector<std::string> dependencies;
 
         /**
          * Creation date
@@ -135,12 +144,16 @@ namespace AwsMock::Dto::Apps {
             r.containerName = Core::Json::GetStringValue(v, "containerName");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
-            r.description = Core::Json::GetStringValue(v, "description");
+            r.description = Core::Crypto::Base64Decode(Core::Json::GetStringValue(v, "description"));
+            r.dockerFile = Core::Crypto::Base64Decode(Core::Json::GetStringValue(v, "description"));
             r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
             r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
             r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
             r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
             r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            if (Core::Json::AttributeExists(v, "dependencies")) {
+                r.dependencies = boost::json::value_to<std::vector<std::string>>(v.at("dependencies"));
+            }
             return r;
         }
 
@@ -161,11 +174,13 @@ namespace AwsMock::Dto::Apps {
                     {"containerName", obj.containerName},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
-                    {"description", obj.description},
+                    {"description", Core::Crypto::Base64Encode(obj.description)},
+                    {"dockerFile", Core::Crypto::Base64Encode(obj.description)},
                     {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
                     {"environment", boost::json::value_from(obj.environment)},
+                    {"dependencies", boost::json::value_from(obj.dependencies)},
                     {"tags", boost::json::value_from(obj.tags)},
             };
         }

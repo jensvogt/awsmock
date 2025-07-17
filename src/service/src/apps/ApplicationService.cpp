@@ -224,13 +224,14 @@ namespace AwsMock::Service {
             log_debug << "Application start initiated, name: " << request.application.name;
 
         } else {
-            Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
+            Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerId);
             if (inspectContainerResponse.status == http::status::ok && inspectContainerResponse.state.status != "running") {
                 ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
                 ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             }
 
-            inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerName);
+            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+            inspectContainerResponse = ContainerService::instance().InspectContainer(container.id);
             if (inspectContainerResponse.status == http::status::ok) {
                 application.imageId = inspectContainerResponse.image;
                 application.containerId = inspectContainerResponse.id;
@@ -273,6 +274,28 @@ namespace AwsMock::Service {
             response.user = request.user;
             response.requestId = request.requestId;
             response.applications = Dto::Apps::Mapper::map(applications);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    std::vector<std::string> ApplicationService::ListApplicationNames() const {
+        Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "list_application_names");
+        Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "list_application_names");
+        log_debug << "List application names request";
+
+        try {
+
+            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications();
+
+            // Prepare response
+            std::vector<std::string> response;
+            for (const auto &application: applications) {
+                response.push_back(application.name);
+            }
             return response;
 
         } catch (bsoncxx::exception &exc) {

@@ -458,23 +458,19 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Encode(const std::string &decodedString) {
-        const size_t size = boost::beast::detail::base64::encoded_size(decodedString.length());
-        const auto bytes = static_cast<unsigned char *>(malloc(size));
-        const unsigned long encodedSize = boost::beast::detail::base64::encode(bytes, decodedString.c_str(), decodedString.length());
-        std::stringstream ofs;
-        ofs.write((const char *) bytes, encodedSize);
-        free(bytes);
-        return ofs.str();
+        std::string dst;
+        dst.resize(boost::beast::detail::base64::encoded_size(decodedString.length()));
+        const unsigned long encodedSize = boost::beast::detail::base64::encode(&dst[0], decodedString.c_str(), decodedString.length());
+        log_trace << "Base64 encoded string size: " << encodedSize;
+        return dst;
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
-        const size_t size = boost::beast::detail::base64::decoded_size(encodedString.length());
-        const auto bytes = static_cast<char *>(malloc(size));
-        const auto [fst, snd] = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
-        std::stringstream ofs;
-        ofs.write(bytes, fst);
-        free(bytes);
-        return ofs.str();
+        std::string dst;
+        dst.resize(boost::beast::detail::base64::decoded_size(encodedString.length()));
+        const auto [fst, snd] = boost::beast::detail::base64::decode(&dst[0], encodedString.c_str(), encodedString.length());
+        log_trace << "Base64 decoded string size: " << fst;
+        return dst;
     }
 
 #ifdef _WIN32

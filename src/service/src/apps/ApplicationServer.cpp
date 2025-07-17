@@ -61,27 +61,39 @@ namespace AwsMock::Service {
 
     void ApplicationServer::UpdateApplications() const {
         for (auto &application: _applicationDatabase.ListApplications()) {
-            Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.name);
-            application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-            application.containerId = response.id;
-            application.containerName = response.name;
-            application.imageId = response.image;
-            application.imageSize = response.sizeRootFs;
-            application = _applicationDatabase.UpdateApplication(application);
-            log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
+            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+            if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id); response.status == http::status::ok) {
+                application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application.containerId = response.id;
+                application.containerName = response.name;
+                application.imageId = response.image;
+                application.imageSize = response.sizeRootFs;
+                application = _applicationDatabase.UpdateApplication(application);
+                log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
+            }
         }
     }
 
     void ApplicationServer::StartApplications() const {
         for (const auto &application: _applicationDatabase.ListApplications()) {
             if (application.enabled) {
-                Dto::Apps::StartApplicationRequest request;
-                request.application = Dto::Apps::Mapper::map(application);
-                request.region = application.region;
-                Dto::Apps::ListApplicationCountersResponse response = _applicationService.StartApplication(request);
-                log_info << "Application started, name: " << request.application.name << ", total: " << response.applications.size();
+                DoAddApplication(application);
             }
         }
+    }
+
+    void ApplicationServer::DoAddApplication(const Database::Entity::Apps::Application &application) const {
+        if (!application.dependencies.empty()) {
+            for (const auto &d: application.dependencies) {
+                Database::Entity::Apps::Application dependency = _applicationDatabase.GetApplication(application.region, d);
+                DoAddApplication(dependency);
+            }
+        }
+        Dto::Apps::StartApplicationRequest request;
+        request.application = Dto::Apps::Mapper::map(application);
+        request.region = application.region;
+        const Dto::Apps::ListApplicationCountersResponse response = _applicationService.StartApplication(request);
+        log_info << "Application started, name: " << request.application.name << ", total: " << response.applications.size();
     }
 
     void ApplicationServer::BackupApplication() {

@@ -270,7 +270,7 @@ namespace AwsMock::Service {
     Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "decrypt");
         Monitoring::MetricService::instance().IncrementCounter(KMS_SERVICE_TIMER, "action", "decrypt");
-        log_trace << "Decrypt plaintext request: " << request;
+        log_trace << "Decrypt plaintext request, keyId: " << request.keyId;
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;

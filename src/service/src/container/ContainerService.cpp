@@ -343,9 +343,9 @@ namespace AwsMock::Service {
 
         Dto::Docker::InspectContainerResponse inspectContainerResponse{};
         auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
+        inspectContainerResponse.status = statusCode;
         if (statusCode != http::status::ok) {
-            log_warning << "Get container by name failed, state: " << statusCode;
-            inspectContainerResponse.status = statusCode;
+            log_warning << "Inspect container failed, state: " << statusCode << ", containerId: " << containerId;
             return inspectContainerResponse;
         }
 
@@ -361,7 +361,7 @@ namespace AwsMock::Service {
             const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
             auto [statusCode, body] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters);
             if (statusCode != http::status::ok) {
-                log_warning << "Get docker container by name failed, state: " << statusCode;
+                log_warning << "Get docker container by name failed, state: " << statusCode << ", name: " << name << ":" << tag;
                 return {};
             }
 

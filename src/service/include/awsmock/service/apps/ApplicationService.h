@@ -105,6 +105,14 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const;
 
+
+        /**
+         * @brief List all application names
+         *
+         * @return list of strings
+         */
+        [[nodiscard]] std::vector<std::string> ListApplicationNames() const;
+
         /**
          * @brief Starts an application
          *

@@ -59,6 +59,13 @@ namespace AwsMock::Service {
         void StartApplications() const;
 
         /**
+         * @brief Recursively start applications and dependencies.
+         *
+         * @param application application entity
+         */
+        void DoAddApplication(const Database::Entity::Apps::Application &application) const;
+
+        /**
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();

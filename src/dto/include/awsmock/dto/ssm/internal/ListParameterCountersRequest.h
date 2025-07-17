@@ -10,7 +10,6 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/SortColumn.h>
-#include <awsmock/dto/sqs/model/QueueCounter.h>
 
 namespace AwsMock::Dto::SSM {
 

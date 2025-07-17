@@ -57,6 +57,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApplicationCommandType::LIST_APPLICATION_NAMES: {
+
+                    Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
+                    std::vector<std::string> serviceResponse = _applicationService.ListApplicationNames();
+                    log_info << "Application names listed, region: " << serviceRequest.region;
+                    return SendOkResponse(request, boost::json::serialize(serviceResponse));
+                }
+
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
 
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
