@@ -466,6 +466,12 @@ namespace AwsMock::Service {
 
     void ContainerService::ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) const {
 
+        // First the last 1000 lines
+        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=1000&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
+            ws.text(true);
+            ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
+        }
+
         system_clock::time_point last = system_clock::now();
         while (ws.is_open()) {
             const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(last));
@@ -819,14 +825,6 @@ namespace AwsMock::Service {
         log_debug << "Zipped TAR file written: " << tarFileName;
 
         return tarFileName;
-    }
-
-    std::ostream ContainerService::ContainerAttach(const std::string &containerId) const {
-        boost::mutex::scoped_lock lock(_dockerServiceMutex);
-
-        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/attach"); statusCode != http::status::ok) {
-            log_error << "Attach to container failed, statusCode: " << statusCode << ", containerId: " << containerId;
-        }
     }
 
     std::string ContainerService::GetNetworkName() {

@@ -84,9 +84,8 @@ namespace AwsMock::Service {
 
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_debug << "Lambda cleaned up, name: " << lambda.function;
+            log_info << "Lambda stopped, name: " << lambda.function;
         }
-        log_info << "All lambda instances stopped";
     }
 
     void LambdaServer::CleanupDocker() const {
