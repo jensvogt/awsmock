@@ -34,7 +34,9 @@ namespace AwsMock::Service {
         }
 
         Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
+        Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
         SecretsManagerService _secretsManagerService;
+        KMSService _kmsService;
     };
 
     BOOST_FIXTURE_TEST_CASE(CreateSecretTest, SecretsServiceTest) {
@@ -44,11 +46,11 @@ namespace AwsMock::Service {
 
         // act
         const Dto::SecretsManager::CreateSecretResponse response = _secretsManagerService.CreateSecret(request);
-        const long keyCount = _secretsManagerDatabase.CountSecrets();
+        const long secretCount = _secretsManagerDatabase.CountSecrets();
         const Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(response.arn);
 
         // assert
-        BOOST_CHECK_EQUAL(1, keyCount);
+        BOOST_CHECK_EQUAL(1, secretCount);
         BOOST_CHECK_EQUAL(response.name, "test-secret");
         BOOST_CHECK_EQUAL(response.versionId.empty(), false);
         BOOST_CHECK_EQUAL(secret.versions.empty(), false);
@@ -77,6 +79,32 @@ namespace AwsMock::Service {
         BOOST_CHECK_EQUAL(getResponse.name, "test-secret");
         BOOST_CHECK_EQUAL(getResponse.versionId.empty(), false);
         BOOST_CHECK_EQUAL(getResponse.secretString, createRequest.secretString);
+    }
+
+    BOOST_FIXTURE_TEST_CASE(UpdateSecretValueTest, SecretsServiceTest) {
+
+        // arrange
+        const Dto::SecretsManager::CreateSecretRequest createRequest = createDefaultRequest();
+        const Dto::SecretsManager::CreateSecretResponse createResponse = _secretsManagerService.CreateSecret(createRequest);
+
+        // act
+        Dto::SecretsManager::UpdateSecretRequest updateRequest;
+        updateRequest.region = REGION;
+        updateRequest.secretId = createResponse.arn.substr(createResponse.arn.find_last_of(':') + 1);
+        updateRequest.secretString = "new-secret-string";
+        Dto::SecretsManager::UpdateSecretResponse updateResponse = _secretsManagerService.UpdateSecret(updateRequest);
+
+        // Get updated value
+        Dto::SecretsManager::GetSecretValueRequest getRequest;
+        getRequest.region = REGION;
+        getRequest.secretId = createResponse.arn.substr(createResponse.arn.find_last_of(':') + 1);
+        getRequest.versionStage = "AWSCURRENT";
+        Dto::SecretsManager::GetSecretValueResponse updatedValue = _secretsManagerService.GetSecretValue(getRequest);
+
+        // assert
+        BOOST_CHECK_EQUAL(updatedValue.name, "test-secret");
+        BOOST_CHECK_EQUAL(updatedValue.versionId.empty(), false);
+        BOOST_CHECK_EQUAL(updatedValue.secretString, "new-secret-string");
     }
 
 }// namespace AwsMock::Service
