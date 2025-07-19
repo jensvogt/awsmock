@@ -6,10 +6,13 @@
 #define AWSMOCK_SERVICE_DOCKER_SERVICE_H
 
 // C++ standard includes
+#include <memory>
 #include <string>
 #include <thread>
 
 // Boost includes
+#include <boost/beast/core.hpp>
+#include <boost/beast/websocket.hpp>
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
@@ -84,7 +87,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ContainerService {
+    class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
       public:
 
@@ -225,9 +228,10 @@ namespace AwsMock::Service {
          * @brief Attach to the container and get the stdin, stdout, stderr streams
          *
          * @param containerId container ID
-         * @return ouitput stream
+         * @param ws websocket
+         * @return output stream
          */
-        [[nodiscard]] std::ostream ContainerAttach(const std::string &containerId) const;
+        void ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) const;
 
         /**
          * @brief Waits until a container is in state 'running'
@@ -463,8 +467,8 @@ namespace AwsMock::Service {
          * @brief Returns the network name
          *
          * @par
-         * Depending on the container engine, the network name must be different. For Podman use the default name 'podman', for docker
-         * we use an own network, named 'local'.
+         * Depending on the container engine, the network name must be different. For Podman use the default name 'podman'; for docker
+         * we use our own network, named 'local'.
          *
          * @return network name
          */
@@ -485,6 +489,10 @@ namespace AwsMock::Service {
          * @param environment environment variables
          */
         static void AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment);
+
+        void WriteToWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, const boost::asio::const_buffer &buffer);
+
+        void OnWebSocketWrite(const boost::beast::error_code &error, std::size_t bytesWritten);
 
         /**
          * Docker version
@@ -520,6 +528,11 @@ namespace AwsMock::Service {
          * Mutex
          */
         static boost::mutex _dockerServiceMutex;
+
+        /**
+         * Log buffer
+         */
+        boost::beast::flat_buffer _buffer;
     };
 
 }// namespace AwsMock::Service

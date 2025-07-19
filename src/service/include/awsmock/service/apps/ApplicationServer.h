@@ -59,6 +59,11 @@ namespace AwsMock::Service {
         void StartApplications() const;
 
         /**
+         * @brief Start an application log server
+         */
+        static void StartApplicationLogServer();
+
+        /**
          * @brief Recursively start applications and dependencies.
          *
          * @param application application entity
