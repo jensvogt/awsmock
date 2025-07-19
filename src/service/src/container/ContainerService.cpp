@@ -821,6 +821,14 @@ namespace AwsMock::Service {
         return tarFileName;
     }
 
+    std::ostream ContainerService::ContainerAttach(const std::string &containerId) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        if (auto [statusCode, body] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/attach"); statusCode != http::status::ok) {
+            log_error << "Attach to container failed, statusCode: " << statusCode << ", containerId: " << containerId;
+        }
+    }
+
     std::string ContainerService::GetNetworkName() {
         if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
             return Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
