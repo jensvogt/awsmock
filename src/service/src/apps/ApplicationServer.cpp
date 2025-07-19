@@ -2,6 +2,9 @@
 // Created by vogje01 on 04/01/2023.
 //
 
+#include "awsmock/service/apps/ApplicationLogServer.h"
+
+
 #include <awsmock/service/apps/ApplicationServer.h>
 
 namespace AwsMock::Service {
@@ -28,6 +31,9 @@ namespace AwsMock::Service {
         if (_backupActive) {
             scheduler.AddTask("application-backup", [this] { BackupApplication(); }, _backupCron);
         }
+
+        // Start the application
+        StartApplicationLogServer();
 
         // Start the application
         StartApplications();
@@ -61,15 +67,17 @@ namespace AwsMock::Service {
 
     void ApplicationServer::UpdateApplications() const {
         for (auto &application: _applicationDatabase.ListApplications()) {
-            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
-            if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id); response.status == http::status::ok) {
-                application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application.containerId = response.id;
-                application.containerName = response.name;
-                application.imageId = response.image;
-                application.imageSize = response.sizeRootFs;
-                application = _applicationDatabase.UpdateApplication(application);
-                log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
+            if (application.enabled) {
+                Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+                if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id); response.status == http::status::ok) {
+                    application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                    application.containerId = response.id;
+                    application.containerName = response.name;
+                    application.imageId = response.image;
+                    application.imageSize = response.sizeRootFs;
+                    application = _applicationDatabase.UpdateApplication(application);
+                    log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
+                }
             }
         }
     }
@@ -80,6 +88,14 @@ namespace AwsMock::Service {
                 DoAddApplication(application);
             }
         }
+    }
+
+    void ApplicationServer::StartApplicationLogServer() {
+        log_info << "Starting application log server";
+        ApplicationLogServer applicationLogServer;
+        boost::thread t(boost::ref(applicationLogServer), "0.0.0.0", 4568);
+        t.detach();
+        log_info << "Application log server started";
     }
 
     void ApplicationServer::DoAddApplication(const Database::Entity::Apps::Application &application) const {

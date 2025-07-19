@@ -124,6 +124,48 @@ namespace AwsMock::Core {
         return {.statusCode = status::internal_server_error, .body = "General error"};
     }
 
+    boost::asio::local::stream_protocol::socket WindowsSocket::SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) {
+
+        boost::system::error_code ec;
+
+        boost::asio::io_context ctx;
+        boost::asio::local::stream_protocol::endpoint endpoint(_basePath);
+        boost::asio::local::stream_protocol::socket socket(ctx);
+        ec = socket.connect(endpoint, ec);
+        if (ec) {
+            log_error << "Could not connect to docker UNIX domain socket, basePath: " << _basePath << ", method: " << method << ", error: " << ec.message();
+            return socket;
+        }
+
+        // Prepare the message
+        request<empty_body> request;
+        request.method(method);
+        request.target(path);
+        request.base().set("Host", "localhost");
+        request.set(field::user_agent, BOOST_BEAST_VERSION_STRING);
+
+        if (!headers.empty()) {
+            for (const auto &[fst, snd]: headers) {
+                request.base().set(fst, snd);
+            }
+        }
+
+        // Write to unix socket
+        http::write(socket, request);
+
+        boost::beast::flat_buffer buffer;
+        response<string_body> response;
+        read(socket, buffer, response, ec);
+        if (ec) {
+            log_error << "Send to docker daemon failed, error: " << ec.message();
+        }
+        socket.close();
+        if (ec) {
+            log_error << "Shutdown socket failed, error: " << ec.message();
+        }
+        return socket;
+    }
+
     void WindowsSocket::GetHostPort(const std::string &url, std::string &host, int &port) {
         const boost::regex expr(R"(.*:\/\/(.*):(\d+)$)");
         boost::smatch what;

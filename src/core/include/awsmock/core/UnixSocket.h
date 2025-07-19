@@ -117,6 +117,18 @@ namespace AwsMock::Core {
          * @see Core::DomainSocketResult
          */
         DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) override;
+
+        /**
+         * @brief Send an attach-container command
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param headers optional HTTP headers
+         * @param ws web socket
+         * @return result struct
+         * @see Core::DomainSocketResult
+         */
+        [[nodiscard]] boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
     };
 
 }// namespace AwsMock::Core
