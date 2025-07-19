@@ -116,4 +116,16 @@ namespace AwsMock::Service {
         ModuleService::BackupModule("application", true);
     }
 
+    void ApplicationServer::Shutdown() {
+        log_debug << "Application server shutdown";
+
+        for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase.ListApplications(); auto &application: applications) {
+
+            ContainerService::instance().StopContainer(application.containerId);
+            ContainerService::instance().DeleteContainer(application.containerId);
+            application = _applicationDatabase.UpdateApplication(application);
+            log_info << "Application stopped, name: " << application.name;
+        }
+    }
+
 }// namespace AwsMock::Service

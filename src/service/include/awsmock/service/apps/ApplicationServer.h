@@ -36,6 +36,11 @@ namespace AwsMock::Service {
          */
         explicit ApplicationServer(Core::Scheduler &scheduler);
 
+        /**
+         * @brief Shutdown server
+         */
+        void Shutdown() override;
+
       private:
 
         /**
