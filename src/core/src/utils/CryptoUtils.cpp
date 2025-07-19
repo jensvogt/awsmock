@@ -3,11 +3,11 @@
 //
 
 #include <awsmock/core/CryptoUtils.h>
-#include <boost/beast/core/detail/base64.hpp>
 
 namespace AwsMock::Core {
 
     unsigned int Crypto::_salt[] = {1214370622, 264849915};
+    unsigned char Crypto::_iv[] = "[Qáwu";
 
     std::string Crypto::GetMd5FromString(const std::string &content) {
 
@@ -273,57 +273,38 @@ namespace AwsMock::Core {
         }
     }
 
-    unsigned char *Crypto::Aes256EncryptString(unsigned char *plaintext, int *len, unsigned char *key) {
+    unsigned char *Crypto::Aes256EncryptString(const unsigned char *plaintext, int *len, unsigned char *key) {
 
-        // "opaque" encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
-        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+        int f_len = 0, p_len = *len;
 
-        auto *key_data = key;
-        if (const int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256EncryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
-            log_error << "Couldn't initialize AES256 cipher";
-            return {};
-        }
-
-        // max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 byte
-        int c_len = *len + CRYPTO_AES256_BLOCK_SIZE, f_len = 0;
-        auto *ciphertext = static_cast<unsigned char *>(malloc(c_len));
+        // Max plaintext len for n bytes of ciphertext is n + AES_BLOCK_SIZE -1 byte
+        auto *ciphertext = static_cast<unsigned char *>(malloc(*len + CRYPTO_AES256_BLOCK_SIZE));
 
         // Allows reusing of 'ctx' for multiple encryption cycles
-        EVP_EncryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
-        EVP_EncryptUpdate(ctx, ciphertext, &c_len, plaintext, *len);
-        EVP_EncryptFinal_ex(ctx, ciphertext + c_len, &f_len);
-
+        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+        EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), nullptr, key, _iv);
+        EVP_EncryptUpdate(ctx, ciphertext, &p_len, plaintext, *len);
+        EVP_EncryptFinal_ex(ctx, ciphertext + p_len, &f_len);
         EVP_CIPHER_CTX_free(ctx);
 
-        *len = c_len + f_len;
+        *len = p_len + f_len;
         return ciphertext;
     }
 
-    unsigned char *Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, unsigned char *key) {
+    unsigned char *Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key) {
 
-        // Opaque encryption, decryption ctx structures that libcrypto uses to record status of enc/dec operations
-        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+        int p_len = 0, f_len = 0;
 
-        auto *key_data = key;
-
-        if (const int key_data_len = static_cast<int>(strlen(reinterpret_cast<const char *>(key_data))); Aes256DecryptionInit(key_data, key_data_len, reinterpret_cast<unsigned char *>(&_salt), ctx)) {
-            log_error << "Couldn't initialize AES cipher";
-            return {};
-        }
-
-        const int c_len = *len;
         // Max ciphertext len for n bytes of plaintext is n + AES_BLOCK_SIZE -1 byte
-        int f_len = 0, p_len = 0;
-        auto *plaintext = static_cast<unsigned char *>(malloc(c_len));
+        auto *plaintext = static_cast<unsigned char *>(malloc(*len + AES_BLOCK_SIZE));
 
-        EVP_DecryptInit_ex(ctx, nullptr, nullptr, nullptr, nullptr);
-        EVP_DecryptUpdate(ctx, plaintext, &p_len, ciphertext, c_len);
-        p_len = *len;
-        EVP_DecryptFinal(ctx, plaintext + c_len, len);
-        p_len += *len;
-
+        EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+        EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), nullptr, key, _iv);
+        EVP_DecryptUpdate(ctx, plaintext, &p_len, ciphertext, *len);
+        EVP_DecryptFinal(ctx, plaintext + p_len, &f_len);
         EVP_CIPHER_CTX_free(ctx);
-        *len = p_len;
+
+        *len = p_len + f_len;
         return plaintext;
     }
 
@@ -457,18 +438,23 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Encode(const std::string &decodedString) {
-        std::string dst;
-        dst.resize(boost::beast::detail::base64::encoded_size(decodedString.length()));
-        const unsigned long encodedSize = boost::beast::detail::base64::encode(&dst[0], decodedString.c_str(), decodedString.length());
-        log_trace << "Base64 encoded string size: " << encodedSize;
+        const int data_len = decodedString.length();
+        const int dataB64_len = 4 * ((data_len + 2) / 3);
+        const auto dataB64 = (unsigned char *) calloc(dataB64_len + 1, 1);
+        EVP_EncodeBlock(dataB64, reinterpret_cast<const unsigned char *>(decodedString.c_str()), data_len);
+        std::string dst = {reinterpret_cast<char *>(dataB64), static_cast<std::string::size_type>(dataB64_len)};
+        free(dataB64);
         return dst;
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
-        std::string dst;
-        dst.resize(boost::beast::detail::base64::decoded_size(encodedString.length()));
-        const auto [fst, snd] = boost::beast::detail::base64::decode(&dst[0], encodedString.c_str(), encodedString.length());
-        log_trace << "Base64 decoded string size: " << fst;
+        int dataB64_len = strlen(encodedString.c_str());
+        int data_len = 3 * dataB64_len / 4;
+        const auto data = (unsigned char *) calloc(data_len, 1);
+        EVP_DecodeBlock(data, reinterpret_cast<const unsigned char *>(encodedString.c_str()), dataB64_len);
+        while (encodedString[--dataB64_len] == '=') data_len--;
+        std::string dst = {reinterpret_cast<char *>(data), static_cast<std::string::size_type>(data_len)};
+        free(data);
         return dst;
     }
 
