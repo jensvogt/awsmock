@@ -48,9 +48,9 @@ namespace AwsMock::Dto::Docker {
 
             // Hosts docker internal, localstack (for localstack compatibility) and awsmock are routed to the docker host
             array extraHostsArray;
-            extraHostsArray.append("host.docker.internal:172.17.0.1");
-            extraHostsArray.append("awsmock:172.17.0.1");
-            extraHostsArray.append("localstack:172.17.0.1");
+            extraHostsArray.append("host.docker.internal:host-gateway");
+            extraHostsArray.append("awsmock:host-gateway");
+            extraHostsArray.append("localstack:host-gateway");
 
             hostConfigObject.append(kvp("ExtraHosts", extraHostsArray));
             hostConfigObject.append(kvp("NetworkMode", networkMode));

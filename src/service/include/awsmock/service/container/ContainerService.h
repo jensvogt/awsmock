@@ -222,6 +222,14 @@ namespace AwsMock::Service {
         [[nodiscard]] bool IsContainerRunning(const std::string &containerId) const;
 
         /**
+         * @brief Attach to the container and get the stdin, stdout, stderr streams
+         *
+         * @param containerId container ID
+         * @return ouitput stream
+         */
+        [[nodiscard]] std::ostream ContainerAttach(const std::string &containerId) const;
+
+        /**
          * @brief Waits until a container is in state 'running'
          *
          * @par

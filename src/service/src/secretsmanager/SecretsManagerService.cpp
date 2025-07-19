@@ -166,7 +166,6 @@ namespace AwsMock::Service {
 
             if (!secret.kmsKeyId.empty()) {
                 response.secretString = DecryptSecret(version, secret.kmsKeyId, version.secretString);
-                log_warning << "Secret string, stage: " << request.versionStage << ": " << response.secretString;
             } else if (!version.secretString.empty()) {
                 response.secretBinary = Core::Crypto::Base64Decode(version.secretBinary);
             }
@@ -695,7 +694,6 @@ namespace AwsMock::Service {
         decryptRequest.keyId = kmsKeyId;
         decryptRequest.ciphertext = secretString;
         const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
-        log_info << "Decrypt secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
         return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 
