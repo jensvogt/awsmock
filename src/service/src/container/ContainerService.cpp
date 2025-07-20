@@ -2,9 +2,6 @@
 // Created by vogje01 on 06/06/2023.
 //
 
-#include "awsmock/dto/apps/internal/WebSocketCommand.h"
-
-
 #include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
@@ -467,10 +464,10 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void ContainerService::ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) const {
+    void ContainerService::ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, long tail) const {
 
         // First the last 1000 lines
-        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=1000&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
+        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
             ws.text(true);
             ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
         }
