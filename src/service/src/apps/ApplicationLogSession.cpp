@@ -77,7 +77,7 @@ namespace AwsMock::Service {
         log_debug << "Received message: " << webSocketCommand;
         switch (webSocketCommand.command) {
             case Dto::Apps::WebSoketCommandType::OPEN_LOG:
-                ContainerService::instance().ContainerAttach(webSocketCommand.containerId, ws);
+                ContainerService::instance().ContainerAttach(webSocketCommand.containerId, ws, 1000);
                 return "ok";
             default:
                 return "ok";
