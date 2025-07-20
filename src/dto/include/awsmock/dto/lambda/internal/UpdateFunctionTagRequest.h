@@ -45,17 +45,17 @@ namespace AwsMock::Dto::Lambda {
 
         friend UpdateFunctionTagRequest tag_invoke(boost::json::value_to_tag<UpdateFunctionTagRequest>, boost::json::value const &v) {
             UpdateFunctionTagRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
-            r.tagKey = Core::Json::GetStringValue(v, "tagKey");
-            r.tagValue = Core::Json::GetStringValue(v, "tagValue");
+            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            r.tagKey = Core::Json::GetStringValue(v, "Key");
+            r.tagValue = Core::Json::GetStringValue(v, "Value");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateFunctionTagRequest const &obj) {
             jv = {
-                    {"functionArn", obj.functionArn},
-                    {"tagKey", obj.tagKey},
-                    {"tagValue", obj.tagValue},
+                    {"FunctionArn", obj.functionArn},
+                    {"Key", obj.tagKey},
+                    {"Value", obj.tagValue},
             };
         }
     };
