@@ -256,6 +256,81 @@ namespace AwsMock::Service {
         return ListApplications(listRequest);
     }
 
+    Dto::Apps::ListApplicationCountersResponse ApplicationService::RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "restart_application");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "restart_application");
+        log_debug << "Restart application request, name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_warning << "Application does not exist, name: " << request.application.name;
+            throw Core::ServiceException("Application does not exist, name: " + request.application.name);
+        }
+
+        // Get application
+        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+
+        // Update status
+        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
+        application = _database.UpdateApplication(application);
+
+        // Stop the application
+        if (!ContainerService::instance().ContainerExistsByName(application.containerName)) {
+            log_warning << "Container does not exist, name: " << request.application.name;
+            throw Core::ServiceException("Container does not exist, name: " + request.application.name);
+        }
+
+        // Stop container
+        ContainerService::instance().StopContainer(application.containerId);
+        ContainerService::instance().DeleteContainer(application.containerId);
+        log_debug << "Application stopped, name: " << application.name;
+
+        const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
+
+        // Check whether a container exists already
+        if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByImageName(application.name, application.version)) {
+
+            // Create the application asynchronously
+            const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            ApplicationCreator applicationCreator;
+            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
+            t.detach();
+            log_debug << "Application start initiated, name: " << request.application.name;
+
+        } else {
+
+            Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(application.containerId);
+            if (inspectContainerResponse.status == http::status::ok && inspectContainerResponse.state.status != "running") {
+                ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
+                ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+            }
+
+            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+            inspectContainerResponse = ContainerService::instance().InspectContainer(container.id);
+            if (inspectContainerResponse.status == http::status::ok) {
+                application.imageId = inspectContainerResponse.image;
+                application.containerId = inspectContainerResponse.id;
+                application.containerName = inspectContainerResponse.name.substr(1);
+                application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
+                application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application = _database.UpdateApplication(application);
+                log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
+            } else {
+                log_error << "Could not get the status of the container, name: " << application.containerName;
+            }
+        }
+
+        Dto::Apps::ListApplicationCountersRequest listRequest{};
+        listRequest.requestId = request.requestId;
+        listRequest.region = request.region;
+        listRequest.user = request.user;
+        listRequest.prefix = request.prefix;
+        listRequest.pageSize = request.pageSize;
+        listRequest.pageIndex = request.pageIndex;
+        log_trace << "Application deleted, name: " + request.application.name;
+        return ListApplications(listRequest);
+    }
+
     Dto::Apps::ListApplicationCountersResponse ApplicationService::ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "list_applications");
         Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "list_applications");

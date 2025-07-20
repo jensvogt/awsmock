@@ -12,10 +12,15 @@
 // AwsMock include
 #include <awsmock/core/LogStream.h>
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
+#include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
 
-    // Echoes back all received WebSocket messages
+    /**
+     * @brief Echoes back all received WebSocket messages
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     class ApplicationLogSession : public std::enable_shared_from_this<ApplicationLogSession> {
 
         boost::beast::websocket::stream<boost::beast::tcp_stream> ws_;
@@ -61,7 +66,7 @@ namespace AwsMock::Service {
          * @param message websocket message
          * @param ws web socket
          */
-        std::string HandleEvent(const std::string &message, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) const;
+        static std::string HandleEvent(const std::string &message, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws);
     };
 
 }// namespace AwsMock::Service

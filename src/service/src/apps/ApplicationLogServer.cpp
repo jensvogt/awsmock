@@ -16,7 +16,6 @@ namespace AwsMock::Service {
         constexpr auto threads = std::max<int>(1, 5);
 
         // The io_context is required for all I/O
-        //ioc = boost::asio::io_context(threads);
         boost::asio::io_context _ioc{5};
 
         // Create and launch a listening port

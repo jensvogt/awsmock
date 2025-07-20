@@ -19,6 +19,7 @@
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
 #include <awsmock/dto/apps/internal/RebuildApplicationRequest.h>
+#include <awsmock/dto/apps/internal/RestartApplicationRequest.h>
 #include <awsmock/dto/apps/internal/StartApplicationRequest.h>
 #include <awsmock/dto/apps/internal/StopApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
@@ -132,6 +133,19 @@ namespace AwsMock::Service {
          * @see Dto::Apps::ListApplicationCountersResponse
          */
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopApplication(const Dto::Apps::StopApplicationRequest &request) const;
+
+        /**
+         * @brief Restarts an application
+         *
+         * @par
+         * This method will stop the container, delete the container and will rebuild the container from the corresponding image.
+         *
+         * @param request restart application request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::RestartApplicationRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const;
 
         /**
          * @brief Rebuilds an application
