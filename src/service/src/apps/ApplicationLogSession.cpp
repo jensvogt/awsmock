@@ -2,9 +2,6 @@
 // Created by vogje01 on 7/19/25.
 //
 
-#include "awsmock/service/container/ContainerService.h"
-
-
 #include <awsmock/service/apps/ApplicationLogSession.h>
 
 namespace AwsMock::Service {
@@ -16,7 +13,7 @@ namespace AwsMock::Service {
 
         // Set a decorator to change the Server of the handshake
         ws_.set_option(boost::beast::websocket::stream_base::decorator([](boost::beast::websocket::response_type &res) {
-            res.set(http::field::server, std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-async");
+            res.set(boost::beast::http::field::server, std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-async");
         }));
 
         // Accept the websocket handshake
@@ -41,11 +38,13 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This indicates that the session was closed
-        if (ec == boost::beast::websocket::error::closed)
+        if (ec == boost::beast::websocket::error::closed) {
+            log_info << "Application log session closed";
             return;
+        }
 
         if (ec) {
-            log_error << "Read failed, errorCode: " << ec.message() << std::endl;
+            log_info << "Websocket closed by peer, errorCode: " << ec.message();
             return;
         }
 
@@ -59,8 +58,10 @@ namespace AwsMock::Service {
 
         boost::ignore_unused(bytes_transferred);
 
-        if (ec)
-            log_error << "Write failed, errorCode: " << ec.message() << std::endl;
+        if (ec) {
+            log_info << "Websocket closed by peer, errorCode: " << ec.message();
+            return;
+        }
 
         // Clear the buffer
         log_info << "Write: " << boost::beast::make_printable(buffer_.data());
@@ -70,11 +71,10 @@ namespace AwsMock::Service {
         DoRead();
     }
 
-    std::string ApplicationLogSession::HandleEvent(const std::string &message, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) const {
+    std::string ApplicationLogSession::HandleEvent(const std::string &message, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) {
 
         const Dto::Apps::WebSocketCommand webSocketCommand = Dto::Apps::WebSocketCommand::FromJson(message);
-        log_info << "Received message: " << webSocketCommand;
-
+        log_debug << "Received message: " << webSocketCommand;
         switch (webSocketCommand.command) {
             case Dto::Apps::WebSoketCommandType::OPEN_LOG:
                 ContainerService::instance().ContainerAttach(webSocketCommand.containerId, ws);

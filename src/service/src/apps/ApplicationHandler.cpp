@@ -81,6 +81,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
+
+                    Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.RestartApplication(serviceRequest);
+                    log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
                 case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
 
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);

@@ -2,6 +2,9 @@
 // Created by vogje01 on 06/06/2023.
 //
 
+#include "awsmock/dto/apps/internal/WebSocketCommand.h"
+
+
 #include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
@@ -472,15 +475,28 @@ namespace AwsMock::Service {
             ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
         }
 
+        boost::asio::streambuf buffer;
         system_clock::time_point last = system_clock::now();
         while (ws.is_open()) {
             const std::string since = std::to_string(Core::DateTimeUtils::UnixTimestamp(last));
-            if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
-                ws.text(true);
-                ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
+            if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?since=" + since + "&stdout=true&stderr=true&tail=1000"); statusCode == http::status::ok && contentLength > 0) {
+                if (ws.is_open()) {
+                    ws.text(true);
+                    ws.write(boost::asio::buffer(Core::StringUtils::RemoveColorCoding(body)));
+                }
             }
             last = system_clock::now();
-            std::this_thread::sleep_for(1000ms);
+
+            // Check for a closing message
+            ws.read(buffer);
+            log_trace << "Container read, message: " << boost::beast::make_printable(buffer.data());
+            if (const Dto::Apps::WebSocketCommand webSocketCommand = Dto::Apps::WebSocketCommand::FromJson(boost::beast::buffers_to_string(buffer.data()));
+                webSocketCommand.command == Dto::Apps::WebSoketCommandType::CLOSE_LOG || webSocketCommand.command == Dto::Apps::WebSoketCommandType::UNKNOWN) {
+                ws.close({"Graceful shutdown"});
+                log_info << "Container logging connection closed, containerId: " << containerId;
+                break;
+            }
+            buffer.consume(buffer.size());
         }
         log_info << "Attached to container finished, containerId: " << containerId;
     }
