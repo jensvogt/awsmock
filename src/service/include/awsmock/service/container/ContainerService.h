@@ -28,6 +28,7 @@
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/UnixSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/apps/internal/WebSocketCommand.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
@@ -229,9 +230,10 @@ namespace AwsMock::Service {
          *
          * @param containerId container ID
          * @param ws websocket
+         * @param tail maximal number of lines
          * @return output stream
          */
-        void ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) const;
+        void ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, long tail) const;
 
         /**
          * @brief Waits until a container is in state 'running'
