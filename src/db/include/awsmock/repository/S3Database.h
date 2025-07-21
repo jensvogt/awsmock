@@ -30,14 +30,14 @@ namespace AwsMock::Database {
 
     using std::chrono::system_clock;
 
-    struct BucketMonitoringCounter {
+    struct S3MonitoringCounter {
         long keys{};
         long size{};
         system_clock::time_point modified = system_clock::now();
     };
 
-    using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, BucketMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using S3CounterMapType = boost::container::map<std::string, BucketMonitoringCounter, std::less<std::string>, S3ShmAllocator>;
+    using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, S3MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using S3CounterMapType = boost::container::map<std::string, S3MonitoringCounter, std::less<std::string>, S3ShmAllocator>;
 
     static constexpr auto S3_COUNTER_MAP_NAME = "S3BucketCounter";
 
@@ -134,7 +134,7 @@ namespace AwsMock::Database {
          * @param bucketArn AWS region
          * @return bucket entity
          */
-        Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn) const;
+        [[nodiscard]] Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn) const;
 
         /**
          * @brief Create a new bucket in the S3 bucket table
@@ -155,7 +155,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export all buckets
@@ -163,7 +163,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Check whether the bucket has still objects

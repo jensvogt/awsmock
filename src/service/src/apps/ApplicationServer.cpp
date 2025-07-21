@@ -23,6 +23,10 @@ namespace AwsMock::Service {
         }
         log_info << "Application module starting";
 
+        // Initialize shared memory
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _applicationCounterMap = _segment.find<Database::ApplicationCounterMapType>(Database::APPLICATION_COUNTER_MAP_NAME).first;
+
         // Start application monitoring update counters
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod, _monitoringPeriod);
@@ -44,25 +48,12 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::UpdateCounter() const {
-        log_trace << "Application monitoring starting";
+        log_trace << "S3 Monitoring starting";
 
-        /* const long users = _applicationDatabase.CountUsers();
-        const long userPools = _applicationDatabase.CountUserPools();
-        _metricService.SetGauge(APPLICATION_USER_COUNT, {}, {}, static_cast<double>(users));
-        _metricService.SetGauge(APPLICATION_USERPOOL_COUNT, {}, {}, static_cast<double>(userPools));
-
-        // Count users per user pool
-        for (auto &userPool: _applicationDatabase.ListUserPools()) {
-            const long usersPerUserPool = _applicationDatabase.CountUsers(userPool.region, userPool.userPoolId);
-            _metricService.SetGauge(APPLICATION_USER_BY_USERPOOL_COUNT, "userPool", userPool.name, static_cast<double>(usersPerUserPool));
+        if (_applicationCounterMap) {
+            _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationCounterMap->size()));
         }
-
-        // Count users per user group
-        for (auto &group: _applicationDatabase.ListGroups()) {
-            const long usersPerGroup = _applicationDatabase.CountUsers(group.region, group.userPoolId, group.groupName);
-            _metricService.SetGauge(APPLICATION_USER_BY_GROUP_COUNT, "group", group.groupName, static_cast<double>(usersPerGroup));
-        }*/
-        log_trace << "Application monitoring finished";
+        log_debug << "Application monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
 
     void ApplicationServer::UpdateApplications() const {
@@ -98,7 +89,7 @@ namespace AwsMock::Service {
         log_info << "Application log server started";
     }
 
-    void ApplicationServer::DoAddApplication(const Database::Entity::Apps::Application &application) const {
+    auto ApplicationServer::DoAddApplication(const Database::Entity::Apps::Application &application) const -> void {
         if (!application.dependencies.empty()) {
             for (const auto &d: application.dependencies) {
                 Database::Entity::Apps::Application dependency = _applicationDatabase.GetApplication(application.region, d);

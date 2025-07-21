@@ -8,17 +8,29 @@
 // C++ standard includes
 #include <string>
 
+// Boost includes
+#include <boost/container/map.hpp>
+#include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/interprocess/shared_memory_object.hpp>
+
 // AwsMock includes
 #include <awsmock/core/LogStream.h>
+#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
 
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
+    struct ApplicationMonitoringCounter {
+        long count{};
+        system_clock::time_point modified = system_clock::now();
+    };
+
+    using ApplicationShmAllocator = boost::interprocess::allocator<std::pair<const std::string, ApplicationMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using ApplicationCounterMapType = boost::container::map<std::string, ApplicationMonitoringCounter, std::less<std::string>, ApplicationShmAllocator>;
+
+    static constexpr auto APPLICATION_COUNTER_MAP_NAME = "ApplicationCounter";
 
     /**
      * @brief Application MongoDB database.
@@ -32,7 +44,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {};
+        explicit ApplicationDatabase();
 
         /**
          * @brief Singleton instance
@@ -142,6 +154,16 @@ namespace AwsMock::Database {
          * Application in-memory database
          */
         ApplicationMemoryDb &_memoryDb;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Map of monitoring counters
+         */
+        ApplicationCounterMapType *_applicationCounterMap;
     };
 
 }// namespace AwsMock::Database
