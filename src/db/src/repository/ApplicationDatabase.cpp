@@ -5,6 +5,22 @@
 #include <awsmock/repository/ApplicationDatabase.h>
 
 namespace AwsMock::Database {
+    ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {
+
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _applicationCounterMap = _segment.find<ApplicationCounterMapType>(APPLICATION_COUNTER_MAP_NAME).first;
+        if (!_applicationCounterMap) {
+            _applicationCounterMap = _segment.construct<ApplicationCounterMapType>(APPLICATION_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
+        }
+
+        // Initialize the counters
+        for (const auto &application: ListApplications()) {
+            ApplicationMonitoringCounter counter;
+            counter.count = CountApplications(application.region);
+            _applicationCounterMap->insert_or_assign(application.name, counter);
+        }
+        log_debug << "Application counters initialized" << _applicationCounterMap->size();
+    }
 
     bool ApplicationDatabase::ApplicationExists(const std::string &region, const std::string &name) const {
 

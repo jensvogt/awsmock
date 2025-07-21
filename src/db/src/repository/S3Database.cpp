@@ -20,7 +20,7 @@ namespace AwsMock::Database {
 
         // Initialize the counters
         for (const auto &bucket: ListBuckets()) {
-            BucketMonitoringCounter counter;
+            S3MonitoringCounter counter;
             counter.keys = GetBucketObjectCount(bucket.region, bucket.name);
             counter.size = GetBucketSize(bucket.region, bucket.name);
             _s3CounterMap->insert_or_assign(bucket.arn, counter);
@@ -101,7 +101,7 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        _s3CounterMap->insert_or_assign(bucket.arn, BucketMonitoringCounter{.keys = 0, .size = 0});
+        _s3CounterMap->insert_or_assign(bucket.arn, S3MonitoringCounter{.keys = 0, .size = 0});
 
         return bucket;
     }
@@ -353,7 +353,7 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        _s3CounterMap->insert_or_assign(bucket.arn, BucketMonitoringCounter{.keys = 0, .size = 0});
+        _s3CounterMap->insert_or_assign(bucket.arn, S3MonitoringCounter{.keys = 0, .size = 0});
 
         return purged;
     }

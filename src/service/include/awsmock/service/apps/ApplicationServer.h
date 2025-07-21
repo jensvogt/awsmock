@@ -122,6 +122,16 @@ namespace AwsMock::Service {
          * Asynchronous task scheduler
          */
         Core::Scheduler &_scheduler;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::ApplicationCounterMapType *_applicationCounterMap{};
     };
 
 }// namespace AwsMock::Service
