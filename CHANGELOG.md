@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.6.0](https://github.com/jensvogt/awsmock/compare/v1.5.5...v1.6.0) (2025-07-21)
+
+
+### Features
+
+* **development:** add application builder ([d7e365b](https://github.com/jensvogt/awsmock/commit/d7e365b920a41dc8932b73c0a35f52828527253d))
+* **development:** add application builder ([789e96b](https://github.com/jensvogt/awsmock/commit/789e96bdd78e98e02009f83661ce7791fb05d8bf))
+* **development:** add application module ([b0fbcd9](https://github.com/jensvogt/awsmock/commit/b0fbcd96452f90bc0e841f2e307d23c6b619888b))
+* **development:** add application module import/export ([62e66bf](https://github.com/jensvogt/awsmock/commit/62e66bf60cefdfed7caa4120292507b200d10c9b))
+* **development:** add application start/stop ([205a089](https://github.com/jensvogt/awsmock/commit/205a089a443d69ef247490833c079978bc001fcd))
+* **development:** add application start/stop ([c8d1799](https://github.com/jensvogt/awsmock/commit/c8d1799d81fbdff0464c4c69fd1814e357a22bcf))
+* **development:** add application start/stop ([f63f128](https://github.com/jensvogt/awsmock/commit/f63f12892503bd79670e72c125345df3c395be00))
+
+
+### Bug Fixes
+
+* **development:** add SSM parameter update ([42a6893](https://github.com/jensvogt/awsmock/commit/42a689317b01c709a0125ecdbb886c668651b741))
+* **development:** fix application logs ([5446d5e](https://github.com/jensvogt/awsmock/commit/5446d5e280ee7ab54645b08165557095224b77f5))
+* **development:** fix application startup ([38c3329](https://github.com/jensvogt/awsmock/commit/38c33296691df3a25b84d470b62cb2340578a3b6))
+
 ## [1.5.5](https://github.com/jensvogt/awsmock/compare/v1.5.4...v1.5.5) (2025-07-05)
 
 
