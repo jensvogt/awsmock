@@ -86,13 +86,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * @brief Maps a list of lambda entities to list lambda counters response
          *
-         * @param request list lambda counters request
          * @param lambdaEntities lambda entities
          * @return ListFunctionCountersResponse
          * @see ListFunctionCountersRequest
          * @see ListFunctionCountersResponse
          */
-        static ListFunctionCountersResponse map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
+        static ListFunctionCountersResponse map(const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
 
         /**
          * @brief Maps a list of lambda result entities to a list lambda result counters response
