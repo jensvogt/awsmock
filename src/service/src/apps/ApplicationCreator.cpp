@@ -87,7 +87,7 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_debug << "Docker image created, name: " << applicationEntity.name << " size: " << applicationEntity.imageSize;
+        log_info << "Docker image created, name: " << applicationEntity.name << " size: " << applicationEntity.imageSize;
     }
 
     void ApplicationCreator::CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {

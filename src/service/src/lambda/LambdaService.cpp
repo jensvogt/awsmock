@@ -440,6 +440,7 @@ namespace AwsMock::Service {
                 instanceCounter.instanceId = instance.instanceId;
                 instanceCounter.containerId = instance.containerId;
                 instanceCounter.status = Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status);
+                instanceCounter.lastInvocation = instance.lastInvocation;
                 response.instanceCounters.emplace_back(instanceCounter);
             }
 
@@ -675,6 +676,10 @@ namespace AwsMock::Service {
         std::string hostName = GetHostname(instance);
         int port = GetContainerPort(instance);
 
+        // Update database
+        lambda.SetInstanceLastInvocation(instanceId);
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
         // Asynchronous execution
         LambdaExecutor lambdaExecutor;
         boost::thread t(boost::ref(lambdaExecutor), lambda, instance.containerId, hostName, port, payload, lambda.function, receiptHandle);
@@ -684,10 +689,6 @@ namespace AwsMock::Service {
             t.join();
         }
         log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
-
-        // Update database
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
-        log_debug << "Lambda entity invoked, name: " << lambda.function;
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) const {
@@ -1130,7 +1131,7 @@ namespace AwsMock::Service {
         return response.body.substr(0, MAX_OUTPUT_LENGTH);
     }
 
-    std::string LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) {
+    std::string LambdaService::FindIdleInstance(const Database::Entity::Lambda::Lambda &lambda) {
         if (lambda.instances.empty()) {
             log_debug << "No idle instances found";
             return {};

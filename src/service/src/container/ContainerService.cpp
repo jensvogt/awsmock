@@ -696,6 +696,9 @@ namespace AwsMock::Service {
         if (Core::StringUtils::StartsWithIgnoringCase(runtime, "java")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
+            ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "COPY config /root/.aws/" << std::endl;
+            ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "COPY classes ${LAMBDA_TASK_ROOT}" << std::endl;
             ofs << "CMD [ \"" + handler + "::handleRequest\" ]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "postgres")) {
@@ -705,6 +708,8 @@ namespace AwsMock::Service {
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
+            ofs << "COPY config /root/.aws/" << std::endl;
+            ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "COPY bootstrap ${LAMBDA_RUNTIME_DIR}" << std::endl;
             ofs << "RUN chmod 775 ${LAMBDA_RUNTIME_DIR}/bootstrap" << std::endl;
             ofs << "RUN mkdir -p ${LAMBDA_TASK_ROOT}/lib" << std::endl;
@@ -860,5 +865,9 @@ namespace AwsMock::Service {
         for (const auto &[fst, snd]: environment) {
             ofs << "ENV " << fst << "=\"" << snd << "\"" << std::endl;
         }
+        ofs << "ENV " << "AWS_REGION=\"eu-central-1\"" << std::endl;
+        ofs << "ENV " << "AWS_ACCESS_KEY_ID=\"none\"" << std::endl;
+        ofs << "ENV " << "AWS_SECRET_ACCESS_KEY=\"none\"" << std::endl;
+        ofs << "ENV " << "AWS_SESSION_TOKEN=\"none\"" << std::endl;
     }
 }// namespace AwsMock::Service

@@ -16,6 +16,7 @@ namespace AwsMock::Database::Entity::Lambda {
             hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
             status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult, "lastInvocation");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -34,6 +35,7 @@ namespace AwsMock::Database::Entity::Lambda {
             instanceDoc.append(kvp("hostPort", hostPort));
             instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
             instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+            instanceDoc.append(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)));
             return instanceDoc.extract();
 
         } catch (bsoncxx::exception &exc) {

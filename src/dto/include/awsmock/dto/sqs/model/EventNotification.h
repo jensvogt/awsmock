@@ -57,8 +57,8 @@ namespace AwsMock::Dto::SQS {
 
         friend EventNotification tag_invoke(boost::json::value_to_tag<EventNotification>, boost::json::value const &v) {
             EventNotification r;
-            if (Core::Json::AttributeExists(v, "records")) {
-                r.records = boost::json::value_to<std::vector<EventRecord>>(v.at("records"));
+            if (Core::Json::AttributeExists(v, "Records")) {
+                r.records = boost::json::value_to<std::vector<EventRecord>>(v.at("Records"));
             }
             return r;
         }
@@ -68,7 +68,7 @@ namespace AwsMock::Dto::SQS {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"records", boost::json::value_from(obj.records)},
+                    {"Records", boost::json::value_from(obj.records)},
             };
         }
     };

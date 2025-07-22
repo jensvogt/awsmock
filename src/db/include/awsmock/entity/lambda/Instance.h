@@ -92,6 +92,11 @@ namespace AwsMock::Database::Entity::Lambda {
         LambdaInstanceStatus status;
 
         /**
+         * Last invocation timestamp
+         */
+        system_clock::time_point lastInvocation;
+
+        /**
          * Created timestamp
          */
         system_clock::time_point created = system_clock::now();

@@ -45,17 +45,17 @@ namespace AwsMock::Dto::Lambda {
 
         friend UpdateFunctionEnvironmentRequest tag_invoke(boost::json::value_to_tag<UpdateFunctionEnvironmentRequest>, boost::json::value const &v) {
             UpdateFunctionEnvironmentRequest r;
-            r.functionArn = Core::Json::GetStringValue(v, "functionArn");
-            r.environmentKey = Core::Json::GetStringValue(v, "environmentKey");
-            r.environmentValue = Core::Json::GetStringValue(v, "environmentValue");
+            r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
+            r.environmentKey = Core::Json::GetStringValue(v, "Key");
+            r.environmentValue = Core::Json::GetStringValue(v, "Value");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateFunctionEnvironmentRequest const &obj) {
             jv = {
-                    {"functionArn", obj.functionArn},
-                    {"environmentKey", obj.environmentKey},
-                    {"environmentValue", obj.environmentValue},
+                    {"FunctionArn", obj.functionArn},
+                    {"Key", obj.environmentKey},
+                    {"Value", obj.environmentValue},
             };
         }
     };
