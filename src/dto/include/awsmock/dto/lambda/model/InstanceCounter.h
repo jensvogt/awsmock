@@ -30,6 +30,16 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string status;
 
+        /**
+         * Invocation duration in milliseconds
+         */
+        long duration{};
+
+        /**
+         * Last started
+         */
+        system_clock::time_point lastInvocation;
+
       private:
 
         friend InstanceCounter tag_invoke(boost::json::value_to_tag<InstanceCounter>, boost::json::value const &v) {
@@ -37,6 +47,8 @@ namespace AwsMock::Dto::Lambda {
             r.instanceId = Core::Json::GetStringValue(v, "instanceId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.status = Core::Json::GetStringValue(v, "status");
+            r.duration = Core::Json::GetLongValue(v, "duration");
+            r.lastInvocation = Core::Json::GetDatetimeValue(v, "lastInvocation");
             return r;
         }
 
@@ -45,6 +57,8 @@ namespace AwsMock::Dto::Lambda {
                     {"instanceId", obj.instanceId},
                     {"containerId", obj.containerId},
                     {"status", obj.status},
+                    {"duration", obj.duration},
+                    {"lastInvocation", Core::DateTimeUtils::ToISO8601(obj.lastInvocation)},
             };
         }
     };

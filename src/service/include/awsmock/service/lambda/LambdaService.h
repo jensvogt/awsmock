@@ -485,7 +485,7 @@ namespace AwsMock::Service {
          * @param lambda lambda entity to check
          * @return containerId of the idle instance
          */
-        static std::string FindIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+        static std::string FindIdleInstance(const Database::Entity::Lambda::Lambda &lambda);
 
         /**
          * @brief Stops all running instances and deleted any existing containers and images.

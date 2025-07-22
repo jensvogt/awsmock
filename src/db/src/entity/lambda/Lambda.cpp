@@ -47,6 +47,14 @@ namespace AwsMock::Database::Entity::Lambda {
         return {};
     }
 
+    void Lambda::SetInstanceLastInvocation(const std::string &instanceId) {
+        if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
+            it->lastInvocation = system_clock::now();
+            return;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+    }
+
     void Lambda::RemoveInstance(const Instance &instance) {
         RemoveInstance(instance.instanceId);
     }

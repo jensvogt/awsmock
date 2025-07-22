@@ -35,7 +35,6 @@ set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionRespon
         src/lambda/CreateFunctionResponse.cpp src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp
         src/lambda/model/UserIdentity.cpp src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp
         src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp src/lambda/model/Configuration.cpp
-        src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
         src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp
         src/lambda/DeleteFunctionRequest.cpp)
 set(COGNITO_SOURCES src/cognito/mapper/Mapper.cpp)

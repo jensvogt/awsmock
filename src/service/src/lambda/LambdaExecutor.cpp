@@ -66,7 +66,7 @@ namespace AwsMock::Service {
         result.logMessages = Core::StringUtils::RemoveColorCoding(logs);
         result.lambdaName = functionName;
         result.lambdaArn = lambda.arn;
-        result.runtime = lambda.runtime;
+        result.duration = runtime;
         Database::LambdaDatabase::instance().CreateLambdaResult(result);
 
         (*_lambdaCounterMap)[lambda.arn].invocations++;

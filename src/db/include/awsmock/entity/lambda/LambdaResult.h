@@ -66,6 +66,11 @@ namespace AwsMock::Database::Entity::Lambda {
         LambdaInstanceStatus lambdaStatus = InstanceUnknown;
 
         /**
+         * Duration in milliseconds
+         */
+        long duration;
+
+        /**
          *
          * Last function StartServer
          */
