@@ -12,10 +12,16 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct Tags {
+    /**
+     * @brief Lambda tags
+     *
+     * @author jens.vogt\@opitz--consulting.com
+     */
+    struct Tags final : Common::BaseCounter<Tags> {
 
         /**
          * Tags
@@ -23,12 +29,16 @@ namespace AwsMock::Dto::Lambda {
         std::map<std::string, std::string> tags;
 
         /**
-         * Checks whether a tags with the given tags key exists.
+         * Checks whether a tag with the given tags key exists.
          *
          * @param key key of the tags
-         * @return true if tags with the given key exists.
+         * @return true if tag with the given key exists.
          */
-        bool HasTag(const std::string &key);
+        bool HasTag(const std::string &key) {
+            return std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
+                       return t.first == key;
+                   }) != tags.end();
+        }
 
         /**
          * Returns a given tags value by key
@@ -36,42 +46,75 @@ namespace AwsMock::Dto::Lambda {
          * @param key key of the tags
          * @return tag value
          */
-        std::string GetTagValue(const std::string &key);
+        std::string GetTagValue(const std::string &key) {
+            const auto it = std::ranges::find_if(tags, [key](const std::pair<std::string, std::string> &t) {
+                return t.first == key;
+            });
+            return it->second;
+        }
 
         /**
          * Convert to a JSON array
          *
          * @return JSON array
          */
-        [[nodiscard]] array ToDocument() const;
+        [[nodiscard]] array ToDocument() const {
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
+                // Tags
+                array jsonArray;
+                if (!tags.empty()) {
+                    for (const auto &[fst, snd]: tags) {
+                        document tagObject;
+                        tagObject.append(kvp(fst, snd));
+                        jsonArray.append(tagObject);
+                    }
+                }
+                return jsonArray;
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * Convert to a JSON string
          *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Tags &r);
+                if (document.view().find("Tags") != document.view().end()) {
+                    for (const bsoncxx::array::view jsonArray = document.view()["Tags"].get_array().value; const auto &tag: jsonArray) {
+                        std::string key = bsoncxx::string::to_string(tag.key());
+                        const std::string value = bsoncxx::string::to_string(tag[key].get_string().value);
+                        tags[key] = value;
+                    }
+                }
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+
+      private:
+
+        friend Tags tag_invoke(boost::json::value_to_tag<Tags>, boost::json::value const &v) {
+            Tags r;
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Tags const &obj) {
+            jv = {
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

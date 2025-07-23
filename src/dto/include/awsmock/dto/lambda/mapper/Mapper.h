@@ -15,6 +15,7 @@
 #include <awsmock/dto/lambda/internal/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
+#include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
@@ -29,6 +30,14 @@ namespace AwsMock::Dto::Lambda {
     class Mapper {
 
       public:
+
+        /**
+         * @brief Maps a lambda function entity to a lambda function DTO
+         *
+         * @param lambdaEntity lambda function entity
+         * @return lambda function DTO
+         */
+        static Function mapFunction(const Database::Entity::Lambda::Lambda &lambdaEntity);
 
         /**
          * @brief Maps a lambda entity to a create function response

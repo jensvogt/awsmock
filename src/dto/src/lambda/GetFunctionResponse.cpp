@@ -38,18 +38,6 @@ namespace AwsMock::Dto::Lambda {
         }
     }
 
-    std::string GetFunctionResponse::ToXml() const {
-
-        boost::property_tree::ptree root;
-        root.add("GetFunctionResponse.Configuration.Region", region);
-        root.add("GetFunctionResponse.Configuration.FunctionName", configuration.functionName);
-        root.add("GetFunctionResponse.Configuration.FunctionArn", configuration.functionArn);
-        root.add("GetFunctionResponse.Configuration.State", configuration.state);
-        root.add("GetFunctionResponse.Configuration.LastUpdateStatus", configuration.lastUpdateStatus);
-        log_info << "DEBUG: " << Core::XmlUtils::ToXmlString(root);
-        return Core::XmlUtils::ToXmlString(root);
-    }
-
     std::string GetFunctionResponse::ToString() const {
         std::stringstream ss;
         ss << *this;
