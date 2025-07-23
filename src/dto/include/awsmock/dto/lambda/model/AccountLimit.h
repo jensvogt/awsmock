@@ -10,8 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -31,7 +30,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountLimit final : Common::BaseDto<AccountLimit> {
+    struct AccountLimit final : Common::BaseCounter<AccountLimit> {
 
         /**
          * Code size unzipped limit
@@ -46,7 +45,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Concurrent executions
          */
-        int concurrentExecutions{};
+        long concurrentExecutions{};
 
         /**
          * Total code size
@@ -65,12 +64,27 @@ namespace AwsMock::Dto::Lambda {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend AccountLimit tag_invoke(boost::json::value_to_tag<AccountLimit>, boost::json::value const &v) {
+            AccountLimit r;
+            r.codeSizeUnzipped = Core::Json::GetLongValue(v, "CodeSizeUnzipped");
+            r.codeSizeZipped = Core::Json::GetLongValue(v, "CodeSizeZipped");
+            r.concurrentExecutions = Core::Json::GetLongValue(v, "ConcurrentExecutions");
+            r.totalCodeSize = Core::Json::GetLongValue(v, "TotalCodeSize");
+            r.unreservedConcurrentExecutions = Core::Json::GetLongValue(v, "UnreservedConcurrentExecutions");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AccountLimit const &obj) {
+            jv = {
+                    {"CodeSizeUnzipped", obj.codeSizeUnzipped},
+                    {"CodeSizeZipped", obj.codeSizeZipped},
+                    {"ConcurrentExecutions", obj.concurrentExecutions},
+                    {"TotalCodeSize", obj.totalCodeSize},
+                    {"UnreservedConcurrentExecutions", obj.unreservedConcurrentExecutions},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

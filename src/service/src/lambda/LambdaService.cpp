@@ -113,7 +113,10 @@ namespace AwsMock::Service {
         try {
             const std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(region);
 
-            auto response = Dto::Lambda::ListFunctionResponse(lambdas);
+            Dto::Lambda::ListFunctionResponse response;
+            for (const auto &lambda: lambdas) {
+                response.functions.emplace_back(Dto::Lambda::Mapper::mapFunction(lambda));
+            }
             log_debug << "Lambda list outcome: " << response.ToJson();
             return response;
         } catch (bsoncxx::exception &exc) {
@@ -555,18 +558,19 @@ namespace AwsMock::Service {
         try {
             const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(region, name);
 
-            const Dto::Lambda::Configuration configuration = {
-                    .functionName = lambda.function,
-                    .handler = lambda.handler,
-                    .runtime = lambda.runtime,
-                    .lastUpdateStatus = "Successful",
-                    .state = LambdaStateToString(lambda.state),
-                    .stateReason = lambda.stateReason,
-                    .stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode)};
+            Dto::Lambda::Function function;
+            function.functionName = lambda.function,
+            function.handler = lambda.handler,
+            function.runtime = lambda.runtime,
+            function.lastUpdateStatus = "Successful",
+            function.state = LambdaStateToString(lambda.state),
+            function.stateReason = lambda.stateReason,
+            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
+            function.stateReasonCode = LambdaStateReasonCodeToString(lambda.stateReasonCode);
 
             Dto::Lambda::GetFunctionResponse response = {
                     .region = lambda.region,
-                    .configuration = configuration,
+                    .configuration = function,
                     .tags = lambda.tags};
 
             log_info << "Lambda function: " + response.ToJson();

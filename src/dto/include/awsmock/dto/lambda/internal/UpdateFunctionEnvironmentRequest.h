@@ -11,7 +11,7 @@
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * @brief Update function tag request
+     * @brief Update function environment request
      *
      * Example:
      * @code{.json}

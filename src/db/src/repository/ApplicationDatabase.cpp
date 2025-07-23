@@ -72,7 +72,7 @@ namespace AwsMock::Database {
         application.modified = system_clock::now();
         application.containerId = "";
         application.containerName = "";
-        if (!ApplicationExists(application.region, application.name)) {
+        if (ApplicationExists(application.region, application.name)) {
             return UpdateApplication(application);
         }
         return CreateApplication(application);
