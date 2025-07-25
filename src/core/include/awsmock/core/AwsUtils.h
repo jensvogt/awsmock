@@ -20,7 +20,7 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>

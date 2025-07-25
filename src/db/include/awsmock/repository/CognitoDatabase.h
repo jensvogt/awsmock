@@ -10,7 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>

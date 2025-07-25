@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BackupUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/module/CleanInfrastructureRequest.h>

@@ -2,7 +2,7 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/sftpserver/SftpServer.h>
 #include <awsmock/sftpserver/SftpUser.h>
 

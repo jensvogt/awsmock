@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/sns/MessageAttribute.h>
 #include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/utils/MongoUtils.h>

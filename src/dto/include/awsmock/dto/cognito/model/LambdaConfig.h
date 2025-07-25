@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/cognito/model/CustomEmailSender.h>
 #include <awsmock/dto/cognito/model/CustomSmsSender.h>
 #include <awsmock/dto/cognito/model/PreTokenGenerationConfig.h>

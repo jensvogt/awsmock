@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/MonitoringClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MonitoringService.h>

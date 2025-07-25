@@ -7,7 +7,7 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>

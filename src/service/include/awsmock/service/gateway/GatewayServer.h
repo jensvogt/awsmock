@@ -13,7 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/FieldAlloc.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewayListener.h>
 #include <awsmock/service/gateway/GatewayWorker.h>

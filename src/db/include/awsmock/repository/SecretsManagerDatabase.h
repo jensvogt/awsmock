@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/memorydb/SecretsManagerMemoryDb.h>

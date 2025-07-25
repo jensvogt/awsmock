@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 

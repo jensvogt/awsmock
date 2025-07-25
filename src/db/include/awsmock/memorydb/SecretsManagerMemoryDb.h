@@ -13,7 +13,7 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/repository/Database.h>
 

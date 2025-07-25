@@ -19,7 +19,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>

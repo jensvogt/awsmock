@@ -38,7 +38,7 @@
 #endif
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/server/Manager.h>
 #include <awsmock/service/frontend/FrontendServer.h>

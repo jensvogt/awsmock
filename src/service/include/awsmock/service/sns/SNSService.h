@@ -15,7 +15,7 @@
 
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sns/CreateTopicRequest.h>
 #include <awsmock/dto/sns/CreateTopicResponse.h>

@@ -25,7 +25,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 

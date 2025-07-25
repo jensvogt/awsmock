@@ -10,7 +10,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>

@@ -7,7 +7,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/ftpserver/FtpUser.h>
 
 namespace AwsMock::FtpServer {

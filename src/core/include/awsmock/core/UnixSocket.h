@@ -17,7 +17,7 @@
 // AwsMock includes
 #include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 

@@ -12,7 +12,7 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>

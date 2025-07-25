@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/memorydb/SSMMemoryDb.h>

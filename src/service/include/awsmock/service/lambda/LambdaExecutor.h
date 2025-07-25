@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
