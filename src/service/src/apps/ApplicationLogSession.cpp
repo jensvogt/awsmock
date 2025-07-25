@@ -57,14 +57,11 @@ namespace AwsMock::Service {
             ws_.text(ws_.got_text());
             HandleEvent(boost::beast::buffers_to_string(buffer_.cdata()), ws_);
             buffer_.consume(buffer_.size());
-            //DoRead();
 
         } catch (std::exception &ex) {
             buffer_.consume(buffer_.size());
             ws_.close(ws_.reason());
         }
-
-        //ws_.async_write(boost::asio::buffer(response), boost::beast::bind_front_handler(&ApplicationLogSession::OnWrite, shared_from_this()));
     }
 
     void ApplicationLogSession::OnWrite(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
