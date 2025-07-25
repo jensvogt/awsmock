@@ -21,13 +21,13 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/UnixSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>

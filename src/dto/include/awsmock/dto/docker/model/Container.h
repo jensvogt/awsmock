@@ -10,10 +10,10 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/core/BsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/exception/JsonException.h"
-#include "awsmock/dto/docker/model/Port.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/docker/model/Port.h>
 
 #define LAMBDA_INTERNAL_PORT 8080
 

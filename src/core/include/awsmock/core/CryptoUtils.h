@@ -44,7 +44,7 @@
 // AwsMock includes
 #include <awsmock/core/Base64Utils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
 

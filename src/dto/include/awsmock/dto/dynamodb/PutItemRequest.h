@@ -13,7 +13,7 @@
 #include "model/ReturnConsumedCapacity.h"
 
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/dto/dynamodb/model/ReturnValues.h>

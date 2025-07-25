@@ -14,7 +14,7 @@
 #include <boost/beast/websocket.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/apps/ApplicationLogSession.h>
 
 namespace AwsMock::Service {

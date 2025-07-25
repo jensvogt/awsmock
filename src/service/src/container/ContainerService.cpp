@@ -466,6 +466,20 @@ namespace AwsMock::Service {
 
     void ContainerService::ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, long tail) const {
 
+        if (containerId.empty()) {
+            log_error << "Empty container Id";
+            return;
+        }
+
+        ws.control_callback([&ws](const boost::beast::websocket::frame_type kind, const boost::beast::string_view message) {
+            if (kind == boost::beast::websocket::frame_type::close) {
+                ws.close(boost::beast::websocket::close_code::abnormal);
+            } else if (kind == boost::beast::websocket::frame_type::ping) {
+                const boost::beast::websocket::ping_data pd(message);
+                ws.pong(boost::beast::websocket::ping_data("message"));
+            }
+        });
+
         // First the last 1000 lines
         if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/logs?tail=" + std::to_string(tail) + "&stdout=true&stderr=true"); statusCode == http::status::ok && contentLength > 0) {
             ws.text(true);

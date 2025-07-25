@@ -18,8 +18,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/cognito/UserPoolClient.h>
 #include <awsmock/entity/cognito/UserPoolDomain.h>
 #include <awsmock/utils/MongoUtils.h>

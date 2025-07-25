@@ -20,6 +20,7 @@ namespace AwsMock::Dto::Apps {
         OPEN_LOG,
         LOG_MESSAGE,
         CLOSE_LOG,
+        OPEN_AWSMOCK_LOGS,
         UNKNOWN
     };
 
@@ -27,6 +28,7 @@ namespace AwsMock::Dto::Apps {
             {WebSoketCommandType::OPEN_LOG, "open-log"},
             {WebSoketCommandType::LOG_MESSAGE, "log-message"},
             {WebSoketCommandType::CLOSE_LOG, "close-log"},
+            {WebSoketCommandType::OPEN_AWSMOCK_LOGS, "open-awsmock-logs"},
             {WebSoketCommandType::UNKNOWN, "unknown"},
     };
 

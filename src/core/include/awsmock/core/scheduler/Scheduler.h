@@ -17,7 +17,7 @@
 
 // AwsMock includes
 #include <awsmock/core/CronUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/CronTask.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 

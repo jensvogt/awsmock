@@ -12,7 +12,7 @@
 #include "ApplicationService.h"
 
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/repository/ApplicationDatabase.h>

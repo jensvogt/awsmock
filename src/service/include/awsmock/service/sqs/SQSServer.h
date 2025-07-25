@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_SQS_SERVER_H
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SQSDatabase.h>

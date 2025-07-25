@@ -28,6 +28,8 @@
 #include <string_view>
 
 // Boost includes
+#include <boost/beast/core/tcp_stream.hpp>
+#include <boost/beast/websocket/stream.hpp>
 #include <boost/log/attributes.hpp>
 #include <boost/log/attributes/scoped_attribute.hpp>
 #include <boost/log/expressions.hpp>
@@ -42,6 +44,9 @@
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
+
+// AwsMock includes
+#include <awsmock/core/logging/LogWebsocketSink.h>
 
 #define DEFAULT_LOG_SIZE (10 * 1024 * 1024)
 #define DEFAULT_LOG_COUNT 5
@@ -87,7 +92,7 @@ namespace AwsMock::Core {
         static void SetSeverity(const std::string &severity);
 
         /**
-         * @brief Set the log filename
+         * @brief Add a file logging sink
          *
          * @par
          * The filename is constructed from <logDirectory>/<logPrefix>_nn.log
@@ -98,6 +103,18 @@ namespace AwsMock::Core {
          * @param count log count
          */
         static void AddFile(const std::string &dir, const std::string &prefix, long size = DEFAULT_LOG_SIZE, int count = DEFAULT_LOG_COUNT);
+
+        /**
+         * @brief Adds a web socket sink
+         *
+         * @param ws websocket
+         */
+        static void AddWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws);
+
+        /**
+         * @brief Remove web socket sink
+         */
+        static void RemoveWebSocketSink();
 
         /**
          * Removes the console log sink
@@ -140,6 +157,21 @@ namespace AwsMock::Core {
          * File appender
          */
         static boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> file_sink;
+
+        /**
+         * Web socket
+         */
+        static boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> _ws;
+
+        /**
+         * Web socket backend
+         */
+        static boost::shared_ptr<LogWebsocketSink> webSocketBackend;
+
+        /**
+         * Web socket sink
+         */
+        static boost::shared_ptr<webSocketSink_t> webSocketSink;
     };
 
 }// namespace AwsMock::Core

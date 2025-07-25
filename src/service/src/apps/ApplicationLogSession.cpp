@@ -13,7 +13,7 @@ namespace AwsMock::Service {
 
         // Set a decorator to change the Server of the handshake
         ws_.set_option(boost::beast::websocket::stream_base::decorator([](boost::beast::websocket::response_type &res) {
-            res.set(boost::beast::http::field::server, std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-async");
+            res.set(http::field::server, std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-async");
         }));
 
         // Accept the websocket handshake
@@ -21,8 +21,9 @@ namespace AwsMock::Service {
     }
 
     void ApplicationLogSession::OnAccept(const boost::beast::error_code &ec) {
-        if (ec)
+        if (ec) {
             log_error << "Accept failed, errorCode: " << ec.message() << std::endl;
+        }
 
         // Read a message
         DoRead();
@@ -37,21 +38,33 @@ namespace AwsMock::Service {
     void ApplicationLogSession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 
-        // This indicates that the session was closed
-        if (ec == boost::beast::websocket::error::closed) {
-            log_info << "Application log session closed";
-            return;
+        try {
+
+            // This indicates that the session was closed
+            if (ec == boost::beast::websocket::error::closed) {
+                log_info << "Application log session closed";
+                ws_.close(ws_.reason());
+                return;
+            }
+
+            if (ec) {
+                log_info << "Websocket closed by peer";
+                ws_.close(ws_.reason());
+                return;
+            }
+
+            // Echo the message
+            ws_.text(ws_.got_text());
+            HandleEvent(boost::beast::buffers_to_string(buffer_.cdata()), ws_);
+            buffer_.consume(buffer_.size());
+            //DoRead();
+
+        } catch (std::exception &ex) {
+            buffer_.consume(buffer_.size());
+            ws_.close(ws_.reason());
         }
 
-        if (ec) {
-            log_info << "Websocket closed by peer, errorCode: " << ec.message();
-            return;
-        }
-
-        // Echo the message
-        ws_.text(ws_.got_text());
-        std::string response = HandleEvent(boost::beast::buffers_to_string(buffer_.cdata()), ws_);
-        ws_.async_write(boost::asio::buffer(response), boost::beast::bind_front_handler(&ApplicationLogSession::OnWrite, shared_from_this()));
+        //ws_.async_write(boost::asio::buffer(response), boost::beast::bind_front_handler(&ApplicationLogSession::OnWrite, shared_from_this()));
     }
 
     void ApplicationLogSession::OnWrite(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
@@ -64,7 +77,7 @@ namespace AwsMock::Service {
         }
 
         // Clear the buffer
-        log_info << "Write: " << boost::beast::make_printable(buffer_.data());
+        log_trace << "Write: " << boost::beast::make_printable(buffer_.data());
         buffer_.consume(buffer_.size());
 
         // Do another read
@@ -79,6 +92,10 @@ namespace AwsMock::Service {
             case Dto::Apps::WebSoketCommandType::OPEN_LOG:
                 ContainerService::instance().ContainerAttach(webSocketCommand.containerId, ws, 1000);
                 return "ok";
+            case Dto::Apps::WebSoketCommandType::OPEN_AWSMOCK_LOGS: {
+                Core::LogStream::AddWebSocket(ws);
+                return "ok";
+            }
             default:
                 return "ok";
         }

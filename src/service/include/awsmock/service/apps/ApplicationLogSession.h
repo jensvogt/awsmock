@@ -10,7 +10,7 @@
 #include <boost/beast/websocket.hpp>
 
 // AwsMock include
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
 #include <awsmock/service/container/ContainerService.h>
 
@@ -67,6 +67,16 @@ namespace AwsMock::Service {
          * @param ws web socket
          */
         static std::string HandleEvent(const std::string &message, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws);
+
+        /**
+         * Websocket backend
+         */
+        boost::shared_ptr<Core::LogWebsocketSink> backend;
+
+        /**
+         * Websocket sink
+         */
+        boost::shared_ptr<Core::webSocketSink_t> sink;
     };
 
 }// namespace AwsMock::Service

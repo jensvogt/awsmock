@@ -297,7 +297,7 @@ int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t arg
 }
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/sftpserver/SftpUser.h>
 #include <boost/log/trivial.hpp>
