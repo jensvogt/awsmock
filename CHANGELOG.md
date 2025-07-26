@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/jensvogt/awsmock/compare/v1.6.0...v1.6.1) (2025-07-26)
+
+
+### Bug Fixes
+
+* **1366-application-stop:** fix application stop ([4745ec1](https://github.com/jensvogt/awsmock/commit/4745ec11e3f7176f7d9ec8b3a6efc5eb50c53afc))
+
 ## [1.6.0](https://github.com/jensvogt/awsmock/compare/v1.5.5...v1.6.0) (2025-07-21)
 
 
