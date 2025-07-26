@@ -213,8 +213,17 @@ namespace AwsMock::Service {
         const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
         const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
 
+        // Get container id, if already running
+        if (application.containerName.empty()) {
+            if (Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version); !container.id.empty()) {
+                application.containerId = container.id;
+                application.containerName = container.names.front().substr(1);
+                application = _database.UpdateApplication(application);
+            }
+        }
+
         // Check whether a container exists already
-        if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByImageName(application.name, application.version)) {
+        if (!ContainerService::instance().ContainerExistsByImageName(application.name, application.version)) {
 
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
@@ -392,7 +401,7 @@ namespace AwsMock::Service {
         try {
             Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
 
-            if (!ContainerService::instance().ContainerExistsByName(application.containerName)) {
+            if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByName(application.containerName)) {
                 log_warning << "Container does not exist, name: " << request.application.name;
                 throw Core::ServiceException("Container does not exist, name: " + request.application.name);
             }

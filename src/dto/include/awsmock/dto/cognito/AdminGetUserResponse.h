@@ -73,34 +73,34 @@ namespace AwsMock::Dto::Cognito {
 
         friend AdminGetUserResponse tag_invoke(boost::json::value_to_tag<AdminGetUserResponse>, boost::json::value const &v) {
             AdminGetUserResponse r;
-            r.id = Core::Json::GetStringValue(v, "idd");
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.userName = Core::Json::GetStringValue(v, "userName");
-            r.password = Core::Json::GetStringValue(v, "password");
-            r.enabled = Core::Json::GetBoolValue(v, "enabled");
-            r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "userStatus"));
-            if (Core::Json::AttributeExists(v, "userAttributes")) {
-                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "userAttributes");
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.userName = Core::Json::GetStringValue(v, "Username");
+            r.password = Core::Json::GetStringValue(v, "Password");
+            r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "UserStatus"));
+            if (Core::Json::AttributeExists(v, "UserAttributes")) {
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "UserAttributes");
             }
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
-            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminGetUserResponse const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"id", obj.id},
-                    {"userPoolId", obj.userPoolId},
-                    {"userName", obj.userName},
-                    {"password", obj.password},
-                    {"enabled", obj.enabled},
-                    {"userStatus", Database::Entity::Cognito::UserStatusToString(obj.userStatus)},
-                    {"userAttributes", boost::json::value_from(obj.userAttributes)},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Id", obj.id},
+                    {"UserPoolId", obj.userPoolId},
+                    {"Username", obj.userName},
+                    {"Password", obj.password},
+                    {"Enabled", obj.enabled},
+                    {"UserStatus", Database::Entity::Cognito::UserStatusToString(obj.userStatus)},
+                    {"UserAttributes", boost::json::value_from(obj.userAttributes)},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
 
             };
         }
