@@ -39,6 +39,7 @@
 #include <awsmock/dto/docker/ListNetworkResponse.h>
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
+#include <awsmock/dto/docker/model/ContainerStat.h>
 
 #ifdef _WIN32
 #include <awsmock/core/WindowsSocket.h>
@@ -79,7 +80,7 @@ namespace AwsMock::Service {
      *
      * @par Linux
      * On Linux, the service is using the docker REST API available at the UNIX domain socket. Depending on your Linux distribution, the docker socket is located under
-     * different directory normally its: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If your Linux distribution is using another location, set the full path to the
+     * a different directory, normally it is: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If your Linux distribution is using another location, set the full path to the
      * docker socket in the awsmock configuration file.
      *
      * @par Windows
@@ -367,6 +368,15 @@ namespace AwsMock::Service {
          * @return log messages as string
          */
         [[nodiscard]] std::string GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const;
+
+        /**
+         * @brief Get statistics about a container
+         *
+         * @param containerId ID of the container
+         * @return counter statistics
+         * @see AwsMock::Dto::Docker::Model::ContainerStat
+         */
+        [[nodiscard]] Dto::Docker::ContainerStat GetContainerStats(const std::string &containerId) const;
 
         /**
          * @brief Start the container

@@ -48,10 +48,29 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::UpdateCounter() const {
-        log_trace << "S3 Monitoring starting";
+        log_trace << "Application Monitoring starting";
 
         if (_applicationCounterMap) {
             _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationCounterMap->size()));
+        }
+
+        // CPU / memory usage
+        for (auto &application: _applicationDatabase.ListApplications()) {
+
+            if (!application.containerId.empty()) {
+                const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
+                const auto cpuDelta = (double) (containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
+                const auto systemCpuDelta = (double) (containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
+                const auto numberCpus = (double) containerStat.cpuStats.onlineCpus;
+                if (const auto cpuPercentages = cpuDelta / systemCpuDelta / numberCpus * 100; std::isfinite(cpuPercentages) && cpuPercentages >= 0 && cpuPercentages <= 100) {
+                    _metricService.SetGauge(APPLICATION_CPU_USAGE, "application", application.name, cpuPercentages);
+                }
+                const auto usedMemory = (double) (containerStat.memoryStats.usage - containerStat.memoryStats.stats.cache);
+                const auto totalMemory = (double) containerStat.memoryStats.limit;
+                if (const double memoryPercentages = usedMemory / totalMemory * 100; std::isfinite(memoryPercentages) && memoryPercentages >= 0 && memoryPercentages <= 100) {
+                    _metricService.SetGauge(APPLICATION_MEMORY_USAGE, "application", application.name, memoryPercentages);
+                }
+            }
         }
         log_debug << "Application monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }

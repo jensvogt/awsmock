@@ -613,7 +613,7 @@ namespace AwsMock::Service {
             log_warning << "Restart container failed, statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
-        log_debug << "Docker container restarted, id: " << containerId;
+        log_debug << "Docker container restarted, containerId: " << containerId;
     }
 
     void ContainerService::StopContainer(const Dto::Docker::Container &container) const {
@@ -629,7 +629,18 @@ namespace AwsMock::Service {
             log_debug << "Container logs received, containerId: " << containerId;
             return body;
         }
-        log_error << "Receive container logs failed, statusCode: " << statusCode;
+        log_error << "Receive container logs failed, containerId: " << containerId << ", statusCode: " << statusCode;
+        return {};
+    }
+
+    Dto::Docker::ContainerStat ContainerService::GetContainerStats(const std::string &containerId) const {
+
+        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/stats?stream=false");
+        if (statusCode == http::status::ok) {
+            log_debug << "Container statistics received, containerId: " << containerId;
+            return Dto::Docker::ContainerStat::FromJson(body);
+        }
+        log_error << "Receive container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
         return {};
     }
 
