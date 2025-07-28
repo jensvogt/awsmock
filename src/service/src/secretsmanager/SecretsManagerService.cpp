@@ -694,7 +694,7 @@ namespace AwsMock::Service {
         decryptRequest.keyId = kmsKeyId;
         decryptRequest.ciphertext = secretString;
         const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
-        log_info << "Decrypt secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
+        log_trace << "Decrypt secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
         return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 
@@ -706,6 +706,7 @@ namespace AwsMock::Service {
         decryptRequest.keyId = secret.kmsKeyId;
         decryptRequest.ciphertext = version.secretString;
         const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
+        log_trace << "GetSecretString secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
         return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 }// namespace AwsMock::Service

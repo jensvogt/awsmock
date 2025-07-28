@@ -82,7 +82,7 @@ namespace AwsMock::Service {
                 if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id); response.status == http::status::ok) {
                     application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                     application.containerId = response.id;
-                    application.containerName = response.name;
+                    application.containerName = Core::StringUtils::StartsWith(response.name, "/") ? response.name.substr(1) : response.name;
                     application.imageId = response.image;
                     application.imageSize = response.sizeRootFs;
                     application = _applicationDatabase.UpdateApplication(application);

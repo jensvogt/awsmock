@@ -309,7 +309,6 @@ namespace AwsMock::Service {
             if (!infrastructure.applications.empty()) {
                 const Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
                 for (auto &application: infrastructure.applications) {
-                    application.modified = system_clock::now();
                     application = _applicationDatabase.ImportApplication(application);
                 }
                 log_info << "Applications imported, count: " << infrastructure.applications.size();
