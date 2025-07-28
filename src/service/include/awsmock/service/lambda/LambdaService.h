@@ -14,7 +14,6 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
@@ -22,6 +21,7 @@
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
@@ -263,8 +263,9 @@ namespace AwsMock::Service {
          * @param payload SQS message
          * @param receiptHandle receipt handle of the message which triggered the lambda
          * @param detached detached thread
+         * @return lambda result
          */
-        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = true) const;
+        std::string InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = false) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -464,20 +465,6 @@ namespace AwsMock::Service {
         void DeleteTags(const Dto::Lambda::DeleteTagsRequest &request) const;
 
       private:
-
-        /**
-         * @brief Invoke the lambda function synchronously.
-         *
-         * The output will be returned to the calling method.
-         *
-         * @param host lambda docker container host
-         * @param port lambda docker container port
-         * @param payload payload for the function
-         * @param oid lambda OID
-         * @param instanceId instance ID
-         * @return output from lambda invocation call
-         */
-        static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload, const std::string &oid, const std::string &instanceId);
 
         /**
          * @brief Tries to find an idle instance
