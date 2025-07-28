@@ -69,7 +69,6 @@ namespace AwsMock::Database {
     }
 
     Entity::Apps::Application ApplicationDatabase::ImportApplication(Entity::Apps::Application &application) const {
-        application.modified = system_clock::now();
         application.containerId = "";
         application.containerName = "";
         if (ApplicationExists(application.region, application.name)) {

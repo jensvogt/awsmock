@@ -50,6 +50,9 @@ namespace AwsMock::Service {
 
         /**
          * @brief Update application status
+         *
+         * @par
+         * Synchronizes the container ID and name between the docker daemon and the database. Runs normally each 300sec.
          */
         void UpdateApplications() const;
 
