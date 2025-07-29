@@ -188,4 +188,11 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
+    LambdaResult Mapper::mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        LambdaResult result;
+        result.functionArn = resultEntity.lambdaArn;
+        result.responseBody = resultEntity.requestBody;
+        result.status = (int) resultEntity.status;
+        return result;
+    }
 }// namespace AwsMock::Dto::Lambda

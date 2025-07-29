@@ -138,7 +138,7 @@ namespace AwsMock::Service {
                     }
 
                     // Send range response
-                    log_debug << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
+                    log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
                     return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                 }
 
@@ -200,7 +200,7 @@ namespace AwsMock::Service {
                             encodingType = Core::HttpUtils::GetStringParameter(request.target(), "encoding_type");
                         }
 
-                        // Return object list
+                        // Return the object list
                         s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .prefix = prefix, .delimiter = delimiter, .encodingType = encodingType};
                         s3Request.listType = listType;
 
@@ -334,7 +334,7 @@ namespace AwsMock::Service {
 
                     std::map<std::string, std::string> headerMap;
                     headerMap["ETag"] = Core::StringUtils::Quoted(eTag);
-                    log_debug << "Finished S3 multipart upload part: " << partNumber;
+                    log_info << "Finished S3 multipart upload part: " << partNumber;
 
                     return SendOkResponse(request, {}, headerMap);
                 }
@@ -366,7 +366,7 @@ namespace AwsMock::Service {
 
                     Dto::S3::UploadPartCopyResponse s3Response = _s3Service.UploadPartCopy(s3Request);
 
-                    log_debug << "Finished S3 multipart upload part copy: " << partNumber;
+                    log_info << "Finished S3 multipart upload part copy: " << partNumber;
 
                     return SendOkResponse(request, s3Response.ToXml());
                 }
@@ -718,6 +718,7 @@ namespace AwsMock::Service {
             std::map<std::string, std::string> headers;
             headers["Handler"] = "awsmock";
             headers["Content-Type"] = "application/json";
+            headers["Content-Length"] = std::to_string(s3Response.size);
             headers["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
             headers["accept-ranges"] = "bytes";

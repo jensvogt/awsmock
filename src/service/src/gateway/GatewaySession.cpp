@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
+    GatewaySession::GatewaySession() {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
@@ -19,71 +19,53 @@ namespace AwsMock::Service {
         _user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
     };
 
-    void GatewaySession::Run() {
-        dispatch(_stream.get_executor(), boost::beast::bind_front_handler(&GatewaySession::DoRead, shared_from_this()));
-    }
+    void GatewaySession::DoSession(boost::beast::tcp_stream &stream, const boost::asio::yield_context &yield) {
+        boost::beast::error_code ec;
 
-    void GatewaySession::DoRead() {
+        // This buffer is required to persist across reads
+        boost::beast::flat_buffer buffer;
 
-        // Construct a new parser for each message
-        _parser.emplace();
-        _buffer.clear();
+        // This lambda is used to send messages
+        for (;;) {
 
-        // Apply a reasonable limit to the allowed size
-        // of the body in bytes to prevent abuse.
-        _parser->body_limit(boost::none);
+            // Set the timeout.
+            stream.expires_after(std::chrono::seconds(_timeout));
 
-        // Set the timeout.
-        _stream.expires_after(std::chrono::seconds(_timeout));
+            // Read a request
+            http::request<http::dynamic_body> req;
+            http::async_read(stream, buffer, req, yield[ec]);
+            if (ec == http::error::end_of_stream)
+                break;
+            if (ec) {
+                log_error << "read: " << ec.message();
+                return;
+            }
 
-        // Read a request using the parser-oriented interface
-        http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
-    }
+            // Handle the request
+            http::message_generator msg = HandleRequest(std::move(req));
 
-    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
-        boost::ignore_unused(bytes_transferred);
+            // Determine if we should close the connection
+            const bool keep_alive = msg.keep_alive();
 
-        // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
-            return DoShutdown();
+            // Send the response
+            boost::beast::async_write(stream, std::move(msg), yield[ec]);
+
+            if (ec) {
+                log_error << "write: " << ec.message();
+                return;
+            }
+
+            if (!keep_alive) {
+                // This means we should close the connection, usually because
+                // the response indicated the "Connection: close" semantic.
+                break;
+            }
         }
 
-        if (ec) {
-            return;
-        }
-
-        // Read the header
-        boost::beast::error_code ev;
-        read_header(_stream, _buffer, *_parser, ev);
-        if (ec)
-            return;
-
-        // Handle 100-continue requests
-        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
-            HandleContinueRequest(_stream);
-        }
-
-        // Read from the stream
-        read(_stream, _buffer, *_parser, ev);
-
-        // Send the response
-        QueueWrite(HandleRequest(_parser->release()));
-
-        // If we aren't at the queue limit, try to pipeline another request
-        if (_response_queue.size() < _queueLimit) {
-            DoRead();
-        }
-        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
-    }
-
-    void GatewaySession::QueueWrite(http::message_generator response) {
-
-        // Allocate and store the work
-        _response_queue.push(std::move(response));
-
-        // If there was no previous work, start the write loop
-        if (_response_queue.size() == 1)
-            DoWrite();
+        // Send a TCP shutdown
+        ec = stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        log_trace << "Socket shutdown: " << ec.message();
+        // At this point the connection is closed gracefully
     }
 
     // Return a response for the given request.
@@ -181,55 +163,6 @@ namespace AwsMock::Service {
             }
         }
         return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
-    }
-
-    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
-    void GatewaySession::DoWrite() {
-        if (!_response_queue.empty()) {
-            bool keep_alive = _response_queue.front().keep_alive();
-            boost::beast::async_write(_stream,
-                                      std::move(_response_queue.front()),
-                                      boost::beast::bind_front_handler(&GatewaySession::OnWrite,
-                                                                       shared_from_this(),
-                                                                       keep_alive));
-        }
-    }
-
-    void GatewaySession::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) {
-        boost::ignore_unused(bytes_transferred);
-
-        // This means they closed the connection
-        if (ec == http::error::end_of_stream)
-            return DoShutdown();
-
-        if (!keep_alive) {
-            // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
-            log_debug << "Connection shutdown";
-            return DoShutdown();
-        }
-
-        // Resume the read if it has been paused
-        if (_response_queue.size() == _queueLimit)
-            DoRead();
-
-        _response_queue.pop();
-
-        DoWrite();
-    }
-
-    void GatewaySession::DoShutdown() {
-
-        // Send a TCP shutdown
-        boost::beast::error_code ec;
-        _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
-        // At this point the connection is closed gracefully
-    }
-
-    void GatewaySession::DoClose() {
-        // Send a TCP shutdown
-        boost::beast::error_code ec;
-        _stream.socket().close(ec);
-        // At this point the connection is closed gracefully
     }
 
     Core::AuthorizationHeaderKeys GatewaySession::GetAuthorizationKeys(const http::request<http::dynamic_body> &request, const std::string &secretAccessKey) {

@@ -638,8 +638,7 @@ namespace AwsMock::Service {
         }
     }
 
-    std::string LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle, bool detached) const {
-        boost::mutex::scoped_lock lock(_mutex);
+    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "invoke_lambda_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
@@ -686,15 +685,12 @@ namespace AwsMock::Service {
 
         // Asynchronous execution
         LambdaExecutor lambdaExecutor;
-        std::string result = lambdaExecutor.Run(lambda, instance.containerId, hostName, port, payload, lambda.function, receiptHandle);
-        /*boost::thread t(boost::ref(lambdaExecutor), lambda, instance.containerId, hostName, port, payload, lambda.function, receiptHandle);
-        if (detached) {
-            t.detach();
-        } else {
-            t.join();
-        }*/
-        log_debug << "Lambda invocation notification send, name: " << lambda.function << " endpoint: " << instance.containerName << ":" << instance.hostPort;
-        return result;
+        Database::Entity::Lambda::LambdaResult lambdaResult;
+        lambdaExecutor.SpawnDetached(lambda, instance.containerId, hostName, port, payload, lambdaResult);
+        lambdaExecutor.WaitForFinish();
+        log_debug << "Lambda invocation result: " << lambdaResult;
+
+        return Dto::Lambda::Mapper::mapResult(lambdaResult);
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) const {
