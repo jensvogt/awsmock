@@ -81,6 +81,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
+
+                    Dto::Apps::StartAllApplicationsRequest serviceRequest = Dto::Apps::StartAllApplicationsRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StartAllApplications(serviceRequest);
+                    log_info << "Start all applications, region: " << serviceRequest.region;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
                 case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
 
                     Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
@@ -94,6 +102,14 @@ namespace AwsMock::Service {
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StopApplication(serviceRequest);
                     log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    return SendOkResponse(request, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
+
+                    Dto::Apps::StopAllApplicationsRequest serviceRequest = Dto::Apps::StopAllApplicationsRequest::FromJson(clientCommand);
+                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StopAllApplications(serviceRequest);
+                    log_info << "All applications stopped, region: " << serviceRequest.region;
                     return SendOkResponse(request, serviceResponse.ToJson());
                 }
 

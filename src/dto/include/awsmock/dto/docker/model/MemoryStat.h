@@ -51,7 +51,9 @@ namespace AwsMock::Dto::Docker {
             r.maxUsage = Core::Json::GetLongValue(v, "max_usage");
             r.usage = Core::Json::GetLongValue(v, "usage");
             r.limit = Core::Json::GetLongValue(v, "limit");
-            r.stats = boost::json::value_to<MemoryStats>(v.at("stats"));
+            if (Core::Json::AttributeExists(v, "stats")) {
+                r.stats = boost::json::value_to<MemoryStats>(v.at("stats"));
+            }
             return r;
         }
 

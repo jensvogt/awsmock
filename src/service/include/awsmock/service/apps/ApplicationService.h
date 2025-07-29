@@ -20,7 +20,9 @@
 #include <awsmock/dto/apps/internal/ListApplicationCountersResponse.h>
 #include <awsmock/dto/apps/internal/RebuildApplicationRequest.h>
 #include <awsmock/dto/apps/internal/RestartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StartAllApplicationsRequest.h>
 #include <awsmock/dto/apps/internal/StartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StopAllApplicationsRequest.h>
 #include <awsmock/dto/apps/internal/StopApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UploadApplicationCodeRequest.h>
@@ -124,6 +126,17 @@ namespace AwsMock::Service {
          */
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StartApplication(const Dto::Apps::StartApplicationRequest &request) const;
 
+
+        /**
+         * @brief Starts all applications
+         *
+         * @param request start all applications request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::StartAllApplicationsRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StartAllApplications(const Dto::Apps::StartAllApplicationsRequest &request) const;
+
         /**
          * @brief Stops an application
          *
@@ -133,6 +146,16 @@ namespace AwsMock::Service {
          * @see Dto::Apps::ListApplicationCountersResponse
          */
         [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopApplication(const Dto::Apps::StopApplicationRequest &request) const;
+
+        /**
+         * @brief Stops all applications
+         *
+         * @param request stop all-applications request
+         * @return ListApplicationCountersResponse DTO
+         * @see Dto::Apps::StopAllApplicationsRequest
+         * @see Dto::Apps::ListApplicationCountersResponse
+         */
+        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopAllApplications(const Dto::Apps::StopAllApplicationsRequest &request) const;
 
         /**
          * @brief Restarts an application

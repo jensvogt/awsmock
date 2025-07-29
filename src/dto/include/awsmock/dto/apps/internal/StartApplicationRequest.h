@@ -15,10 +15,10 @@
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief Update an application
+     * @brief Starts an application
      *
      * @par
-     * Request to update an  application.
+     * Request to start an application.
      *
      * Example:
      * @code{.json}
@@ -55,7 +55,7 @@ namespace AwsMock::Dto::Apps {
     struct StartApplicationRequest final : Common::BaseCounter<StartApplicationRequest> {
 
         /**
-         * UserPoolId
+         * Application object
          */
         Application application;
 
