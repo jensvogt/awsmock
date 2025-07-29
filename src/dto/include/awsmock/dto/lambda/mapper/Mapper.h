@@ -17,6 +17,7 @@
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
+#include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 
@@ -143,6 +144,14 @@ namespace AwsMock::Dto::Lambda {
          * @return list of event source mapping DTOs
          */
         static std::vector<EventSourceMapping> mapCounters(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappingEntities);
+
+        /**
+         * @brief Maps a lambda result
+         *
+         * @param resultEntity
+         * @return list of event source mapping DTOs
+         */
+        static LambdaResult mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity);
     };
 
 }// namespace AwsMock::Dto::Lambda

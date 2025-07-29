@@ -135,14 +135,16 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        boost::asio::io_context _ios;
-        WorkGuardManager guard(_ios);
+        //boost::asio::io_context _ios;
+        const int numProcs = Core::SystemUtils::GetNumberOfCores();
+        boost::asio::io_context ioc{numProcs};
+        //WorkGuardManager guard(_ios);
 
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
         // Initialize monitoring
-        Core::Scheduler scheduler(_ios);
+        Core::Scheduler scheduler(ioc);
         const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
 
@@ -158,7 +160,7 @@ namespace AwsMock::Manager {
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(_ios));
+                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(ioc));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -185,27 +187,35 @@ namespace AwsMock::Manager {
         }
         log_info << "Module started, count: " << moduleMap.GetSize();
 
+        // Spawn a listening port
+        auto const address = net::ip::make_address("0.0.0.0");
+        Service::GatewayListener listener;
+        boost::asio::spawn(ioc, std::bind(&Service::GatewayListener::DoListen, listener, std::ref(ioc), tcp::endpoint{address, 4566}, std::placeholders::_1),
+                           [](const std::exception_ptr &ex) {
+                               if (ex)
+                                   std::rethrow_exception(ex);
+                           });
+
         // Start listener threads
-        const int numProcs = Core::SystemUtils::GetNumberOfCores();
         for (auto i = 0; i < numProcs; i++) {
-            _threadGroup.create_thread([&_ios] { return _ios.run(); });
+            _threadGroup.create_thread([&ioc] { return ioc.run(); });
         }
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::signal_set signals(_ios, SIGINT, SIGTERM);
+        boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
         signals.async_wait([&](beast::error_code const &, int) {
             // Stop the `io_context`. This will cause `run()` to return immediately,
             // eventually destroying the `io_context` and all the sockets in it.
             log_info << "Backend stopping on signal";
             StopModules(moduleMap);
-            _ios.stop();
+            ioc.stop();
             log_info << "Backend IO context stopped";
             log_info << "So long, and thanks for all the fish!";
         });
         log_info << "Manager signal handler installed";
 
         // Start IO context
-        _ios.run();
+        ioc.run();
     }
 
 }// namespace AwsMock::Manager
