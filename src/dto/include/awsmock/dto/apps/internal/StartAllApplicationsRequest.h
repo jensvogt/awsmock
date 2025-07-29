@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_STOP_APPLICATION_REQUEST_H
-#define AWSMOCK_DTO_APPS_STOP_APPLICATION_REQUEST_H
+#ifndef AWSMOCK_DTO_APPS_START_ALL_APPLICATIONS_REQUEST_H
+#define AWSMOCK_DTO_APPS_START_ALL_APPLICATIONS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -11,14 +11,15 @@
 // AwsMock includes
 #include <awsmock/dto/apps/model/Application.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief Stop an application
+     * @brief Start all applications request
      *
      * @par
-     * Request to stop an application.
+     * Request to start an application.
      *
      * Example:
      * @code{.json}
@@ -52,12 +53,7 @@ namespace AwsMock::Dto::Apps {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct StopApplicationRequest final : Common::BaseCounter<StopApplicationRequest> {
-
-        /**
-         * Application object
-         */
-        Application application;
+    struct StartAllApplicationsRequest final : Common::BaseCounter<StartAllApplicationsRequest> {
 
         /**
          * Application name prefix
@@ -81,9 +77,8 @@ namespace AwsMock::Dto::Apps {
 
       private:
 
-        friend StopApplicationRequest tag_invoke(boost::json::value_to_tag<StopApplicationRequest>, boost::json::value const &v) {
-            StopApplicationRequest r;
-            r.application = boost::json::value_to<Application>(v.at("application"));
+        friend StartAllApplicationsRequest tag_invoke(boost::json::value_to_tag<StartAllApplicationsRequest>, boost::json::value const &v) {
+            StartAllApplicationsRequest r;
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
@@ -93,12 +88,11 @@ namespace AwsMock::Dto::Apps {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, StopApplicationRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, StartAllApplicationsRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"application", boost::json::value_from(obj.application)},
                     {"prefix", obj.prefix},
                     {"pageSize", obj.pageSize},
                     {"pageIndex", obj.pageIndex},
@@ -109,4 +103,4 @@ namespace AwsMock::Dto::Apps {
 
 }// namespace AwsMock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_STOP_APPLICATION_REQUEST_H
+#endif// AWSMOCK_DTO_APPS_START_ALL_APPLICATIONS_REQUEST_H

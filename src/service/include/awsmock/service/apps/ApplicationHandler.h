@@ -34,7 +34,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        ApplicationHandler() : AbstractHandler("application-handler") {}
+        ApplicationHandler(boost::beast::tcp_stream stream) : AbstractHandler("application-handler", std::move(stream)) {}
 
         /**
          * @brief HTTP POST request.
