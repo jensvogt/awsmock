@@ -23,6 +23,11 @@ namespace AwsMock::Service {
 
         // Set running
         SetRunning();
+
+        // Create and launch a listening port
+        const auto address = ip::make_address(_address);
+        const auto listener = std::make_shared<GatewayListener>(_ios, ip::tcp::endpoint{address, _port});
+        listener->Run();
         log_info << "Gateway server started, endpoint: " << _address << " port: " << _port;
     }
 

@@ -3,8 +3,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/mapper/Mapper.h"
-#include "awsmock/dto/ssm/mapper/Mapper.h"
 #include "awsmock/service/apps/ApplicationCreator.h"
 
 
@@ -374,7 +372,7 @@ namespace AwsMock::Service {
 
             Dto::Apps::ListApplicationCountersResponse response;
 
-            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region, request.prefix, request.pageIndex, request.pageSize, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region);
             response.total = _database.CountApplications(request.region, request.prefix);
             log_trace << "Got applications, region: " << request.region;
 

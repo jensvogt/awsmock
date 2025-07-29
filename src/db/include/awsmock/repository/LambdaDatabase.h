@@ -16,10 +16,10 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 #include <awsmock/memorydb/LambdaMemoryDb.h>
@@ -40,14 +40,6 @@ namespace AwsMock::Database {
     using LambdaCounterMapType = boost::container::map<std::string, LambdaMonitoringCounter, std::less<std::string>, LambdaShmAllocator>;
 
     static constexpr auto LAMBDA_COUNTER_MAP_NAME = "LambdaCounter";
-
-    struct LambdaInstanceCounter {
-        std::string containerId;
-        boost::beast::http::status status;
-        std::string resultString;
-    };
-    using LambdaInstanceType = boost::container::map<std::string, LambdaInstanceCounter, std::less<std::string>, LambdaShmAllocator>;
-
 
     /**
      * Lambda MongoDB database.

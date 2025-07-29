@@ -2,6 +2,7 @@
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
+
     http::response<http::dynamic_body> AbstractHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
@@ -286,36 +287,6 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-
-        // Send the response to the client
-        return response;
-    }
-
-    http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, http::status status, const std::string &body, const std::map<std::string, std::string> &headers) {
-
-        // Prepare the response message
-        http::response<http::dynamic_body> response;
-        response.version(request.version());
-        response.result(status);
-        response.set(http::field::server, "awsmock");
-        response.set(http::field::content_type, "application/json");
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
-        response.set(http::field::access_control_allow_origin, "*");
-        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
-        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-
-        // Copy headers
-        if (!headers.empty()) {
-            for (const auto &[fst, snd]: headers) {
-                response.set(fst, snd);
-            }
-        }
-
-        // Body
-        if (!body.empty()) {
-            ostream(response.body()).write(body.c_str(), body.length()).flush();
-            response.prepare_payload();
-        }
 
         // Send the response to the client
         return response;

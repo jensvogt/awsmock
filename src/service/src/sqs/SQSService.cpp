@@ -1399,7 +1399,7 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson());
+        _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), message.receiptHandle);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 }// namespace AwsMock::Service

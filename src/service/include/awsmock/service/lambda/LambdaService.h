@@ -261,9 +261,11 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param functionName lambda function name
          * @param payload SQS message
-         * @return Dto::Lambda::LambdaResult
+         * @param receiptHandle receipt handle of the message which triggered the lambda
+         * @param detached detached thread
+         * @return lambda result
          */
-        Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload) const;
+        std::string InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = false) const;
 
         /**
          * @brief Create a new tag for a lambda function.
