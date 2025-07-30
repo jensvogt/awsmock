@@ -7,48 +7,57 @@
 
 namespace AwsMock::Service {
 
-    void GatewayListener::DoListen(boost::asio::io_context &ioc, ip::tcp::endpoint &endpoint, boost::asio::yield_context yield) {
+    GatewayListener::GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(make_strand(ioc)) {
+
         boost::beast::error_code ec;
 
         // Open the acceptor
-        ip::tcp::acceptor acceptor(ioc);
-        acceptor.open(endpoint.protocol(), ec);
+        ec = _acceptor.open(endpoint.protocol(), ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
         // Allow address reuse
-        acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
+        ec = _acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
         // Bind to the server address
-        acceptor.bind(endpoint, ec);
+        ec = _acceptor.bind(endpoint, ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
 
         // Start listening for connections
-        acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
+        ec = _acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
         if (ec) {
             log_error << ec.message();
             return;
         }
+    }
 
-        for (;;) {
-            ip::tcp::socket socket(ioc);
-            acceptor.async_accept(socket, yield[ec]);
-            if (ec) {
-                log_error << ec.message();
-                return;
-            }
-            GatewaySession session;
-            boost::asio::spawn(acceptor.get_executor(), std::bind(&GatewaySession::DoSession, session, boost::beast::tcp_stream(std::move(socket)), std::placeholders::_1), boost::asio::detached);
+    void GatewayListener::Run() {
+        dispatch(_acceptor.get_executor(), boost::beast::bind_front_handler(&GatewayListener::DoAccept, shared_from_this()));
+    }
+
+    void GatewayListener::DoAccept() {
+        _acceptor.async_accept(make_strand(_ioc), boost::beast::bind_front_handler(&GatewayListener::OnAccept, shared_from_this()));
+    }
+
+    void GatewayListener::OnAccept(const boost::beast::error_code &ec, ip::tcp::socket socket) {
+        if (ec) {
+            log_error << ec.message();
+        } else {
+            // Create the http session and run it
+            std::make_shared<GatewaySession>(std::move(socket))->Run();
         }
+
+        // Accept another connection
+        DoAccept();
     }
 
 }// namespace AwsMock::Service

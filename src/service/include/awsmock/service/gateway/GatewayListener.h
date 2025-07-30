@@ -6,17 +6,18 @@
 #define AWSMOCK_SERVICE_GATEWAY_LISTENER_H
 
 // C++ includes
-#include <functional>
 #include <memory>
 
 // Boost includes
-#include <boost/asio/detached.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/spawn.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/beast/core/bind_handler.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
 namespace AwsMock::Service {
@@ -32,17 +33,44 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
-         */
-        GatewayListener() = default;
-
-        /**
-         * @brief The new connection gets its own strand
          *
          * @param ioc Boost IO context
          * @param endpoint HTTP endpoint
-         * @param yield yield the current thread
          */
-        void DoListen(boost::asio::io_context &ioc, ip::tcp::endpoint &endpoint, boost::asio::yield_context yield);
+        GatewayListener(boost::asio::io_context &ioc, const ip::tcp::endpoint &endpoint);
+
+        /**
+         * @brief Start accepting incoming connections,
+         *
+         * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
+         * for single-threaded contexts, this example code is written to be thread-safe by default.
+         */
+        void Run();
+
+      private:
+
+        /**
+         * @brief The new connection gets its own strand
+         */
+        void DoAccept();
+
+        /**
+         * @brief Accept callback
+         *
+         * @param ec error code
+         * @param socket HTTP socket
+         */
+        void OnAccept(const boost::beast::error_code &ec, boost::asio::ip::tcp::socket socket);
+
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context &_ioc;
+
+        /**
+         * Boost acceptor
+         */
+        boost::asio::ip::tcp::acceptor _acceptor;
     };
 
 }// namespace AwsMock::Service
