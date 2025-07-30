@@ -190,10 +190,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
 
-                    Dto::SNS::PurgeTopicRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-                    log_debug << "Purge topic, topicArn: " << snsRequest.topicArn;
-
+                    Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
                     long deleted = _snsService.PurgeTopic(snsRequest);
 
                     log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;

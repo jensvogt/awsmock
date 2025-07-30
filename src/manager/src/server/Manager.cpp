@@ -192,15 +192,19 @@ namespace AwsMock::Manager {
         }
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::signal_set signals(_ios, SIGINT, SIGTERM);
-        signals.async_wait([&](beast::error_code const &, int) {
+        boost::asio::signal_set signals(_ios, SIGINT, SIGQUIT, SIGTERM);
+        signals.async_wait([&](beast::error_code const &ec, const int signal) {
             // Stop the `io_context`. This will cause `run()` to return immediately,
             // eventually destroying the `io_context` and all the sockets in it.
-            log_info << "Backend stopping on signal";
-            StopModules(moduleMap);
-            _ios.stop();
-            log_info << "Backend IO context stopped";
-            log_info << "So long, and thanks for all the fish!";
+            if (!ec) {
+                log_info << "Backend stopping on signal: " << signal;
+                StopModules(moduleMap);
+                log_info << "Backend modules stopped";
+                _ios.stop();
+                log_info << "Backend IO context stopped";
+                log_info << "So long, and thanks for all the fish!";
+                exit(0);
+            }
         });
         log_info << "Manager signal handler installed";
 
