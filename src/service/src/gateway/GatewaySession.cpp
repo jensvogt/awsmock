@@ -117,7 +117,7 @@ namespace AwsMock::Service {
         std::shared_ptr<AbstractHandler> handler;
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
-            std::string target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
+            auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
             handler = GatewayRouter::instance().GetHandler(target);
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
