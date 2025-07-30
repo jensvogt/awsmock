@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.1](https://github.com/jensvogt/awsmock/compare/v1.6.0...v1.6.1) (2025-07-30)
+
+
+### Bug Fixes
+
+* **1366-application-stop:** add application monitoring ([bde9b33](https://github.com/jensvogt/awsmock/commit/bde9b336e3cff5899f28a4380069a62449f2003e))
+* **1366-application-stop:** add application monitoring ([700fba7](https://github.com/jensvogt/awsmock/commit/700fba70a5d1b2b56a75974a1cda28a739156e63))
+* **1366-application-stop:** fix application stop ([4745ec1](https://github.com/jensvogt/awsmock/commit/4745ec11e3f7176f7d9ec8b3a6efc5eb50c53afc))
+
 ## [1.6.0](https://github.com/jensvogt/awsmock/compare/v1.5.5...v1.6.0) (2025-07-21)
 
 
