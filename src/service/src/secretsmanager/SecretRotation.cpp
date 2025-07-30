@@ -80,7 +80,7 @@ namespace AwsMock::Service {
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         const LambdaService lambdaService;
-        lambdaService.InvokeLambdaFunction(region, lambda.function, body, {});
+        lambdaService.InvokeLambdaFunction(region, lambda.function, body);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function;
     }
 

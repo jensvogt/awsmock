@@ -6,13 +6,17 @@
 #define AWSMOCK_MANAGER_H
 
 // Boost includes
+#include <boost/asio/spawn.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
 #include <boost/interprocess/interprocess_fwd.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/apps/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
