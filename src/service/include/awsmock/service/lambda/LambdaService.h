@@ -265,7 +265,7 @@ namespace AwsMock::Service {
          * @param detached detached thread
          * @return lambda result
          */
-        std::string InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = false) const;
+        Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = false) const;
 
         /**
          * @brief Create a new tag for a lambda function.

@@ -61,6 +61,11 @@ namespace AwsMock::Database::Entity::Lambda {
         std::string httpStatusCode;
 
         /**
+         * Status code
+         */
+        boost::beast::http::status status;
+
+        /**
          * Lambda status
          */
         LambdaInstanceStatus lambdaStatus = InstanceUnknown;

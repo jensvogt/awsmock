@@ -55,6 +55,11 @@ namespace AwsMock::Service {
             // Get bucket
             Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
 
+            // Delete file system objects
+            for (const auto &object: _database.ListBucket(request.bucketName)) {
+                DeleteObject(object.bucket, object.key, object.internalName);
+            }
+
             // Purge bucket
             const long deleted = _database.PurgeBucket(bucket);
             log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;

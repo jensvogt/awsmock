@@ -63,6 +63,7 @@ namespace AwsMock::Dto::Common {
         GET_EVENT_SOURCE,
         TOUCH_OBJECT,
         UPDATE_OBJECT,
+        DELETE_ALL_OBJECTS,
         UNKNOWN
     };
 
@@ -97,6 +98,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
             {S3CommandType::GET_EVENT_SOURCE, "GetEventSource"},
             {S3CommandType::TOUCH_OBJECT, "TouchObject"},
+            {S3CommandType::DELETE_ALL_OBJECTS, "DeleteAllObjects"},
             {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
     };
 

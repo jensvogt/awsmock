@@ -547,7 +547,7 @@ namespace AwsMock::Service {
 
             } else {
 
-                log_debug << "New and original are equal: " << base64FullFile;
+                log_info << "Application upload: new and original are equal: " << base64FullFile;
             }
         }
         return base64FullFile;
