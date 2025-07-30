@@ -11,8 +11,8 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/apps/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
