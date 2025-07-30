@@ -27,7 +27,7 @@
 
 // AwsMock includes
 #include <awsmock/awslocal/AwsLocal.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 
 #ifdef _WIN32

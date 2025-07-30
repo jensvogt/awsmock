@@ -10,10 +10,11 @@
 #include <string>
 
 // AwsMock includes
+#include "model/Function.h"
+
+
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/lambda/model/Code.h>
-#include <awsmock/dto/lambda/model/Configuration.h>
 #include <awsmock/dto/lambda/model/EphemeralStorage.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -147,7 +148,7 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Configuration
          */
-        Configuration configuration;
+        Function configuration;
 
         /**
          * Temporary disk space in MB
@@ -195,13 +196,6 @@ namespace AwsMock::Dto::Lambda {
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Creates an XML string from the object.
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
 
         /**
          * @brief Converts the DTO to a string representation.

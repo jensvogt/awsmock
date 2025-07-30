@@ -17,16 +17,16 @@ namespace AwsMock::Dto::Apps {
      * @author jens.vogt\@opitz-consulting.com
      */
     enum class AppsRuntimeType {
-        JAVA_11,
-        JAVA_17,
-        JAVA_21,
+        JAVA11,
+        JAVA17,
+        JAVA21,
         UNKNOWN
     };
 
     static std::map<AppsRuntimeType, std::string> AppsRuntimeTypeNames{
-            {AppsRuntimeType::JAVA_11, "JAVA_11"},
-            {AppsRuntimeType::JAVA_17, "JAVA_17"},
-            {AppsRuntimeType::JAVA_21, "JAVA_21"},
+            {AppsRuntimeType::JAVA11, "JAVA11"},
+            {AppsRuntimeType::JAVA17, "JAVA17"},
+            {AppsRuntimeType::JAVA21, "JAVA21"},
             {AppsRuntimeType::UNKNOWN, "UNKNOWN"},
     };
 

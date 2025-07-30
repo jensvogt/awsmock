@@ -1,15 +1,13 @@
 #ifndef AWS_MOCK_CORE_BASE64_UTILS_H
 #define AWS_MOCK_CORE_BASE64_UTILS_H
 
-#include "LogStream.h"
-
 // C++ standard includes
 #include <cstdint>
 #include <fstream>
 #include <string>
 
 // Awsmock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 

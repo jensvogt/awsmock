@@ -9,16 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/common/SortColumn.h"
-
-
-#include <awsmock/core/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SSM {
 
     /**
-     * @brief Get parameter request.
+     * @brief Get parameter counter request.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -32,24 +28,24 @@ namespace AwsMock::Dto::SSM {
         /**
          * With description
          */
-        bool withDescription = false;
+        bool withDecryption = false;
 
       private:
 
         friend GetParameterCounterRequest tag_invoke(boost::json::value_to_tag<GetParameterCounterRequest>, boost::json::value const &v) {
             GetParameterCounterRequest r;
-            r.name = Core::Json::GetStringValue(v, "name");
-            r.withDescription = Core::Json::GetBoolValue(v, "withDescription");
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.withDecryption = Core::Json::GetBoolValue(v, "WithDecryption");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetParameterCounterRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"name", obj.name},
-                    {"withDescription", obj.withDescription},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"WithDescription", obj.withDecryption},
             };
         }
     };

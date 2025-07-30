@@ -10,7 +10,9 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/apps/model/RunType.h>
 #include <awsmock/dto/apps/model/Runtime.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -37,6 +39,21 @@ namespace AwsMock::Dto::Apps {
         AppsRuntimeType runtime = AppsRuntimeType::UNKNOWN;
 
         /**
+         * Application run type
+         */
+        AppsRunType runType = AppsRunType::UNKNOWN;
+
+        /**
+         * Application private port
+         */
+        long privatePort{};
+
+        /**
+         * Application public port
+         */
+        long publicPort{};
+
+        /**
          * Application archive
          */
         std::string archive;
@@ -47,9 +64,19 @@ namespace AwsMock::Dto::Apps {
         std::string version;
 
         /**
+         * Application docker image ID
+         */
+        std::string imageId;
+
+        /**
          * Application docker container ID
          */
         std::string containerId;
+
+        /**
+         * Application docker container name
+         */
+        std::string containerName;
 
         /**
          * Application status
@@ -62,6 +89,36 @@ namespace AwsMock::Dto::Apps {
         bool enabled = false;
 
         /**
+         * Application description
+         */
+        std::string description;
+
+        /**
+         * Application docker file
+         */
+        std::string dockerFile;
+
+        /**
+         * Environment
+         */
+        std::map<std::string, std::string> environment;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
+         * Dependencies
+         */
+        std::vector<std::string> dependencies;
+
+        /**
+         * Creation date
+         */
+        system_clock::time_point lastStarted;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -71,18 +128,32 @@ namespace AwsMock::Dto::Apps {
          */
         system_clock::time_point modified = system_clock::now();
 
-
       private:
 
         friend Application tag_invoke(boost::json::value_to_tag<Application>, boost::json::value const &v) {
             Application r;
             r.name = Core::Json::GetStringValue(v, "name");
             r.runtime = AppsRuntimeTypeFromString(Core::Json::GetStringValue(v, "runtime"));
+            r.runType = AppsRunTypeFromString(Core::Json::GetStringValue(v, "runType"));
+            r.privatePort = Core::Json::GetLongValue(v, "privatePort");
+            r.publicPort = Core::Json::GetLongValue(v, "publicPort");
             r.archive = Core::Json::GetStringValue(v, "archive");
             r.version = Core::Json::GetStringValue(v, "version");
+            r.imageId = Core::Json::GetStringValue(v, "imageId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
+            r.containerName = Core::Json::GetStringValue(v, "containerName");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.description = Core::Crypto::Base64Decode(Core::Json::GetStringValue(v, "description"));
+            r.dockerFile = Core::Crypto::Base64Decode(Core::Json::GetStringValue(v, "description"));
+            r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
+            r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
+            r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
+            if (Core::Json::AttributeExists(v, "dependencies")) {
+                r.dependencies = boost::json::value_to<std::vector<std::string>>(v.at("dependencies"));
+            }
             return r;
         }
 
@@ -93,11 +164,24 @@ namespace AwsMock::Dto::Apps {
                     {"requestId", obj.requestId},
                     {"name", obj.name},
                     {"runtime", AppsRuntimeTypeToString(obj.runtime)},
+                    {"runType", AppsRunTypeToString(obj.runType)},
+                    {"privatePort", obj.privatePort},
+                    {"publicPort", obj.publicPort},
                     {"archive", obj.archive},
                     {"version", obj.version},
+                    {"imageId", obj.imageId},
                     {"containerId", obj.containerId},
+                    {"containerName", obj.containerName},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
+                    {"description", Core::Crypto::Base64Encode(obj.description)},
+                    {"dockerFile", Core::Crypto::Base64Encode(obj.description)},
+                    {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"environment", boost::json::value_from(obj.environment)},
+                    {"dependencies", boost::json::value_from(obj.dependencies)},
+                    {"tags", boost::json::value_from(obj.tags)},
             };
         }
     };

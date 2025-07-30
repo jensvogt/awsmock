@@ -19,10 +19,10 @@
 
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/module/mapper/Mapper.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadRequest.h>
 #include <awsmock/dto/s3/CompleteMultipartUploadResult.h>
@@ -34,8 +34,6 @@
 #include <awsmock/dto/s3/CreateMultipartUploadResult.h>
 #include <awsmock/dto/s3/DeleteBucketRequest.h>
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
-#include <awsmock/dto/s3/DeleteObjectsRequest.h>
-#include <awsmock/dto/s3/DeleteObjectsResponse.h>
 #include <awsmock/dto/s3/GetBucketRequest.h>
 #include <awsmock/dto/s3/GetBucketResponse.h>
 #include <awsmock/dto/s3/GetEventSourceRequest.h>
@@ -62,6 +60,8 @@
 #include <awsmock/dto/s3/UpdateBucketRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyRequest.h>
 #include <awsmock/dto/s3/UploadPartCopyResponse.h>
+#include <awsmock/dto/s3/internal/DeleteObjectsRequest.h>
+#include <awsmock/dto/s3/internal/DeleteObjectsResponse.h>
 #include <awsmock/dto/s3/internal/GetObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/GetObjectCounterResponse.h>
 #include <awsmock/dto/s3/internal/ListBucketCounterRequest.h>

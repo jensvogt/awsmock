@@ -13,6 +13,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief List Lambda environment counter response.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaEnvironmentCountersResponse final : Common::BaseCounter<ListLambdaEnvironmentCountersResponse> {
 
         /**

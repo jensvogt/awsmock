@@ -20,7 +20,7 @@
 #include <jwt-cpp/jwt.h>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 

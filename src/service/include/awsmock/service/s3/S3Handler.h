@@ -15,6 +15,7 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/s3/internal/DeleteObjectsRequest.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -30,7 +31,7 @@ namespace AwsMock::Service {
      *
      * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
      * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structure, the request
-     * are first send to the S3CmdHandler, which normalizes the commands.
+     * are first sent to the S3CmdHandler, which normalizes the commands.
      *
      * @author jens.vogt\@opitz-consulting.com
      */

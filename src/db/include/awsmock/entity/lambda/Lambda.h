@@ -382,6 +382,13 @@ namespace AwsMock::Database::Entity::Lambda {
         [[nodiscard]] std::string GetTagValue(const std::string &key) const;
 
         /**
+         * @brief Set the last invocation time for an instance
+         *
+         * @param instanceId instance ID
+         */
+        void SetInstanceLastInvocation(const std::string &instanceId);
+
+        /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.

@@ -76,6 +76,9 @@ namespace AwsMock::Dto::Common {
          * @param jsonString JSON string
          */
         static T FromJson(const std::string &jsonString) {
+            if (jsonString.empty()) {
+                return {};
+            }
             const boost::json::value jv = boost::json::parse(jsonString);
             T t = boost::json::value_to<T>(jv);
             if (Core::Json::AttributeExists(jv, "region")) {

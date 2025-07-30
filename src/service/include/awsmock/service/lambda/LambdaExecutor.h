@@ -7,13 +7,15 @@
 
 // C++ include
 #include <chrono>
+#include <condition_variable>
 
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
@@ -49,10 +51,26 @@ namespace AwsMock::Service {
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
-         * @param functionName lambda function name
-         * @param receiptHandle receipt handle of the message which triggered the invocation
+         * @param lambdaResult
          */
-        void operator()(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
+        void Invocation(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
+
+        /**
+         * @brief Executes a lambda function
+         *
+         * @param lambda lambda function
+         * @param containerId lambda docker container ID
+         * @param host lambda docker host
+         * @param port lambda docker port
+         * @param payload lambda payload
+         * @param lambdaResult lambda result structure
+         */
+        void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
+
+        /**
+         * @brief Wait for the detached thread to finish
+         */
+        void WaitForFinish();
 
       private:
 
@@ -60,6 +78,10 @@ namespace AwsMock::Service {
          * Metric module
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        std::condition_variable _condition;
+        std::mutex _mutex;
+        int _exitConfirm = 0;
     };
 
 }// namespace AwsMock::Service

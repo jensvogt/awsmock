@@ -55,6 +55,11 @@ namespace AwsMock::Service {
             // Get bucket
             Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucketName);
 
+            // Delete file system objects
+            for (const auto &object: _database.ListBucket(request.bucketName)) {
+                DeleteObject(object.bucket, object.key, object.internalName);
+            }
+
             // Purge bucket
             const long deleted = _database.PurgeBucket(bucket);
             log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
@@ -1209,8 +1214,12 @@ namespace AwsMock::Service {
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
+        /*std::string payload = eventNotification.ToJson();
+        LambdaService lambdaService;
+        std::thread(&LambdaService::InvokeLambdaFunction, lambdaService, std::ref(region), std::ref(functionName), std::ref(payload)).detach();*/
+
         _lambdaService.InvokeLambdaFunction(region, functionName, eventNotification.ToJson());
-        log_debug << "Lambda invocation finished send";
+        log_debug << "Lambda invocation send";
     }
 
     Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const {

@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 
@@ -131,30 +131,30 @@ namespace AwsMock::Dto::SSM {
 
         friend Parameter tag_invoke(boost::json::value_to_tag<Parameter>, boost::json::value const &v) {
             Parameter r;
-            r.name = Core::Json::GetStringValue(v, "name");
-            r.parameterValue = Core::Json::GetStringValue(v, "value");
-            r.description = Core::Json::GetStringValue(v, "description");
-            r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "description"));
-            r.kmsKeyArn = Core::Json::GetStringValue(v, "kmsKeyArn");
-            r.arn = Core::Json::GetStringValue(v, "arn");
-            r.created = Core::Json::GetDatetimeValue(v, "created");
-            r.modified = Core::Json::GetDatetimeValue(v, "modified");
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.parameterValue = Core::Json::GetStringValue(v, "Value");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "Type"));
+            r.kmsKeyArn = Core::Json::GetStringValue(v, "KmsKeyArn");
+            r.arn = Core::Json::GetStringValue(v, "ARN");
+            r.created = Core::Json::GetDatetimeValue(v, "Created");
+            r.modified = Core::Json::GetDatetimeValue(v, "Modified");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Parameter const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"name", obj.name},
-                    {"value", obj.parameterValue},
-                    {"type", ParameterTypeToString(obj.type)},
-                    {"description", obj.description},
-                    {"kmsKeyArn", obj.kmsKeyArn},
-                    {"arn", obj.arn},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"Value", obj.parameterValue},
+                    {"Type", ParameterTypeToString(obj.type)},
+                    {"Description", obj.description},
+                    {"KmsKeyArn", obj.kmsKeyArn},
+                    {"ARN", obj.arn},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };

@@ -11,7 +11,7 @@
 #include <boost/asio/ssl.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/ServerCertificate.h>
 #include <awsmock/ftpserver/FtpSession.h>
 #include <awsmock/ftpserver/FtpUser.h>

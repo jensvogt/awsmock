@@ -1347,8 +1347,9 @@ namespace AwsMock::Service {
                 } else {
 
                     // Delete from database
-                    _sqsDatabase.DeleteMessage(d.receiptHandle);
+                    const long count = _sqsDatabase.DeleteMessage(d.receiptHandle);
                     deleteMessageBatchResponse.successfull.emplace_back(d.id);
+                    log_trace << "Message deleted, receiptHandle: " << d.receiptHandle.substr(0, 40) << " deleted: " << count;
                 }
             }
 
@@ -1398,7 +1399,7 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), message.receiptHandle);
+        _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson());
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 }// namespace AwsMock::Service

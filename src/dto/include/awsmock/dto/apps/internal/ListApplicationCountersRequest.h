@@ -23,7 +23,7 @@ namespace AwsMock::Dto::Apps {
     struct ListApplicationCountersRequest final : Common::BaseCounter<ListApplicationCountersRequest> {
 
         /**
-         * User pool name prefix
+         * Application name prefix
          */
         std::string prefix;
 

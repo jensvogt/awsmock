@@ -20,7 +20,7 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
@@ -639,10 +639,10 @@ namespace AwsMock::Core {
      */
     inline std::string CreateSQSQueueUrl(const std::string &queueName) {
         const std::string hostname = SystemUtils::GetHostName();
-        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
-        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        const std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+        const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
         log_trace << "queueUrl: " << queueUrl;
         return queueUrl;
     }

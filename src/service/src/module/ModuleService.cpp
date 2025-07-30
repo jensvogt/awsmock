@@ -143,6 +143,11 @@ namespace AwsMock::Service {
 
                 Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
                 infrastructure.ssmParameters = _ssmDatabase.ListParameters();
+
+            } else if (module == "application") {
+
+                Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+                infrastructure.applications = _applicationDatabase.ListApplications();
             }
         }
         return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
@@ -299,7 +304,16 @@ namespace AwsMock::Service {
                     log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
                 }
             }
-        } catch (Core::ServiceException ex) {
+
+            // Applications
+            if (!infrastructure.applications.empty()) {
+                const Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+                for (auto &application: infrastructure.applications) {
+                    application = _applicationDatabase.ImportApplication(application);
+                }
+                log_info << "Applications imported, count: " << infrastructure.applications.size();
+            }
+        } catch (Core::ServiceException &ex) {
             log_error << "Service exception: " << ex.what();
         }
 
@@ -355,6 +369,8 @@ namespace AwsMock::Service {
                 count += _dynamoDbService.DeleteAllTables();
             } else if (m == "transfer") {
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
+            } else if (m == "application") {
+                count += Database::ApplicationDatabase::instance().DeleteAllApplications();
             }
         }
     }

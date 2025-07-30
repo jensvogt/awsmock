@@ -270,7 +270,7 @@ namespace AwsMock::Service {
     Dto::KMS::DecryptResponse KMSService::Decrypt(const Dto::KMS::DecryptRequest &request) const {
         Monitoring::MetricServiceTimer measure(KMS_SERVICE_TIMER, "method", "decrypt");
         Monitoring::MetricService::instance().IncrementCounter(KMS_SERVICE_TIMER, "action", "decrypt");
-        log_trace << "Decrypt plaintext request: " << request;
+        log_trace << "Decrypt plaintext request, keyId: " << request.keyId;
 
         if (!_kmsDatabase.KeyExists(request.keyId)) {
             log_error << "Key not found, keyId: " << request.keyId;
@@ -328,7 +328,7 @@ namespace AwsMock::Service {
                 // Preparation
                 unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
                 const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
-                int plaintextLen = static_cast<int>(rawPlaintext.length());
+                int plaintextLen = static_cast<int>(rawPlaintext.size());
 
                 // Encryption
                 unsigned char *rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, rawKey);
@@ -414,15 +414,14 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::SYMMETRIC_DEFAULT: {
 
                 // Preparation
-                unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
+                const unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
                 const std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
-                int ciphertextLen = static_cast<int>(rawCiphertext.length());
+                int ciphertextLen = static_cast<int>(rawCiphertext.size());
 
                 // Description
                 unsigned char *rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLen, rawKey);
                 log_debug << "Decrypted plaintext, length: " << ciphertextLen;
-
-                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext)});
+                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext), static_cast<size_t>(ciphertextLen)});
             }
 
             case Dto::KMS::KeySpec::RSA_2048:

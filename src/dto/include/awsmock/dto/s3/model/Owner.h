@@ -14,7 +14,7 @@
 
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 
 namespace AwsMock::Dto::S3 {

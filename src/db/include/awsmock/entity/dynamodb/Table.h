@@ -13,7 +13,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {

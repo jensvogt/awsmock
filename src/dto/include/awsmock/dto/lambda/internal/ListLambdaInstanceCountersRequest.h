@@ -14,6 +14,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief List Lambda instance counter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaInstanceCountersRequest final : Common::BaseCounter<ListLambdaInstanceCountersRequest> {
 
         /**

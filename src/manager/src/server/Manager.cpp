@@ -141,6 +141,7 @@ namespace AwsMock::Manager {
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
+        // Initialize monitoring
         Core::Scheduler scheduler(_ios);
         const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
@@ -148,6 +149,9 @@ namespace AwsMock::Manager {
         // Load available modules from configuration file
         LoadModulesFromConfiguration();
         log_info << "Module configuration loaded";
+
+        // Autoload the init file before modules start
+        AutoLoad();
 
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
@@ -180,9 +184,6 @@ namespace AwsMock::Manager {
             }
         }
         log_info << "Module started, count: " << moduleMap.GetSize();
-
-        // Auto load init file
-        AutoLoad();
 
         // Start listener threads
         const int numProcs = Core::SystemUtils::GetNumberOfCores();

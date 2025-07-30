@@ -15,11 +15,11 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ForbiddenException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -186,6 +186,17 @@ namespace AwsMock::Service {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendContinueResponse(const http::request<http::dynamic_body> &request);
+
+        /**
+         * @brief General response
+         *
+         * @param request HTTP request
+         * @param status HTTP status
+         * @param body message body
+         * @param headers HTTP header map values, added to the default headers
+         * @return HTTP response
+         */
+        static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, http::status status, const std::string &body, const std::map<std::string, std::string> &headers = {});
 
         /**
          * Get the name

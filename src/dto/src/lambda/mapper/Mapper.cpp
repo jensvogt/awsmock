@@ -2,9 +2,31 @@
 // Created by vogje01 on 5/10/24.
 //
 
+
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 
 namespace AwsMock::Dto::Lambda {
+
+    Function Mapper::mapFunction(const Database::Entity::Lambda::Lambda &lambdaEntity) {
+
+        Function function;
+        function.region = lambdaEntity.region;
+        function.user = lambdaEntity.user;
+        function.functionName = lambdaEntity.function;
+        function.functionArn = lambdaEntity.arn;
+        function.codeSha256 = lambdaEntity.codeSha256;
+        function.runtime = lambdaEntity.runtime;
+        function.handler = lambdaEntity.handler;
+        function.timeout = lambdaEntity.timeout;
+        function.state = Database::Entity::Lambda::LambdaStateToString(lambdaEntity.state);
+        function.stateReason = lambdaEntity.stateReason;
+        function.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCodeToString(lambdaEntity.stateReasonCode);
+
+        // Environment
+        function.environment.variables = lambdaEntity.environment.variables;
+
+        return function;
+    }
 
     CreateFunctionResponse Mapper::map(const CreateFunctionRequest &request, const Database::Entity::Lambda::Lambda &lambdaEntity) {
 
@@ -116,7 +138,7 @@ namespace AwsMock::Dto::Lambda {
         return eventSourceMappings;
     }
 
-    ListFunctionCountersResponse Mapper::map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
+    ListFunctionCountersResponse Mapper::map(const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities) {
         ListFunctionCountersResponse response;
         for (auto &lambdaEntity: lambdaEntities) {
             FunctionCounter counter;
@@ -141,6 +163,7 @@ namespace AwsMock::Dto::Lambda {
         counter.lambdaArn = resultEntity.lambdaArn;
         counter.lambdaName = resultEntity.lambdaName;
         counter.runtime = resultEntity.runtime;
+        counter.duration = resultEntity.duration;
         counter.containerId = resultEntity.containerId;
         counter.requestBody = resultEntity.requestBody;
         counter.responseBody = resultEntity.responseBody;
@@ -165,4 +188,11 @@ namespace AwsMock::Dto::Lambda {
         return response;
     }
 
+    LambdaResult Mapper::mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity) {
+        LambdaResult result;
+        result.functionArn = resultEntity.lambdaArn;
+        result.responseBody = resultEntity.requestBody;
+        result.status = (int) resultEntity.status;
+        return result;
+    }
 }// namespace AwsMock::Dto::Lambda

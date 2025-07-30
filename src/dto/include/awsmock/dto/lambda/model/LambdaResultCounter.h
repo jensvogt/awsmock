@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/entity/lambda/Instance.h>
 
@@ -43,6 +43,11 @@ namespace AwsMock::Dto::Lambda {
         std::string lambdaArn;
 
         /**
+         * Lambda runtime
+         */
+        std::string runtime;
+
+        /**
          * Request body
          */
         std::string requestBody;
@@ -58,9 +63,9 @@ namespace AwsMock::Dto::Lambda {
         std::string logMessages;
 
         /**
-         * Runtime
+         * Execution duration
          */
-        std::string runtime;
+        long duration{};
 
         /**
          * Container ID
@@ -89,11 +94,12 @@ namespace AwsMock::Dto::Lambda {
             LambdaResultCounter r;
             r.oid = Core::Json::GetStringValue(v, "oid");
             r.lambdaName = Core::Json::GetStringValue(v, "lambdaName");
-            r.lambdaArn = Core::Json::GetLongValue(v, "lambdaArn");
+            r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
+            r.runtime = Core::Json::GetStringValue(v, "runtime");
             r.requestBody = Core::Json::GetLongValue(v, "requestBody");
             r.responseBody = Core::Json::GetStringValue(v, "responseBody");
             r.logMessages = Core::Json::GetStringValue(v, "logMessages");
-            r.runtime = Core::Json::GetStringValue(v, "runtime");
+            r.duration = Core::Json::GetLongValue(v, "duration");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.httpStatusCode = Core::Json::GetStringValue(v, "httpStatusCode");
             r.lambdaStatus = Database::Entity::Lambda::LambdaInstanceStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
@@ -108,10 +114,11 @@ namespace AwsMock::Dto::Lambda {
                     {"oid", obj.oid},
                     {"lambdaName", obj.lambdaName},
                     {"lambdaArn", obj.lambdaArn},
+                    {"runtime", obj.runtime},
                     {"requestBody", obj.requestBody},
                     {"responseBody", obj.responseBody},
                     {"logMessages", obj.logMessages},
-                    {"runtime", obj.runtime},
+                    {"duration", obj.duration},
                     {"containerId", obj.containerId},
                     {"httpStatusCode", obj.httpStatusCode},
                     {"lambdaStatus", Database::Entity::Lambda::LambdaInstanceStatusToString(obj.lambdaStatus)},

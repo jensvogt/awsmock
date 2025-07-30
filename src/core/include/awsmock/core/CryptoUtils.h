@@ -39,11 +39,12 @@
 #include <boost/archive/iterators/ostream_iterator.hpp>
 #include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
+#include <boost/beast/core/detail/base64.hpp>
 
 // AwsMock includes
 #include <awsmock/core/Base64Utils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
 
@@ -215,7 +216,7 @@ namespace AwsMock::Core {
          * @param key encryption key
          * @return encrypted string
          */
-        static unsigned char *Aes256EncryptString(unsigned char *plaintext, int *len, unsigned char *key);
+        static unsigned char *Aes256EncryptString(const unsigned char *plaintext, int *len, unsigned char *key);
 
         /**
          * @brief AES256 decryption of a string.
@@ -225,7 +226,7 @@ namespace AwsMock::Core {
          * @param key encryption key
          * @return decrypted string
          */
-        static unsigned char *Aes256DecryptString(const unsigned char *ciphertext, int *len, unsigned char *key);
+        static unsigned char *Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key);
 
         /**
          * @brief AES256 encryption of a file
@@ -413,6 +414,11 @@ namespace AwsMock::Core {
          * Salt values
          */
         static unsigned int _salt[];
+
+        /**
+         * Salt values
+         */
+        static unsigned char _iv[16];
     };
 
 }// namespace AwsMock::Core

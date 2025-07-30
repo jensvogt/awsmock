@@ -97,8 +97,10 @@
 #define SSM_SERVICE_COUNTER "ssm_service_counter"
 
 // Applications
-#define APPLICATION_COUNT "applicaiton_parameter_counter"
+#define APPLICATION_COUNT "application_counter"
 #define APPLICATION_SERVICE_TIMER "application_service_timer"
 #define APPLICATION_SERVICE_COUNTER "application_service_counter"
+#define APPLICATION_CPU_USAGE "application_cpu_usage"
+#define APPLICATION_MEMORY_USAGE "application_mem_usage"
 
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H

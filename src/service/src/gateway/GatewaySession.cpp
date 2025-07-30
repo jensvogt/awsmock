@@ -58,11 +58,6 @@ namespace AwsMock::Service {
         if (ec)
             return;
 
-        // Handle 100-continue requests
-        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
-            HandleContinueRequest(_stream);
-        }
-
         // Read from the stream
         read(_stream, _buffer, *_parser, ev);
 
@@ -208,7 +203,7 @@ namespace AwsMock::Service {
             return DoShutdown();
         }
 
-        // Resume the read if it has been paused
+        // Resume the reading if it has been paused
         if (_response_queue.size() == _queueLimit)
             DoRead();
 
@@ -222,13 +217,6 @@ namespace AwsMock::Service {
         // Send a TCP shutdown
         boost::beast::error_code ec;
         _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
-        // At this point the connection is closed gracefully
-    }
-
-    void GatewaySession::DoClose() {
-        // Send a TCP shutdown
-        boost::beast::error_code ec;
-        _stream.socket().close(ec);
         // At this point the connection is closed gracefully
     }
 

@@ -10,6 +10,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief Reset function counters
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ResetFunctionCountersRequest final : Common::BaseCounter<ResetFunctionCountersRequest> {
 
         /**

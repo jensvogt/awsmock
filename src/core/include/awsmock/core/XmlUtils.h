@@ -23,7 +23,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 // AwsMOck includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 

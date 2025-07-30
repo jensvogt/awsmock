@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/sns/model/EventRecord.h>
 
 namespace AwsMock::Dto::SNS {

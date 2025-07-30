@@ -289,7 +289,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::DeleteMessageBatchRequest sqsRequest = Dto::SQS::DeleteMessageBatchRequest::FromJson(clientCommand);
                     Dto::SQS::DeleteMessageBatchResponse sqsResponse = _sqsService.DeleteMessageBatch(sqsRequest);
-                    log_info << "Delete message batch, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Delete message batch, queueUrl: " << sqsRequest.queueUrl << ", count: " << sqsRequest.entries.size();
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 

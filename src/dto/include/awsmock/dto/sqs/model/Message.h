@@ -55,7 +55,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Message attributes
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
         /**
          * MD5 sum of the message body

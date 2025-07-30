@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SSM {
@@ -29,14 +29,14 @@ namespace AwsMock::Dto::SSM {
         /**
          * WIth description
          */
-        bool withDescription = false;
+        bool withDecryption = false;
 
       private:
 
         friend GetParameterRequest tag_invoke(boost::json::value_to_tag<GetParameterRequest>, boost::json::value const &v) {
             GetParameterRequest r;
-            r.name = Core::Json::GetLongValue(v, "Name");
-            r.withDescription = Core::Json::GetBoolValue(v, "WithDescription");
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.withDecryption = Core::Json::GetBoolValue(v, "WithDecryption");
             return r;
         }
 
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::SSM {
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
                     {"Name", obj.name},
-                    {"WithDescription", obj.withDescription},
+                    {"WithDecryption", obj.withDecryption},
             };
         }
     };

@@ -95,11 +95,11 @@ namespace AwsMock::Service {
         WaitForActive(REGION, FUNCTION_NAME);
 
         // act
-        auto [lambdaList, functions] = _lambdaService.ListFunctions(REGION);
+        auto functions = _lambdaService.ListFunctions(REGION);
 
         // assert
-        BOOST_CHECK_EQUAL(lambdaList.empty(), false);
-        BOOST_CHECK_EQUAL(lambdaList.front().function, FUNCTION_NAME);
+        BOOST_CHECK_EQUAL(functions.functions.empty(), false);
+        BOOST_CHECK_EQUAL(functions.functions.front().functionName, FUNCTION_NAME);
     }
 
     BOOST_FIXTURE_TEST_CASE(LambdaGetTest, LambdaServiceTest) {

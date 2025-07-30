@@ -43,6 +43,31 @@ namespace AwsMock::Database::Entity::Apps {
         std::string runtime;
 
         /**
+         * Application type
+         */
+        std::string type;
+
+        /**
+         * Private port. This is the internal port used by the application inside the docker image.
+         */
+        long privatePort{};
+
+        /**
+         * Public port. This is the host port used by the application inside the docker image.
+         */
+        long publicPort{};
+
+        /**
+         * Name of the container
+         */
+        std::string containerName;
+
+        /**
+         * ID of the container
+         */
+        std::string containerId;
+
+        /**
          * Application archive
          */
         std::string archive;
@@ -53,11 +78,6 @@ namespace AwsMock::Database::Entity::Apps {
         std::string version;
 
         /**
-         * Application docker container ID
-         */
-        std::string containerId;
-
-        /**
          * Application status
          */
         std::string status;
@@ -65,7 +85,47 @@ namespace AwsMock::Database::Entity::Apps {
         /**
          * Enabled
          */
-        bool enabled;
+        bool enabled = false;
+
+        /**
+         * Application description
+         */
+        std::string description;
+
+        /**
+         * Environment
+         */
+        std::map<std::string, std::string> environment;
+
+        /**
+         * Tags
+         */
+        std::map<std::string, std::string> tags;
+
+        /**
+         * Application dependencies
+         */
+        std::vector<std::string> dependencies;
+
+        /**
+         * Docker image ID
+         */
+        std::string imageId;
+
+        /**
+         * Docker image size
+         */
+        long imageSize{};
+
+        /**
+         * MD5 of docker image
+         */
+        std::string imageMd5;
+
+        /**
+         * Last start time
+         */
+        system_clock::time_point lastStarted;
 
         /**
          * Creation date

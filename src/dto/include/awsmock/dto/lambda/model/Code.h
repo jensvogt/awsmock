@@ -10,7 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -29,7 +30,7 @@ namespace AwsMock::Dto::Lambda {
      * @endcode
      *
      */
-    struct Code {
+    struct Code final : Common::BaseCounter<Code> {
 
         /**
          * URI of a container image in the Amazon ECR registry.
@@ -47,7 +48,7 @@ namespace AwsMock::Dto::Lambda {
         std::string s3Key;
 
         /**
-         * For versioned objects, the version of the deployment package object to use.
+         * For versioned objects, the version of the deployment package objects to use.
          */
         std::string s3ObjectVersion;
 
@@ -74,35 +75,70 @@ namespace AwsMock::Dto::Lambda {
          *
          * @param document json object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
+
+            try {
+
+                s3Bucket = Core::Bson::BsonUtils::GetStringValue(document, "S3Bucket");
+                s3Key = Core::Bson::BsonUtils::GetStringValue(document, "S3Key");
+                s3ObjectVersion = Core::Bson::BsonUtils::GetStringValue(document, "S3ObjectVersion");
+                imageUri = Core::Bson::BsonUtils::GetStringValue(document, "ImageUri");
+                zipFile = Core::Bson::BsonUtils::GetStringValue(document, "ZipFile");
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
         /**
          * @brief Creates a JSON string from the object.
          *
          * @return JSON string
          */
-        [[nodiscard]] std::string ToJson() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                document document;
+                Core::Bson::BsonUtils::SetStringValue(document, "ZipFile", zipFile);
+                Core::Bson::BsonUtils::SetStringValue(document, "S3Bucket", s3Bucket);
+                Core::Bson::BsonUtils::SetStringValue(document, "S3Key", s3Key);
+                Core::Bson::BsonUtils::SetStringValue(document, "S3ObjectVersion", s3ObjectVersion);
+                Core::Bson::BsonUtils::SetStringValue(document, "ImageUri", imageUri);
+                return document.extract();
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Code &r);
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend Code tag_invoke(boost::json::value_to_tag<Code>, boost::json::value const &v) {
+            Code r;
+            r.imageUri = Core::Json::GetStringValue(v, "ImageUri");
+            r.s3Bucket = Core::Json::GetStringValue(v, "S3Bucket");
+            r.s3Key = Core::Json::GetStringValue(v, "S3Key");
+            r.s3ObjectVersion = Core::Json::GetStringValue(v, "S3ObjectVersion");
+            r.zipFile = Core::Json::GetStringValue(v, "ZipFile");
+            r.repositoryType = Core::Json::GetStringValue(v, "RepositoryType");
+            r.resolvedImageUri = Core::Json::GetStringValue(v, "ResolvedImageUri");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Code const &obj) {
+            jv = {
+                    {"ImageUri", obj.imageUri},
+                    {"S3Bucket", obj.s3Bucket},
+                    {"S3Key", obj.s3Key},
+                    {"S3ObjectVersion", obj.s3ObjectVersion},
+                    {"ZipFile", obj.zipFile},
+                    {"RepositoryType", obj.repositoryType},
+                    {"ResolvedImageUri", obj.resolvedImageUri},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

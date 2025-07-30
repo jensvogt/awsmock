@@ -11,13 +11,23 @@ namespace AwsMock::Dto::Apps {
         applicationDto.region = applicationEntity.region;
         applicationDto.name = applicationEntity.name;
         applicationDto.runtime = AppsRuntimeTypeFromString(applicationEntity.runtime);
+        applicationDto.runType = AppsRunTypeFromString(applicationEntity.type);
+        applicationDto.privatePort = applicationEntity.privatePort;
+        applicationDto.publicPort = applicationEntity.publicPort;
         applicationDto.archive = applicationEntity.archive;
         applicationDto.version = applicationEntity.version;
+        applicationDto.imageId = applicationEntity.imageId;
         applicationDto.containerId = applicationEntity.containerId;
+        applicationDto.containerName = applicationEntity.containerName;
         applicationDto.status = AppsStatusTypeFromString(applicationEntity.status);
         applicationDto.enabled = applicationEntity.enabled;
+        applicationDto.description = Core::Crypto::Base64Encode(applicationEntity.description);
+        applicationDto.lastStarted = applicationEntity.lastStarted;
         applicationDto.created = applicationEntity.created;
         applicationDto.modified = applicationEntity.modified;
+        applicationDto.environment = applicationEntity.environment;
+        applicationDto.tags = applicationEntity.tags;
+        applicationDto.dependencies = applicationEntity.dependencies;
         return applicationDto;
     }
 
@@ -34,13 +44,23 @@ namespace AwsMock::Dto::Apps {
         applicationEntity.region = applicationDto.region;
         applicationEntity.name = applicationDto.name;
         applicationEntity.runtime = AppsRuntimeTypeToString(applicationDto.runtime);
+        applicationEntity.type = AppsRunTypeToString(applicationDto.runType);
+        applicationEntity.privatePort = applicationDto.privatePort;
+        applicationEntity.publicPort = applicationDto.publicPort;
         applicationEntity.archive = applicationDto.archive;
         applicationEntity.version = applicationDto.version;
+        applicationEntity.imageId = applicationDto.imageId;
         applicationEntity.containerId = applicationDto.containerId;
+        applicationEntity.containerName = applicationDto.containerName;
         applicationEntity.status = AppsStatusTypeToString(applicationDto.status);
         applicationEntity.enabled = applicationDto.enabled;
+        applicationEntity.description = Core::Crypto::Base64Decode(applicationDto.description);
+        applicationEntity.lastStarted = applicationDto.lastStarted;
         applicationEntity.created = applicationDto.created;
         applicationEntity.modified = applicationDto.modified;
+        applicationEntity.environment = applicationDto.environment;
+        applicationEntity.tags = applicationDto.tags;
+        applicationEntity.dependencies = applicationDto.dependencies;
         return applicationEntity;
     }
 

@@ -12,7 +12,8 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
@@ -64,6 +65,16 @@ namespace AwsMock::Database {
         Entity::Apps::Application GetApplicationByOid(const std::string &oid);
 
         /**
+         * @brief Get an application
+         *
+         * @param region AWS region
+         * @param name application name
+         * @return application entity
+         * @throws DatabaseException
+         */
+        [[nodiscard]] Entity::Apps::Application GetApplication(const std::string &region, const std::string &name) const;
+
+        /**
          * @brief Create a new application
          *
          * @param application application entity to create
@@ -72,16 +83,52 @@ namespace AwsMock::Database {
         Entity::Apps::Application CreateApplication(const Entity::Apps::Application &application);
 
         /**
+         * @brief Update an application
+         *
+         * @param application application entity to update
+         * @return updated application entity.
+         */
+        Entity::Apps::Application UpdateApplication(Entity::Apps::Application &application);
+
+        /**
          * @brief Returns a list of cognito user pools.
          *
          * @param region AWS region name
-         * @param prefix name prtefix
+         * @param prefix name prefix
          * @param pageSize page size
          * @param pageIndex page index
          * @param sortColumns vector of sort columns and direction
          * @return list of cognito user pools
          */
         std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {});
+
+        /**
+         * @brief Count all applications by region and prefix
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @return number of applications
+         */
+        long CountApplications(const std::string &region, const std::string &prefix) const;
+
+        /**
+         * @brief Deletes an application
+         *
+         * @param region AWS region name
+         * @param name application name
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteApplication(const std::string &region, const std::string &name);
+
+
+        /**
+         * @brief Deletes all application
+         *
+         * @return true if, application exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] long DeleteAllApplications();
 
       private:
 

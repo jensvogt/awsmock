@@ -7,7 +7,7 @@ StartLimitIntervalSec=0
 Type=simple
 Restart=always
 RestartSec=1
-User=root
+User=vogje01
 ExecStart=/usr/local/awsmock/bin/awsmockmgr --loglevel info --config /usr/local/awsmock/etc/awsmock.json
 KillSignal=SIGTERM
 

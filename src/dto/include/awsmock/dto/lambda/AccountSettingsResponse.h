@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/lambda/model/AccountLimit.h>
 #include <awsmock/dto/lambda/model/AccountUsage.h>
 
@@ -37,7 +35,7 @@ namespace AwsMock::Dto::Lambda {
      * }
      * @endcode
      */
-    struct AccountSettingsResponse : Common::BaseDto<AccountSettingsResponse> {
+    struct AccountSettingsResponse final : Common::BaseCounter<AccountSettingsResponse> {
 
         /**
          * Account limits
@@ -49,12 +47,21 @@ namespace AwsMock::Dto::Lambda {
          */
         AccountUsage accountUsage;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend AccountSettingsResponse tag_invoke(boost::json::value_to_tag<AccountSettingsResponse>, boost::json::value const &v) {
+            AccountSettingsResponse r;
+            r.accountLimit = boost::json::value_to<AccountLimit>(v.at("AccountLimit"));
+            r.accountUsage = boost::json::value_to<AccountUsage>(v.at("AccountUsage"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AccountSettingsResponse const &obj) {
+            jv = {
+                    {"AccountLimit", boost::json::value_from(obj.accountLimit)},
+                    {"AccountUsage", boost::json::value_from(obj.accountUsage)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

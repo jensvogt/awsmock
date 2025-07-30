@@ -30,15 +30,23 @@ namespace AwsMock::Dto::Apps {
     struct CreateApplicationResponse final : Common::BaseCounter<CreateApplicationResponse> {
 
         /**
-         * Application
+         * Applications
          */
-        Application application;
+        std::vector<Application> applications;
+
+        /**
+         * Total number of application entities
+         */
+        long total{};
 
       private:
 
         friend CreateApplicationResponse tag_invoke(boost::json::value_to_tag<CreateApplicationResponse>, boost::json::value const &v) {
             CreateApplicationResponse r;
-            r.application = boost::json::value_to<Application>(v, "application");
+            r.total = Core::Json::GetLongValue(v, "total");
+            if (Core::Json::AttributeExists(v, "applications")) {
+                r.applications = boost::json::value_to<std::vector<Application>>(v.at("applications"));
+            }
             return r;
         }
 
@@ -47,7 +55,8 @@ namespace AwsMock::Dto::Apps {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
-                    {"application", boost::json::value_from(obj.application)},
+                    {"total", obj.total},
+                    {"applications", boost::json::value_from(obj.applications)},
             };
         }
     };

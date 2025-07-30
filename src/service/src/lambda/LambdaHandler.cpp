@@ -27,7 +27,7 @@ namespace AwsMock::Service {
                     std::string functionName = Core::HttpUtils::GetPathParameters(request.target())[2];
                     Dto::Lambda::GetFunctionResponse lambdaResponse = _lambdaService.GetFunction(region, functionName);
                     std::map<std::string, std::string> headers;
-                    headers["Content-Length"] = std::to_string(lambdaResponse.ToXml().length());
+                    headers["Content-Length"] = std::to_string(lambdaResponse.ToJson().length());
                     headers["Content-Type"] = "application/xml";
                     return SendOkResponse(request, lambdaResponse.ToJson(), headers);
                 }
@@ -122,9 +122,9 @@ namespace AwsMock::Service {
                     std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
                     log_debug << "Lambda function invocation, name: " << functionName;
 
-                    _lambdaService.InvokeLambdaFunction(region, functionName, body);
+                    Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, body);
                     log_info << "Lambda function invoked, name: " << functionName;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::int_to_status(result.status), result.responseBody);
                 }
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
                 lambdaRequest.FromJson(body);

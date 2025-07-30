@@ -15,7 +15,9 @@
 #include <awsmock/dto/lambda/internal/ListFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
+#include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
+#include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 
@@ -29,6 +31,14 @@ namespace AwsMock::Dto::Lambda {
     class Mapper {
 
       public:
+
+        /**
+         * @brief Maps a lambda function entity to a lambda function DTO
+         *
+         * @param lambdaEntity lambda function entity
+         * @return lambda function DTO
+         */
+        static Function mapFunction(const Database::Entity::Lambda::Lambda &lambdaEntity);
 
         /**
          * @brief Maps a lambda entity to a create function response
@@ -86,13 +96,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * @brief Maps a list of lambda entities to list lambda counters response
          *
-         * @param request list lambda counters request
          * @param lambdaEntities lambda entities
          * @return ListFunctionCountersResponse
          * @see ListFunctionCountersRequest
          * @see ListFunctionCountersResponse
          */
-        static ListFunctionCountersResponse map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
+        static ListFunctionCountersResponse map(const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
 
         /**
          * @brief Maps a list of lambda result entities to a list lambda result counters response
@@ -135,6 +144,14 @@ namespace AwsMock::Dto::Lambda {
          * @return list of event source mapping DTOs
          */
         static std::vector<EventSourceMapping> mapCounters(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappingEntities);
+
+        /**
+         * @brief Maps a lambda result
+         *
+         * @param resultEntity result entity
+         * @return lambda result DTO
+         */
+        static LambdaResult mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity);
     };
 
 }// namespace AwsMock::Dto::Lambda

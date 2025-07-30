@@ -111,10 +111,11 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.java11", "AWSMOCK_MODULES_LAMBDA_JAVA11", "public.ecr.aws/lambda/java:11");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.java17", "AWSMOCK_MODULES_LAMBDA_JAVA17", "public.ecr.aws/lambda/java:17");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.java21", "AWSMOCK_MODULES_LAMBDA_JAVA21", "public.ecr.aws/lambda/java:21");
-        DefineProperty<std::string>("awsmock.modules.lambda.runtime.python3-8", "AWSMOCK_MODULES_LAMBDA_PYTHON38", "public.ecr.aws/lambda/python:3.8");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.python3-9", "AWSMOCK_MODULES_LAMBDA_PYTHON39", "public.ecr.aws/lambda/python:3.9");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.python3-10", "AWSMOCK_MODULES_LAMBDA_PYTHON310", "public.ecr.aws/lambda/python:3.10");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.python3-11", "AWSMOCK_MODULES_LAMBDA_PYTHON311", "public.ecr.aws/lambda/python:3.11");
+        DefineProperty<std::string>("awsmock.modules.lambda.runtime.python3-12", "AWSMOCK_MODULES_LAMBDA_PYTHON312", "public.ecr.aws/lambda/python:3.12");
+        DefineProperty<std::string>("awsmock.modules.lambda.runtime.python3-13", "AWSMOCK_MODULES_LAMBDA_PYTHON313", "public.ecr.aws/lambda/python:3.13");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.nodejs20-x", "AWSMOCK_MODULES_LAMBDA_NODES20", "public.ecr.aws/lambda/nodejs:20");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.provided-al2", "AWSMOCK_MODULES_LAMBDA_PROVIDES_AL2", "public.ecr.aws/lambda/provided:al2");
         DefineProperty<std::string>("awsmock.modules.lambda.runtime.provided-al2023", "AWSMOCK_MODULES_LAMBDA_PROVIDED_2023", "public.ecr.aws/lambda/provided:al2023");
@@ -200,6 +201,25 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.application.backup.cron", "AWSMOCK_MODULES_APPLICATION_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.application.backup.count", "AWSMOCK_MODULES_APPLICATION_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.application.monitoring-period", "AWSMOCK_SERVICE_APPLICATION_MONITORING_PERIOD", 300);
+#ifdef _WIN32
+        DefineProperty<std::string>("awsmock.modules.application.data-dir", "AWSMOCK_MODULES_APPLICATION_DATADIR", "C:/Program Files (x86)/awsmock/data/application");
+#else
+        DefineProperty<std::string>("awsmock.modules.application.data-dir", "AWSMOCK_MODULES_APPLICATION_DATADIR", "/usr/local/awsmock/data/application");
+#endif
+        DefineProperty<std::string>("awsmock.modules.application.runtime.java11", "AWSMOCK_MODULES_APPLICATION_JAVA11", "alpine/java:11.0.22-jdk");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.java17", "AWSMOCK_MODULES_APPLICATION_JAVA17", "openjdk:17-jdk-alpine");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.java21", "AWSMOCK_MODULES_APPLICATION_JAVA21", "alpine/java:21-jdk");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.python3-9", "AWSMOCK_MODULES_APPLICATION_PYTHON39", "python:3.9");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.python3-10", "AWSMOCK_MODULES_APPLICATION_PYTHON310", "python:3.10");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.python3-11", "AWSMOCK_MODULES_APPLICATION_PYTHON311", "python:3.11");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.python3-12", "AWSMOCK_MODULES_APPLICATION_PYTHON312", "python:3.12");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.python3-13", "AWSMOCK_MODULES_APPLICATION_PYTHON313", "python:3.13");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.nodejs20-x", "AWSMOCK_MODULES_APPLICATION_NODES20", "public.ecr.aws/lambda/nodejs:20");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.nodejs21-x", "AWSMOCK_MODULES_APPLICATION_NODES20", "public.ecr.aws/lambda/nodejs:21");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.provided-al2", "AWSMOCK_MODULES_APPLICATION_PROVIDES_AL2", "public.ecr.aws/lambda/provided:al2");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.provided-al2023", "AWSMOCK_MODULES_APPLICATION_PROVIDED_2023", "public.ecr.aws/lambda/provided:al2023");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.provided-latest", "AWSMOCK_MODULES_APPLICATION_PROVIDED_LATEST", "public.ecr.aws/lambda/provided:latest");
+        DefineProperty<std::string>("awsmock.modules.application.runtime.go", "AWSMOCK_MODULES_APPLICATION_GO", "public.ecr.aws/lambda/provided:al2023");
 
         // Docker
         DefineProperty<bool>("awsmock.docker.active", "AWSMOCK_DOCKER_ACTIVE", true);

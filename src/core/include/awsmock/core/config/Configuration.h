@@ -15,11 +15,11 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/TypeName.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 #ifdef _WIN32
 #define DEFAULT_MAGIC_FILE "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc"

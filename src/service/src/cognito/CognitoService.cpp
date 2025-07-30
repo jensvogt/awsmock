@@ -401,10 +401,12 @@ namespace AwsMock::Service {
         log_debug << "Admin create user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
             throw Core::ServiceException("User pool does not exists, userPoolId: " + request.userPoolId);
         }
 
         if (_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            log_error << "User exists exists already, userPoolId: " << request.userPoolId << ", userName: " + request.userName;
             throw Core::ServiceException("User exists exists already, userPoolId: " + request.userPoolId + " userName: " + request.userName);
         }
 
@@ -440,10 +442,12 @@ namespace AwsMock::Service {
         log_debug << "Admin get user request, userName:  " << request.userName << " userPoolId: " << request.userPoolId;
 
         if (!_database.UserPoolExists(request.userPoolId)) {
+            log_error << "User pool does not exists, userPoolId: " << request.userPoolId;
             throw Core::BadRequestException("User pool does not exists, userPoolId: " + request.userPoolId);
         }
 
         if (!_database.UserExists(request.region, request.userPoolId, request.userName)) {
+            log_error << "User does not exists, userPoolId: " << request.userPoolId << ", userName: " + request.userName;
             throw Core::BadRequestException("User does not exists, userPoolId: " + request.userPoolId + " userName: " + request.userName);
         }
 

@@ -57,8 +57,6 @@ namespace AwsMock::Service {
             for (auto const &[key, val]: *_snsCounterMap) {
 
                 std::string labelValue = key;
-
-
                 _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(val.messages));
                 _metricService.SetGauge(SNS_TOPIC_SIZE, "topic", labelValue, static_cast<double>(val.size));
 

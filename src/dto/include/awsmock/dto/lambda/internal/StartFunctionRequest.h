@@ -10,6 +10,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief Start function request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct StartFunctionRequest final : Common::BaseCounter<StartFunctionRequest> {
 
         /**

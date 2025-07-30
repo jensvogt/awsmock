@@ -19,6 +19,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief List Lambda event sources request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaEventSourceCountersRequest final : Common::BaseCounter<ListLambdaEventSourceCountersRequest> {
 
         /**

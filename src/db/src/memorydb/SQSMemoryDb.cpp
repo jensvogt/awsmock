@@ -30,7 +30,7 @@ namespace AwsMock::Database {
             counter.size = GetQueueSize(queue.queueArn);
             _sqsCounterMap->insert_or_assign(queue.queueArn, counter);
         }
-        log_debug << "SQS queues counters initialized" << _sqsCounterMap->size();
+        log_debug << "SQS queues counters initialized, count: " << _sqsCounterMap->size();
     }
 
     bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
