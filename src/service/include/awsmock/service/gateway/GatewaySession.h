@@ -30,7 +30,6 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 #include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
-#include <boost/asio/spawn.hpp>
 
 namespace AwsMock::Service {
 
@@ -50,9 +49,13 @@ namespace AwsMock::Service {
       public:
 
         /**
-         * @brief Constructor
+         * @brief HTTP session
+         *
+         * Takes ownership of the socket.
+         *
+         * @param socket
          */
-        explicit GatewaySession();
+        explicit GatewaySession(ip::tcp::socket &&socket);
 
         /**
          * @brief Start the session
@@ -60,9 +63,24 @@ namespace AwsMock::Service {
          * We need to be executing within a strand to perform async operations on the I/O objects in this session. Although not strictly necessary
          * for single-threaded contexts, this example code is written to be thread-safe by default.
          */
-        void DoSession(boost::beast::tcp_stream &stream, const boost::asio::yield_context &yield);
+        void Run();
 
       private:
+
+        /**
+         * @brief Read callback
+         */
+        void DoRead();
+
+        /**
+         * @brief On read callback
+         */
+        void OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred);
+
+        /**
+         * @brief Queue write callback
+         */
+        void QueueWrite(http::message_generator response);
 
         /**
          * @brief Return a response for the given request.
@@ -76,6 +94,27 @@ namespace AwsMock::Service {
          */
         template<class Body, class Allocator>
         http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
+
+        /**
+         * @brief Called to start/continue the write-loop.
+         *
+         * Should not be called when write_loop is already active.
+         */
+        void DoWrite();
+
+        /**
+         * @brief On read callback
+         *
+         * @param keep_alive keep alive flag
+         * @param ec error code
+         * @param bytes_transferred number of bytes transferred
+         */
+        void OnWrite(bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred);
+
+        /**
+         * @brief On class callback
+         */
+        void DoShutdown();
 
         /**
          * @brief Returns the authorization header
@@ -105,7 +144,7 @@ namespace AwsMock::Service {
         /**
          * TCP stream
          */
-        //boost::beast::tcp_stream _stream;
+        boost::beast::tcp_stream _stream;
 
         /**
          * Read buffer
@@ -145,12 +184,12 @@ namespace AwsMock::Service {
         /**
          * HTTP request queue
          */
-        //std::queue<http::message_generator> _response_queue;
+        std::queue<http::message_generator> _response_queue;
 
         /**
          * The parser is stored in an optional container, so we can construct it from scratch it at the beginning of each new message.
          */
-        //boost::optional<http::request_parser<http::dynamic_body>> _parser;
+        boost::optional<http::request_parser<http::dynamic_body>> _parser;
 
         /**
          * Metric service

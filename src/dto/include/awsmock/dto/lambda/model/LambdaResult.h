@@ -16,14 +16,16 @@
 namespace AwsMock::Dto::Lambda {
 
     /**
-     * @brief Lambda result DTO
+     * @brief Lambda code DTO
      *
      * Example:
      * @code{.json}
-     * {
-     *   "functionArn": "string",
-     *   "responseBody": "string",
-     *   "status": int
+     * "Code": {
+     *   "ImageUri": "string",
+     *   "S3Bucket": "string",
+     *   "S3Key": "string",
+     *   "S3ObjectVersion": "string",
+     *   "ZipFile": blob
      * },
      * @endcode
      *

@@ -320,4 +320,5 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
+
 }// namespace AwsMock::Service

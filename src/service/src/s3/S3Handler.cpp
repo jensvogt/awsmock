@@ -5,7 +5,6 @@
 namespace AwsMock::Service {
 
     http::response<http::dynamic_body> S3Handler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 GET request, URI: " << request.target() << " region: " << region << " user: " + user;
 
         // Get the command
@@ -228,7 +227,6 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePutRequest(http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 PUT request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -321,16 +319,17 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
 
+                    Core::HttpUtils::DumpHeaders(request);
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    std::string contentLength = request.base()[http::field::content_length];
+                    long contentLength = std::stol(request.base()[http::field::content_length]);
                     log_debug << "S3 multipart upload part: " << partNumber << " size: " << contentLength;
 
+                    // If chunked, we take the content length from the decoded content length header field.
                     boost::beast::net::streambuf sb;
-                    sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+                    contentLength = PrepareBody(request, sb);
                     std::istream stream(&sb);
-
-                    std::string eTag = _s3Service.UploadPart(stream, std::stoi(partNumber), uploadId, std::stol(contentLength));
+                    std::string eTag = S3Service::UploadPart(stream, std::stoi(partNumber), uploadId, contentLength);
 
                     std::map<std::string, std::string> headerMap;
                     headerMap["ETag"] = Core::StringUtils::Quoted(eTag);
@@ -437,7 +436,6 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -623,6 +621,18 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
+
+                    // Build request
+                    Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
+
+                    // Delete objects
+                    auto s3response = _s3Service.DeleteObjects(s3Request);
+
+                    log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return SendBadRequestError(request, "Unknown method");
@@ -645,7 +655,6 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
         log_debug << "S3 DELETE request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;
@@ -783,7 +792,6 @@ namespace AwsMock::Service {
     long S3Handler::PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb) {
 
         sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
-
         if (Core::HttpUtils::HasHeaderValue(request, "content-encoding", "aws-chunked")) {
 
             // Get decoded length from the header.
@@ -792,7 +800,7 @@ namespace AwsMock::Service {
             // Skip first line, AWS bug in binary chunk encoding
             int count = 0;
             do {
-                if (const char c = sb.sbumpc(); c == '\r') {
+                if (const int c = sb.sbumpc(); c == '\r') {
                     if (sb.sbumpc() == '\n') {
                         count++;
                     }
@@ -801,9 +809,13 @@ namespace AwsMock::Service {
                 count++;
             } while (sb.sgetc() != boost::asio::error::eof);
             log_trace << "Skipped count: " << count << " decodedContentLength: " << decodedContentLength;
+
+            request.body().consume(count);
+            sb.commit(boost::beast::net::buffer_copy(sb.prepare(decodedContentLength), request.body().cdata()));
             return decodedContentLength;
         }
-        return request.body().size();
+        sb.commit(boost::beast::net::buffer_copy(sb.prepare(request.body().size()), request.body().cdata()));
+        return static_cast<long>(request.body().size());
     }
 
     void S3Handler::GetBucketKeyFromHeader(const std::string &path, std::string &bucket, std::string &key) {

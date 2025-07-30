@@ -148,8 +148,8 @@ namespace AwsMock::Dto::Lambda {
         /**
          * @brief Maps a lambda result
          *
-         * @param resultEntity
-         * @return list of event source mapping DTOs
+         * @param resultEntity result entity
+         * @return lambda result DTO
          */
         static LambdaResult mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity);
     };

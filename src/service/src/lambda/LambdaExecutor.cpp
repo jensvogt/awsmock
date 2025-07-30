@@ -71,8 +71,8 @@ namespace AwsMock::Service {
         _condition.notify_all();
     }
 
-    void LambdaExecutor::SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, const int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult) {
-        std::thread(&LambdaExecutor::Invocation, this, std::ref(lambda), std::ref(containerId), std::ref(host), port, std::ref(payload), std::ref(lambdaResult)).detach();
+    void LambdaExecutor::SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, const int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &result) {
+        std::thread(&LambdaExecutor::Invocation, this, std::ref(lambda), std::ref(containerId), std::ref(host), port, std::ref(payload), std::ref(result)).detach();
         log_info << "Lambda invocation started, lambda: " << lambda.function;
     }
 

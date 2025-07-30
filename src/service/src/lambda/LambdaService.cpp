@@ -638,7 +638,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload) const {
+    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle, bool detached) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "invoke_lambda_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;

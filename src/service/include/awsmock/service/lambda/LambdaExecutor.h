@@ -51,7 +51,7 @@ namespace AwsMock::Service {
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
-         * @param lambdaResult lambda result structure
+         * @param lambdaResult
          */
         void Invocation(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
 
