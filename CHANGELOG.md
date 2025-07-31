@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/jensvogt/awsmock/compare/v1.6.1...v1.6.2) (2025-07-31)
+
+
+### Bug Fixes
+
+* **1366-application-stop:** fix lambda output ([358eb15](https://github.com/jensvogt/awsmock/commit/358eb15ead6859bf2ba7c66a32bc21a317df5dfc))
+
 ## [1.6.1](https://github.com/jensvogt/awsmock/compare/v1.6.0...v1.6.1) (2025-07-30)
 
 
