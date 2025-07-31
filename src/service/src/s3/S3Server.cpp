@@ -28,10 +28,10 @@ namespace AwsMock::Service {
         _s3CounterMap = _segment.find<Database::S3CounterMapType>(Database::S3_COUNTER_MAP_NAME).first;
 
         // Start S3 monitoring counters updates
-        scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
+        scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
 
         // Start synchronization of objects
-        scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod);
+        scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
 
         // Start backup
         if (_backupActive) {

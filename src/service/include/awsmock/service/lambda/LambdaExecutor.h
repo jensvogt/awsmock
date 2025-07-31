@@ -79,8 +79,19 @@ namespace AwsMock::Service {
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
+        /**
+         * Wait condition
+         */
         std::condition_variable _condition;
+
+        /**
+         * Mutex
+         */
         std::mutex _mutex;
+
+        /**
+         * Exit confirmed
+         */
         int _exitConfirm = 0;
     };
 

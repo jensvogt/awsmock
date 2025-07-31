@@ -497,7 +497,8 @@ namespace AwsMock::Service {
                 boost::thread t(boost::ref(s3HashCreator), algorithms, object);
                 t.detach();
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-            }*/
+            }
+            */
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(uploadDir);

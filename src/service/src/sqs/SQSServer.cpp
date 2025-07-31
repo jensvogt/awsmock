@@ -26,11 +26,11 @@ namespace AwsMock::Service {
 
         // Start SQS monitoring update counters
         scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _counterPeriod);
-        scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, 10);
+        scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
 
         // Start reset messages task
-        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, 10);
-        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, _resetPeriod, 10);
+        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
+        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, _resetPeriod, _resetPeriod);
 
         // Start backup
         if (_backupActive) {
@@ -80,7 +80,7 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::SetDlq() const {
-        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
         log_trace << "SQS relocate messages starting, count: " << queueList.size();
 
         if (queueList.empty()) {
@@ -113,11 +113,8 @@ namespace AwsMock::Service {
             long totalSize = 0;
             for (auto const &[key, val]: *_sqsCounterMap) {
 
-                std::string labelValue = key;
-
-
-                _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", labelValue, static_cast<double>(val.messages));
-                _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", labelValue, static_cast<double>(val.size));
+                _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", key, static_cast<double>(val.messages));
+                _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", key, static_cast<double>(val.size));
 
                 totalMessages += val.messages;
                 totalSize += val.size;
