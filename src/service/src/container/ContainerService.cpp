@@ -640,7 +640,7 @@ namespace AwsMock::Service {
             log_debug << "Container statistics received, containerId: " << containerId;
             return Dto::Docker::ContainerStat::FromJson(body);
         }
-        log_error << "Receive container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
+        log_error << "Get container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
         return {};
     }
 
