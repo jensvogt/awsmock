@@ -129,8 +129,6 @@ namespace AwsMock::Database {
                 }
                 if (pageSize > 0) {
                     opts.skip(pageSize * pageIndex);
-                }
-                if (pageSize > 0) {
                     opts.limit(pageSize);
                 }
 

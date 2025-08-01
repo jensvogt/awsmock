@@ -72,9 +72,9 @@ namespace AwsMock::Database::Entity::Lambda {
         }
 
         // Convert environment to document
-        auto variablesDoc = array{};
+        auto variablesDoc = document{};
         for (const auto &[fst, snd]: environment.variables) {
-            variablesDoc.append(make_document(kvp(fst, snd)));
+            variablesDoc.append(kvp(fst, snd));
         }
         document varDoc;
         varDoc.append(kvp("variables", variablesDoc));
