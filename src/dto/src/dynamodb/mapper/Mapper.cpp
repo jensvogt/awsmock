@@ -10,6 +10,7 @@ namespace AwsMock::Dto::DynamoDb {
         Database::Entity::DynamoDb::Table tableEntity;
         tableEntity.region = response.region,
         tableEntity.name = response.tableName,
+        tableEntity.arn = response.tableArn,
         tableEntity.status = TableStatusTypeToString(response.tableStatus),
         tableEntity.attributes = response.attributes,
         tableEntity.keySchemas = response.keySchemas;
