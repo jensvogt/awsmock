@@ -15,6 +15,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
+#include <awsmock/entity/dynamodb/StreamSpecification.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -41,6 +42,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * Name
          */
         std::string name;
+
+        /**
+         * AWS ARN
+         */
+        std::string arn;
 
         /**
          * Table status
@@ -76,6 +82,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * Provisioned throughput
          */
         ProvisionedThroughput provisionedThroughput;
+
+        /**
+         * Stream specification
+         */
+        StreamSpecification streamSpecification;
 
         /**
          * Creation date

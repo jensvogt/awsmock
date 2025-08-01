@@ -20,11 +20,11 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/UnauthorizedException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 #define S3_FILE_NAME_LENGTH 64
 #define S3_VERSION_ID_LENGTH 64
@@ -261,6 +261,17 @@ namespace AwsMock::Core {
          * @return KMS key ARN
          */
         static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
+
+        /**
+         * @brief Create DynamoDB table ARN
+         *
+         * <p>Syntax arn:aws:dynamodb:ddblocal:123456789012:table/tableName</p>
+         *
+         * @param accountId AWS account ID
+         * @param tableName table name
+         * @return DynamoDb table ARN
+         */
+        static std::string CreateDynamoDbTableArn(const std::string &accountId, const std::string &tableName);
 
         /**
          * @brief Create Cognito user pool ID

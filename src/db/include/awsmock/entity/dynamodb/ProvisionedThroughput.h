@@ -26,12 +26,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Read capacity units
          */
-        int readCapacityUnits = 0;
+        long readCapacityUnits = 0;
 
         /**
          * Write capacity units
          */
-        int writeCapacityUnits = 0;
+        long writeCapacityUnits = 0;
 
         /**
          * Last decrease time
@@ -44,16 +44,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
         system_clock::time_point lastIncreaseDateTime;
 
         /**
-         * NUmber of decreases
+         * Number of decreases
          */
         long numberOfDecreasesToday = 0;
-
-        /**
-         * Converts the entity to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Convert to a BSON document
@@ -63,7 +56,13 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * @brief Convert from a BSON document
          */
-        void FromDocument(std::optional<view> document);
+        void FromDocument(const std::optional<view> &document);
+        /**
+         * @brief Converts the entity to a JSON object
+         *
+         * @return JSON object
+         */
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * Converts the DTO to a string representation.

@@ -88,6 +88,9 @@ namespace AwsMock::Core {
         return CreateArn("kms", region, accountId, "key/" + kmsId);
     }
 
+    std::string AwsUtils::CreateDynamoDbTableArn(const std::string &accountId, const std::string &tableName) {
+        return CreateArn("dynamodb", "ddblocal", accountId, "table/" + tableName);
+    }
     std::string AwsUtils::CreateCognitoUserPoolId(const std::string &region) {
         return region + "_" + StringUtils::GenerateRandomString(9);
     }

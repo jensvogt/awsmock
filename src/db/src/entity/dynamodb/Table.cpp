@@ -2,6 +2,9 @@
 // Created by vogje01 on 03/09/2023.
 //
 
+#include "awsmock/entity/cognito/UserPool.h"
+
+
 #include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
@@ -14,6 +17,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             tableDoc.append(
                     kvp("region", region),
                     kvp("name", name),
+                    kvp("arn", arn),
                     kvp("status", status),
                     kvp("size", bsoncxx::types::b_int64(size)),
                     kvp("itemCount", bsoncxx::types::b_int64(itemCount)),
@@ -50,6 +54,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
             // Provisioned throughput
             tableDoc.append(kvp("provisionedThroughput", provisionedThroughput.ToDocument()));
 
+            // Stream specification
+            tableDoc.append(kvp("streamSpecification", streamSpecification.ToDocument()));
+
             return tableDoc.extract();
 
         } catch (std::exception &e) {
@@ -63,6 +70,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
+        arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
         status = Core::Bson::BsonUtils::GetStringValue(mResult, "status");
         size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
         itemCount = Core::Bson::BsonUtils::GetLongValue(mResult, "itemCount");
@@ -103,6 +111,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
         // Provisioned throughput
         if (mResult.value().find("provisionedThroughput") != mResult.value().end()) {
             provisionedThroughput.FromDocument(mResult.value()["provisionedThroughput"].get_document().value);
+        }
+
+        // Stream specification
+        if (mResult.value().find("streamSpecification") != mResult.value().end()) {
+            streamSpecification.FromDocument(mResult.value()["streamSpecification"].get_document().value);
         }
     }
 

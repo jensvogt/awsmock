@@ -21,6 +21,7 @@ namespace AwsMock::Service {
                 {"kms", std::make_shared<KMSHandler>()},
                 {"ssm", std::make_shared<SSMHandler>()},
                 {"dynamodb", std::make_shared<DynamoDbHandler>()},
+                {"dynamodbstreams", std::make_shared<DynamoDbHandler>()},
                 {"monitoring", std::make_shared<MonitoringHandler>()},
                 {"module", std::make_shared<ModuleHandler>()},
                 {"application", std::make_shared<ApplicationHandler>()}};
