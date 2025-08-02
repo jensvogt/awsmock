@@ -44,7 +44,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const {
+    long S3Service::PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "purge_bucket");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "purge_bucket");
         log_trace << "Purge bucket request, s3Request: " << request.ToString();
@@ -63,6 +63,7 @@ namespace AwsMock::Service {
             // Purge bucket
             const long deleted = _database.PurgeBucket(bucket);
             log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
+            return deleted;
 
         } catch (Core::JsonException &exc) {
             log_error << "S3 purge bucket failed, message: " << exc.message();

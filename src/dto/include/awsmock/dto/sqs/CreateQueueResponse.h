@@ -39,27 +39,6 @@ namespace AwsMock::Dto::SQS {
          */
         std::string queueArn;
 
-        /**
-         * @brief Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const {
-
-            try {
-
-                boost::property_tree::ptree pt;
-                pt.put("CreateQueueResponse.CreateQueueResult.QueueName", queueName);
-                pt.put("CreateQueueResponse.CreateQueueResult.QueueUrl", queueUrl);
-                pt.put("CreateQueueResponse.ResponseMetadata.RequestId", Core::StringUtils::CreateRandomUuid());
-                return Core::XmlUtils::ToXmlString(pt);
-
-            } catch (std::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
       private:
 
         friend CreateQueueResponse tag_invoke(boost::json::value_to_tag<CreateQueueResponse>, boost::json::value const &v) {

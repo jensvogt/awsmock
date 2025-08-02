@@ -80,9 +80,13 @@ namespace AwsMock::Dto::SQS {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
-                    {"Successful", boost::json::value_from(obj.successful)},
-                    {"Failed", boost::json::value_from(obj.failed)},
             };
+            if (!obj.successful.empty()) {
+                jv.as_object()["Successful"] = boost::json::value_from(obj.successful);
+            }
+            if (!obj.failed.empty()) {
+                jv.as_object()["Failed"] = boost::json::value_from(obj.failed);
+            }
         }
     };
 

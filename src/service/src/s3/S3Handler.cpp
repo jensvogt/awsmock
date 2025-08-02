@@ -556,9 +556,11 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
-                    _s3Service.PurgeBucket(s3Request);
-
-                    log_info << "Purge bucket, name: " << s3Request.bucketName;
+                    boost::asio::spawn(_ioc, [this, s3Request](const boost::asio::yield_context &) {
+                        const long deleted = _s3Service.PurgeBucket(s3Request);
+                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: "<<deleted; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request, {});
                 }
 
@@ -591,11 +593,11 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
-
-                    // Get object versions
-                    _s3Service.TouchObject(s3Request);
-
-                    log_info << "Touch object, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                        _s3Service.TouchObject(s3Request);
+                        log_info << "Touch object, bucket: " << s3Request.bucket << ", key: " << s3Request.key; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -604,11 +606,11 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
-
-                    // Get object versions
-                    _s3Service.UpdateObject(s3Request);
-
-                    log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                        _s3Service.UpdateObject(s3Request);
+                        log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -625,11 +627,12 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
+                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                        const auto s3response = _s3Service.DeleteObjects(s3Request);
+                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size(); }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
 
-                    // Delete objects
-                    auto s3response = _s3Service.DeleteObjects(s3Request);
-
-                    log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
                     return SendOkResponse(request);
                 }
 

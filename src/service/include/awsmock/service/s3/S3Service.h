@@ -154,8 +154,9 @@ namespace AwsMock::Service {
          * still existing, but empty.
          *
          * @param request S3 purge request
+         * @return number of objects deleted
          */
-        void PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const;
+        long PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const;
 
         /**
          * @brief Updates a bucket
