@@ -319,7 +319,6 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
 
-                    Core::HttpUtils::DumpHeaders(request);
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     long contentLength = std::stol(request.base()[http::field::content_length]);
