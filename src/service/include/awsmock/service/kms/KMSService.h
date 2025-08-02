@@ -9,16 +9,12 @@
 #include <chrono>
 #include <ctime>
 #include <string>
-#include <thread>
-
-// Boost includes
-#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>

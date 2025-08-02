@@ -50,49 +50,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Sender fault
          */
-        bool senderFault;
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        view_or_value<view, value> ToDocument() const {
-
-            try {
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "Id", id);
-                Core::Bson::BsonUtils::SetStringValue(document, "Code", code);
-                Core::Bson::BsonUtils::SetStringValue(document, "Message", message);
-                Core::Bson::BsonUtils::SetBoolValue(document, "SenderFault", senderFault);
-
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-
-                id = Core::Bson::BsonUtils::GetStringValue(document, "Id");
-                code = Core::Bson::BsonUtils::GetStringValue(document, "code");
-                message = Core::Bson::BsonUtils::GetStringValue(document, "message");
-                senderFault = Core::Bson::BsonUtils::GetBoolValue(document, "senderFault");
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
+        bool senderFault{};
 
       private:
 

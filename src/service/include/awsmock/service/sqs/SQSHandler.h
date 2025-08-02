@@ -5,9 +5,6 @@
 #ifndef AWSMOCK_SERVICE_SQS_HANDLER_H
 #define AWSMOCK_SERVICE_SQS_HANDLER_H
 
-// Boost includes
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -98,6 +95,11 @@ namespace AwsMock::Service {
          * SQS service
          */
         SQSService _sqsService;
+
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context _ioc;
     };
 
 }// namespace AwsMock::Service

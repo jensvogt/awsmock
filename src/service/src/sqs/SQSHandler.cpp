@@ -1,6 +1,8 @@
 
 
 #include <awsmock/service/sqs/SQSHandler.h>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 
 namespace AwsMock::Service {
     http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
@@ -18,15 +20,17 @@ namespace AwsMock::Service {
                     Dto::SQS::CreateQueueResponse sqsResponse = _sqsService.CreateQueue(sqsRequest);
                     log_info << "Create queue, queueName: " << sqsRequest.queueName;
 
-                    return SendOkResponse(request, clientCommand.contentType == "application/json" ? sqsResponse.ToJson() : sqsResponse.ToXml());
+                    return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
 
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
-                    long deleted = _sqsService.PurgeQueue(sqsRequest);
-                    log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl << " count: " << deleted;
-
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        const long purged = _sqsService.PurgeQueue(sqsRequest);
+                        log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl << " count: " << purged; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -248,24 +252,33 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::REDRIVE_MESSAGES: {
 
                     Dto::SQS::RedriveMessagesRequest sqsRequest = Dto::SQS::RedriveMessagesRequest::FromJson(clientCommand);
-                    long count = _sqsService.RedriveMessages(sqsRequest);
-                    log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count;
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        const long count = _sqsService.RedriveMessages(sqsRequest);
+                        log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::UPDATE_MESSAGE: {
 
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
-                    _sqsService.UpdateMessage(sqsRequest);
-                    log_info << "Update message, messageId: " << sqsRequest.messageId;
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        _sqsService.UpdateMessage(sqsRequest);
+                        log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::RESEND_MESSAGE: {
 
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
-                    _sqsService.ResendMessage(sqsRequest);
-                    log_info << "Resend message, messageId: " << sqsRequest.messageId;
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        _sqsService.ResendMessage(sqsRequest);
+                        log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -280,8 +293,11 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::DELETE_MESSAGE: {
 
                     Dto::SQS::DeleteMessageRequest sqsRequest = Dto::SQS::DeleteMessageRequest::FromJson(clientCommand);
-                    _sqsService.DeleteMessage(sqsRequest);
-                    log_info << "Delete message, queueUrl: " << sqsRequest.queueUrl;
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        _sqsService.DeleteMessage(sqsRequest);
+                        log_info << "Delete message, queueUrl: " << sqsRequest.queueUrl; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -320,16 +336,22 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::IMPORT_MESSAGES: {
 
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
-                    _sqsService.ImportMessages(sqsRequest);
-                    log_info << "Import messages";
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        _sqsService.ImportMessages(sqsRequest);
+                        log_info << "Import messages"; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::RELOAD_COUNTERS: {
 
                     Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
-                    _sqsService.ReloadCounters(sqsRequest);
-                    log_info << "Reload counters";
+                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                        _sqsService.ReloadCounters(sqsRequest);
+                        log_info << "Reload counters"; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 

@@ -5,6 +5,7 @@
 #include <awsmock/dto/sqs/mapper/Mapper.h>
 
 namespace AwsMock::Dto::SQS {
+    struct EventMessageAttribute;
 
     Queue Mapper::map(const Database::Entity::SQS::Queue &queueEntity) {
 
@@ -177,4 +178,17 @@ namespace AwsMock::Dto::SQS {
         return messageAttributeList;
     }
 
+    std::map<std::string, EventMessageAttribute> Mapper::mapEventMessageAttributes(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes) {
+        std::map<std::string, EventMessageAttribute> messageAttributeList{};
+        if (!messageAttributes.empty()) {
+            for (const auto &[fst, snd]: messageAttributes) {
+                EventMessageAttribute messageAttribute;
+                messageAttribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SQS::MessageAttributeTypeToString(snd.dataType));
+                messageAttribute.stringValue = snd.stringValue;
+                messageAttribute.stringListValues = snd.stringListValues;
+                messageAttributeList[fst] = messageAttribute;
+            }
+        }
+        return messageAttributeList;
+    }
 }// namespace AwsMock::Dto::SQS
