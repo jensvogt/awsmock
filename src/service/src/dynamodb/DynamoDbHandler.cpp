@@ -54,7 +54,6 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::DynamoDbCommandType::LIST_STREAMS: {
-                    Core::HttpUtils::DumpHeaders(request);
 
                     Dto::DynamoDb::ListStreamsRequest tableRequest = Dto::DynamoDb::ListStreamsRequest::FromJson(clientCommand);
                     Dto::DynamoDb::ListStreamsResponse tableResponse = _dynamoDbService.ListStreams(tableRequest);

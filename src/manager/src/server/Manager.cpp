@@ -187,7 +187,7 @@ namespace AwsMock::Manager {
 
         // Start listener threads
         const int numProcs = Core::SystemUtils::GetNumberOfCores();
-        for (auto i = 0; i < numProcs; i++) {
+        for (auto i = 0; i < numProcs * 2; i++) {
             _threadGroup.create_thread([&_ios] { return _ios.run(); });
         }
 

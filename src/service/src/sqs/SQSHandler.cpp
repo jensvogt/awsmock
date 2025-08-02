@@ -154,7 +154,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::DeleteQueueRequest sqsRequest = Dto::SQS::DeleteQueueRequest::FromJson(clientCommand);
                     Dto::SQS::DeleteQueueResponse sqsResponse = _sqsService.DeleteQueue(sqsRequest);
-                    log_info << "Delete queue, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Delete queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
                     return SendOkResponse(request);
                 }
 
@@ -162,7 +162,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::SendMessageRequest sqsRequest = Dto::SQS::SendMessageRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
-                    log_info << "Send message, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Send message, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
@@ -179,7 +179,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::ReceiveMessageRequest sqsRequest = Dto::SQS::ReceiveMessageRequest::FromJson(clientCommand);
                     Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
-                    log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << sqsRequest.queueUrl;
+                    log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
 
                     // Send response
                     return SendOkResponse(request, sqsResponse.ToJson());
@@ -189,7 +189,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::ChangeMessageVisibilityRequest sqsRequest = Dto::SQS::ChangeMessageVisibilityRequest::FromJson(clientCommand);
                     _sqsService.SetVisibilityTimeout(sqsRequest);
-                    log_info << "Change visibility, queueUrl: " << sqsRequest.queueUrl << " timeout: " << sqsRequest.visibilityTimeout;
+                    log_info << "Change visibility, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " timeout: " << sqsRequest.visibilityTimeout;
                     return SendOkResponse(request);
                 }
 
@@ -286,7 +286,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::GetEventSourceRequest sqsRequest = Dto::SQS::GetEventSourceRequest::FromJson(clientCommand);
                     Dto::SQS::GetEventSourceResponse sqsResponse = _sqsService.GetEventSource(sqsRequest);
-                    log_info << "Get event source, arn: " << sqsRequest.eventSourceArn;
+                    log_info << "Get event source, arn: " << Core::AwsUtils::ConvertSQSQueueArnToName(sqsRequest.eventSourceArn);
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -295,7 +295,7 @@ namespace AwsMock::Service {
                     Dto::SQS::DeleteMessageRequest sqsRequest = Dto::SQS::DeleteMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.DeleteMessage(sqsRequest);
-                        log_info << "Delete message, queueUrl: " << sqsRequest.queueUrl; }, boost::asio::detached);
+                        log_info << "Delete message, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl); }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -305,7 +305,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::DeleteMessageBatchRequest sqsRequest = Dto::SQS::DeleteMessageBatchRequest::FromJson(clientCommand);
                     Dto::SQS::DeleteMessageBatchResponse sqsResponse = _sqsService.DeleteMessageBatch(sqsRequest);
-                    log_info << "Delete message batch, queueUrl: " << sqsRequest.queueUrl << ", count: " << sqsRequest.entries.size();
+                    log_info << "Delete message batch, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << ", count: " << sqsRequest.entries.size();
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 

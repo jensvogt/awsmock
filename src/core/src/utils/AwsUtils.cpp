@@ -29,16 +29,16 @@ namespace AwsMock::Core {
         const std::string queueName = parts[5];
         parts.clear();
 
-        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
-        const std::string hostname = SystemUtils::GetHostName();
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const auto hostname = SystemUtils::GetHostName();
 
         return "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
     }
 
     std::string AwsUtils::ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl) {
-        const std::string queueName = queueUrl.substr(queueUrl.rfind('/') + 1);
-        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto queueName = queueUrl.substr(queueUrl.rfind('/') + 1);
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         log_trace << "Region: " << region << " accountId: " << accountId;
         return CreateArn("sqs", region, accountId, queueName);
     }
@@ -50,6 +50,10 @@ namespace AwsMock::Core {
             return {};
         }
         return parts[5];
+    }
+
+    std::string AwsUtils::ConvertSQSQueueUrlToName(const std::string &queueUrl) {
+        return queueUrl.substr(queueUrl.find_last_of("/") + 1);
     }
 
     std::string AwsUtils::CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName) {
