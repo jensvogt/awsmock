@@ -458,7 +458,11 @@ namespace AwsMock::Service {
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     log_debug << "Finish multipart upload request, uploadId: " << uploadId;
 
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
+                    s3Request.uploadId = uploadId;
                     Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;
@@ -503,7 +507,12 @@ namespace AwsMock::Service {
 
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId, .contentType = clientCommand.contentType};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
+                    s3Request.uploadId = uploadId;
+                    s3Request.contentType = clientCommand.contentType;
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;

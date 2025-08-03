@@ -142,8 +142,7 @@ See [AwsMock SystemsManager supported commands](docs/man/awsmocksecretsmanager.1
 
 ### Building AwsMock
 
-Building of the AwsMock executables is CMake based. Supported platforms are Linux, MacOS und Windows. Windows has some
-operating system based limitations.
+Building of the AwsMock executables is CMake based. Supported platforms are Linux, MacOS and Windows
 
 ### Building on Linux
 
@@ -175,18 +174,18 @@ To create an out-of-source build:
    ```
 4. Install the executables, libraries, and man pages:
    ```
-   cmake --install . --config=Debug
+   cmake --install . --config=Release
    ```
 5. Start the manager:
    ```
-   awsmockmgr --deamon --loglevel debug
+   awsmockmgr --loglevel debug
    ```
 
 As already said, this can be a time-consuming procedure, depending on your machine and the environment.
 
 #### Building the frontend from source:
 
-IN order to build the frontend, you need Node.js >16.0. The sourcecode is located at
+In order to build the frontend, you need Node.js >16.0, Currently it is using Node v20. The sourcecode is located at
 
 ```
 http://github.com/jensvogt/awsmock-ui
@@ -198,7 +197,7 @@ To build the frontend part, use:
 npm run build --omit-dev
 ```
 
-and copy the result to ```$HOME/awsmock/frontend```.
+and copy the result to ```<awsmock_install_dir>/frontend```.
 
 ### Using the docker image
 
@@ -215,15 +214,14 @@ To start the docker image:
 2. Start the container
 
   ```  
-  docker run -p 4566-4567:4566-4567 -p 21:21 -p 6000-6100:6000:6100 -e AWSMOCK_MONGODB_ACTIVE=false -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
+  docker run -p 4566-4568:4566-4568 -p 2121:2121 -p 2222:2222 -p 6000-6100:6000:6100 -v /var/run/docker.sock:/var/run/docker.sock jensvogt/awsmock:latest
   ```
 
-This invocation will run with the in-memory database, as the alpine image does not have an own MongoDb instance. Port
-```4566``` (gateway) and ```4567``` (frontend)
-should be reachable. ```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and
-```-v /var/run/docker.sock:/var/run/docker.sock``` for the communication with the host's docker daemon (lambdas,
-dynamodb).
-Ports ```6000-6100``` are use for the passive mode of the FTP server.
+Port ```4566``` (gateway) and ```4567``` (frontend) and ```4568``` (websocket) should be reachable.
+```-e AWSMOCK_MONGODB_ACTIVE=false``` is needed to use the in-memory database and
+```-v /var/run/docker.sock:/var/run/docker.sock```
+for the communication with the host's docker daemon (lambdas,dynamodb). Ports ```6000-6100``` are use for the passive
+mode of the FTP server.
 
 If you have problems with the docker daemon connection and you see errors like:
 
@@ -257,23 +255,21 @@ To connect a MongoDB instance, use the provided docker-compose file:
 ```
 
 This will start a mongo DB instance an awsmock docker image. Remote access to the MongoDB image must be configured
-separately. See for
+separately. See, for
 instance: [Getting MongoDB on Linux to Listen to Remote Connections](https://www.baeldung.com/linux/mongodb-remote-connections).
 
 ### Running the Manager on the host
 
-In order to run the manager on the host system (Docker ist still needed for the lambda functions and DynamoDB), you need
+To run the manager on the host system (Docker is still needed for the lambda functions and DynamoDB), you need
 to make sure the manager application has access to the docker daemon REST API. For this, put your user id into the
-docker
-group;
+docker group;
 
 ```
 sudo usermod -a -G docker <userName>
 ```
 
-this will add ```<userName>``` to the docker group and the manager can access the docker daemon REST APIs. After that
-you
-can start the manager as a normal foreground process:
+This will add ```<userName>``` to the docker group and the manager can access the docker daemon REST APIs. After that
+you can start the manager as a normal foreground process:
 
 ```
 /usr/local/bin/awsmockmgr --loglevel debug
@@ -281,8 +277,7 @@ can start the manager as a normal foreground process:
 
 It will use the configuration file: ```/etc/awsmock.yml```. Logging output will be written to the console. To stop the
 process just type ```<CRTL>-C```. THe frontend will be served by default from the
-```$HOME/awsmock/frontend``` directory.
-To customize that, change the corresponding attribute in the configuration file.
+```$HOME/awsmock/frontend``` directory. To customize that, change the corresponding attribute in the configuration file.
 
 ## Examples
 

@@ -507,24 +507,22 @@ namespace AwsMock::Service {
             // Check notifications
             CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
             log_debug << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
-
-            return {
-                    .location = request.region,
-                    .bucket = request.bucket,
-                    .key = request.key,
-                    .etag = md5sum,
-                    .md5sum = md5sum,
-                    .checksumSha1 = sha1sum,
-                    .checksumSha256 = sha256sum};
+            Dto::S3::CompleteMultipartUploadResult response;
+            response.location = request.region;
+            response.bucket = request.bucket;
+            response.key = request.key;
+            response.etag = md5sum;
+            response.checksumSha1 = sha1sum;
+            response.checksumSha256 = sha256sum;
+            return response;
         }
-        return {
-                .location = request.region,
-                .bucket = request.bucket,
-                .key = request.key,
-                .etag = object.md5sum,
-                .md5sum = object.md5sum,
-                .checksumSha1 = object.sha1sum,
-                .checksumSha256 = object.sha256sum};
+        Dto::S3::CompleteMultipartUploadResult response;
+        response.location = request.region;
+        response.bucket = request.bucket;
+        response.key = request.key;
+        response.checksumSha1 = object.sha1sum;
+        response.checksumSha256 = object.sha256sum;
+        return response;
     }
 
     Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const {
