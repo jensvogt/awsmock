@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler") {};
+        explicit S3Handler() : AbstractHandler("s3-handler") {}
 
         /**
          * @brief HTTP GET request.
@@ -146,10 +146,12 @@ namespace AwsMock::Service {
          */
         S3Service _s3Service;
 
-        /**
-         * Boost IO context
-         */
         boost::asio::io_context _ioc;
+
+        /**
+         * Thread group
+         */
+        boost::thread_group _threadGroup;
     };
 
 }// namespace AwsMock::Service

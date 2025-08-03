@@ -38,6 +38,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, tableResponse.ToJson());
                 }
 
+                case Dto::Common::DynamoDbCommandType::GET_TABLE_DETAIL_COUNTERS: {
+
+                    Dto::DynamoDb::GetTableDetailCountersRequest tableRequest = Dto::DynamoDb::GetTableDetailCountersRequest::FromJson(clientCommand.payload);
+                    Dto::DynamoDb::GetTableDetailCountersResponse tableResponse = _dynamoDbService.GetTableDetailCounters(tableRequest);
+                    log_debug << "Get table details counters, region: " << tableRequest.region << ", tableName: " << tableRequest.tableName;
+                    return SendOkResponse(request, tableResponse.ToJson());
+                }
+
                 case Dto::Common::DynamoDbCommandType::LIST_TABLE_ARNS: {
 
                     Dto::DynamoDb::ListTableArnsResponse tableResponse = _dynamoDbService.ListTableArns(region);

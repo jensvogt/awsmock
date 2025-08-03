@@ -315,6 +315,8 @@
       "doc-root": "/usr/local/awsmock/frontend"
     },
     "logging": {
+      "file-active": false,
+      "console-active": true,
       "level": "info",
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",

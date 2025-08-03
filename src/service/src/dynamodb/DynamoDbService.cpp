@@ -128,6 +128,30 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::DynamoDb::GetTableDetailCountersResponse DynamoDbService::GetTableDetailCounters(const Dto::DynamoDb::GetTableDetailCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_table_detail_counters");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "get_table_detail_counters");
+        log_debug << "Starting get table detail request, region: " << request.region << ", tableName: " << request.tableName;
+
+        try {
+
+            Dto::DynamoDb::GetTableDetailCountersResponse tableResponse;
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            tableResponse.tableCounters.region = table.region;
+            tableResponse.tableCounters.tableName = table.name;
+            tableResponse.tableCounters.items = table.itemCount;
+            tableResponse.tableCounters.size = table.size;
+            tableResponse.tableCounters.status = table.status;
+            tableResponse.tableCounters.created = table.created;
+            tableResponse.tableCounters.modified = table.modified;
+            return tableResponse;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd get table detail counters failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd get table detail counters failed, error: " + exc.message());
+        }
+    }
+
     Dto::DynamoDb::ListTableArnsResponse DynamoDbService::ListTableArns(const std::string &region) const {
         Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_arns");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_table_arns");
@@ -306,8 +330,7 @@ namespace AwsMock::Service {
 
                 // Convert to an entity and save to a database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
                 Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
-                // TODO: Calculate real size
-                item.size = body.size();
+                item.size = static_cast<long>(body.size());
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
                 log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
 

@@ -38,8 +38,8 @@
 #endif
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/server/Manager.h>
 #include <awsmock/service/frontend/FrontendServer.h>
 
@@ -271,8 +271,7 @@ int main(const int argc, char *argv[]) {
     }
 
     // Set the log file
-    if (AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.dir") &&
-        AwsMock::Core::Configuration::instance().HasValue("awsmock.logging.prefix")) {
+    if (AwsMock::Core::Configuration::instance().GetValue<bool>("awsmock.logging.file-active")) {
         auto logDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
         auto prefix = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
         int size = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-size");

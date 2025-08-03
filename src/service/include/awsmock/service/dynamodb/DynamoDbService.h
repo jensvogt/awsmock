@@ -44,6 +44,8 @@
 #include <awsmock/dto/dynamodb/QueryResponse.h>
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/dto/dynamodb/internal/GetTableDetailCountersRequest.h>
+#include <awsmock/dto/dynamodb/internal/GetTableDetailCountersResponse.h>
 #include <awsmock/dto/dynamodb/internal/ListItemCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/ListItemCountersResponse.h>
 #include <awsmock/dto/dynamodb/internal/ListTableArnsResponse.h>
@@ -110,6 +112,16 @@ namespace AwsMock::Service {
          * @see ListTableCountersResponse
          */
         [[nodiscard]] Dto::DynamoDb::ListTableCountersResponse ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const;
+
+        /**
+         * @brief Get  table detail counters
+         *
+         * @param request get table detail counters request DTO
+         * @return GetTableDetailCountersResponse
+         * @see GetTableDetailCountersRequest
+         * @see GetTableDetailCountersResponse
+         */
+        [[nodiscard]] Dto::DynamoDb::GetTableDetailCountersResponse GetTableDetailCounters(const Dto::DynamoDb::GetTableDetailCountersRequest &request) const;
 
         /**
          * @brief Lists all table counters
