@@ -73,14 +73,6 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Apps::GetApplicationResponse GetApplication(const Dto::Apps::GetApplicationRequest &request) const;
 
         /**
-         * @brief Start an application
-         *
-         * @param request start application request
-         * @see Dto::Apps::StartApplicationRequest
-         */
-        //void StartApplication(const Dto::Apps::StopApplicationRequest &request) const;
-
-        /**
          * @brief Update an application
          *
          * @param request update application request
@@ -117,45 +109,35 @@ namespace AwsMock::Service {
         [[nodiscard]] std::vector<std::string> ListApplicationNames() const;
 
         /**
-         * @brief Starts an application
+         * @brief Start an application
          *
          * @param request start application request
-         * @return ListApplicationCountersResponse DTO
          * @see Dto::Apps::StartApplicationRequest
-         * @see Dto::Apps::ListApplicationCountersResponse
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StartApplication(const Dto::Apps::StartApplicationRequest &request) const;
-
+        void StartApplication(const Dto::Apps::StartApplicationRequest &request) const;
 
         /**
          * @brief Starts all applications
          *
-         * @param request start all applications request
-         * @return ListApplicationCountersResponse DTO
-         * @see Dto::Apps::StartAllApplicationsRequest
-         * @see Dto::Apps::ListApplicationCountersResponse
+         * @return number of applications started
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StartAllApplications(const Dto::Apps::StartAllApplicationsRequest &request) const;
+        [[nodiscard]] long StartAllApplications() const;
 
         /**
          * @brief Stops an application
          *
          * @param request stop application request
-         * @return ListApplicationCountersResponse DTO
          * @see Dto::Apps::StopApplicationRequest
-         * @see Dto::Apps::ListApplicationCountersResponse
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopApplication(const Dto::Apps::StopApplicationRequest &request) const;
+        void StopApplication(const Dto::Apps::StopApplicationRequest &request) const;
 
         /**
          * @brief Stops all applications
          *
-         * @param request stop all-applications request
-         * @return ListApplicationCountersResponse DTO
+         * @return number of applications stopped
          * @see Dto::Apps::StopAllApplicationsRequest
-         * @see Dto::Apps::ListApplicationCountersResponse
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse StopAllApplications(const Dto::Apps::StopAllApplicationsRequest &request) const;
+        [[nodiscard]] long StopAllApplications() const;
 
         /**
          * @brief Restarts an application
@@ -164,11 +146,19 @@ namespace AwsMock::Service {
          * This method will stop the container, delete the container and will rebuild the container from the corresponding image.
          *
          * @param request restart application request
-         * @return ListApplicationCountersResponse DTO
          * @see Dto::Apps::RestartApplicationRequest
-         * @see Dto::Apps::ListApplicationCountersResponse
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const;
+        void RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const;
+
+        /**
+         * @brief Restarts all applications
+         *
+         * @par
+         * This method will stop all application containers, delete the containers and will rebuild the containers from the corresponding image.
+         *
+         * @return number of applications restarted
+         */
+        [[nodiscard]] long RestartAllApplications() const;
 
         /**
          * @brief Rebuilds an application
@@ -178,11 +168,9 @@ namespace AwsMock::Service {
          * a new container is started with the new image.
          *
          * @param request rebuild application request
-         * @return ListApplicationCountersResponse DTO
          * @see Dto::Apps::RebuildApplicationCodeRequest
-         * @see Dto::Apps::ListApplicationCountersResponse
          */
-        [[nodiscard]] Dto::Apps::ListApplicationCountersResponse RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const;
+        void RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const;
 
         /**
          * @brief Deletes an application

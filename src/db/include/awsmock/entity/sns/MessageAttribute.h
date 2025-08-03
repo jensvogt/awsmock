@@ -70,13 +70,6 @@ namespace AwsMock::Database::Entity::SNS {
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument();
-
-        /**
          * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string

@@ -310,6 +310,8 @@
       "doc-root": "C:\\Program Files (x86)\\awsmock\\frontend"
     },
     "logging": {
+      "file-active": false,
+      "console-active": true,
       "level": "info",
       "dir": "C:\\Program Files (x86)\\awsmock\\log",
       "prefix": "awsmock",

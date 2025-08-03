@@ -118,8 +118,8 @@ namespace AwsMock::Service {
         Dto::Apps::StartApplicationRequest request;
         request.application = Dto::Apps::Mapper::map(application);
         request.region = application.region;
-        const Dto::Apps::ListApplicationCountersResponse response = _applicationService.StartApplication(request);
-        log_info << "Application started, name: " << request.application.name << ", total: " << response.applications.size();
+        _applicationService.StartApplication(request);
+        log_info << "Application started, name: " << request.application.name;
     }
 
     void ApplicationServer::BackupApplication() {

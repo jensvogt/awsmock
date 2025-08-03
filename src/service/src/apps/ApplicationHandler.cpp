@@ -68,49 +68,76 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
 
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
-                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.RebuildApplication(serviceRequest);
-                    log_info << "Applications rebuild, region: " << serviceRequest.region;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                        _applicationService.RebuildApplication(serviceRequest);
+                        log_info << "Applications rebuild, region: " << serviceRequest.region; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
-                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StartApplication(serviceRequest);
-                    log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                        _applicationService.StartApplication(serviceRequest);
+                        log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
 
-                    Dto::Apps::StartAllApplicationsRequest serviceRequest = Dto::Apps::StartAllApplicationsRequest::FromJson(clientCommand);
-                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StartAllApplications(serviceRequest);
-                    log_info << "Start all applications, region: " << serviceRequest.region;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                        const long count = _applicationService.StartAllApplications();
+                        log_info << "All applications started, count: " << count; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
 
                     Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
-                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.RestartApplication(serviceRequest);
-                    log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                        _applicationService.RestartApplication(serviceRequest);
+                        log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
+
+                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                        const long count = _applicationService.RestartAllApplications();
+                        log_info << "All applications restarted, count: " << count; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
 
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
-                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StopApplication(serviceRequest);
-                    log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                        _applicationService.StopApplication(serviceRequest);
+                        log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
 
-                    Dto::Apps::StopAllApplicationsRequest serviceRequest = Dto::Apps::StopAllApplicationsRequest::FromJson(clientCommand);
-                    Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.StopAllApplications(serviceRequest);
-                    log_info << "All applications stopped, region: " << serviceRequest.region;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                        const long count = _applicationService.StopAllApplications();
+                        log_info << "All applications stopped, count: " << count; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
+
+                    return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::DELETE_APPLICATION: {

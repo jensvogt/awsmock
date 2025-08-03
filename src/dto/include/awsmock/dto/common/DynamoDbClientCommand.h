@@ -38,6 +38,8 @@ namespace AwsMock::Dto::Common {
         LIST_TABLE_COUNTERS,
         LIST_ITEM_COUNTERS,
         LIST_STREAMS,
+        LIST_STREAMS_COUNTERS,
+        GET_TABLE_DETAIL_COUNTERS,
         UNKNOWN
     };
 
@@ -55,6 +57,8 @@ namespace AwsMock::Dto::Common {
             {DynamoDbCommandType::LIST_TABLE_COUNTERS, "list-table-counters"},
             {DynamoDbCommandType::LIST_ITEM_COUNTERS, "list-item-counters"},
             {DynamoDbCommandType::LIST_STREAMS, "list-streams"},
+            {DynamoDbCommandType::LIST_STREAMS_COUNTERS, "list-stream-counters"},
+            {DynamoDbCommandType::GET_TABLE_DETAIL_COUNTERS, "get-table-detail-counters"},
             {DynamoDbCommandType::UNKNOWN, "unknown"}};
 
     [[maybe_unused]] static std::string DynamoDbCommandTypeToString(const DynamoDbCommandType &commandType) {

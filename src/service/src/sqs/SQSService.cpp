@@ -945,12 +945,6 @@ namespace AwsMock::Service {
             message.attributes["VisibilityTimeout"] = std::to_string(queue.attributes.visibilityTimeout);
             message.attributes["SenderId"] = request.user;
 
-            message.messageSystemAttributes["SentTimestamp"] = {.stringValue = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now())), .dataType = Database::Entity::SQS::STRING};
-            message.messageSystemAttributes["ApproximateFirstReceivedTimestamp"] = {.stringValue = std::to_string(Core::DateTimeUtils::UnixTimestampMs(system_clock::now())), .dataType = Database::Entity::SQS::STRING};
-            message.messageSystemAttributes["ApproximateReceivedCount"] = {.stringValue = std::to_string(1), .dataType = Database::Entity::SQS::STRING};
-            message.messageSystemAttributes["VisibilityTimeout"] = {.stringValue = std::to_string(queue.attributes.visibilityTimeout), .dataType = Database::Entity::SQS::STRING};
-            message.messageSystemAttributes["SenderId"] = {.stringValue = request.user, .dataType = Database::Entity::SQS::STRING};
-
             // Default message attributes
             if (!queue.defaultMessageAttributes.empty()) {
                 message.messageAttributes.insert(queue.defaultMessageAttributes.begin(), queue.defaultMessageAttributes.end());

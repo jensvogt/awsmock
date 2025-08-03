@@ -49,13 +49,13 @@ namespace AwsMock::Dto::DynamoDb {
             {ReturnValuesType::UPDATED_NEW, "UPDATED_NEW"},
     };
 
-    [[maybe_unused]] static std::string ReturnValuesTypeToString(ReturnValuesType returnValuesType) {
+    [[maybe_unused]] static std::string ReturnValuesTypeToString(const ReturnValuesType &returnValuesType) {
         return ReturnValuesTypeNames[returnValuesType];
     }
 
-    [[maybe_unused]] static ReturnValuesType ReturnValuesTypeFromString(const std::string &tableStatusName) {
+    [[maybe_unused]] static ReturnValuesType ReturnValuesTypeFromString(const std::string &returnValuesType) {
         for (auto &[fst, snd]: ReturnValuesTypeNames) {
-            if (snd == tableStatusName) {
+            if (snd == returnValuesType) {
                 return fst;
             }
         }

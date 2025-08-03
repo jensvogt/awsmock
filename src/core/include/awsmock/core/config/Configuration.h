@@ -167,7 +167,7 @@ namespace AwsMock::Core {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Dumps the configuration to std::cerr
+         * @brief Dumps the configuration to std::err
          */
         void Dump() const;
 
@@ -256,9 +256,6 @@ namespace AwsMock::Core {
                 value = envVariable == "true" || envVariable == "True" || envVariable == "TRUE" || envVariable == "1";
             }
         }
-        // if (typeName == TYPE_NAME_STRING) {
-        //     value = ReplaceEnvironmentVariables(value);
-        // }
         _treeConfiguration.put<T>(key, value);
         log_trace << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
@@ -276,7 +273,6 @@ namespace AwsMock::Core {
 
         boost::property_tree::ptree array;
         for (const std::vector<std::string> values = StringUtils::Split(value, ';'); auto &v: values) {
-            //            v = ReplaceEnvironmentVariables(v);
             boost::property_tree::ptree child;
             child.put("", v);
             array.push_back(std::make_pair("", child));

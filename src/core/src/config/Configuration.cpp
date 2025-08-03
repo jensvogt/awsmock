@@ -281,6 +281,8 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.logging.prefix", "AWSMOCK_LOG_FILE_PREFIX", "awsmock");
         DefineProperty<long>("awsmock.logging.file-size", "AWSMOCK_LOG_FILE_SIZE", 10485760);
         DefineProperty<int>("awsmock.logging.file-count", "AWSMOCK_LOG_FILE_COUNT", 5);
+        DefineProperty<bool>("awsmock.logging.file-active", "AWSMOCK_LOG_FILE_ACTIVE", false);
+        DefineProperty<bool>("awsmock.logging.console-active", "AWSMOCK_LOG_CONSOLE_ACTIVE", true);
     }
 
     std::string Configuration::GetFilename() const {
