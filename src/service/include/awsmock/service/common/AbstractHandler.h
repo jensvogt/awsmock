@@ -78,17 +78,6 @@ namespace AwsMock::Service {
         virtual http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * @brief Handles the HTTP method POST.
-         *
-         * @param stream response stream
-         * @param request HTTP request
-         * @param region AWS region
-         * @param user current user
-         * @return HTTP response
-         */
-        virtual http::response<http::dynamic_body> HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
-
-        /**
          * @brief Handles the HTTP method DELETE.
          *
          * @param request HTTP request
@@ -119,7 +108,7 @@ namespace AwsMock::Service {
         static http::response<http::dynamic_body> SendOkResponse(const http::request<http::dynamic_body> &request, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
         /**
-         * @brief Send a OK response (HTTP state code 200) for a multipart download/upload
+         * @brief Send an OK response (HTTP state code 200) for a multipart download/upload
          *
          * @param request HTTP request object
          * @param fileName file to send
@@ -211,6 +200,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          */
         static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, http::status status, const std::string &body, const std::map<std::string, std::string> &headers = {});
+        void SendResponseNew(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body, const std::map<std::string, std::string> &headers = {});
 
         /**
          * Get the name
@@ -219,26 +209,20 @@ namespace AwsMock::Service {
 
       private:
 
+        using alloc_t = fields_alloc<char>;
+        using request_body_t = http::string_body;
+
         /**
          * @brief Called to start/continue the write-loop.
          *
          * Should not be called when write_loop is already active.
          */
-        void DoWrite(http::message_generator response);
+        void DoWrite(http::response<http::dynamic_body> response);
 
         /**
-         * @brief On read callback
-         *
-         * @param keep_alive session keep alive
-         * @param ec error code
-         * @param bytes_transferred number of bytes transferred
+         * The string-based response serializer.
          */
-        void OnWrite(bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) const;
-
-        /**
-         * @brief On class callback
-         */
-        void DoShutdown() const;
+        boost::optional<http::response_serializer<http::string_body, http::basic_fields<alloc_t>>> _stringSerializer;
 
       protected:
 

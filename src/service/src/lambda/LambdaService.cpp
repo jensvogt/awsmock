@@ -659,13 +659,13 @@ namespace AwsMock::Service {
 
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};
-        if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
+        /*if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
             boost::mutex::scoped_lock lock(*_lambdaServiceMutex[instance.instanceId]);
             Database::Entity::Lambda::LambdaResult lambdaResult = LambdaExecutor::InvocationSync(lambda, instance.containerId, hostName, port, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
-        } else if (invocationType == Dto::Lambda::EVENT) {
-            LambdaExecutor::SpawnDetached(lambda, instance.containerId, hostName, port, payload);
-        }
+        } else if (invocationType == Dto::Lambda::EVENT) {*/
+        LambdaExecutor::SpawnDetached(lambda, invocationType, instance.containerId, hostName, port, payload, _stream);
+        //}
         return result;
     }
 
@@ -1262,6 +1262,39 @@ namespace AwsMock::Service {
             }
         }
         return lambda;
+    }
+
+    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
+    void LambdaService::DoWrite(http::message_generator response) {
+        bool keep_alive = false;
+        boost::beast::async_write(_stream,
+                                  std::move(response),
+                                  boost::beast::bind_front_handler(&LambdaService::OnWrite,
+                                                                   shared_from_this(),
+                                                                   keep_alive));
+    }
+
+    void LambdaService::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) const {
+        boost::ignore_unused(bytes_transferred);
+
+        // This means they closed the connection
+        if (ec == http::error::end_of_stream)
+            return DoShutdown();
+    }
+
+    void LambdaService::DoShutdown() const {
+
+        // Send a TCP shutdown
+        boost::beast::error_code ec;
+        ec = _stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if (ec) {
+            log_error << "Backend stream shutdown failed: " << ec.message();
+            ec = _stream.socket().close(ec);
+            if (ec) {
+                log_error << "Close failed: " << ec.message();
+            }
+        }
+        // At this point the connection is closed gracefully
     }
 
 }// namespace AwsMock::Service

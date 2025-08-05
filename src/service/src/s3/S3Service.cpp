@@ -1184,7 +1184,6 @@ namespace AwsMock::Service {
         // Get queue URL
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
 
-        SQSService _sqsService;
         Dto::SQS::SendMessageRequest request;
         request.region = region;
         request.queueUrl = queueUrl;
@@ -1197,7 +1196,6 @@ namespace AwsMock::Service {
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
 
-        SNSService _snsService;
         Dto::SNS::PublishRequest request;
         request.region = region;
         request.targetArn = topicNotification.topicArn;

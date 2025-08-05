@@ -102,7 +102,7 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::LambdaClientCommand clientCommand;
@@ -139,7 +139,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
                 log_info << "Lambda function created, name: " << lambdaResponse.functionName;
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (action == "tags") {
@@ -154,17 +154,13 @@ namespace AwsMock::Service {
                 _lambdaService.CreateTag(lambdaRequest);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
-                return SendNoContentResponse(request);
+                SendResponse(request, http::status::ok, lambdaRequest.ToJson());
             }
 
             if (action == "event-source-mappings") {
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
-                Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest;
-                lambdaRequest.FromJson(body);
-                lambdaRequest.region = region;
-                lambdaRequest.user = user;
-
+                Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest = Dto::Lambda::CreateEventSourceMappingsRequest::FromJson(body);
                 Dto::Lambda::CreateEventSourceMappingsResponse lambdaResponse = _lambdaService.CreateEventSourceMappings(lambdaRequest);
                 log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
 
@@ -177,7 +173,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
                 std::string tmp = lambdaResponse.ToJson();
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                SendResponseNew(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {

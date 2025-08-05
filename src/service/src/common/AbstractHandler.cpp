@@ -13,12 +13,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        //        log_error << "Real method not implemented";
-        return {};
-    }
-
-    http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        //log_error << "Real method not implemented";
+        log_error << "Real method not implemented";
         return {};
     }
 
@@ -326,36 +321,54 @@ namespace AwsMock::Service {
         return response;
     }
 
-    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
-    void AbstractHandler::DoWrite(http::message_generator response) {
-        bool keep_alive = false;
-        boost::beast::async_write(_stream,
-                                  std::move(response),
-                                  boost::beast::bind_front_handler(&AbstractHandler::OnWrite,
-                                                                   shared_from_this(),
-                                                                   keep_alive));
-    }
+    void AbstractHandler::SendResponseNew(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-    void AbstractHandler::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) const {
-        boost::ignore_unused(bytes_transferred);
+        // Prepare the response message
+        alloc_t _alloc{1024 * 1024};
+        boost::optional<http::response<http::string_body, http::basic_fields<alloc_t>>> _stringResponse;
+        _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
+        _stringResponse->version(request.version());
+        _stringResponse->result(status);
+        _stringResponse->set(http::field::server, "awsmock");
+        _stringResponse->set(http::field::content_type, "application/json");
+        _stringResponse->set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        _stringResponse->set(http::field::access_control_allow_origin, "*");
+        _stringResponse->set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        _stringResponse->set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
 
-        // This means they closed the connection
-        if (ec == http::error::end_of_stream)
-            return DoShutdown();
-    }
-
-    void AbstractHandler::DoShutdown() const {
-
-        // Send a TCP shutdown
-        boost::beast::error_code ec;
-        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
-        if (ec) {
-            log_error << "Backend stream shutdown failed: " << ec.message();
-            ec = _stream.socket().close(ec);
-            if (ec) {
-                log_error << "Close failed: " << ec.message();
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &[fst, snd]: headers) {
+                _stringResponse->set(fst, snd);
             }
         }
-        // At this point the connection is closed gracefully
+
+        // Body
+        if (!body.empty()) {
+            _stringResponse->body() = body;
+            _stringResponse->prepare_payload();
+        }
+        _stringSerializer.emplace(*_stringResponse);
+
+        // Send the response to the client
+        http::async_write(_stream, *_stringSerializer, [this](boost::beast::error_code ec, std::size_t) {
+            ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+            if (ec) {
+                log_error << "Backend stream shutdown failed: " << ec.message();
+            }
+            _stringSerializer.reset();
+        });
     }
+
+    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
+    void AbstractHandler::DoWrite(http::response<http::dynamic_body> response) {
+        http::async_write(_stream, *_stringSerializer, [this](boost::beast::error_code ec, std::size_t) {
+            ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+            if (ec) {
+                log_error << "Backend stream shutdown failed: " << ec.message();
+            }
+            _stringSerializer.reset();
+        });
+    }
+
 }// namespace AwsMock::Service

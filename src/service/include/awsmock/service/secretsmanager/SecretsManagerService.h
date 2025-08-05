@@ -67,7 +67,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerService();
+        explicit SecretsManagerService(boost::beast::tcp_stream &stream);
 
         /**
          * @brief Create a new secret
@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         /**
          * @brief Returns the secret value
          *
-         * @param request get secret value request
+         * @param request get a secret value request
          * @return GetSecretValueResponse
          */
         [[nodiscard]] Dto::SecretsManager::GetSecretValueResponse GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const;

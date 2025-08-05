@@ -116,14 +116,15 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaService {
+    class LambdaService : public std::enable_shared_from_this<LambdaService> {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()) {};
+        explicit LambdaService(boost::beast::tcp_stream &stream) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()),
+                                                                   _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _stream(stream) {};
 
         /**
          * @brief Create lambda function
@@ -468,6 +469,27 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * @brief Called to start/continue the write-loop.
+         *
+         * Should not be called when write_loop is already active.
+         */
+        void DoWrite(http::message_generator response);
+
+        /**
+         * @brief On read callback
+         *
+         * @param keep_alive session keeps alive
+         * @param ec error code
+         * @param bytes_transferred number of bytes transferred
+         */
+        void OnWrite(bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) const;
+
+        /**
+         * @brief On class callback
+         */
+        void DoShutdown() const;
+
+        /**
          * @brief Tries to find an idle lambda function instance
          *
          * @par
@@ -582,6 +604,11 @@ namespace AwsMock::Service {
          * SQS database connection
          */
         Database::SNSDatabase &_snsDatabase;
+
+        /**
+         * TCP stream
+         */
+        boost::beast::tcp_stream &_stream;
 
         /**
          * Map of semaphores

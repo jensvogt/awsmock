@@ -180,14 +180,14 @@ namespace AwsMock::Service {
 
     // Called to start/continue the write-loop. Should not be called when write_loop is already active.
     void GatewaySession::DoWrite() {
-        if (!_response_queue.empty()) {
+        /*if (!_response_queue.empty() && _stream.socket().is_open()) {
             bool keep_alive = _response_queue.front().keep_alive();
             boost::beast::async_write(_stream,
                                       std::move(_response_queue.front()),
                                       boost::beast::bind_front_handler(&GatewaySession::OnWrite,
                                                                        shared_from_this(),
                                                                        keep_alive));
-        }
+        }*/
     }
 
     void GatewaySession::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) {

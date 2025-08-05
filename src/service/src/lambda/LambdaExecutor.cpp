@@ -2,6 +2,7 @@
 // Created by root on 10/9/23.
 //
 
+#include "awsmock/dto/lambda/model/InvocationType.h"
 #include "awsmock/dto/lambda/model/LambdaResult.h"
 
 
@@ -74,7 +75,7 @@ namespace AwsMock::Service {
         log_info << "Lambda invocation finished, lambda: " << lambda.function;
     }
 
-    Database::Entity::Lambda::LambdaResult LambdaExecutor::InvocationSync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, const int port, const std::string &payload) {
+    Database::Entity::Lambda::LambdaResult LambdaExecutor::InvocationSync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, const int port, const std::string &payload, boost::beast::tcp_stream &_stream) {
 
         if (port == 0) {
             log_error << "Port is 0, cannot connect to lambda";
@@ -133,8 +134,12 @@ namespace AwsMock::Service {
         return lambdaResult;
     }
 
-    void LambdaExecutor::SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, const int port, const std::string &payload) {
-        std::thread(&LambdaExecutor::InvocationAsync, lambda, containerId, host, port, payload).detach();
+    void LambdaExecutor::SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const Dto::Lambda::LambdaInvocationType &invocationType, const std::string &containerId, const std::string &host, int port, const std::string &payload, boost::beast::tcp_stream &_stream) {
+        if (invocationType == Dto::Lambda::EVENT) {
+            std::thread(&LambdaExecutor::InvocationAsync, lambda, containerId, host, port, payload).detach();
+        } else {
+            std::thread(&LambdaExecutor::InvocationSync, lambda, containerId, host, port, payload, std::ref(_stream)).detach();
+        }
         log_info << "Lambda invocation started, lambda: " << lambda.function;
     }
 

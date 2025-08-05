@@ -46,10 +46,11 @@ namespace AwsMock::Service {
         request.owner = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
         request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         request.name = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
-        if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
+        // TODO: fix me
+        /*if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
             log_debug << "Creating bucket " << request.name << ", region: " << request.region << ", owner: " << request.owner;
             Dto::S3::CreateBucketResponse response = s3Service.CreateBucket(request);
-        }
+        }*/
     }
 
     void TransferServer::CreateDirectories(const std::string &userName) {

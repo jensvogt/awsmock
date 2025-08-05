@@ -13,6 +13,7 @@
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
@@ -62,20 +63,23 @@ namespace AwsMock::Service {
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
+         * @param stream response stream
          * @return lambdaResult
          */
-        static Database::Entity::Lambda::LambdaResult InvocationSync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
+        static Database::Entity::Lambda::LambdaResult InvocationSync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, boost::beast::tcp_stream &stream);
 
         /**
          * @brief Executes a lambda function
          *
          * @param lambda lambda function
+         * @param invocationType invocation types asynchron/synchron
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
+         * @param _stream response stream
          */
-        static void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
+        static void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const Dto::Lambda::LambdaInvocationType &invocationType, const std::string &containerId, const std::string &host, int port, const std::string &payload, boost::beast::tcp_stream &_stream);
 
       private:
 

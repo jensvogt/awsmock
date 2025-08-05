@@ -20,7 +20,7 @@ namespace AwsMock::Service {
     /**
      * @brief Lambda request handler
      *
-     * All lambda related REST call are ending here.
+     * All lambda-related REST call are ending here.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda-handler", stream) {}
+        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda-handler", stream), _lambdaService(stream) {}
 
         /**
          * @brief HTTP GET request.
@@ -47,14 +47,13 @@ namespace AwsMock::Service {
         /**
          * @brief HTTP POST request.
          *
-         * @param stream response stream
          * @param request HTTP request
          * @param region AWS region name
          * @param user AWS user
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        http::response<http::dynamic_body> HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP DELETE request.
@@ -72,7 +71,7 @@ namespace AwsMock::Service {
         /**
          * Lambda module
          */
-        Service::LambdaService _lambdaService;
+        LambdaService _lambdaService;
     };
 
 }// namespace AwsMock::Service
