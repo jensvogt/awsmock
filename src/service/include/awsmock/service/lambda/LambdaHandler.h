@@ -7,9 +7,9 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler() : AbstractHandler("lambda-handler") {}
+        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda-handler", stream) {}
 
         /**
          * @brief HTTP GET request.
@@ -47,13 +47,14 @@ namespace AwsMock::Service {
         /**
          * @brief HTTP POST request.
          *
+         * @param stream response stream
          * @param request HTTP request
          * @param region AWS region name
          * @param user AWS user
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
         /**
          * @brief HTTP DELETE request.

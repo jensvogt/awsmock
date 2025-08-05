@@ -28,7 +28,7 @@ namespace AwsMock::Service {
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         const long purged = _sqsService.PurgeQueue(sqsRequest);
-                        log_info << "Purge queue, queueUrl: " << sqsRequest.queueUrl << " count: " << purged; }, boost::asio::detached);
+                        log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::GetQueueAttributesRequest sqsRequest = Dto::SQS::GetQueueAttributesRequest::FromJson(clientCommand);
                     Dto::SQS::GetQueueAttributesResponse sqsResponse = _sqsService.GetQueueAttributes(sqsRequest);
-                    log_info << "Get queue attributes, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Get queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -46,7 +46,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
                     _sqsService.SetQueueAttributes(sqsRequest);
-                    log_info << "Set queue attributes, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
 
                     return SendOkResponse(request);
                 }
@@ -64,7 +64,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::GetQueueDetailsRequest sqsRequest = Dto::SQS::GetQueueDetailsRequest::FromJson(clientCommand);
                     Dto::SQS::GetQueueDetailsResponse sqsResponse = _sqsService.GetQueueDetails(sqsRequest);
-                    log_info << "Get queue details, queueArn: " << sqsRequest.queueArn;
+                    log_info << "Get queue details, queueArn: " << Core::AwsUtils::ConvertSQSQueueArnToName(sqsRequest.queueArn);
 
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
@@ -96,7 +96,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::TagQueueRequest sqsRequest = Dto::SQS::TagQueueRequest::FromJson(clientCommand);
                     _sqsService.TagQueue(sqsRequest);
-                    log_info << "Tag queue, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Tag queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
 
                     return SendOkResponse(request);
                 }
@@ -105,7 +105,7 @@ namespace AwsMock::Service {
 
                     Dto::SQS::UntagQueueRequest sqsRequest = Dto::SQS::UntagQueueRequest::FromJson(clientCommand);
                     _sqsService.UntagQueue(sqsRequest);
-                    log_info << "Untag queue, queueUrl: " << sqsRequest.queueUrl;
+                    log_info << "Untag queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
 
                     return SendOkResponse(request);
                 }

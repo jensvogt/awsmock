@@ -66,9 +66,10 @@ namespace AwsMock::Dto::DynamoDb {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, StreamSpecification const &obj) {
             jv = {
                     {"StreamEnabled", obj.enabled},
-                    {"StreamViewType", StreamViewTypeToString(obj.streamViewType)},
-
             };
+            if (obj.enabled) {
+                jv.as_object()["StreamViewType"] = StreamViewTypeToString(obj.streamViewType);
+            }
         }
     };
 

@@ -238,7 +238,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::CREATE_BUCKET: {
 
-                    Dto::S3::CreateBucketRequest s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .owner = clientCommand.user};
+                    Dto::S3::CreateBucketRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.name = clientCommand.bucket;
+                    s3Request.owner = clientCommand.user;
                     Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
                     return SendOkResponse(request, s3Response.ToXml());
                     log_info << "Create bucket, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
@@ -677,7 +680,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::DELETE_BUCKET: {
 
-                    const Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region = clientCommand.region, .bucket = clientCommand.bucket};
+                    Dto::S3::DeleteBucketRequest deleteBucketRequest;
+                    deleteBucketRequest.region = clientCommand.region;
+                    deleteBucketRequest.bucket = clientCommand.bucket;
                     _s3Service.DeleteBucket(deleteBucketRequest);
 
                     log_info << "Delete bucket, bucket: " << clientCommand.bucket;
@@ -687,7 +692,12 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::MOVE_OBJECT:
                 case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
-                    _s3Service.DeleteObject({.region = clientCommand.region, .user = clientCommand.user, .bucket = clientCommand.bucket, .key = clientCommand.key});
+                    Dto::S3::DeleteObjectRequest deleteRequest;
+                    deleteRequest.region = clientCommand.region;
+                    deleteRequest.user = clientCommand.user;
+                    deleteRequest.bucket = clientCommand.bucket;
+                    deleteRequest.key = clientCommand.key;
+                    _s3Service.DeleteObject(deleteRequest);
                     log_info << "Delete object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     return SendNoContentResponse(request);
                 }

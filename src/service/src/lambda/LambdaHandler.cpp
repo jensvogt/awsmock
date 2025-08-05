@@ -1,4 +1,7 @@
 
+#include "awsmock/dto/lambda/model/InvocationType.h"
+
+
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace AwsMock::Service {
@@ -99,7 +102,7 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_trace << "Lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::LambdaClientCommand clientCommand;
@@ -117,14 +120,16 @@ namespace AwsMock::Service {
 
                 if (Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations") {
 
-                    std::string logType = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Log-Type");
+                    auto functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
+                    auto logType = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Log-Type");
+                    auto invocationType = Dto::Lambda::LambdaInvocationTypeFromString(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Invocation-Type"));
 
-                    std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
-                    log_debug << "Lambda function invocation, name: " << functionName;
-
-                    Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, body);
-                    log_info << "Lambda function invoked, name: " << functionName;
-                    return SendResponse(request, http::int_to_status(result.status), result.responseBody);
+                    log_info << "Lambda function invoked, name: " << functionName << ", type: " << LambdaInvocationTypeToString(invocationType);
+                    Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, body, invocationType);
+                    if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
+                        return SendResponse(request, http::int_to_status(result.status), result.responseBody);
+                    }
+                    return SendOkResponse(request);
                 }
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
                 lambdaRequest.FromJson(body);

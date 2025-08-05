@@ -9,11 +9,23 @@ namespace AwsMock::Database::Entity::SNS {
     view_or_value<view, value> MessageAttribute::ToDocument() const {
 
         view_or_value<view, value> messageAttributeDoc = make_document(
-                kvp("attributeName", attributeName),
-                kvp("attributeValue", attributeValue),
-                kvp("attributeType", MessageAttributeTypeToString(attributeType)));
+                kvp("stringValue", stringValue),
+                kvp("dataType", MessageAttributeTypeToString(dataType)));
 
         return messageAttributeDoc;
+    }
+
+    void MessageAttribute::FromDocument(const view_or_value<view, value> &object) {
+
+        try {
+
+            stringValue = Core::Bson::BsonUtils::GetStringValue(object, "stringValue");
+            dataType = MessageAttributeTypeFromString(Core::Bson::BsonUtils::GetStringValue(object, "dataType"));
+
+        } catch (std::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     std::string MessageAttribute::ToJson() const {

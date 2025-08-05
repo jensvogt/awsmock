@@ -47,9 +47,26 @@ namespace AwsMock::Database::Entity::Lambda {
         return {};
     }
 
+    void Lambda::SetInstanceHostPort(const std::string &instanceId, const std::string &host, int port) {
+        if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
+            it->hostName = host;
+            it->hostPort = port;
+            return;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+    }
+
     void Lambda::SetInstanceLastInvocation(const std::string &instanceId) {
         if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
             it->lastInvocation = system_clock::now();
+            return;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+    }
+
+    void Lambda::SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status) {
+        if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
+            it->status = status;
             return;
         }
         log_error << "Lambda instance not found, id: " << instanceId;

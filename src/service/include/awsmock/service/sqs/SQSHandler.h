@@ -44,7 +44,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSHandler() : AbstractHandler("sqs-handler") {}
+        explicit SQSHandler(boost::beast::tcp_stream &stream) : AbstractHandler("sqs-handler", stream) {}
 
         /**
          * @brief HTTP POST request.

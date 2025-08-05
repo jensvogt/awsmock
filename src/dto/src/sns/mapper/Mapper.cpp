@@ -61,11 +61,11 @@ namespace AwsMock::Dto::SNS {
             message.lastSend = entity.lastSend;
             message.created = entity.created;
             message.modified = entity.modified;
-            for (const auto &[attributeName, attributeValue, attributeType]: entity.messageAttributes) {
+            for (const auto &[fst, snd]: entity.messageAttributes) {
                 MessageAttributeCounter attribute;
-                attribute.name = attributeName;
-                attribute.stringValue = attributeValue;
-                attribute.type = MessageAttributeDataTypeFromString(MessageAttributeTypeToString(attributeType));
+                attribute.name = fst;
+                attribute.stringValue = snd.stringValue;
+                attribute.type = MessageAttributeDataTypeFromString(Database::Entity::SNS::MessageAttributeTypeToString(snd.dataType));
                 message.messageAttributes.emplace_back(attribute);
             }
             response.messages.emplace_back(message);
@@ -101,40 +101,31 @@ namespace AwsMock::Dto::SNS {
 
     Database::Entity::SNS::MessageAttribute Mapper::map(const MessageAttribute &messageAttribute) {
         Database::Entity::SNS::MessageAttribute messageAttributeEntity;
-        messageAttributeEntity.attributeType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(messageAttribute.type));
-        messageAttributeEntity.attributeName = messageAttribute.name;
-        if (messageAttributeEntity.attributeType == Database::Entity::SNS::MessageAttributeType::STRING) {
-            messageAttributeEntity.attributeValue = messageAttribute.stringValue;
-        } else if (messageAttributeEntity.attributeType == Database::Entity::SNS::MessageAttributeType::NUMBER) {
-            messageAttributeEntity.attributeValue = std::to_string(messageAttribute.numberValue);
-        }
+        messageAttributeEntity.dataType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(messageAttribute.dataType));
+        messageAttributeEntity.stringValue = messageAttribute.stringValue;
         return messageAttributeEntity;
     }
 
-    Database::Entity::SNS::MessageAttributeList Mapper::map(const std::map<std::string, MessageAttribute> &messageAttributes) {
-        std::vector<Database::Entity::SNS::MessageAttribute> messageAttributesEntities;
-        for (const auto &snd: messageAttributes | std::views::values) {
-            messageAttributesEntities.emplace_back(map(snd));
+    std::map<std::string, Database::Entity::SNS::MessageAttribute> Mapper::map(const std::map<std::string, MessageAttribute> &messageAttributes) {
+        std::map<std::string, Database::Entity::SNS::MessageAttribute> messageAttributesEntities;
+        for (const auto &[fst, snd]: messageAttributes) {
+            const Database::Entity::SNS::MessageAttribute entity = map(snd);
+            messageAttributesEntities[fst] = entity;
         }
         return messageAttributesEntities;
     }
 
     MessageAttribute Mapper::map(const Database::Entity::SNS::MessageAttribute &messageAttributeEntity) {
         MessageAttribute messageAttribute;
-        messageAttribute.type = MessageAttributeDataTypeFromString(Database::Entity::SNS::MessageAttributeTypeToString(messageAttributeEntity.attributeType));
-        messageAttribute.name = messageAttributeEntity.attributeName;
-        if (messageAttribute.type == STRING) {
-            messageAttribute.stringValue = messageAttributeEntity.attributeValue;
-        } else if (messageAttribute.type == NUMBER) {
-            messageAttribute.numberValue = std::stol(messageAttributeEntity.attributeValue);
-        }
+        messageAttribute.dataType = MessageAttributeDataTypeFromString(Database::Entity::SNS::MessageAttributeTypeToString(messageAttributeEntity.dataType));
+        messageAttribute.stringValue = messageAttributeEntity.stringValue;
         return messageAttribute;
     }
 
-    std::map<std::string, MessageAttribute> Mapper::map(const Database::Entity::SNS::MessageAttributeList &messageAttributesEntities) {
+    std::map<std::string, MessageAttribute> Mapper::map(const std::map<std::string, Database::Entity::SNS::MessageAttribute> &messageAttributesEntities) {
         std::map<std::string, MessageAttribute> messageAttributes;
-        for (const auto &messageAttributeEntity: messageAttributesEntities) {
-            messageAttributes[messageAttributeEntity.attributeName] = map(messageAttributeEntity);
+        for (const auto &[fst, snd]: messageAttributesEntities) {
+            messageAttributes[fst] = map(snd);
         }
         return messageAttributes;
     }

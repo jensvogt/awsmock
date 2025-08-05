@@ -121,10 +121,10 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
 
                 const auto result = _lambdaCollection.insert_one(lambda.ToDocument());
                 log_trace << "Lambda created, oid: " << result->inserted_id().get_oid().value.to_string();
@@ -235,15 +235,27 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
+            auto session = client->start_session();
+
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-                auto result = _lambdaCollection.find_one_and_update(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument());
+                mongocxx::options::find_one_and_update opts{};
+                opts.return_document(mongocxx::options::return_document::k_after);
+
+                session.start_transaction();
+                auto mResult = _lambdaCollection.find_one_and_update(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument(), opts);
+                session.commit_transaction();
                 log_trace << "Lambda updated: " << lambda.ToString();
-                return GetLambdaByArn(lambda.arn);
+                if (mResult) {
+                    lambda.FromDocument(mResult->view());
+                    return lambda;
+                }
+                return {};
 
             } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }

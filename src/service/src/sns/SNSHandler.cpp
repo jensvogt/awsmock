@@ -307,9 +307,8 @@ namespace AwsMock::Service {
                 attributeValue = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
             }
             Dto::SNS::MessageAttribute attribute;
-            attribute.name = attributeName;
             attribute.stringValue = attributeValue;
-            attribute.type = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
+            attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
             messageAttributes[attributeName] = attribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();

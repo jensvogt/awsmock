@@ -6,27 +6,27 @@
 
 namespace AwsMock::Service {
 
-    void LambdaCreator::operator()(const std::string &functionCode, const std::string &functionId, const std::string &instanceId) const {
+    boost::mutex LambdaCreator::_lambdaCreatorMutex;
 
-        log_debug << "Start creating lambda function, oid: " << functionId;
-
-        // Make a local copy
-        Database::Entity::Lambda::Lambda lambdaEntity = Database::LambdaDatabase::instance().GetLambdaById(functionId);
+    Database::Entity::Lambda::Lambda LambdaCreator::DoCreate(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) {
+        boost::mutex::scoped_lock lock(_lambdaCreatorMutex);
+        log_debug << "Start creating lambda function, instanceId: " << instanceId;
 
         // Create a new instance
-        CreateInstance(instanceId, lambdaEntity, functionCode);
+        const std::string containerId = CreateInstance(instanceId, lambda, lambda.code.zipFile);
 
         // Update database
-        lambdaEntity.lastStarted = system_clock::now();
-        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Active;
-        lambdaEntity.stateReason = "Activated";
-        lambdaEntity.codeSize = static_cast<long>(functionCode.size());
-        lambdaEntity = Database::LambdaDatabase::instance().UpdateLambda(lambdaEntity);
+        lambda.lastStarted = system_clock::now();
+        lambda.state = Database::Entity::Lambda::LambdaState::Active;
+        lambda.stateReason = "Activated";
+        lambda.codeSize = static_cast<long>(lambda.code.zipFile.size());
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
 
-        log_info << "Lambda function installed: " << lambdaEntity.function << " status: " << LambdaStateToString(lambdaEntity.state);
+        log_info << "Lambda function instance created: " << lambda.function << " instanceId: " << instanceId << ", instances: " << lambda.instances.size();
+        return lambda;
     }
 
-    void LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode) {
+    std::string LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode) {
 
         const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
 
@@ -44,7 +44,6 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing, get the current port from the docker container
-        Database::Entity::Lambda::Instance instance;
         const std::string containerName = lambdaEntity.function + "-" + instanceId;
         if (!ContainerService::instance().ContainerExistsByName(containerName)) {
             CreateDockerContainer(lambdaEntity, instanceId, CreateRandomHostPort(), lambdaEntity.dockerTag);
@@ -62,18 +61,20 @@ namespace AwsMock::Service {
 
         // Get the public port
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
+        Database::Entity::Lambda::Instance instance;
         instance.instanceId = instanceId;
+        instance.status = Database::Entity::Lambda::InstanceIdle;
+        instance.containerName = containerName;
+        instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
-            instance.status = Database::Entity::Lambda::InstanceIdle;
             instance.containerId = inspectContainerResponse.id;
-            instance.containerName = containerName;
-            instance.created = system_clock::now();
-            lambdaEntity.instances.emplace_back(instance);
         }
+        lambdaEntity.instances.emplace_back(instance);
 
         // Save size in entity
         lambdaEntity.containerSize = inspectContainerResponse.sizeRootFs;
+        return inspectContainerResponse.id;
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {

@@ -343,11 +343,18 @@ namespace AwsMock::Database::Entity::Lambda {
         void RemoveInstance(const std::string &instanceId);
 
         /**
-         * @brief CHecks for any lambda instance with state 'inactive'.
+         * @brief Checks for any lambda instance with state 'inactive'.
          *
          * @return true if any idle instance has been found.
          */
         bool HasIdleInstance();
+
+        /**
+         * @brief Returns an idle instance
+         *
+         * @return idle instance
+         */
+        Instance GetIdleInstance();
 
         /**
          * @brief Checks whether an event source with the given ARN exists already.
@@ -385,8 +392,25 @@ namespace AwsMock::Database::Entity::Lambda {
          * @brief Set the last invocation time for an instance
          *
          * @param instanceId instance ID
+         * @param host current host name
+         * @param port current port
+         */
+        void SetInstanceHostPort(const std::string &instanceId, const std::string &host, int port);
+
+        /**
+         * @brief Set the last invocation time for an instance
+         *
+         * @param instanceId instance ID
          */
         void SetInstanceLastInvocation(const std::string &instanceId);
+
+        /**
+         * @brief Set the last invocation time for an instance
+         *
+         * @param instanceId instance ID
+         * @param status instance status
+         */
+        void SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status);
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -432,6 +456,16 @@ namespace AwsMock::Database::Entity::Lambda {
         return std::ranges::find_if(instances, [](const Instance &i) {
                    return i.status == InstanceIdle;
                }) != instances.end();
+    }
+
+    inline Instance Lambda::GetIdleInstance() {
+        const auto it = std::ranges::find_if(instances, [](const Instance &i) {
+            return i.status == InstanceIdle;
+        });
+        if (it != instances.end()) {
+            return *it;
+        }
+        return Instance();
     }
 
 }// namespace AwsMock::Database::Entity::Lambda

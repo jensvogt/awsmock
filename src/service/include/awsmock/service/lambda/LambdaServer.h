@@ -74,7 +74,7 @@ namespace AwsMock::Service {
          * @par
          * For each lambda function, the container will be created, if not existing already
          */
-        void CreateContainers() const;
+        void CreateContainers();
 
         /**
          * @brief Remove expired lambda functions

@@ -144,7 +144,7 @@ namespace AwsMock::Service::Frontend {
         http::async_write(_socket, *_fileSerializer, [this](beast::error_code errorCode, std::size_t) {
             errorCode = _socket.shutdown(tcp::socket::shutdown_send, errorCode);
             if (errorCode) {
-                log_error << "Shutdown socket failed: " << errorCode.message();
+                log_error << "Frontend stream shutdown failed: " << errorCode.message();
             }
             _fileSerializer.reset();
             _fileResponse.reset();
@@ -155,11 +155,11 @@ namespace AwsMock::Service::Frontend {
     void FrontendWorker::CheckDeadline() {
         // The deadline may have moved, so check it has really passed.
         if (_requestDeadline.expiry() <= std::chrono::steady_clock::now()) {
-            // Close socket to cancel any outstanding operation.
+            // Close the socket to cancel any outstanding operation.
             _socket.close();
 
             // Sleep indefinitely until we're given a new deadline.
-            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max)());
+            _requestDeadline.expires_at((std::chrono::steady_clock::time_point::max) ());
         }
 
         _requestDeadline.async_wait([this](beast::error_code) {
@@ -189,7 +189,7 @@ namespace AwsMock::Service::Frontend {
         http::async_write(_socket, *_stringSerializer, [this](beast::error_code ec, std::size_t) {
             ec = _socket.shutdown(tcp::socket::shutdown_send, ec);
             if (ec) {
-                log_error << "Shutdown socket failed: " << ec.message();
+                log_error << "Frontend stream shutdown failed: " << ec.message();
             }
             _stringSerializer.reset();
             _stringResponse.reset();
