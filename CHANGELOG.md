@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.6.4](https://github.com/jensvogt/awsmock/compare/v1.6.3...v1.6.4) (2025-08-06)
+
+
+### Bug Fixes
+
+* **1366-application-stop:** add dynamodb streams ([d662d8c](https://github.com/jensvogt/awsmock/commit/d662d8c5ee43fbaefb3c3280bf8dda0a9470bc43))
+* **1366-application-stop:** add dynamodb streams ([b6aa475](https://github.com/jensvogt/awsmock/commit/b6aa475e5b197cb44a2b5fb4cd5a4745a324df32))
+* **1375-new-stream-response:** add asynchronous lambda requests ([34babd8](https://github.com/jensvogt/awsmock/commit/34babd8c7da281e63db9a9dfaa0d42b1e1e2889b))
+
 ## [1.6.3](https://github.com/jensvogt/awsmock/compare/v1.6.2...v1.6.3) (2025-08-02)
 
 
