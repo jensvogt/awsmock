@@ -53,7 +53,8 @@ else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
             src/apps/ApplicationLogSession.cpp
             include/awsmock/service/apps/ApplicationLogSession.h
-            include/awsmock/service/apps/ApplicationLogListener.h)
+            include/awsmock/service/apps/ApplicationLogListener.h
+    )
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale boost_thread boost_filesystem
             ssl crypto archive magic prometheus-cpp-core prometheus-cpp-pull boost_log boost_log_setup ssh)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

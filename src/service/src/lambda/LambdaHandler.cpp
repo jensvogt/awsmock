@@ -102,7 +102,7 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> LambdaHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) {
         log_trace << "Lambda POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::LambdaClientCommand clientCommand;
@@ -139,7 +139,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
                 log_info << "Lambda function created, name: " << lambdaResponse.functionName;
 
-                SendResponse(request, http::status::ok, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (action == "tags") {
@@ -154,7 +154,7 @@ namespace AwsMock::Service {
                 _lambdaService.CreateTag(lambdaRequest);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
-                SendResponse(request, http::status::ok, lambdaRequest.ToJson());
+                return SendResponse(request, http::status::ok, lambdaRequest.ToJson());
             }
 
             if (action == "event-source-mappings") {
@@ -173,7 +173,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
                 std::string tmp = lambdaResponse.ToJson();
-                SendResponseNew(request, http::status::ok, lambdaResponse.ToJson());
+                return SendOkResponse(request, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
@@ -400,9 +400,6 @@ namespace AwsMock::Service {
                 return SendOkResponse(request);
             }
 
-            log_error << "Unknown method";
-            return SendBadRequestError(request, "Unknown method");
-
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
             return SendInternalServerError(request, exc.message());
@@ -410,6 +407,7 @@ namespace AwsMock::Service {
             log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         }
+        return SendOkResponse(request);
     }
 
     http::response<http::dynamic_body> LambdaHandler::HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {

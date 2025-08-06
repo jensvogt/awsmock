@@ -119,6 +119,7 @@ namespace AwsMock::Service {
 
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
             handler = GatewayRouter::GetHandler(target, _stream);
+
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -145,7 +146,10 @@ namespace AwsMock::Service {
             log_trace << "Handler found, name: " << handler->name();
         }
 
-        if (handler) {
+        if (handler->name() == "lambda") {
+            _newRequest = true;
+        }
+        bool isDOne if (handler) {
             switch (request.method()) {
                 case http::verb::get: {
                     Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
@@ -160,7 +164,7 @@ namespace AwsMock::Service {
                 case http::verb::post: {
                     Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                    return handler->HandlePostRequest(request, _region, _user);
+                    return handler->HandlePostRequest(request, _region, _user, isDone);
                 }
                 case http::verb::delete_: {
                     Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
@@ -180,16 +184,21 @@ namespace AwsMock::Service {
 
     // Called to start/continue the write-loop. Should not be called when write_loop is already active.
     void GatewaySession::DoWrite() {
-        /*if (!_response_queue.empty() && _stream.socket().is_open()) {
+        if (_newRequest) {
+            std::queue<http::message_generator> empty;
+            std::swap(_response_queue, empty);
+        }
+        if (!_response_queue.empty()) {
             bool keep_alive = _response_queue.front().keep_alive();
             boost::beast::async_write(_stream,
                                       std::move(_response_queue.front()),
                                       boost::beast::bind_front_handler(&GatewaySession::OnWrite,
                                                                        shared_from_this(),
                                                                        keep_alive));
-        }*/
+        }
     }
 
+    // ReSharper disable once CppDFAConstantParameter
     void GatewaySession::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) {
         boost::ignore_unused(bytes_transferred);
 

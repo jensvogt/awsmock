@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerService::SecretsManagerService(boost::beast::tcp_stream &stream) : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(stream) {
+    SecretsManagerService::SecretsManagerService(tcp_stream_t &stream) : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(stream) {
 
         // Initialize environment
         _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");

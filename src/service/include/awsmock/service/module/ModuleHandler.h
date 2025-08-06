@@ -54,7 +54,7 @@ namespace AwsMock::Service {
          * @param user AWS user
          * @return HTTP response structure
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) override;
 
       private:
 

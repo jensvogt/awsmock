@@ -3,7 +3,7 @@
 
 namespace AwsMock::Service {
 
-    boost::beast::http::response<http::dynamic_body> KMSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    boost::beast::http::response<http::dynamic_body> KMSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) {
         log_trace << "KMS POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::KMSClientCommand clientCommand;

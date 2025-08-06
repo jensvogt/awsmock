@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit CognitoHandler(boost::beast::tcp_stream &stream) : AbstractHandler("cognito-handler", stream) {}
+        explicit CognitoHandler(tcp_stream_t &stream) : AbstractHandler("cognito-handler", stream) {}
 
         /**
          * @brief HTTP POST request.
@@ -43,7 +43,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractHandler::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) override;
 
       private:
 

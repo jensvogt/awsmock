@@ -182,6 +182,15 @@ namespace AwsMock::Service {
         std::string _user;
 
         /**
+         * @brief Flag indicating the initialization of a new request
+         *
+         * This variable is used to track whether a new request has been initiated
+         * within a specific process or flow. It plays a critical role in controlling
+         * and monitoring the request-handling logic.
+         */
+        bool _newRequest = false;
+
+        /**
          * HTTP request queue
          */
         std::queue<http::message_generator> _response_queue;

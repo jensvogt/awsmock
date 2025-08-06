@@ -4,7 +4,7 @@
 
 namespace AwsMock::Service {
 
-    http::response<http::dynamic_body> DynamoDbHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> DynamoDbHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) {
         log_trace << "DynamoDb POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::DynamoDbClientCommand clientCommand;

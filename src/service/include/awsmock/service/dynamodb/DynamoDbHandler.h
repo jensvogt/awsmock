@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler(boost::beast::tcp_stream &stream) : AbstractHandler("dynamodb-handler", stream) {}
+        explicit DynamoDbHandler(tcp_stream_t &stream) : AbstractHandler("dynamodb-handler", stream) {}
 
         /**
          * @brief HTTP POST request.
@@ -47,14 +47,14 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::HandlePostRequest
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) override;
 
       private:
 
         /**
          * DynamoDB service
          */
-        Service::DynamoDbService _dynamoDbService;
+        DynamoDbService _dynamoDbService;
     };
 
 }// namespace AwsMock::Service

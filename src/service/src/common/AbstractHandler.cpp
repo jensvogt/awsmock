@@ -12,7 +12,7 @@ namespace AwsMock::Service {
         return {};
     }
 
-    http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) {
         log_error << "Real method not implemented";
         return {};
     }
@@ -40,6 +40,7 @@ namespace AwsMock::Service {
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+        response.set(http::field::connection, "close");
 
         // Copy headers
         if (!headers.empty()) {
@@ -63,6 +64,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -93,6 +95,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -117,6 +120,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::internal_server_error);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -147,6 +151,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -177,6 +182,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::not_found);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -210,6 +216,7 @@ namespace AwsMock::Service {
             // Prepare the response message
             http::response<http::dynamic_body> response;
             response.version(request.version());
+            response.keep_alive(request.keep_alive());
             response.result(http::status::partial_content);
             response.set(http::field::server, "awsmock");
             response.set(http::field::content_type, "application/octet-stream");
@@ -254,6 +261,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -279,6 +287,7 @@ namespace AwsMock::Service {
         // Prepare the response message
         http::response<http::dynamic_body> response;
         response.version(request.version());
+        response.keep_alive(request.keep_alive());
         response.result(http::status::continue_);
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
@@ -328,6 +337,7 @@ namespace AwsMock::Service {
         boost::optional<http::response<http::string_body, http::basic_fields<alloc_t>>> _stringResponse;
         _stringResponse.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
         _stringResponse->version(request.version());
+        _stringResponse->keep_alive(request.keep_alive());
         _stringResponse->result(status);
         _stringResponse->set(http::field::server, "awsmock");
         _stringResponse->set(http::field::content_type, "application/json");
@@ -352,21 +362,11 @@ namespace AwsMock::Service {
 
         // Send the response to the client
         http::async_write(_stream, *_stringSerializer, [this](boost::beast::error_code ec, std::size_t) {
-            ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+            /*ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
             if (ec) {
                 log_error << "Backend stream shutdown failed: " << ec.message();
             }
-            _stringSerializer.reset();
-        });
-    }
-
-    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
-    void AbstractHandler::DoWrite(http::response<http::dynamic_body> response) {
-        http::async_write(_stream, *_stringSerializer, [this](boost::beast::error_code ec, std::size_t) {
-            ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
-            if (ec) {
-                log_error << "Backend stream shutdown failed: " << ec.message();
-            }
+            _stream.socket().close();*/
             _stringSerializer.reset();
         });
     }

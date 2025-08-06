@@ -2,11 +2,12 @@
 // Created by vogje01 on 5/27/24.
 //
 
+
 #include <awsmock/service/gateway/GatewayRouter.h>
 
 namespace AwsMock::Service {
 
-    std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey, boost::beast::tcp_stream &stream) {
+    std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey, tcp_stream_t &stream) {
         if (routingKey == "s3" || routingKey == "s3api") {
             return std::make_shared<S3Handler>(stream);
         }

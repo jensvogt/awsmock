@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler(boost::beast::tcp_stream &stream) : AbstractHandler("s3-handler", stream), _s3Service(stream) {}
+        explicit S3Handler() : AbstractHandler("s3-handler") {}
 
         /**
          * @brief HTTP GET request.
@@ -76,7 +76,7 @@ namespace AwsMock::Service {
          * @return HTTP response
          * @see AbstractResource::handlePost(Poco::Net::HTTPServerRequest &, Poco::Net::HTTPServerResponse &)
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) override;
 
         /**
          * @brief Delete DELETE request.

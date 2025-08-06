@@ -437,7 +437,7 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::dynamic_body> S3Handler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> S3Handler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) {
         log_debug << "S3 POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;

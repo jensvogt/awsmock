@@ -22,10 +22,11 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 
 namespace AwsMock::Service {
 
-    namespace http = boost::beast::http;
+    namespace http = beast::http;
     namespace ip = boost::asio::ip;
 
     /**
@@ -33,7 +34,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class AbstractHandler : public std::enable_shared_from_this<AbstractHandler> {
+    class AbstractHandler {
 
       public:
 
@@ -45,7 +46,7 @@ namespace AwsMock::Service {
          * @param name handler name
          * @param stream response stream
          */
-        explicit AbstractHandler(const std::string &name, boost::beast::tcp_stream &stream) : _stream(stream), _name(std::move(name)) {};
+        explicit AbstractHandler(const std::string &name, tcp_stream_t &stream) : _stream(stream), _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -73,9 +74,10 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @param region AWS region
          * @param user current user
+         * @param isDone response already sent
          * @return HTTP response
          */
-        virtual http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
+        virtual http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone);
 
         /**
          * @brief Handles the HTTP method DELETE.
@@ -229,7 +231,7 @@ namespace AwsMock::Service {
         /**
          * TCP stream
          */
-        boost::beast::tcp_stream &_stream;
+        tcp_stream_t &_stream;
 
         /**
          * Handler name

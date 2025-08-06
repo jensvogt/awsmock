@@ -6,7 +6,7 @@ namespace AwsMock::Service {
 
     const std::map<std::string, std::string> ApplicationHandler::headers = CreateHeaderMap();
 
-    http::response<http::dynamic_body> ApplicationHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+    http::response<http::dynamic_body> ApplicationHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) {
         log_debug << "Application POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::ApplicationClientCommand clientCommand;

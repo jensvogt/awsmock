@@ -12,6 +12,7 @@
 #include <awsmock/service/apps/ApplicationHandler.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
+#include <awsmock/service/gateway/GatewayServer.h>
 #include <awsmock/service/kms/KMSHandler.h>
 #include <awsmock/service/lambda/LambdaHandler.h>
 #include <awsmock/service/module/ModuleHandler.h>
@@ -46,7 +47,7 @@ namespace AwsMock::Service {
          * @param stream
          * @return pointer to module handler
          */
-        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::beast::tcp_stream &stream);
+        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, tcp_stream_t &stream);
     };
 
 }// namespace AwsMock::Service

@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda-handler", stream), _lambdaService(stream) {}
+        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda", stream), _lambdaService(stream) {}
 
         /**
          * @brief HTTP GET request.
@@ -50,10 +50,11 @@ namespace AwsMock::Service {
          * @param request HTTP request
          * @param region AWS region name
          * @param user AWS user
+         * @param isDone response already send
          * @return HTTP response
          * @see AbstractResource::HandleGetRequest
          */
-        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+        http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user, bool &isDone) override;
 
         /**
          * @brief HTTP DELETE request.
