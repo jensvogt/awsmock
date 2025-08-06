@@ -6,6 +6,7 @@
 
 namespace AwsMock::Service {
 
+    boost::mutex LambdaService::_lambdaFindMutex;
     std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_lambdaServiceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
@@ -59,7 +60,6 @@ namespace AwsMock::Service {
 
         // Find idle instance
         Database::Entity::Lambda::Instance instance = FindIdleInstance(lambdaEntity);
-        _lambdaServiceMutex[instance.instanceId] = std::make_shared<boost::mutex>();
         return Dto::Lambda::Mapper::map(request, lambdaEntity);
     }
 
@@ -1084,6 +1084,7 @@ namespace AwsMock::Service {
     }
 
     Database::Entity::Lambda::Instance LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) const {
+        boost::mutex::scoped_lock lock(_lambdaFindMutex);
 
         // Synchronize the docker daemon with the DB
         lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
@@ -1092,8 +1093,12 @@ namespace AwsMock::Service {
         // CHeck existing instances
         for (const auto &instance: lambda.instances) {
             if (instance.status == Database::Entity::Lambda::InstanceIdle) {
-                log_debug << "Found idle instance, id: " << instance.instanceId;
-                return instance;
+                if (!instance.instanceId.empty()) {
+                    lambda.SetInstanceStatus(instance.instanceId, Database::Entity::Lambda::InstanceRunning);
+                    lambda = _lambdaDatabase.UpdateLambda(lambda);
+                    log_info << "Found idle instance, id: " << instance.instanceId;
+                    return instance;
+                }
             }
         }
 

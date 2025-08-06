@@ -218,7 +218,6 @@ namespace AwsMock::Service {
         boost::beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
         if (ec) {
-            log_error << "Backend stream shutdown failed: " << ec.message();
             ec = _stream.socket().close(ec);
             if (ec) {
                 log_error << "Close failed: " << ec.message();

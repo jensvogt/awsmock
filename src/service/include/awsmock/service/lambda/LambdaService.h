@@ -587,6 +587,7 @@ namespace AwsMock::Service {
          * Map of semaphores
          */
         static std::map<std::string, std::shared_ptr<boost::mutex>> _lambdaServiceMutex;
+        static boost::mutex _lambdaFindMutex;
     };
 
 }// namespace AwsMock::Service

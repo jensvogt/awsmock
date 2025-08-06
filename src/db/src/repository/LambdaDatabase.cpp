@@ -249,7 +249,7 @@ namespace AwsMock::Database {
                 session.commit_transaction();
                 log_trace << "Lambda updated: " << lambda.ToString();
                 if (mResult) {
-                    lambda.FromDocument(mResult->view());
+                    lambda.FromDocument(mResult.value());
                     return lambda;
                 }
                 return {};
