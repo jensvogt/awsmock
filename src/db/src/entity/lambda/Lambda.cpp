@@ -40,16 +40,33 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     Instance Lambda::GetInstance(const std::string &instanceId) {
-        if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             return *it;
         }
         log_error << "Lambda instance not found, id: " << instanceId;
         return {};
     }
 
+    void Lambda::SetInstanceHostPort(const std::string &instanceId, const std::string &host, const int port) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+            it->hostName = host;
+            it->hostPort = port;
+            return;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+    }
+
     void Lambda::SetInstanceLastInvocation(const std::string &instanceId) {
-        if (const auto it = std::ranges::find(instances, instanceId, &Instance::instanceId); it != instances.end()) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             it->lastInvocation = system_clock::now();
+            return;
+        }
+        log_error << "Lambda instance not found, id: " << instanceId;
+    }
+
+    void Lambda::SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+            it->status = status;
             return;
         }
         log_error << "Lambda instance not found, id: " << instanceId;
@@ -181,6 +198,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get instances
         if (mResult.value().find("instances") != mResult.value().end()) {
+            instances.clear();
             for (const view instancesView = mResult.value()["instances"].get_array().value; const bsoncxx::document::element &instanceElement: instancesView) {
                 Instance instance;
                 instance.FromDocument(instanceElement.get_document().view());
@@ -190,6 +208,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get event sources
         if (mResult.value().find("eventSources") != mResult.value().end()) {
+            eventSources.clear();
             for (const view eventSourcesView = mResult.value()["eventSources"].get_array().value; const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
                 EventSourceMapping eventSourceMapping;
                 eventSourceMapping.FromDocument(eventSourceElement.get_document().view());

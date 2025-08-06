@@ -48,19 +48,14 @@ namespace AwsMock::Database::Entity::SNS {
     struct MessageAttribute {
 
         /**
-         * MessageAttribute name
-         */
-        std::string attributeName;
-
-        /**
          * MessageAttribute value
          */
-        std::string attributeValue;
+        std::string stringValue;
 
         /**
-         * Message attribute value
+         * Message attribute type
          */
-        MessageAttributeType attributeType;
+        MessageAttributeType dataType;
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -70,11 +65,11 @@ namespace AwsMock::Database::Entity::SNS {
         [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
         /**
-         * @brief Converts the DTO to a string representation.
+         * @brief Converts the entity to a MongoDB document
          *
-         * @return DTO as string
+         * @return entity as MongoDB document.
          */
-        [[nodiscard]] std::string ToString() const;
+        void FromDocument(const view_or_value<view, value> &object);
 
         /**
          * @brief Converts the DTO to a JSON string representation.
@@ -82,6 +77,14 @@ namespace AwsMock::Database::Entity::SNS {
          * @return DTO as JSON string
          */
         [[nodiscard]] std::string ToJson() const;
+
+
+        /**
+         * @brief Converts the DTO to a string representation.
+         *
+         * @return DTO as string
+         */
+        [[nodiscard]] std::string ToString() const;
 
         /**
          * @brief Stream provider.
@@ -92,8 +95,6 @@ namespace AwsMock::Database::Entity::SNS {
          */
         friend std::ostream &operator<<(std::ostream &os, const MessageAttribute &m);
     };
-
-    typedef std::vector<MessageAttribute> MessageAttributeList;
 
 }// namespace AwsMock::Database::Entity::SNS
 

@@ -47,20 +47,26 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(BucketCreateTest, S3ServiceTest) {
 
         // arrange
-        const Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
 
         // act
-        auto [location, arn] = _service.CreateBucket(request);
+        const auto response = _service.CreateBucket(createRequest);
 
         // assert
-        BOOST_CHECK_EQUAL(location, "eu-central-1");
+        BOOST_CHECK_EQUAL(response.location, "eu-central-1");
     }
 
     BOOST_FIXTURE_TEST_CASE(BucketListTest, S3ServiceTest) {
 
         // arrange
-        const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
-        auto [location, arn] = _service.CreateBucket(createRequest);
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
+        auto response = _service.CreateBucket(createRequest);
         std::ifstream ifs(testFile);
         Dto::S3::PutObjectRequest putRequest;
         putRequest.region = REGION;
@@ -80,8 +86,11 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(BucketListAllTest, S3ServiceTest) {
 
         // arrange
-        const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
-        auto [location, arn] = _service.CreateBucket(createRequest);
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
+        Dto::S3::CreateBucketResponse createResponse = _service.CreateBucket(createRequest);
 
         // act
         const Dto::S3::ListAllBucketResponse response = _service.ListAllBuckets();
@@ -94,11 +103,16 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(BucketDeleteTest, S3ServiceTest) {
 
         // arrange
-        const Dto::S3::CreateBucketRequest createRequest = {.region = REGION, .name = BUCKET, .owner = OWNER};
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
         Dto::S3::CreateBucketResponse createResponse = _service.CreateBucket(createRequest);
 
         // act
-        const Dto::S3::DeleteBucketRequest s3Request = {.region = REGION, .bucket = BUCKET};
+        Dto::S3::DeleteBucketRequest s3Request;
+        s3Request.region = REGION;
+        s3Request.bucket = BUCKET;
         _service.DeleteBucket(s3Request);
         const Dto::S3::ListAllBucketResponse response = _service.ListAllBuckets();
 
@@ -109,8 +123,11 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(ObjectPutTest, S3ServiceTest) {
 
         // arrange
-        Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
-        Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
+        Dto::S3::CreateBucketResponse response = _service.CreateBucket(createRequest);
         std::ifstream ifs(testFile);
 
         // act
@@ -128,8 +145,11 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(ObjectGetTest, S3ServiceTest) {
 
         // arrange
-        Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
-        Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
+        Dto::S3::CreateBucketResponse response = _service.CreateBucket(createRequest);
         std::ifstream ifs(testFile);
         Dto::S3::PutObjectRequest putRequest;
         putRequest.region = REGION;
@@ -152,8 +172,11 @@ namespace AwsMock::Service {
     BOOST_FIXTURE_TEST_CASE(ObjectDeleteTest, S3ServiceTest) {
 
         // arrange
-        Dto::S3::CreateBucketRequest request = {.region = REGION, .name = BUCKET, .owner = OWNER};
-        Dto::S3::CreateBucketResponse response = _service.CreateBucket(request);
+        Dto::S3::CreateBucketRequest createRequest;
+        createRequest.region = REGION;
+        createRequest.name = BUCKET;
+        createRequest.owner = OWNER;
+        Dto::S3::CreateBucketResponse response = _service.CreateBucket(createRequest);
         std::ifstream ifs(testFile);
         Dto::S3::PutObjectRequest putRequest;
         putRequest.region = REGION;
@@ -162,7 +185,10 @@ namespace AwsMock::Service {
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
 
         // act
-        Dto::S3::DeleteObjectRequest deleteRequest = {.region = REGION, .bucket = BUCKET, .key = KEY};
+        Dto::S3::DeleteObjectRequest deleteRequest;
+        deleteRequest.region = REGION;
+        deleteRequest.bucket = BUCKET;
+        deleteRequest.key = KEY;
         BOOST_CHECK_NO_THROW({ _service.DeleteObject(deleteRequest); });
 
         // assert

@@ -921,7 +921,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) const {
+    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "send_message");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "send_message");
         log_trace << "Sending message request, queueUrl: " << request.queueUrl;
@@ -986,7 +986,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const {
+    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "send_message_batch");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "send_message_batch");
         log_trace << "Send message batch request, queueUrl: " << request.queueUrl;
@@ -1169,7 +1169,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) const {
+    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "resend_message");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "resend_message");
         log_trace << "Resend message request, queueArn: " << request.queueArn;
@@ -1370,7 +1370,7 @@ namespace AwsMock::Service {
                                     }) != attributes.end();
     }
 
-    void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
+    void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) {
         if (const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
             log_debug << "Found lambda notification events, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
@@ -1379,7 +1379,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
+    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) {
         log_debug << "Invoke lambda function request, function: " << lambda.function;
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
@@ -1401,7 +1401,7 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson());
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", sourceArn: " << eventSourceArn << ", result: " << result;
     }
 }// namespace AwsMock::Service

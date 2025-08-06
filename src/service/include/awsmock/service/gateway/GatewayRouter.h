@@ -37,15 +37,16 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayRouter();
+        explicit GatewayRouter() {};
 
         /**
          * @brief Returns an HTTP request handler for a module.
          *
          * @param routingKey module name
+         * @param stream
          * @return pointer to module handler
          */
-        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
+        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::beast::tcp_stream &stream);
     };
 
 }// namespace AwsMock::Service

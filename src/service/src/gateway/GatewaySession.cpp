@@ -31,7 +31,7 @@ namespace AwsMock::Service {
 
         // Apply a reasonable limit to the allowed size
         // of the body in bytes to prevent abuse.
-        _parser->body_limit(boost::none);
+        _parser->body_limit(_bodyLimit);
 
         // Set the timeout.
         _stream.expires_after(std::chrono::seconds(_timeout));
@@ -118,7 +118,7 @@ namespace AwsMock::Service {
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            handler = GatewayRouter::GetHandler(target);
+            handler = GatewayRouter::GetHandler(target, _stream);
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -137,7 +137,7 @@ namespace AwsMock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             _region = authKey.region;
-            handler = GatewayRouter::GetHandler(authKey.module);
+            handler = GatewayRouter::GetHandler(authKey.module, _stream);
             if (!handler) {
                 log_error << "Handler not found, target: " << authKey.module;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -216,9 +216,12 @@ namespace AwsMock::Service {
 
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
+        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
         if (ec) {
-            log_error << "Shutdown failed: " << ec.message();
+            ec = _stream.socket().close(ec);
+            if (ec) {
+                log_error << "Close failed: " << ec.message();
+            }
         }
         // At this point the connection is closed gracefully
     }

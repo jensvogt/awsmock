@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SSMHandler() : AbstractHandler("ssm-handler") {}
+        explicit SSMHandler(boost::beast::tcp_stream &stream) : AbstractHandler("ssm-handler", stream) {}
 
         /**
          * @brief HTTP POST request.

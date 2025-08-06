@@ -7,9 +7,9 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler() : AbstractHandler("lambda-handler") {}
+        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda-handler", stream) {}
 
         /**
          * @brief HTTP GET request.
@@ -71,7 +71,7 @@ namespace AwsMock::Service {
         /**
          * Lambda module
          */
-        Service::LambdaService _lambdaService;
+        LambdaService _lambdaService;
     };
 
 }// namespace AwsMock::Service

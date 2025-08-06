@@ -51,9 +51,20 @@ namespace AwsMock::Service {
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
-         * @param lambdaResult
          */
-        void Invocation(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
+        static void InvocationAsync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
+
+        /**
+         * @brief Synchronously execution a lambda function
+         *
+         * @param lambda lambda function
+         * @param containerId lambda docker container ID
+         * @param host lambda docker host
+         * @param port lambda docker port
+         * @param payload lambda payload
+         * @return lambdaResult
+         */
+        static Database::Entity::Lambda::LambdaResult InvocationSync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
         /**
          * @brief Executes a lambda function
@@ -63,14 +74,8 @@ namespace AwsMock::Service {
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
-         * @param lambdaResult lambda result structure
          */
-        void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
-
-        /**
-         * @brief Wait for the detached thread to finish
-         */
-        void WaitForFinish();
+        static void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
       private:
 
@@ -78,21 +83,6 @@ namespace AwsMock::Service {
          * Metric module
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
-
-        /**
-         * Wait condition
-         */
-        std::condition_variable _condition;
-
-        /**
-         * Mutex
-         */
-        std::mutex _mutex;
-
-        /**
-         * Exit confirmed
-         */
-        int _exitConfirm = 0;
     };
 
 }// namespace AwsMock::Service

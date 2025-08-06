@@ -123,10 +123,11 @@ namespace AwsMock::Core {
 
     void LogStream::Initialize() {
 
-        if (Configuration::instance().GetValue<bool>("awsmock.logging.console-active")) {
-            console_sink = boost::log::add_console_log(std::cout);
-            console_sink->set_formatter(&LogColorFormatter);
-            console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+        console_sink = boost::log::add_console_log(std::cout);
+        console_sink->set_formatter(&LogColorFormatter);
+        console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+        if (!Configuration::instance().GetValue<bool>("awsmock.logging.console-active")) {
+            RemoveConsoleLogs();
         }
         boost::log::add_common_attributes();
     }

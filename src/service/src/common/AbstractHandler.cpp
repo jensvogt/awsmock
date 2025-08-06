@@ -13,7 +13,12 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        log_error << "Real method not implemented";
+        //        log_error << "Real method not implemented";
+        return {};
+    }
+
+    http::response<http::dynamic_body> AbstractHandler::HandlePostRequest(const boost::beast::tcp_stream &stream, const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
+        //log_error << "Real method not implemented";
         return {};
     }
 
@@ -321,4 +326,36 @@ namespace AwsMock::Service {
         return response;
     }
 
+    // Called to start/continue the write-loop. Should not be called when write_loop is already active.
+    void AbstractHandler::DoWrite(http::message_generator response) {
+        bool keep_alive = false;
+        boost::beast::async_write(_stream,
+                                  std::move(response),
+                                  boost::beast::bind_front_handler(&AbstractHandler::OnWrite,
+                                                                   shared_from_this(),
+                                                                   keep_alive));
+    }
+
+    void AbstractHandler::OnWrite(const bool keep_alive, const boost::beast::error_code &ec, std::size_t bytes_transferred) const {
+        boost::ignore_unused(bytes_transferred);
+
+        // This means they closed the connection
+        if (ec == http::error::end_of_stream)
+            return DoShutdown();
+    }
+
+    void AbstractHandler::DoShutdown() const {
+
+        // Send a TCP shutdown
+        boost::beast::error_code ec;
+        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+        if (ec) {
+            log_error << "Backend stream shutdown failed: " << ec.message();
+            ec = _stream.socket().close(ec);
+            if (ec) {
+                log_error << "Close failed: " << ec.message();
+            }
+        }
+        // At this point the connection is closed gracefully
+    }
 }// namespace AwsMock::Service

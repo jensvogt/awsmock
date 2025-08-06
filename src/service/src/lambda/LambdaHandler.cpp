@@ -1,4 +1,7 @@
 
+#include "awsmock/dto/lambda/model/InvocationType.h"
+
+
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace AwsMock::Service {
@@ -117,14 +120,16 @@ namespace AwsMock::Service {
 
                 if (Core::HttpUtils::GetPathParameter(request.target(), 3) == "invocations") {
 
-                    std::string logType = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Log-Type");
+                    auto functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
+                    auto logType = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Log-Type");
+                    auto invocationType = Dto::Lambda::LambdaInvocationTypeFromString(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Invocation-Type"));
 
-                    std::string functionName = Core::HttpUtils::GetPathParameter(request.target(), 2);
-                    log_debug << "Lambda function invocation, name: " << functionName;
-
-                    Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, body);
-                    log_info << "Lambda function invoked, name: " << functionName;
-                    return SendResponse(request, http::int_to_status(result.status), result.responseBody);
+                    log_info << "Lambda function invoked, name: " << functionName << ", type: " << LambdaInvocationTypeToString(invocationType);
+                    Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, body, invocationType);
+                    if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
+                        return SendResponse(request, http::int_to_status(result.status), result.responseBody);
+                    }
+                    return SendOkResponse(request);
                 }
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
                 lambdaRequest.FromJson(body);
@@ -155,11 +160,7 @@ namespace AwsMock::Service {
             if (action == "event-source-mappings") {
 
                 std::string body = Core::HttpUtils::GetBodyAsString(request);
-                Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest;
-                lambdaRequest.FromJson(body);
-                lambdaRequest.region = region;
-                lambdaRequest.user = user;
-
+                Dto::Lambda::CreateEventSourceMappingsRequest lambdaRequest = Dto::Lambda::CreateEventSourceMappingsRequest::FromJson(body);
                 Dto::Lambda::CreateEventSourceMappingsResponse lambdaResponse = _lambdaService.CreateEventSourceMappings(lambdaRequest);
                 log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
 
@@ -171,7 +172,6 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
-                std::string tmp = lambdaResponse.ToJson();
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
 

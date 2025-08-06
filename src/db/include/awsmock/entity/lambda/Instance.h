@@ -31,6 +31,7 @@ namespace AwsMock::Database::Entity::Lambda {
     enum LambdaInstanceStatus {
         InstanceIdle,
         InstanceRunning,
+        InstanceSuccess,
         InstanceFailed,
         InstanceUnknown
     };
@@ -38,6 +39,7 @@ namespace AwsMock::Database::Entity::Lambda {
     static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
             {InstanceIdle, "Idle"},
             {InstanceRunning, "Running"},
+            {InstanceSuccess, "Success"},
             {InstanceFailed, "Failed"},
             {InstanceUnknown, "Unknown"},
     };
@@ -87,6 +89,11 @@ namespace AwsMock::Database::Entity::Lambda {
         int hostPort;
 
         /**
+         * Host name
+         */
+        std::string hostName;
+
+        /**
          * Status
          */
         LambdaInstanceStatus status;
@@ -106,7 +113,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document

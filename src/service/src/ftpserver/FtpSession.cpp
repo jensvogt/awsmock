@@ -1470,11 +1470,11 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) const {
-        const Dto::S3::DeleteObjectRequest request = {
-                .region = _region,
-                .user = user,
-                .bucket = _bucket,
-                .key = GetKey(fileName)};
+        Dto::S3::DeleteObjectRequest request;
+        request.region = _region;
+        request.user = user;
+        request.bucket = _bucket;
+        request.key = GetKey(fileName);
         _s3Service->DeleteObject(request);
 
         log_debug << "Delete object request send, fileName: " << fileName;

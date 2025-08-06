@@ -53,8 +53,7 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.gateway.http.host", "AWSMOCK_GATEWAY_HOST", "localhost");
         DefineProperty<std::string>("awsmock.gateway.http.address", "AWSMOCK_GATEWAY_ADDRESS", "0.0.0.0");
         DefineProperty<int>("awsmock.gateway.http.port", "AWSMOCK_GATEWAY_PORT", 4566);
-        DefineProperty<int>("awsmock.gateway.http.max-queue", "AWSMOCK_GATEWAY_MAX_QUEUE", 10);
-        DefineProperty<int>("awsmock.gateway.http.max-threads", "AWSMOCK_GATEWAY_MAX_THREADS", 50);
+        DefineProperty<int>("awsmock.gateway.http.max-queue", "AWSMOCK_GATEWAY_MAX_QUEUE", 250);
         DefineProperty<int>("awsmock.gateway.http.max-body", "AWSMOCK_GATEWAY_MAX_BODY", 104857600);
         DefineProperty<int>("awsmock.gateway.http.timeout", "AWSMOCK_GATEWAY_TIMEOUT", 900);
 

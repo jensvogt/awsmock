@@ -194,7 +194,7 @@ namespace AwsMock::Service {
         log_trace << "Lambda monitoring finished";
     }
 
-    void LambdaServer::CreateContainers() const {
+    void LambdaServer::CreateContainers() {
         try {
 
             // Get the lambda list

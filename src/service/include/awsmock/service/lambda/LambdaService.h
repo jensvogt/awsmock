@@ -15,6 +15,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/PagingUtils.h>
+#include <awsmock/core/Semaphore.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
@@ -71,6 +72,7 @@
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
+#include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
@@ -261,11 +263,10 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param functionName lambda function name
          * @param payload SQS message
-         * @param receiptHandle receipt handle of the message which triggered the lambda
-         * @param detached detached thread
-         * @return lambda result
+         * @param invocationType invocation type synchronous/asynchronous
+         * @return lambda result in case of synchronous invocation, otherwise empty struct
          */
-        Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = false) const;
+        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -467,12 +468,17 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Tries to find an idle instance
+         * @brief Tries to find an idle lambda function instance
+         *
+         * @par
+         * Tries to find an idle instance. If no instance is found and the current total number of lambda instances is below the
+         * concurrency limit, a new instance will be created, otherwise it will wait for an idle instance in a loop with 1 sec.
+         * Period time.
          *
          * @param lambda lambda entity to check
-         * @return containerId of the idle instance
+         * @return lambda instance
          */
-        static std::string FindIdleInstance(const Database::Entity::Lambda::Lambda &lambda);
+        Database::Entity::Lambda::Instance FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
@@ -482,7 +488,7 @@ namespace AwsMock::Service {
         static void CleanupDocker(Database::Entity::Lambda::Lambda &lambda);
 
         /**
-         * @brief Returns the host name, to where we send lambda invocation notifications
+         * @brief Returns the hostname to where we send the lambda invocation notifications
          *
          * @par
          * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
@@ -496,7 +502,7 @@ namespace AwsMock::Service {
         static std::string GetHostname(Database::Entity::Lambda::Instance &instance);
 
         /**
-         * @brief Returns the lambda port, to where we send lambda invocation notifications
+         * @brief Returns the lambda port to where we send the lambda invocation notifications
          *
          * @par
          * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
@@ -517,9 +523,10 @@ namespace AwsMock::Service {
          * time is limited by the total timeout period of the lambda (i.e. 900sec.)
          *
          * @param lambda lambda entity to check
+         * @return idle instance
          * @see Database::Entity::Lambda::Lambda
          */
-        static void WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+        Database::Entity::Lambda::Instance WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns the full path to the base64 encoded lambda function code.
@@ -545,6 +552,18 @@ namespace AwsMock::Service {
         void CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const;
 
         /**
+         * @brief Synchronize docker daemon with lambda instances vector
+         *
+         * @par
+         * This will remove crashed or stopped docker container instances from the lambda entity and save the entity to the
+         * database.
+         *
+         * @param lambda lambda entity
+         * @return updated lambda
+         */
+        Database::Entity::Lambda::Lambda SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const;
+
+        /**
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -565,9 +584,10 @@ namespace AwsMock::Service {
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Mutex
+         * Map of semaphores
          */
-        static boost::mutex _mutex;
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _lambdaServiceMutex;
+        static boost::mutex _lambdaFindMutex;
     };
 
 }// namespace AwsMock::Service

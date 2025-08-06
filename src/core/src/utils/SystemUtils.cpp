@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
+#include <boost/asio/deadline_timer.hpp>
 #ifdef _WIN32
 #include <winsock2.h>
 #else

@@ -83,8 +83,6 @@ namespace AwsMock::Dto::SNS {
         /**
          * @brief Maps an SNS message DTO list to message entity
          *
-         * Some values will be pulled over from the request.
-         *
          * @param messageDto message DTO
          * @return Message entity
          * @see Database::Entity::SNS::Message
@@ -94,8 +92,6 @@ namespace AwsMock::Dto::SNS {
 
         /**
          * @brief Maps a single SNS message attribute DTO to a message attribute entity
-         *
-         * Some values will be pulled over from the request.
          *
          * @param messageAttribute SNS message attribute DTO list
          * @return MessageAttribute entity
@@ -107,19 +103,15 @@ namespace AwsMock::Dto::SNS {
         /**
          * @brief Maps an SNS message attribute DTO to a message attribute entity
          *
-         * Some values will be pulled over from the request.
-         *
          * @param messageAttributes SNS message attribute DTO list
          * @return MessageAttributeList
          * @see SQS::MessageAttributeList
          * @see Database::Entity::SQS::MessageAttributeList
          */
-        static Database::Entity::SNS::MessageAttributeList map(const MessageAttributeList &messageAttributes);
+        static std::map<std::string, Database::Entity::SNS::MessageAttribute> map(const std::map<std::string, MessageAttribute> &messageAttributes);
 
         /**
          * @brief Maps a single SNS message attribute entity to a message attribute DTO
-         *
-         * Some values will be pulled over from the request.
          *
          * @param messageAttributeEntity SNS message attribute entities list
          * @return MessageAttribute DTo
@@ -131,14 +123,12 @@ namespace AwsMock::Dto::SNS {
         /**
          * @brief Maps an SNS message attribute DTO to a message attribute entity
          *
-         * Some values will be pulled over from the request.
-         *
          * @param messageAttributesEntities SNS message attribute entities list
          * @return MessageAttributeList DTos
          * @see SQS::MessageAttributeList
          * @see Database::Entity::SQS::MessageAttributeList
          */
-        static MessageAttributeList map(const Database::Entity::SNS::MessageAttributeList &messageAttributesEntities);
+        static std::map<std::string, MessageAttribute> map(const std::map<std::string, Database::Entity::SNS::MessageAttribute> &messageAttributesEntities);
     };
 
 }// namespace AwsMock::Dto::SNS
