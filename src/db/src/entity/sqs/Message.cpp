@@ -90,6 +90,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Attributes
             if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+                messageAttributes.clear();
                 for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(a.key());
@@ -100,6 +101,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Get attributes
             if (mResult.value().find("attributes") != mResult.value().end()) {
+                attributes.clear();
                 for (const view attributesView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
                     std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);

@@ -184,6 +184,7 @@ namespace AwsMock::Database::Entity::Lambda {
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
+            tags.clear();
             for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);

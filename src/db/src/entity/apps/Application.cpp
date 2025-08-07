@@ -102,10 +102,9 @@ namespace AwsMock::Database::Entity::Apps {
 
         // Dependencies
         if (mResult.value().find("dependencies") != mResult.value().end()) {
+            dependencies.clear();
             for (const view dependenciesArray = mResult.value()["dependencies"].get_array().value; const auto &d: dependenciesArray) {
-                if (std::ranges::find(dependencies, d.get_string().value) == dependencies.end()) {
-                    dependencies.emplace_back(d.get_string().value);
-                }
+                dependencies.emplace_back(d.get_string().value);
             }
         }
     }
