@@ -109,8 +109,6 @@ namespace AwsMock::Service {
         clientCommand.FromRequest(request, region, user);
 
         try {
-            std::map<std::string, std::string> headers = Core::HttpUtils::GetHeaders(request);
-
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.target(), version, action);
 

@@ -1090,7 +1090,7 @@ namespace AwsMock::Service {
         lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
         lambda = SyncDockerDaemon(lambda);
 
-        // CHeck existing instances
+        // Check existing instances
         for (const auto &instance: lambda.instances) {
             if (instance.status == Database::Entity::Lambda::InstanceIdle) {
                 if (!instance.instanceId.empty()) {
@@ -1135,7 +1135,7 @@ namespace AwsMock::Service {
         const system_clock::time_point deadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
 
         while (!lambda.HasIdleInstance() && system_clock::now() < deadline) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
         }
         return lambda.GetIdleInstance();
@@ -1260,8 +1260,8 @@ namespace AwsMock::Service {
 
             // Remove the docker container, in case it is not running.
             if (Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(instance.containerId); inspectContainerResponse.id.empty() || !inspectContainerResponse.state.running) {
-                lambda.RemoveInstance(instance);
                 _lambdaServiceMutex.erase(instance.instanceId);
+                lambda.RemoveInstance(instance);
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
                 log_info << "Lambda instance remove, function: " << lambda.function << ", containerId: " << instance.containerId;
             }

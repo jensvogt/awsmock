@@ -72,11 +72,11 @@ namespace AwsMock::Service {
          * @brief Create a lambda function instance
          *
          * @param instanceId name of the instance, lambda function name + '-' + 8 random hex digits
-         * @param lambdaEntity lambda entity
+         * @param lambda lambda entity
          * @param functionCode function code
          * @return container ID
          */
-        std::string CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode);
+        std::string CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode);
 
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder
@@ -90,13 +90,13 @@ namespace AwsMock::Service {
         /**
          * @brief Creates a new docker container, in case the container does not exists inside the docker daemon.
          *
-         * @param lambdaEntity lambda entity.
+         * @param lambda lambda entity.
          * @param instanceId lambda instance ID.
          * @param hostPort host port
          * @param dockerTag docker tag.
          * @see Database::Entity::Lambda::Lambda
          */
-        void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &instanceId, int hostPort, const std::string &dockerTag);
+        void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, int hostPort, const std::string &dockerTag);
 
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API
