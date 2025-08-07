@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler(boost::beast::tcp_stream &stream) : AbstractHandler("dynamodb-handler", stream) {}
+        explicit DynamoDbHandler() : AbstractHandler("dynamodb-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
         /**
          * DynamoDB service
          */
-        Service::DynamoDbService _dynamoDbService;
+        DynamoDbService _dynamoDbService;
     };
 
 }// namespace AwsMock::Service

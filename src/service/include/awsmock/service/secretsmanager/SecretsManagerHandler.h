@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * Constructor
          */
-        explicit SecretsManagerHandler(boost::beast::tcp_stream &stream) : AbstractHandler("secretsmanager-handler", stream) {}
+        explicit SecretsManagerHandler() : AbstractHandler("secretsmanager-handler") {}
 
         /**
          * HTTP POST request.

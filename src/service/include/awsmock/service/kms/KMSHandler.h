@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit KMSHandler(boost::beast::tcp_stream &stream) : AbstractHandler("kms-handler", stream) {}
+        explicit KMSHandler() : AbstractHandler("kms-handler") {}
 
         /**
          * @brief HTTP POST request.

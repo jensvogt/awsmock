@@ -21,7 +21,7 @@ namespace AwsMock::Service {
                     Dto::Apps::CreateApplicationRequest serviceRequest = Dto::Apps::CreateApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.CreateApplication(serviceRequest);
                     log_info << "Application created, name: " << serviceRequest.application.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::ApplicationCommandType::GET_APPLICATION: {
@@ -29,7 +29,7 @@ namespace AwsMock::Service {
                     Dto::Apps::GetApplicationRequest serviceRequest = Dto::Apps::GetApplicationRequest::FromJson(clientCommand);
                     Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.GetApplication(serviceRequest);
                     log_info << "Application retrieved, name: " << serviceRequest.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::ApplicationCommandType::UPDATE_APPLICATION: {
@@ -38,7 +38,7 @@ namespace AwsMock::Service {
                     serviceRequest.application.region = region;
                     Dto::Apps::GetApplicationResponse serviceResponse = _applicationService.UpdateApplication(serviceRequest);
                     log_info << "Application updated, name: " << serviceRequest.application.name;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::ApplicationCommandType::UPLOAD_APPLICATION: {
@@ -46,7 +46,7 @@ namespace AwsMock::Service {
                     Dto::Apps::UploadApplicationCodeRequest serviceRequest = Dto::Apps::UploadApplicationCodeRequest::FromJson(clientCommand);
                     _applicationService.UploadApplicationCode(serviceRequest);
                     log_info << "Upload application code, name: " << serviceRequest.applicationName;
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::LIST_APPLICATIONS: {
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
                     Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
                     Dto::Apps::ListApplicationCountersResponse serviceResponse = _applicationService.ListApplications(serviceRequest);
                     log_info << "Applications listed, region: " << serviceRequest.region;
-                    return SendOkResponse(request, serviceResponse.ToJson());
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
                 case Dto::Common::ApplicationCommandType::LIST_APPLICATION_NAMES: {
@@ -62,7 +62,7 @@ namespace AwsMock::Service {
                     Dto::Apps::ListApplicationCountersRequest serviceRequest = Dto::Apps::ListApplicationCountersRequest::FromJson(clientCommand);
                     std::vector<std::string> serviceResponse = _applicationService.ListApplicationNames();
                     log_info << "Application names listed, region: " << serviceRequest.region;
-                    return SendOkResponse(request, boost::json::serialize(serviceResponse));
+                    return SendResponse(request, http::status::ok, boost::json::serialize(serviceResponse));
                 }
 
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
@@ -73,7 +73,7 @@ namespace AwsMock::Service {
                         log_info << "Applications rebuild, region: " << serviceRequest.region; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
                         log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
@@ -94,7 +94,7 @@ namespace AwsMock::Service {
                         log_info << "All applications started, count: " << count; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
@@ -136,7 +136,6 @@ namespace AwsMock::Service {
                         log_info << "All applications stopped, count: " << count; }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
-
                     return SendOkResponse(request);
                 }
 
@@ -150,20 +149,20 @@ namespace AwsMock::Service {
 
                 default:
                     log_error << "Unknown action";
-                    return SendBadRequestError(request, "Unknown action");
+                    return SendResponse(request, http::status::bad_request, "Unknown action");
             }
         } catch (Core::JsonException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, "Unknown action");
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::BadRequestException &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         } catch (Core::NotFoundException &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 

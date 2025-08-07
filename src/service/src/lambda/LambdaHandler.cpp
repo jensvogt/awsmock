@@ -1,7 +1,4 @@
 
-#include "awsmock/dto/lambda/model/InvocationType.h"
-
-
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace AwsMock::Service {
@@ -20,7 +17,7 @@ namespace AwsMock::Service {
 
                     Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                     log_trace << "Lambda function list";
-                    return SendOkResponse(request, lambdaResponse.ToJson());
+                    return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
                 }
 
                 case Dto::Common::LambdaCommandType::WAIT_LAMBDA: {
@@ -32,7 +29,7 @@ namespace AwsMock::Service {
                     std::map<std::string, std::string> headers;
                     headers["Content-Length"] = std::to_string(lambdaResponse.ToJson().length());
                     headers["Content-Type"] = "application/xml";
-                    return SendOkResponse(request, lambdaResponse.ToJson(), headers);
+                    return SendResponse(request, http::status::ok, lambdaResponse.ToJson(), headers);
                 }
 
                 case Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_MAPPINGS: {
@@ -53,7 +50,7 @@ namespace AwsMock::Service {
 
                     Dto::Lambda::ListEventSourceMappingsResponse lambdaResponse = _lambdaService.ListEventSourceMappings(lambdaRequest);
                     log_info << "Event source mappings" << lambdaResponse;
-                    return SendOkResponse(request, lambdaResponse.ToJson());
+                    return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
                 }
 
                 default:
@@ -76,7 +73,7 @@ namespace AwsMock::Service {
                 }
                 Dto::Lambda::ListFunctionResponse lambdaResponse = _lambdaService.ListFunctions(region);
                 log_trace << "Lambda function list: " << lambdaResponse.ToJson();
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
             if (action == "tags") {
 
@@ -85,7 +82,7 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::ListTagsResponse lambdaResponse = _lambdaService.ListTags(arn);
                 log_trace << "Lambda tag list";
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
             if (action == "account-settings") {
 
@@ -93,12 +90,12 @@ namespace AwsMock::Service {
                 log_trace << "Lambda account settings";
                 return SendOkResponse(request, lambdaResponse.ToJson());
             }
-            return SendBadRequestError(request, "Unknown method");
+            return SendResponse(request, http::status::bad_request, "Unknown method");
 
         } catch (Core::ServiceException &exc) {
-            return Core::HttpUtils::InternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (Core::NotFoundException &exc) {
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         }
     }
 
@@ -127,7 +124,7 @@ namespace AwsMock::Service {
                     if (invocationType == Dto::Lambda::LambdaInvocationType::REQUEST_RESPONSE) {
                         return SendResponse(request, http::int_to_status(result.status), result.responseBody);
                     }
-                    return SendOkResponse(request);
+                    return SendResponse(request, http::status::ok);
                 }
                 Dto::Lambda::CreateFunctionRequest lambdaRequest;
                 lambdaRequest.FromJson(body);
@@ -137,7 +134,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::CreateFunctionResponse lambdaResponse = _lambdaService.CreateFunction(lambdaRequest);
                 log_info << "Lambda function created, name: " << lambdaResponse.functionName;
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (action == "tags") {
@@ -152,7 +149,7 @@ namespace AwsMock::Service {
                 _lambdaService.CreateTag(lambdaRequest);
                 log_info << "Lambda tag created, name: " << lambdaRequest.arn;
 
-                return SendNoContentResponse(request);
+                return SendResponse(request, http::status::no_content);
             }
 
             if (action == "event-source-mappings") {
@@ -162,7 +159,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::CreateEventSourceMappingsResponse lambdaResponse = _lambdaService.CreateEventSourceMappings(lambdaRequest);
                 log_info << "Lambda event source mapping created, name: " << lambdaRequest.functionName;
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_COUNTERS) {
@@ -170,7 +167,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListFunctionCountersRequest lambdaRequest = Dto::Lambda::ListFunctionCountersRequest::FromJson(clientCommand.payload);
                 Dto::Lambda::ListFunctionCountersResponse lambdaResponse = _lambdaService.ListFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list, count: " << lambdaResponse.functionCounters.size();
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_FUNCTION_COUNTERS) {
@@ -179,7 +176,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::GetFunctionCountersResponse lambdaResponse = _lambdaService.GetFunctionCounters(lambdaRequest);
                 log_trace << "Lambda function counters list";
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_ENVIRONMENT_COUNTERS) {
@@ -188,7 +185,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaEnvironmentCountersResponse lambdaResponse = _lambdaService.ListLambdaEnvironmentCounters(lambdaRequest);
                 log_trace << "Lambda environment counters list, count: " << lambdaResponse.environmentCounters.size();
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_ENVIRONMENT) {
@@ -197,7 +194,7 @@ namespace AwsMock::Service {
                 _lambdaService.AddLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment added, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_ENVIRONMENT) {
@@ -206,7 +203,7 @@ namespace AwsMock::Service {
                 _lambdaService.UpdateLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment updated, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_ENVIRONMENT) {
@@ -215,7 +212,7 @@ namespace AwsMock::Service {
                 _lambdaService.DeleteLambdaEnvironment(lambdaRequest);
                 log_trace << "Lambda environment deleted, functionArn: " << lambdaRequest.functionArn << ", key: " << lambdaRequest.environmentKey;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_TAG_COUNTERS) {
@@ -224,7 +221,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaTagCountersResponse lambdaResponse = _lambdaService.ListLambdaTagCounters(lambdaRequest);
                 log_trace << "Lambda tag counters list";
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_TAG) {
@@ -233,7 +230,7 @@ namespace AwsMock::Service {
                 _lambdaService.AddLambdaTag(lambdaRequest);
                 log_info << "Lambda tag added";
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_TAG) {
@@ -242,7 +239,7 @@ namespace AwsMock::Service {
                 _lambdaService.UpdateLambdaTag(lambdaRequest);
                 log_info << "Lambda tag updated";
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_TAG) {
@@ -251,7 +248,7 @@ namespace AwsMock::Service {
                 _lambdaService.DeleteLambdaTag(lambdaRequest);
                 log_info << "Lambda tag deleted";
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_INSTANCE_COUNTERS) {
@@ -259,7 +256,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaInstanceCountersRequest lambdaRequest = Dto::Lambda::ListLambdaInstanceCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaInstanceCountersResponse lambdaResponse = _lambdaService.ListLambdaInstanceCounters(lambdaRequest);
                 log_trace << "Lambda instance counters list";
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
@@ -268,7 +265,7 @@ namespace AwsMock::Service {
                 _lambdaService.ResetFunctionCounters(lambdaRequest);
                 log_info << "Reset function counters list";
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPLOAD_FUNCTION_CODE) {
@@ -278,14 +275,14 @@ namespace AwsMock::Service {
                 _lambdaService.UploadFunctionCode(lambdaRequest);
                 log_info << "Upload function code, functionArn: " << lambdaRequest.functionArn;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_ARNS) {
 
                 Dto::Lambda::ListLambdaArnsResponse lambdaResponse = _lambdaService.ListLambdaArns();
                 log_info << "List function ARNs, count: " << lambdaResponse.lambdaArns.size();
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_LAMBDA_RESULT_COUNTERS) {
@@ -294,7 +291,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaResultCountersResponse lambdaResponse = _lambdaService.ListLambdaResultCounters(lambdaRequest);
                 log_trace << "Lambda result counters list";
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::GET_LAMBDA_RESULT_COUNTER) {
@@ -303,7 +300,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::GetLambdaResultCounterResponse lambdaResponse = _lambdaService.GetLambdaResultCounter(lambdaRequest);
                 log_trace << "Get lambda result counter, oid: " << lambdaRequest.oid;
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER) {
@@ -312,7 +309,7 @@ namespace AwsMock::Service {
                 long count = _lambdaService.DeleteLambdaResultCounter(lambdaRequest);
                 log_trace << "Delete lambda result counter, count: " << count;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS) {
@@ -321,7 +318,7 @@ namespace AwsMock::Service {
                 long count = _lambdaService.DeleteLambdaResultCounters(lambdaRequest);
                 log_trace << "Delete lambda result counters, count: " << count;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_EVENT_SOURCE_COUNTERS) {
@@ -330,7 +327,7 @@ namespace AwsMock::Service {
                 Dto::Lambda::ListLambdaEventSourceCountersResponse lambdaResponse = _lambdaService.ListLambdaEventSourceCounters(lambdaRequest);
                 log_trace << "Lambda event source counters list, count: " << lambdaResponse.eventSourceCounters.size();
 
-                return SendOkResponse(request, lambdaResponse.ToJson());
+                return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_EVENT_SOURCE_COUNTER) {
@@ -339,7 +336,7 @@ namespace AwsMock::Service {
                 _lambdaService.AddEventSource(lambdaRequest);
                 log_trace << "Add event source, functionArn: " << lambdaRequest.functionArn;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_EVENT_SOURCE_COUNTER) {
@@ -348,7 +345,7 @@ namespace AwsMock::Service {
                 _lambdaService.DeleteEventSource(lambdaRequest);
                 log_trace << "Delete event source, functionArn: " << lambdaRequest.functionArn;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
@@ -357,7 +354,7 @@ namespace AwsMock::Service {
                 _lambdaService.StartFunction(lambdaRequest);
                 log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_FUNCTION) {
@@ -366,7 +363,7 @@ namespace AwsMock::Service {
                 _lambdaService.StopFunction(lambdaRequest);
                 log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA_INSTANCE) {
@@ -375,7 +372,7 @@ namespace AwsMock::Service {
                 _lambdaService.StopLambdaInstance(lambdaRequest);
                 log_trace << "Stop lambda instance, functionArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_IMAGE) {
@@ -384,7 +381,7 @@ namespace AwsMock::Service {
                 _lambdaService.DeleteImage(lambdaRequest);
                 log_trace << "Delete image, functionArn: " << lambdaRequest.functionArn;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_LAMBDA) {
@@ -395,18 +392,18 @@ namespace AwsMock::Service {
                 _lambdaService.DeleteFunction(lambdaRequest);
                 log_trace << "Delete function, functionName: " << lambdaRequest.functionName;
 
-                return SendOkResponse(request);
+                return SendResponse(request, http::status::ok);
             }
 
             log_error << "Unknown method";
-            return SendBadRequestError(request, "Unknown method");
+            return SendResponse(request, http::status::bad_request, "Unknown method");
 
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 
@@ -419,7 +416,6 @@ namespace AwsMock::Service {
         try {
             std::string version, action;
             Core::HttpUtils::GetVersionAction(request.target(), version, action);
-            std::string body = Core::HttpUtils::GetBodyAsString(request);
 
             if (action == "functions") {
 
@@ -429,7 +425,7 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = {.region = region, .functionName = functionName, .qualifier = qualifier};
                 _lambdaService.DeleteFunction(lambdaRequest);
-                return SendNoContentResponse(request);
+                return SendResponse(request, http::status::no_content);
             }
             if (action == "tags") {
 
@@ -442,17 +438,17 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteTagsRequest lambdaRequest(arn, tagKeys);
                 _lambdaService.DeleteTags(lambdaRequest);
-                return SendNoContentResponse(request);
+                return SendResponse(request, http::status::no_content);
             }
             log_error << "Unknown method";
-            return SendBadRequestError(request, "Unknown method");
+            return SendResponse(request, http::status::bad_request, "Unknown method");
 
         } catch (Core::ServiceException &exc) {
             log_error << exc.message();
-            return SendInternalServerError(request, exc.message());
+            return SendResponse(request, http::status::internal_server_error, exc.message());
         } catch (std::exception &exc) {
             log_error << exc.what();
-            return SendInternalServerError(request, exc.what());
+            return SendResponse(request, http::status::internal_server_error, exc.what());
         }
     }
 

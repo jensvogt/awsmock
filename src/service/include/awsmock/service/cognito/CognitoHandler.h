@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit CognitoHandler(boost::beast::tcp_stream &stream) : AbstractHandler("cognito-handler", stream) {}
+        explicit CognitoHandler() : AbstractHandler("cognito-handler") {}
 
         /**
          * @brief HTTP POST request.

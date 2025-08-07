@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferHandler(boost::beast::tcp_stream &stream) : AbstractHandler("transfer-handler", stream) {}
+        explicit TransferHandler() : AbstractHandler("transfer-handler") {}
 
         /**
          * @brief HTTP POST request.
