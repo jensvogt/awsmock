@@ -48,6 +48,7 @@ namespace AwsMock::Database::Entity::SNS {
 
             // Attributes
             if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+                messageAttributes.clear();
                 for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(a.key());

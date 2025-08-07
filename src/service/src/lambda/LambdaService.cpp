@@ -659,12 +659,13 @@ namespace AwsMock::Service {
 
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};
+        LambdaExecutor lambdaExecutor;
         if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
             boost::mutex::scoped_lock lock(*_lambdaServiceMutex[instance.instanceId]);
-            Database::Entity::Lambda::LambdaResult lambdaResult = LambdaExecutor::InvocationSync(lambda, instance.containerId, hostName, port, payload);
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance.containerId, hostName, port, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
         } else if (invocationType == Dto::Lambda::EVENT) {
-            LambdaExecutor::SpawnDetached(lambda, instance.containerId, hostName, port, payload);
+            lambdaExecutor.SpawnDetached(lambda, instance.containerId, hostName, port, payload);
         }
         return result;
     }

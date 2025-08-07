@@ -20,6 +20,8 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sqs/SQSService.h>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 

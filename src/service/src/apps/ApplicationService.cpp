@@ -434,7 +434,7 @@ namespace AwsMock::Service {
                 }
 
                 // Stop container
-                ContainerService::instance().StopContainer(application.containerId);
+                ContainerService::instance().KillContainer(application.containerId);
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application.containerId = "";
                 application.containerName = "";

@@ -52,19 +52,7 @@ namespace AwsMock::Service {
          * @param port lambda docker port
          * @param payload lambda payload
          */
-        static void InvocationAsync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
-
-        /**
-         * @brief Synchronously execution a lambda function
-         *
-         * @param lambda lambda function
-         * @param containerId lambda docker container ID
-         * @param host lambda docker host
-         * @param port lambda docker port
-         * @param payload lambda payload
-         * @return lambdaResult
-         */
-        static Database::Entity::Lambda::LambdaResult InvocationSync(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
+        static Database::Entity::Lambda::LambdaResult Invocation(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
         /**
          * @brief Executes a lambda function
@@ -75,7 +63,7 @@ namespace AwsMock::Service {
          * @param port lambda docker port
          * @param payload lambda payload
          */
-        static void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
+        void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload);
 
       private:
 
@@ -83,6 +71,11 @@ namespace AwsMock::Service {
          * Metric module
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context _ioc;
     };
 
 }// namespace AwsMock::Service

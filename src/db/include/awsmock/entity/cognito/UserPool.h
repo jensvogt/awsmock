@@ -5,42 +5,21 @@
 #ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
 #define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_H
 
-// C++ includes
-#include <string>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/string/to_string.hpp>
-
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/cognito/UserPoolClient.h>
 #include <awsmock/entity/cognito/UserPoolDomain.h>
-#include <awsmock/utils/MongoUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::Cognito {
-
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Cognito user pool entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserPool {
+    struct UserPool final : Common::BaseEntity<UserPool> {
 
         /**
          * MongoDB POD
@@ -110,7 +89,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -118,32 +97,9 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the entity to a string representation.
-         *
-         * @return entity as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param userPool userPool entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UserPool &userPool);
     };
 
-    typedef std::vector<Entity::Cognito::UserPool> UserPoolList;
+    typedef std::vector<UserPool> UserPoolList;
 
 }// namespace AwsMock::Database::Entity::Cognito
 

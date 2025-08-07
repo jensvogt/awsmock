@@ -415,6 +415,22 @@ namespace AwsMock::Service {
         void StopContainer(const std::string &containerId) const;
 
         /**
+         * @brief Kills the container by sending a signal.
+         *
+         * @param container container DTO
+         * @param signal signal to send a string, default: SIGKILL
+         */
+        void KillContainer(const Dto::Docker::Container &container, const std::string &signal = "SIGKILL") const;
+
+        /**
+         * @brief Kills the container by ID, by sending a signal
+         *
+         * @param containerId container ID
+         * @param signal signal to send a string, default: SIGKILL
+         */
+        void KillContainer(const std::string &containerId, const std::string &signal = "SIGKILL") const;
+
+        /**
          * @brief Deletes the container
          *
          * @param container container DTO

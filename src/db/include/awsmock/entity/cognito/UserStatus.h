@@ -12,7 +12,7 @@
 namespace AwsMock::Database::Entity::Cognito {
 
     /**
-     * Cognito user status entity
+     * @brief Cognito user status entity
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -34,14 +34,14 @@ namespace AwsMock::Database::Entity::Cognito {
             {UserStatus::FORCE_CHANGE_PASSWORD, "FORCE_CHANGE_PASSWORD"},
     };
 
-    [[maybe_unused]] static std::string UserStatusToString(UserStatus userStatus) {
+    [[maybe_unused]] static std::string UserStatusToString(const UserStatus &userStatus) {
         return UserStatusNames[userStatus];
     }
 
     [[maybe_unused]] static UserStatus UserStatusFromString(const std::string &userStatus) {
-        for (auto &it: UserStatusNames) {
-            if (it.second == userStatus) {
-                return it.first;
+        for (auto &[fst, snd]: UserStatusNames) {
+            if (snd == userStatus) {
+                return fst;
             }
         }
         return UserStatus::UNKNOWN;
