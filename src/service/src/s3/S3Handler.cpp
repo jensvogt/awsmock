@@ -137,7 +137,7 @@ namespace AwsMock::Service {
                     }
 
                     // Send range response
-                    log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
+                    log_debug << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
                     return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                 }
 

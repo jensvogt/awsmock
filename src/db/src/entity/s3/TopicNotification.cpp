@@ -46,6 +46,7 @@ namespace AwsMock::Database::Entity::S3 {
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
+                filterRules.clear();
                 for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document());

@@ -182,8 +182,8 @@ namespace AwsMock::Service {
         CheckBucketExistence(request.region, request.bucket);
 
         if (!request.key.empty() && !_database.ObjectExists(request.region, request.bucket, request.key)) {
-            log_error << "Object does not exists, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
-            throw Core::NotFoundException("Object does not exists, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
+            log_error << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
+            throw Core::NotFoundException("Object does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
         }
 
         try {

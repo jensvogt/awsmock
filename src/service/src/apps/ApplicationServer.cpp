@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {
 
-            if (!application.containerId.empty()) {
+            if (!application.containerId.empty() && application.status == Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
                 const auto cpuDelta = (double) (containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
                 const auto systemCpuDelta = (double) (containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
