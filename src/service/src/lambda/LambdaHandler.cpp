@@ -274,6 +274,7 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPLOAD_FUNCTION_CODE) {
 
                 Dto::Lambda::UploadFunctionCodeRequest lambdaRequest = Dto::Lambda::UploadFunctionCodeRequest::FromJson(clientCommand);
+                log_info << "Starting upload function code, functionArn: " << lambdaRequest.functionArn;
                 _lambdaService.UploadFunctionCode(lambdaRequest);
                 log_info << "Upload function code, functionArn: " << lambdaRequest.functionArn;
 
