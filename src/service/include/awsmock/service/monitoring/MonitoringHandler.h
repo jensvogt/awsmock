@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringHandler(boost::beast::tcp_stream &stream) : AbstractHandler("monitoring-handler", stream) {};
+        explicit MonitoringHandler() : AbstractHandler("monitoring-handler") {};
 
         /**
          * @brief HTTP POST request.

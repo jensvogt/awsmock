@@ -11,6 +11,7 @@
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
+#include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -20,7 +21,8 @@ namespace AwsMock::Service {
     /**
      * @brief Lambda request handler
      *
-     * All lambda related REST call are ending here.
+     * @par
+     * All lambda-related REST call are ending here.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -31,7 +33,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler(boost::beast::tcp_stream &stream) : AbstractHandler("lambda-handler", stream) {}
+        explicit LambdaHandler() : AbstractHandler("lambda-handler") {}
 
         /**
          * @brief HTTP GET request.

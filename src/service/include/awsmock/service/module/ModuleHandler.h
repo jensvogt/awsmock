@@ -30,7 +30,7 @@ namespace AwsMock::Service {
         /**
          * @brief Manager HTTP server
          */
-        explicit ModuleHandler(boost::beast::tcp_stream &stream) : AbstractHandler("module-handler", stream) {}
+        explicit ModuleHandler() : AbstractHandler("module-handler") {}
 
         /**
          * @brief Handler HTTP GET requests.
