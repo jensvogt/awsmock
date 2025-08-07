@@ -109,18 +109,4 @@ namespace AwsMock::Database::Entity::Apps {
         }
     }
 
-    std::string Application::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string Application::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Application &application) {
-        os << "Application=" << application.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::Apps

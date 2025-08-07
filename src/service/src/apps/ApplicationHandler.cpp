@@ -110,7 +110,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
 
-                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                    boost::asio::spawn(_ioc, [this](const boost::asio::yield_context &) {
                         const long count = _applicationService.RestartAllApplications();
                         log_info << "All applications restarted, count: " << count; }, boost::asio::detached);
                     _ioc.poll();

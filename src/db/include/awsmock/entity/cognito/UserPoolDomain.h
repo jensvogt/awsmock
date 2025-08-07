@@ -5,9 +5,6 @@
 #ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H
 #define AWSMOCK_DB_ENTITY_COGNITO_USER_POOL_DOMAIN_H
 
-// AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-
 namespace AwsMock::Database::Entity::Cognito {
 
     /**

@@ -27,13 +27,11 @@ namespace AwsMock::Service {
 
             // Generate user pool ID
             const std::string userPoolId = Core::AwsUtils::CreateCognitoUserPoolId(request.region);
-            Database::Entity::Cognito::UserPool userPool = {
-                    .region = request.region,
-                    .userPoolId = userPoolId,
-                    .name = request.name,
-                    .arn = Core::AwsUtils::CreateCognitoUserPoolArn(request.region, _accountId, userPoolId),
-            };
-
+            Database::Entity::Cognito::UserPool userPool;
+            userPool.region = request.region;
+            userPool.userPoolId = userPoolId;
+            userPool.name = request.name;
+            userPool.arn = Core::AwsUtils::CreateCognitoUserPoolArn(request.region, _accountId, userPoolId);
             userPool = _database.CreateUserPool(userPool);
             response.requestId = request.requestId;
             response.region = userPool.region;
@@ -411,18 +409,15 @@ namespace AwsMock::Service {
         }
 
         try {
-            Database::Entity::Cognito::User user = {
-                    .region = request.region,
-                    .userPoolId = request.userPoolId,
-                    .userName = request.userName,
-                    .enabled = true,
-                    .password = Core::StringUtils::GenerateRandomPassword(12),
-                    .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
-                    .created = system_clock::now(),
-                    .modified = system_clock::now(),
-            };
-
+            Database::Entity::Cognito::User user;
+            user.region = request.region;
+            user.userPoolId = request.userPoolId;
+            user.userName = request.userName;
+            user.enabled = true;
+            user.password = Core::StringUtils::GenerateRandomPassword(12);
+            user.confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode();
             user = _database.CreateUser(user);
+
             Dto::Cognito::AdminCreateUserResponse response;
             response.region = user.region;
             response.userName = user.userName;
@@ -790,15 +785,12 @@ namespace AwsMock::Service {
 
         Database::Entity::Cognito::UserPool userPool = _database.GetUserPoolByClientId(request.clientId);
         try {
-            Database::Entity::Cognito::User user = {
-                    .region = request.region,
-                    .userPoolId = userPool.userPoolId,
-                    .userName = request.userName,
-                    .enabled = true,
-                    .confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode(),
-                    .created = system_clock::now(),
-                    .modified = system_clock::now(),
-            };
+            Database::Entity::Cognito::User user;
+            user.region = request.region;
+            user.userPoolId = userPool.userPoolId;
+            user.userName = request.userName;
+            user.enabled = true;
+            user.confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode();
 
             user = _database.CreateUser(user);
             Dto::Cognito::SignUpResponse response;

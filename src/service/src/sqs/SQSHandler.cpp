@@ -1,8 +1,6 @@
 
 
 #include <awsmock/service/sqs/SQSHandler.h>
-#include <boost/asio/detached.hpp>
-#include <boost/asio/spawn.hpp>
 
 namespace AwsMock::Service {
     http::response<http::dynamic_body> SQSHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
