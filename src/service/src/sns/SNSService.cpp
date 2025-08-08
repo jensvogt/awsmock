@@ -165,6 +165,28 @@ namespace AwsMock::Service {
         }
     }
 
+    long SNSService::PurgeAllTopics() const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "purge_all_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "purge_all_topic");
+        log_trace << "Purge all topics request";
+
+        try {
+
+            long deleted = 0;
+            for (const auto &topic: _snsDatabase.ListTopics()) {
+                Dto::SNS::PurgeTopicRequest request;
+                request.topicArn = topic.topicArn;
+                request.region = topic.region;
+                deleted += PurgeTopic(request);
+            }
+            return deleted;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS purge topic failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "delete_topic");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "delete_topic");
@@ -843,7 +865,8 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), Dto::Lambda::LambdaInvocationType::EVENT);
+        std::string payload = eventNotification.ToJson();
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 

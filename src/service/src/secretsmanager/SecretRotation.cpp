@@ -36,7 +36,8 @@ namespace AwsMock::Service {
         invocationRequest.clientRequestToken = clientRequestToken;
         invocationRequest.requestId = clientRequestToken;
         invocationRequest.step = TaskTypeToString(createSecret);
-        SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
+        std::string payload = invocationRequest.ToJson();
+        SendLambdaInvocationRequest(lambda, payload);
     }
 
     void SecretRotation::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
@@ -48,7 +49,8 @@ namespace AwsMock::Service {
         invocationRequest.clientRequestToken = clientRequestToken;
         invocationRequest.requestId = clientRequestToken;
         invocationRequest.step = TaskTypeToString(setSecret);
-        SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
+        std::string payload = invocationRequest.ToJson();
+        SendLambdaInvocationRequest(lambda, payload);
     }
 
     void SecretRotation::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
@@ -60,7 +62,8 @@ namespace AwsMock::Service {
         invocationRequest.clientRequestToken = clientRequestToken;
         invocationRequest.requestId = clientRequestToken;
         invocationRequest.step = TaskTypeToString(testSecret);
-        SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
+        std::string payload = invocationRequest.ToJson();
+        SendLambdaInvocationRequest(lambda, payload);
     }
 
     void SecretRotation::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
@@ -72,10 +75,11 @@ namespace AwsMock::Service {
         invocationRequest.clientRequestToken = clientRequestToken;
         invocationRequest.requestId = clientRequestToken;
         invocationRequest.step = TaskTypeToString(finishSecret);
-        SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
+        std::string payload = invocationRequest.ToJson();
+        SendLambdaInvocationRequest(lambda, payload);
     }
 
-    void SecretRotation::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) {
+    void SecretRotation::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body) {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");

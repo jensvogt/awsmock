@@ -34,6 +34,7 @@ namespace AwsMock::Dto::Common {
     enum class SqsCommandType {
         CREATE_QUEUE,
         PURGE_QUEUE,
+        PURGE_ALL_QUEUES,
         GET_QUEUE_ATTRIBUTES,
         SET_QUEUE_ATTRIBUTES,
         GET_QUEUE_URL,
@@ -79,6 +80,7 @@ namespace AwsMock::Dto::Common {
             // Queues
             {SqsCommandType::CREATE_QUEUE, "create-queue"},
             {SqsCommandType::PURGE_QUEUE, "purge-queue"},
+            {SqsCommandType::PURGE_ALL_QUEUES, "purge-all-queues"},
             {SqsCommandType::GET_QUEUE_ATTRIBUTES, "get-queue-attributes"},
             {SqsCommandType::SET_QUEUE_ATTRIBUTES, "set-queue-attributes"},
             {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},

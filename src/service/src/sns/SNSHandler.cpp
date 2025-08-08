@@ -197,6 +197,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
+
+                    long deleted = _snsService.PurgeAllTopics();
+
+                    log_info << "All topic purged, count: " << deleted;
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
 
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");

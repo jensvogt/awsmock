@@ -93,9 +93,13 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::StartApplications() const {
-        for (const auto &application: _applicationDatabase.ListApplications()) {
+        for (auto &application: _applicationDatabase.ListApplications()) {
             if (application.enabled) {
                 DoAddApplication(application);
+            } else {
+                application.status = "STOPPED";
+                application = _applicationDatabase.UpdateApplication(application);
+                log_debug << "Application stopped, name: " << application.name;
             }
         }
     }

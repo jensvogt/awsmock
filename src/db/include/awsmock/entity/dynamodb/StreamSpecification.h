@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/dynamodb/StreamViewType.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
@@ -20,7 +21,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct StreamSpecification {
+    struct StreamSpecification final : Common::BaseEntity<StreamSpecification> {
 
         /**
          * Enabled

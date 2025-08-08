@@ -6,19 +6,15 @@
 #define AWSMOCK_DB_ENTITY_DYNAMODB_ITEM_H
 
 // C++ includes
-#include <chrono>
 #include <string>
 #include <vector>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/dynamodb/AttributeValue.h>
-#include <awsmock/entity/dynamodb/Table.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
-
-    using std::optional;
-    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB item primary key
@@ -37,7 +33,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
      * @endcode
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Item {
+    struct Item final : Common::BaseEntity<Item> {
 
         /**
          * ID
@@ -84,7 +80,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -99,29 +95,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * @param mResult query result.
          */
         Item FromDynamodb(const view_or_value<view, value> &mResult);
-
-        /**
-         * Converts the entity to a JSON string
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param d DynamoDB  entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Item &d);
     };
 
     typedef std::vector<Item> ItemList;

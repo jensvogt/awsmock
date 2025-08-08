@@ -46,29 +46,4 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
-    view_or_value<view, value> Instance::ToDocument() {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "id", instanceId);
-            Core::Bson::BsonUtils::SetStringValue(document, "status", LambdaInstanceStatusToString(status));
-            return document.extract();
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    [[nodiscard]] std::string Instance::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Instance &t) {
-        os << "Instance=" << to_json(t.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::Lambda

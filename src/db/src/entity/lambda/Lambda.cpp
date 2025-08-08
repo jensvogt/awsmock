@@ -36,12 +36,12 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     bool Lambda::HasInstance(const std::string &instanceId) {
-        const auto it = std::ranges::find_if(instances, [instanceId](const Instance &obj) { return obj.instanceId == instanceId; });
+        const auto it = std::ranges::find_if(instances, [&](const Instance &obj) { return obj.instanceId == instanceId; });
         return it != instances.end();
     }
 
     Instance Lambda::GetInstance(const std::string &instanceId) {
-        if (const auto it = std::ranges::find_if(instances, [instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             return *it;
         }
         log_error << "Lambda instance not found, id: " << instanceId;
@@ -49,7 +49,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     void Lambda::SetInstanceHostPort(const std::string &instanceId, const std::string &host, const int port) {
-        if (const auto it = std::ranges::find_if(instances, [instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             it->hostName = host;
             it->hostPort = port;
             return;
@@ -58,7 +58,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     void Lambda::SetInstanceLastInvocation(const std::string &instanceId) {
-        if (const auto it = std::ranges::find_if(instances, [instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             it->lastInvocation = system_clock::now();
             return;
         }
@@ -66,7 +66,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     void Lambda::SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status) {
-        if (const auto it = std::ranges::find_if(instances, [instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             it->status = status;
             return;
         }

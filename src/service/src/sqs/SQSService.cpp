@@ -411,6 +411,26 @@ namespace AwsMock::Service {
         }
     }
 
+    long SQSService::PurgeAllQueues() const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "purge_all_queue");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "purge_all_queue");
+        log_trace << "Purge all queues request";
+
+        try {
+            long deleted = 0;
+            for (const auto &queue: _sqsDatabase.ListQueues()) {
+                Dto::SQS::PurgeQueueRequest request;
+                request.region = queue.region;
+                request.queueUrl = queue.queueUrl;
+                deleted += PurgeQueue(request);
+            }
+            return deleted;
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     long SQSService::RedriveMessages(const Dto::SQS::RedriveMessagesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "redrive_messages");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "redrive_messages");
@@ -1401,7 +1421,8 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), Dto::Lambda::LambdaInvocationType::EVENT);
+        std::string payload = eventNotification.ToJson();
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << ", sourceArn: " << eventSourceArn << ", result: " << result;
     }
 }// namespace AwsMock::Service
