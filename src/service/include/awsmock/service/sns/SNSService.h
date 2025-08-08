@@ -249,6 +249,14 @@ namespace AwsMock::Service {
         [[nodiscard]] long PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
 
         /**
+         * @brief Purge all topics
+         *
+         * @return total number of deleted messages
+         * @throws ServiceException
+         */
+        [[nodiscard]] long PurgeAllTopics() const;
+
+        /**
          * @brief Returns an event source as a lambda configuration
          *
          * @param request get event source request

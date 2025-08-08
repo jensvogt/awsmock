@@ -1215,11 +1215,11 @@ namespace AwsMock::Service {
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        /*std::string payload = eventNotification.ToJson();
-        LambdaService lambdaService;
+        std::string payload = eventNotification.ToJson();
+        /*LambdaService lambdaService;
         std::thread(&LambdaService::InvokeLambdaFunction, lambdaService, std::ref(region), std::ref(functionName), std::ref(payload)).detach();*/
 
-        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, eventNotification.ToJson(), Dto::Lambda::LambdaInvocationType::EVENT);
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda invocation send";
     }
 

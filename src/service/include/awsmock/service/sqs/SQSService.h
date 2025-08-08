@@ -175,6 +175,14 @@ namespace AwsMock::Service {
         [[nodiscard]] long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
 
         /**
+         * @brief Purge all queues.
+         *
+         * @return total number of purged queues
+         * @throws ServiceException
+         */
+        [[nodiscard]] long PurgeAllQueues() const;
+
+        /**
          * @brief Redrive messages in queue
          *
          * @param request redrive messages request

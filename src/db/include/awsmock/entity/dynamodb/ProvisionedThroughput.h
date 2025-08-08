@@ -11,17 +11,16 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
-
-    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB provisioned throughput
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ProvisionedThroughput {
+    struct ProvisionedThroughput final : Common::BaseEntity<ProvisionedThroughput> {
 
         /**
          * Read capacity units
@@ -51,32 +50,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * @brief Convert to a BSON document
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Convert from a BSON document
          */
         void FromDocument(const std::optional<view> &document);
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
     };
 
 }// namespace AwsMock::Database::Entity::DynamoDb

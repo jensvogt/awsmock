@@ -9,6 +9,8 @@
 #include <string>
 
 // Boost includes
+#include <boost/interprocess/sync/named_mutex.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/thread/thread.hpp>
 
 // AwsMock includes
@@ -266,7 +268,7 @@ namespace AwsMock::Service {
          * @param invocationType invocation type synchronous/asynchronous
          * @return lambda result in case of synchronous invocation, otherwise empty struct
          */
-        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
+        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType);
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -476,9 +478,10 @@ namespace AwsMock::Service {
          * Period time.
          *
          * @param lambda lambda entity to check
+         * @param instance
          * @return lambda instance
          */
-        Database::Entity::Lambda::Instance FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) const;
+        void FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const;
 
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
@@ -559,9 +562,8 @@ namespace AwsMock::Service {
          * database.
          *
          * @param lambda lambda entity
-         * @return updated lambda
          */
-        Database::Entity::Lambda::Lambda SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const;
+        void SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * Lambda database connection
@@ -584,10 +586,15 @@ namespace AwsMock::Service {
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Map of semaphores
+         * Find idle instance mutex
          */
-        static std::map<std::string, std::shared_ptr<boost::mutex>> _lambdaServiceMutex;
         static boost::mutex _lambdaFindMutex;
+
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context _ioc;
+        LambdaExecutor lambdaExecutor;
     };
 
 }// namespace AwsMock::Service

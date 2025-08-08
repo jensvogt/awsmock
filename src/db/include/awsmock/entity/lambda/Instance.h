@@ -12,16 +12,9 @@
 
 // AwsMOck includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::Lambda {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda instance status enum
@@ -66,7 +59,7 @@ namespace AwsMock::Database::Entity::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Instance {
+    struct Instance final : Common::BaseEntity<Instance> {
 
         /**
          * Instance ID, will be appended to the container name, in case of multiple instances.
@@ -96,7 +89,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Status
          */
-        LambdaInstanceStatus status;
+        LambdaInstanceStatus status = InstanceUnknown;
 
         /**
          * Last invocation timestamp
@@ -120,30 +113,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument();
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param tag tag entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Instance &tag);
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
     };
 
 }// namespace AwsMock::Database::Entity::Lambda

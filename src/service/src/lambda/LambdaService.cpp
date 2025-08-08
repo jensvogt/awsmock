@@ -7,7 +7,6 @@
 namespace AwsMock::Service {
 
     boost::mutex LambdaService::_lambdaFindMutex;
-    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_lambdaServiceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "create_function");
@@ -59,7 +58,8 @@ namespace AwsMock::Service {
         lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
 
         // Find idle instance
-        Database::Entity::Lambda::Instance instance = FindIdleInstance(lambdaEntity);
+        Database::Entity::Lambda::Instance instance;
+        FindIdleInstance(lambdaEntity, instance);
         return Dto::Lambda::Mapper::map(request, lambdaEntity);
     }
 
@@ -631,7 +631,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const {
+    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) {
 
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "invoke_lambda_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
@@ -645,27 +645,31 @@ namespace AwsMock::Service {
         log_debug << "Got lambda entity, name: " << lambda.function;
 
         // Find an idle instance
-        Database::Entity::Lambda::Instance instance = FindIdleInstance(lambda);
+        Database::Entity::Lambda::Instance instance;
+        FindIdleInstance(lambda, instance);
 
         // Get the hostname; the hostname is different from a manager running as a Linux host and a manager running as a docker container.
-        const std::string hostName = GetHostname(instance);
-        const int port = GetContainerPort(instance);
+        std::string containerId = instance.containerId;
+        std::string hostName = GetHostname(instance);
+        int port = GetContainerPort(instance);
 
         // Update database
         lambda.SetInstanceHostPort(instance.instanceId, hostName, port);
         lambda.SetInstanceLastInvocation(instance.instanceId);
         lambda = _lambdaDatabase.UpdateLambda(lambda);
-        log_info << "Updates saved, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", hostName: " << hostName << ", port: " << port;
+        log_info << "Updates saved, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", containerId: " << containerId << ", hostName: " << hostName << ", port: " << port;
 
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};
-        LambdaExecutor lambdaExecutor;
         if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
-            boost::mutex::scoped_lock lock(*_lambdaServiceMutex[instance.instanceId]);
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance.containerId, hostName, port, payload);
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
         } else if (invocationType == Dto::Lambda::EVENT) {
-            lambdaExecutor.SpawnDetached(lambda, instance.containerId, hostName, port, payload);
+            boost::asio::spawn(_ioc, [this, &lambda, &containerId, &hostName, port, &payload](boost::asio::yield_context) {
+                       Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
+                       log_info << "Lambda launched detached, result: "<<lambdaResult.httpStatusCode; }, boost::asio::detached);
+            _ioc.poll();
+            _ioc.restart();
         }
         return result;
     }
@@ -1084,22 +1088,20 @@ namespace AwsMock::Service {
         log_debug << "Delete tag request succeeded, arn: " + lambdaEntity.arn << " deleted: " << count;
     }
 
-    Database::Entity::Lambda::Instance LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda) const {
+    void LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const {
         boost::mutex::scoped_lock lock(_lambdaFindMutex);
 
         // Synchronize the docker daemon with the DB
         lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
-        lambda = SyncDockerDaemon(lambda);
+        SyncDockerDaemon(lambda);
 
         // Check existing instances
-        for (const auto &instance: lambda.instances) {
-            if (instance.status == Database::Entity::Lambda::InstanceIdle) {
-                if (!instance.instanceId.empty()) {
-                    lambda.SetInstanceStatus(instance.instanceId, Database::Entity::Lambda::InstanceRunning);
-                    lambda = _lambdaDatabase.UpdateLambda(lambda);
-                    log_info << "Found idle instance, id: " << instance.instanceId;
-                    return instance;
-                }
+        for (auto &i: lambda.instances) {
+            if (i.status == Database::Entity::Lambda::InstanceIdle) {
+                lambda.SetInstanceStatus(i.instanceId, Database::Entity::Lambda::InstanceRunning);
+                lambda = _lambdaDatabase.UpdateLambda(lambda);
+                log_info << "Found idle instance, lambda: " << lambda.function << ", id: " << i.instanceId;
+                instance = i;
             }
         }
 
@@ -1113,7 +1115,6 @@ namespace AwsMock::Service {
             // Create lambda
             LambdaCreator lambdaCreator;
             lambda = lambdaCreator.DoCreate(lambda, instanceId);
-            _lambdaServiceMutex[instanceId] = std::make_shared<boost::mutex>();
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
 
         } else {
@@ -1121,7 +1122,7 @@ namespace AwsMock::Service {
         }
         lambda.SetInstanceStatus(instanceId, Database::Entity::Lambda::InstanceRunning);
         lambda = _lambdaDatabase.UpdateLambda(lambda);
-        return lambda.GetInstance(instanceId);
+        instance = lambda.GetInstance(instanceId);
     }
 
     std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {
@@ -1255,19 +1256,17 @@ namespace AwsMock::Service {
         }
     }
 
-    Database::Entity::Lambda::Lambda LambdaService::SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const {
+    void LambdaService::SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const {
 
         for (const auto &instance: lambda.instances) {
 
             // Remove the docker container, in case it is not running.
             if (Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(instance.containerId); inspectContainerResponse.id.empty() || !inspectContainerResponse.state.running) {
-                _lambdaServiceMutex.erase(instance.instanceId);
                 lambda.RemoveInstance(instance);
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
                 log_info << "Lambda instance remove, function: " << lambda.function << ", containerId: " << instance.containerId;
             }
         }
-        return lambda;
     }
 
 }// namespace AwsMock::Service

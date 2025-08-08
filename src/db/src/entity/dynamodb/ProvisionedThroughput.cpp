@@ -24,19 +24,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         numberOfDecreasesToday = Core::Bson::BsonUtils::GetLongValue(document, "NumberOfDecreasesToday");
     }
 
-    std::string ProvisionedThroughput::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string ProvisionedThroughput::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &p) {
-        os << "ProvisionedThroughput=" << p.ToJson();
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::DynamoDb

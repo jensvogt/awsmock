@@ -80,6 +80,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
+            tags.clear();
             for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::map<std::string, std::string> tag;
                 tag["Key"] = bsoncxx::string::to_string(tagElement.key());
@@ -90,6 +91,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         // Get attributes
         if (mResult.value().find("attributes") != mResult.value().end()) {
+            attributes.clear();
             for (const view tagsView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::map<std::string, std::string> attribute;
                 attribute["AttributeName"] = bsoncxx::string::to_string(tagElement.key());
@@ -100,6 +102,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
         // Key schemas
         if (mResult.value().find("keySchemas") != mResult.value().end()) {
+            keySchemas.clear();
             for (const view keySchemaView = mResult.value()["keySchemas"].get_document().value; const bsoncxx::document::element &keySchemaElement: keySchemaView) {
                 std::map<std::string, std::string> key;
                 key["AttributeName"] = bsoncxx::string::to_string(keySchemaElement.key());
@@ -119,18 +122,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    std::string Table::ToJson() const {
-        return to_json(ToDocument());
-    }
-
-    std::string Table::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Table &d) {
-        os << "Table=" << d.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::DynamoDb

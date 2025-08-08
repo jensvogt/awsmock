@@ -23,7 +23,7 @@
     "dockerized": false,
     "magic-file": "/usr/local/awsmock/etc/magic.mgc",
     "autoload": {
-      "active": true,
+      "active": false,
       "file": "/usr/local/awsmock/init/init.json",
       "dir": "/usr/local/awsmock/init"
     },
