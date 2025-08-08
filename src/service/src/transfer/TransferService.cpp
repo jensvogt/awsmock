@@ -16,7 +16,6 @@ namespace AwsMock::Service {
         log_debug << "Create transfer manager";
 
         // Check existence
-        // TODO: How can see that a server exists already
         if (_transferDatabase.TransferExists(request.region, ProtocolTypeToString(request.protocols[0]))) {
             log_error << "Transfer manager exists already";
             throw Core::ServiceException("Transfer manager exists already");
