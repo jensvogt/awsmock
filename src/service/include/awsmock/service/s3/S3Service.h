@@ -99,7 +99,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Service() : _database(Database::S3Database::instance()) {};
+        explicit S3Service(boost::asio::io_context &ioc) : _database(Database::S3Database::instance()), _lambdaService(ioc) {};
 
         /**
          * @brief Checks whether a bucket exists
@@ -388,7 +388,7 @@ namespace AwsMock::Service {
          * @param eventNotification S3 event notification.
          * @param queueNotification queue notification.
          */
-        static void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
+        void SendQueueNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::QueueNotification &queueNotification);
 
         /**
          * @brief Sends a message to the corresponding SNS topic.
@@ -396,7 +396,7 @@ namespace AwsMock::Service {
          * @param eventNotification S3 event notification.
          * @param topicNotification topic notification.
          */
-        static void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
+        void SendTopicNotificationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::TopicNotification &topicNotification);
 
         /**
          * @brief Send lambda function invocation request to lambda module.

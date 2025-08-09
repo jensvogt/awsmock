@@ -11,8 +11,8 @@
 #include <boost/asio/ssl.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/ServerCertificate.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/ftpserver/FtpSession.h>
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
@@ -29,8 +29,9 @@ namespace AwsMock::FtpServer {
          * @param serverName name of the manager
          * @param address listen address
          * @param port listen port
+         * @param awsIoc AwsMock IO context
          */
-        FtpServerImpl(std::string serverName, std::string address, uint16_t port);
+        FtpServerImpl(std::string serverName, std::string address, uint16_t port, boost::asio::io_context &awsIoc);
 
         /**
          * Copy (constructor disabled)
@@ -154,7 +155,7 @@ namespace AwsMock::FtpServer {
         /**
          * Asio IO module
          */
-        boost::asio::io_context _ioService;
+        //boost::asio::io_context _ioService;
 
         /**
          * Asio session acceptor
@@ -170,5 +171,10 @@ namespace AwsMock::FtpServer {
          * Name of the manager
          */
         std::string _serverName;
+
+        /**
+         * AwsMock IOC
+         */
+        boost::asio::io_context &_awsIoc;
     };
 }// namespace AwsMock::FtpServer

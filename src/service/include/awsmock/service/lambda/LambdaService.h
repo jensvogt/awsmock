@@ -91,8 +91,6 @@
 
 namespace AwsMock::Service {
 
-    using std::chrono::system_clock;
-
     /**
      * @brief Lambda service module. Handles all lambda related requests:
      *
@@ -124,8 +122,10 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param ioc boost asio IO context
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()) {};
+        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {};
 
         /**
          * @brief Create lambda function
@@ -268,7 +268,7 @@ namespace AwsMock::Service {
          * @param invocationType invocation type synchronous/asynchronous
          * @return lambda result in case of synchronous invocation, otherwise empty struct
          */
-        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType);
+        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -601,7 +601,11 @@ namespace AwsMock::Service {
         /**
          * Boost IO context
          */
-        boost::asio::io_context _ioc;
+        boost::asio::io_context &_ioc;
+
+        /**
+         * Lambda executor
+         */
         LambdaExecutor lambdaExecutor;
     };
 

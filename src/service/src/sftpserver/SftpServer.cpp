@@ -1306,8 +1306,8 @@ static int process_close(sftp_client_message client_msg) {
         const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
 #endif
         realFilePath[nBytes] = '\0';
-        const auto p = new AwsMock::Service::S3Service();
-        p->PutObject(currentUser, realFilePath, currentServerId);
+        //const auto p = new AwsMock::Service::S3Service();
+        //p->PutObject(currentUser, realFilePath, currentServerId);
     }
 
     if (h->type == SFTP_FILE_HANDLE) {

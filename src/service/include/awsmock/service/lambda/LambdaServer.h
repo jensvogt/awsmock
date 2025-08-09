@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaServer(Core::Scheduler &scheduler);
+        explicit LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
         /**
          * @brief Shutdown server

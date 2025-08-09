@@ -105,7 +105,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {};
 
         /**
          * @brief Creates a new queue.

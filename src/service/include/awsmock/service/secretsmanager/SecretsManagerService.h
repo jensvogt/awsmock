@@ -67,7 +67,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerService();
+        explicit SecretsManagerService(boost::asio::io_context &ioc);
 
         /**
          * @brief Create a new secret

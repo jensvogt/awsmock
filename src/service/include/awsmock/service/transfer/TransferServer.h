@@ -36,14 +36,14 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferServer(Core::Scheduler &scheduler);
+        explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
       private:
 
         /**
          * @brief Creates the transfer server bucket
          */
-        static void CreateTransferBucket();
+        void CreateTransferBucket() const;
 
         /**
          * @brief Creates the transfer server default directories
@@ -179,9 +179,14 @@ namespace AwsMock::Service {
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
         /**
-       * Actual SFTP manager
-       */
+         * Actual SFTP manager
+         */
         std::shared_ptr<SftpServer> _sftpServer;
+
+        /**
+         * Asynchronous task scheduler
+         */
+        boost::asio::io_context &_ioc;
     };
 }// namespace AwsMock::Service
 

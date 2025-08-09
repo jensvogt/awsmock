@@ -640,7 +640,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) {
+    Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const {
 
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "invoke_lambda_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
@@ -674,11 +674,9 @@ namespace AwsMock::Service {
             Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
         } else if (invocationType == Dto::Lambda::EVENT) {
-            boost::asio::spawn(_ioc, [this, &lambda, &containerId, &hostName, port, &payload](boost::asio::yield_context) {
-                       Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
-                       log_info << "Lambda launched detached, result: "<<lambdaResult.httpStatusCode; }, boost::asio::detached);
-            _ioc.poll();
-            _ioc.restart();
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
+            result = Dto::Lambda::Mapper::mapResult(lambdaResult);
+            log_debug << "Lambda result, lambda: " << result.functionArn << ", result: " << result.status;
         }
         return result;
     }
@@ -1105,14 +1103,11 @@ namespace AwsMock::Service {
         SyncDockerDaemon(lambda);
 
         // Check existing instances
-        for (auto &i: lambda.instances) {
-            if (i.status == Database::Entity::Lambda::InstanceIdle) {
-                lambda.SetInstanceStatus(i.instanceId, Database::Entity::Lambda::InstanceRunning);
-                lambda = _lambdaDatabase.UpdateLambda(lambda);
-                log_info << "Found idle instance, lambda: " << lambda.function << ", id: " << i.instanceId;
-                instance = i;
-                return;
-            }
+        instance = lambda.GetIdleInstance();
+        if (!instance.containerId.empty()) {
+            lambda.SetInstanceStatus(instance.instanceId, Database::Entity::Lambda::InstanceRunning);
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            return;
         }
 
         // Check empty and max concurrency and create a new instance if necessary
