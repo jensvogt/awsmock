@@ -77,9 +77,10 @@ namespace AwsMock::Service {
             _s3Service.PutObject(putRequest, input_file);
         }
 
+        boost::asio::io_context _ioContext;
         std::string _endpoint, _region;
-        S3Service _s3Service;
-        LambdaService _lambdaService;
+        S3Service _s3Service{_ioContext};
+        LambdaService _lambdaService{_ioContext};
         Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
     };

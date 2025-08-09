@@ -294,7 +294,7 @@ namespace AwsMock::Service {
         }
 
         // Stop container
-        ContainerService::instance().StopContainer(application.containerId);
+        ContainerService::instance().KillContainer(application.containerId);
         ContainerService::instance().DeleteContainer(application.containerId);
         log_debug << "Application stopped, name: " << application.name;
 
