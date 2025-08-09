@@ -64,10 +64,11 @@ namespace AwsMock::Service {
             }
         }
 
+        boost::asio::io_context _ioContext;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
-        LambdaService _lambdaService;
+        LambdaService _lambdaService{_ioContext};
         std::string testFile;
     };
 
