@@ -560,7 +560,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
+    void SQSService::SetQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "set_queue_attributes");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
@@ -578,23 +578,24 @@ namespace AwsMock::Service {
             log_trace << "Got queue: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
             // Reset all userAttributes
-            if (!request.attributes["Policy"].empty()) {
-                queue.attributes.policy = request.attributes["Policy"];
+            std::map<std::string, std::string> attributes = request.attributes;
+            if (!attributes["Policy"].empty()) {
+                queue.attributes.policy = attributes["Policy"];
             }
-            if (!request.attributes["RedrivePolicy"].empty()) {
-                queue.attributes.redrivePolicy.FromJson(request.attributes["RedrivePolicy"]);
+            if (!attributes["RedrivePolicy"].empty()) {
+                queue.attributes.redrivePolicy.FromJson(attributes["RedrivePolicy"]);
             }
-            if (!request.attributes["RedriveAllowPolicy"].empty()) {
-                queue.attributes.redriveAllowPolicy = request.attributes["RedriveAllowPolicy"];
+            if (!attributes["RedriveAllowPolicy"].empty()) {
+                queue.attributes.redriveAllowPolicy = attributes["RedriveAllowPolicy"];
             }
-            if (!request.attributes["MessageRetentionPeriod"].empty()) {
-                queue.attributes.messageRetentionPeriod = std::stoi(request.attributes["MessageRetentionPeriod"]);
+            if (!attributes["MessageRetentionPeriod"].empty()) {
+                queue.attributes.messageRetentionPeriod = std::stoi(attributes["MessageRetentionPeriod"]);
             }
-            if (!request.attributes["VisibilityTimeout"].empty()) {
-                queue.attributes.visibilityTimeout = std::stoi(request.attributes["VisibilityTimeout"]);
+            if (!attributes["VisibilityTimeout"].empty()) {
+                queue.attributes.visibilityTimeout = std::stoi(attributes["VisibilityTimeout"]);
             }
-            if (!request.attributes["QueueArn"].empty()) {
-                queue.attributes.queueArn = request.attributes["QueueArn"];
+            if (!attributes["QueueArn"].empty()) {
+                queue.attributes.queueArn = attributes["QueueArn"];
             } else {
                 queue.attributes.queueArn = queue.queueArn;
             }

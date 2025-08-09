@@ -232,7 +232,7 @@ namespace AwsMock::Service {
          * @param request put queue sqs request
          * @throws ServiceException
          */
-        void SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
+        void SetQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const;
 
         /**
          * @brief Adds a default attribute

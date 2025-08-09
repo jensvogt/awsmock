@@ -38,16 +38,6 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
-                case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
-
-                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
-                        const long purged = _sqsService.PurgeAllQueues();
-                        log_info << "Purge all queues, count: " << purged; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
-                    return SendOkResponse(request);
-                }
-
                 case Dto::Common::SqsCommandType::GET_QUEUE_ATTRIBUTES: {
 
                     Dto::SQS::GetQueueAttributesRequest sqsRequest = Dto::SQS::GetQueueAttributesRequest::FromJson(clientCommand);
@@ -59,9 +49,9 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
 
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
-                    _sqsService.SetQueueAttributes(sqsRequest);
-                    log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
-
+                    boost::asio::post(_ioc, [this, sqsRequest] {
+                        _sqsService.SetQueueAttributes(sqsRequest);
+                        log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl); });
                     return SendOkResponse(request);
                 }
 

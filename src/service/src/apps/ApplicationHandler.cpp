@@ -4,8 +4,6 @@
 
 namespace AwsMock::Service {
 
-    const std::map<std::string, std::string> ApplicationHandler::headers = CreateHeaderMap();
-
     http::response<http::dynamic_body> ApplicationHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Application POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
@@ -68,74 +66,60 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::REBUILD_APPLICATION: {
 
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this, serviceRequest] {
                         _applicationService.RebuildApplication(serviceRequest);
-                        log_info << "Applications rebuild, region: " << serviceRequest.region; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "Applications rebuild, region: " << serviceRequest.region; });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this, serviceRequest] {
                         _applicationService.StartApplication(serviceRequest);
-                        log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
 
-                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this] {
                         const long count = _applicationService.StartAllApplications();
-                        log_info << "All applications started, count: " << count; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "All applications started, count: " << count; });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::RESTART_APPLICATION: {
 
                     Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this, serviceRequest] {
                         _applicationService.RestartApplication(serviceRequest);
-                        log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
 
-                    boost::asio::spawn(_ioc, [this](const boost::asio::yield_context &) {
+                    boost::asio::post(_ioc, [this] {
                         const long count = _applicationService.RestartAllApplications();
-                        log_info << "All applications restarted, count: " << count; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "All applications restarted, count: " << count; });
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::STOP_APPLICATION: {
 
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, serviceRequest](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this, serviceRequest] {
                         _applicationService.StopApplication(serviceRequest);
-                        log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
 
-                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this] {
                         const long count = _applicationService.StopAllApplications();
-                        log_info << "All applications stopped, count: " << count; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "All applications stopped, count: " << count; });
                     return SendOkResponse(request);
                 }
 
