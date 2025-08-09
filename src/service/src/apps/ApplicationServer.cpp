@@ -2,14 +2,11 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/apps/ApplicationLogServer.h"
-
-
 #include <awsmock/service/apps/ApplicationServer.h>
 
 namespace AwsMock::Service {
 
-    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler) : AbstractServer("application"), _module("application"), _scheduler(scheduler) {
+    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("application"), _applicationService(ioc), _module("application"), _scheduler(scheduler) {
 
         // Get HTTP configuration values
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.monitoring-period");

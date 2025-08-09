@@ -180,7 +180,7 @@ namespace AwsMock::Manager {
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler));
+                moduleMap.AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ios));
             }
         }
         log_info << "Module started, count: " << moduleMap.GetSize();
