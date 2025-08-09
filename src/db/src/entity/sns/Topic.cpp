@@ -82,12 +82,13 @@ namespace AwsMock::Database::Entity::SNS {
 
             // Subscriptions
             if (mResult.view().find("subscriptions") != mResult.view().end()) {
+                subscriptions.clear();
                 for (const bsoncxx::array::view subscriptionsView{mResult.view()["subscriptions"].get_array().value}; const bsoncxx::array::element &subscriptionElement: subscriptionsView) {
                     Subscription subscription{
                             .protocol = bsoncxx::string::to_string(subscriptionElement["protocol"].get_string().value),
                             .endpoint = bsoncxx::string::to_string(subscriptionElement["endpoint"].get_string().value),
                             .subscriptionArn = bsoncxx::string::to_string(subscriptionElement["subscriptionArn"].get_string().value)};
-                    subscriptions.push_back(subscription);
+                    subscriptions.emplace_back(subscription);
                 }
             }
 

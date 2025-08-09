@@ -289,6 +289,8 @@ awsmock.mongodb.pool-size                         AWSMOCK_MONGODB_POOL_SIZE     
 ### Logging variables
 
 ```
+awsmock.logging.console-active                    AWSMOCK_LOG_CONSOLE_ACTIVE                        console appender activation flag
+awsmock.logging.file-active                       AWSMOCK_LOG_FILE_ACTIVE                           file appender activation flag
 awsmock.logging.level                             AWSMOCK_LOG_LEVEL                                 logging level, default: info, valid: trace, debug, info, warning, error, fatal
 awsmock.logging.dir                               AWSMOCK_LOG_DIR                                   logging file directory, default: /usr/local/awsmock/log
 awsmock.logging.prefix                            AWSMOCK_LOG_PREFIX                                prefix for the log files, default: awsmock

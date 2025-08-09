@@ -6,6 +6,8 @@
 #define AWSMOCK_SERVICE_APPLICATION_HANDLER_H
 
 // Boost includes
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 #include <boost/beast.hpp>
 
 // AwsMock includes
@@ -34,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        ApplicationHandler() : AbstractHandler("application-handler") {}
+        explicit ApplicationHandler() : AbstractHandler("application-handler") {}
 
         /**
          * @brief HTTP POST request.
@@ -53,6 +55,11 @@ namespace AwsMock::Service {
          * Application service
          */
         ApplicationService _applicationService;
+
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context _ioc;
 
         /**
          * @brief Create static default headers map.

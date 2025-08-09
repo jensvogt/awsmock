@@ -7,8 +7,8 @@
 
 // C++ includes
 #include <chrono>
+#include <map>
 #include <string>
-#include <vector>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -64,7 +64,7 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * List of sqs
          */
-        MessageAttributeList messageAttributes;
+        std::map<std::string, MessageAttribute> messageAttributes;
 
         /**
          * Content type

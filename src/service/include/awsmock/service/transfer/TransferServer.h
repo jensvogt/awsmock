@@ -14,7 +14,7 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/dto/s3/CreateBucketConstraint.h>
+#include <awsmock/dto/s3/model/BucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>

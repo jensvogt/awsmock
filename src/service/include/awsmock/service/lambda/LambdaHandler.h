@@ -7,10 +7,11 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
+#include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -20,7 +21,8 @@ namespace AwsMock::Service {
     /**
      * @brief Lambda request handler
      *
-     * All lambda related REST call are ending here.
+     * @par
+     * All lambda-related REST call are ending here.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -71,7 +73,7 @@ namespace AwsMock::Service {
         /**
          * Lambda module
          */
-        Service::LambdaService _lambdaService;
+        LambdaService _lambdaService;
     };
 
 }// namespace AwsMock::Service

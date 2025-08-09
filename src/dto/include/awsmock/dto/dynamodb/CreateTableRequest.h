@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/dynamodb//model/StreamSpecification.h>
 #include <awsmock/dto/dynamodb/model/ProvisionedThroughput.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -53,13 +54,21 @@ namespace AwsMock::Dto::DynamoDb {
          */
         std::vector<std::map<std::string, std::string>> tags;
 
-      private:
+        /**
+         * Streams
+         */
+        StreamSpecification streamSpecification;
 
         friend CreateTableRequest tag_invoke(boost::json::value_to_tag<CreateTableRequest>, boost::json::value const &v) {
             CreateTableRequest r;
             r.tableClass = Core::Json::GetStringValue(v, "TableClass");
             r.tableName = Core::Json::GetStringValue(v, "TableName");
-            r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(v.as_object(), "ProvisionedThroughput");
+            if (Core::Json::AttributeExists(v, "ProvisionedThroughput")) {
+                r.provisionedThroughput = boost::json::value_to<ProvisionedThroughput>(v.at("ProvisionedThroughput"));
+            }
+            if (Core::Json::AttributeExists(v, "StreamSpecification")) {
+                r.streamSpecification = boost::json::value_to<StreamSpecification>(v.at("StreamSpecification"));
+            }
             if (Core::Json::AttributeExists(v, "Tags")) {
                 for (boost::json::array tagsArray = v.at("Tags").as_array(); const auto &a: tagsArray) {
                     boost::json::object tagObject = a.as_object();
@@ -95,6 +104,7 @@ namespace AwsMock::Dto::DynamoDb {
                     {"TableClass", obj.tableClass},
                     {"TableName", obj.tableName},
                     {"ProvisionedThroughput", boost::json::value_from(obj.provisionedThroughput)},
+                    {"StreamSpecification", boost::json::value_from(obj.streamSpecification)},
             };
             if (!obj.tags.empty()) {
                 jv.as_object()["Tags"] = boost::json::value_from(obj.tags);

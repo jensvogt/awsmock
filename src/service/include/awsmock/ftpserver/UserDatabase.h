@@ -24,7 +24,7 @@ namespace AwsMock::FtpServer {
         /**
          * Add a new user to the database.
          *
-         * <p>TODO:Should be replaced by Aws User database</p>
+         * // TODO:Should be replaced by Aws User database
          *
          * @param username name of the user
          * @param password user password

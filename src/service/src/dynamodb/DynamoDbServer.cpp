@@ -35,6 +35,10 @@ namespace AwsMock::Service {
         }
         log_info << "DynamoDb server starting";
 
+        // Initialize shared memory
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _dynamoDbCounterMap = _segment.find<Database::DynamoDbCounterMapType>(Database::DYNAMODB_COUNTER_MAP_NAME).first;
+
         // Create a local network if it is not existing yet
         CreateLocalNetwork();
 
@@ -45,8 +49,8 @@ namespace AwsMock::Service {
         scheduler.AddTask("dynamodb-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
 
         // Start synchronizing
-        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, 20);
-        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, 20);
+        scheduler.AddTask("dynamodb-sync-tables", [this] { this->SynchronizeTables(); }, _workerPeriod, _workerPeriod);
+        scheduler.AddTask("dynamodb-sync-items", [this] { this->SynchronizeItems(); }, _workerPeriod, _workerPeriod);
 
         // Start backup
         if (_backupActive) {
@@ -227,12 +231,22 @@ namespace AwsMock::Service {
     void DynamoDbServer::UpdateCounter() const {
         log_trace << "Dynamodb monitoring starting";
 
-        const long tables = _dynamoDbDatabase.CountTables();
-        const long items = _dynamoDbDatabase.CountItems();
-        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables));
-        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(items));
+        if (_dynamoDbCounterMap) {
+            long totalItems = 0;
+            long totalSize = 0;
+            for (auto const &[key, val]: *_dynamoDbCounterMap) {
 
-        log_trace << "DynamoDb monitoring finished";
+                _metricService.SetGauge(DYNAMODB_ITEMS_BY_TABLE, "table", key, static_cast<double>(val.items));
+                _metricService.SetGauge(DYNAMODB_SIZE_BY_TABLE, "table", key, static_cast<double>(val.size));
+
+                totalItems += val.items;
+                totalSize += val.size;
+                _dynamoDbDatabase.UpdateTableCounter(key, val.items, val.size);
+            }
+            _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(_dynamoDbCounterMap->size()));
+            _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(totalItems));
+        }
+        log_trace << "DynamoDb monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
 
     void DynamoDbServer::BackupDynamoDb() {

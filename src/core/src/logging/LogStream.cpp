@@ -1,5 +1,8 @@
 
 
+#include "awsmock/core/config/Configuration.h"
+
+
 #include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
@@ -123,7 +126,9 @@ namespace AwsMock::Core {
         console_sink = boost::log::add_console_log(std::cout);
         console_sink->set_formatter(&LogColorFormatter);
         console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
-
+        if (!Configuration::instance().GetValue<bool>("awsmock.logging.console-active")) {
+            RemoveConsoleLogs();
+        }
         boost::log::add_common_attributes();
     }
 
@@ -131,7 +136,9 @@ namespace AwsMock::Core {
         _severity = severity;
         boost::log::trivial::severity_level lvl;
         from_string(severity.c_str(), severity.length(), lvl);
-        console_sink->set_filter(boost::log::trivial::severity >= lvl);
+        if (console_sink) {
+            console_sink->set_filter(boost::log::trivial::severity >= lvl);
+        }
         if (file_sink) {
             file_sink->set_filter(boost::log::trivial::severity >= lvl);
         }

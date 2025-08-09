@@ -58,6 +58,8 @@
 // Dynamodb
 #define DYNAMODB_TABLE_COUNT "dynamodb_table_counter"
 #define DYNAMODB_ITEM_COUNT "dynamodb_item_counter"
+#define DYNAMODB_ITEMS_BY_TABLE "dynamodb_items_by_table_counter"
+#define DYNAMODB_SIZE_BY_TABLE "dynamodb_size_by_table_counter"
 #define DYNAMODB_SERVICE_TIMER "dynamodb_service_timer"
 #define DYNAMODB_SERVICE_COUNTER "dynamodb_service_counter"
 

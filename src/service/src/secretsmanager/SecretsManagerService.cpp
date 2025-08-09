@@ -615,7 +615,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SecretsManagerService::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -627,7 +627,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -639,7 +639,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -651,7 +651,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -663,11 +663,12 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) const {
+    void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        _lambdaService.InvokeLambdaFunction(region, lambda.function, body);
+        std::string payload = body;
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function;
     }
 

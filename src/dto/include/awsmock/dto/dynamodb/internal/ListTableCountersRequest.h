@@ -22,12 +22,7 @@ namespace AwsMock::Dto::DynamoDb {
     struct ListTableCountersRequest final : Common::BaseCounter<ListTableCountersRequest> {
 
         /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
-         * TAble name prefix.
+         * Table name prefix.
          */
         std::string prefix;
 

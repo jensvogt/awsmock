@@ -5,9 +5,6 @@
 #ifndef AWSMOCK_SERVICE_SQS_HANDLER_H
 #define AWSMOCK_SERVICE_SQS_HANDLER_H
 
-// Boost includes
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -23,6 +20,8 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sqs/SQSService.h>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
@@ -98,6 +97,11 @@ namespace AwsMock::Service {
          * SQS service
          */
         SQSService _sqsService;
+
+        /**
+         * Boost IO context
+         */
+        boost::asio::io_context _ioc;
     };
 
 }// namespace AwsMock::Service

@@ -33,7 +33,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class AbstractHandler {
+    class AbstractHandler : public std::enable_shared_from_this<AbstractHandler> {
 
       public:
 
@@ -41,8 +41,10 @@ namespace AwsMock::Service {
 
         /**
          * @brief Default User-defined Constructor
+         *
+         * @param name handler name
          */
-        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
+        explicit AbstractHandler(const std::string &name) : _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -196,7 +198,7 @@ namespace AwsMock::Service {
          * @param headers HTTP header map values, added to the default headers
          * @return HTTP response
          */
-        static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, http::status status, const std::string &body, const std::map<std::string, std::string> &headers = {});
+        static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
 
         /**
          * Get the name

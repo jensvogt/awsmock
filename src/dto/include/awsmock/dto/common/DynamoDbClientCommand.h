@@ -27,6 +27,7 @@ namespace AwsMock::Dto::Common {
     enum class DynamoDbCommandType {
         CREATE_TABLE,
         LIST_TABLES,
+        LIST_TABLE_ARNS,
         DESCRIBE_TABLE,
         DELETE_TABLE,
         GET_ITEM,
@@ -36,12 +37,16 @@ namespace AwsMock::Dto::Common {
         DELETE_ITEM,
         LIST_TABLE_COUNTERS,
         LIST_ITEM_COUNTERS,
+        LIST_STREAMS,
+        LIST_STREAMS_COUNTERS,
+        GET_TABLE_DETAIL_COUNTERS,
         UNKNOWN
     };
 
     static std::map<DynamoDbCommandType, std::string> DynamoDbCommandTypeNames{
             {DynamoDbCommandType::CREATE_TABLE, "create-table"},
             {DynamoDbCommandType::LIST_TABLES, "list-tables"},
+            {DynamoDbCommandType::LIST_TABLE_ARNS, "list-table-arns"},
             {DynamoDbCommandType::DESCRIBE_TABLE, "describe-table"},
             {DynamoDbCommandType::DELETE_TABLE, "delete-table"},
             {DynamoDbCommandType::GET_ITEM, "get-item"},
@@ -51,6 +56,9 @@ namespace AwsMock::Dto::Common {
             {DynamoDbCommandType::DELETE_ITEM, "delete-item"},
             {DynamoDbCommandType::LIST_TABLE_COUNTERS, "list-table-counters"},
             {DynamoDbCommandType::LIST_ITEM_COUNTERS, "list-item-counters"},
+            {DynamoDbCommandType::LIST_STREAMS, "list-streams"},
+            {DynamoDbCommandType::LIST_STREAMS_COUNTERS, "list-stream-counters"},
+            {DynamoDbCommandType::GET_TABLE_DETAIL_COUNTERS, "get-table-detail-counters"},
             {DynamoDbCommandType::UNKNOWN, "unknown"}};
 
     [[maybe_unused]] static std::string DynamoDbCommandTypeToString(const DynamoDbCommandType &commandType) {

@@ -14,6 +14,7 @@
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/model/AttributeCounter.h>
+#include <awsmock/dto/sqs/model/EventMessageAttribute.h>
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/dto/sqs/model/Queue.h>
@@ -128,6 +129,15 @@ namespace AwsMock::Dto::SQS {
          * @see Database::Entity::SQS::MessageAttributeList
          */
         static std::map<std::string, MessageAttribute> map(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes);
+
+        /**
+         * @brief Maps a SQS attribute entity to an event message attribute DTO
+         *
+         * @param messageAttributes list of message attributes
+         * @return EventMessageAttributeList
+         * @see Database::Entity::SQS::EventMessageAttributeList
+         */
+        static std::map<std::string, EventMessageAttribute> mapEventMessageAttributes(const std::map<std::string, Database::Entity::SQS::MessageAttribute> &messageAttributes);
     };
 
 }// namespace AwsMock::Dto::SQS

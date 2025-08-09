@@ -55,15 +55,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    std::string AttributeValue::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const AttributeValue &r) {
-        os << "AttributeValue=" << to_json(r.ToDocument());
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::DynamoDb

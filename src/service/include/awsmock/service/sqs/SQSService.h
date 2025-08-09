@@ -12,10 +12,10 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/cognito/model/MessageAction.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/sqs/AddAttributeRequest.h>
@@ -175,6 +175,14 @@ namespace AwsMock::Service {
         [[nodiscard]] long PurgeQueue(const Dto::SQS::PurgeQueueRequest &request) const;
 
         /**
+         * @brief Purge all queues.
+         *
+         * @return total number of purged queues
+         * @throws ServiceException
+         */
+        [[nodiscard]] long PurgeAllQueues() const;
+
+        /**
          * @brief Redrive messages in queue
          *
          * @param request redrive messages request
@@ -318,7 +326,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
+        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
 
         /**
          * @brief Creates a new queue
@@ -327,7 +335,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
+        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request);
 
         /**
          * @brief Receive a list of resources
@@ -383,7 +391,7 @@ namespace AwsMock::Service {
          * @throws ServiceException
          * @see ResendMessage
          */
-        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
+        void ResendMessage(const Dto::SQS::ResendMessageRequest &request);
 
         /**
          * @brief Export messages
@@ -458,7 +466,7 @@ namespace AwsMock::Service {
          * @param queueArn queue ARN
          * @param message SQS message.
          */
-        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
+        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message);
 
         /**
          * @brief Send a lambda invocation request for a message.
@@ -467,7 +475,7 @@ namespace AwsMock::Service {
          * @param message SQS message.
          * @param eventSourceArn event source ARN
          */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn);
 
         /**
          * @brief Checks the attributes for an entry with 'all'. The search is case-insensitive.

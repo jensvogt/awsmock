@@ -151,7 +151,7 @@ namespace AwsMock::Service {
         log_debug << "Application code updated, name: " << request.applicationName;
     }
 
-    Dto::Apps::ListApplicationCountersResponse ApplicationService::RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const {
+    void ApplicationService::RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "rebuild_application");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "rebuild_application");
         log_debug << "Rebuild application code request, name: " << request.application.name;
@@ -182,19 +182,9 @@ namespace AwsMock::Service {
         ApplicationCreator applicationCreator;
         boost::thread t(boost::ref(applicationCreator), base64FullFile, application.region, application.name, instanceId);
         t.detach();
-
-        Dto::Apps::ListApplicationCountersRequest listRequest{};
-        listRequest.requestId = request.requestId;
-        listRequest.region = request.region;
-        listRequest.user = request.user;
-        listRequest.prefix = request.prefix;
-        listRequest.pageSize = request.pageSize;
-        listRequest.pageIndex = request.pageIndex;
-        log_debug << "Application rebuild, name: " << request.application.name;
-        return ListApplications(listRequest);
     }
 
-    Dto::Apps::ListApplicationCountersResponse ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
+    void ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_application");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_application");
         log_debug << "Start application request, name: " << request.application.name;
@@ -257,40 +247,27 @@ namespace AwsMock::Service {
                 log_error << "Could not get the status of the container, name: " << application.containerName;
             }
         }
-
-        Dto::Apps::ListApplicationCountersRequest listRequest{};
-        listRequest.requestId = request.requestId;
-        listRequest.region = request.region;
-        listRequest.user = request.user;
-        listRequest.prefix = request.prefix;
-        listRequest.pageSize = request.pageSize;
-        listRequest.pageIndex = request.pageIndex;
-        return ListApplications(listRequest);
     }
 
-    Dto::Apps::ListApplicationCountersResponse ApplicationService::StartAllApplications(const Dto::Apps::StartAllApplicationsRequest &request) const {
+    long ApplicationService::StartAllApplications() const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_all_applications");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_all_applications");
-        log_debug << "Start all applications request, region: " << request.region;
+        log_debug << "Start all applications request";
 
         // Loop over applications
-        Dto::Apps::ListApplicationCountersResponse startResponse;
+        long count = 0;
         for (auto &application: _database.ListApplications()) {
 
             Dto::Apps::StartApplicationRequest startRequest;
             startRequest.application = Dto::Apps::Mapper::map(application);
-            startRequest.requestId = request.requestId;
-            startRequest.region = request.region;
-            startRequest.prefix = request.prefix;
-            startRequest.pageIndex = request.pageIndex;
-            startRequest.pageSize = request.pageSize;
-            startRequest.sortColumns = request.sortColumns;
-            startResponse = StartApplication(startRequest);
+            startRequest.region = application.region;
+            StartApplication(startRequest);
+            count++;
         }
-        return startResponse;
+        return count;
     }
 
-    Dto::Apps::ListApplicationCountersResponse ApplicationService::RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const {
+    void ApplicationService::RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "restart_application");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "restart_application");
         log_debug << "Restart application request, name: " << request.application.name;
@@ -353,16 +330,16 @@ namespace AwsMock::Service {
                 log_error << "Could not get the status of the container, name: " << application.containerName;
             }
         }
+    }
 
-        Dto::Apps::ListApplicationCountersRequest listRequest{};
-        listRequest.requestId = request.requestId;
-        listRequest.region = request.region;
-        listRequest.user = request.user;
-        listRequest.prefix = request.prefix;
-        listRequest.pageSize = request.pageSize;
-        listRequest.pageIndex = request.pageIndex;
-        log_trace << "Application deleted, name: " + request.application.name;
-        return ListApplications(listRequest);
+    long ApplicationService::RestartAllApplications() const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "restart_all_applications");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "restart_all_applications");
+        log_debug << "Restart all applications request";
+
+        long count = StopAllApplications();
+        count = StartAllApplications();
+        return count;
     }
 
     Dto::Apps::ListApplicationCountersResponse ApplicationService::ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const {
@@ -374,7 +351,7 @@ namespace AwsMock::Service {
 
             Dto::Apps::ListApplicationCountersResponse response;
 
-            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region, request.prefix, request.pageIndex, request.pageSize, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             response.total = _database.CountApplications(request.region, request.prefix);
             log_trace << "Got applications, region: " << request.region;
 
@@ -413,7 +390,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::Apps::ListApplicationCountersResponse ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
+    void ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
         Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "stop_application");
         Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "stop_application");
         log_debug << "Stop application request, region:  " << request.region << " name: " << request.application.name;
@@ -437,52 +414,35 @@ namespace AwsMock::Service {
             application = _database.UpdateApplication(application);
             log_debug << "Application stopped, name: " << application.name;
 
-            Dto::Apps::ListApplicationCountersRequest listRequest{};
-            listRequest.requestId = request.requestId;
-            listRequest.region = request.region;
-            listRequest.user = request.user;
-            listRequest.prefix = request.prefix;
-            listRequest.pageSize = request.pageSize;
-            listRequest.pageIndex = request.pageIndex;
-            log_trace << "Application stopped, name: " + request.application.name;
-            return ListApplications(listRequest);
-
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
     }
 
-    Dto::Apps::ListApplicationCountersResponse ApplicationService::StopAllApplications(const Dto::Apps::StopAllApplicationsRequest &request) const {
+    long ApplicationService::StopAllApplications() const {
         Monitoring::MetricServiceTimer measure(APPLICATION_SERVICE_TIMER, "action", "stop_all_applications");
         Monitoring::MetricService::instance().IncrementCounter(APPLICATION_SERVICE_COUNTER, "action", "stop_all_applications");
-        log_debug << "Stop application request, region:  " << request.region;
+        log_debug << "Stop application request";
 
         try {
-            for (auto &application: _database.ListApplications(request.region)) {
-
+            long count = 0;
+            for (auto &application: _database.ListApplications()) {
                 if (application.containerName.empty() && application.containerId.empty()) {
                     log_warning << "Container does not exist, name: " << application.name;
                     continue;
                 }
 
                 // Stop container
-                ContainerService::instance().StopContainer(application.containerId);
+                ContainerService::instance().KillContainer(application.containerId);
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application.containerId = "";
                 application.containerName = "";
                 application = _database.UpdateApplication(application);
                 log_info << "Application stopped, name: " << application.name;
+                count++;
             }
-
-            Dto::Apps::ListApplicationCountersRequest listRequest{};
-            listRequest.requestId = request.requestId;
-            listRequest.region = request.region;
-            listRequest.user = request.user;
-            listRequest.prefix = request.prefix;
-            listRequest.pageSize = request.pageSize;
-            listRequest.pageIndex = request.pageIndex;
-            return ListApplications(listRequest);
+            return count;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();

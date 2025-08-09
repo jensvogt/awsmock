@@ -9,7 +9,8 @@
 #include <chrono>
 
 // Boost includes
-#include <boost/beast.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
@@ -30,7 +31,7 @@ namespace AwsMock::Service {
      * @brief S3 request handler
      *
      * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structure, the request
+     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structures, the requests
      * are first sent to the S3CmdHandler, which normalizes the commands.
      *
      * @author jens.vogt\@opitz-consulting.com
@@ -42,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler") {};
+        explicit S3Handler() : AbstractHandler("s3-handler") {}
 
         /**
          * @brief HTTP GET request.
@@ -144,6 +145,13 @@ namespace AwsMock::Service {
          * S3 service
          */
         S3Service _s3Service;
+
+        boost::asio::io_context _ioc;
+
+        /**
+         * Thread group
+         */
+        boost::thread_group _threadGroup;
     };
 
 }// namespace AwsMock::Service

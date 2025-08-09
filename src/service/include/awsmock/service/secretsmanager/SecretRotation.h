@@ -112,7 +112,7 @@ namespace AwsMock::Service {
          * @param lambda lambda entity
          * @param body message body
          */
-        static void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body);
+        static void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, std::string &body);
 
         /**
          * @brief Calculates the next rotation date

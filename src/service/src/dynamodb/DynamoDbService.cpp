@@ -2,9 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/mapper/Mapper.h"
-
-
 #include <awsmock/service/dynamodb/DynamoDbService.h>
 
 namespace AwsMock::Service {
@@ -12,6 +9,7 @@ namespace AwsMock::Service {
     DynamoDbService::DynamoDbService() : _dynamoDbDatabase(Database::DynamoDbDatabase::instance()) {
 
         // DynamoDB docker host, port
+        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         _containerHost = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.dynamodb.container.host");
         _containerPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.dynamodb.container.port");
     }
@@ -43,6 +41,7 @@ namespace AwsMock::Service {
             Database::Entity::DynamoDb::Table table;
             table.region = request.region;
             table.name = request.tableName;
+            table.arn = Core::AwsUtils::CreateDynamoDbTableArn(_accountId, request.tableName);
             table.attributes = request.attributes;
             table.keySchemas = request.keySchemas;
             table.tags = request.tags;
@@ -126,6 +125,68 @@ namespace AwsMock::Service {
         } catch (Core::JsonException &exc) {
             log_error << "DynamoDbd list table counters failed, error: " << exc.message();
             throw Core::ServiceException("DynamoDbd list table counters failed, error: " + exc.message());
+        }
+    }
+
+    Dto::DynamoDb::GetTableDetailCountersResponse DynamoDbService::GetTableDetailCounters(const Dto::DynamoDb::GetTableDetailCountersRequest &request) const {
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_table_detail_counters");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "get_table_detail_counters");
+        log_debug << "Starting get table detail request, region: " << request.region << ", tableName: " << request.tableName;
+
+        try {
+
+            Dto::DynamoDb::GetTableDetailCountersResponse tableResponse;
+            const Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(request.region, request.tableName);
+            tableResponse.tableCounters.region = table.region;
+            tableResponse.tableCounters.tableName = table.name;
+            tableResponse.tableCounters.items = table.itemCount;
+            tableResponse.tableCounters.size = table.size;
+            tableResponse.tableCounters.status = table.status;
+            tableResponse.tableCounters.created = table.created;
+            tableResponse.tableCounters.modified = table.modified;
+            return tableResponse;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd get table detail counters failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd get table detail counters failed, error: " + exc.message());
+        }
+    }
+
+    Dto::DynamoDb::ListTableArnsResponse DynamoDbService::ListTableArns(const std::string &region) const {
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_arns");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_table_arns");
+        log_debug << "Starting list table arns request, region: " << region;
+
+        try {
+
+            Dto::DynamoDb::ListTableArnsResponse tableResponse;
+            for (const std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables(region); const auto &table: tables) {
+                tableResponse.tableArns.emplace_back(table.arn);
+            }
+            return tableResponse;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd list table arns failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDbd list table arns failed, error: " + exc.message());
+        }
+    }
+
+    Dto::DynamoDb::ListStreamsResponse DynamoDbService::ListStreams(const Dto::DynamoDb::ListStreamsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_streams");
+        Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_streams");
+        log_debug << "Starting list streams request, region: " << request.region;
+
+        try {
+
+            // Send request to docker container
+            std::map<std::string, std::string> headers = PrepareStreamHeaders("ListStreams");
+            auto [body, outHeaders, status] = SendAuthorizedDynamoDbRequest(request.ToJson(), headers);
+            Dto::DynamoDb::ListStreamsResponse listTableResponse = Dto::DynamoDb::ListStreamsResponse::FromJson(body);
+            return listTableResponse;
+
+        } catch (Core::JsonException &exc) {
+            log_error << "DynamoDbd list table counters failed, error: " << exc.message();
+            throw Core::ServiceException("DynamoDb list table counters failed, error: " + exc.message());
         }
     }
 
@@ -269,8 +330,7 @@ namespace AwsMock::Service {
 
                 // Convert to an entity and save to a database. If no exception is thrown by the HTTP call to the docker image, seems to be ok.
                 Database::Entity::DynamoDb::Item item = Dto::DynamoDb::Mapper::map(request, table);
-                // TODO: Calculate real size
-                item.size = body.size();
+                item.size = static_cast<long>(body.size());
                 item = _dynamoDbDatabase.CreateOrUpdateItem(item);
                 log_debug << "DynamoDb put item, region: " << item.region << " tableName: " << item.tableName;
 
@@ -388,6 +448,17 @@ namespace AwsMock::Service {
         headers["User-Agent"] = "aws-cli/2.15.23 Python/3.11.6 Linux/6.1.0-18-amd64 exe/x86_64.debian.12 prompt/off command/dynamodb." + Core::StringUtils::ToSnakeCase(command);
         headers["Content-Type"] = "application/x-amz-json-1.0";
         headers["X-Amz-Target"] = "DynamoDB_20120810." + command;
+        headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
+        headers["X-Amz-Security-Token"] = "none";
+        return headers;
+    }
+
+    std::map<std::string, std::string> DynamoDbService::PrepareStreamHeaders(const std::string &command) {
+        std::map<std::string, std::string> headers;
+        headers["Region"] = "eu-central-1";
+        headers["User-Agent"] = "aws-cli/2.25.1 md/awscrt#0.23.8 ua/2.1 os/linux#6.14.0-24-generic md/arch#x86_64 lang/python#3.12.9 md/pyimpl#CPython m/N cfg/retry-mode#standard md/installer#exe md/distrib#ubuntu.24 md/prompt#off md/command#dynamodbstreams." + Core::StringUtils::ToSnakeCase(command);
+        headers["Content-Type"] = "application/x-amz-json-1.0";
+        headers["X-Amz-Target"] = "DynamoDBStreams_20120810." + command;
         headers["X-Amz-Date"] = Core::DateTimeUtils::NowISO8601();
         headers["X-Amz-Security-Token"] = "none";
         return headers;

@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {
 
-            if (!application.containerId.empty()) {
+            if (!application.containerId.empty() && application.status == Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
                 const auto cpuDelta = (double) (containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
                 const auto systemCpuDelta = (double) (containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
@@ -93,9 +93,13 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::StartApplications() const {
-        for (const auto &application: _applicationDatabase.ListApplications()) {
+        for (auto &application: _applicationDatabase.ListApplications()) {
             if (application.enabled) {
                 DoAddApplication(application);
+            } else {
+                application.status = "STOPPED";
+                application = _applicationDatabase.UpdateApplication(application);
+                log_debug << "Application stopped, name: " << application.name;
             }
         }
     }
@@ -118,8 +122,8 @@ namespace AwsMock::Service {
         Dto::Apps::StartApplicationRequest request;
         request.application = Dto::Apps::Mapper::map(application);
         request.region = application.region;
-        const Dto::Apps::ListApplicationCountersResponse response = _applicationService.StartApplication(request);
-        log_info << "Application started, name: " << request.application.name << ", total: " << response.applications.size();
+        _applicationService.StartApplication(request);
+        log_info << "Application started, name: " << request.application.name;
     }
 
     void ApplicationServer::BackupApplication() {

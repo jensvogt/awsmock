@@ -291,7 +291,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, http::status status, const std::string &body, const std::map<std::string, std::string> &headers) {
+    http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;

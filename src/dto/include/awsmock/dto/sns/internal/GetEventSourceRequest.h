@@ -15,7 +15,7 @@
 namespace AwsMock::Dto::SNS {
 
     /**
-     * @brief Get event source
+     * @brief Get the event source
      *
      * @author jens.vogt\@opitz-consulting.com
      */

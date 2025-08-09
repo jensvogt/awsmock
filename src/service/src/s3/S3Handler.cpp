@@ -137,7 +137,7 @@ namespace AwsMock::Service {
                     }
 
                     // Send range response
-                    log_info << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
+                    log_debug << "Range download request: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max) << "/" << std::to_string(s3Response.size);
                     return SendRangeResponse(request, s3Response.filename, s3Request.min, s3Request.max, size, s3Response.size, http::status::partial_content, headerMap);
                 }
 
@@ -238,7 +238,10 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::CREATE_BUCKET: {
 
-                    Dto::S3::CreateBucketRequest s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .owner = clientCommand.user};
+                    Dto::S3::CreateBucketRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.name = clientCommand.bucket;
+                    s3Request.owner = clientCommand.user;
                     Dto::S3::CreateBucketResponse s3Response = _s3Service.CreateBucket(s3Request);
                     return SendOkResponse(request, s3Response.ToXml());
                     log_info << "Create bucket, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
@@ -319,7 +322,6 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::UPLOAD_PART: {
 
-                    Core::HttpUtils::DumpHeaders(request);
                     std::string partNumber = Core::HttpUtils::GetStringParameter(request.target(), "partNumber");
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     long contentLength = std::stol(request.base()[http::field::content_length]);
@@ -459,7 +461,11 @@ namespace AwsMock::Service {
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
                     log_debug << "Finish multipart upload request, uploadId: " << uploadId;
 
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
+                    s3Request.uploadId = uploadId;
                     Dto::S3::CompleteMultipartUploadResult result = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;
@@ -504,7 +510,12 @@ namespace AwsMock::Service {
 
                     log_debug << "Completing multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     std::string uploadId = Core::HttpUtils::GetStringParameter(request.target(), "uploadId");
-                    Dto::S3::CompleteMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .uploadId = uploadId, .contentType = clientCommand.contentType};
+                    Dto::S3::CompleteMultipartUploadRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
+                    s3Request.uploadId = uploadId;
+                    s3Request.contentType = clientCommand.contentType;
                     Dto::S3::CompleteMultipartUploadResult s3Response = _s3Service.CompleteMultipartUpload(s3Request);
 
                     std::map<std::string, std::string> headers;
@@ -556,9 +567,11 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
-                    _s3Service.PurgeBucket(s3Request);
-
-                    log_info << "Purge bucket, name: " << s3Request.bucketName;
+                    boost::asio::spawn(_ioc, [this, s3Request](const boost::asio::yield_context &) {
+                        const long deleted = _s3Service.PurgeBucket(s3Request);
+                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: "<<deleted; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request, {});
                 }
 
@@ -591,11 +604,11 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
-
-                    // Get object versions
-                    _s3Service.TouchObject(s3Request);
-
-                    log_info << "Touch object, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                        _s3Service.TouchObject(s3Request);
+                        log_info << "Touch object, bucket: " << s3Request.bucket << ", key: " << s3Request.key; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -604,11 +617,11 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
-
-                    // Get object versions
-                    _s3Service.UpdateObject(s3Request);
-
-                    log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key;
+                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                        _s3Service.UpdateObject(s3Request);
+                        log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key; }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
                     return SendOkResponse(request);
                 }
 
@@ -625,11 +638,12 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
+                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                        const auto s3response = _s3Service.DeleteObjects(s3Request);
+                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size(); }, boost::asio::detached);
+                    _ioc.poll();
+                    _ioc.restart();
 
-                    // Delete objects
-                    auto s3response = _s3Service.DeleteObjects(s3Request);
-
-                    log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
                     return SendOkResponse(request);
                 }
 
@@ -666,7 +680,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::S3CommandType::DELETE_BUCKET: {
 
-                    const Dto::S3::DeleteBucketRequest deleteBucketRequest = {.region = clientCommand.region, .bucket = clientCommand.bucket};
+                    Dto::S3::DeleteBucketRequest deleteBucketRequest;
+                    deleteBucketRequest.region = clientCommand.region;
+                    deleteBucketRequest.bucket = clientCommand.bucket;
                     _s3Service.DeleteBucket(deleteBucketRequest);
 
                     log_info << "Delete bucket, bucket: " << clientCommand.bucket;
@@ -676,7 +692,12 @@ namespace AwsMock::Service {
                 case Dto::Common::S3CommandType::MOVE_OBJECT:
                 case Dto::Common::S3CommandType::DELETE_OBJECT: {
 
-                    _s3Service.DeleteObject({.region = clientCommand.region, .user = clientCommand.user, .bucket = clientCommand.bucket, .key = clientCommand.key});
+                    Dto::S3::DeleteObjectRequest deleteRequest;
+                    deleteRequest.region = clientCommand.region;
+                    deleteRequest.user = clientCommand.user;
+                    deleteRequest.bucket = clientCommand.bucket;
+                    deleteRequest.key = clientCommand.key;
+                    _s3Service.DeleteObject(deleteRequest);
                     log_info << "Delete object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
                     return SendNoContentResponse(request);
                 }

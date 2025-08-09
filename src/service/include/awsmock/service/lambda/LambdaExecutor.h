@@ -7,12 +7,17 @@
 
 // C++ include
 #include <chrono>
-#include <condition_variable>
+
+// Boost includes
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
+#include <boost/interprocess/sync/named_mutex.hpp>
 
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
@@ -34,43 +39,30 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaExecutor {
+    class LambdaExecutor : public boost::enable_shared_from_this<LambdaExecutor> {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() = default;
+        explicit LambdaExecutor() {}
 
         /**
-         * @brief Executes a lambda function
+         * @brief Executes a lambda function synchronized
          *
          * @param lambda lambda function
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
-         * @param lambdaResult
          */
-        void Invocation(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
+        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, std::string &containerId, std::string &host, int port, std::string &payload) const;
 
         /**
-         * @brief Executes a lambda function
-         *
-         * @param lambda lambda function
-         * @param containerId lambda docker container ID
-         * @param host lambda docker host
-         * @param port lambda docker port
-         * @param payload lambda payload
-         * @param lambdaResult lambda result structure
+         * @brief Executes a lambda function asynchronously
          */
-        void SpawnDetached(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, Database::Entity::Lambda::LambdaResult &lambdaResult);
-
-        /**
-         * @brief Wait for the detached thread to finish
-         */
-        void WaitForFinish();
+        void SpawnDetached();
 
       private:
 
@@ -79,9 +71,20 @@ namespace AwsMock::Service {
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
-        std::condition_variable _condition;
-        std::mutex _mutex;
-        int _exitConfirm = 0;
+        /**
+         * Lambda database connection
+         */
+        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+
+        /**
+         * Docker module
+         */
+        ContainerService &_containerService = ContainerService::instance();
+
+        /**
+         * Mutex
+         */
+        static boost::mutex _executionMutex;
     };
 
 }// namespace AwsMock::Service

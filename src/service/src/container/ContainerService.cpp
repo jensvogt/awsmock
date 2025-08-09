@@ -616,10 +616,6 @@ namespace AwsMock::Service {
         log_debug << "Docker container restarted, containerId: " << containerId;
     }
 
-    void ContainerService::StopContainer(const Dto::Docker::Container &container) const {
-        StopContainer(container.id);
-    }
-
     std::string ContainerService::GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const {
 
         std::string logMessages;
@@ -640,8 +636,12 @@ namespace AwsMock::Service {
             log_debug << "Container statistics received, containerId: " << containerId;
             return Dto::Docker::ContainerStat::FromJson(body);
         }
-        log_error << "Receive container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
+        log_error << "Get container stats failed, containerId: " << containerId << ", statusCode: " << statusCode;
         return {};
+    }
+
+    void ContainerService::StopContainer(const Dto::Docker::Container &container) const {
+        StopContainer(container.id);
     }
 
     void ContainerService::StopContainer(const std::string &containerId) const {
@@ -652,6 +652,20 @@ namespace AwsMock::Service {
             return;
         }
         log_debug << "Docker container stopped, id: " << containerId;
+    }
+
+    void ContainerService::KillContainer(const Dto::Docker::Container &container, const std::string &signal) const {
+        KillContainer(container.id, signal);
+    }
+
+    void ContainerService::KillContainer(const std::string &containerId, const std::string &signal) const {
+        boost::mutex::scoped_lock lock(_dockerServiceMutex);
+
+        if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/kill?signal=" + signal); statusCode != http::status::no_content) {
+            log_warning << "Kill container failed, statusCode: " << statusCode;
+            return;
+        }
+        log_debug << "Docker container killed, id: " << containerId << ", signal: " << signal;
     }
 
     void ContainerService::DeleteContainer(const Dto::Docker::Container &container) const {
@@ -669,7 +683,7 @@ namespace AwsMock::Service {
     }
 
     void ContainerService::DeleteContainers(const std::string &imageName, const std::string &tag) const {
-        for (std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); const auto &container: containers) {
+        for (const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); const auto &container: containers) {
             DeleteContainer(container.id);
         }
         log_debug << "All docker containers deleted, id: " << imageName << ":" << tag;

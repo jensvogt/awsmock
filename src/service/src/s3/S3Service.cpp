@@ -33,10 +33,13 @@ namespace AwsMock::Service {
             bucket.arn = arn;
             bucket = _database.CreateBucket(bucket);
 
-            auto createBucketResponse = Dto::S3::CreateBucketResponse(region, Core::CreateArn("s3", region, accountId, s3Request.name));
-            log_trace << "S3 create bucket response: " << createBucketResponse.ToXml();
+            Dto::S3::CreateBucketResponse response;
+            response.region = region;
+            response.arn = Core::CreateArn("s3", region, accountId, s3Request.name);
+
+            log_trace << "S3 create bucket response: " << response.ToXml();
             log_debug << "Bucket created, bucket: " << s3Request.name;
-            return createBucketResponse;
+            return response;
 
         } catch (Core::JsonException &exc) {
             log_error << "S3 create bucket failed, message: " << exc.message();
@@ -44,7 +47,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const {
+    long S3Service::PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "purge_bucket");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "purge_bucket");
         log_trace << "Purge bucket request, s3Request: " << request.ToString();
@@ -63,6 +66,7 @@ namespace AwsMock::Service {
             // Purge bucket
             const long deleted = _database.PurgeBucket(bucket);
             log_debug << "Bucket purged, region: " << request.region << " bucket: " << request.bucketName << "deleted: " << deleted;
+            return deleted;
 
         } catch (Core::JsonException &exc) {
             log_error << "S3 purge bucket failed, message: " << exc.message();
@@ -177,11 +181,9 @@ namespace AwsMock::Service {
         // Check existence
         CheckBucketExistence(request.region, request.bucket);
 
-        if (!request.key.empty()) {
-            if (!_database.ObjectExists(request.region, request.bucket, request.key)) {
-                log_debug << "Object does not exists, bucket: " << request.bucket << ", key: " << request.key;
-                throw Core::NotFoundException("Object does not exists, bucket: " + request.bucket + ", key: " + request.key);
-            }
+        if (!request.key.empty() && !_database.ObjectExists(request.region, request.bucket, request.key)) {
+            log_error << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
+            throw Core::NotFoundException("Object does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
         }
 
         try {
@@ -449,7 +451,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) const {
+    Dto::S3::CompleteMultipartUploadResult S3Service::CompleteMultipartUpload(const Dto::S3::CompleteMultipartUploadRequest &request) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "complete_multipart_upload");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "complete_multipart_upload");
         log_trace << "CompleteMultipartUpload request, uploadId: " << request.uploadId << " bucket: " << request.bucket << " key: " << request.key << " region: " << request.region;
@@ -497,7 +499,8 @@ namespace AwsMock::Service {
                 boost::thread t(boost::ref(s3HashCreator), algorithms, object);
                 t.detach();
                 log_debug << "Checksums, bucket: " << request.bucket << " key: " << request.key << " sha1: " << object.sha1sum << " sha256: " << object.sha256sum;
-            }*/
+            }
+            */
 
             // Cleanup
             Core::DirUtils::DeleteDirectory(uploadDir);
@@ -505,27 +508,25 @@ namespace AwsMock::Service {
             // Check notifications
             CheckNotifications(request.region, request.bucket, request.key, object.size, "ObjectCreated");
             log_debug << "Multipart upload finished, bucket: " << request.bucket << " key: " << request.key;
-
-            return {
-                    .location = request.region,
-                    .bucket = request.bucket,
-                    .key = request.key,
-                    .etag = md5sum,
-                    .md5sum = md5sum,
-                    .checksumSha1 = sha1sum,
-                    .checksumSha256 = sha256sum};
+            Dto::S3::CompleteMultipartUploadResult response;
+            response.location = request.region;
+            response.bucket = request.bucket;
+            response.key = request.key;
+            response.etag = md5sum;
+            response.checksumSha1 = sha1sum;
+            response.checksumSha256 = sha256sum;
+            return response;
         }
-        return {
-                .location = request.region,
-                .bucket = request.bucket,
-                .key = request.key,
-                .etag = object.md5sum,
-                .md5sum = object.md5sum,
-                .checksumSha1 = object.sha1sum,
-                .checksumSha256 = object.sha256sum};
+        Dto::S3::CompleteMultipartUploadResult response;
+        response.location = request.region;
+        response.bucket = request.bucket;
+        response.key = request.key;
+        response.checksumSha1 = object.sha1sum;
+        response.checksumSha256 = object.sha256sum;
+        return response;
     }
 
-    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) const {
+    Dto::S3::PutObjectResponse S3Service::PutObject(Dto::S3::PutObjectRequest &request, std::istream &stream) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "put_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "put_object");
         log_trace << "Put object request: " << request.ToString();
@@ -548,7 +549,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::PutObject(const std::string &username, const std::string &filename, const std::string &serverId) const {
+    void S3Service::PutObject(const std::string &username, const std::string &filename, const std::string &serverId) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "put_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "put_object");
         log_trace << "Put object request, username: " << username << ", filename: " << filename;
@@ -592,7 +593,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::TouchObject(const Dto::S3::TouchObjectRequest &request) const {
+    void S3Service::TouchObject(const Dto::S3::TouchObjectRequest &request) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "touch_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "touch_object");
         log_trace << "Touch object request: " << request.ToString();
@@ -647,7 +648,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::CopyObjectResponse S3Service::CopyObject(const Dto::S3::CopyObjectRequest &request) const {
+    Dto::S3::CopyObjectResponse S3Service::CopyObject(const Dto::S3::CopyObjectRequest &request) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "copy_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "copy_object");
         log_trace << "Copy object request: " << request.ToString();
@@ -718,7 +719,7 @@ namespace AwsMock::Service {
         return {.eTag = targetObject.md5sum, .modified = system_clock::now()};
     }
 
-    Dto::S3::MoveObjectResponse S3Service::MoveObject(const Dto::S3::MoveObjectRequest &request) const {
+    Dto::S3::MoveObjectResponse S3Service::MoveObject(const Dto::S3::MoveObjectRequest &request) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "move_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "move_object");
         log_trace << "Move object request: " << request.ToString();
@@ -784,7 +785,7 @@ namespace AwsMock::Service {
         return {.eTag = targetObject.md5sum, .lastModified = Core::DateTimeUtils::ToISO8601(system_clock::now())};
     }
 
-    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) const {
+    void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "delete_object");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "delete_object");
         log_trace << "Delete object request: " << request.ToString();
@@ -816,7 +817,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) const {
+    Dto::S3::DeleteObjectsResponse S3Service::DeleteObjects(const Dto::S3::DeleteObjectsRequest &request) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "delete_objects");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "delete_objects");
         log_trace << "Delete objects request: " << request.ToString();
@@ -938,7 +939,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) const {
+    void S3Service::CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event) {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "check_notifications");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "check_notifications");
         log_debug << "Check notifications, region: " << region << " bucket: " << bucket << " event: " << event;
@@ -1183,7 +1184,7 @@ namespace AwsMock::Service {
         // Get queue URL
         const std::string queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queueNotification.queueArn);
 
-        const SQSService _sqsService;
+        SQSService _sqsService;
         Dto::SQS::SendMessageRequest request;
         request.region = region;
         request.queueUrl = queueUrl;
@@ -1196,7 +1197,7 @@ namespace AwsMock::Service {
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
 
-        const SNSService _snsService;
+        SNSService _snsService;
         Dto::SNS::PublishRequest request;
         request.region = region;
         request.targetArn = topicNotification.topicArn;
@@ -1205,7 +1206,7 @@ namespace AwsMock::Service {
         log_debug << "SNS message request send, messageId: " << response.messageId;
     }
 
-    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const {
+    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) {
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
@@ -1214,15 +1215,15 @@ namespace AwsMock::Service {
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
-        /*std::string payload = eventNotification.ToJson();
-        LambdaService lambdaService;
+        std::string payload = eventNotification.ToJson();
+        /*LambdaService lambdaService;
         std::thread(&LambdaService::InvokeLambdaFunction, lambdaService, std::ref(region), std::ref(functionName), std::ref(payload)).detach();*/
 
-        _lambdaService.InvokeLambdaFunction(region, functionName, eventNotification.ToJson());
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda invocation send";
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) const {
+    Dto::S3::PutObjectResponse S3Service::SaveUnversionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream, long size) {
 
         const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
@@ -1296,7 +1297,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) const {
+    Dto::S3::PutObjectResponse S3Service::SaveVersionedObject(Dto::S3::PutObjectRequest &request, const Database::Entity::S3::Bucket &bucket, std::istream &stream) {
 
         // S3 data directory
         const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
@@ -1465,10 +1466,6 @@ namespace AwsMock::Service {
                 lambdaNotification.filterRules.emplace_back(filterRuleEntity);
             }
             bucket.lambdaNotifications.emplace_back(lambdaNotification);
-
-            // TODO: Add lambda event source mapping
-            //_lambdaService.
-
             log_debug << "Added queue notification configurations, count: " << bucket.queueNotifications.size();
         }
     }

@@ -25,8 +25,6 @@
 
 namespace AwsMock::Service {
 
-    typedef std::map<std::string, std::shared_ptr<AbstractHandler>> RoutingTable;
-
     /**
      * @brief Gateway router
      *
@@ -39,15 +37,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayRouter();
-
-        /**
-         * @brief Singleton instance
-         */
-        static GatewayRouter &instance() {
-            static GatewayRouter gatewayRouter;
-            return gatewayRouter;
-        }
+        explicit GatewayRouter() {};
 
         /**
          * @brief Returns an HTTP request handler for a module.
@@ -55,14 +45,7 @@ namespace AwsMock::Service {
          * @param routingKey module name
          * @return pointer to module handler
          */
-        std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
-
-      private:
-
-        /**
-         * Routine table
-         */
-        RoutingTable _routingTable;
+        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
     };
 
 }// namespace AwsMock::Service

@@ -51,6 +51,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             // Attributes
             if (mResult.view().find("attributes") != mResult.view().end()) {
+                attributes.clear();
                 for (const auto value = mResult.view()["attributes"].get_document().value; auto &v: value) {
                     std::string name = bsoncxx::string::to_string(v.key());
                     AttributeValue attribute;
@@ -61,6 +62,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
 
             // Keys
             if (mResult.view().find("keys") != mResult.view().end()) {
+                keys.clear();
                 for (const auto value = mResult.view()["keys"].get_document().value; auto &v: value) {
                     std::string name = bsoncxx::string::to_string(v.key());
                     AttributeValue attribute;
@@ -87,8 +89,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             for (const bsoncxx::document::element &tagElement: mResult.view()) {
-                std::string key = bsoncxx::string::to_string(tagElement.key());
-                if (key != "_id" && key != "region" && key != "tableName") {
+                if (std::string key = bsoncxx::string::to_string(tagElement.key()); key != "_id" && key != "region" && key != "tableName") {
                     AttributeValue attribute;
                     attribute.FromDocument(mResult.view()[key].get_document().value);
                     attributes.emplace(key, attribute);
@@ -103,18 +104,4 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    std::string Item::ToJson() const {
-        return to_json(ToDocument());
-    }
-
-    std::string Item::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Item &d) {
-        os << "Item=" << to_json(d.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::DynamoDb

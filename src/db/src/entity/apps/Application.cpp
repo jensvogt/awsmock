@@ -102,26 +102,11 @@ namespace AwsMock::Database::Entity::Apps {
 
         // Dependencies
         if (mResult.value().find("dependencies") != mResult.value().end()) {
+            dependencies.clear();
             for (const view dependenciesArray = mResult.value()["dependencies"].get_array().value; const auto &d: dependenciesArray) {
-                if (std::ranges::find(dependencies, d.get_string().value) == dependencies.end()) {
-                    dependencies.emplace_back(d.get_string().value);
-                }
+                dependencies.emplace_back(d.get_string().value);
             }
         }
     }
 
-    std::string Application::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string Application::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Application &application) {
-        os << "Application=" << application.ToJson();
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::Apps

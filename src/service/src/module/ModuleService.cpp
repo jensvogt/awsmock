@@ -280,6 +280,8 @@ namespace AwsMock::Service {
                             dynamoDbRequest.attributes = table.attributes;
                             dynamoDbRequest.keySchemas = table.keySchemas;
                             dynamoDbRequest.tags = table.tags;
+                            dynamoDbRequest.streamSpecification.enabled = table.streamSpecification.enabled;
+                            dynamoDbRequest.streamSpecification.streamViewType = Dto::DynamoDb::StreamViewTypeFromString(Database::Entity::DynamoDb::StreamViewTypeToString(table.streamSpecification.streamViewType));
                             Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
                         } else {
                             _dynamoDatabase.CreateOrUpdateTable(table);

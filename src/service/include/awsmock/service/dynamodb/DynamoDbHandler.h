@@ -10,8 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
         /**
          * DynamoDB service
          */
-        Service::DynamoDbService _dynamoDbService;
+        DynamoDbService _dynamoDbService;
     };
 
 }// namespace AwsMock::Service

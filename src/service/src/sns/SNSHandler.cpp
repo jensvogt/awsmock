@@ -190,13 +190,18 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
 
-                    Dto::SNS::PurgeTopicRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-                    log_debug << "Purge topic, topicArn: " << snsRequest.topicArn;
-
+                    Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
                     long deleted = _snsService.PurgeTopic(snsRequest);
 
                     log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
+
+                    long deleted = _snsService.PurgeAllTopics();
+
+                    log_info << "All topic purged, count: " << deleted;
                     return SendOkResponse(request);
                 }
 
@@ -310,9 +315,8 @@ namespace AwsMock::Service {
                 attributeValue = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
             }
             Dto::SNS::MessageAttribute attribute;
-            attribute.name = attributeName;
             attribute.stringValue = attributeValue;
-            attribute.type = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
+            attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
             messageAttributes[attributeName] = attribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();

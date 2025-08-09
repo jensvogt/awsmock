@@ -129,8 +129,6 @@ namespace AwsMock::Database {
                 }
                 if (pageSize > 0) {
                     opts.skip(pageSize * pageIndex);
-                }
-                if (pageSize > 0) {
                     opts.limit(pageSize);
                 }
 
@@ -201,7 +199,7 @@ namespace AwsMock::Database {
                 session.commit_transaction();
 
                 if (mResult.has_value() && !mResult->empty()) {
-                    log_trace << "Application updated: " << application.ToString();
+                    log_trace << "Application updated: " << application;
                     application.FromDocument(mResult->view());
                     return application;
                 }

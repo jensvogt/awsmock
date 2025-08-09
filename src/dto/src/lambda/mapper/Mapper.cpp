@@ -191,7 +191,7 @@ namespace AwsMock::Dto::Lambda {
     LambdaResult Mapper::mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity) {
         LambdaResult result;
         result.functionArn = resultEntity.lambdaArn;
-        result.responseBody = resultEntity.requestBody;
+        result.responseBody = resultEntity.responseBody;
         result.status = (int) resultEntity.status;
         return result;
     }

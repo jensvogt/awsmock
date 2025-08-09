@@ -70,7 +70,7 @@ namespace AwsMock::Service {
         /**
          * Boost acceptor
          */
-        boost::asio::ip::tcp::acceptor _acceptor;
+        ip::tcp::acceptor _acceptor;
     };
 
 }// namespace AwsMock::Service

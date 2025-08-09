@@ -16,7 +16,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/beast/core/string.hpp>
-#include <boost/bind/bind.hpp>
 #include <boost/exception/info.hpp>
 #include <boost/url/decode_view.hpp>
 #include <boost/url/encode.hpp>

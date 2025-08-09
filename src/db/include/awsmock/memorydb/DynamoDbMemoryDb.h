@@ -13,8 +13,8 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/dynamodb/Item.h>
 #include <awsmock/entity/dynamodb/Table.h>
 #include <awsmock/repository/Database.h>
@@ -114,6 +114,16 @@ namespace AwsMock::Database {
          * @return approximate table size in bytes
          */
         [[nodiscard]] long GetTableSize(const std::string &region = {}, const std::string &tableName = {}) const;
+
+        /**
+         * @brief Update table counters
+         *
+         * @param tableArn table ARN
+         * @param items number of items
+         * @param size table size
+         * @throws DatabaseException
+         */
+        void UpdateTableCounter(const std::string &tableArn, long items, long size);
 
         /**
          * @brief Deletes an existing DynamoDB table
