@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSHandler() : AbstractHandler("sns-handler") {}
+        explicit SNSHandler(boost::asio::io_context &ioc) : AbstractHandler("sns-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.

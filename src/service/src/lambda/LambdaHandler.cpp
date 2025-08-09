@@ -227,27 +227,24 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::ADD_TAG) {
 
                 Dto::Lambda::AddTagRequest lambdaRequest = Dto::Lambda::AddTagRequest::FromJson(clientCommand);
-                _lambdaService.AddLambdaTag(lambdaRequest);
-                log_info << "Lambda tag added";
-
+                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.AddLambdaTag(lambdaRequest); });
+                log_info << "Lambda tag added, functionArn: " << lambdaRequest.functionArn << ", tag: " << lambdaRequest.tagKey;
                 return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_TAG) {
 
                 Dto::Lambda::UpdateFunctionTagRequest lambdaRequest = Dto::Lambda::UpdateFunctionTagRequest::FromJson(clientCommand);
-                _lambdaService.UpdateLambdaTag(lambdaRequest);
-                log_info << "Lambda tag updated";
-
+                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UpdateLambdaTag(lambdaRequest); });
+                log_info << "Lambda tag updated, lambda: " << lambdaRequest.functionArn << ", tag: " << lambdaRequest.tagKey;
                 return SendResponse(request, http::status::ok);
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_TAG) {
 
                 Dto::Lambda::DeleteTagRequest lambdaRequest = Dto::Lambda::DeleteTagRequest::FromJson(clientCommand);
-                _lambdaService.DeleteLambdaTag(lambdaRequest);
-                log_info << "Lambda tag deleted";
-
+                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.DeleteLambdaTag(lambdaRequest); });
+                log_info << "Lambda tag deleted, lambda: " << lambdaRequest.functionArn << ", tag: " << lambdaRequest.tagKey;
                 return SendResponse(request, http::status::ok);
             }
 
@@ -255,16 +252,15 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::ListLambdaInstanceCountersRequest lambdaRequest = Dto::Lambda::ListLambdaInstanceCountersRequest::FromJson(clientCommand);
                 Dto::Lambda::ListLambdaInstanceCountersResponse lambdaResponse = _lambdaService.ListLambdaInstanceCounters(lambdaRequest);
-                log_trace << "Lambda instance counters list";
+                log_trace << "Lambda instance counters list, lambdaArn: " << lambdaRequest.lambdaArn;
                 return SendResponse(request, http::status::ok, lambdaResponse.ToJson());
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::ResetFunctionCountersRequest lambdaRequest = Dto::Lambda::ResetFunctionCountersRequest::FromJson(clientCommand);
-                _lambdaService.ResetFunctionCounters(lambdaRequest);
+                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.ResetFunctionCounters(lambdaRequest); });
                 log_info << "Reset function counters list";
-
                 return SendResponse(request, http::status::ok);
             }
 
@@ -272,9 +268,7 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::UploadFunctionCodeRequest lambdaRequest = Dto::Lambda::UploadFunctionCodeRequest::FromJson(clientCommand);
                 log_info << "Starting upload function code, functionArn: " << lambdaRequest.functionArn;
-                _lambdaService.UploadFunctionCode(lambdaRequest);
-                log_info << "Upload function code, functionArn: " << lambdaRequest.functionArn;
-
+                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UploadFunctionCode(lambdaRequest); });
                 return SendResponse(request, http::status::ok);
             }
 

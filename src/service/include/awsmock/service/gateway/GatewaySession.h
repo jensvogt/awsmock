@@ -53,9 +53,10 @@ namespace AwsMock::Service {
          *
          * Takes ownership of the socket.
          *
+         * @param ioc boost asio IO context
          * @param socket
          */
-        explicit GatewaySession(ip::tcp::socket &&socket);
+        explicit GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket);
 
         /**
          * @brief Start the session
@@ -140,6 +141,11 @@ namespace AwsMock::Service {
          * @param _stream HTTP socket stream
          */
         static void HandleContinueRequest(boost::beast::tcp_stream &_stream);
+
+        /**
+         * Boost asio IO context
+         */
+        boost::asio::io_context &_ioc;
 
         /**
          * TCP stream

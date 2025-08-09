@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler") {}
+        explicit S3Handler(boost::asio::io_context &ioc) : AbstractHandler("s3-handler", ioc) {}
 
         /**
          * @brief HTTP GET request.
@@ -129,13 +129,14 @@ namespace AwsMock::Service {
          * @par AWS puts some extra bytes into the response when chunk encoding is used.
          *
          * @param request HTTP request
-         * @param sb prepared strean buffer
+         * @param sb prepared stream buffer
          */
         static long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
+
         /**
-         * @brief Gets bucket and key from source header
+         * @brief Gets bucket and key from the source header
          *
-         * @param path path from soiurce header
+         * @param path path from source header
          * @param bucket bucket name
          * @param key S3 object key
          */
@@ -145,13 +146,6 @@ namespace AwsMock::Service {
          * S3 service
          */
         S3Service _s3Service;
-
-        boost::asio::io_context _ioc;
-
-        /**
-         * Thread group
-         */
-        boost::thread_group _threadGroup;
     };
 
 }// namespace AwsMock::Service

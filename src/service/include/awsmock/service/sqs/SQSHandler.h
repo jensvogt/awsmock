@@ -46,7 +46,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSHandler() : AbstractHandler("sqs-handler") {}
+        explicit SQSHandler(boost::asio::io_context &ioc) : AbstractHandler("sqs-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.
@@ -97,11 +97,6 @@ namespace AwsMock::Service {
          * SQS service
          */
         SQSService _sqsService;
-
-        /**
-         * Boost IO context
-         */
-        boost::asio::io_context _ioc;
     };
 
 }// namespace AwsMock::Service

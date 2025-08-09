@@ -16,14 +16,14 @@ namespace AwsMock::Service {
         const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
 
         // Create an entity and set ARN
-        Database::Entity::Lambda::Lambda lambdaEntity = {};
+        Database::Entity::Lambda::Lambda lambda = {};
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
 
         std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
 
-            lambdaEntity = _lambdaDatabase.GetLambdaByArn(lambdaArn);
-            const std::string fileName = GetLambdaCodePath(lambdaEntity);
+            lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
+            const std::string fileName = GetLambdaCodePath(lambda);
             if (!Core::FileUtils::FileExists(fileName) || Core::FileUtils::FileSize(fileName) == 0) {
                 throw Core::ServiceException("Lambda base64 encoded code does not exists, fileName: " + fileName);
             }
@@ -32,35 +32,35 @@ namespace AwsMock::Service {
         } else {
 
             Database::Entity::Lambda::Environment environment = {.variables = request.environment.variables};
-            lambdaEntity = Dto::Lambda::Mapper::map(request);
-            lambdaEntity.arn = lambdaArn;
+            lambda = Dto::Lambda::Mapper::map(request);
+            lambda.arn = lambdaArn;
 
             // Remove code
             if (!request.code.zipFile.empty()) {
                 zippedCode = std::move(request.code.zipFile);
-                lambdaEntity.code.zipFile.clear();
+                lambda.code.zipFile.clear();
             }
-            lambdaEntity.code.zipFile = GetLambdaCodePath(lambdaEntity);
+            lambda.code.zipFile = GetLambdaCodePath(lambda);
         }
 
         // Create a response, if inactive
-        if (lambdaEntity.state == Database::Entity::Lambda::Inactive) {
-            Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambdaEntity);
-            log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambdaEntity.state);
+        if (lambda.state == Database::Entity::Lambda::Inactive) {
+            Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambda);
+            log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambda.state);
             return response;
         }
 
         // Update database
-        lambdaEntity.timeout = request.timeout;
-        lambdaEntity.state = Database::Entity::Lambda::LambdaState::Pending;
-        lambdaEntity.stateReason = "Initializing";
-        lambdaEntity.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
-        lambdaEntity = _lambdaDatabase.CreateOrUpdateLambda(lambdaEntity);
+        lambda.timeout = request.timeout;
+        lambda.state = Database::Entity::Lambda::LambdaState::Pending;
+        lambda.stateReason = "Initializing";
+        lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
+        lambda = _lambdaDatabase.CreateOrUpdateLambda(lambda);
 
         // Find idle instance
         Database::Entity::Lambda::Instance instance;
-        FindIdleInstance(lambdaEntity, instance);
-        return Dto::Lambda::Mapper::map(request, lambdaEntity);
+        FindIdleInstance(lambda, instance);
+        return Dto::Lambda::Mapper::map(request, lambda);
     }
 
     void LambdaService::UploadFunctionCode(const Dto::Lambda::UploadFunctionCodeRequest &request) const {
@@ -84,16 +84,25 @@ namespace AwsMock::Service {
         // Stop and delete all containers/images
         CleanupDocker(lambda);
 
+        // Write the base64 file
+        lambda.code.zipFile = lambda.function + "-" + request.version + ".b64";
+        WriteBase64File(lambda.code.zipFile, request.functionCode);
+
+        // Update lambda attributes
         lambda.state = Database::Entity::Lambda::LambdaState::Pending;
-        lambda.dockerTag = request.version;
+        lambda.invocations = 0;
+        lambda.averageRuntime = 0;
         lambda.stateReason = "Initializing";
         lambda.stateReasonCode = Database::Entity::Lambda::LambdaStateReasonCode::Creating;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
-        // Create the lambda function asynchronously
-        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        // Clear lambda results
+        const long count = _lambdaDatabase.DeleteResultsCounters(lambda.arn);
+        log_debug << "Lambda results cleared, arn: " << lambda.arn << " count: " << count;
+
+        // Update the lambda function
         LambdaCreator lambdaCreator;
-        lambdaCreator.DoCreate(lambda, instanceId);
+        lambdaCreator.UpdateLambda(lambda, request.functionCode, request.version);
 
         log_debug << "Lambda function code updated, function: " << lambda.function;
     }
@@ -915,7 +924,7 @@ namespace AwsMock::Service {
         // Create the lambda function asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         LambdaCreator lambdaCreator;
-        lambdaCreator.DoCreate(lambda, instanceId);
+        lambdaCreator.CreateLambda(lambda, instanceId);
 
         // Update state
         lambda.state = Database::Entity::Lambda::Pending;
@@ -1102,6 +1111,7 @@ namespace AwsMock::Service {
                 lambda = _lambdaDatabase.UpdateLambda(lambda);
                 log_info << "Found idle instance, lambda: " << lambda.function << ", id: " << i.instanceId;
                 instance = i;
+                return;
             }
         }
 
@@ -1114,7 +1124,7 @@ namespace AwsMock::Service {
 
             // Create lambda
             LambdaCreator lambdaCreator;
-            lambda = lambdaCreator.DoCreate(lambda, instanceId);
+            lambda = lambdaCreator.CreateLambda(lambda, instanceId);
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
 
         } else {
@@ -1157,7 +1167,7 @@ namespace AwsMock::Service {
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {
         for (const auto &instance: lambda.instances) {
-            ContainerService::instance().StopContainer(instance.containerId);
+            ContainerService::instance().KillContainer(instance.containerId);
             ContainerService::instance().DeleteContainers(lambda.function, lambda.dockerTag);
         }
         lambda.instances.clear();
@@ -1269,4 +1279,15 @@ namespace AwsMock::Service {
         }
     }
 
+    void LambdaService::WriteBase64File(const std::string &base64File, const std::string &content) {
+
+        auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + base64File;
+        log_debug << "Using Base64File: " << base64FullFile;
+
+        std::ofstream ofs(base64FullFile);
+        ofs << content;
+        ofs.close();
+        log_debug << "New Base64 file written: " << content;
+    }
 }// namespace AwsMock::Service

@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler() : AbstractHandler("dynamodb-handler") {}
+        explicit DynamoDbHandler(boost::asio::io_context &ioc) : AbstractHandler("dynamodb-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.

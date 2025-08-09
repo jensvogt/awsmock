@@ -43,8 +43,9 @@ namespace AwsMock::Service {
          * @brief Default User-defined Constructor
          *
          * @param name handler name
+         * @param ioc boost asio IO context
          */
-        explicit AbstractHandler(const std::string &name) : _name(std::move(name)) {};
+        explicit AbstractHandler(const std::string &name, boost::asio::io_context &ioc) : _ioc(ioc), _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -204,6 +205,13 @@ namespace AwsMock::Service {
          * Get the name
          */
         std::string name() { return _name; }
+
+      protected:
+
+        /**
+         * Boost asio IO context
+         */
+        boost::asio::io_context &_ioc;
 
       private:
 

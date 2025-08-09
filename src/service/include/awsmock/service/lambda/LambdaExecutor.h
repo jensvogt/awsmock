@@ -27,9 +27,6 @@
 
 namespace AwsMock::Service {
 
-    namespace http = boost::beast::http;
-    using std::chrono::system_clock;
-
     /**
      * @brief Lambda executor.
      *
@@ -59,11 +56,6 @@ namespace AwsMock::Service {
          */
         Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, std::string &containerId, std::string &host, int port, std::string &payload) const;
 
-        /**
-         * @brief Executes a lambda function asynchronously
-         */
-        void SpawnDetached();
-
       private:
 
         /**
@@ -80,11 +72,6 @@ namespace AwsMock::Service {
          * Docker module
          */
         ContainerService &_containerService = ContainerService::instance();
-
-        /**
-         * Mutex
-         */
-        static boost::mutex _executionMutex;
     };
 
 }// namespace AwsMock::Service

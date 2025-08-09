@@ -33,7 +33,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaHandler() : AbstractHandler("lambda-handler") {}
+        explicit LambdaHandler(boost::asio::io_context &ioc) : AbstractHandler("lambda-handler", ioc) {}
 
         /**
          * @brief HTTP GET request.
