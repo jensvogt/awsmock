@@ -613,7 +613,8 @@ namespace AwsMock::Service {
 
             // Check notification
             CheckNotifications(object.region, object.bucket, object.key, object.size, "ObjectCreated");
-            log_debug << "Notifications send, bucket: " << request.bucket << " key: " << request.key;
+            log_info << "Touch object, bucket: " << request.bucket << ", key: " << request.key;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 touch object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
@@ -641,7 +642,8 @@ namespace AwsMock::Service {
             // Change metadata
             object.metadata = request.metadata;
             object = _database.UpdateObject(object);
-            log_debug << "Metadata updated, bucket: " << object.bucket << " key: " << object.key;
+            log_info << "Object updated, bucket: " << request.bucket << ", key: " << request.key;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 update object failed, message: " << ex.what() << " key: " << request.key;
             throw Core::ServiceException(ex.what());
@@ -1216,9 +1218,6 @@ namespace AwsMock::Service {
         log_debug << "Invocation request function name: " << functionName;
 
         std::string payload = eventNotification.ToJson();
-        /*LambdaService lambdaService;
-        std::thread(&LambdaService::InvokeLambdaFunction, lambdaService, std::ref(region), std::ref(functionName), std::ref(payload)).detach();*/
-
         Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, functionName, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda invocation send";
     }

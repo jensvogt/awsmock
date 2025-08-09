@@ -60,12 +60,4 @@ namespace AwsMock::Service {
         return lambdaResult;
     }
 
-    void LambdaExecutor::SpawnDetached() {
-        /*        boost::asio::spawn(_ioc, [this](const boost::asio::yield_context &) {
-                        Database::Entity::Lambda::LambdaResult result = Invocation();
-                        log_info << "Lambda invocation started, lambda: " << lambda.function << ", containerId: " << containerId << ", status: " << result.httpStatusCode; }, boost::asio::detached);
-        _ioc.poll();
-        _ioc.stop();*/
-    }
-
 }// namespace AwsMock::Service

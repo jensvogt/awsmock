@@ -566,6 +566,14 @@ namespace AwsMock::Service {
         void SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
+         * @brief Writes the base64 ZIP file coming from the frontend to the local lambda data dir.
+         *
+         * @param base64File name of the file
+         * @param content base64 encoded content
+         */
+        static void WriteBase64File(const std::string &base64File, const std::string &content);
+
+        /**
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;

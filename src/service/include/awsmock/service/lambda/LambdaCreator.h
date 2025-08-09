@@ -64,7 +64,17 @@ namespace AwsMock::Service {
          * @param instanceId instanceId
          * @return updated lambda entity
          */
-        Database::Entity::Lambda::Lambda DoCreate(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId);
+        Database::Entity::Lambda::Lambda CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId);
+
+        /**
+         * @brief Create a new version of an existing lambda function
+         *
+         * @param lambda lambda instance
+         * @param functionCode new function code
+         * @param newVersion new version
+         * @return
+         */
+        void UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion);
 
       private:
 
@@ -102,7 +112,7 @@ namespace AwsMock::Service {
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API
          *
          * @par
-         * Additionally the AWS_LAMBDA_FUNCTION_TIMEOUT variable will be added. This restricts the AWS Lambda RIE for the given timeout.
+         * Additionally, the AWS_LAMBDA_FUNCTION_TIMEOUT variable will be added. This restricts the AWS Lambda RIE for the given timeout.
          *
          * @param lambda lambda entity
          * @return vector of strings containing the runtime environment as key=value pairs
@@ -158,6 +168,9 @@ namespace AwsMock::Service {
          */
         static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag);
 
+        /**
+         * Lambda database connection
+         */
         Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
 
         /**

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
+    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
@@ -123,7 +123,7 @@ namespace AwsMock::Service {
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            handler = GatewayRouter::GetHandler(target);
+            handler = GatewayRouter::GetHandler(target, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             _region = authKey.region;
-            handler = GatewayRouter::GetHandler(authKey.module);
+            handler = GatewayRouter::GetHandler(authKey.module, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << authKey.module;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
