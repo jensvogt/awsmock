@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.6.5](https://github.com/jensvogt/awsmock/compare/v1.6.4...v1.6.5) (2025-08-09)
+
+
+### Bug Fixes
+
+* **1375-lambda-invocation:** fix lambda startup status ([b40aa8a](https://github.com/jensvogt/awsmock/commit/b40aa8aab515eecf583180c80e3ad392dc84bb20))
+* **1375-lambda-invocation:** fix memory leak ([7172f2d](https://github.com/jensvogt/awsmock/commit/7172f2dc41d618245dfe2102ad8146d4b2904b5f))
+* **1375-lambda-invocation:** fix tests ([3d114d1](https://github.com/jensvogt/awsmock/commit/3d114d1881e22fdefff4f6216ea1e1d4b0712dd5))
+* **1375-lambda-invocation:** general cleanup ([0c36c1b](https://github.com/jensvogt/awsmock/commit/0c36c1bb90d437853c2500f6f89dc8564a27acfd))
+* **1375-lambda-invocation:** general cleanup ([b6466fb](https://github.com/jensvogt/awsmock/commit/b6466fb2abc70a11c30555bd7d34e176950ce68d))
+* **1375-lambda-invocation:** use boost ioc for detached threads ([a625f85](https://github.com/jensvogt/awsmock/commit/a625f85dba4492ad872cefcf62d3c8a8efacdba3))
+* **1375-lambda-invocation:** use boost ioc for detached threads ([084ed92](https://github.com/jensvogt/awsmock/commit/084ed92b0630d4d33078b5481bfd3279592c892b))
+* **1375-lambda-invocation:** use boost ioc for detached threads ([ab3471b](https://github.com/jensvogt/awsmock/commit/ab3471bf0ddf4bd9ce7ed5cac88836e91249529c))
+* **1375-new-stream-response:** fix duplicate lambda event sources ([10c613a](https://github.com/jensvogt/awsmock/commit/10c613a33b1177184a391c0b0a1c4468e5643ecb))
+* **1375-new-stream-response:** fix duplicate lambda event sources ([4caf485](https://github.com/jensvogt/awsmock/commit/4caf48542f9ecc81f3997233769efbab67f95a15))
+
 ## [1.6.4](https://github.com/jensvogt/awsmock/compare/v1.6.3...v1.6.4) (2025-08-06)
 
 
