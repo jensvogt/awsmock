@@ -221,7 +221,7 @@ namespace AwsMock::Service {
 
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
         if (ec) {
             ec = _stream.socket().close(ec);
             if (ec) {

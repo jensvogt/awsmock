@@ -99,7 +99,7 @@ namespace AwsMock::Service {
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
             log_debug << "Get containers";
             for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, lambda.dockerTag); const auto &container: containers) {
-                ContainerService::instance().StopContainer(container.id);
+                ContainerService::instance().KillContainer(container.id);
                 ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
@@ -183,7 +183,7 @@ namespace AwsMock::Service {
         for (const auto &lambda: lambdas) {
             double averageRuntime = 0.0;
             if ((*_lambdaCounterMap)[lambda.arn].invocations > 0) {
-                averageRuntime = (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
+                averageRuntime = (double) (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
             }
             _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function, (*_lambdaCounterMap)[lambda.arn].invocations);
             _metricService.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
@@ -207,11 +207,13 @@ namespace AwsMock::Service {
             log_info << "Start creating lambda functions, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
                 log_info << "Start creating lambda container, function: " << lambda.function;
+
                 Dto::Lambda::CreateFunctionRequest request;
                 request.region = _region;
                 request.functionName = lambda.function;
                 request.runtime = lambda.runtime;
                 Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
+
                 log_debug << "Finished creating lambda container, function: " << lambda.function;
             }
             log_debug << "Lambda containers created, count: " << lambdas.size();

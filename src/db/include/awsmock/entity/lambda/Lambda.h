@@ -17,24 +17,15 @@
 #include <bsoncxx/json.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 #include <awsmock/entity/lambda/EventSourceMapping.h>
 #include <awsmock/entity/lambda/Instance.h>
-#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database::Entity::Lambda {
-
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda entity
@@ -122,7 +113,7 @@ namespace AwsMock::Database::Entity::Lambda {
             {FunctionError, "FunctionError"},
     };
 
-    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode lambdaStateReasonCode) {
+    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode &lambdaStateReasonCode) {
         return LambdaStateReasonCodeNames[lambdaStateReasonCode];
     }
 

@@ -136,7 +136,6 @@ namespace AwsMock::Manager {
     void Manager::Run() {
 
         boost::asio::io_context _ioc;
-        WorkGuardManager guard(_ioc);
 
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
@@ -186,8 +185,8 @@ namespace AwsMock::Manager {
         log_info << "Module started, count: " << moduleMap.GetSize();
 
         // Start listener threads
-        const int numProcs = Core::SystemUtils::GetNumberOfCores();
-        for (auto i = 0; i < numProcs * 2; i++) {
+        const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
+        for (auto i = 0; i < maxThreads; i++) {
             _threadGroup.create_thread([&_ioc] { return _ioc.run(); });
         }
 

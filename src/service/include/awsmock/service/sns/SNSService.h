@@ -358,7 +358,7 @@ namespace AwsMock::Service {
          * @param message SNS message to publish
          * @param eventSourceArn event source ARN
         */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SNS::Message &message, const std::string &eventSourceArn);
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SNS::Message &message, const std::string &eventSourceArn) const;
 
         /**
          * SNS database connection

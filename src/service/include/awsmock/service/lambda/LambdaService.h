@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Boost includes
-#include <boost/interprocess/sync/named_mutex.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/thread/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -125,7 +120,7 @@ namespace AwsMock::Service {
          *
          * @param ioc boost asio IO context
          */
-        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {};
+        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {}
 
         /**
          * @brief Create lambda function
@@ -594,11 +589,6 @@ namespace AwsMock::Service {
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Find idle instance mutex
-         */
-        static boost::mutex _lambdaFindMutex;
-
-        /**
          * Boost IO context
          */
         boost::asio::io_context &_ioc;
@@ -607,6 +597,11 @@ namespace AwsMock::Service {
          * Lambda executor
          */
         LambdaExecutor lambdaExecutor;
+
+        /**
+         * Function mutexes
+         */
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
 
 }// namespace AwsMock::Service

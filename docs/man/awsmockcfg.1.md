@@ -78,7 +78,7 @@ awsmock.gateway.http.host                         AWSMOCK_MODULES_GATEWAY_HOST  
 awsmock.gateway.http.address                      AWSMOCK_MODULES_GATEWAY_ADDRESS                   listener IP address, default: 0.0.0.0
 awsmock.gateway.http.port                         AWSMOCK_MODULES_GATEWAY_PORT                      port, default: 4566
 awsmock.gateway.http.max-queue                    AWSMOCK_MODULES_GATEWAY_MAX_QUEUE                 maximal queue length, default: 250
-awsmock.gateway.http.max-threads                  AWSMOCK_MODULES_GATEWAY_MAX_THREADS               maximal threads, default: 50
+awsmock.gateway.http.max-thread                   AWSMOCK_MODULES_GATEWAY_MAX_THREAD                maximal threads, default: 256
 awsmock.gateway.http.max-body                     AWSMOCK_MODULES_GATEWAY_MAX_BODY                  maximal request body size in bytes, default: 104857600
 awsmock.gateway.timeout                           AWSMOCK_MODULES_GATEWAY_TIMEOUT                   HTTP request timeout in seconds, default: 900
 ```

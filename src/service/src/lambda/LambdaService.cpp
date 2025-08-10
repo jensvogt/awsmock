@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    boost::mutex LambdaService::_lambdaFindMutex;
+    std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "create_function");
@@ -18,6 +18,9 @@ namespace AwsMock::Service {
         // Create an entity and set ARN
         Database::Entity::Lambda::Lambda lambda = {};
         const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
+
+        // Create mutex
+        _instanceMutex[lambdaArn] = std::make_shared<boost::mutex>();
 
         std::string zippedCode;
         if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
@@ -671,10 +674,10 @@ namespace AwsMock::Service {
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};
         if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance.instanceId, containerId, hostName, port, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
         } else if (invocationType == Dto::Lambda::EVENT) {
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, containerId, hostName, port, payload);
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance.instanceId, containerId, hostName, port, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
             log_debug << "Lambda result, lambda: " << result.functionArn << ", result: " << result.status;
         }
@@ -1096,7 +1099,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const {
-        boost::mutex::scoped_lock lock(_lambdaFindMutex);
+        boost::mutex::scoped_lock lock(*_instanceMutex[lambda.arn]);
 
         // Synchronize the docker daemon with the DB
         lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
@@ -1111,23 +1114,23 @@ namespace AwsMock::Service {
         }
 
         // Check empty and max concurrency and create a new instance if necessary
-        std::string instanceId;
         if (lambda.instances.size() < lambda.concurrency) {
 
             // Create instance
-            instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
             // Create lambda
             LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
+            instance = lambda.GetInstance(instanceId);
 
         } else {
-            instanceId = WaitForIdleInstance(lambda).instanceId;
+            instance = WaitForIdleInstance(lambda);
         }
-        lambda.SetInstanceStatus(instanceId, Database::Entity::Lambda::InstanceRunning);
+        instance.status = Database::Entity::Lambda::InstanceRunning;
+        lambda.SetInstanceStatus(instance.instanceId, instance.status);
         lambda = _lambdaDatabase.UpdateLambda(lambda);
-        instance = lambda.GetInstance(instanceId);
     }
 
     std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {

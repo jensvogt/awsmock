@@ -408,7 +408,7 @@ namespace AwsMock::Service {
          * @param eventNotification S3 event notification
          * @param lambdaNotification S3 lambda notification
          */
-        void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification);
+        void SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const;
 
         /**
          * @brief Check for bucket notifications.

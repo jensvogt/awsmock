@@ -5,14 +5,6 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
-// C++ include
-#include <chrono>
-
-// Boost includes
-#include <boost/asio/detached.hpp>
-#include <boost/asio/spawn.hpp>
-#include <boost/interprocess/sync/named_mutex.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
@@ -43,18 +35,19 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() {}
+        explicit LambdaExecutor() = default;
 
         /**
          * @brief Executes a lambda function synchronized
          *
          * @param lambda lambda function
+         * @param instanceId instance ID
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
          */
-        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, std::string &containerId, std::string &host, int port, std::string &payload) const;
+        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, std::string &containerId, std::string &host, int port, std::string &payload) const;
 
       private:
 

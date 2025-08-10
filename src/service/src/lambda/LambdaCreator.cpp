@@ -6,16 +6,15 @@
 
 namespace AwsMock::Service {
 
-    boost::mutex LambdaCreator::_lambdaCreatorMutex;
-
     Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) {
-        boost::mutex::scoped_lock lock(_lambdaCreatorMutex);
         log_debug << "Start creating lambda function, instanceId: " << instanceId;
 
         // Create a new instance
         const std::string containerId = CreateInstance(instanceId, lambda, lambda.code.zipFile);
 
         // Update database
+        lambda.averageRuntime = 0;
+        lambda.invocations = 0;
         lambda.lastStarted = system_clock::now();
         lambda.state = Database::Entity::Lambda::LambdaState::Active;
         lambda.stateReason = "Activated";

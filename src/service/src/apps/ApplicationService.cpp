@@ -95,6 +95,24 @@ namespace AwsMock::Service {
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
             application = _database.UpdateApplication(application);
 
+            // Stop if not enabled anymore
+            if (!application.enabled) {
+                Dto::Apps::StopApplicationRequest stopRequest{};
+                stopRequest.requestId = request.requestId;
+                stopRequest.region = request.region;
+                stopRequest.user = request.user;
+                stopRequest.application = Dto::Apps::Mapper::map(application);
+                StopApplication(stopRequest);
+            } else {
+                Dto::Apps::StartApplicationRequest startRequest{};
+                startRequest.requestId = request.requestId;
+                startRequest.region = request.region;
+                startRequest.user = request.user;
+                startRequest.application = Dto::Apps::Mapper::map(application);
+                StartApplication(startRequest);
+            }
+
+            // Create get request
             Dto::Apps::GetApplicationResponse getRequest{};
             getRequest.requestId = request.requestId;
             getRequest.region = request.region;

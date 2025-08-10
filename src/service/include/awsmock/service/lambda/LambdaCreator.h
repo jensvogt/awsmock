@@ -172,11 +172,6 @@ namespace AwsMock::Service {
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
-
-        /**
-         * Creator mutex
-         */
-        static boost::mutex _lambdaCreatorMutex;
     };
 
 }// namespace AwsMock::Service

@@ -6,26 +6,20 @@
 #define AWSMOCK_DTO_S3_GET_METADATA_RESPONSE_H
 
 // C++ standard includes
-#include <chrono>
 #include <map>
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <boost/json/value_from.hpp>
 
 namespace AwsMock::Dto::S3 {
 
     using std::chrono::system_clock;
 
-    struct GetMetadataResponse {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct GetMetadataResponse final : Common::BaseCounter<GetMetadataResponse> {
 
         /**
          * Bucket
@@ -67,26 +61,38 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend GetMetadataResponse tag_invoke(boost::json::value_to_tag<GetMetadataResponse>, boost::json::value const &v) {
+            GetMetadataResponse r;
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.md5Sum = Core::Json::GetStringValue(v, "md5Sum");
+            r.contentType = Core::Json::GetStringValue(v, "contentType");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.modified = Core::Json::GetDatetimeValue(v, "modified");
+            if (Core::Json::AttributeExists(v, "metadata")) {
+                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            }
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetMetadataResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetMetadataResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"key", obj.bucket},
+                    {"md5Sum", obj.md5Sum},
+                    {"contentType", obj.contentType},
+                    {"size", obj.size},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+                    {"metadata", boost::json::value_from(obj.metadata)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3
