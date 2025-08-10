@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Boost includes
-#include <boost/interprocess/sync/named_mutex.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/thread/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -467,11 +462,6 @@ namespace AwsMock::Service {
          */
         void DeleteTags(const Dto::Lambda::DeleteTagsRequest &request) const;
 
-        /**
-         * Function mutexes
-         */
-        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
-
       private:
 
         /**
@@ -599,11 +589,6 @@ namespace AwsMock::Service {
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Find idle instance mutex
-         */
-        static boost::mutex _lambdaFindMutex;
-
-        /**
          * Boost IO context
          */
         boost::asio::io_context &_ioc;
@@ -612,6 +597,11 @@ namespace AwsMock::Service {
          * Lambda executor
          */
         LambdaExecutor lambdaExecutor;
+
+        /**
+         * Function mutexes
+         */
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
 
 }// namespace AwsMock::Service

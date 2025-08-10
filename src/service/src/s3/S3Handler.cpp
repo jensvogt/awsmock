@@ -722,26 +722,28 @@ namespace AwsMock::Service {
             if (clientCommand.key.empty()) {
 
                 // Bucket metadata
-                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket};
+                Dto::S3::GetMetadataRequest s3Request;
+                s3Request.region = clientCommand.region;
+                s3Request.bucket = clientCommand.bucket;
                 s3Response = _s3Service.GetBucketMetadata(s3Request);
 
             } else {
 
                 // Object metadata
-                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
+                Dto::S3::GetMetadataRequest s3Request;
+                s3Request.region = clientCommand.region;
+                s3Request.bucket = clientCommand.bucket;
+                s3Request.key = clientCommand.key;
                 s3Response = _s3Service.GetObjectMetadata(s3Request);
             }
 
             std::map<std::string, std::string> headers;
+            headers["accept-ranges"] = "bytes";
             headers["Handler"] = "awsmock";
             headers["Content-Type"] = "application/json";
             headers["Content-Length"] = std::to_string(s3Response.size);
             headers["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
-            headers["accept-ranges"] = "bytes";
-            headers["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
-            headers["x-amz-request-userPoolId"] = Core::StringUtils::CreateRandomUuid();
-            headers["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
             headers["x-amz-bucket-region"] = s3Response.region;
             headers["x-amz-location-name"] = s3Response.region;
 
@@ -750,16 +752,13 @@ namespace AwsMock::Service {
                 headers["x-amz-meta-" + fst] = snd;
             }
             log_info << "Get metadata, count: " << s3Response.metadata.size();
-            return SendHeadResponse(request, s3Response.size, headers);
+            return SendResponse(request, http::status::ok, {}, headers);
 
         } catch (Core::NotFoundException &exc) {
-            log_error << exc.message();
-            return SendNotFoundError(request, exc.message());
+            return SendResponse(request, http::status::not_found, exc.message());
         } catch (std::exception &exc) {
-            log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         } catch (...) {
-            log_error << "Unknown exception";
             return SendInternalServerError(request, "Unknown exception");
         }
     }

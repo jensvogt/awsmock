@@ -1099,9 +1099,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const {
-
-        //boost::interprocess::named_mutex _mutex{boost::interprocess::open_or_create, lambda.function.c_str()};
-        boost::interprocess::scoped_lock lock(*_instanceMutex[lambda.arn]);
+        boost::mutex::scoped_lock lock(*_instanceMutex[lambda.arn]);
 
         // Synchronize the docker daemon with the DB
         lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
@@ -1116,23 +1114,23 @@ namespace AwsMock::Service {
         }
 
         // Check empty and max concurrency and create a new instance if necessary
-        std::string instanceId;
         if (lambda.instances.size() < lambda.concurrency) {
 
             // Create instance
-            instanceId = Core::StringUtils::GenerateRandomHexString(8);
+            std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
             // Create lambda
             LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
+            instance = lambda.GetInstance(instanceId);
 
         } else {
-            instanceId = WaitForIdleInstance(lambda).instanceId;
+            instance = WaitForIdleInstance(lambda);
         }
-        lambda.SetInstanceStatus(instanceId, Database::Entity::Lambda::InstanceRunning);
+        instance.status = Database::Entity::Lambda::InstanceRunning;
+        lambda.SetInstanceStatus(instance.instanceId, instance.status);
         lambda = _lambdaDatabase.UpdateLambda(lambda);
-        instance = lambda.GetInstance(instanceId);
     }
 
     std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {

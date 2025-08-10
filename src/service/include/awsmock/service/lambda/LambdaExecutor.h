@@ -5,14 +5,6 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
-// C++ include
-#include <chrono>
-
-// Boost includes
-#include <boost/asio/detached.hpp>
-#include <boost/asio/spawn.hpp>
-#include <boost/interprocess/sync/named_mutex.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
@@ -43,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() {}
+        explicit LambdaExecutor() = default;
 
         /**
          * @brief Executes a lambda function synchronized

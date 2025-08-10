@@ -112,11 +112,11 @@ namespace AwsMock::Service {
 
         try {
             const Database::Entity::S3::Bucket bucket = _database.GetBucketByRegionName(request.region, request.bucket);
-            Dto::S3::GetMetadataResponse response = {
-                    .region = bucket.region,
-                    .bucket = bucket.name,
-                    .created = bucket.created,
-                    .modified = bucket.modified};
+            Dto::S3::GetMetadataResponse response;
+            response.region = bucket.region;
+            response.bucket = bucket.name;
+            response.created = bucket.created;
+            response.modified = bucket.modified;
 
             log_trace << "S3 get bucket metadata response: " + response.ToString();
             log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key;
@@ -181,23 +181,24 @@ namespace AwsMock::Service {
         // Check existence
         CheckBucketExistence(request.region, request.bucket);
 
+        // Check existence. If it does not exist, log an info message as this method is also used to check the existence of the object
         if (!request.key.empty() && !_database.ObjectExists(request.region, request.bucket, request.key)) {
-            log_error << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
+            log_info << "Object does not exist, region: " << request.region << ", bucket: " << request.bucket << ", key: " << request.key;
             throw Core::NotFoundException("Object does not exist, region: " + request.region + ", bucket: " + request.bucket + ", key: " + request.key);
         }
 
         try {
             const Database::Entity::S3::Object object = _database.GetObject(request.region, request.bucket, request.key);
 
-            Dto::S3::GetMetadataResponse response = {
-                    .bucket = object.bucket,
-                    .key = object.key,
-                    .md5Sum = object.md5sum,
-                    .contentType = object.contentType,
-                    .size = object.size,
-                    .metadata = object.metadata,
-                    .created = object.created,
-                    .modified = object.modified};
+            Dto::S3::GetMetadataResponse response;
+            response.bucket = object.bucket;
+            response.key = object.key;
+            response.md5Sum = object.md5sum;
+            response.contentType = object.contentType;
+            response.size = object.size;
+            response.metadata = object.metadata;
+            response.created = object.created;
+            response.modified = object.modified;
 
             log_trace << "S3 get object metadata response: " + response.ToString();
             log_debug << "Metadata returned, bucket: " << request.bucket << " key: " << request.key << " size: " << response.size;
@@ -1208,7 +1209,7 @@ namespace AwsMock::Service {
         log_debug << "SNS message request send, messageId: " << response.messageId;
     }
 
-    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) {
+    void S3Service::SendLambdaInvocationRequest(const Dto::S3::EventNotification &eventNotification, const Database::Entity::S3::LambdaNotification &lambdaNotification) const {
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
