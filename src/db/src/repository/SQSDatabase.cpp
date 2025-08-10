@@ -887,7 +887,10 @@ namespace AwsMock::Database {
                     opts.limit(maxResult);
                 }
 
-                session.start_transaction();
+                std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
+                std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
+
+                auto bulk = messageCollection.create_bulk_write();
 
                 // Get the cursor
                 for (auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
@@ -898,9 +901,6 @@ namespace AwsMock::Database {
                     // Check retries
                     result.retries++;
                     if (maxRetries > 0 && result.retries >= maxRetries && !dlQueueArn.empty()) {
-
-                        std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
-                        std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
 
                         document filterQuery;
                         filterQuery.append(kvp("_id", message["_id"].get_oid()));
@@ -915,7 +915,8 @@ namespace AwsMock::Database {
                         document updateQuery;
                         updateQuery.append(kvp("$set", setQuery));
 
-                        messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                        bulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
+
                         log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
                         (*_sqsCounterMap)[queueArn].initial--;
                         (*_sqsCounterMap)[queueArn].messages--;
@@ -941,15 +942,20 @@ namespace AwsMock::Database {
                         document updateQuery;
                         updateQuery.append(kvp("$set", setQuery));
 
-                        messageCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                        bulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
+
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
                         (*_sqsCounterMap)[queueArn].initial--;
                         (*_sqsCounterMap)[queueArn].invisible++;
                     }
                 }
 
-                // Commit
-                session.commit_transaction();
+                if (!messageList.empty()) {
+                    session.start_transaction();
+                    auto result = bulk.execute();
+                    session.commit_transaction();
+                }
+
                 log_trace << "Messages received, queueArn: " << queueArn + " count: " << messageList.size();
 
             } catch (mongocxx::exception &e) {

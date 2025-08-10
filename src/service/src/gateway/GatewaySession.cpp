@@ -223,10 +223,7 @@ namespace AwsMock::Service {
         boost::beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
         if (ec) {
-            ec = _stream.socket().close(ec);
-            if (ec) {
-                log_error << "Close failed: " << ec.message();
-            }
+            _stream.socket().cancel();
         }
         // At this point the connection is closed gracefully
     }

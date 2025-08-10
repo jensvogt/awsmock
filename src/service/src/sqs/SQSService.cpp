@@ -1072,17 +1072,25 @@ namespace AwsMock::Service {
                 maxRetries = queue.attributes.redrivePolicy.maxReceiveCount;
             }
 
+            // Restrict wait time, otherwise the socker timeout is reached
+            const long waitTimeSeconds = request.waitTimeSeconds > 10 ? 10 : request.waitTimeSeconds;
+
+            if (request.queueUrl == "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/ftp-file-distribution-image-queue") {
+                log_debug << "Receive message, queueArn: " << queue.queueArn;
+            }
             Database::Entity::SQS::MessageList messageList;
-            if (request.waitTimeSeconds == 0) {
+            if (waitTimeSeconds == 0) {
+
                 // Short polling period
                 _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                 log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
+
             } else {
-                long elapsed = 0;
 
                 // Long polling period
+                long elapsed = 0;
                 const auto begin = system_clock::now();
-                while (elapsed < request.waitTimeSeconds) {
+                while (elapsed < waitTimeSeconds) {
                     Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
 
                     _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
