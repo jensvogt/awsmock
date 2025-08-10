@@ -39,31 +39,34 @@ namespace AwsMock::Manager {
     }
 
     void Manager::AutoLoad() {
-        if (Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
-            if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
-                for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
-                    if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
-                        Dto::Module::Infrastructure infrastructure;
-                        infrastructure.FromJson(jsonString);
-                        Dto::Module::ImportInfrastructureRequest importRequest;
-                        importRequest.cleanFirst = false;
-                        importRequest.infrastructure = infrastructure;
-                        Service::ModuleService::ImportInfrastructure(importRequest);
-                        log_info << "Loaded infrastructure, filename: " << file;
-                    }
-                }
-            } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
-                if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
+        if (!Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
+            return;
+        }
+
+        if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
+            for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
+                if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
                     Dto::Module::Infrastructure infrastructure;
                     infrastructure.FromJson(jsonString);
                     Dto::Module::ImportInfrastructureRequest importRequest;
                     importRequest.cleanFirst = false;
                     importRequest.infrastructure = infrastructure;
                     Service::ModuleService::ImportInfrastructure(importRequest);
-                    log_info << "Loaded infrastructure, filename: " << autoLoadFile;
+                    log_info << "Loaded infrastructure, filename: " << file;
                 }
             }
+        } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
+            if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
+                Dto::Module::Infrastructure infrastructure;
+                infrastructure.FromJson(jsonString);
+                Dto::Module::ImportInfrastructureRequest importRequest;
+                importRequest.cleanFirst = false;
+                importRequest.infrastructure = infrastructure;
+                Service::ModuleService::ImportInfrastructure(importRequest);
+                log_info << "Loaded infrastructure, filename: " << autoLoadFile;
+            }
         }
+
         log_info << "Autoload finished";
     }
 
@@ -186,6 +189,7 @@ namespace AwsMock::Manager {
 
         // Start listener threads
         const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
+        log_info << "Gateway starting, threads: " << maxThreads;
         for (auto i = 0; i < maxThreads; i++) {
             _threadGroup.create_thread([&_ioc] { return _ioc.run(); });
         }
