@@ -68,6 +68,11 @@ namespace AwsMock::Dto::Lambda {
         long duration{};
 
         /**
+         * Instance ID
+         */
+        std::string instanceId;
+
+        /**
          * Container ID
          */
         std::string containerId;
@@ -100,6 +105,7 @@ namespace AwsMock::Dto::Lambda {
             r.responseBody = Core::Json::GetStringValue(v, "responseBody");
             r.logMessages = Core::Json::GetStringValue(v, "logMessages");
             r.duration = Core::Json::GetLongValue(v, "duration");
+            r.instanceId = Core::Json::GetStringValue(v, "instanceId");
             r.containerId = Core::Json::GetStringValue(v, "containerId");
             r.httpStatusCode = Core::Json::GetStringValue(v, "httpStatusCode");
             r.lambdaStatus = Database::Entity::Lambda::LambdaInstanceStatusFromString(Core::Json::GetStringValue(v, "lambdaStatus"));
@@ -119,6 +125,7 @@ namespace AwsMock::Dto::Lambda {
                     {"responseBody", obj.responseBody},
                     {"logMessages", obj.logMessages},
                     {"duration", obj.duration},
+                    {"instanceId", obj.instanceId},
                     {"containerId", obj.containerId},
                     {"httpStatusCode", obj.httpStatusCode},
                     {"lambdaStatus", Database::Entity::Lambda::LambdaInstanceStatusToString(obj.lambdaStatus)},

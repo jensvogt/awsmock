@@ -164,6 +164,7 @@ namespace AwsMock::Dto::Lambda {
         counter.lambdaName = resultEntity.lambdaName;
         counter.runtime = resultEntity.runtime;
         counter.duration = resultEntity.duration;
+        counter.instanceId = resultEntity.instanceId;
         counter.containerId = resultEntity.containerId;
         counter.requestBody = resultEntity.requestBody;
         counter.responseBody = resultEntity.responseBody;

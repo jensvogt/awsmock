@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, std::string &containerId, std::string &host, const int port, std::string &payload) const {
+    Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, std::string &containerId, std::string &host, const int port, std::string &payload) const {
 
         Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function);
         _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
@@ -19,10 +19,6 @@ namespace AwsMock::Service {
         log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << host << ":" << port;
         log_trace << "Sending lambda invocation request, payload: " << payload;
 
-        // Prepare resultSend request to lambda docker container
-        Database::Entity::Lambda::LambdaResult lambdaResult;
-        lambdaResult.containerId = containerId;
-
         // Send request to lambda docker container
         const system_clock::time_point start = system_clock::now();
         Core::HttpSocketResponse response = Core::HttpSocket::SendJson(http::verb::post, host, port, "/2015-03-31/functions/function/invocations", payload);
@@ -32,9 +28,16 @@ namespace AwsMock::Service {
         log_info << "Getting lambda logs, containerId: " << containerId;
         const std::string logs = _containerService.GetContainerLogs(containerId, start);
 
-        // Save results
-        _lambdaDatabase.SetAverageRuntime(lambda.oid, runtime);
-        _lambdaDatabase.SetInstanceStatus(containerId, Database::Entity::Lambda::InstanceIdle);
+        // update lambda
+        lambda.SetInstanceStatus(instanceId, Database::Entity::Lambda::InstanceIdle);
+        lambda.invocations++;
+        lambda.averageRuntime = static_cast<long>(std::ceil((lambda.averageRuntime + runtime) / lambda.invocations));
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        // Prepare resultSend request to lambda docker container
+        Database::Entity::Lambda::LambdaResult lambdaResult;
+        lambdaResult.instanceId = instanceId;
+        lambdaResult.containerId = containerId;
         lambdaResult.status = response.statusCode;
         lambdaResult.httpStatusCode = Core::HttpUtils::StatusCodeToString(response.statusCode);
         lambdaResult.lambdaStatus = response.statusCode == http::status::ok ? Database::Entity::Lambda::InstanceSuccess : Database::Entity::Lambda::InstanceFailed;
