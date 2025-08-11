@@ -717,7 +717,6 @@ namespace AwsMock::Service {
         clientCommand.FromRequest(request, region, user);
 
         try {
-
             Dto::S3::GetMetadataResponse s3Response;
             if (clientCommand.key.empty()) {
 
@@ -748,10 +747,12 @@ namespace AwsMock::Service {
             headers["x-amz-location-name"] = s3Response.region;
 
             // User supplied metadata
-            for (const auto &[fst, snd]: s3Response.metadata) {
-                headers["x-amz-meta-" + fst] = snd;
+            if (!s3Response.metadata.empty()) {
+                for (const auto &[fst, snd]: s3Response.metadata) {
+                    headers["x-amz-meta-" + fst] = snd;
+                }
+                log_info << "Get metadata, count: " << s3Response.metadata.size();
             }
-            log_info << "Get metadata, count: " << s3Response.metadata.size();
             return SendResponse(request, http::status::ok, {}, headers);
 
         } catch (Core::NotFoundException &exc) {
