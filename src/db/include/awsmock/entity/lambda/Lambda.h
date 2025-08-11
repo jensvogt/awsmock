@@ -215,12 +215,12 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Timeout in seconds
          */
-        int timeout = 3600;
+        long timeout = 3600;
 
         /**
          * Concurrency
          */
-        int concurrency = 5;
+        long concurrency = 5;
 
         /**
          * Environment
@@ -286,6 +286,11 @@ namespace AwsMock::Database::Entity::Lambda {
          * Average runtime in milliseconds
          */
         long averageRuntime = 0;
+
+        /**
+         * Enabled flag
+         */
+        bool enabled = false;
 
         /**
          * Creation date
