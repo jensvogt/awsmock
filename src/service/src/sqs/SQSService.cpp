@@ -1075,9 +1075,6 @@ namespace AwsMock::Service {
             // Restrict wait time, otherwise the socker timeout is reached
             const long waitTimeSeconds = request.waitTimeSeconds > 10 ? 10 : request.waitTimeSeconds;
 
-            if (request.queueUrl == "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/ftp-file-distribution-image-queue") {
-                log_debug << "Receive message, queueArn: " << queue.queueArn;
-            }
             Database::Entity::SQS::MessageList messageList;
             if (waitTimeSeconds == 0) {
 
