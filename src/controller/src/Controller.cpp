@@ -49,8 +49,9 @@ namespace AwsMock::Controller {
         else if (std::ranges::find(_commands, "logs") != _commands.end()) {
 
             ShowServiceLogs();
+        }
 #endif
-        } else if (std::ranges::find(_commands, "list-applications") != _commands.end()) {
+        else if (std::ranges::find(_commands, "list-applications") != _commands.end()) {
 
             for (std::vector<Dto::Apps::Application> applications = GetAllApplications(); const auto &application: applications) {
                 std::cout << "  " << std::setw(32) << std::left << application.name
