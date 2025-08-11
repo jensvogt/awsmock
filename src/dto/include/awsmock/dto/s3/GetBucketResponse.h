@@ -5,40 +5,27 @@
 #ifndef AWSMOCK_DTO_S3_GET_BUCKET_RESPONSE_H
 #define AWSMOCK_DTO_S3_GET_BUCKET_RESPONSE_H
 
-// C++ standard includes
-#include <chrono>
-#include <string>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
 
 namespace AwsMock::Dto::S3 {
 
-    using std::chrono::system_clock;
-
     /**
      * @brief Get bucket response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetBucketResponse {
+    struct GetBucketResponse final : Common::BaseCounter<GetBucketRequest> {
 
         /**
          * ID
          */
         std::string id;
-
-        /**
-         * AWS region
-         */
-        std::string region;
 
         /**
          * Bucket
@@ -95,26 +82,31 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend GetBucketResponse tag_invoke(boost::json::value_to_tag<GetBucketResponse>, boost::json::value const &v) {
+            GetBucketResponse r;
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.arn = Core::Json::GetStringValue(v, "arn");
+            r.owner = Core::Json::GetStringValue(v, "owner");
+            r.versionStatus = Core::Json::GetStringValue(v, "versionStatus");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.keys = Core::Json::GetLongValue(v, "keys");
+            r.lambdaConfigurations = boost::json::value_to<std::vector<LambdaConfiguration>>(v.at("lambdaConfigurations"));
+            r.queueConfigurations = boost::json::value_to<std::vector<QueueConfiguration>>(v.at("queueConfigurations"));
+            r.topicConfigurations = boost::json::value_to<std::vector<TopicConfiguration>>(v.at("topicConfigurations"));
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const GetBucketResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, GetBucketResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"id", obj.id},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

@@ -19,7 +19,7 @@ set(S3_SOURCES src/s3/PutBucketVersioningRequest.cpp src/s3/CopyObjectRequest.cp
         src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp
         src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp src/s3/UploadPartCopyResponse.cpp
-        src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
+        src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
         src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp
         src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp src/docker/model/LogConfig.cpp
