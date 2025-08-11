@@ -1377,27 +1377,27 @@ namespace AwsMock::Service {
     }
 
     void S3Service::PutQueueNotificationConfigurations(Database::Entity::S3::Bucket &bucket, const std::vector<Dto::S3::QueueConfiguration> &queueConfigurations) {
-        for (const auto &[id, queueArn, filterRules, events]: queueConfigurations) {
+        for (const auto &queueConfiguration: queueConfigurations) {
 
             // Check existence
-            if (!id.empty() && bucket.HasQueueNotificationId(id)) {
-                log_debug << "Queue notification configuration exists already, id: " << id;
+            if (!queueConfiguration.id.empty() && bucket.HasQueueNotificationId(queueConfiguration.id)) {
+                log_debug << "Queue notification configuration exists already, id: " << queueConfiguration.id;
                 break;
             }
 
             // General attributes
-            const std::string attrId = id.empty() ? Core::StringUtils::CreateRandomUuid() : id;
+            const std::string attrId = queueConfiguration.id.empty() ? Core::StringUtils::CreateRandomUuid() : queueConfiguration.id;
             Database::Entity::S3::QueueNotification queueNotification;
             queueNotification.id = attrId;
-            queueNotification.queueArn = queueArn;
+            queueNotification.queueArn = queueConfiguration.queueArn;
 
             // Get events
-            for (const auto &event: events) {
+            for (const auto &event: queueConfiguration.events) {
                 queueNotification.events.emplace_back(EventTypeToString(event));
             }
 
             // Get filter rules
-            for (const auto &filterRule: filterRules) {
+            for (const auto &filterRule: queueConfiguration.filterRules) {
                 Database::Entity::S3::FilterRule filterRuleEntity;
                 filterRuleEntity.name = Dto::S3::NameTypeToString(filterRule.name);
                 filterRuleEntity.value = filterRule.filterValue;

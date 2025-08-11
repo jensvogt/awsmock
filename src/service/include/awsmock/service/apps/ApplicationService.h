@@ -14,6 +14,10 @@
 #include <awsmock/dto/apps/internal/CreateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/CreateApplicationResponse.h>
 #include <awsmock/dto/apps/internal/DeleteApplicationRequest.h>
+#include <awsmock/dto/apps/internal/DisableAllApplicationRequest.h>
+#include <awsmock/dto/apps/internal/DisableApplicationRequest.h>
+#include <awsmock/dto/apps/internal/EnableAllApplicationRequest.h>
+#include <awsmock/dto/apps/internal/EnableApplicationRequest.h>
 #include <awsmock/dto/apps/internal/GetApplicationRequest.h>
 #include <awsmock/dto/apps/internal/GetApplicationResponse.h>
 #include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
@@ -111,6 +115,38 @@ namespace AwsMock::Service {
          * @return list of strings
          */
         [[nodiscard]] std::vector<std::string> ListApplicationNames() const;
+
+        /**
+         * @brief Enable an application
+         *
+         * @param request enable application request
+         * @see Dto::Apps::EnableApplicationRequest
+         */
+        void EnableApplication(const Dto::Apps::EnableApplicationRequest &request) const;
+
+        /**
+         * @brief Enable all applications
+         *
+         * @param request enable sll applications request
+         * @see Dto::Apps::EnableAllApplicationRequest
+         */
+        void EnableAllApplications(const Dto::Apps::EnableAllApplicationsRequest &request) const;
+
+        /**
+         * @brief Enable an application
+         *
+         * @param request enable application request
+         * @see Dto::Apps::EnableApplicationRequest
+         */
+        void DisableApplication(const Dto::Apps::DisableApplicationRequest &request) const;
+
+        /**
+         * @brief Disable all applications
+         *
+         * @param request disable all applications request
+         * @see Dto::Apps::DisableAllApplicationRequest
+         */
+        void DisableAllApplications(const Dto::Apps::DisableAllApplicationsRequest &request) const;
 
         /**
          * @brief Start an application

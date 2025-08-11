@@ -72,12 +72,48 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::ApplicationCommandType::ENABLE_APPLICATION: {
+
+                    Dto::Apps::EnableApplicationRequest serviceRequest = Dto::Apps::EnableApplicationRequest::FromJson(clientCommand);
+                    boost::asio::post(_ioc, [this, serviceRequest] {
+                        _applicationService.EnableApplication(serviceRequest);
+                        log_info << "Application enabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApplicationCommandType::ENABLE_ALL_APPLICATIONS: {
+
+                    Dto::Apps::EnableAllApplicationsRequest serviceRequest = Dto::Apps::EnableAllApplicationsRequest::FromJson(clientCommand);
+                    boost::asio::post(_ioc, [this, serviceRequest] {
+                        _applicationService.EnableAllApplications(serviceRequest);
+                        log_info << "Application enabled, region: " << serviceRequest.region; });
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApplicationCommandType::DISABLE_APPLICATION: {
+
+                    Dto::Apps::DisableApplicationRequest serviceRequest = Dto::Apps::DisableApplicationRequest::FromJson(clientCommand);
+                    boost::asio::post(_ioc, [this, serviceRequest] {
+                        _applicationService.DisableApplication(serviceRequest);
+                        log_info << "Application disabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::ApplicationCommandType::DISABLE_ALL_APPLICATIONS: {
+
+                    Dto::Apps::DisableAllApplicationsRequest serviceRequest = Dto::Apps::DisableAllApplicationsRequest::FromJson(clientCommand);
+                    boost::asio::post(_ioc, [this, serviceRequest] {
+                        _applicationService.DisableAllApplications(serviceRequest);
+                        log_info << "Application disabled, region: " << serviceRequest.region; });
+                    return SendResponse(request, http::status::ok);
+                }
+
                 case Dto::Common::ApplicationCommandType::START_APPLICATION: {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
                         _applicationService.StartApplication(serviceRequest);
-                        log_info << "Applications started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                        log_info << "Application started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendResponse(request, http::status::ok);
                 }
 

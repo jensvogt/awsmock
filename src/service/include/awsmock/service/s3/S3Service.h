@@ -34,8 +34,6 @@
 #include <awsmock/dto/s3/CreateMultipartUploadResult.h>
 #include <awsmock/dto/s3/DeleteBucketRequest.h>
 #include <awsmock/dto/s3/DeleteObjectRequest.h>
-#include <awsmock/dto/s3/GetBucketRequest.h>
-#include <awsmock/dto/s3/GetBucketResponse.h>
 #include <awsmock/dto/s3/GetEventSourceRequest.h>
 #include <awsmock/dto/s3/GetEventSourceResponse.h>
 #include <awsmock/dto/s3/GetMetadataRequest.h>
@@ -62,6 +60,8 @@
 #include <awsmock/dto/s3/UploadPartCopyResponse.h>
 #include <awsmock/dto/s3/internal/DeleteObjectsRequest.h>
 #include <awsmock/dto/s3/internal/DeleteObjectsResponse.h>
+#include <awsmock/dto/s3/internal/GetBucketRequest.h>
+#include <awsmock/dto/s3/internal/GetBucketResponse.h>
 #include <awsmock/dto/s3/internal/GetObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/GetObjectCounterResponse.h>
 #include <awsmock/dto/s3/internal/ListBucketCounterRequest.h>

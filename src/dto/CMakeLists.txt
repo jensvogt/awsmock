@@ -19,8 +19,7 @@ set(S3_SOURCES src/s3/PutBucketVersioningRequest.cpp src/s3/CopyObjectRequest.cp
         src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
         src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp
         src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp src/s3/UploadPartCopyResponse.cpp
-        src/s3/GetBucketResponse.cpp src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp
-        src/s3/PurgeBucketRequest.cpp)
+        src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp
         src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp src/docker/model/LogConfig.cpp
         src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp
@@ -29,9 +28,8 @@ set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/
         src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp src/docker/model/HostConfig.cpp)
 set(LAMBDA_SOURCES
         src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
-        src/lambda/GetFunctionResponse.cpp src/lambda/mapper/Mapper.cpp
-        src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp
-)
+        src/lambda/GetFunctionResponse.cpp src/lambda/mapper/Mapper.cpp src/lambda/ListEventSourceMappingsRequest.cpp
+        src/lambda/ListEventSourceMappingsResponse.cpp)
 set(COGNITO_SOURCES src/cognito/mapper/Mapper.cpp)
 set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp

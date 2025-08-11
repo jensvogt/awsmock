@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_APPS_START_APPLICATION_REQUEST_H
-#define AWSMOCK_DTO_APPS_START_APPLICATION_REQUEST_H
+#ifndef AWSMOCK_DTO_APPS_ENABLE_APPLICATION_REQUEST_H
+#define AWSMOCK_DTO_APPS_ENABLE_APPLICATION_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief Starts an application
+     * @brief Enable an application
      *
      * @par
      * Request to start an application.
@@ -53,7 +53,7 @@ namespace AwsMock::Dto::Apps {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct StartApplicationRequest final : Common::BaseCounter<StartApplicationRequest> {
+    struct EnableApplicationRequest final : Common::BaseCounter<EnableApplicationRequest> {
 
         /**
          * Application object
@@ -82,8 +82,8 @@ namespace AwsMock::Dto::Apps {
 
       private:
 
-        friend StartApplicationRequest tag_invoke(boost::json::value_to_tag<StartApplicationRequest>, boost::json::value const &v) {
-            StartApplicationRequest r;
+        friend EnableApplicationRequest tag_invoke(boost::json::value_to_tag<EnableApplicationRequest>, boost::json::value const &v) {
+            EnableApplicationRequest r;
             r.application = boost::json::value_to<Application>(v.at("application"));
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
@@ -94,7 +94,7 @@ namespace AwsMock::Dto::Apps {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, StartApplicationRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EnableApplicationRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
@@ -110,4 +110,4 @@ namespace AwsMock::Dto::Apps {
 
 }// namespace AwsMock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_START_APPLICATION_REQUEST_H
+#endif// AWSMOCK_DTO_APPS_ENABLE_APPLICATION_REQUEST_H

@@ -17,8 +17,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/FilterRule.h>
 #include <awsmock/dto/s3/model/NotificationEvent.h>
 
@@ -53,7 +53,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct QueueConfiguration {
+    struct QueueConfiguration final : Common::BaseCounter<QueueConfiguration> {
 
         /**
          * ID, optional, if empty, a random ID will be generated
@@ -97,6 +97,15 @@ namespace AwsMock::Dto::S3 {
         void FromXml(const boost::property_tree::ptree &pt);
 
       private:
+
+        friend QueueConfiguration tag_invoke(boost::json::value_to_tag<QueueConfiguration>, boost::json::value const &v) {
+            QueueConfiguration r;
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.filterRules = boost::json::value_to<std::vector<FilterRule>>(v.at("filterRules"));
+            r.events = boost::json::value_to<std::vector<NotificationEventType>>(v.at("events"));
+            return r;
+        }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, QueueConfiguration const &obj) {
             jv = {

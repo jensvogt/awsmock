@@ -20,7 +20,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct GetBucketResponse final : Common::BaseCounter<GetBucketRequest> {
+    struct GetBucketResponse final : Common::BaseCounter<GetBucketResponse> {
 
         /**
          * ID
@@ -50,12 +50,12 @@ namespace AwsMock::Dto::S3 {
         /**
          * Size in bytes
          */
-        long size;
+        long size{};
 
         /**
          * Object keys count
          */
-        long keys;
+        long keys{};
 
         /**
          * Lambda notification configurations
@@ -96,6 +96,8 @@ namespace AwsMock::Dto::S3 {
             r.lambdaConfigurations = boost::json::value_to<std::vector<LambdaConfiguration>>(v.at("lambdaConfigurations"));
             r.queueConfigurations = boost::json::value_to<std::vector<QueueConfiguration>>(v.at("queueConfigurations"));
             r.topicConfigurations = boost::json::value_to<std::vector<TopicConfiguration>>(v.at("topicConfigurations"));
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
         }
 
@@ -105,6 +107,17 @@ namespace AwsMock::Dto::S3 {
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"id", obj.id},
+                    {"bucket", obj.bucket},
+                    {"arn", obj.arn},
+                    {"owner", obj.owner},
+                    {"versionStatus", obj.versionStatus},
+                    {"size", obj.size},
+                    {"keys", obj.keys},
+                    {"lambdaConfigurations", boost::json::value_from(obj.lambdaConfigurations)},
+                    {"queueConfigurations", boost::json::value_from(obj.queueConfigurations)},
+                    {"topicConfigurations", boost::json::value_from(obj.topicConfigurations)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };
