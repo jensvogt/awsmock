@@ -570,8 +570,6 @@ namespace AwsMock::Service {
                     boost::asio::spawn(_ioc, [this, s3Request](const boost::asio::yield_context &) {
                         const long deleted = _s3Service.PurgeBucket(s3Request);
                         log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: "<<deleted; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
                     return SendOkResponse(request, {});
                 }
 
@@ -604,11 +602,7 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
-                        _s3Service.TouchObject(s3Request);
-                        log_info << "Touch object, bucket: " << s3Request.bucket << ", key: " << s3Request.key; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                    boost::asio::post(_ioc, [this, s3Request] { _s3Service.TouchObject(s3Request); });
                     return SendOkResponse(request);
                 }
 
@@ -617,11 +611,7 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
-                        _s3Service.UpdateObject(s3Request);
-                        log_info << "Object updated, bucket: " << s3Request.bucket << ", key: " << s3Request.key; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                    boost::asio::post(_ioc, [this, s3Request] { _s3Service.UpdateObject(s3Request); });
                     return SendOkResponse(request);
                 }
 
@@ -638,12 +628,9 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, s3Request](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this, s3Request] {
                         const auto s3response = _s3Service.DeleteObjects(s3Request);
-                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size(); }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
-
+                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size(); });
                     return SendOkResponse(request);
                 }
 
@@ -730,49 +717,49 @@ namespace AwsMock::Service {
         clientCommand.FromRequest(request, region, user);
 
         try {
-
             Dto::S3::GetMetadataResponse s3Response;
             if (clientCommand.key.empty()) {
 
                 // Bucket metadata
-                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket};
+                Dto::S3::GetMetadataRequest s3Request;
+                s3Request.region = clientCommand.region;
+                s3Request.bucket = clientCommand.bucket;
                 s3Response = _s3Service.GetBucketMetadata(s3Request);
 
             } else {
 
                 // Object metadata
-                Dto::S3::GetMetadataRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key};
+                Dto::S3::GetMetadataRequest s3Request;
+                s3Request.region = clientCommand.region;
+                s3Request.bucket = clientCommand.bucket;
+                s3Request.key = clientCommand.key;
                 s3Response = _s3Service.GetObjectMetadata(s3Request);
             }
 
             std::map<std::string, std::string> headers;
+            headers["accept-ranges"] = "bytes";
             headers["Handler"] = "awsmock";
             headers["Content-Type"] = "application/json";
             headers["Content-Length"] = std::to_string(s3Response.size);
             headers["Last-Modified"] = Core::DateTimeUtils::HttpFormat(s3Response.modified);
             headers["ETag"] = Core::StringUtils::Quoted(s3Response.md5Sum);
-            headers["accept-ranges"] = "bytes";
-            headers["x-amz-userPoolId-2"] = Core::StringUtils::GenerateRandomString(30);
-            headers["x-amz-request-userPoolId"] = Core::StringUtils::CreateRandomUuid();
-            headers["x-amz-version-userPoolId"] = Core::StringUtils::GenerateRandomString(30);
             headers["x-amz-bucket-region"] = s3Response.region;
             headers["x-amz-location-name"] = s3Response.region;
 
             // User supplied metadata
-            for (const auto &[fst, snd]: s3Response.metadata) {
-                headers["x-amz-meta-" + fst] = snd;
+            if (!s3Response.metadata.empty()) {
+                for (const auto &[fst, snd]: s3Response.metadata) {
+                    headers["x-amz-meta-" + fst] = snd;
+                }
+                log_info << "Get metadata, count: " << s3Response.metadata.size();
             }
-            log_info << "Get metadata, count: " << s3Response.metadata.size();
-            return SendHeadResponse(request, s3Response.size, headers);
+            return SendResponse(request, http::status::ok, {}, headers);
 
         } catch (Core::NotFoundException &exc) {
-            log_error << exc.message();
-            return SendNotFoundError(request, exc.message());
+            return SendResponse(request, http::status::not_found, exc.message());
         } catch (std::exception &exc) {
-            log_error << exc.what();
             return SendInternalServerError(request, exc.what());
         } catch (...) {
-            log_error << "Unknown exception";
             return SendInternalServerError(request, "Unknown exception");
         }
     }

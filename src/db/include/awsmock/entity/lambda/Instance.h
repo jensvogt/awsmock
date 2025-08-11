@@ -64,27 +64,27 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Instance ID, will be appended to the container name, in case of multiple instances.
          */
-        std::string instanceId;
+        std::string instanceId{};
 
         /**
          * Container ID
          */
-        std::string containerId;
+        std::string containerId{};
 
         /**
          * Container name
          */
-        std::string containerName;
+        std::string containerName{};
 
         /**
          * Host port
          */
-        int hostPort;
+        int hostPort{};
 
         /**
          * Host name
          */
-        std::string hostName;
+        std::string hostName{};
 
         /**
          * Status

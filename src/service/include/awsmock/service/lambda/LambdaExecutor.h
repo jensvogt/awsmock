@@ -5,14 +5,6 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
-// C++ include
-#include <chrono>
-
-// Boost includes
-#include <boost/asio/detached.hpp>
-#include <boost/asio/spawn.hpp>
-#include <boost/interprocess/sync/named_mutex.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
@@ -26,9 +18,6 @@
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
-
-    namespace http = boost::beast::http;
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda executor.
@@ -46,23 +35,19 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() {}
+        explicit LambdaExecutor() = default;
 
         /**
          * @brief Executes a lambda function synchronized
          *
          * @param lambda lambda function
+         * @param instanceId instance ID
          * @param containerId lambda docker container ID
          * @param host lambda docker host
          * @param port lambda docker port
          * @param payload lambda payload
          */
-        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, std::string &containerId, std::string &host, int port, std::string &payload) const;
-
-        /**
-         * @brief Executes a lambda function asynchronously
-         */
-        void SpawnDetached();
+        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, std::string &containerId, std::string &host, int port, std::string &payload) const;
 
       private:
 
@@ -80,11 +65,6 @@ namespace AwsMock::Service {
          * Docker module
          */
         ContainerService &_containerService = ContainerService::instance();
-
-        /**
-         * Mutex
-         */
-        static boost::mutex _executionMutex;
     };
 
 }// namespace AwsMock::Service

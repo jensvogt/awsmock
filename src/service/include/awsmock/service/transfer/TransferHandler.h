@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferHandler() : AbstractHandler("transfer-handler") {}
+        explicit TransferHandler(boost::asio::io_context &ioc) : AbstractHandler("transfer-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.

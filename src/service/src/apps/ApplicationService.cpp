@@ -3,16 +3,11 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/common/mapper/Mapper.h"
-#include "awsmock/dto/ssm/mapper/Mapper.h"
-#include "awsmock/service/apps/ApplicationCreator.h"
-
-
 #include <awsmock/service/apps/ApplicationService.h>
 
 namespace AwsMock::Service {
 
-    ApplicationService::ApplicationService() : _database(Database::ApplicationDatabase::instance()) {
+    ApplicationService::ApplicationService(boost::asio::io_context &ioc) : _database(Database::ApplicationDatabase::instance()), _ioc(ioc) {
         _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
     }
 
@@ -39,8 +34,9 @@ namespace AwsMock::Service {
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
             ApplicationCreator applicationCreator;
-            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-            t.detach();
+            boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
+                applicationCreator(fullBase64File, application.region, application.name, instanceId);
+            });
 
             Dto::Apps::ListApplicationCountersRequest listRequest{};
             listRequest.requestId = request.requestId;
@@ -99,6 +95,24 @@ namespace AwsMock::Service {
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
             application = _database.UpdateApplication(application);
 
+            // Stop if not enabled anymore
+            if (!application.enabled) {
+                Dto::Apps::StopApplicationRequest stopRequest{};
+                stopRequest.requestId = request.requestId;
+                stopRequest.region = request.region;
+                stopRequest.user = request.user;
+                stopRequest.application = Dto::Apps::Mapper::map(application);
+                StopApplication(stopRequest);
+            } else {
+                Dto::Apps::StartApplicationRequest startRequest{};
+                startRequest.requestId = request.requestId;
+                startRequest.region = request.region;
+                startRequest.user = request.user;
+                startRequest.application = Dto::Apps::Mapper::map(application);
+                StartApplication(startRequest);
+            }
+
+            // Create get request
             Dto::Apps::GetApplicationResponse getRequest{};
             getRequest.requestId = request.requestId;
             getRequest.region = request.region;
@@ -145,9 +159,9 @@ namespace AwsMock::Service {
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         ApplicationCreator applicationCreator;
-        boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-        t.detach();
-
+        boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
+            applicationCreator(fullBase64File, application.region, application.name, instanceId);
+        });
         log_debug << "Application code updated, name: " << request.applicationName;
     }
 
@@ -180,8 +194,9 @@ namespace AwsMock::Service {
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         ApplicationCreator applicationCreator;
-        boost::thread t(boost::ref(applicationCreator), base64FullFile, application.region, application.name, instanceId);
-        t.detach();
+        boost::asio::post(_ioc, [applicationCreator, base64FullFile, application, instanceId] {
+            applicationCreator(base64FullFile, application.region, application.name, instanceId);
+        });
     }
 
     void ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
@@ -191,11 +206,17 @@ namespace AwsMock::Service {
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
-            throw Core::ServiceException("Application does not exist, name: " + request.application.name);
+            return;
         }
 
         // Get application
         Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+
+        // Check enables flag
+        if (!application.enabled) {
+            log_warning << "Application not enabled, name: " << request.application.name;
+            return;
+        }
 
         // Update status
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
@@ -222,8 +243,9 @@ namespace AwsMock::Service {
             // Create the application asynchronously
             const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
             ApplicationCreator applicationCreator;
-            boost::thread t(boost::ref(applicationCreator), fullBase64File, application.region, application.name, instanceId);
-            t.detach();
+            boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
+                applicationCreator(fullBase64File, application.region, application.name, instanceId);
+            });
             log_debug << "Application start initiated, name: " << request.application.name;
 
         } else {
@@ -257,7 +279,6 @@ namespace AwsMock::Service {
         // Loop over applications
         long count = 0;
         for (auto &application: _database.ListApplications()) {
-
             Dto::Apps::StartApplicationRequest startRequest;
             startRequest.application = Dto::Apps::Mapper::map(application);
             startRequest.region = application.region;
@@ -274,7 +295,7 @@ namespace AwsMock::Service {
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
-            throw Core::ServiceException("Application does not exist, name: " + request.application.name);
+            return;
         }
 
         // Get application
@@ -287,11 +308,11 @@ namespace AwsMock::Service {
         // Stop the application
         if (!ContainerService::instance().ContainerExistsByName(application.containerName)) {
             log_warning << "Container does not exist, name: " << request.application.name;
-            throw Core::ServiceException("Container does not exist, name: " + request.application.name);
+            return;
         }
 
         // Stop container
-        ContainerService::instance().StopContainer(application.containerId);
+        ContainerService::instance().KillContainer(application.containerId);
         ContainerService::instance().DeleteContainer(application.containerId);
         log_debug << "Application stopped, name: " << application.name;
 

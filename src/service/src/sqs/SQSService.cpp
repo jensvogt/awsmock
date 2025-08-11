@@ -560,7 +560,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const {
+    void SQSService::SetQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "set_queue_attributes");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "set_queue_attributes");
         log_trace << "Put queue sqs request, queue: " << request.queueUrl;
@@ -578,23 +578,24 @@ namespace AwsMock::Service {
             log_trace << "Got queue: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
             // Reset all userAttributes
-            if (!request.attributes["Policy"].empty()) {
-                queue.attributes.policy = request.attributes["Policy"];
+            std::map<std::string, std::string> attributes = request.attributes;
+            if (!attributes["Policy"].empty()) {
+                queue.attributes.policy = attributes["Policy"];
             }
-            if (!request.attributes["RedrivePolicy"].empty()) {
-                queue.attributes.redrivePolicy.FromJson(request.attributes["RedrivePolicy"]);
+            if (!attributes["RedrivePolicy"].empty()) {
+                queue.attributes.redrivePolicy.FromJson(attributes["RedrivePolicy"]);
             }
-            if (!request.attributes["RedriveAllowPolicy"].empty()) {
-                queue.attributes.redriveAllowPolicy = request.attributes["RedriveAllowPolicy"];
+            if (!attributes["RedriveAllowPolicy"].empty()) {
+                queue.attributes.redriveAllowPolicy = attributes["RedriveAllowPolicy"];
             }
-            if (!request.attributes["MessageRetentionPeriod"].empty()) {
-                queue.attributes.messageRetentionPeriod = std::stoi(request.attributes["MessageRetentionPeriod"]);
+            if (!attributes["MessageRetentionPeriod"].empty()) {
+                queue.attributes.messageRetentionPeriod = std::stoi(attributes["MessageRetentionPeriod"]);
             }
-            if (!request.attributes["VisibilityTimeout"].empty()) {
-                queue.attributes.visibilityTimeout = std::stoi(request.attributes["VisibilityTimeout"]);
+            if (!attributes["VisibilityTimeout"].empty()) {
+                queue.attributes.visibilityTimeout = std::stoi(attributes["VisibilityTimeout"]);
             }
-            if (!request.attributes["QueueArn"].empty()) {
-                queue.attributes.queueArn = request.attributes["QueueArn"];
+            if (!attributes["QueueArn"].empty()) {
+                queue.attributes.queueArn = attributes["QueueArn"];
             } else {
                 queue.attributes.queueArn = queue.queueArn;
             }
@@ -1071,17 +1072,22 @@ namespace AwsMock::Service {
                 maxRetries = queue.attributes.redrivePolicy.maxReceiveCount;
             }
 
+            // Restrict wait time, otherwise the socker timeout is reached
+            const long waitTimeSeconds = request.waitTimeSeconds > 10 ? 10 : request.waitTimeSeconds;
+
             Database::Entity::SQS::MessageList messageList;
-            if (request.waitTimeSeconds == 0) {
+            if (waitTimeSeconds == 0) {
+
                 // Short polling period
                 _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                 log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();
+
             } else {
-                long elapsed = 0;
 
                 // Long polling period
+                long elapsed = 0;
                 const auto begin = system_clock::now();
-                while (elapsed < request.waitTimeSeconds) {
+                while (elapsed < waitTimeSeconds) {
                     Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
 
                     _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
@@ -1399,7 +1405,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) {
+    void SQSService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const {
         log_debug << "Invoke lambda function request, function: " << lambda.function;
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");

@@ -2,14 +2,11 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#include "awsmock/service/apps/ApplicationLogServer.h"
-
-
 #include <awsmock/service/apps/ApplicationServer.h>
 
 namespace AwsMock::Service {
 
-    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler) : AbstractServer("application"), _module("application"), _scheduler(scheduler) {
+    ApplicationServer::ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("application"), _applicationService(ioc), _module("application"), _scheduler(scheduler) {
 
         // Get HTTP configuration values
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.monitoring-period");
@@ -135,7 +132,7 @@ namespace AwsMock::Service {
 
         for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase.ListApplications(); auto &application: applications) {
 
-            ContainerService::instance().StopContainer(application.containerId);
+            ContainerService::instance().KillContainer(application.containerId);
             ContainerService::instance().DeleteContainer(application.containerId);
             application = _applicationDatabase.UpdateApplication(application);
             log_info << "Application stopped, name: " << application.name;

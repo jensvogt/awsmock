@@ -38,8 +38,9 @@ namespace AwsMock::Service {
             _database.DeleteAllMessages();
         }
 
+        boost::asio::io_context _ioContext;
         Database::SQSDatabase &_database = Database::SQSDatabase::instance();
-        SQSService _service;
+        SQSService _service{_ioContext};
     };
 
     BOOST_FIXTURE_TEST_CASE(QueueCreateTest, SQSServiceTest) {

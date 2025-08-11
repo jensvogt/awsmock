@@ -33,9 +33,10 @@ namespace AwsMock::Service {
             return request;
         }
 
+        boost::asio::io_context _ioContext;
         Database::SecretsManagerDatabase &_secretsManagerDatabase = Database::SecretsManagerDatabase::instance();
         Database::KMSDatabase &_kmsDatabase = Database::KMSDatabase::instance();
-        SecretsManagerService _secretsManagerService;
+        SecretsManagerService _secretsManagerService{_ioContext};
         KMSService _kmsService;
     };
 

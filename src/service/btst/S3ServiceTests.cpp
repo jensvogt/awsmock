@@ -39,7 +39,8 @@ namespace AwsMock::Service {
             Core::FileUtils::DeleteFile(testFile);
         }
 
-        S3Service _service;
+        boost::asio::io_context _ioContext;
+        S3Service _service{_ioContext};
         std::string testFile;
         Database::S3Database _database = Database::S3Database();
     };

@@ -41,7 +41,7 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     Instance Lambda::GetInstance(const std::string &instanceId) {
-        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
+        if (const auto &it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
             return *it;
         }
         log_error << "Lambda instance not found, id: " << instanceId;
@@ -49,26 +49,32 @@ namespace AwsMock::Database::Entity::Lambda {
     }
 
     void Lambda::SetInstanceHostPort(const std::string &instanceId, const std::string &host, const int port) {
-        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
-            it->hostName = host;
-            it->hostPort = port;
-            return;
+        for (auto &instance: instances) {
+            if (instanceId == instance.instanceId) {
+                instance.hostName = host;
+                instance.hostPort = port;
+                return;
+            }
         }
         log_error << "Lambda instance not found, id: " << instanceId;
     }
 
     void Lambda::SetInstanceLastInvocation(const std::string &instanceId) {
-        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
-            it->lastInvocation = system_clock::now();
-            return;
+        for (auto &instance: instances) {
+            if (instanceId == instance.instanceId) {
+                instance.lastInvocation = system_clock::now();
+                return;
+            }
         }
         log_error << "Lambda instance not found, id: " << instanceId;
     }
 
     void Lambda::SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status) {
-        if (const auto it = std::ranges::find_if(instances, [&instanceId](const Instance &obj) { return obj.instanceId == instanceId; }); it != instances.end()) {
-            it->status = status;
-            return;
+        for (auto &instance: instances) {
+            if (instanceId == instance.instanceId) {
+                instance.status = status;
+                return;
+            }
         }
         log_error << "Lambda instance not found, id: " << instanceId;
     }

@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaServer(Core::Scheduler &scheduler);
+        explicit LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
         /**
          * @brief Shutdown server
@@ -74,7 +74,7 @@ namespace AwsMock::Service {
          * @par
          * For each lambda function, the container will be created, if not existing already
          */
-        void CreateContainers();
+        void CreateContainers() const;
 
         /**
          * @brief Remove expired lambda functions

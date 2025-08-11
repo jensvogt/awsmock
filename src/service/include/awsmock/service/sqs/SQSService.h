@@ -105,7 +105,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSService() : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit SQSService(boost::asio::io_context &ioc) : _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {};
 
         /**
          * @brief Creates a new queue.
@@ -232,7 +232,7 @@ namespace AwsMock::Service {
          * @param request put queue sqs request
          * @throws ServiceException
          */
-        void SetQueueAttributes(Dto::SQS::SetQueueAttributesRequest &request) const;
+        void SetQueueAttributes(const Dto::SQS::SetQueueAttributesRequest &request) const;
 
         /**
          * @brief Adds a default attribute
@@ -475,7 +475,7 @@ namespace AwsMock::Service {
          * @param message SQS message.
          * @param eventSourceArn event source ARN
          */
-        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn);
+        void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SQS::Message &message, const std::string &eventSourceArn) const;
 
         /**
          * @brief Checks the attributes for an entry with 'all'. The search is case-insensitive.

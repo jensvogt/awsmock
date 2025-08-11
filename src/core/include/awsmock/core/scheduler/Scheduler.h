@@ -29,12 +29,12 @@ namespace AwsMock::Core {
 
       public:
 
-        explicit Scheduler(boost::asio::io_context &io_service);
+        explicit Scheduler(boost::asio::io_context &ioc);
 
         /**
          * @brief Main routine
          */
-        void Run();
+        static void Run();
 
         /**
          * @brief Add a task to the scheduler.
@@ -65,7 +65,7 @@ namespace AwsMock::Core {
         /**
          * Boost asio IO service
          */
-        boost::asio::io_context &_io_service;
+        boost::asio::io_context &_ioc;
 
         /**
          * Periodic task list

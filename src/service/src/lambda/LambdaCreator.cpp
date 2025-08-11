@@ -6,16 +6,15 @@
 
 namespace AwsMock::Service {
 
-    boost::mutex LambdaCreator::_lambdaCreatorMutex;
-
-    Database::Entity::Lambda::Lambda LambdaCreator::DoCreate(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) {
-        boost::mutex::scoped_lock lock(_lambdaCreatorMutex);
+    Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) {
         log_debug << "Start creating lambda function, instanceId: " << instanceId;
 
         // Create a new instance
         const std::string containerId = CreateInstance(instanceId, lambda, lambda.code.zipFile);
 
         // Update database
+        lambda.averageRuntime = 0;
+        lambda.invocations = 0;
         lambda.lastStarted = system_clock::now();
         lambda.state = Database::Entity::Lambda::LambdaState::Active;
         lambda.stateReason = "Activated";
@@ -75,6 +74,57 @@ namespace AwsMock::Service {
 
         // Save size in entity
         return inspectContainerResponse.id;
+    }
+
+    void LambdaCreator::UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) {
+
+        const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
+        const auto dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
+
+        // Docker tag
+        lambda.dockerTag = newVersion;
+        lambda.tags["dockerTag"] = lambda.dockerTag;
+        lambda.tags["version"] = lambda.dockerTag;
+        log_debug << "Using docker tag: " << lambda.dockerTag;
+
+        // Build the docker image, if not existing
+        CreateDockerImage(functionCode, lambda, lambda.dockerTag);
+
+        // Create instance
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+
+        // Create the container, if not existing. If existing, get the current port from the docker container
+        const std::string containerName = lambda.function + "-" + instanceId;
+        CreateDockerContainer(lambda, instanceId, CreateRandomHostPort(), lambda.dockerTag);
+
+        // Get docker container
+        Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
+
+        // Start the docker container, in case it is not already running.
+        if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
+            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
+            ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
+            log_info << "Lambda docker container started, function: " << lambda.function << ", containerId: " << inspectContainerResponse.id;
+        }
+
+        // Get the public port
+        inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
+        Database::Entity::Lambda::Instance instance;
+        instance.instanceId = instanceId;
+        instance.status = Database::Entity::Lambda::InstanceIdle;
+        instance.containerName = containerName;
+        instance.created = system_clock::now();
+        if (!inspectContainerResponse.id.empty()) {
+            instance.hostName = dockerized ? containerName : "localhost";
+            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
+            instance.containerId = inspectContainerResponse.id;
+            lambda.containerSize = inspectContainerResponse.sizeRootFs;
+        }
+        lambda.instances.emplace_back(instance);
+
+        // Set status and update database
+        lambda.state = Database::Entity::Lambda::LambdaState::Active;
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
     }
 
     void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {

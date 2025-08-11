@@ -42,10 +42,11 @@ namespace AwsMock::Service {
         /**
          * @brief Returns an HTTP request handler for a module.
          *
+         * @param ioc boost asio IO context
          * @param routingKey module name
          * @return pointer to module handler
          */
-        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
+        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::asio::io_context &ioc);
     };
 
 }// namespace AwsMock::Service

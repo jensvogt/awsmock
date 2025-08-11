@@ -53,6 +53,11 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Instance ID
          */
+        std::string instanceId;
+
+        /**
+         * Container ID
+         */
         std::string containerId;
 
         /**

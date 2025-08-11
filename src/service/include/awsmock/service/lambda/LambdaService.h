@@ -8,11 +8,6 @@
 // C++ standard includes
 #include <string>
 
-// Boost includes
-#include <boost/interprocess/sync/named_mutex.hpp>
-#include <boost/interprocess/sync/scoped_lock.hpp>
-#include <boost/thread/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -91,8 +86,6 @@
 
 namespace AwsMock::Service {
 
-    using std::chrono::system_clock;
-
     /**
      * @brief Lambda service module. Handles all lambda related requests:
      *
@@ -124,8 +117,10 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param ioc boost asio IO context
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()) {};
+        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {}
 
         /**
          * @brief Create lambda function
@@ -268,7 +263,7 @@ namespace AwsMock::Service {
          * @param invocationType invocation type synchronous/asynchronous
          * @return lambda result in case of synchronous invocation, otherwise empty struct
          */
-        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType);
+        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -566,6 +561,14 @@ namespace AwsMock::Service {
         void SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
+         * @brief Writes the base64 ZIP file coming from the frontend to the local lambda data dir.
+         *
+         * @param base64File name of the file
+         * @param content base64 encoded content
+         */
+        static void WriteBase64File(const std::string &base64File, const std::string &content);
+
+        /**
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -586,15 +589,19 @@ namespace AwsMock::Service {
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Find idle instance mutex
-         */
-        static boost::mutex _lambdaFindMutex;
-
-        /**
          * Boost IO context
          */
-        boost::asio::io_context _ioc;
+        boost::asio::io_context &_ioc;
+
+        /**
+         * Lambda executor
+         */
         LambdaExecutor lambdaExecutor;
+
+        /**
+         * Function mutexes
+         */
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
 
 }// namespace AwsMock::Service

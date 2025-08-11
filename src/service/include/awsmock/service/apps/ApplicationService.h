@@ -27,9 +27,13 @@
 #include <awsmock/dto/apps/internal/UpdateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/UploadApplicationCodeRequest.h>
 #include <awsmock/dto/apps/mapper/Mapper.h>
+#include <awsmock/dto/common/mapper/Mapper.h>
+#include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/ApplicationDatabase.h>
+#include <awsmock/service/apps/ApplicationCreator.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
+
 
 namespace AwsMock::Service {
 
@@ -50,7 +54,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ApplicationService();
+        explicit ApplicationService(boost::asio::io_context &ioc);
 
         /**
          * @brief Create a new application
@@ -209,6 +213,11 @@ namespace AwsMock::Service {
          * AWS account userPoolId
          */
         std::string _accountId;
+
+        /**
+         * Boost asio IO context
+         */
+        boost::asio::io_context &_ioc;
     };
 
 }// namespace AwsMock::Service

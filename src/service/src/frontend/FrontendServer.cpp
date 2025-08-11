@@ -20,10 +20,10 @@ namespace AwsMock::Service::Frontend {
 
             auto const address = net::ip::make_address(Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.address"));
             unsigned short port = Core::Configuration::instance().GetValue<int>("awsmock.frontend.port");
-            std::string doc_root = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.doc-root");
+            auto doc_root = Core::Configuration::instance().GetValue<std::string>("awsmock.frontend.doc-root");
             const int num_workers = Core::Configuration::instance().GetValue<int>("awsmock.frontend.workers");
 
-            boost::asio::io_context ioc{1};
+            boost::asio::io_context ioc{num_workers};
             boost::asio::ip::tcp::acceptor acceptor{ioc, {address, port}};
 
             std::list<FrontendWorker> workers;

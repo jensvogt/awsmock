@@ -159,7 +159,7 @@ namespace AwsMock::Database {
             }
 
             Entity::Lambda::Lambda result;
-            result.FromDocument(mResult->view());
+            result.FromDocument(mResult.value());
             return result;
 
         } catch (const mongocxx::exception &exc) {

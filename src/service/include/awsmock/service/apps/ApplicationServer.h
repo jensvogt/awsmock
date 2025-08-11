@@ -9,13 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include "ApplicationService.h"
-
-
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/repository/ApplicationDatabase.h>
+#include <awsmock/service/apps/ApplicationLogServer.h>
+#include <awsmock/service/apps/ApplicationService.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -34,7 +33,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit ApplicationServer(Core::Scheduler &scheduler);
+        explicit ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
         /**
          * @brief Shutdown server

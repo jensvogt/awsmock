@@ -24,21 +24,17 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
 
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this, sqsRequest] {
                         const long purged = _sqsService.PurgeQueue(sqsRequest);
-                        log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged; });
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
 
-                    boost::asio::spawn(_ioc, [this](boost::asio::yield_context) {
+                    boost::asio::post(_ioc, [this] {
                         const long purged = _sqsService.PurgeAllQueues();
-                        log_info << "Purge all queues, count: " << purged; }, boost::asio::detached);
-                    _ioc.poll();
-                    _ioc.restart();
+                        log_info << "Purge all queues, count: " << purged; });
                     return SendOkResponse(request);
                 }
 
@@ -53,9 +49,9 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::SET_QUEUE_ATTRIBUTES: {
 
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
-                    _sqsService.SetQueueAttributes(sqsRequest);
-                    log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
-
+                    boost::asio::post(_ioc, [this, sqsRequest] {
+                        _sqsService.SetQueueAttributes(sqsRequest);
+                        log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl); });
                     return SendOkResponse(request);
                 }
 

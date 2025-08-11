@@ -34,7 +34,7 @@
         "address": "0.0.0.0",
         "port": 4566,
         "max-queue": 10,
-        "max-threads": 50,
+        "max-threads": 250,
         "max-body": 104857600,
         "timeout": 900
       }

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewaySession::GatewaySession(ip::tcp::socket &&socket) : _stream(std::move(socket)) {
+    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
@@ -123,7 +123,7 @@ namespace AwsMock::Service {
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target")) {
 
             auto target = Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target");
-            handler = GatewayRouter::GetHandler(target);
+            handler = GatewayRouter::GetHandler(target, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
             Core::AuthorizationHeaderKeys authKey = GetAuthorizationKeys(request, {});
 
             _region = authKey.region;
-            handler = GatewayRouter::GetHandler(authKey.module);
+            handler = GatewayRouter::GetHandler(authKey.module, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << authKey.module;
                 return Core::HttpUtils::BadRequest(request, "Handler not found");
@@ -221,12 +221,9 @@ namespace AwsMock::Service {
 
         // Send a TCP shutdown
         boost::beast::error_code ec;
-        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_both, ec);
+        ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
         if (ec) {
-            ec = _stream.socket().close(ec);
-            if (ec) {
-                log_error << "Close failed: " << ec.message();
-            }
+            _stream.socket().cancel();
         }
         // At this point the connection is closed gracefully
     }

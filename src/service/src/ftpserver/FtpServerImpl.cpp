@@ -8,8 +8,8 @@
 
 namespace AwsMock::FtpServer {
 
-    FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, const uint16_t port)
-        : _port(port), _address(std::move(address)), _acceptor(_ioService), _openConnectionCount(0), _serverName(std::move(serverName)) {
+    FtpServerImpl::FtpServerImpl(std::string serverName, std::string address, const uint16_t port, boost::asio::io_context &awsIoc)
+        : _port(port), _address(std::move(address)), _acceptor(awsIoc), _openConnectionCount(0), _serverName(std::move(serverName)), _awsIoc(awsIoc) {
     }
 
     FtpServerImpl::~FtpServerImpl() {
@@ -26,7 +26,7 @@ namespace AwsMock::FtpServer {
 
     bool FtpServerImpl::start(const size_t thread_count) {
 
-        auto ftp_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
+        auto ftp_session = std::make_shared<FtpSession>(_awsIoc, _ftpUsers, _serverName, [this]() { --_openConnectionCount; });
 
         // set up the acceptor to listen on the tcp port
         boost::beast::error_code make_address_ec;
@@ -80,21 +80,21 @@ namespace AwsMock::FtpServer {
 
             acceptFtpSession(ftp_session, ec);
         });
-
+        /*
         for (size_t i = 0; i < thread_count; i++) {
-            _threadPool.emplace_back([this] { _ioService.run(); });
+            _threadPool.emplace_back([this] { _awsIoc.run(); });
         }
         log_info << "Listening threads started, count: " << thread_count;
-
+*/
         return true;
     }
 
     void FtpServerImpl::stop() {
-        _ioService.stop();
+        /*      _ioService.stop();
         for (std::thread &thread: _threadPool) {
             thread.join();
         }
-        _threadPool.clear();
+        _threadPool.clear();*/
     }
 
     void FtpServerImpl::acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, boost::beast::error_code const &error) {
@@ -106,7 +106,7 @@ namespace AwsMock::FtpServer {
 
         ftp_session->start();
 
-        auto new_session = std::make_shared<FtpSession>(_ioService, _ftpUsers, _serverName, [this] { --_openConnectionCount; });
+        auto new_session = std::make_shared<FtpSession>(_awsIoc, _ftpUsers, _serverName, [this] { --_openConnectionCount; });
 
         _acceptor.async_accept(new_session->getSocket(), [this, new_session](auto ec) {
             ++_openConnectionCount;

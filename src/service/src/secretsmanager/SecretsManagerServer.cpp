@@ -29,7 +29,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("secretsmanager-backup", [this] { BackupSecretsManger(); }, _backupCron);
+            scheduler.AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
         }
 
         // Set running

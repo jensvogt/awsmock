@@ -506,21 +506,17 @@ namespace AwsMock::Service {
          * @brief Extracts the handler file name from the handler name.
          *
          * @param handler handler
-         * @return name of the handler file to copy to docker file
+         * @return name of the handler file to copy to the docker file
          */
         static std::string GetHandlerFileNodeJs22(const std::string &handler);
 
         /**
          * @brief Add environment variables to the Dockerfile
          *
-         * @param ofs output strean
+         * @param ofs output stream
          * @param environment environment variables
          */
         static void AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment);
-
-        void WriteToWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, const boost::asio::const_buffer &buffer);
-
-        void OnWebSocketWrite(const boost::beast::error_code &error, std::size_t bytesWritten);
 
         /**
          * Docker version
@@ -551,16 +547,6 @@ namespace AwsMock::Service {
          * Docker listening socket
          */
         std::shared_ptr<Core::DomainSocket> _domainSocket;
-
-        /**
-         * Mutex
-         */
-        static boost::mutex _dockerServiceMutex;
-
-        /**
-         * Log buffer
-         */
-        boost::beast::flat_buffer _buffer;
     };
 
 }// namespace AwsMock::Service

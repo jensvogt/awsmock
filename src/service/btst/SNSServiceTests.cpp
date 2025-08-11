@@ -41,10 +41,11 @@ namespace AwsMock::Service {
             _sqsDatabase.DeleteAllQueues();
         }
 
+        boost::asio::io_context _ioContext;
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSService _snsService;
-        SQSService _sqsService;
+        SNSService _snsService{_ioContext};
+        SQSService _sqsService{_ioContext};
     };
 
     BOOST_FIXTURE_TEST_CASE(TopicCreateTest, SNSServiceTest) {
