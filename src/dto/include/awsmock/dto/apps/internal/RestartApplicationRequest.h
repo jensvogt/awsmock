@@ -16,10 +16,10 @@
 namespace AwsMock::Dto::Apps {
 
     /**
-     * @brief Update an application
+     * @brief Restart an application
      *
      * @par
-     * Request to update an  application.
+     * Request to restart an  application.
      *
      * Example:
      * @code{.json}

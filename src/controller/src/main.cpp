@@ -36,7 +36,11 @@
 
 // Allowed actions
 static std::list<std::string> allowedActions() {
-    return {"list", "logLevel", "logs", "start", "stop", "restart", "export", "import", "clean", "clean-objects", "show-ftp-users", "config", "ping", "loglevel"};
+    return {
+            "logLevel", "logs",
+            "list-applications", "enable-application", "disable-application", "start-application", "stop-application", "restart-application",
+            "list-lambdas", "start-lambda", "stop-lambda", "restart-lambda",
+            "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"};
 }
 
 /**
@@ -52,10 +56,16 @@ void ShowHelp(const boost::program_options::options_description &desc) {
               << std::endl
               << desc << std::endl
               << "Commands: " << std::endl
-              << std::left << std::setw(leftIndent) << "  list" << ": lists all available services" << std::endl
-              << std::left << std::setw(leftIndent) << "  start [<module>]" << ": starts the given module. If no argument is given, starts all services." << std::endl
-              << std::left << std::setw(leftIndent) << "  stop [<module>]" << ": stops the given module. If no argument is given, stops all services" << std::endl
-              << std::left << std::setw(leftIndent) << "  restart [<module>]" << ": restarts the given module. If no argument is given, restarts all services" << std::endl;
+              << std::left << std::setw(leftIndent) << "  list-applications" << ": lists all available applications" << std::endl
+              << std::left << std::setw(leftIndent) << "  enable-application [<application>]" << ": enable the given application. If no argument is given, enables all applications." << std::endl
+              << std::left << std::setw(leftIndent) << "  disable-application [<application>]" << ": disable the given application. If no argument is given, disables all applications." << std::endl
+              << std::left << std::setw(leftIndent) << "  start-application [<application>]" << ": starts the given application. If no argument is given, starts all applications." << std::endl
+              << std::left << std::setw(leftIndent) << "  stop-application [<application>]" << ": stops the given application. If no argument is given, stops all applications" << std::endl
+              << std::left << std::setw(leftIndent) << "  restart-application [<application>]" << ": restarts the given application. If no argument is given, restarts all applications" << std::endl
+              << std::left << std::setw(leftIndent) << "  list-lambdas" << ": lists all available lambdas" << std::endl
+              << std::left << std::setw(leftIndent) << "  start-lambda [<lambda>]" << ": starts the given lambda. If no argument is given, starts all lambdas." << std::endl
+              << std::left << std::setw(leftIndent) << "  stop-lambda [<lambda>]" << ": stops the given lambda. If no argument is given, stops all lambdas" << std::endl
+              << std::left << std::setw(leftIndent) << "  restart-lambda [<lambda>]" << ": restarts the given lambda. If no argument is given, restarts all lambdas" << std::endl;
 #ifdef HAS_SYSTEMD
     std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
 #endif

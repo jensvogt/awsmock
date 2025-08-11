@@ -3,8 +3,6 @@
 //
 
 #include <awsmock/controller/Controller.h>
-#include <awsmock/dto/module/ExportInfrastructureRequest.h>
-#include <awsmock/dto/module/ListModuleNamesResponse.h>
 
 namespace AwsMock::Controller {
 
@@ -30,7 +28,7 @@ namespace AwsMock::Controller {
 
         if (std::ranges::find(_commands, "list") != _commands.end()) {
 
-            ListServices();
+            ListModules();
 
         } else if (std::ranges::find(_commands, "config") != _commands.end()) {
 
@@ -51,60 +49,99 @@ namespace AwsMock::Controller {
         else if (std::ranges::find(_commands, "logs") != _commands.end()) {
 
             ShowServiceLogs();
-        }
 #endif
-        else if (std::ranges::find(_commands, "start") != _commands.end()) {
+        } else if (std::ranges::find(_commands, "list-applications") != _commands.end()) {
 
-            std::vector<Dto::Module::Module> modules;
+            for (std::vector<Dto::Apps::Application> applications = GetAllApplications(); const auto &application: applications) {
+                std::cout << "  " << std::setw(32) << std::left << application.name
+                          << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                          << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+            }
+
+        } else if (std::ranges::find(_commands, "enable-application") != _commands.end()) {
+
+            std::vector<Dto::Apps::Application> applications;
             for (const auto &command: _commands) {
-                if (command != "start" && command != "all") {
-                    Dto::Module::Module module;
-                    module.name = command;
-                    module.status = Database::Entity::Module::ModuleState::RUNNING;
-                    modules.emplace_back(module);
+                if (command != "enable-application" && command != "all") {
+                    Dto::Apps::Application application;
+                    application.name = command;
+                    applications.emplace_back(application);
                 }
             }
 
-            if (modules.empty()) {
-                modules = GetAllModules();
+            if (applications.empty()) {
+                return EnableAllApplications();
             }
 
-            StartService(modules);
+            return EnableApplications(applications);
 
-        } else if (std::ranges::find(_commands, "restart") != _commands.end()) {
+        } else if (std::ranges::find(_commands, "disable-application") != _commands.end()) {
 
-            std::vector<Dto::Module::Module> modules;
+            std::vector<Dto::Apps::Application> applications;
             for (const auto &command: _commands) {
-                if (command != "restart" && command != "all") {
-                    Dto::Module::Module module;
-                    module.name = command;
-                    modules.emplace_back(module);
+                if (command != "disable-application" && command != "all") {
+                    Dto::Apps::Application application;
+                    application.name = command;
+                    applications.emplace_back(application);
                 }
             }
 
-            if (modules.empty()) {
-                modules = GetAllModules();
+            if (applications.empty()) {
+                return DisableAllApplications();
             }
 
-            StartService(modules);
+            return DisableApplications(applications);
 
-        } else if (std::ranges::find(_commands, "stop") != _commands.end()) {
+        } else if (std::ranges::find(_commands, "start-application") != _commands.end()) {
 
-            std::vector<Dto::Module::Module> modules;
+            std::vector<Dto::Apps::Application> applications;
             for (const auto &command: _commands) {
-                if (command != "stop" && command != "all") {
-                    Dto::Module::Module module;
-                    module.name = command;
-                    module.status = Database::Entity::Module::ModuleState::STOPPED;
-                    modules.emplace_back(module);
+                if (command != "start-application" && command != "all") {
+                    Dto::Apps::Application application;
+                    application.name = command;
+                    applications.emplace_back(application);
                 }
             }
 
-            if (modules.empty()) {
-                modules = GetAllModules();
+            if (applications.empty()) {
+                return StartAllApplications();
             }
 
-            StopService(modules);
+            return StartApplications(applications);
+
+        } else if (std::ranges::find(_commands, "restart-application") != _commands.end()) {
+
+            std::vector<Dto::Apps::Application> applications;
+            for (const auto &command: _commands) {
+                if (command != "restart-application" && command != "all") {
+                    Dto::Apps::Application application;
+                    application.name = command;
+                    applications.emplace_back(application);
+                }
+            }
+
+            if (applications.empty()) {
+                return RestartAllApplications();
+            }
+
+            return RestartApplications(applications);
+
+        } else if (std::ranges::find(_commands, "stop-application") != _commands.end()) {
+
+            std::vector<Dto::Apps::Application> applications;
+            for (const auto &command: _commands) {
+                if (command != "stop-application" && command != "all") {
+                    Dto::Apps::Application application;
+                    application.name = command;
+                    applications.emplace_back(application);
+                }
+            }
+
+            if (applications.empty()) {
+                return StopAllApplications();
+            }
+
+            return StopApplications(applications);
 
         } else if (std::ranges::find(_commands, "import") != _commands.end()) {
 
@@ -123,8 +160,8 @@ namespace AwsMock::Controller {
                 modules = GetAllModuleNames();
             }
 
-            bool pretty = _vm.count("pretty");
-            bool includeObjects = _vm.count("include-objects");
+            bool pretty = _vm.contains("pretty");
+            bool includeObjects = _vm.contains("include-objects");
 
             ExportInfrastructure(modules, pretty, includeObjects);
 
@@ -140,7 +177,7 @@ namespace AwsMock::Controller {
             }
 
             if (modules.empty()) {
-                modules = GetAllModules();
+                // modules = GetAllModules();
             }
 
             CleanInfrastructure(modules);
@@ -162,7 +199,7 @@ namespace AwsMock::Controller {
         }
     }
 
-    void AwsMockCtl::ListServices() const {
+    void AwsMockCtl::ListModules() const {
 
         std::map<std::string, std::string> headers;
         AddStandardHeaders(headers, "list-modules");
@@ -180,65 +217,169 @@ namespace AwsMock::Controller {
         }
     }
 
-    void AwsMockCtl::StartService(std::vector<Dto::Module::Module> &modules) const {
+    void AwsMockCtl::EnableApplications(const std::vector<Dto::Apps::Application> &applications) const {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "start-modules");
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
-        if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
-            return;
-        }
+        AddStandardHeaders(headers, "enable-application");
+        for (const auto &application: applications) {
 
-        modules = Dto::Module::Module::FromJsonList(response.body);
-        for (const auto &module: modules) {
-            if (module.port > 0) {
-                std::cout << "Module " << module.name << "(" << module.port << ") started" << std::endl;
-            } else {
-                std::cout << "Module " << module.name << " started" << std::endl;
+            Dto::Apps::EnableApplicationRequest appRequest;
+            appRequest.region = _region;
+            appRequest.application.name = application.name;
+            appRequest.application.region = application.region;
+
+            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+                return;
             }
+            std::cout << "Application " << application.name << " enabled" << std::endl;
         }
     }
 
-    void AwsMockCtl::RestartService(std::vector<Dto::Module::Module> &modules) const {
+    void AwsMockCtl::EnableAllApplications() const {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "restart-modules");
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
-        if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
+        AddStandardHeaders(headers, "enable-all-applications");
+
+        Dto::Apps::EnableAllApplicationsRequest appRequest;
+        appRequest.region = _region;
+
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
+        std::cout << "All application enabled" << std::endl;
+    }
 
-        modules = Dto::Module::Module::FromJsonList(response.body);
-        for (const auto &module: modules) {
-            if (module.port > 0) {
-                std::cout << "Module " << module.name << "(" << module.port << ") restarted" << std::endl;
-            } else {
-                std::cout << "Module " << module.name << " restarted" << std::endl;
+    void AwsMockCtl::DisableApplications(const std::vector<Dto::Apps::Application> &applications) const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "disable-application");
+        for (const auto &application: applications) {
+
+            Dto::Apps::DisableApplicationRequest appRequest;
+            appRequest.region = _region;
+            appRequest.application.name = application.name;
+            appRequest.application.region = application.region;
+
+            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+                return;
             }
+            std::cout << "Application " << application.name << " enabled" << std::endl;
         }
     }
 
-    void AwsMockCtl::StopService(Dto::Module::Module::ModuleList &modules) const {
+    void AwsMockCtl::DisableAllApplications() const {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "stop-modules");
+        AddStandardHeaders(headers, "disable-all-applications");
 
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::put, _host, _port, "/", Dto::Module::Module::ToJson(modules), headers);
-        if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Error: " << response.statusCode << " body:" << response.body << std::endl;
+        Dto::Apps::DisableAllApplicationsRequest appRequest;
+        appRequest.region = _region;
+
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
             return;
         }
+        std::cout << "All application disabled" << std::endl;
+    }
 
-        modules = Dto::Module::Module::FromJsonList(response.body);
-        for (const auto &module: modules) {
-            if (module.port > 0) {
-                std::cout << "Module " << module.name << "(" << module.port << ") stopped" << std::endl;
-            } else {
-                std::cout << "Module " << module.name << " stopped" << std::endl;
+    void AwsMockCtl::StartApplications(const std::vector<Dto::Apps::Application> &applications) const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "start-application");
+        for (const auto &application: applications) {
+
+            Dto::Apps::StartApplicationRequest appRequest;
+            appRequest.region = _region;
+            appRequest.application.name = application.name;
+            appRequest.application.region = application.region;
+
+            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+                return;
             }
+            std::cout << "Application " << application.name << " started" << std::endl;
         }
+    }
+
+    void AwsMockCtl::StartAllApplications() const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "start-all-applications");
+        Dto::Apps::StartAllApplicationsRequest appRequest;
+        appRequest.region = _region;
+
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+            return;
+        }
+        std::cout << "All applications started" << std::endl;
+    }
+
+    void AwsMockCtl::RestartApplications(const std::vector<Dto::Apps::Application> &applications) const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "restart-application");
+        for (const auto &application: applications) {
+
+            Dto::Apps::RestartApplicationRequest appRequest;
+            appRequest.region = _region;
+            appRequest.application.name = application.name;
+            appRequest.application.region = application.region;
+
+            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+                return;
+            }
+            std::cout << "Application " << application.name << " restarted" << std::endl;
+        }
+    }
+
+    void AwsMockCtl::RestartAllApplications() const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "restart-all-applications");
+
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", {}, headers); response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+            return;
+        }
+        std::cout << "All application restarted" << std::endl;
+    }
+
+    void AwsMockCtl::StopApplications(const std::vector<Dto::Apps::Application> &applications) const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "stop-application");
+        for (const auto &application: applications) {
+
+            Dto::Apps::StopApplicationRequest appRequest;
+            appRequest.region = _region;
+            appRequest.application.name = application.name;
+            appRequest.application.region = application.region;
+
+            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+                return;
+            }
+            std::cout << "Application " << application.name << " stopped" << std::endl;
+        }
+    }
+
+    void AwsMockCtl::StopAllApplications() const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "stop-all-applications");
+        Dto::Apps::StopAllApplicationsRequest appRequest;
+        appRequest.region = _region;
+
+        if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+            std::cerr << "Error: httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+            return;
+        }
+        std::cout << "All applications stopped" << std::endl;
     }
 
 #ifdef HAS_SYSTEMD
@@ -411,21 +552,37 @@ namespace AwsMock::Controller {
     void AwsMockCtl::AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) const {
         headers["User"] = _user;
         headers["Region"] = _region;
-        headers["x-awsmock-target"] = "module";
+        headers["x-awsmock-target"] = "application";
         headers["x-awsmock-action"] = action;
     }
 
-    Dto::Module::Module::ModuleList AwsMockCtl::GetAllModules() const {
+    std::vector<Dto::Apps::Application> AwsMockCtl::GetAllApplications() const {
+
+        Dto::Apps::ListApplicationCountersRequest request;
+        request.region = _region;
+        request.user = _user;
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "list-modules");
-        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::get, _host, _port, "/", {}, headers);
+        AddStandardHeaders(headers, "list-applications");
+
+        const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", request.ToJson(), headers);
         if (response.statusCode != boost::beast::http::status::ok) {
-            std::cerr << "Could not get modules list, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
+            std::cerr << "Could not get application list, httpStatus: " << response.statusCode << " body:" << response.body << std::endl;
             return {};
         }
 
-        return Dto::Module::Module::FromJsonList(response.body);
+        std::vector<Dto::Apps::Application> applications;
+        if (auto const jv = boost::json::parse(response.body); !jv.as_object().empty()) {
+            for (boost::json::array appArray = jv.at("applications").as_array(); const auto &element: appArray) {
+                Dto::Apps::Application application;
+                application.name = element.at("name").as_string().data();
+                application.status = Dto::Apps::AppsStatusTypeFromString(element.at("status").as_string().data());
+                application.enabled = element.at("enabled").as_bool();
+                applications.push_back(application);
+            }
+        }
+
+        return applications;
     }
 
     std::vector<std::string> AwsMockCtl::GetAllModuleNames() const {

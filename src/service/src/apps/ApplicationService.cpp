@@ -199,6 +199,66 @@ namespace AwsMock::Service {
         });
     }
 
+    void ApplicationService::EnableApplication(const Dto::Apps::EnableApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "enable_application");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "enable_application");
+        log_debug << "Enable application request, name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_warning << "Application does not exist, name: " << request.application.name;
+            return;
+        }
+
+        // Get application
+        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+        application.enabled = true;
+        application = _database.UpdateApplication(application);
+        log_debug << "Application enabled, name: " << request.application.name;
+    }
+
+    void ApplicationService::EnableAllApplications(const Dto::Apps::EnableAllApplicationsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "enable_all_applications");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "enable_all_applications");
+        log_debug << "Enable all applications request, region: " << request.region;
+
+        // Get application
+        for (std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region); auto &application: applications) {
+            application.enabled = true;
+            application = _database.UpdateApplication(application);
+        }
+        log_debug << "All applications enabled, region: " << request.region;
+    }
+
+    void ApplicationService::DisableApplication(const Dto::Apps::DisableApplicationRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_application");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_application");
+        log_debug << "Diable application request, name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_warning << "Application does not exist, name: " << request.application.name;
+            return;
+        }
+
+        // Get application
+        Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+        application.enabled = false;
+        application = _database.UpdateApplication(application);
+        log_debug << "Application disabled, name: " << request.application.name;
+    }
+
+    void ApplicationService::DisableAllApplications(const Dto::Apps::DisableAllApplicationsRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_all_applications");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_all_applications");
+        log_debug << "Disable all applications request, region: " << request.region;
+
+        // Get application
+        for (std::vector<Database::Entity::Apps::Application> applications = _database.ListApplications(request.region); auto &application: applications) {
+            application.enabled = false;
+            application = _database.UpdateApplication(application);
+        }
+        log_debug << "All applications disabled, region: " << request.region;
+    }
+
     void ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_application");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_application");
@@ -426,7 +486,7 @@ namespace AwsMock::Service {
 
             if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByName(application.containerName)) {
                 log_warning << "Container does not exist, name: " << request.application.name;
-                throw Core::ServiceException("Container does not exist, name: " + request.application.name);
+                return;
             }
 
             // Stop container

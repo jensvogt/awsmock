@@ -19,6 +19,7 @@
 #include <string>
 
 // Boost includes
+#include <boost/json.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
@@ -26,6 +27,19 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
+#include <awsmock/dto/apps/internal/DisableAllApplicationRequest.h>
+#include <awsmock/dto/apps/internal/DisableApplicationRequest.h>
+#include <awsmock/dto/apps/internal/EnableAllApplicationRequest.h>
+#include <awsmock/dto/apps/internal/EnableApplicationRequest.h>
+#include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
+#include <awsmock/dto/apps/internal/RestartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StartAllApplicationsRequest.h>
+#include <awsmock/dto/apps/internal/StartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StopAllApplicationsRequest.h>
+#include <awsmock/dto/apps/internal/StopApplicationRequest.h>
+#include <awsmock/dto/apps/model/Application.h>
+#include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/dto/transfer/model/Server.h>
@@ -67,28 +81,67 @@ namespace AwsMock::Controller {
         /**
          * @brief List all available services
          */
-        void ListServices() const;
+        void ListModules() const;
 
         /**
-         * @brief Start a module
+         * @brief Start one or more applications
          *
-         * @param modules list of modules names
+         * @param applications list of application names
          */
-        void StartService(std::vector<Dto::Module::Module> &modules) const;
+        void StartApplications(const std::vector<Dto::Apps::Application> &applications) const;
 
         /**
-         * @brief Restart a module
-         *
-         * @param modules list of modules names
+         * @brief Start all applications
          */
-        void RestartService(std::vector<Dto::Module::Module> &modules) const;
+        void StartAllApplications() const;
 
         /**
-         * @brief Stops a module
+         * @brief Enable one or more applications
          *
-         * @param modules list of modules names
+         * @param applications list of applications
          */
-        void StopService(std::vector<Dto::Module::Module> &modules) const;
+        void EnableApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Disable all applications
+         */
+        void EnableAllApplications() const;
+
+        /**
+         * @brief Disable one or more applications
+         *
+         * @param applications list of applications
+         */
+        void DisableApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Disable all applications
+         */
+        void DisableAllApplications() const;
+
+        /**
+         * @brief Restart one or more applications
+         *
+         * @param applications list of applications
+         */
+        void RestartApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Restart all applications
+         */
+        void RestartAllApplications() const;
+
+        /**
+         * @brief Stops one or more applications
+         *
+         * @param applications list of applications
+         */
+        void StopApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Stops all applications
+         */
+        void StopAllApplications() const;
 
 #ifdef HAS_SYSTEMD
         /**
@@ -153,11 +206,11 @@ namespace AwsMock::Controller {
         void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) const;
 
         /**
-         * @brief Get a list of all modules.
+         * @brief Get a list of all applications.
          *
-         * @return list of all modules.
+         * @return list of all applications.
          */
-        Dto::Module::Module::ModuleList GetAllModules() const;
+        std::vector<Dto::Apps::Application> GetAllApplications() const;
 
         /**
          * @brief Get a list of all module names.

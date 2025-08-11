@@ -11,8 +11,6 @@ namespace AwsMock::Core {
 
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
-        log_debug << "Sending JSON to host, endpoint: " << host << ":" << port << " path: " << path;
-
         boost::asio::io_context ctx;
 
         boost::asio::ip::tcp::resolver resolver(ctx);
@@ -25,6 +23,7 @@ namespace AwsMock::Core {
 
             // Connect
             stream.connect(results, ec);
+            stream.socket().set_option(boost::asio::ip::tcp::socket::keep_alive(false));
             if (ec) {
                 log_error << "Connect to " << host << ":" << port << " failed, error: " << ec.message();
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
@@ -42,7 +41,6 @@ namespace AwsMock::Core {
 
             boost::beast::flat_buffer buffer;
             http::response<http::string_body> response;
-
             http::read(stream, buffer, response);
             if (ec) {
                 log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
@@ -168,6 +166,8 @@ namespace AwsMock::Core {
         request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         request.set(http::field::content_type, "application/json");
         request.set(http::field::date, DateTimeUtils::HttpFormatNow());
+        request.set(http::field::content_length, std::to_string(body.size()));
+        request.set(http::field::connection, "close");
         request.target(path);
         request.body() = body;
         request.prepare_payload();
@@ -190,6 +190,7 @@ namespace AwsMock::Core {
         request.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
         request.set(http::field::content_type, "application/octet-stream");
         request.set(http::field::date, DateTimeUtils::HttpFormatNow());
+        request.set(http::field::connection, "close");
         request.body().open(filename.c_str(), boost::beast::file_mode::scan, ec);
         request.prepare_payload();
 

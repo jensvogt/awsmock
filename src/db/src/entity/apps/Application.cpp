@@ -84,6 +84,7 @@ namespace AwsMock::Database::Entity::Apps {
 
         // Environment
         if (mResult.value().find("environment") != mResult.value().end()) {
+            environment.clear();
             for (const view environmentObject = mResult.value()["environment"].get_document().value; const auto &e: environmentObject) {
                 const std::string key = bsoncxx::string::to_string(e.key());
                 const std::string value = bsoncxx::string::to_string(environmentObject[key].get_string().value);
@@ -93,6 +94,7 @@ namespace AwsMock::Database::Entity::Apps {
 
         // Tags
         if (mResult.value().find("tags") != mResult.value().end()) {
+            tags.clear();
             for (const view tagsObject = mResult.value()["tags"].get_document().value; const auto &t: tagsObject) {
                 const std::string key = bsoncxx::string::to_string(t.key());
                 const std::string value = bsoncxx::string::to_string(tagsObject[key].get_string().value);

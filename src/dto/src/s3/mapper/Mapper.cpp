@@ -29,20 +29,20 @@ namespace AwsMock::Dto::S3 {
     }
 
     GetBucketResponse Mapper::map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket) {
-        GetBucketResponse response = {
-                .id = bucket.oid,
-                .region = bucket.region,
-                .bucket = bucket.name,
-                .arn = bucket.arn,
-                .owner = bucket.owner,
-                .versionStatus = BucketVersionStatusToString(bucket.versionStatus),
-                .size = bucket.size,
-                .keys = bucket.keys,
-                .lambdaConfigurations = map(bucket.lambdaNotifications),
-                .queueConfigurations = map(bucket.queueNotifications),
-                .created = bucket.created,
-                .modified = bucket.modified};
-
+        GetBucketResponse response;
+        response.id = bucket.oid;
+        response.region = bucket.region;
+        response.bucket = bucket.name;
+        response.arn = bucket.arn;
+        response.owner = bucket.owner;
+        response.versionStatus = BucketVersionStatusToString(bucket.versionStatus);
+        response.size = bucket.size;
+        response.keys = bucket.keys;
+        response.lambdaConfigurations = map(bucket.lambdaNotifications);
+        response.queueConfigurations = map(bucket.queueNotifications);
+        response.topicConfigurations = map(bucket.topicNotifications);
+        response.created = bucket.created;
+        response.modified = bucket.modified;
         return response;
     }
 
