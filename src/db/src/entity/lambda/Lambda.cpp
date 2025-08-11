@@ -146,6 +146,7 @@ namespace AwsMock::Database::Entity::Lambda {
         Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "invocations", invocations);
         Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "averageRuntime", averageRuntime);
         Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "dockerTag", dockerTag);
+        Core::Bson::BsonUtils::SetBoolValue(lambdaDoc, "enabled", enabled);
         Core::Bson::BsonUtils::SetArrayValue(lambdaDoc, "eventSources", eventSourcesDoc);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastStarted", lastStarted);
         Core::Bson::BsonUtils::SetDateValue(lambdaDoc, "lastInvocation", lastInvocation);
@@ -183,6 +184,7 @@ namespace AwsMock::Database::Entity::Lambda {
         invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
         dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
+        enabled = Core::Bson::BsonUtils::GetBoolValue(mResult, "enabled");
         created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

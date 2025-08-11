@@ -115,6 +115,11 @@ namespace AwsMock::Dto::Lambda {
         std::string version = "latest";
 
         /**
+         * Enabled
+         */
+        bool enabled = false;
+
+        /**
          * Environment
          */
         EnvironmentVariables environment = {};
@@ -188,7 +193,6 @@ namespace AwsMock::Dto::Lambda {
 
         friend Function tag_invoke(boost::json::value_to_tag<Function>, boost::json::value const &v) {
             Function r;
-            r.architectures = boost::json::value_to<std::vector<std::string>>(v.at("Architectures"));
             r.codeSha256 = Core::Json::GetStringValue(v, "CodeSha256");
             r.codeSize = Core::Json::GetLongValue(v, "CodeSize");
             r.deadLetterConfig = boost::json::value_to<DeadLetterConfig>(v.at("DeadLetterConfig"));
@@ -205,7 +209,13 @@ namespace AwsMock::Dto::Lambda {
             r.stateReasonCode = Core::Json::GetStringValue(v, "StateReasonCode");
             r.timeout = Core::Json::GetIntValue(v, "Timeout");
             r.version = Core::Json::GetStringValue(v, "Version");
-            r.environment = boost::json::value_to<EnvironmentVariables>(v.at("Environment"));
+            r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            if (Core::Json::AttributeExists(v, "Architectures")) {
+                r.architectures = boost::json::value_to<std::vector<std::string>>(v.at("Architectures"));
+            }
+            if (Core::Json::AttributeExists(v, "Environment")) {
+                r.environment = boost::json::value_to<EnvironmentVariables>(v.at("Environment"));
+            }
             if (Core::Json::AttributeExists(v, "Tags")) {
                 r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
             }
@@ -214,7 +224,6 @@ namespace AwsMock::Dto::Lambda {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Function const &obj) {
             jv = {
-                    {"ImageUri", boost::json::value_from(obj.architectures)},
                     {"CodeSha256", obj.codeSha256},
                     {"CodeSize", obj.codeSize},
                     {"DeadLetterConfig", boost::json::value_from(obj.deadLetterConfig)},
@@ -231,6 +240,8 @@ namespace AwsMock::Dto::Lambda {
                     {"StateReasonCode", obj.stateReasonCode},
                     {"Timeout", obj.timeout},
                     {"Version", obj.version},
+                    {"Enabled", obj.enabled},
+                    {"Architectures", boost::json::value_from(obj.architectures)},
                     {"Environment", boost::json::value_from(obj.environment)},
                     {"Tags", boost::json::value_from(obj.tags)},
             };
