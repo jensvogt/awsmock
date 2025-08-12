@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)) {
+    GatewaySession::GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket) : _ioc(ioc), _stream(std::move(socket)), _queue(*this) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _queueLimit = configuration.GetValue<int>("awsmock.gateway.http.max-queue");
@@ -60,19 +60,23 @@ namespace AwsMock::Service {
 
         // Handle 100-continue requests
         if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
-            HandleContinueRequest(_stream);
+            HandleContinueRequest(_stream, _parser->get());
         }
 
         // Read from the stream
         read(_stream, _buffer, *_parser, ev);
 
         // Send the response
-        QueueWrite(HandleRequest(_parser->release()));
+        HandleRequest(_parser->release(), _queue);
+        //QueueWrite();
+        // If we aren't at the queue limit, try to pipeline another request
+        if (!_queue.is_full())
+            DoRead();
 
         // If we aren't at the queue limit, try to pipeline another request
-        if (_response_queue.size() < _queueLimit) {
+        /*if (_response_queue.size() < _queueLimit) {
             DoRead();
-        }
+        }*/
         log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
@@ -89,15 +93,16 @@ namespace AwsMock::Service {
     // Return a response for the given request.
     //
     // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
-    template<class Body, class Allocator>
-    http::message_generator GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request) {
+    template<class Body, class Allocator, class Send>
+    void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send) {
 
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
             request.method() != http::verb::post && request.method() != http::verb::delete_ &&
             request.method() != http::verb::head && request.method() != http::verb::connect &&
             request.method() != http::verb::options) {
-            return Core::HttpUtils::BadRequest(request, "Unknown HTTP-method");
+            send(std::move(Core::HttpUtils::BadRequest(request, "Unknown HTTP-method")));
+            return;
         }
 
         // Ping request
@@ -105,18 +110,21 @@ namespace AwsMock::Service {
             log_debug << "Handle CONNECT request";
             Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
             Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
-            return Core::HttpUtils::Ok(request);
+            send(std::move(Core::HttpUtils::Ok(request)));
+            return;
         }
 
         // Request path must be absolute and not contain "..".
         if (request.target().empty() || request.target()[0] != '/' || request.target().find("..") != boost::beast::string_view::npos) {
             log_error << "Illegal request-target";
-            return Core::HttpUtils::BadRequest(request, "Invalid target path");
+            send(std::move(Core::HttpUtils::BadRequest(request, "Invalid target path")));
+            return;
         }
 
         // Handle OPTIONS requests
         if (request.method() == http::verb::options) {
-            return HandleOptionsRequest(request);
+            send(std::move(HandleOptionsRequest(request)));
+            return;
         }
 
         std::shared_ptr<AbstractHandler> handler;
@@ -126,7 +134,8 @@ namespace AwsMock::Service {
             handler = GatewayRouter::GetHandler(target, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << target;
-                return Core::HttpUtils::BadRequest(request, "Handler not found");
+                send(std::move(Core::HttpUtils::BadRequest(request, "Handler not found")));
+                return;
             }
             log_trace << "Handler found, name: " << handler->name();
 
@@ -135,7 +144,8 @@ namespace AwsMock::Service {
             // Verify AWS signature
             if (_verifySignature && !Core::AwsUtils::VerifySignature(request, "none")) {
                 log_warning << "AWS signature could not be verified";
-                return Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified");
+                send(std::move(Core::HttpUtils::Unauthorized(request, "AWS signature could not be verified")));
+                return;
             }
 
             // Get the module from the authorization key, or the target header field.
@@ -145,7 +155,7 @@ namespace AwsMock::Service {
             handler = GatewayRouter::GetHandler(authKey.module, _ioc);
             if (!handler) {
                 log_error << "Handler not found, target: " << authKey.module;
-                return Core::HttpUtils::BadRequest(request, "Handler not found");
+                return send(std::move(Core::HttpUtils::BadRequest(request, "Handler not found")));
             }
             log_trace << "Handler found, name: " << handler->name();
         }
@@ -155,38 +165,44 @@ namespace AwsMock::Service {
                 case http::verb::get: {
                     Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
-                    return handler->HandleGetRequest(request, _region, _user);
+                    send(std::move(handler->HandleGetRequest(request, _region, _user)));
+                    break;
                 }
                 case http::verb::put: {
                     Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
-                    return handler->HandlePutRequest(request, _region, _user);
+                    send(std::move(handler->HandlePutRequest(request, _region, _user)));
+                    break;
                 }
                 case http::verb::post: {
                     Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
-                    return handler->HandlePostRequest(request, _region, _user);
+                    send(std::move(handler->HandlePostRequest(request, _region, _user)));
+                    break;
                 }
                 case http::verb::delete_: {
                     Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
-                    return handler->HandleDeleteRequest(request, _region, _user);
+                    send(std::move(handler->HandleDeleteRequest(request, _region, _user)));
+                    break;
                 }
                 case http::verb::head: {
                     Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
                     Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
-                    return handler->HandleHeadRequest(request, _region, _user);
+                    send(std::move(handler->HandleHeadRequest(request, _region, _user)));
+                    break;
                 }
-                default:;
+                default:
+                    send(std::move(Core::HttpUtils::NotImplemented(request, "Not yet implemented")));
+                    break;
             }
         }
-        return Core::HttpUtils::NotImplemented(request, "Not yet implemented");
     }
 
     // Called to start/continue the write-loop. Should not be called when write_loop is already active.
     void GatewaySession::DoWrite() {
         if (!_response_queue.empty()) {
-            bool keep_alive = false;//_response_queue.front().keep_alive();
+            bool keep_alive = _response_queue.front().keep_alive();
             boost::beast::async_write(_stream,
                                       std::move(_response_queue.front()),
                                       boost::beast::bind_front_handler(&GatewaySession::OnWrite,
@@ -208,13 +224,10 @@ namespace AwsMock::Service {
             return DoShutdown();
         }
 
-        // Resume the reading if it has been paused
-        if (_response_queue.size() == _queueLimit)
+        if (_queue.on_write()) {
+            // Read another request
             DoRead();
-
-        _response_queue.pop();
-
-        DoWrite();
+        }
     }
 
     void GatewaySession::DoShutdown() {
@@ -222,9 +235,6 @@ namespace AwsMock::Service {
         // Send a TCP shutdown
         boost::beast::error_code ec;
         ec = _stream.socket().shutdown(ip::tcp::socket::shutdown_send, ec);
-        if (ec) {
-            _stream.socket().cancel();
-        }
         // At this point the connection is closed gracefully
     }
 
@@ -272,6 +282,7 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::ok);
+        response.keep_alive(request.keep_alive());
         response.set(http::field::server, "awsmock");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::allow, "*/*");
@@ -288,9 +299,10 @@ namespace AwsMock::Service {
         return response;
     }
 
-    void GatewaySession::HandleContinueRequest(boost::beast::tcp_stream &_stream) {
+    void GatewaySession::HandleContinueRequest(boost::beast::tcp_stream &_stream, const http::request<http::dynamic_body> &request) {
         http::response<http::empty_body> response;
         response.version(11);
+        response.keep_alive(request.keep_alive());
         response.result(http::status::continue_);
         response.set(http::field::server, "awsmock");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());

@@ -345,10 +345,27 @@ namespace AwsMock::Service {
 
         try {
             const std::vector<Database::Entity::S3::Object> objectList = _database.ListBucket(s3Request.name, s3Request.prefix);
-            auto listBucketResponse = Dto::S3::ListBucketResponse(s3Request.name, objectList);
-            log_debug << "Bucket list returned, count: " << objectList.size();
 
+            // TODO: mapper implementation
+            Dto::S3::ListBucketResponse listBucketResponse;
+            listBucketResponse.name = s3Request.name;
+            for (auto &it: objectList) {
+                Dto::S3::Owner owner;
+                owner.displayName = it.owner;
+                owner.id = it.owner;
+
+                Dto::S3::Content content;
+                content.key = it.key;
+                content.etag = it.md5sum;
+                content.size = it.size;
+                content.owner = owner;
+                content.storageClass = "STANDARD";
+                content.modified = system_clock::now();
+                listBucketResponse.contents.push_back(content);
+            }
+            log_debug << "Bucket list returned, count: " << objectList.size();
             return listBucketResponse;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 list bucket failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());

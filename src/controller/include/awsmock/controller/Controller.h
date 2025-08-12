@@ -169,7 +169,7 @@ namespace AwsMock::Controller {
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(const std::vector<std::string> &modules, bool pretty = true, bool includeObjects = false) const;
+        void ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, bool pretty = true, bool includeObjects = false) const;
 
         /**
          * @brief Imports the current infrastructure from stdin
@@ -201,23 +201,49 @@ namespace AwsMock::Controller {
          * @brief Add an authorization header.
          *
          * @param headers headers
+         * @param target awsmock target
          * @param action action to perform
          */
-        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) const;
+        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &target, const std::string &action) const;
+
+        /**
+         * @brief Get a list of applications
+         *
+         * @param commands command line arguments
+         * @param discards discard list
+         * @return list of applications
+         */
+        static std::vector<Dto::Apps::Application> GetApplications(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+
+        /**
+         * @brief Get a list of modules
+         *
+         * @param commands command line arguments
+         * @param discards discard list
+         * @return list of modules
+         */
+        static std::vector<Dto::Module::Module> GetModules(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
 
         /**
          * @brief Get a list of all applications.
          *
          * @return list of all applications.
          */
-        std::vector<Dto::Apps::Application> GetAllApplications() const;
+        [[nodiscard]] std::vector<Dto::Apps::Application> GetAllApplications() const;
+
+        /**
+         * @brief Get a list of all modules.
+         *
+         * @return list of all modules.
+         */
+        [[nodiscard]] std::vector<Dto::Module::Module> GetAllModules() const;
 
         /**
          * @brief Get a list of all module names.
          *
          * @return list of all module names.
          */
-        std::vector<std::string> GetAllModuleNames() const;
+        [[nodiscard]] std::vector<std::string> GetAllModuleNames() const;
 
         /**
          * Commands

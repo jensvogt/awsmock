@@ -1088,7 +1088,7 @@ namespace AwsMock::Service {
                 long elapsed = 0;
                 const auto begin = system_clock::now();
                 while (elapsed < waitTimeSeconds) {
-                    Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "method", "receive_message");
+                    Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "receive_message");
 
                     _sqsDatabase.ReceiveMessages(queue.queueArn, visibilityTimeout, request.maxMessages, dlQueueArn, maxRetries, messageList);
                     log_trace << "Messages in list, url: " << queue.queueUrl << " count: " << messageList.size();

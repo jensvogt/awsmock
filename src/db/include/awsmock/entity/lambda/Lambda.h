@@ -353,6 +353,20 @@ namespace AwsMock::Database::Entity::Lambda {
         Instance GetIdleInstance();
 
         /**
+         * @brief Returns the count of idle instances
+         *
+         * @return number of running instances
+         */
+        long CountIdleInstances();
+
+        /**
+         * @brief Returns the count of running instances
+         *
+         * @return number of running instances
+         */
+        long CountRunningInstances();
+
+        /**
          * @brief Checks whether an event source with the given ARN exists already.
          *
          * @param eventSourceArn event source ARN
@@ -461,7 +475,19 @@ namespace AwsMock::Database::Entity::Lambda {
         if (it != instances.end()) {
             return *it;
         }
-        return Instance();
+        return {};
+    }
+
+    inline long Lambda::CountIdleInstances() {
+        return std::ranges::count_if(instances, [](const Instance &i) {
+            return i.status == InstanceIdle;
+        });
+    }
+
+    inline long Lambda::CountRunningInstances() {
+        return std::ranges::count_if(instances, [](const Instance &i) {
+            return i.status == InstanceRunning;
+        });
     }
 
 }// namespace AwsMock::Database::Entity::Lambda

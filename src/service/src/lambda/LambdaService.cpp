@@ -62,7 +62,15 @@ namespace AwsMock::Service {
 
         // Find idle instance
         Database::Entity::Lambda::Instance instance;
-        FindIdleInstance(lambda, instance);
+
+        // Create instance
+        std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+
+        // Create lambda
+        LambdaCreator lambdaCreator;
+        lambda = lambdaCreator.CreateLambda(lambda, instanceId);
+        log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", status: " << Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status) << ", totalSize: " << lambda.instances.size();
+
         return Dto::Lambda::Mapper::map(request, lambda);
     }
 
@@ -659,25 +667,15 @@ namespace AwsMock::Service {
         // Find an idle instance
         Database::Entity::Lambda::Instance instance;
         FindIdleInstance(lambda, instance);
-
-        // Get the hostname; the hostname is different from a manager running as a Linux host and a manager running as a docker container.
-        std::string containerId = instance.containerId;
-        std::string hostName = GetHostname(instance);
-        int port = GetContainerPort(instance);
-
-        // Update database
-        lambda.SetInstanceHostPort(instance.instanceId, hostName, port);
-        lambda.SetInstanceLastInvocation(instance.instanceId);
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
-        log_info << "Updates saved, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", containerId: " << containerId << ", hostName: " << hostName << ", port: " << port;
+        log_info << "Found idle instance, name: " << lambda.function << ", instanceId: " << instance.instanceId << ", containerId: " << instance.containerId << ", hostName: " << instance.hostName << ", port: " << instance.hostPort;
 
         // Execution depending on the invocation type
         Dto::Lambda::LambdaResult result{};
         if (invocationType == Dto::Lambda::REQUEST_RESPONSE) {
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance.instanceId, containerId, hostName, port, payload);
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
         } else if (invocationType == Dto::Lambda::EVENT) {
-            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance.instanceId, containerId, hostName, port, payload);
+            Database::Entity::Lambda::LambdaResult lambdaResult = lambdaExecutor.Invocation(lambda, instance, payload);
             result = Dto::Lambda::Mapper::mapResult(lambdaResult);
             log_debug << "Lambda result, lambda: " << result.functionArn << ", result: " << result.status;
         }
@@ -1103,18 +1101,13 @@ namespace AwsMock::Service {
 
         // Synchronize the docker daemon with the DB
         lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
-        SyncDockerDaemon(lambda);
 
         // Check existing instances
-        instance = lambda.GetIdleInstance();
-        if (!instance.containerId.empty()) {
-            lambda.SetInstanceStatus(instance.instanceId, Database::Entity::Lambda::InstanceRunning);
-            lambda = _lambdaDatabase.UpdateLambda(lambda);
-            return;
-        }
+        if (lambda.HasIdleInstance()) {
 
-        // Check empty and max concurrency and create a new instance if necessary
-        if (lambda.instances.size() < lambda.concurrency) {
+            instance = lambda.GetIdleInstance();
+
+        } else if (lambda.instances.size() < lambda.concurrency) {
 
             // Create instance
             std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
@@ -1126,24 +1119,18 @@ namespace AwsMock::Service {
             instance = lambda.GetInstance(instanceId);
 
         } else {
+
+            // Wait for an idle instance
             instance = WaitForIdleInstance(lambda);
         }
-        instance.status = Database::Entity::Lambda::InstanceRunning;
-        lambda.SetInstanceStatus(instance.instanceId, instance.status);
-        lambda = _lambdaDatabase.UpdateLambda(lambda);
-    }
-
-    std::string LambdaService::GetHostname(Database::Entity::Lambda::Instance &instance) {
-        return Core::Configuration::instance().GetValue<bool>("awsmock.dockerized") ? instance.containerName : "localhost";
-    }
-
-    int LambdaService::GetContainerPort(const Database::Entity::Lambda::Instance &instance) {
-        return Core::Configuration::instance().GetValue<bool>("awsmock.dockerized") ? 8080 : instance.hostPort;
+        _lambdaDatabase.SetInstanceValues(instance.containerId, Database::Entity::Lambda::InstanceRunning);
+        log_info << "Lambda instances: name: " << lambda.function << ", count(running/idle/total): " << lambda.CountRunningInstances() << "/" << lambda.CountIdleInstances() << "/" << lambda.instances.size();
     }
 
     Database::Entity::Lambda::Instance LambdaService::WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) const {
         const system_clock::time_point deadline = system_clock::now() + std::chrono::seconds(lambda.timeout);
 
+        lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
         while (!lambda.HasIdleInstance() && system_clock::now() < deadline) {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             lambda = _lambdaDatabase.GetLambdaByArn(lambda.arn);
@@ -1261,19 +1248,6 @@ namespace AwsMock::Service {
 
             // Send S3 put notification request
             _snsDatabase.CreateOrUpdateTopic(topic);
-        }
-    }
-
-    void LambdaService::SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const {
-
-        for (const auto &instance: lambda.instances) {
-
-            // Remove the docker container, in case it is not running.
-            if (Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(instance.containerId); inspectContainerResponse.id.empty() || !inspectContainerResponse.state.running) {
-                lambda.RemoveInstance(instance);
-                lambda = _lambdaDatabase.UpdateLambda(lambda);
-                log_info << "Lambda instance remove, function: " << lambda.function << ", containerId: " << instance.containerId;
-            }
         }
     }
 

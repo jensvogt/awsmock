@@ -887,10 +887,15 @@ namespace AwsMock::Database {
                     opts.limit(maxResult);
                 }
 
-                std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
-                std::string dlqQueueName = Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
+                std::string dlqQueueUrl;
+                std::string dlqQueueName;
+                if (!dlQueueArn.empty()) {
+                    Core::AwsUtils::ConvertSQSQueueArnToUrl(dlQueueArn);
+                    Core::AwsUtils::ConvertSQSQueueArnToName(dlQueueArn);
+                }
 
-                auto bulk = messageCollection.create_bulk_write();
+                auto queueBulk = messageCollection.create_bulk_write();
+                auto dqlBulk = messageCollection.create_bulk_write();
 
                 // Get the cursor
                 for (auto messageCursor = messageCollection.find(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL))), opts); auto message: messageCursor) {
@@ -900,7 +905,7 @@ namespace AwsMock::Database {
 
                     // Check retries
                     result.retries++;
-                    if (maxRetries > 0 && result.retries >= maxRetries && !dlQueueArn.empty()) {
+                    if (!dlQueueArn.empty() && maxRetries > 0 && result.retries >= maxRetries) {
 
                         document filterQuery;
                         filterQuery.append(kvp("_id", message["_id"].get_oid()));
@@ -915,7 +920,7 @@ namespace AwsMock::Database {
                         document updateQuery;
                         updateQuery.append(kvp("$set", setQuery));
 
-                        bulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
+                        dqlBulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
 
                         log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
                         (*_sqsCounterMap)[queueArn].initial--;
@@ -942,7 +947,7 @@ namespace AwsMock::Database {
                         document updateQuery;
                         updateQuery.append(kvp("$set", setQuery));
 
-                        bulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
+                        queueBulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
 
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
                         (*_sqsCounterMap)[queueArn].initial--;
@@ -950,9 +955,19 @@ namespace AwsMock::Database {
                     }
                 }
 
-                if (!messageList.empty()) {
+                // Update dql
+                if (!dqlBulk.empty()) {
                     session.start_transaction();
-                    auto result = bulk.execute();
+                    auto result = dqlBulk.execute();
+                    log_debug << "Dl queue bulk update, count: " << result->modified_count();
+                    session.commit_transaction();
+                }
+
+                // Queue bulk
+                if (!queueBulk.empty()) {
+                    session.start_transaction();
+                    auto result = queueBulk.execute();
+                    log_debug << "Queue bulk update, count: " << result->modified_count();
                     session.commit_transaction();
                 }
 

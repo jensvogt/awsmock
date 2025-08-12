@@ -41,13 +41,10 @@ namespace AwsMock::Service {
          * @brief Executes a lambda function synchronized
          *
          * @param lambda lambda function
-         * @param instanceId instance ID
-         * @param containerId lambda docker container ID
-         * @param host lambda docker host
-         * @param port lambda docker port
+         * @param instance lambda instance ID
          * @param payload lambda payload
          */
-        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, std::string &containerId, std::string &host, int port, std::string &payload) const;
+        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const;
 
       private:
 

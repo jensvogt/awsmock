@@ -5,14 +5,9 @@
 #ifndef AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
 #define AWSMOCK_DTO_EXPORT_INFRASTRUCTURE_REQUEST_H
 
-// C++ includes
-#include <string>
-#include <vector>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Module {
 
@@ -30,12 +25,7 @@ namespace AwsMock::Dto::Module {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ExportInfrastructureRequest {
-
-        /**
-         * Modules
-         */
-        std::vector<std::string> modules;
+    struct ExportInfrastructureRequest final : Common::BaseCounter<ExportInfrastructureRequest> {
 
         /**
          * Include objects, default: false
@@ -53,32 +43,32 @@ namespace AwsMock::Dto::Module {
         bool cleanFirst = false;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
+         * Modules
          */
-        [[nodiscard]] std::string ToJson() const;
+        std::vector<std::string> modules;
 
-        /**
-         * Convert from a JSON object.
-         *
-         * @param payload json string object
-         */
-        void FromJson(const std::string &payload);
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ExportInfrastructureRequest tag_invoke(boost::json::value_to_tag<ExportInfrastructureRequest>, boost::json::value const &v) {
+            ExportInfrastructureRequest r;
+            r.includeObjects = Core::Json::GetBoolValue(v, "includeObjects");
+            r.prettyPrint = Core::Json::GetBoolValue(v, "prettyPrint");
+            r.cleanFirst = Core::Json::GetBoolValue(v, "cleanFirst");
+            r.modules = boost::json::value_to<std::vector<std::string>>(v.at("modules"));
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ExportInfrastructureRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ExportInfrastructureRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"includeObjects", obj.includeObjects},
+                    {"prettyPrint", obj.prettyPrint},
+                    {"cleanFirst", obj.cleanFirst},
+                    {"modules", boost::json::value_from(obj.modules)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Module

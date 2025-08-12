@@ -172,6 +172,11 @@ namespace AwsMock::Service {
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+
+        /**
+         * Dockerized flag
+         */
+        bool _dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     };
 
 }// namespace AwsMock::Service

@@ -184,7 +184,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name) const;
+        [[nodiscard]] Entity::Lambda::Lambda GetLambdaByName(const std::string &region, const std::string &name) const;
 
         /**
          * @brief Sets the status of a lambda instance
@@ -193,25 +193,17 @@ namespace AwsMock::Database {
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const;
+        void SetInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const;
 
         /**
-         * @brief Sets the average runtime of a lambda instance
+         * @brief Sets the status of a lambda instance
          *
-         * @param oid lambda ID
-         * @param lastInvocation last update timestamp
+         * @param lambda lambda function
+         * @param invocations number of invocations
+         * @param avgRuntime average runtime
          * @throws DatabaseException
          */
-        void SetLastInvocation(const std::string &oid, const system_clock::time_point &lastInvocation) const;
-
-        /**
-         * @brief Sets the average runtime of a lambda instance
-         *
-         * @param oid lambda ID
-         * @param millis lambda invocation runtime
-         * @throws DatabaseException
-         */
-        void SetAverageRuntime(const std::string &oid, long millis) const;
+        void SetLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const;
 
         /**
          * @brief Returns a list of lambda functions.

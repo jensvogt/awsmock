@@ -74,13 +74,15 @@ namespace AwsMock::Service {
         putRequest.bucket = BUCKET;
         putRequest.key = KEY;
         Dto::S3::PutObjectResponse putResponse = _service.PutObject(putRequest, ifs);
-        const Dto::S3::ListBucketRequest listRequest = {.region = REGION, .name = BUCKET};
+        Dto::S3::ListBucketRequest listRequest;
+        listRequest.region = REGION;
+        listRequest.name = BUCKET;
 
         // act
         const Dto::S3::ListBucketResponse listResponse = _service.ListBucket(listRequest);
 
         // assert
-        BOOST_CHECK_EQUAL(listResponse.contents.size() > 0, true);
+        BOOST_CHECK_EQUAL(listResponse.contents.empty(), false);
         BOOST_CHECK_EQUAL(listResponse.contents.front().key, KEY);
     }
 

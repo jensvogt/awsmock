@@ -48,20 +48,18 @@ namespace AwsMock::Service {
                         }
 
                         // Return an object list
-                        s3Request = {
-                                .region = clientCommand.region,
-                                .name = clientCommand.bucket,
-                                .prefix = prefix,
-                                .delimiter = delimiter,
-                                .encodingType = encodingType};
+                        s3Request.region = clientCommand.region;
+                        s3Request.name = clientCommand.bucket;
+                        s3Request.prefix = prefix;
+                        s3Request.delimiter = delimiter;
+                        s3Request.encodingType = encodingType;
                         s3Request.listType = listType;
 
                     } else {
-                        s3Request = {
-                                .region = clientCommand.region,
-                                .name = clientCommand.bucket,
-                                .listType = 1,
-                                .encodingType = "url"};
+                        s3Request.region = clientCommand.region;
+                        s3Request.name = clientCommand.bucket;
+                        s3Request.listType = 1;
+                        s3Request.encodingType = "url";
                     }
 
                     Dto::S3::ListBucketResponse s3Response = _s3Service.ListBucket(s3Request);
@@ -200,11 +198,19 @@ namespace AwsMock::Service {
                         }
 
                         // Return the object list
-                        s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .prefix = prefix, .delimiter = delimiter, .encodingType = encodingType};
+                        s3Request.region = clientCommand.region;
+                        s3Request.name = clientCommand.bucket;
+                        s3Request.prefix = prefix;
+                        s3Request.delimiter = delimiter;
+                        s3Request.encodingType = encodingType;
                         s3Request.listType = listType;
 
                     } else {
-                        s3Request = {.region = clientCommand.region, .name = clientCommand.bucket, .listType = 1, .encodingType = "url"};
+
+                        s3Request.region = clientCommand.region;
+                        s3Request.name = clientCommand.bucket;
+                        s3Request.listType = 1;
+                        s3Request.encodingType = "url";
                     }
 
                     Dto::S3::ListBucketResponse s3Response = _s3Service.ListBucket(s3Request);
@@ -756,7 +762,7 @@ namespace AwsMock::Service {
             return SendResponse(request, http::status::ok, {}, headers);
 
         } catch (Core::NotFoundException &exc) {
-            return SendResponse(request, http::status::not_found, exc.message());
+            return SendResponse(request, http::status::not_found);
         } catch (std::exception &exc) {
             return SendInternalServerError(request, exc.what());
         } catch (...) {
