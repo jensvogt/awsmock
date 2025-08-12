@@ -46,6 +46,71 @@ namespace AwsMock::Service {
      */
     class GatewaySession : public std::enable_shared_from_this<GatewaySession> {
 
+
+        // This queue is used for HTTP pipelining.
+        class queue {
+            // Maximum number of responses we will queue
+            int limit = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-queue");
+
+            // The type-erased, saved work item
+            struct work {
+                virtual ~work() = default;
+                virtual void operator()() = 0;
+            };
+
+            GatewaySession &self_;
+            std::vector<std::unique_ptr<work>> items_;
+
+          public:
+
+            explicit queue(GatewaySession &self) : self_(self) {
+                items_.reserve(limit);
+            }
+
+            // Returns `true` if we have reached the queue limit
+            bool is_full() const {
+                return items_.size() >= limit;
+            }
+
+            // Called when a message finishes sending
+            // Returns `true` if the caller should initiate a read
+            bool on_write() {
+                BOOST_ASSERT(!items_.empty());
+                auto const was_full = is_full();
+                items_.erase(items_.begin());
+                if (!items_.empty())
+                    (*items_.front())();
+                return was_full;
+            }
+
+            // Called by the HTTP handler to send a response.
+            template<bool isRequest, class Body, class Fields>
+            void operator()(http::message<isRequest, Body, Fields> &&msg) {
+                // This holds a work item
+                struct work_impl : work {
+                    GatewaySession &self_;
+                    http::message<isRequest, Body, Fields> msg_;
+
+                    work_impl(GatewaySession &self, http::message<isRequest, Body, Fields> &&msg) : self_(self), msg_(std::move(msg)) {
+                    }
+
+                    void operator()() override {
+                        http::async_write(
+                                self_._stream,
+                                msg_,
+                                boost::beast::bind_front_handler(&GatewaySession::OnWrite, self_.shared_from_this(), msg_.need_eof()));
+                    }
+                };
+
+                // Allocate and store the work
+                items_.push_back(boost::make_unique<work_impl>(self_, std::move(msg)));
+
+                // If there was no previous work, start this one
+                if (items_.size() == 1)
+                    (*items_.front())();
+            }
+        };
+
       public:
 
         /**
@@ -91,10 +156,11 @@ namespace AwsMock::Service {
          * @tparam Body HTTP body
          * @tparam Allocator allocator
          * @param request HTTP request
+         * @param send send queue
          * @return
          */
-        template<class Body, class Allocator>
-        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
+        template<class Body, class Allocator, class Send>
+        void HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send);
 
         /**
          * @brief Called to start/continue the write-loop.
@@ -139,8 +205,9 @@ namespace AwsMock::Service {
          * @brief Handles continue request (HTTP status: 100)
          *
          * @param _stream HTTP socket stream
+         * @param request request
          */
-        static void HandleContinueRequest(boost::beast::tcp_stream &_stream);
+        static void HandleContinueRequest(boost::beast::tcp_stream &_stream, const http::request<http::dynamic_body> &request);
 
         /**
          * Boost asio IO context
@@ -151,6 +218,8 @@ namespace AwsMock::Service {
          * TCP stream
          */
         boost::beast::tcp_stream _stream;
+
+        queue _queue;
 
         /**
          * Read buffer

@@ -282,7 +282,7 @@ namespace AwsMock::Database {
     }
 
 
-    void LambdaDatabase::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
+    void LambdaDatabase::SetInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) const {
 
         if (HasDatabase()) {
 
@@ -294,7 +294,9 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("instances.containerId", containerId)),
-                                             make_document(kvp("$set", make_document(kvp("instances.$.status", LambdaInstanceStatusToString(status))))));
+                                             make_document(kvp("$set", make_document(
+                                                                               kvp("instances.$.status", LambdaInstanceStatusToString(status)),
+                                                                               kvp("instances.$.lastInvocation", bsoncxx::types::b_date(system_clock::now()))))));
                 session.commit_transaction();
 
             } catch (mongocxx::exception::system_error &e) {
@@ -304,11 +306,11 @@ namespace AwsMock::Database {
 
         } else {
 
-            _memoryDb.SetInstanceStatus(containerId, status);
+            _memoryDb.SetInstanceValues(containerId, status);
         }
     }
 
-    void LambdaDatabase::SetLastInvocation(const std::string &oid, const system_clock::time_point &lastInvocation) const {
+    void LambdaDatabase::SetLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) const {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -318,46 +320,17 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(oid))),
-                                             make_document(kvp("$set", make_document(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation))))));
+                _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(lambda.oid))),
+                                             make_document(kvp("$set", make_document(kvp("invocations", invocations), kvp("averageRuntime", avgRuntime)))));
                 session.commit_transaction();
 
             } catch (mongocxx::exception::system_error &e) {
                 log_error << "Set last invocation failed, error: " << e.what();
             }
-        } else {
-
-            _memoryDb.SetLastInvocation(oid, lastInvocation);
-        }
-    }
-
-    void LambdaDatabase::SetAverageRuntime(const std::string &oid, const long millis) const {
-
-        if (HasDatabase()) {
-
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-            auto session = client->start_session();
-
-            try {
-
-                session.start_transaction();
-                Entity::Lambda::Lambda lambda = GetLambdaById(oid);
-                lambda.invocations++;
-                lambda.averageRuntime = static_cast<long>(std::round((lambda.averageRuntime + millis) / lambda.invocations));
-
-                _lambdaCollection.find_one_and_update(make_document(kvp("_id", bsoncxx::oid(oid))), lambda.ToDocument());
-                session.commit_transaction();
-                log_debug << "Lambda counters updated, oid: " << oid;
-
-            } catch (mongocxx::exception::system_error &e) {
-                session.abort_transaction();
-                log_error << "Set average function runtime failed, error: " << e.what();
-            }
 
         } else {
 
-            _memoryDb.SetAverageRuntime(oid, millis);
+            _memoryDb.SetLambdaValues(lambda, invocations, avgRuntime);
         }
     }
 

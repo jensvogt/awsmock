@@ -10,35 +10,17 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/Content.h>
 #include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/entity/s3/Object.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct CommonPrefix {
-
-        /**
-         * Prefix
-         */
-        std::string _prefix;
-    };
-
-    struct ListBucketResponse {
-
-        /**
-         * Truncation flag
-         */
-        bool isTruncated = false;
-
-        /**
-         * Contents
-         */
-        std::vector<Content> contents;
+    struct ListBucketResponse final : Common::BaseCounter<ListBucketResponse> {
 
         /**
          * Name
@@ -56,9 +38,14 @@ namespace AwsMock::Dto::S3 {
         std::string delimiter;
 
         /**
+         * Truncation flag
+         */
+        bool isTruncated = false;
+
+        /**
          * Maximal keys
          */
-        int maxKeys = 1000;
+        long maxKeys = 1000;
 
         /**
          * Encoding type
@@ -68,7 +55,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Key count
          */
-        int keyCount = 0;
+        long keyCount = 0;
 
         /**
          * Continuation token
@@ -91,40 +78,85 @@ namespace AwsMock::Dto::S3 {
         long total = 0;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
+         * Contents
          */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Constructor
-         *
-         * @param bucket bucket
-         * @param objectList object list
-         */
-        ListBucketResponse(const std::string &bucket, const std::vector<Database::Entity::S3::Object> &objectList);
+        std::vector<Content> contents;
 
         /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        std::string ToXml();
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            boost::property_tree::ptree root;
+            root.add("ListBucketResult.IsTruncated", isTruncated);
+            root.add("ListBucketResult.Name", name);
+            root.add("ListBucketResult.Prefix", prefix);
+            root.add("ListBucketResult.Delimiter", delimiter);
+            root.add("ListBucketResult.MaxKeys", maxKeys);
+            root.add("ListBucketResult.EncodingType", encodingType);
+            root.add("ListBucketResult.KeyCount", keyCount);
+            root.add("ListBucketResult.ContinuationToken", continuationToken);
+            root.add("ListBucketResult.NextContinuationToken", nextContinuationToken);
+            root.add("ListBucketResult.StartAfter", startAfter);
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListBucketResponse &r);
+            // Contents
+            if (!contents.empty()) {
+                for (auto &it: contents) {
+                    boost::property_tree::ptree xmlContent;
+                    xmlContent.add("Key", it.key);
+                    xmlContent.add("LastModified", Core::DateTimeUtils::ToISO8601(it.modified));
+                    xmlContent.add("ETag", it.etag);
+                    xmlContent.add("Size", it.size);
+                    xmlContent.add("StorageClass", it.storageClass);
+                    xmlContent.add("Owner.DisplayName", it.owner.displayName);
+                    xmlContent.add("Owner.ID", it.owner.id);
+                    root.add_child("ListBucketResult.Contents", xmlContent);
+                }
+            }
+            return Core::XmlUtils::ToXmlString(root);
+        }
+
+      private:
+
+        friend ListBucketResponse tag_invoke(boost::json::value_to_tag<ListBucketResponse>, boost::json::value const &v) {
+            ListBucketResponse r;
+            r.name = Core::Json::GetStringValue(v, "name");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.delimiter = Core::Json::GetStringValue(v, "delimiter");
+            r.isTruncated = Core::Json::GetBoolValue(v, "isTruncated");
+            r.maxKeys = Core::Json::GetLongValue(v, "maxKeys");
+            r.encodingType = Core::Json::GetStringValue(v, "encodingType");
+            r.keyCount = Core::Json::GetLongValue(v, "keyCount");
+            r.continuationToken = Core::Json::GetStringValue(v, "continuationToken");
+            r.nextContinuationToken = Core::Json::GetStringValue(v, "nextContinuationToken");
+            r.startAfter = Core::Json::GetStringValue(v, "startAfter");
+            r.total = Core::Json::GetLongValue(v, "total");
+            if (Core::Json::AttributeExists(v, "contents")) {
+                r.contents = boost::json::value_to<std::vector<Content>>(v.at("contents"));
+            }
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListBucketResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"name", obj.name},
+                    {"prefix", obj.prefix},
+                    {"delimiter", obj.delimiter},
+                    {"isTruncated", obj.isTruncated},
+                    {"maxKeys", obj.maxKeys},
+                    {"encodingType", obj.encodingType},
+                    {"keyCount", obj.keyCount},
+                    {"continuationToken", obj.continuationToken},
+                    {"nextContinuationToken", obj.nextContinuationToken},
+                    {"startAfter", obj.startAfter},
+                    {"total", obj.total},
+                    {"contents", boost::json::value_from(obj.contents)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

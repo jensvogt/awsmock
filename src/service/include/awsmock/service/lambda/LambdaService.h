@@ -486,34 +486,6 @@ namespace AwsMock::Service {
         static void CleanupDocker(Database::Entity::Lambda::Lambda &lambda);
 
         /**
-         * @brief Returns the hostname to where we send the lambda invocation notifications
-         *
-         * @par
-         * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
-         * host machine, the hostname to which we need to send the invocation notification differs. For a host manager we need
-         * to use 'localhost', for a dockerized manager we need to use the container name.
-         *
-         * @param instance lambda instance to check
-         * @return containerId of the idle instance
-         * @see Database::Entity::Lambda::Instance
-         */
-        static std::string GetHostname(Database::Entity::Lambda::Instance &instance);
-
-        /**
-         * @brief Returns the lambda port to where we send the lambda invocation notifications
-         *
-         * @par
-         * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
-         * host machine, the port to which we need to send the invocation notification differs. For a host manager we need
-         * to use the container exposed port, for a dockerized manager we need to use the container internal port, i.e. 8080.
-         *
-         * @param instance lambda instance to check
-         * @return containerId of the idle instance
-         * @see Database::Entity::Lambda::Instance
-         */
-        static int GetContainerPort(const Database::Entity::Lambda::Instance &instance);
-
-        /**
          * @brief Waits in a  loop for an idle lambda instance
          *
          * @par
@@ -548,17 +520,6 @@ namespace AwsMock::Service {
          * @param request add event notification request
          */
         void CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const;
-
-        /**
-         * @brief Synchronize docker daemon with lambda instances vector
-         *
-         * @par
-         * This will remove crashed or stopped docker container instances from the lambda entity and save the entity to the
-         * database.
-         *
-         * @param lambda lambda entity
-         */
-        void SyncDockerDaemon(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Writes the base64 ZIP file coming from the frontend to the local lambda data dir.

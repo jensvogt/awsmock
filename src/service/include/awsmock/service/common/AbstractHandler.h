@@ -173,16 +173,6 @@ namespace AwsMock::Service {
         static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers = {});
 
         /**
-         * @brief Send an HEAD response (HTTP state code 200) with not body
-         *
-         * @param request HTTP request object
-         * @param contentLength HTTP content length
-         * @param headers HTTP header map values, added to the default headers
-         * @return HTTP response
-         */
-        static http::response<http::dynamic_body> SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers = {});
-
-        /**
          * @brief Send continue response
          *
          * @param request HTTP request

@@ -43,9 +43,10 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing, get the current port from the docker container
+        const int hostPort = CreateRandomHostPort();
         const std::string containerName = lambda.function + "-" + instanceId;
         if (!ContainerService::instance().ContainerExistsByName(containerName)) {
-            CreateDockerContainer(lambda, instanceId, CreateRandomHostPort(), lambda.dockerTag);
+            CreateDockerContainer(lambda, instanceId, hostPort, lambda.dockerTag);
         }
 
         // Get docker container
@@ -66,7 +67,8 @@ namespace AwsMock::Service {
         instance.containerName = containerName;
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
-            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
+            instance.hostName = _dockerized ? containerName : std::string("localhost");
+            instance.hostPort = _dockerized ? 8080 : hostPort;
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
         }

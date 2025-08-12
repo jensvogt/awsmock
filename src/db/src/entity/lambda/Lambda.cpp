@@ -134,8 +134,8 @@ namespace AwsMock::Database::Entity::Lambda {
         Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "containerSize", containerSize);
         Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "tags", tagsDoc);
         Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "ephemeralStorage", ephemeralStorageDoc);
-        Core::Bson::BsonUtils::SetIntValue(lambdaDoc, "timeout", timeout);
-        Core::Bson::BsonUtils::SetIntValue(lambdaDoc, "concurrency", concurrency);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "timeout", timeout);
+        Core::Bson::BsonUtils::SetLongValue(lambdaDoc, "concurrency", concurrency);
         Core::Bson::BsonUtils::SetStringValue(lambdaDoc, "codeSha256", codeSha256);
         Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "environment", varDoc);
         Core::Bson::BsonUtils::SetDocumentValue(lambdaDoc, "code", code.ToDocument());
