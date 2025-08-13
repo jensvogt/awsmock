@@ -45,6 +45,8 @@
 #include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/StartAllLambdasRequest.h>
 #include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/StopAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
@@ -56,11 +58,56 @@
 
 namespace AwsMock::Controller {
 
+    enum class CommandType {
+        CONFIG,
+        LOG_LEVEL,
+        LIST_APPLICATIONS,
+        ENABLE_APPLICATION,
+        DISABLE_APPLICATION,
+        START_APPLICATION,
+        RESTART_APPLICATION,
+        STOP_APPLICATION,
+        LIST_LAMBDAS,
+        ENABLE_LAMBDA,
+        DISABLE_LAMBDA,
+        START_LAMBDA,
+        RESTART_LAMBDA,
+        STOP_LAMBDA,
+        UNKNOWN
+    };
+
+    static std::map<CommandType, std::string> CommandTypeNames{
+            {CommandType::CONFIG, "config"},
+            {CommandType::LOG_LEVEL, "log-level"},
+            {CommandType::LIST_APPLICATIONS, "list-applications"},
+            {CommandType::START_APPLICATION, "start-application"},
+            {CommandType::RESTART_APPLICATION, "restart-application"},
+            {CommandType::STOP_LAMBDA, "stop-lambda"},
+            {CommandType::LIST_LAMBDAS, "list-lambdas"},
+            {CommandType::START_LAMBDA, "start-lambda"},
+            {CommandType::RESTART_LAMBDA, "restart-lambda"},
+            {CommandType::STOP_LAMBDA, "stop-lambda"},
+            {CommandType::UNKNOWN, "unknown"},
+    };
+
+    [[maybe_unused]] static std::string CommandTypeToString(const CommandType &commandType) {
+        return CommandTypeNames[commandType];
+    }
+
+    [[maybe_unused]] static CommandType CommandTypeFromString(const std::string &commandType) {
+        for (auto &[fst, snd]: CommandTypeNames) {
+            if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
+                return fst;
+            }
+        }
+        return CommandType::UNKNOWN;
+    }
+
     /**
-     * @brief AwsMock awslocal
+     * @brief AwsMock controller
      *
      * @par
-     * AwsMock awslocal, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
+     * AwsMock controller, which sends commands to the awsmock manager. Default port is 4567, but can be changed in the awsmock properties file.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -85,11 +132,6 @@ namespace AwsMock::Controller {
          * @brief Main method
          */
         void Run();
-
-        /**
-         * @brief List all available services
-         */
-        void ListModules() const;
 
         /**
          * @brief Start one or more applications
@@ -187,6 +229,18 @@ namespace AwsMock::Controller {
          */
         void StartAllLambdas() const;
 
+        /**
+         * @brief Stop one or more lambdas
+         *
+         * @param lambdas list of application names
+         */
+        void StopLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Stop all lambdas
+         */
+        void StopAllLambdas() const;
+
 #ifdef HAS_SYSTEMD
         /**
          * @brief Show the logs
@@ -257,7 +311,7 @@ namespace AwsMock::Controller {
          * @param discards discard list
          * @return list of applications
          */
-        static std::vector<Dto::Apps::Application> GetApplications(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+        static std::vector<Dto::Apps::Application> GetApplicationFromCommands(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
 
         /**
          * @brief Get a list of lambdas
@@ -266,7 +320,7 @@ namespace AwsMock::Controller {
          * @param discards discard list
          * @return list of lambdas
          */
-        static std::vector<Dto::Lambda::Function> GetLambdas(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+        static std::vector<Dto::Lambda::Function> GetLambdasFromCommand(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
 
         /**
          * @brief Get a list of modules
@@ -275,7 +329,7 @@ namespace AwsMock::Controller {
          * @param discards discard list
          * @return list of modules
          */
-        static std::vector<Dto::Module::Module> GetModules(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+        static std::vector<Dto::Module::Module> GetModulesFromCommand(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
 
         /**
          * @brief Get a list of all applications.
@@ -297,13 +351,6 @@ namespace AwsMock::Controller {
          * @return list of all modules.
          */
         [[nodiscard]] std::vector<Dto::Module::Module> GetAllModules() const;
-
-        /**
-         * @brief Get a list of all module names.
-         *
-         * @return list of all module names.
-         */
-        [[nodiscard]] std::vector<std::string> GetAllModuleNames() const;
 
         /**
          * Commands
