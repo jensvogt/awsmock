@@ -897,7 +897,67 @@ namespace AwsMock::Service {
         }
     }
 
-    void LambdaService::StartFunction(const Dto::Lambda::StartFunctionRequest &request) const {
+    void LambdaService::EnableLambda(const Dto::Lambda::EnableLambdaRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "enable_lambda");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "enable_lambda");
+        log_debug << "Enable lambda request, name: " << request.function.functionName;
+
+        if (!_lambdaDatabase.LambdaExists(request.function.functionName)) {
+            log_warning << "Lambda does not exist, name: " << request.function.functionName;
+            return;
+        }
+
+        // Get lambda
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.function.functionName);
+        lambda.enabled = true;
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        log_debug << "Lambda enabled, name: " << request.function.functionName;
+    }
+
+    void LambdaService::EnableAllLambdas(const Dto::Lambda::EnableAllLambdasRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "enable_all_lambdas");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "enable_all_lambdas");
+        log_debug << "Enable all lambdas request, region: " << request.region;
+
+        // Get lambda
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(request.region); auto &lambda: lambdas) {
+            lambda.enabled = true;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+        }
+        log_debug << "All lambdas enabled, region: " << request.region;
+    }
+
+    void LambdaService::DisableLambda(const Dto::Lambda::DisableLambdaRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_lambda");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_lambda");
+        log_debug << "Disable lambda request, name: " << request.function.functionName;
+
+        if (!_lambdaDatabase.LambdaExists(request.function.functionName)) {
+            log_warning << "Lambda does not exist, name: " << request.function.functionName;
+            return;
+        }
+
+        // Get lambda
+        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.function.functionName);
+        lambda.enabled = false;
+        lambda = _lambdaDatabase.UpdateLambda(lambda);
+        log_debug << "Lambda disabled, name: " << request.function.functionName;
+    }
+
+    void LambdaService::DisableAllLambdas(const Dto::Lambda::DisableAllLambdasRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_all_lambdas");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_all_lambdas");
+        log_debug << "Disable all lambdas request, region: " << request.region;
+
+        // Get lambda
+        for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(request.region); auto &lambda: lambdas) {
+            lambda.enabled = false;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+        }
+        log_debug << "All lambdas disabled, region: " << request.region;
+    }
+
+    void LambdaService::StartFunction(const Dto::Lambda::StartLambdaRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_function");
         log_debug << "Start function, functionArn: " + request.functionArn;
@@ -931,7 +991,7 @@ namespace AwsMock::Service {
         log_info << "Lambda function started, functionArn: " + lambda.arn;
     }
 
-    void LambdaService::StopFunction(const Dto::Lambda::StopFunctionRequest &request) const {
+    void LambdaService::StopFunction(const Dto::Lambda::StopLambdaRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_function");
         log_debug << "Stop function, functionArn: " + request.functionArn;

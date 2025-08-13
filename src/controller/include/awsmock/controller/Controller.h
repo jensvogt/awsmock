@@ -38,6 +38,14 @@
 #include <awsmock/dto/apps/internal/StopAllApplicationsRequest.h>
 #include <awsmock/dto/apps/internal/StopApplicationRequest.h>
 #include <awsmock/dto/apps/model/Application.h>
+#include <awsmock/dto/lambda/internal/DisableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/EnableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/EnableLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/StartAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
+#include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/module/ExportInfrastructureRequest.h>
 #include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
@@ -143,6 +151,42 @@ namespace AwsMock::Controller {
          */
         void StopAllApplications() const;
 
+        /**
+         * @brief Enable one or more lambdas
+         *
+         * @param lambdas list of lambdas
+         */
+        void EnableLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Disable all lambdas
+         */
+        void EnableAllLambdas() const;
+
+        /**
+         * @brief Disable one or more lambdas
+         *
+         * @param lambdas list of lambdas
+         */
+        void DisableLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Disable all lambdas
+         */
+        void DisableAllLambdas() const;
+
+        /**
+         * @brief Start one or more lambdas
+         *
+         * @param lambdas list of application names
+         */
+        void StartLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Start all lambdas
+         */
+        void StartAllLambdas() const;
+
 #ifdef HAS_SYSTEMD
         /**
          * @brief Show the logs
@@ -151,7 +195,7 @@ namespace AwsMock::Controller {
 #endif
 
         /**
-         * @brief Sets the managers log level
+         * @brief Sets the manager's log level
          *
          * @param level log level
          */
@@ -163,7 +207,7 @@ namespace AwsMock::Controller {
         void GetConfig() const;
 
         /**
-         * @brief Dumps the current infrastructure as JSON file to stdout.
+         * @brief Dumps the current infrastructure as a JSON file to stdout.
          *
          * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
@@ -216,6 +260,15 @@ namespace AwsMock::Controller {
         static std::vector<Dto::Apps::Application> GetApplications(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
 
         /**
+         * @brief Get a list of lambdas
+         *
+         * @param commands command line arguments
+         * @param discards discard list
+         * @return list of lambdas
+         */
+        static std::vector<Dto::Lambda::Function> GetLambdas(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+
+        /**
          * @brief Get a list of modules
          *
          * @param commands command line arguments
@@ -230,6 +283,13 @@ namespace AwsMock::Controller {
          * @return list of all applications.
          */
         [[nodiscard]] std::vector<Dto::Apps::Application> GetAllApplications() const;
+
+        /**
+         * @brief Get a list of all lambdas.
+         *
+         * @return list of all lambdas.
+         */
+        [[nodiscard]] std::vector<Dto::Lambda::Function> GetAllLambdas() const;
 
         /**
          * @brief Get a list of all modules.

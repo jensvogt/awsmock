@@ -1,4 +1,8 @@
 
+#include "awsmock/dto/lambda/internal/DisableAllLambdasRequest.h"
+#include "awsmock/dto/lambda/internal/DisableLambdaRequest.h"
+
+
 #include <awsmock/service/lambda/LambdaHandler.h>
 
 namespace AwsMock::Service {
@@ -344,9 +348,45 @@ namespace AwsMock::Service {
                 return SendResponse(request, http::status::ok);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::ENABLE_LAMBDA) {
+
+                Dto::Lambda::EnableLambdaRequest lambdaRequest = Dto::Lambda::EnableLambdaRequest::FromJson(clientCommand);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.EnableLambda(lambdaRequest);
+                    log_info << "Lambda enabled, region: " << lambdaRequest.region << ", name: " << lambdaRequest.function.functionName; });
+                return SendResponse(request, http::status::ok);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::ENABLE_ALL_LAMBDAS) {
+
+                Dto::Lambda::EnableAllLambdasRequest lambdaRequest = Dto::Lambda::EnableAllLambdasRequest::FromJson(clientCommand);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.EnableAllLambdas(lambdaRequest);
+                    log_info << "All lambdas enabled, region: " << lambdaRequest.region; });
+                return SendResponse(request, http::status::ok);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DISABLE_LAMBDA) {
+
+                Dto::Lambda::DisableLambdaRequest lambdaRequest = Dto::Lambda::DisableLambdaRequest::FromJson(clientCommand);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.DisableLambda(lambdaRequest);
+                    log_info << "Lambda disabled, region: " << lambdaRequest.region << ", name: " << lambdaRequest.function.functionName; });
+                return SendResponse(request, http::status::ok);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::DISABLE_ALL_LAMBDAS) {
+
+                Dto::Lambda::DisableAllLambdasRequest lambdaRequest = Dto::Lambda::DisableAllLambdasRequest::FromJson(clientCommand);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.DisableAllLambdas(lambdaRequest);
+                    log_info << "All lambdas disabled, region: " << lambdaRequest.region; });
+                return SendResponse(request, http::status::ok);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
 
-                Dto::Lambda::StartFunctionRequest lambdaRequest = Dto::Lambda::StartFunctionRequest::FromJson(clientCommand);
+                Dto::Lambda::StartLambdaRequest lambdaRequest = Dto::Lambda::StartLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
                     _lambdaService.StartFunction(lambdaRequest);
                     log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
@@ -356,7 +396,7 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_FUNCTION) {
 
-                Dto::Lambda::StopFunctionRequest lambdaRequest = Dto::Lambda::StopFunctionRequest::FromJson(clientCommand);
+                Dto::Lambda::StopLambdaRequest lambdaRequest = Dto::Lambda::StopLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
                     _lambdaService.StopFunction(lambdaRequest);
                     log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;

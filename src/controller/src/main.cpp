@@ -39,7 +39,7 @@ static std::list<std::string> allowedActions() {
     return {
             "logLevel", "logs",
             "list-applications", "enable-application", "disable-application", "start-application", "stop-application", "restart-application",
-            "list-lambdas", "start-lambda", "stop-lambda", "restart-lambda",
+            "list-lambdas", "enable-lambda", "disable-lambda", "start-lambda", "stop-lambda", "restart-lambda",
             "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"};
 }
 
@@ -63,6 +63,8 @@ void ShowHelp(const boost::program_options::options_description &desc) {
               << std::left << std::setw(leftIndent) << "  stop-application [<application>]" << ": stops the given application. If no argument is given, stops all applications" << std::endl
               << std::left << std::setw(leftIndent) << "  restart-application [<application>]" << ": restarts the given application. If no argument is given, restarts all applications" << std::endl
               << std::left << std::setw(leftIndent) << "  list-lambdas" << ": lists all available lambdas" << std::endl
+              << std::left << std::setw(leftIndent) << "  enable-lambda [<lambda>]" << ": enable the given lambda function. If no argument is given, enables all lambda functions." << std::endl
+              << std::left << std::setw(leftIndent) << "  disable-lambda [<lambda>]" << ": disable the given lambda function. If no argument is given, disables all lambda functions." << std::endl
               << std::left << std::setw(leftIndent) << "  start-lambda [<lambda>]" << ": starts the given lambda. If no argument is given, starts all lambdas." << std::endl
               << std::left << std::setw(leftIndent) << "  stop-lambda [<lambda>]" << ": stops the given lambda. If no argument is given, stops all lambdas" << std::endl
               << std::left << std::setw(leftIndent) << "  restart-lambda [<lambda>]" << ": restarts the given lambda. If no argument is given, restarts all lambdas" << std::endl;
