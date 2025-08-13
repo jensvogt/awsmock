@@ -91,6 +91,11 @@ namespace AwsMock::Dto::Lambda {
         std::string lastUpdateStatusReasonCode;
 
         /**
+         * Enabled flag
+         */
+        bool enabled = false;
+
+        /**
          * State
          */
         std::string state;
@@ -153,6 +158,7 @@ namespace AwsMock::Dto::Lambda {
             r.lastUpdateStatus = Core::Json::GetStringValue(v, "lastUpdateStatus");
             r.lastUpdateStatusReason = Core::Json::GetStringValue(v, "lastUpdateStatusReason");
             r.lastUpdateStatusReasonCode = Core::Json::GetStringValue(v, "lastUpdateStatusReasonCode");
+            r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.state = Core::Json::GetStringValue(v, "state");
             r.stateReason = Core::Json::GetStringValue(v, "stateReason");
             r.stateReasonCode = Core::Json::GetStringValue(v, "stateReasonCode");
@@ -181,6 +187,7 @@ namespace AwsMock::Dto::Lambda {
                     {"lastUpdateStatus", obj.lastUpdateStatus},
                     {"lastUpdateStatusReason", obj.lastUpdateStatusReason},
                     {"lastUpdateStatusReasonCode", obj.lastUpdateStatusReasonCode},
+                    {"enabled", obj.enabled},
                     {"state", obj.state},
                     {"stateReason", obj.stateReason},
                     {"stateReasonCode", obj.stateReasonCode},

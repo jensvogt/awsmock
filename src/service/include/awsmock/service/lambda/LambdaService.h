@@ -43,6 +43,10 @@
 #include <awsmock/dto/lambda/internal/DeleteLambdaResultCounterRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteLambdaResultCountersRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteTagRequest.h>
+#include <awsmock/dto/lambda/internal/DisableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/EnableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/EnableLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/internal/GetLambdaResultCounterRequest.h>
@@ -61,9 +65,9 @@
 #include <awsmock/dto/lambda/internal/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ResetFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/internal/StartFunctionRequest.h>
-#include <awsmock/dto/lambda/internal/StopFunctionRequest.h>
+#include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/StopLambdaInstanceRequest.h>
+#include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
@@ -199,7 +203,7 @@ namespace AwsMock::Service {
         /**
          * @brief Update a lambda environment variable
          *
-         * @param request update lambda environment variablerequest
+         * @param request update lambda environment variable request
          * @see Dto::Lambda::UpdateFunctionEnvironmentRequest
          */
         void UpdateLambdaEnvironment(const Dto::Lambda::UpdateFunctionEnvironmentRequest &request) const;
@@ -243,6 +247,38 @@ namespace AwsMock::Service {
          * @see Dto::Lambda::UpdateFunctionTagRequest
          */
         void UpdateLambdaTag(const Dto::Lambda::UpdateFunctionTagRequest &request) const;
+
+        /**
+         * @brief Enable an lambda
+         *
+         * @param request enable lambda request
+         * @see Dto::Apps::EnableLambdaRequest
+         */
+        void EnableLambda(const Dto::Lambda::EnableLambdaRequest &request) const;
+
+        /**
+         * @brief Enable all lambdas
+         *
+         * @param request enable sll lambdas request
+         * @see Dto::Apps::EnableAllLambdaRequest
+         */
+        void EnableAllLambdas(const Dto::Lambda::EnableAllLambdasRequest &request) const;
+
+        /**
+         * @brief Disable an lambda
+         *
+         * @param request disable lambda request
+         * @see Dto::Apps::DisableLambdaRequest
+         */
+        void DisableLambda(const Dto::Lambda::DisableLambdaRequest &request) const;
+
+        /**
+         * @brief Disable all lambdas
+         *
+         * @param request disable sll lambdas request
+         * @see Dto::Apps::DisableAllLambdaRequest
+         */
+        void DisableAllLambdas(const Dto::Lambda::DisableAllLambdasRequest &request) const;
 
         /**
          * @brief Delete a lambda tags
@@ -412,7 +448,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::StartFunctionRequest
          */
-        void StartFunction(const Dto::Lambda::StartFunctionRequest &request) const;
+        void StartFunction(const Dto::Lambda::StartLambdaRequest &request) const;
 
         /**
          * @brief Stops the lambda function by stopping all running docker containers
@@ -421,7 +457,7 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::StopFunctionRequest
          */
-        void StopFunction(const Dto::Lambda::StopFunctionRequest &request) const;
+        void StopFunction(const Dto::Lambda::StopLambdaRequest &request) const;
 
         /**
          * @brief Stops the lambda instance
