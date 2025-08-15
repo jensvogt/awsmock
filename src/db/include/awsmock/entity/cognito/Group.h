@@ -5,21 +5,13 @@
 #ifndef AWSMOCK_DB_ENTITY_COGNITO_GROUP_H
 #define AWSMOCK_DB_ENTITY_COGNITO_GROUP_H
 
-// C++ includes
-#include <string>
-
-// MongoDB includes
-#include <bsoncxx/builder/basic/array.hpp>
-#include <bsoncxx/builder/basic/document.hpp>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 struct User;
 namespace AwsMock::Database::Entity::Cognito {
-
-    using std::chrono::system_clock;
 
     /**
      * @brief Cognito group entity
@@ -28,7 +20,7 @@ namespace AwsMock::Database::Entity::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Group {
+    struct Group final : Common::BaseEntity<Group> {
 
         /**
          * MongoDB OID
@@ -80,7 +72,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -88,22 +80,6 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the entity to a string representation.
-         *
-         * @return entity as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param group group entity
-         * @return output string
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Group &group);
     };
 
     typedef std::vector<Group> GroupList;

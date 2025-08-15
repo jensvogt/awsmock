@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     view_or_value<view, value> TopicNotification::ToDocument() const {
-        auto topicNotificationDoc = bsoncxx::builder::basic::document{};
+        auto topicNotificationDoc = document{};
         topicNotificationDoc.append(kvp("id", id));
         topicNotificationDoc.append(kvp("topicArn", topicArn));
 
@@ -46,6 +46,7 @@ namespace AwsMock::Database::Entity::S3 {
 
             // Extract filter rules
             if (mResult.value().find("filterRules") != mResult.value().end()) {
+                filterRules.clear();
                 for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document());
@@ -59,14 +60,4 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
-    std::string TopicNotification::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const TopicNotification &n) {
-        os << "TopicNotification=" << to_json(n.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::S3

@@ -10,8 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbServer(Core::PeriodicScheduler &scheduler);
+        explicit DynamoDbServer(Core::Scheduler &scheduler);
 
         /**
          * @brief Gracefully shutdown the server
@@ -91,6 +91,11 @@ namespace AwsMock::Service {
         void SynchronizeItems() const;
 
         /**
+         * @brief Backup the dynamoDb tables and items
+         */
+        static void BackupDynamoDb();
+
+        /**
          * @brief Writes the docker file
          */
         static std::string WriteDockerFile();
@@ -119,17 +124,19 @@ namespace AwsMock::Service {
          * @brief Dynamo DB backup flag.
          *
          * @par
-         * If true, backup the tables during shutdown.
+         * If true, backup tables and items based on cron expression
          */
-        bool _backup;
+        bool _backupActive;
 
         /**
-         * @brief Backup directory.
+         * @brief Dynamo DB backup cron schedule.
          *
          * @par
-         * Backups will be written to the specified directory
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
          */
-        std::string _backupDir;
+        std::string _backupCron;
 
         /**
          * Monitoring period
@@ -175,6 +182,16 @@ namespace AwsMock::Service {
          * Data directory
          */
         std::string _dataDir;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::DynamoDbCounterMapType *_dynamoDbCounterMap{};
     };
 
 }// namespace AwsMock::Service

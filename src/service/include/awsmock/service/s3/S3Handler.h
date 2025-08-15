@@ -9,12 +9,14 @@
 #include <chrono>
 
 // Boost includes
-#include <boost/beast.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
+#include <awsmock/dto/s3/internal/DeleteObjectsRequest.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -29,8 +31,8 @@ namespace AwsMock::Service {
      * @brief S3 request handler
      *
      * AWS S3 HTTP request handler. All S3 related REST call are ending here. Depending on the request header the S3 module will be selected in case the
-     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structure, the request
-     * are first send to the S3CmdHandler, which normalizes the commands.
+     * authorization header contains the S3 module. As the different clients (Java, C++, Python, nodejs20) are using different request structures, the requests
+     * are first sent to the S3CmdHandler, which normalizes the commands.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -41,7 +43,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Handler() : AbstractHandler("s3-handler") {};
+        explicit S3Handler(boost::asio::io_context &ioc) : AbstractHandler("s3-handler", ioc), _s3Service(ioc) {}
 
         /**
          * @brief HTTP GET request.
@@ -127,13 +129,14 @@ namespace AwsMock::Service {
          * @par AWS puts some extra bytes into the response when chunk encoding is used.
          *
          * @param request HTTP request
-         * @param sb prepared strean buffer
+         * @param sb prepared stream buffer
          */
         static long PrepareBody(http::request<http::dynamic_body> &request, boost::beast::net::streambuf &sb);
+
         /**
-         * @brief Gets bucket and key from source header
+         * @brief Gets bucket and key from the source header
          *
-         * @param path path from soiurce header
+         * @param path path from source header
          * @param bucket bucket name
          * @param key S3 object key
          */

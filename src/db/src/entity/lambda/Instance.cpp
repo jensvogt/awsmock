@@ -13,9 +13,11 @@ namespace AwsMock::Database::Entity::Lambda {
             instanceId = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
             containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");
             containerName = Core::Bson::BsonUtils::GetStringValue(mResult, "containerName");
+            hostName = Core::Bson::BsonUtils::GetStringValue(mResult, "hostName");
             hostPort = Core::Bson::BsonUtils::GetIntValue(mResult, "hostPort");
             status = LambdaInstanceStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "status"));
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+            lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult, "lastInvocation");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -31,9 +33,11 @@ namespace AwsMock::Database::Entity::Lambda {
             instanceDoc.append(kvp("id", instanceId));
             instanceDoc.append(kvp("containerId", containerId));
             instanceDoc.append(kvp("containerName", containerName));
+            instanceDoc.append(kvp("hostName", hostName));
             instanceDoc.append(kvp("hostPort", hostPort));
             instanceDoc.append(kvp("status", LambdaInstanceStatusToString(status)));
             instanceDoc.append(kvp("created", bsoncxx::types::b_date(created)));
+            instanceDoc.append(kvp("lastInvocation", bsoncxx::types::b_date(lastInvocation)));
             return instanceDoc.extract();
 
         } catch (bsoncxx::exception &exc) {
@@ -42,29 +46,4 @@ namespace AwsMock::Database::Entity::Lambda {
         }
     }
 
-    view_or_value<view, value> Instance::ToDocument() {
-
-        try {
-
-            document document;
-            Core::Bson::BsonUtils::SetStringValue(document, "id", instanceId);
-            Core::Bson::BsonUtils::SetStringValue(document, "status", LambdaInstanceStatusToString(status));
-            return document.extract();
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    [[nodiscard]] std::string Instance::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Instance &t) {
-        os << "Instance=" << to_json(t.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::Lambda

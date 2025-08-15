@@ -10,7 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/entity/apps/Application.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
 #include <awsmock/entity/cognito/UserPool.h>
@@ -49,7 +50,7 @@ namespace AwsMock::Dto::Module {
         /**
          * @brief S3 objects
          */
-        Database::Entity::S3::ObjectList s3Objects;
+        std::vector<Database::Entity::S3::Object> s3Objects;
 
         /**
          * @brief SQS queues
@@ -122,11 +123,16 @@ namespace AwsMock::Dto::Module {
         Database::Entity::SSM::ParameterList ssmParameters;
 
         /**
-         * @brief Convert to BSON object
+         * @brief Applications
+         */
+        std::vector<Database::Entity::Apps::Application> applications;
+
+        /**
+         * @brief Convert to a BSON object
          *
          * @return bson document
          */
-        document ToDocument() const;
+        [[nodiscard]] document ToDocument() const;
 
         /**
          * @brief Convert from BSON document

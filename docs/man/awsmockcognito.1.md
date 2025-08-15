@@ -94,11 +94,15 @@ awslocal cognito-idp delete-user-pool --user-pool-userPoolId eu-central-1_6g67LG
 
 ## Authentication in a Web App
 
-In order to use Cognito Identity provider authentication, a browser extension has be used in order to redirect the requests from AWS production servers
-(*.amazonaws.com) to AwsMock. The samples directory contains such a Chrome browser extension in the ```/usr/local/share/awsmock/cognito/resources/redirect```. Head over
-to chrome://extensions/ in Chrome, then select "Load unpacked" and point to the directory where the source code files are stored on the disk.
+In order to use Cognito Identity provider authentication, a browser extension has be used in order to redirect the
+requests from AWS production servers
+(*.amazonaws.com) to AwsMock. The samples directory contains such a Chrome browser extension in the
+```/usr/local/share/awsmock/cognito/resources/redirect```. Head over
+to chrome://extensions/ in Chrome, then select "Load unpacked" and point to the directory where the source code files
+are stored on the disk.
 
-In order to start the authentication process a user pool, users and a user pool client has be created. Create the AwsMock object using the CLI or a application. The
+In order to start the authentication process a user pool, users and a user pool client has be created. Create the
+AwsMock object using the CLI or a application. The
 authentication flow should be initiated like in a NodeJs web application like this:
 
 ```
@@ -194,10 +198,12 @@ $version$ ($builddate$)
 
 ## BUGS
 
-Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/aws-mock/issues
+Bugs and enhancement requests can be reported and filed at https://github.com/jensvogt/awsmock/issues
 
 ## SEE ALSO
 
-```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```,
+```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksqs(1)```,
+```awsmocksns(1)```,
+```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
+```awsmocksqs(1)```,
 ```awsmockssm(1)```

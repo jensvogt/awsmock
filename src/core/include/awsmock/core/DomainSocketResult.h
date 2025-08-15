@@ -23,9 +23,14 @@ namespace AwsMock::Core {
         status statusCode;
 
         /**
-          * Body
-          */
+         * Body
+         */
         std::string body;
+
+        /**
+         * Content length
+         */
+        long contentLength;
     };
 
 }// namespace AwsMock::Core

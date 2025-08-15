@@ -22,6 +22,11 @@ namespace AwsMock::Dto::SNS {
         std::string topicArn;
 
         /**
+         * Target ARN
+         */
+        std::string targetArn;
+
+        /**
          * Message ID
          */
         std::string messageId;
@@ -30,6 +35,11 @@ namespace AwsMock::Dto::SNS {
          * Message
          */
         std::string message;
+
+        /**
+         * Content type
+         */
+        std::string contentType;
 
         /**
          * Message attributes
@@ -54,23 +64,21 @@ namespace AwsMock::Dto::SNS {
         [[nodiscard]] view_or_value<view, value> ToDocument() const {
             try {
                 document rootDocument;
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Region", region);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "TopicArn", topicArn);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "MessageId", messageId);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Message", message);
-                Core::Bson::BsonUtils::SetDateValue(rootDocument, "Created", created);
-                Core::Bson::BsonUtils::SetDateValue(rootDocument, "Modified", modified);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "region", region);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "topicArn", topicArn);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "targetArn", targetArn);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "messageId", messageId);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "message", message);
+                Core::Bson::BsonUtils::SetDateValue(rootDocument, "created", created);
+                Core::Bson::BsonUtils::SetDateValue(rootDocument, "modified", modified);
 
                 if (!messageAttributes.empty()) {
-                    array jsonMessageAttributeArray;
+                    document jsonMessageAttribute;
                     for (const auto &[fst, snd]: messageAttributes) {
-                        document jsonAttribute;
-                        jsonAttribute.append(kvp(fst, snd.ToDocument()));
-                        jsonMessageAttributeArray.append(jsonAttribute);
+                        jsonMessageAttribute.append(kvp(fst, snd.ToDocument()));
                     }
-                    rootDocument.append(kvp("MessageAttributes", jsonMessageAttributeArray));
+                    rootDocument.append(kvp("messageAttributes", jsonMessageAttribute));
                 }
-
                 return rootDocument.extract();
 
             } catch (bsoncxx::exception &exc) {
@@ -83,26 +91,26 @@ namespace AwsMock::Dto::SNS {
 
         friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
             Message r;
-            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
-            r.messageId = Core::Json::GetStringValue(v, "messageId");
-            r.message = Core::Json::GetStringValue(v, "message");
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
-            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
-            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("messageAttributes"));
+            r.topicArn = Core::Json::GetStringValue(v, "TopicArn");
+            r.messageId = Core::Json::GetStringValue(v, "MessageId");
+            r.message = Core::Json::GetStringValue(v, "Message");
+            r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
+            r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Message const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"topicArn", obj.topicArn},
-                    {"messageId", obj.messageId},
-                    {"message", obj.message},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"TopicArn", obj.topicArn},
+                    {"MessageId", obj.messageId},
+                    {"Message", obj.message},
+                    {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };

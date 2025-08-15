@@ -36,18 +36,18 @@ namespace AwsMock::Dto::Cognito {
 
         friend AdminGetUserRequest tag_invoke(boost::json::value_to_tag<AdminGetUserRequest>, boost::json::value const &v) {
             AdminGetUserRequest r;
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.userName = Core::Json::GetStringValue(v, "userName");
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.userName = Core::Json::GetStringValue(v, "Username");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminGetUserRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"userPoolId", obj.userPoolId},
-                    {"userName", obj.userName},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"Username", obj.userName},
             };
         }
     };

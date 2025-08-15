@@ -11,7 +11,7 @@ namespace AwsMock::Database {
 
     MonitoringDatabase::MonitoringDatabase() : _databaseName(GetDatabaseName()), _monitoringCollectionName("monitoring"), _rollingMean(Core::Configuration::instance().GetValue<bool>("awsmock.monitoring.smooth")) {}
 
-    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName) const {
+    std::vector<std::string> MonitoringDatabase::GetDistinctLabelValues(const std::string &name, const std::string &labelName, const long limit) const {
         log_trace << "Get distinct label values, labelName: " << labelName;
 
         if (HasDatabase()) {
@@ -26,8 +26,23 @@ namespace AwsMock::Database {
                 query.append(kvp("name", name));
                 query.append(kvp("labelName", labelName));
 
-                for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
-                    for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) { labels.emplace_back(element.get_string().value); }
+                if (limit > 0) {
+                    mongocxx::pipeline p{};
+                    p.match(make_document(kvp("name", name), kvp("labelName", labelName)));
+                    p.group(make_document(kvp("_id", "$labelValue"), kvp("totalSize", make_document(kvp("$sum", "$value")))));
+                    p.sort(make_document(kvp("totalSize", -1)));
+                    p.limit(static_cast<std::int32_t>(limit));
+                    p.project(make_document(kvp("_id", "$_id"), kvp("value", "$labelValue"), kvp("total", "$totalSize")));
+                    for (auto t = _monitoringCollection.aggregate(p); const auto s: t) {
+                        labels.emplace_back(s["_id"].get_string().value);
+                    }
+                } else {
+
+                    for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
+                        for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) {
+                            labels.emplace_back(element.get_string().value);
+                        }
+                    }
                 }
                 return labels;
             } catch (const mongocxx::exception &exc) {

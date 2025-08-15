@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
@@ -122,7 +122,9 @@ namespace AwsMock::Dto::S3 {
             r.internalName = Core::Json::GetStringValue(v, "internalName");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
-            r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            if (Core::Json::AttributeExists(v, "metadata")) {
+                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            }
             return r;
         }
 

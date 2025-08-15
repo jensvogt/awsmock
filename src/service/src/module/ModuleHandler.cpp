@@ -51,14 +51,7 @@ namespace AwsMock::Service {
                 Dto::Module::ListModuleNamesResponse modulesResponse = _moduleService.ListModuleNames();
                 return SendOkResponse(request, modulesResponse.ToJson());
             }
-            if (action == "show-ftp-users") {
 
-                Dto::Transfer::Server server = Dto::Transfer::Server::FromJson(payload);
-                Dto::Transfer::ListUsersRequest transferRequest = {.region = region, .serverId = server.serverId};
-                TransferService transferService;
-                Dto::Transfer::ListUsersResponse transferResponse = transferService.ListUsers(transferRequest);
-                return SendOkResponse(request, transferResponse.ToJson());
-            }
             if (action == "ping") {
 
                 return SendOkResponse(request);
@@ -88,6 +81,7 @@ namespace AwsMock::Service {
                 modules = _moduleService.StartModules(modules);
                 return SendOkResponse(request, Dto::Module::Module::ToJson(modules));
             }
+
             if (action == "restart-modules") {
 
                 Dto::Module::Module::ModuleList modules = Dto::Module::Module::FromJsonList(payload);
@@ -133,8 +127,7 @@ namespace AwsMock::Service {
             if (action == "export") {
 
                 // Get request body
-                Dto::Module::ExportInfrastructureRequest moduleRequest;
-                moduleRequest.FromJson(payload);
+                Dto::Module::ExportInfrastructureRequest moduleRequest = Dto::Module::ExportInfrastructureRequest::FromJson(payload);
 
                 // Get modules
                 const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);

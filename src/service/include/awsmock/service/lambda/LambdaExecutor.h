@@ -5,23 +5,19 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 #define AWSMOCK_SERVICE_LAMBDA_EXECUTOR_H
 
-// C++ include
-#include <chrono>
-
 // AwsMock includes
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
+#include <awsmock/service/container/ContainerService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
-
-    namespace http = boost::beast::http;
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda executor.
@@ -32,7 +28,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaExecutor {
+    class LambdaExecutor : public boost::enable_shared_from_this<LambdaExecutor> {
 
       public:
 
@@ -42,17 +38,13 @@ namespace AwsMock::Service {
         explicit LambdaExecutor() = default;
 
         /**
-         * @brief Executes a lambda function
+         * @brief Executes a lambda function synchronized
          *
          * @param lambda lambda function
-         * @param containerId lambda docker container ID
-         * @param host lambda docker host
-         * @param port lambda docker port
+         * @param instance lambda instance ID
          * @param payload lambda payload
-         * @param functionName lambda function name
-         * @param receiptHandle receipt handle of the message which triggered the invocation
          */
-        void operator()(const Database::Entity::Lambda::Lambda &lambda, const std::string &containerId, const std::string &host, int port, const std::string &payload, const std::string &functionName, const std::string &receiptHandle = {}) const;
+        Database::Entity::Lambda::LambdaResult Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const;
 
       private:
 
@@ -60,6 +52,16 @@ namespace AwsMock::Service {
          * Metric module
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * Lambda database connection
+         */
+        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+
+        /**
+         * Docker module
+         */
+        ContainerService &_containerService = ContainerService::instance();
     };
 
 }// namespace AwsMock::Service

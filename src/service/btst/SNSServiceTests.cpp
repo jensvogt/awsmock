@@ -41,10 +41,11 @@ namespace AwsMock::Service {
             _sqsDatabase.DeleteAllQueues();
         }
 
+        boost::asio::io_context _ioContext;
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSService _snsService;
-        SQSService _sqsService;
+        SNSService _snsService{_ioContext};
+        SQSService _sqsService{_ioContext};
     };
 
     BOOST_FIXTURE_TEST_CASE(TopicCreateTest, SNSServiceTest) {
@@ -130,7 +131,10 @@ namespace AwsMock::Service {
         createRequest.topicName = TOPIC;
         createRequest.owner = OWNER;
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(createRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
@@ -156,7 +160,10 @@ namespace AwsMock::Service {
         createRequest.topicName = TOPIC;
         createRequest.owner = OWNER;
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(createRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
@@ -189,7 +196,10 @@ namespace AwsMock::Service {
         createRequest.topicName = TOPIC;
         createRequest.owner = OWNER;
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(createRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
         queueRequest.region = REGION;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
@@ -218,7 +228,12 @@ namespace AwsMock::Service {
         createRequest.topicName = TOPIC;
         createRequest.owner = OWNER;
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(createRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
         Dto::SNS::SubscribeRequest subscribeRequest;
@@ -269,13 +284,20 @@ namespace AwsMock::Service {
         createRequest.topicName = TOPIC;
         createRequest.owner = OWNER;
         Dto::SNS::CreateTopicResponse topicResponse = _snsService.CreateTopic(createRequest);
-        Dto::SQS::CreateQueueRequest queueRequest = {.region = REGION, .queueName = QUEUE, .queueUrl = QUEUE_URL, .owner = OWNER, .requestId = Core::StringUtils::CreateRandomUuid()};
+        Dto::SQS::CreateQueueRequest queueRequest;
+        queueRequest.region = REGION;
+        queueRequest.queueName = QUEUE;
+        queueRequest.queueUrl = QUEUE_URL;
+        queueRequest.owner = OWNER;
+        queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
 
-        Dto::SQS::GetQueueUrlRequest queueUrlRequest = {.region = REGION, .queueName = QUEUE};
-        auto [queueUrl] = _sqsService.GetQueueUrl(queueUrlRequest);
-        std::string resultQueueUrl = queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _sqsService.GetQueueUrl(getQueueUrlRequest).queueUrl;
+        const std::string &resultQueueUrl = queueUrl;
 
         Dto::SNS::SubscribeRequest subscribeRequest;
         subscribeRequest.region = REGION;

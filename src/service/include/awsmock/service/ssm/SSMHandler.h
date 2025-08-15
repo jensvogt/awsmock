@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_SSM_HANDLER_H
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/SSMClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SSMHandler() : AbstractHandler("ssm-handler") {}
+        explicit SSMHandler(boost::asio::io_context &ioc) : AbstractHandler("ssm-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.

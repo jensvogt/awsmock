@@ -19,7 +19,7 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
@@ -65,7 +65,7 @@ namespace AwsMock::FtpServer {
         ////////////////////////////////////////////////////////
       public:
 
-        FtpSession(boost::asio::io_context &io_service, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
+        FtpSession(boost::asio::io_context &awsIoc, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler);
 
         // Copy (disabled, as we are inheriting from shared_from_this)
         FtpSession(const FtpSession &) = delete;
@@ -375,5 +375,10 @@ namespace AwsMock::FtpServer {
          * AWS region
          */
         std::string _region;
+
+        /**
+         * AwsMock IOC
+         */
+        boost::asio::io_context &_awsIoc;
     };
 }// namespace AwsMock::FtpServer

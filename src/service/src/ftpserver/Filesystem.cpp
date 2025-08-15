@@ -1,7 +1,7 @@
 #include <awsmock/ftpserver/Filesystem.h>
 
 #include <array>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <cstdint>
 #include <cstring>
 #include <ctime>

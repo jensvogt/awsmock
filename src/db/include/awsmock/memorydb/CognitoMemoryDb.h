@@ -13,7 +13,7 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
@@ -209,13 +209,14 @@ namespace AwsMock::Database {
         Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName);
 
         /**
-         * C@brief ount all user pools
+         * @brief Count all users
          *
          * @param region aws-mock region.
          * @param userPoolId user pool ID
+         * @param groupName group name
          * @return total number of users.
          */
-        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
+        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}, const std::string &groupName = {}) const;
 
         /**
          * @brief Returns a list of cognito users.

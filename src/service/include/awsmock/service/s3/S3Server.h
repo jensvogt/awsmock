@@ -12,10 +12,11 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::Service {
@@ -34,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Server(Core::PeriodicScheduler &scheduler);
+        explicit S3Server(Core::Scheduler &scheduler);
 
       private:
 
@@ -47,6 +48,11 @@ namespace AwsMock::Service {
          * Update counters
          */
         void UpdateCounter();
+
+        /**
+         * @brief Backup the S3 buckets and object
+         */
+        static void BackupS3();
 
         /**
          * Metric service
@@ -72,6 +78,24 @@ namespace AwsMock::Service {
          * S3 bucket counter period
          */
         int _counterPeriod;
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Dynamo DB backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Shared memory segment

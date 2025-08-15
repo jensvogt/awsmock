@@ -2,6 +2,9 @@
 // Created by vogje01 on 03/09/2023.
 //
 
+#include "awsmock/core/exception/DatabaseException.h"
+
+
 #include <awsmock/entity/cognito/UserPoolClient.h>
 
 namespace AwsMock::Database::Entity::Cognito {
@@ -41,17 +44,6 @@ namespace AwsMock::Database::Entity::Cognito {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());
         }
-    }
-
-    std::string UserPoolClient::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const UserPoolClient &u) {
-        os << "UserPoolClient=" << bsoncxx::to_json(u.ToDocument());
-        return os;
     }
 
 }// namespace AwsMock::Database::Entity::Cognito

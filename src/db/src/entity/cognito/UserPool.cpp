@@ -89,18 +89,4 @@ namespace AwsMock::Database::Entity::Cognito {
         }
     }
 
-    std::string UserPool::ToJson() const {
-        return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-    }
-
-    std::string UserPool::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const UserPool &userPool) {
-        os << "UserPool=" << to_json(userPool.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::Cognito

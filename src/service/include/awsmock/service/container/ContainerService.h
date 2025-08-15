@@ -6,10 +6,13 @@
 #define AWSMOCK_SERVICE_DOCKER_SERVICE_H
 
 // C++ standard includes
+#include <memory>
 #include <string>
 #include <thread>
 
 // Boost includes
+#include <boost/beast/core.hpp>
+#include <boost/beast/websocket.hpp>
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
@@ -18,13 +21,14 @@
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/DomainSocketResult.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StreamFilter.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/UnixSocket.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/apps/internal/WebSocketCommand.h>
 #include <awsmock/dto/docker/CreateContainerRequest.h>
 #include <awsmock/dto/docker/CreateContainerResponse.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
@@ -35,6 +39,7 @@
 #include <awsmock/dto/docker/ListNetworkResponse.h>
 #include <awsmock/dto/docker/PruneContainerResponse.h>
 #include <awsmock/dto/docker/VersionResponse.h>
+#include <awsmock/dto/docker/model/ContainerStat.h>
 
 #ifdef _WIN32
 #include <awsmock/core/WindowsSocket.h>
@@ -74,17 +79,17 @@ namespace AwsMock::Service {
      * @endcode
      *
      * @par Linux
-     * On Linux the service is using the docker REST API available at the UNIX domain socket. Depending on your Linux distribution the docker socket is located under
-     * different directory normally its: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If you lLinux distribution is using another location set the full path to the
+     * On Linux, the service is using the docker REST API available at the UNIX domain socket. Depending on your Linux distribution, the docker socket is located under
+     * a different directory, normally it is: <i>/var/run/docker.sock</i> (Debian, Ubuntu). If your Linux distribution is using another location, set the full path to the
      * docker socket in the awsmock configuration file.
      *
      * @par Windows
-     * On Windows the HTTP port will be used to communicate with the docker daemon. Usually `http://localhost:2375`, if the port is not accessible make the port accessible
+     * On Windows, the HTTP port will be used to communicate with the docker daemon. Usually `http://localhost:2375`, if the port is not accessible, make the port accessible
      * in Docker Desktop for Windows.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ContainerService {
+    class ContainerService : public std::enable_shared_from_this<ContainerService> {
 
       public:
 
@@ -106,25 +111,25 @@ namespace AwsMock::Service {
          *
          * @param name image name
          * @param tag image tags
-         * @param imageCode code of the image
+         * @param fromImage code of the image
          */
-        void CreateImage(const std::string &name, const std::string &tag, const std::string &imageCode) const;
+        void CreateImage(const std::string &name, const std::string &tag, const std::string &fromImage) const;
 
         /**
          * @brief Checks whether an image exists.
          *
          * @param name image name
          * @param tag image tags
-         * @return true if image exists, otherwise false
+         * @return true if an image exists, otherwise false
          */
-        bool ImageExists(const std::string &name, const std::string &tag) const;
+        [[nodiscard]] bool ImageExists(const std::string &name, const std::string &tag) const;
 
         /**
          * @brief Returns a image by name/tags.
          *
          * @param name container name
          * @param tag container tags
-         * @param locked if true is already locked
+         * @param locked if true, is already locked
          * @return Image
          */
         [[nodiscard]] Dto::Docker::Image GetImageByName(const std::string &name, const std::string &tag, bool locked = false) const;
@@ -140,7 +145,21 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+        [[nodiscard]] std::string BuildLambdaImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment) const;
+
+        /**
+         * @brief Build a docker image for an application
+         *
+         * @param codeDir code directory
+         * @param name application name
+         * @param tag application version
+         * @param runtime application runtime
+         * @param archive application archive
+         * @param privatePort docker container private port
+         * @param environment runtime environment
+         * @return file size in bytes
+         */
+        [[nodiscard]] std::string BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, long privatePort, const std::map<std::string, std::string> &environment) const;
 
         /**
          * @brief Build a docker image from a docker file
@@ -150,7 +169,7 @@ namespace AwsMock::Service {
          * @param dockerFile docker file
          * @return file size in bytes
          */
-        [[nodiscard]] std::string BuildImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
+        [[nodiscard]] std::string BuildDynamoDbImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const;
 
         /**
          * @brief Delete an image by name/tags.
@@ -164,7 +183,7 @@ namespace AwsMock::Service {
          *
          * @param name container name
          * @param tag container tags
-         * @return true if container exists, otherwise false
+         * @return true if the container exists, otherwise false
          */
         [[nodiscard]] bool ContainerExists(const std::string &name, const std::string &tag) const;
 
@@ -208,6 +227,16 @@ namespace AwsMock::Service {
         [[nodiscard]] bool IsContainerRunning(const std::string &containerId) const;
 
         /**
+         * @brief Attach to the container and get the stdin, stdout, stderr streams
+         *
+         * @param containerId container ID
+         * @param ws websocket
+         * @param tail maximal number of lines
+         * @return output stream
+         */
+        void ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, long tail) const;
+
+        /**
          * @brief Waits until a container is in state 'running'
          *
          * @par
@@ -239,6 +268,23 @@ namespace AwsMock::Service {
          * @return CreateContainerResponse
          */
         [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort) const;
+
+        /**
+         * @brief Creates a container for an application
+         *
+         * @par
+         * Supported standard values for the network mode are: bridge, host, none, and container:<name|id>. Any other value is taken as a custom network's name to which this container should connect to. FOr an
+         * application the port is not fixed, as for a lambda function, therefore, the container has to be supplied.
+         *
+         * @param imageName image name
+         * @param instanceName name of the instance
+         * @param tag image tags
+         * @param environment runtime environment variables
+         * @param hostPort external port of the application
+         * @param containerPort internal port of the application
+         * @return CreateContainerResponse
+         */
+        [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, int hostPort, int containerPort) const;
 
         /**
          * @brief Creates a container for a predefined image.
@@ -324,6 +370,15 @@ namespace AwsMock::Service {
         [[nodiscard]] std::string GetContainerLogs(const std::string &containerId, const system_clock::time_point &start) const;
 
         /**
+         * @brief Get statistics about a container
+         *
+         * @param containerId ID of the container
+         * @return counter statistics
+         * @see AwsMock::Dto::Docker::Model::ContainerStat
+         */
+        [[nodiscard]] Dto::Docker::ContainerStat GetContainerStats(const std::string &containerId) const;
+
+        /**
          * @brief Start the container
          *
          * @param containerId container ID
@@ -355,9 +410,25 @@ namespace AwsMock::Service {
         /**
          * @brief Stops the container by ID
          *
-         * @param id container ID
+         * @param containerId container ID
          */
-        void StopContainer(const std::string &id) const;
+        void StopContainer(const std::string &containerId) const;
+
+        /**
+         * @brief Kills the container by sending a signal.
+         *
+         * @param container container DTO
+         * @param signal signal to send a string, default: SIGKILL
+         */
+        void KillContainer(const Dto::Docker::Container &container, const std::string &signal = "SIGKILL") const;
+
+        /**
+         * @brief Kills the container by ID, by sending a signal
+         *
+         * @param containerId container ID
+         * @param signal signal to send a string, default: SIGKILL
+         */
+        void KillContainer(const std::string &containerId, const std::string &signal = "SIGKILL") const;
 
         /**
          * @brief Deletes the container
@@ -389,7 +460,7 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Write the docker file.
+         * @brief Write the lambda docker file.
          *
          * @param codeDir code directory
          * @param handler handler function
@@ -397,7 +468,19 @@ namespace AwsMock::Service {
          * @param environment runtime environment
          * @return return docker file path
          */
-        static std::string WriteDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+        static std::string WriteLambdaDockerFile(const std::string &codeDir, const std::string &handler, const std::string &runtime, const std::map<std::string, std::string> &environment);
+
+        /**
+         * @brief Write the application docker file.
+         *
+         * @param codeDir code directory
+         * @param archive application archive
+         * @param privatePort docker container internal port
+         * @param runtime docker image runtime
+         * @param environment runtime environment
+         * @return return docker file path
+         */
+        static std::string WriteApplicationDockerFile(const std::string &codeDir, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
         /**
          * @brief Write the compressed docker image file.
@@ -412,12 +495,28 @@ namespace AwsMock::Service {
          * @brief Returns the network name
          *
          * @par
-         * Depending on the container engine, the network name must be different. For Podman use the detault name'podman', for docker
-         * we use a own network, 'local'.
+         * Depending on the container engine, the network name must be different. For Podman use the default name 'podman'; for docker
+         * we use our own network, named 'local'.
          *
          * @return network name
          */
         static std::string GetNetworkName();
+
+        /**
+         * @brief Extracts the handler file name from the handler name.
+         *
+         * @param handler handler
+         * @return name of the handler file to copy to the docker file
+         */
+        static std::string GetHandlerFileNodeJs22(const std::string &handler);
+
+        /**
+         * @brief Add environment variables to the Dockerfile
+         *
+         * @param ofs output stream
+         * @param environment environment variables
+         */
+        static void AddEnvironment(std::ofstream &ofs, const std::map<std::string, std::string> &environment);
 
         /**
          * Docker version
@@ -448,16 +547,6 @@ namespace AwsMock::Service {
          * Docker listening socket
          */
         std::shared_ptr<Core::DomainSocket> _domainSocket;
-
-        /**
-         * Supported runtimes
-         */
-        static std::map<std::string, std::string> _supportedRuntimes;
-
-        /**
-         * Mutex
-         */
-        static boost::mutex _dockerServiceMutex;
     };
 
 }// namespace AwsMock::Service

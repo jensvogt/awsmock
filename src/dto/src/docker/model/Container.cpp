@@ -7,13 +7,6 @@
 
 namespace AwsMock::Dto::Docker {
 
-    int Container::GetLambdaPort() {
-        if (const auto it = std::ranges::find_if(ports, [](const Port &port) { return port.privatePort == LAMBDA_INTERNAL_PORT; }); it != ports.end()) {
-            return it->publicPort;
-        }
-        return -1;
-    }
-
     void Container::FromDocument(const view_or_value<view, value> &document) {
 
         try {

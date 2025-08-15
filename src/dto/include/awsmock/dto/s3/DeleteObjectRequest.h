@@ -9,23 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct DeleteObjectRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Region
-         */
-        std::string user;
+    struct DeleteObjectRequest final : Common::BaseCounter<DeleteObjectRequest> {
 
         /**
          * Bucket
@@ -38,25 +26,26 @@ namespace AwsMock::Dto::S3 {
         std::string key;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
+         * Version ID
          */
-        [[nodiscard]] std::string ToJson() const;
+        std::string versionId;
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteObjectRequest &r);
+        friend DeleteObjectRequest tag_invoke(boost::json::value_to_tag<DeleteObjectRequest>, boost::json::value const &v) {
+            DeleteObjectRequest r;
+            r.bucket = Core::Json::GetStringValue(v, "Bucket");
+            r.versionId = Core::Json::GetStringValue(v, "VersionId");
+            r.key = Core::Json::GetStringValue(v, "Key");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteObjectRequest const &obj) {
+            jv = {
+                    {"Bucket", obj.bucket},
+                    {"VersionId", obj.versionId},
+                    {"Key", obj.key},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

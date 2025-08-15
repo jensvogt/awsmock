@@ -1,3 +1,4 @@
+
 //
 // Created by vogje01 on 5/27/24.
 //
@@ -52,7 +53,7 @@ namespace AwsMock::Service {
             log_error << ec.message();
         } else {
             // Create the http session and run it
-            std::make_shared<GatewaySession>(std::move(socket))->Run();
+            std::make_shared<GatewaySession>(_ioc, std::move(socket))->Run();
         }
 
         // Accept another connection

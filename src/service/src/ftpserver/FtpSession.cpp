@@ -2,14 +2,14 @@
 #include <awsmock/ftpserver/FtpSession.h>
 
 namespace AwsMock::FtpServer {
-    FtpSession::FtpSession(boost::asio::io_context &io_service,
+    FtpSession::FtpSession(boost::asio::io_context &awsIoc,
                            const UserDatabase &user_database,
                            std::string serverName,
                            const std::function<void()> &completion_handler)
-        : _completion_handler(completion_handler), _user_database(user_database), _io_service(io_service),
-          command_socket_(io_service), command_write_strand_(io_service), data_type_binary_(true),
-          data_acceptor_(io_service), data_buffer_strand_(io_service),
-          file_rw_strand_(io_service), _ftpWorkingDirectory("/"), _serverName(std::move(serverName)) {
+        : _completion_handler(completion_handler), _user_database(user_database), _io_service(awsIoc),
+          command_socket_(awsIoc), command_write_strand_(awsIoc), data_type_binary_(true),
+          data_acceptor_(awsIoc), data_buffer_strand_(awsIoc), file_rw_strand_(awsIoc),
+          _ftpWorkingDirectory("/"), _serverName(std::move(serverName)), _awsIoc(awsIoc) {
         // Environment
         const Core::Configuration &configuration = Core::Configuration::instance();
         _region = configuration.GetValue<std::string>("awsmock.region");
@@ -17,7 +17,7 @@ namespace AwsMock::FtpServer {
         _transferDir = configuration.GetValue<std::string>("awsmock.modules.transfer.data-dir");
 
         // S3 service
-        _s3Service = std::make_shared<Service::S3Service>();
+        _s3Service = std::make_shared<Service::S3Service>(_awsIoc);
     }
 
     FtpSession::~FtpSession() {
@@ -1470,11 +1470,11 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::SendDeleteObjectRequest(const std::string &user, const std::string &fileName) const {
-        const Dto::S3::DeleteObjectRequest request = {
-                .region = _region,
-                .user = user,
-                .bucket = _bucket,
-                .key = GetKey(fileName)};
+        Dto::S3::DeleteObjectRequest request;
+        request.region = _region;
+        request.user = user;
+        request.bucket = _bucket;
+        request.key = GetKey(fileName);
         _s3Service->DeleteObject(request);
 
         log_debug << "Delete object request send, fileName: " << fileName;

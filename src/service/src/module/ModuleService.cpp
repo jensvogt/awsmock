@@ -143,6 +143,11 @@ namespace AwsMock::Service {
 
                 Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
                 infrastructure.ssmParameters = _ssmDatabase.ListParameters();
+
+            } else if (module == "application") {
+
+                Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+                infrastructure.applications = _applicationDatabase.ListApplications();
             }
         }
         return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
@@ -275,6 +280,8 @@ namespace AwsMock::Service {
                             dynamoDbRequest.attributes = table.attributes;
                             dynamoDbRequest.keySchemas = table.keySchemas;
                             dynamoDbRequest.tags = table.tags;
+                            dynamoDbRequest.streamSpecification.enabled = table.streamSpecification.enabled;
+                            dynamoDbRequest.streamSpecification.streamViewType = Dto::DynamoDb::StreamViewTypeFromString(Database::Entity::DynamoDb::StreamViewTypeToString(table.streamSpecification.streamViewType));
                             Dto::DynamoDb::CreateTableResponse response = _dynamoDbService.CreateTable(dynamoDbRequest);
                         } else {
                             _dynamoDatabase.CreateOrUpdateTable(table);
@@ -299,7 +306,16 @@ namespace AwsMock::Service {
                     log_info << "DynamoDb items imported, count: " << infrastructure.dynamoDbItems.size();
                 }
             }
-        } catch (Core::ServiceException ex) {
+
+            // Applications
+            if (!infrastructure.applications.empty()) {
+                const Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
+                for (auto &application: infrastructure.applications) {
+                    application = _applicationDatabase.ImportApplication(application);
+                }
+                log_info << "Applications imported, count: " << infrastructure.applications.size();
+            }
+        } catch (Core::ServiceException &ex) {
             log_error << "Service exception: " << ex.what();
         }
 
@@ -355,6 +371,8 @@ namespace AwsMock::Service {
                 count += _dynamoDbService.DeleteAllTables();
             } else if (m == "transfer") {
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
+            } else if (m == "application") {
+                count += Database::ApplicationDatabase::instance().DeleteAllApplications();
             }
         }
     }
@@ -388,6 +406,44 @@ namespace AwsMock::Service {
                 Database::S3Database::instance().DeleteObjects("eu-central-1", "transfer-server");
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
             }
+        }
+    }
+
+    void ModuleService::BackupModule(const std::string &module, bool includeObjects) {
+
+        // Backup file name
+        std::string backupFilename = Core::BackupUtils::GetBackupFilename(module);
+        log_info << "Creating backup of module, name: " << module << ", file: " << backupFilename;
+
+        // Create export request
+        Dto::Module::ExportInfrastructureRequest request;
+        request.includeObjects = includeObjects;
+        request.prettyPrint = true;
+        request.modules.emplace_back(module);
+
+        // Do the actual export
+        Dto::Module::ExportInfrastructureResponse response = ExportInfrastructure(request);
+
+        // Write the backup file
+        std::ofstream backupFile(backupFilename);
+        backupFile << response.ToJson();
+        backupFile.close();
+
+        // Backup retention
+        BackupRetention(module);
+
+        // Sleep for a while, otherwise cron will execute at the same time again
+        std::this_thread::sleep_for(std::chrono::minutes(5));
+    }
+
+    void ModuleService::BackupRetention(const std::string &module) {
+
+        // Get the file list
+        const int retention = Core::Configuration::instance().GetValue<int>("awsmock.modules." + module + ".backup.count");
+        const std::vector<std::string> backupList = Core::BackupUtils::GetBackupFiles(module, retention);
+        log_info << "Cleanup backup files, module: " << module << ", count: " << backupList.size();
+        for (const auto &file: backupList) {
+            Core::FileUtils::DeleteFile(file);
         }
     }
 }// namespace AwsMock::Service

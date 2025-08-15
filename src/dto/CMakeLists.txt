@@ -6,33 +6,18 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
         src/common/Services.cpp src/module/model/Infrastructure.cpp src/common/SNSClientCommand.cpp
         src/common/DynamoDbClientCommand.cpp src/common/SecretsManagerClientCommand.cpp
         src/common/KMSClientCommand.cpp src/common/LambdaClientCommand.cpp src/common/SSMClientCommand.cpp
-        src/common/MonitoringClientCommand.cpp src/common/CognitoClientCommand.cpp)
-set(SQS_SOURCES src/sqs/CreateQueueRequest.cpp src/sqs/CreateQueueResponse.cpp src/sqs/model/MessageAttribute.cpp
-        src/sqs/ListQueuesRequest.cpp src/sqs/ListQueuesResponse.cpp src/sqs/GetQueueUrlRequest.cpp
-        src/sqs/GetQueueAttributesRequest.cpp src/sqs/GetQueueAttributesResponse.cpp src/sqs/GetQueueUrlResponse.cpp
-        src/sqs/DeleteQueueRequest.cpp src/sqs/ChangeMessageVisibilityRequest.cpp src/sqs/DeleteMessageBatchEntry.cpp
-        src/sqs/DeleteMessageBatchRequest.cpp src/sqs/DeleteQueueResponse.cpp src/sqs/model/EventNotification.cpp
-        src/sqs/model/EventRecord.cpp src/sqs/SendMessageBatchRequest.cpp src/sqs/SendMessageBatchResponse.cpp
-        src/sqs/model/MessageEntry.cpp src/sqs/model/MessageSuccessful.cpp src/sqs/model/MessageFailed.cpp
-        src/sqs/ListQueueArnsResponse.cpp src/sqs/ListMessagesRequest.cpp src/sqs/ListMessagesResponse.cpp
-        src/sqs/ListQueueTagsRequest.cpp src/sqs/ListQueueTagsResponse.cpp src/sqs/model/BatchResultErrorEntry.cpp
-        src/sqs/model/DeleteMessageBatchResultEntry.cpp src/sqs/DeleteMessageBatchResponse.cpp src/sqs/mapper/Mapper.cpp
-        src/sqs/DeleteAttributeRequest.cpp)
+        src/common/MonitoringClientCommand.cpp src/common/CognitoClientCommand.cpp src/common/ApplicationClientCommand.cpp)
+set(SQS_SOURCES src/sqs/mapper/Mapper.cpp)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
-set(S3_SOURCES src/s3/CreateBucketRequest.cpp src/s3/CreateBucketResponse.cpp src/s3/PutBucketVersioningRequest.cpp
-        src/s3/DeleteObjectRequest.cpp src/s3/DeleteObjectsRequest.cpp src/s3/DeleteObjectsResponse.cpp
-        src/s3/CompleteMultipartUploadResult.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
-        src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/CreateBucketConstraint.cpp
-        src/s3/model/UserIdentity.cpp src/s3/GetMetadataRequest.cpp src/s3/GetMetadataResponse.cpp
-        src/s3/ListBucketRequest.cpp src/s3/ListBucketResponse.cpp src/s3/DeleteBucketRequest.cpp
-        src/s3/CreateMultipartUploadRequest.cpp src/s3/CreateMultipartUploadResult.cpp
-        src/s3/ListObjectVersionsRequest.cpp src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp
-        src/s3/PutBucketNotificationConfigurationRequest.cpp src/s3/PutBucketNotificationConfigurationResponse.cpp
-        src/s3/model/QueueConfiguration.cpp src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp
-        src/s3/model/LambdaConfiguration.cpp src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp
-        src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
-        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp
-        src/s3/UploadPartCopyResponse.cpp src/s3/GetBucketRequest.cpp src/s3/GetBucketResponse.cpp
+set(S3_SOURCES src/s3/PutBucketVersioningRequest.cpp src/s3/CopyObjectRequest.cpp src/s3/CopyObjectResponse.cpp
+        src/s3/MoveObjectRequest.cpp src/s3/MoveObjectResponse.cpp src/s3/model/UserIdentity.cpp
+        src/s3/CreateMultipartUploadRequest.cpp src/s3/CreateMultipartUploadResult.cpp src/s3/ListObjectVersionsRequest.cpp
+        src/s3/ListObjectVersionsResponse.cpp src/s3/model/FilterRule.cpp src/s3/PutBucketNotificationConfigurationRequest.cpp
+        src/s3/PutBucketNotificationConfigurationResponse.cpp src/s3/model/QueueConfiguration.cpp
+        src/s3/model/TopicConfiguration.cpp src/s3/mapper/Mapper.cpp src/s3/model/LambdaConfiguration.cpp
+        src/s3/PutBucketEncryptionRequest.cpp src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp
+        src/s3/model/ObjectVersion.cpp src/s3/model/RestoreStatus.cpp src/s3/model/ObjectVersion.cpp
+        src/s3/model/RestoreStatus.cpp src/s3/UploadPartCopyRequest.cpp src/s3/UploadPartCopyResponse.cpp
         src/s3/UpdateBucketRequest.cpp src/s3/model/Bucket.cpp src/s3/PurgeBucketRequest.cpp)
 set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp
         src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp src/docker/model/LogConfig.cpp
@@ -40,14 +25,10 @@ set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/
         src/docker/CreateNetworkRequest.cpp src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp
         src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp src/docker/model/Platform.cpp
         src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp src/docker/model/HostConfig.cpp)
-set(LAMBDA_SOURCES src/lambda/ListTagsResponse.cpp src/lambda/ListFunctionResponse.cpp src/lambda/model/Function.cpp
-        src/lambda/model/Code.cpp src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp
-        src/lambda/CreateFunctionResponse.cpp src/lambda/GetFunctionResponse.cpp src/lambda/model/Tags.cpp
-        src/lambda/model/UserIdentity.cpp src/lambda/mapper/Mapper.cpp src/lambda/model/AccountLimit.cpp
-        src/lambda/model/AccountUsage.cpp src/lambda/AccountSettingsResponse.cpp src/lambda/model/Configuration.cpp
-        src/lambda/CreateEventSourceMappingsRequest.cpp src/lambda/CreateEventSourceMappingsResponse.cpp
-        src/lambda/ListEventSourceMappingsRequest.cpp src/lambda/ListEventSourceMappingsResponse.cpp
-        src/lambda/model/EventSourceMapping.cpp src/lambda/DeleteFunctionRequest.cpp)
+set(LAMBDA_SOURCES
+        src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
+        src/lambda/GetFunctionResponse.cpp src/lambda/mapper/Mapper.cpp src/lambda/ListEventSourceMappingsRequest.cpp
+        src/lambda/ListEventSourceMappingsResponse.cpp)
 set(COGNITO_SOURCES src/cognito/mapper/Mapper.cpp)
 set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersResponse.cpp src/transfer/CreateUserRequest.cpp
         src/transfer/CreateUserResponse.cpp src/transfer/DeleteServerRequest.cpp src/transfer/StartServerRequest.cpp
@@ -55,19 +36,17 @@ set(TRANSFER_SOURCES src/transfer/ListUsersRequest.cpp src/transfer/ListUsersRes
         src/transfer/GetServerDetailsResponse.cpp src/transfer/DeleteUserRequest.cpp src/transfer/DeleteProtocolRequest.cpp)
 set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/mapper/Mapper.cpp)
-set(SSM_SOURCES src/ssm/mapper/Mapper.cpp src/ssm/PutParameterRequest.cpp src/ssm/PutParameterResponse.cpp
-        src/ssm/model/Parameter.cpp src/ssm/GetParameterRequest.cpp src/ssm/GetParameterResponse.cpp
-        src/ssm/DeleteParameterRequest.cpp src/ssm/model/ParameterFilter.cpp src/ssm/DescribeParametersRequest.cpp
-        src/ssm/DescribeParametersResponse.cpp)
+set(SSM_SOURCES src/ssm/mapper/Mapper.cpp)
+set(APPS_SOURCES src/apps/mapper/Mapper.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
-        src/module/ExportInfrastructureRequest.cpp src/module/ExportInfrastructureResponse.cpp
+        src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
         src/module/ImportInfrastructureRequest.cpp)
 set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${MONITORING_SOURCES})
+        ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)

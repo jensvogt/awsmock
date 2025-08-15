@@ -36,6 +36,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToXml());
                 }
 
+                case Dto::Common::SNSCommandType::LIST_TOPIC_ARNS: {
+
+                    Dto::SNS::ListTopicArnsResponse snsResponse = _snsService.ListTopicArns(clientCommand.region);
+
+                    log_info << "List topic ARNs";
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
 
                     std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
@@ -182,13 +190,18 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_TOPIC: {
 
-                    Dto::SNS::PurgeTopicRequest snsRequest;
-                    snsRequest.FromJson(clientCommand.payload);
-                    log_debug << "Purge topic, topicArn: " << snsRequest.topicArn;
-
+                    Dto::SNS::PurgeTopicRequest snsRequest = Dto::SNS::PurgeTopicRequest::FromJson(clientCommand.payload);
                     long deleted = _snsService.PurgeTopic(snsRequest);
 
                     log_info << "Topic purged, topicArn: " << snsRequest.topicArn << " count: " << deleted;
+                    return SendOkResponse(request);
+                }
+
+                case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
+
+                    boost::asio::post(_ioc, [this] {
+                        const long purged = _snsService.PurgeAllTopics();
+                        log_info << "All topic purged, count: " << purged; });
                     return SendOkResponse(request);
                 }
 
@@ -215,9 +228,9 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
 
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
-                    _snsService.DeleteMessage(snsRequest);
-
-                    log_info << "Message deleted, messageId: " << snsRequest.messageId;
+                    boost::asio::post(_ioc, [this, snsRequest] {
+                        _snsService.DeleteMessage(snsRequest);
+                        log_info << "Message deleted, messageId: " << snsRequest.messageId; });
                     return SendOkResponse(request, "{}");
                 }
 
@@ -261,6 +274,15 @@ namespace AwsMock::Service {
                     return SendOkResponse(request, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::GET_EVENT_SOURCE: {
+
+                    Dto::SNS::GetEventSourceRequest snsRequest = Dto::SNS::GetEventSourceRequest::FromJson(clientCommand);
+                    Dto::SNS::GetEventSourceResponse snsResponse = _snsService.GetEventSource(snsRequest);
+                    log_info << "Get event source, arn: " << snsRequest.eventSourceArn;
+
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";
@@ -293,9 +315,8 @@ namespace AwsMock::Service {
                 attributeValue = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
             }
             Dto::SNS::MessageAttribute attribute;
-            attribute.name = attributeName;
             attribute.stringValue = attributeValue;
-            attribute.type = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
+            attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
             messageAttributes[attributeName] = attribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();

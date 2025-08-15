@@ -11,9 +11,10 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -31,7 +32,7 @@ namespace AwsMock::Dto::SQS {
      * }
      * @endcode
      */
-    struct MessageSuccessful {
+    struct MessageSuccessful final : Common::BaseCounter<MessageSuccessful> {
 
         /**
          * Message ID
@@ -63,40 +64,33 @@ namespace AwsMock::Dto::SQS {
          */
         std::string md5SystemAttributes;
 
-        /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        friend MessageSuccessful tag_invoke(boost::json::value_to_tag<MessageSuccessful>, boost::json::value const &v) {
+            MessageSuccessful r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.messageId = Core::Json::GetStringValue(v, "MessageId");
+            r.sequenceNumber = Core::Json::GetStringValue(v, "SequenceNumber");
+            r.md5Body = Core::Json::GetStringValue(v, "MD5OfMessageBody");
+            r.md5MessageAttributes = Core::Json::GetStringValue(v, "MD5OfMessageAttributes");
+            r.md5SystemAttributes = Core::Json::GetStringValue(v, "MD5OfMessageSystemAttributes");
+            return r;
+        }
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const MessageSuccessful &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageSuccessful const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"MessageId", obj.messageId},
+                    {"Id", obj.id},
+                    {"MessageId", obj.messageId},
+                    {"SequenceNumber", obj.sequenceNumber},
+                    {"MD5OfMessageBody", obj.md5Body},
+                    {"MD5OfMessageAttributes", obj.md5MessageAttributes},
+                    {"MD5OfMessageSystemAttributes", obj.md5SystemAttributes},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

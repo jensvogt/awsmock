@@ -9,19 +9,17 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct CreateBucketRequest {
-
-        /**
-         * Bucket location
-         */
-        std::string region{};
+    /**
+     * @brief AWS S3 bucket constraints.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct CreateBucketRequest final : Common::BaseCounter<CreateBucketRequest> {
 
         /**
          * Bucket name
@@ -34,32 +32,38 @@ namespace AwsMock::Dto::S3 {
         std::string owner{};
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert from XML representation
          *
          * @param xmlString XML string
          */
-        void FromXml(const std::string &xmlString);
+        void FromXml(const std::string &xmlString) {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateBucketRequest &r);
+                boost::property_tree::ptree pt;
+                read_xml(xmlString, pt);
+                region = pt.get<std::string>("CreateBucketConfiguration.LocationConstraint");
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend CreateBucketRequest tag_invoke(boost::json::value_to_tag<CreateBucketRequest>, boost::json::value const &v) {
+            CreateBucketRequest r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.owner = Core::Json::GetStringValue(v, "Owner");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateBucketRequest const &obj) {
+            jv = {
+                    {"Name", obj.name},
+                    {"Owner", obj.owner},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

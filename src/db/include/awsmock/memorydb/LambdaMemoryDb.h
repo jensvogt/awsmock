@@ -10,9 +10,9 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 #include <awsmock/repository/Database.h>
@@ -166,13 +166,23 @@ namespace AwsMock::Database {
         Entity::Lambda::Lambda UpdateLambda(const Entity::Lambda::Lambda &lambda);
 
         /**
-         * @brief Sets the status of an lambda instance
+         * @brief Sets the status of a lambda instance
          *
          * @param containerId lambda container ID
          * @param status lambda instance status
          * @throws DatabaseException
          */
-        void SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
+        void SetInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status);
+
+        /**
+         * @brief Sets the status of a lambda instance
+         *
+         * @param lambda lambda function
+         * @param invocations number of invocations
+         * @param avgRuntime average runtime
+         * @throws DatabaseException
+         */
+        void SetLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime);
 
         /**
          * @brief Creates a new lambda result

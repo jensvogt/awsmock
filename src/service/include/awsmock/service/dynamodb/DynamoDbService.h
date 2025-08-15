@@ -16,11 +16,13 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpSocket.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/dynamodb/CreateTableResponse.h>
 #include <awsmock/dto/dynamodb/DeleteItemRequest.h>
@@ -32,6 +34,8 @@
 #include <awsmock/dto/dynamodb/DynamoDbResponse.h>
 #include <awsmock/dto/dynamodb/GetItemRequest.h>
 #include <awsmock/dto/dynamodb/GetItemResponse.h>
+#include <awsmock/dto/dynamodb/ListStreamsRequest.h>
+#include <awsmock/dto/dynamodb/ListStreamsResponse.h>
 #include <awsmock/dto/dynamodb/ListTableRequest.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
 #include <awsmock/dto/dynamodb/PutItemRequest.h>
@@ -40,8 +44,11 @@
 #include <awsmock/dto/dynamodb/QueryResponse.h>
 #include <awsmock/dto/dynamodb/ScanRequest.h>
 #include <awsmock/dto/dynamodb/ScanResponse.h>
+#include <awsmock/dto/dynamodb/internal/GetTableDetailCountersRequest.h>
+#include <awsmock/dto/dynamodb/internal/GetTableDetailCountersResponse.h>
 #include <awsmock/dto/dynamodb/internal/ListItemCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/ListItemCountersResponse.h>
+#include <awsmock/dto/dynamodb/internal/ListTableArnsResponse.h>
 #include <awsmock/dto/dynamodb/internal/ListTableCountersRequest.h>
 #include <awsmock/dto/dynamodb/internal/ListTableCountersResponse.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
@@ -78,16 +85,16 @@ namespace AwsMock::Service {
          * @param request create table request DTO
          * @return CreateTableResponse
          */
-        Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::CreateTableResponse CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const;
 
         /**
          * @brief check existence of table in DynamoDB docker image.
          *
          * @param region AWS region
          * @param tableName table name
-         * @return true if table exists in dynamoDb docker image
+         * @return true, if the table exists in dynamoDb docker image
          */
-        bool ExistTable(const std::string &region, const std::string &tableName) const;
+        [[nodiscard]] bool ExistTable(const std::string &region, const std::string &tableName) const;
 
         /**
          * @brief Lists all available tables
@@ -95,7 +102,7 @@ namespace AwsMock::Service {
          * @param request list table request DTO
          * @return ListTableResponse
          */
-        Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::ListTableResponse ListTables(const Dto::DynamoDb::ListTableRequest &request) const;
 
         /**
          * @brief Lists all table counters
@@ -104,7 +111,35 @@ namespace AwsMock::Service {
          * @return ListTableCountersResponse
          * @see ListTableCountersResponse
          */
-        Dto::DynamoDb::ListTableCountersResponse ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::ListTableCountersResponse ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const;
+
+        /**
+         * @brief Get  table detail counters
+         *
+         * @param request get table detail counters request DTO
+         * @return GetTableDetailCountersResponse
+         * @see GetTableDetailCountersRequest
+         * @see GetTableDetailCountersResponse
+         */
+        [[nodiscard]] Dto::DynamoDb::GetTableDetailCountersResponse GetTableDetailCounters(const Dto::DynamoDb::GetTableDetailCountersRequest &request) const;
+
+        /**
+         * @brief Lists all table counters
+         *
+         * @param region AWS region
+         * @return Dto::DynamoDb::ListTableArnsResponse
+         * @see Dto::DynamoDb::ListTableArnsResponse
+         */
+        [[nodiscard]] Dto::DynamoDb::ListTableArnsResponse ListTableArns(const std::string &region) const;
+
+        /**
+         * @brief Lists all table counters
+         *
+         * @param request list streams request
+         * @return Dto::DynamoDb::ListStreamsResponse
+         * @see Dto::DynamoDb::ListStreamsResponse
+         */
+        [[nodiscard]] Dto::DynamoDb::ListStreamsResponse ListStreams(const Dto::DynamoDb::ListStreamsRequest &request) const;
 
         /**
          * @brief Lists all item counters
@@ -113,7 +148,7 @@ namespace AwsMock::Service {
          * @return ListItemCountersResponse
          * @see ListItemCountersResponse
          */
-        Dto::DynamoDb::ListItemCountersResponse ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::ListItemCountersResponse ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const;
 
         /**
          * @brief Describes a table
@@ -121,7 +156,7 @@ namespace AwsMock::Service {
          * @param request describe table request DTO
          * @return DescribeTableResponse
          */
-        Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::DescribeTableResponse DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const;
 
         /**
          * @brief Deletes a table
@@ -129,12 +164,12 @@ namespace AwsMock::Service {
          * @param request delete table request DTO
          * @return DeleteTableResponse
          */
-        Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::DeleteTableResponse DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const;
 
         /**
          * @brief Deletes all tables with all items
          */
-        long DeleteAllTables() const;
+        [[nodiscard]] long DeleteAllTables() const;
 
         /**
          * Gets an item
@@ -142,7 +177,7 @@ namespace AwsMock::Service {
          * @param request get item request DTO
          * @return GetItemResponse
          */
-        Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::GetItemResponse GetItem(const Dto::DynamoDb::GetItemRequest &request) const;
 
         /**
          * @brief Puts an item
@@ -150,7 +185,7 @@ namespace AwsMock::Service {
          * @param request put item request DTO
          * @return GetItemResponse
          */
-        Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::PutItemResponse PutItem(const Dto::DynamoDb::PutItemRequest &request) const;
 
         /**
          * @brief Query the database
@@ -158,7 +193,7 @@ namespace AwsMock::Service {
          * @param request query item request DTO
          * @return QueryResponse
          */
-        Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::QueryResponse Query(const Dto::DynamoDb::QueryRequest &request) const;
 
         /**
          * @brief Scan the database
@@ -166,7 +201,7 @@ namespace AwsMock::Service {
          * @param request scan request DTO
          * @return ScanResponse
          */
-        Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::ScanResponse Scan(const Dto::DynamoDb::ScanRequest &request) const;
 
         /**
          * @brief Deletes a item
@@ -174,7 +209,7 @@ namespace AwsMock::Service {
          * @param request delete item request DTO
          * @return DeleteItemResponse
          */
-        Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
+        [[nodiscard]] Dto::DynamoDb::DeleteItemResponse DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const;
 
       private:
 
@@ -188,7 +223,7 @@ namespace AwsMock::Service {
          * @param headers original HTTP request headers
          * @return response body
          */
-        Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) const;
+        [[nodiscard]] Dto::DynamoDb::DynamoDbResponse SendDynamoDbRequest(const std::string &body, const std::map<std::string, std::string> &headers) const;
 
         /**
          * @brief Send the request to the DynamoDB container.
@@ -210,6 +245,13 @@ namespace AwsMock::Service {
         static std::map<std::string, std::string> PrepareHeaders(const std::string &command);
 
         /**
+         * @brief Prepare the headers for the docker request
+         *
+         * @param command DynamoDB streams command
+         */
+        static std::map<std::string, std::string> PrepareStreamHeaders(const std::string &command);
+
+        /**
          * Database connection
          */
         Database::DynamoDbDatabase &_dynamoDbDatabase;
@@ -223,6 +265,11 @@ namespace AwsMock::Service {
          * DynamoDb container port
          */
         int _containerPort;
+
+        /**
+         * AWS account ID
+         */
+        std::string _accountId;
     };
 
 }// namespace AwsMock::Service

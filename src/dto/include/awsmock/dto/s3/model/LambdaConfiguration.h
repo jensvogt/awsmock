@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/FilterRule.h>
 #include <awsmock/dto/s3/model/NotificationEvent.h>
 
@@ -93,21 +93,10 @@ namespace AwsMock::Dto::S3 {
 
         friend LambdaConfiguration tag_invoke(boost::json::value_to_tag<LambdaConfiguration>, boost::json::value const &v) {
             LambdaConfiguration r;
-            r.id = v.at("id").as_string();
-            r.lambdaArn = v.at("lambdaArn").as_string();
-
-            // Filter rules
-            for (auto filterRules = v.at("filterRules").as_array(); const auto &filterRule: filterRules) {
-                FilterRule filterRuleDto;
-                filterRuleDto.filterValue = filterRule.at("filterValue").as_string();
-                filterRuleDto.name = NameTypeFromString(filterRule.at("name").as_string().data());
-                r.filterRules.push_back(filterRuleDto);
-            }
-
-            // Events
-            for (auto events = v.at("events").as_array(); const auto &event: events) {
-                r.events.push_back(EventTypeFromString(event.as_string().data()));
-            }
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
+            r.filterRules = boost::json::value_to<std::vector<FilterRule>>(v.at("filterRules"));
+            r.events = boost::json::value_to<std::vector<NotificationEventType>>(v.at("events"));
             return r;
         }
 

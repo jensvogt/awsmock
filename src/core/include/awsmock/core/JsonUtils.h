@@ -14,12 +14,13 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 
-using std::chrono::system_clock;
 
 namespace AwsMock::Core::Json {
+
+    using std::chrono::system_clock;
 
     inline boost::json::value ParseJsonString(const std::string &jsonString) {
         boost::system::error_code ec;
@@ -92,6 +93,19 @@ namespace AwsMock::Core::Json {
             return DateTimeUtils::FromUnixTimestamp(value.as_int64());
         }
         return {defaultValue};
+    }
+
+    template<class T, class S>
+    std::map<T, S> GetMapFromObject(const boost::json::value &v, const std::string &name) {
+        std::map<T, S> valueMap;
+        if (AttributeExists(v, name)) {
+            for (const auto &element: v.at(name).as_object()) {
+                T key = element.key().data();
+                S value = element.value().as_string().data();
+                valueMap.emplace(key, value);
+            }
+        }
+        return valueMap;
     }
 
     inline bool findObject(boost::json::value &value, const std::string &name) {

@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/cognito/model/TokenValidityUnits.h>
 #include <awsmock/dto/common/BaseCounter.h>
 

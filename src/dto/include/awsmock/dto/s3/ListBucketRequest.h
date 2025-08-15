@@ -9,18 +9,17 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct ListBucketRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    /**
+     * @brief AWS S3 list bucket request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct ListBucketRequest final : Common::BaseCounter<ListBucketRequest> {
 
         /**
          * Name
@@ -30,7 +29,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * List type
          */
-        int listType;
+        long listType{};
 
         /**
          * Prefix
@@ -47,26 +46,29 @@ namespace AwsMock::Dto::S3 {
          */
         std::string encodingType;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListBucketRequest &r);
+        friend ListBucketRequest tag_invoke(boost::json::value_to_tag<ListBucketRequest>, boost::json::value const &v) {
+            ListBucketRequest r;
+            r.name = Core::Json::GetStringValue(v, "name");
+            r.listType = Core::Json::GetLongValue(v, "listType");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.delimiter = Core::Json::GetStringValue(v, "delimiter");
+            r.encodingType = Core::Json::GetStringValue(v, "encodingType");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListBucketRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"name", obj.name},
+                    {"listType", obj.listType},
+                    {"prefix", obj.prefix},
+                    {"delimiter", obj.delimiter},
+                    {"encodingType", obj.encodingType},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

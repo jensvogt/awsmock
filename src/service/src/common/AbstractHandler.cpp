@@ -2,7 +2,6 @@
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
-
     http::response<http::dynamic_body> AbstractHandler::HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_error << "Real method not implemented";
         return {};
@@ -34,6 +33,7 @@ namespace AwsMock::Service {
         http::response<http::dynamic_body> response;
         response.version(request.version());
         response.result(http::status::ok);
+        response.keep_alive(request.keep_alive());
         response.set(http::field::server, "awsmock");
         response.set(http::field::content_type, "application/json");
         response.set(http::field::content_length, "0");
@@ -63,6 +63,7 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
+        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::ok);
         response.set(http::field::server, "awsmock");
@@ -93,6 +94,7 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
+        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::no_content);
         response.set(http::field::server, "awsmock");
@@ -117,6 +119,7 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
+        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::internal_server_error);
         response.set(http::field::server, "awsmock");
@@ -147,6 +150,7 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
+        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::bad_request);
         response.set(http::field::server, "awsmock");
@@ -177,11 +181,13 @@ namespace AwsMock::Service {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
+        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::not_found);
         response.set(http::field::server, "awsmock");
-        response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_type, "text/html; charset=UTF-8");
         response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::last_modified, Core::DateTimeUtils::HttpFormatNow());
         response.set(http::field::access_control_allow_origin, "*");
         response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
         response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
@@ -210,6 +216,7 @@ namespace AwsMock::Service {
 
             // Prepare the response message
             http::response<http::dynamic_body> response;
+            response.keep_alive(request.keep_alive());
             response.version(request.version());
             response.result(http::status::partial_content);
             response.set(http::field::server, "awsmock");
@@ -250,35 +257,11 @@ namespace AwsMock::Service {
         }
     }
 
-    http::response<http::dynamic_body> AbstractHandler::SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers) {
-
-        // Prepare the response message
-        http::response<http::dynamic_body> response;
-        response.version(request.version());
-        response.result(http::status::ok);
-        response.set(http::field::server, "awsmock");
-        response.set(http::field::content_type, "application/json");
-        response.set(http::field::content_length, std::to_string(contentLength));
-        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
-        response.set(http::field::access_control_allow_origin, "*");
-        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
-        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
-
-        // Copy headers
-        if (!headers.empty()) {
-            for (const auto &[fst, snd]: headers) {
-                response.set(fst, snd);
-            }
-        }
-
-        // Send the response to the client
-        return response;
-    }
-
     http::response<http::dynamic_body> AbstractHandler::SendContinueResponse(const http::request<http::dynamic_body> &request) {
 
         // Prepare the response message
         http::response<http::dynamic_body> response;
+        response.keep_alive(request.keep_alive());
         response.version(request.version());
         response.result(http::status::continue_);
         response.set(http::field::server, "awsmock");
@@ -291,4 +274,39 @@ namespace AwsMock::Service {
         // Send the response to the client
         return response;
     }
+
+    http::response<http::dynamic_body> AbstractHandler::SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body, const std::map<std::string, std::string> &headers) {
+
+        // Prepare the response message
+        http::response<http::dynamic_body> response;
+        response.version(request.version());
+        response.result(status);
+        response.keep_alive(request.keep_alive());
+        response.set(http::field::connection, "Close");
+        response.set(http::field::server, "awsmock");
+        response.set(http::field::content_type, "application/json");
+        response.set(http::field::content_length, std::to_string(body.length()));
+        response.set(http::field::date, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::last_modified, Core::DateTimeUtils::HttpFormatNow());
+        response.set(http::field::access_control_allow_origin, "*");
+        response.set(http::field::access_control_allow_headers, "cache-control,content-type,x-amz-target,x-amz-user-agent");
+        response.set(http::field::access_control_allow_methods, "GET,PUT,POST,DELETE,HEAD,OPTIONS");
+
+        // Copy headers
+        if (!headers.empty()) {
+            for (const auto &[fst, snd]: headers) {
+                response.set(fst, snd);
+            }
+        }
+
+        // Body
+        if (!body.empty()) {
+            ostream(response.body()).write(body.c_str(), body.length()).flush();
+            response.prepare_payload();
+        }
+
+        // Send the response to the client
+        return response;
+    }
+
 }// namespace AwsMock::Service

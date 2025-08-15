@@ -11,7 +11,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/entity/sqs/MessageAttribute.h>
 #include <awsmock/entity/sqs/QueueAttribute.h>
 #include <awsmock/utils/MongoUtils.h>
 
@@ -87,9 +88,19 @@ namespace AwsMock::Database::Entity::SQS {
         bool isDlq = false;
 
         /**
+         * Content type
+         */
+        std::string contentType;
+
+        /**
          * Main queue for this DLQ
          */
         std::string mainQueue;
+
+        /**
+         * Default message attributes
+         */
+        std::map<std::string, MessageAttribute> defaultMessageAttributes;
 
         /**
          * Creation date
@@ -114,50 +125,6 @@ namespace AwsMock::Database::Entity::SQS {
          * @param mResult MongoDB document.
          */
         Queue FromDocument(const std::optional<view> &mResult);
-        /*
-      private:
-
-        friend Queue tag_invoke(boost::json::value_to_tag<Queue>, boost::json::value const &v) {
-            Queue r;
-            r.oid = v.at("oid").as_string();
-            r.user = v.at("user").as_string();
-            r.requestId = v.at("requestId").as_string();
-            r.queueUrl = v.at("queueUrl").as_string();
-            r.queueArn = v.at("queueArn").as_string();
-            r.name = v.at("name").as_string();
-            r.owner = v.at("owner").as_string();
-            r.attributes = boost::json::value_to<QueueAttribute>(v.at("attributes"));
-            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
-            r.paginationToken = v.at("paginationToken").as_string();
-            r.score = v.at("score").as_double();
-            r.size = v.at("size").as_int64();
-            r.isDlq = v.at("isDlq").as_bool();
-            r.mainQueue = v.at("mainQueue").as_string();
-            r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
-            r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
-            return r;
-        }
-
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Queue const &obj) {
-            jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"queueUrl", obj.queueUrl},
-                    {"queueArn", obj.queueArn},
-                    {"name", obj.name},
-                    {"owner", obj.owner},
-                    {"attributes", boost::json::value_from(obj.attributes)},
-                    {"tags", boost::json::value_from(obj.tags)},
-                    {"paginationToken", obj.paginationToken},
-                    {"score", obj.score},
-                    {"size", obj.size},
-                    {"isDlq", obj.isDlq},
-                    {"mainQueue", obj.mainQueue},
-                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
-                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
-            };
-        }*/
     };
 
     typedef std::vector<Queue> QueueList;

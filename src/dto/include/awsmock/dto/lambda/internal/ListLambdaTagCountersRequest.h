@@ -14,6 +14,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief List lambda tag counter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaTagCountersRequest final : Common::BaseCounter<ListLambdaTagCountersRequest> {
 
         /**

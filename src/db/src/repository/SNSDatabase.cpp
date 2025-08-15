@@ -720,6 +720,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSDatabase::UpdateMessage(Entity::SNS::Message &message) const {
+
         if (HasDatabase()) {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
@@ -735,12 +736,10 @@ namespace AwsMock::Database {
                 log_trace << "Message updated, count: " << bsoncxx::to_json(mResult->view());
                 session.commit_transaction();
 
-                if (!mResult) {
-                    throw Core::DatabaseException("Update message failed, oid: " + message.oid);
+                if (mResult) {
+                    message.FromDocument(mResult->view());
+                    return message;
                 }
-
-                message.FromDocument(mResult->view());
-                return message;
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();

@@ -105,6 +105,20 @@ namespace AwsMock::Database {
         return _tables[it->first];
     }
 
+    void DynamoDbMemoryDb::UpdateTableCounter(const std::string &tableArn, const long items, const long size) {
+
+        boost::mutex::scoped_lock lock(_tableMutex);
+
+        const auto it = std::ranges::find_if(_tables,
+                                             [tableArn](const std::pair<std::string, Entity::DynamoDb::Table> &t) {
+                                                 return t.second.arn == tableArn;
+                                             });
+        if (it != _tables.end()) {
+            it->second.itemCount = items;
+            it->second.size = size;
+        }
+    }
+
     void DynamoDbMemoryDb::DeleteTable(const std::string &tableName) {
         boost::mutex::scoped_lock lock(_tableMutex);
 

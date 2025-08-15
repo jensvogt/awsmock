@@ -10,10 +10,16 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/service/lambda/LambdaService.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/dynamodb/mapper/Mapper.h>
+#include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/dto/sns/CreateTopicRequest.h>
 #include <awsmock/dto/sns/CreateTopicResponse.h>
 #include <awsmock/dto/sns/DeleteMessageRequest.h>
@@ -22,6 +28,7 @@
 #include <awsmock/dto/sns/GetTopicAttributesResponse.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicRequest.h>
 #include <awsmock/dto/sns/ListSubscriptionsByTopicResponse.h>
+#include <awsmock/dto/sns/ListTopicArnsResponse.h>
 #include <awsmock/dto/sns/ListTopicsResponse.h>
 #include <awsmock/dto/sns/PublishRequest.h>
 #include <awsmock/dto/sns/PublishResponse.h>
@@ -37,6 +44,8 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
+#include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsResponse.h>
 #include <awsmock/dto/sns/internal/ListAttributeCountersRequest.h>
@@ -57,6 +66,7 @@
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
+#include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
@@ -81,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService() : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {};
+        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc) {};
 
         /**
          * @brief Creates a new topic
@@ -103,6 +113,15 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListTopicsResponse ListTopics(const std::string &region) const;
 
         /**
+         * @brief Returns a list of all available topic ARNs
+         *
+         * @param region AWS region
+         * @return ListTopicArnsResponse
+         * @see ListTopicArnsResponse
+         */
+        [[nodiscard]] Dto::SNS::ListTopicArnsResponse ListTopicArns(const std::string &region) const;
+
+        /**
          * @brief Returns a list of all topic counters
          *
          * @param request List topic counters request
@@ -113,12 +132,12 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListTopicCountersResponse ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const;
 
         /**
-         * @brief Publish a message to a SNS topic
+         * @brief Publish a message to an SNS topic
          *
          * @param request AWS region
          * @return PublishResponse
          */
-        [[nodiscard]] Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request) const;
+        [[nodiscard]] Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
 
         /**
          * @brief Subscribe to a topic
@@ -230,6 +249,22 @@ namespace AwsMock::Service {
         [[nodiscard]] long PurgeTopic(const Dto::SNS::PurgeTopicRequest &request) const;
 
         /**
+         * @brief Purge all topics
+         *
+         * @return total number of deleted messages
+         * @throws ServiceException
+         */
+        [[nodiscard]] long PurgeAllTopics() const;
+
+        /**
+         * @brief Returns an event source as a lambda configuration
+         *
+         * @param request get event source request
+         * @return Dto::S3::GetEventSourceResponse
+         */
+        [[nodiscard]] Dto::SNS::GetEventSourceResponse GetEventSource(const Dto::SNS::GetEventSourceRequest &request) const;
+
+        /**
          * @brief Delete a topic
          *
          * @param region AWS region name
@@ -282,7 +317,7 @@ namespace AwsMock::Service {
          * @param request SNS publish request
          * @param message SNS message entity
          */
-        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message) const;
+        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message);
 
         /**
          * @brief Send a SNS message to an SQS topic
@@ -290,7 +325,7 @@ namespace AwsMock::Service {
          * @param subscription SNS subscription
          * @param request SNS publish request
          */
-        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
+        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
 
         /**
          * @brief Adjust topic counters
@@ -314,13 +349,13 @@ namespace AwsMock::Service {
          * @param request SNS publish request.
          * @param message SNS message.
          */
-        void SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const;
+        void SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message);
 
         /**
          * @brief Send an SNS message to a lambda function endpoint.
          *
          * @param lambda lambda function to invoke
-         * @param message SNS publish message
+         * @param message SNS message to publish
          * @param eventSourceArn event source ARN
         */
         void SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const Database::Entity::SNS::Message &message, const std::string &eventSourceArn) const;

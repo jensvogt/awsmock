@@ -2,9 +2,6 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#include "awsmock/dto/dynamodb/mapper/Mapper.h"
-
-
 #include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {
@@ -73,6 +70,29 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::ListTopicArnsResponse SNSService::ListTopicArns(const std::string &region) const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "list_topics");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topics");
+        log_trace << "List all topic ARNs request, region: " << region;
+
+        try {
+
+            const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics(region);
+
+            Dto::SNS::ListTopicArnsResponse listTopicArnsResponse;
+            for (const auto &it: topicList) {
+                listTopicArnsResponse.topicArns.emplace_back(it.topicArn);
+            }
+            log_trace << "SNS list topic ARNs response: " << listTopicArnsResponse.ToJson();
+
+            return listTopicArnsResponse;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS list topic ARNs request failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
     Dto::SNS::ListTopicCountersResponse SNSService::ListTopicCounters(const Dto::SNS::ListTopicCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "list_topic_counters");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "list_topic_counters");
@@ -88,6 +108,33 @@ namespace AwsMock::Service {
 
         } catch (bsoncxx::exception &ex) {
             log_error << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    Dto::SNS::GetEventSourceResponse SNSService::GetEventSource(const Dto::SNS::GetEventSourceRequest &request) const {
+        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "get_event_source");
+        Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "get_event_source");
+        log_trace << "Get event source request, snsRequest: " << request.ToString();
+
+        // Check existence
+        if (!_snsDatabase.TopicExists(request.eventSourceArn)) {
+            log_warning << "Topic does not exists, arn: " << request.eventSourceArn;
+            throw Core::NotFoundException("Topic does not exists, arn: " + request.eventSourceArn);
+        }
+
+        try {
+            Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.eventSourceArn);
+            log_debug << "Topic returned, topic: " << topic.topicName;
+
+            Dto::SNS::GetEventSourceResponse response;
+            response.lambdaConfiguration.arn = topic.topicArn;
+            response.lambdaConfiguration.enabled = true;
+            response.lambdaConfiguration.uuid = topic.oid;
+            return response;
+
+        } catch (bsoncxx::exception &ex) {
+            log_warning << "S3 get event source failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
     }
@@ -110,6 +157,28 @@ namespace AwsMock::Service {
             // Update database
             const long deleted = _snsDatabase.PurgeTopic(topic);
             log_debug << "SNS topic prune, deleted: " << deleted;
+            return deleted;
+
+        } catch (bsoncxx::exception &ex) {
+            log_error << "SNS purge topic failed, message: " << ex.what();
+            throw Core::ServiceException(ex.what());
+        }
+    }
+
+    long SNSService::PurgeAllTopics() const {
+        Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "purge_all_topic");
+        Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "purge_all_topic");
+        log_trace << "Purge all topics request";
+
+        try {
+
+            long deleted = 0;
+            for (const auto &topic: _snsDatabase.ListTopics()) {
+                Dto::SNS::PurgeTopicRequest request;
+                request.topicArn = topic.topicArn;
+                request.region = topic.region;
+                deleted += PurgeTopic(request);
+            }
             return deleted;
 
         } catch (bsoncxx::exception &ex) {
@@ -142,7 +211,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) const {
+    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "publish");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "publish");
         log_trace << "Publish message request: " << request.ToString();
@@ -179,8 +248,8 @@ namespace AwsMock::Service {
 
             // Attributes
             for (const auto &[fst, snd]: request.messageAttributes) {
-                Database::Entity::SNS::MessageAttribute attribute = {.attributeName = fst, .attributeValue = snd.stringValue, .attributeType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.type))};
-                message.messageAttributes.emplace_back(attribute);
+                const Database::Entity::SNS::MessageAttribute attribute = {.stringValue = snd.stringValue, .dataType = Database::Entity::SNS::MessageAttributeTypeFromString(MessageAttributeDataTypeToString(snd.dataType))};
+                message.messageAttributes[fst] = attribute;
             }
 
             // Save message
@@ -467,11 +536,7 @@ namespace AwsMock::Service {
             attributeCounter.attributeValue = topic.topicAttribute.tracingConfig;
             response.attributeCounters.emplace_back(attributeCounter);
 
-            auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > 11) {
-                endArray = response.attributeCounters.end();
-            }
-            response.attributeCounters = std::vector(response.attributeCounters.begin() + request.pageSize * request.pageIndex, endArray);
+            response.attributeCounters = Core::PageVector<Dto::SNS::AttributeCounter>(response.attributeCounters, request.pageSize, request.pageIndex);
             return response;
 
         } catch (bsoncxx::exception &ex) {
@@ -570,7 +635,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message) const {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message) {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request.ToString();
@@ -673,7 +738,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Get queue by ARN
@@ -700,7 +765,7 @@ namespace AwsMock::Service {
             Dto::SQS::MessageAttribute messageAttribute;
             messageAttribute.stringValue = snd.stringValue;
             messageAttribute.binaryValue = snd.binaryValue;
-            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.type));
+            messageAttribute.dataType = Dto::SQS::MessageAttributeDataTypeFromString(MessageAttributeDataTypeToString(snd.dataType));
             sendMessageRequest.messageAttributes[fst] = messageAttribute;
         }
 
@@ -772,7 +837,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const {
+    void SNSService::SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) {
 
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(subscription.endpoint);
         log_debug << "Found lambda, lambdaArn: " << lambda.arn;
@@ -800,7 +865,8 @@ namespace AwsMock::Service {
         eventNotification.records.emplace_back(record);
         log_debug << "Invocation request function name: " << lambda.function << " json: " << eventNotification.ToJson();
 
-        _lambdaService.InvokeLambdaFunction(region, lambda.function, eventNotification.ToJson(), record.receiptHandle);
+        std::string payload = eventNotification.ToJson();
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function << " sourceArn: " << eventSourceArn;
     }
 

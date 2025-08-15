@@ -69,15 +69,4 @@ namespace AwsMock::Database::Entity::S3 {
         return *this;
     }
 
-    std::string QueueNotification::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const QueueNotification &n) {
-        os << "QueueNotification=" << to_json(n.ToDocument());
-        return os;
-    }
-
 }// namespace AwsMock::Database::Entity::S3

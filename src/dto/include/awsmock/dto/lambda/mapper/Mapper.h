@@ -13,8 +13,11 @@
 #include <awsmock/dto/lambda/internal/GetLambdaResultCounterResponse.h>
 #include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListFunctionCountersResponse.h>
+#include <awsmock/dto/lambda/internal/ListLambdaEventSourceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ListLambdaResultCountersResponse.h>
+#include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/dto/lambda/model/FunctionCounter.h>
+#include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 
@@ -28,6 +31,14 @@ namespace AwsMock::Dto::Lambda {
     class Mapper {
 
       public:
+
+        /**
+         * @brief Maps a lambda function entity to a lambda function DTO
+         *
+         * @param lambdaEntity lambda function entity
+         * @return lambda function DTO
+         */
+        static Function mapFunction(const Database::Entity::Lambda::Lambda &lambdaEntity);
 
         /**
          * @brief Maps a lambda entity to a create function response
@@ -75,24 +86,22 @@ namespace AwsMock::Dto::Lambda {
         /**
          * @brief Maps a list of lambda event source mappings to a lambda event source mapping response.
          *
-         * @param functionArn lambda function ARN
          * @param eventSourceMappings list of event source mapping entities
          * @return lambda event source mapping list response
          * @see ListEventSourceMappingsRequest
          * @see EventSourceMapping
          */
-        static ListEventSourceMappingsResponse map(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings);
+        static ListEventSourceMappingsResponse map(const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappings);
 
         /**
          * @brief Maps a list of lambda entities to list lambda counters response
          *
-         * @param request list lambda counters request
          * @param lambdaEntities lambda entities
          * @return ListFunctionCountersResponse
          * @see ListFunctionCountersRequest
          * @see ListFunctionCountersResponse
          */
-        static ListFunctionCountersResponse map(const ListFunctionCountersRequest &request, const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
+        static ListFunctionCountersResponse map(const std::vector<Database::Entity::Lambda::Lambda> &lambdaEntities);
 
         /**
          * @brief Maps a list of lambda result entities to a list lambda result counters response
@@ -117,6 +126,32 @@ namespace AwsMock::Dto::Lambda {
          * @return lambda result counters response
          */
         static LambdaResultCounter mapCounter(const Database::Entity::Lambda::LambdaResult &resultEntity);
+
+        /**
+         * @brief Maps a lambda event source entity to an event source DTO
+         *
+         * @param functionArn ARN of the lambda function
+         * @param eventSourceMappings event source mapping entity
+         * @return event source mapping DTO
+         */
+        static EventSourceMapping map(const std::string &functionArn, const Database::Entity::Lambda::EventSourceMapping &eventSourceMappings);
+
+        /**
+         * @brief Maps a list of lambda event source entity to a list of event source DTO
+         *
+         * @param functionArn ARN of the lambda function
+         * @param eventSourceMappingEntities list of event source mapping entities
+         * @return list of event source mapping DTOs
+         */
+        static std::vector<EventSourceMapping> mapCounters(const std::string &functionArn, const std::vector<Database::Entity::Lambda::EventSourceMapping> &eventSourceMappingEntities);
+
+        /**
+         * @brief Maps a lambda result
+         *
+         * @param resultEntity result entity
+         * @return lambda result DTO
+         */
+        static LambdaResult mapResult(const Database::Entity::Lambda::LambdaResult &resultEntity);
     };
 
 }// namespace AwsMock::Dto::Lambda

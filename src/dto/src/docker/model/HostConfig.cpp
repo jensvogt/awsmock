@@ -36,7 +36,7 @@ namespace AwsMock::Dto::Docker {
                     for (const view value = portBindingsView[name].get_array().value; const bsoncxx::document::element &portBindingElement: value) {
                         Port port;
                         port.hostIp = Core::Bson::BsonUtils::GetStringValue(portBindingElement.get_document(), "HostIp");
-                        port.publicPort = std::stoi(Core::Bson::BsonUtils::GetStringValue(portBindingElement.get_document(), "HostPort"));
+                        port.hostPort = std::stoi(Core::Bson::BsonUtils::GetStringValue(portBindingElement.get_document(), "HostPort"));
                         ports.push_back(port);
                     }
                     portBindings.portMap[name] = ports;

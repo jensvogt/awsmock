@@ -2,7 +2,7 @@
 // Created by vogje01 on 3/30/25.
 //
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/sftpserver/SftpServer.h>
 #include <awsmock/sftpserver/SftpUser.h>
 
@@ -1306,8 +1306,8 @@ static int process_close(sftp_client_message client_msg) {
         const int nBytes = readlink(filePath, realFilePath, PATH_MAX);
 #endif
         realFilePath[nBytes] = '\0';
-        const auto p = new AwsMock::Service::S3Service();
-        p->PutObject(currentUser, realFilePath, currentServerId);
+        //const auto p = new AwsMock::Service::S3Service();
+        //p->PutObject(currentUser, realFilePath, currentServerId);
     }
 
     if (h->type == SFTP_FILE_HANDLE) {

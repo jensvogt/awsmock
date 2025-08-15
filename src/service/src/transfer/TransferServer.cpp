@@ -6,11 +6,13 @@
 
 namespace AwsMock::Service {
 
-    TransferServer::TransferServer(Core::PeriodicScheduler &scheduler) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()) {
+    TransferServer::TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("transfer"), _transferDatabase(Database::TransferDatabase::instance()), _ioc(ioc) {
 
         // REST manager configuration
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.monitoring.period");
         _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.monitoring.period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.transfer.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.backup.cron");
 
         // Check module active
         if (!IsActive("transfer")) {
@@ -20,7 +22,12 @@ namespace AwsMock::Service {
         log_info << "Transfer server starting";
 
         // Start SNS monitoring update counters
-        scheduler.AddTask("monitoring-transfer-counters", [this] { UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("transfer-monitoring", [this] { UpdateCounter(); }, _monitoringPeriod);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("transfer-backup", [this] { BackupTransfer(); }, _backupCron);
+        }
 
         // Create transfer bucket
         CreateTransferBucket();
@@ -34,12 +41,12 @@ namespace AwsMock::Service {
         log_info << "Transfer server initialized";
     }
 
-    void TransferServer::CreateTransferBucket() {
+    void TransferServer::CreateTransferBucket() const {
         Dto::S3::CreateBucketRequest request;
         request.owner = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
         request.region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         request.name = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.bucket");
-        if (const S3Service s3Service; !s3Service.BucketExists(request.region, request.name)) {
+        if (const S3Service s3Service(_ioc); !s3Service.BucketExists(request.region, request.name)) {
             log_debug << "Creating bucket " << request.name << ", region: " << request.region << ", owner: " << request.owner;
             Dto::S3::CreateBucketResponse response = s3Service.CreateBucket(request);
         }
@@ -80,7 +87,7 @@ namespace AwsMock::Service {
         const auto address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.ftp.address");
 
         // Create a transfer manager thread
-        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address);
+        _ftpServer = std::make_shared<FtpServer::FtpServer>(server.serverId, port, address, _ioc);
         _transferServerList[server.serverId] = _ftpServer;
 
         // Add users
@@ -188,4 +195,9 @@ namespace AwsMock::Service {
 
         log_trace << "Transfer monitoring finished";
     }
+
+    void TransferServer::BackupTransfer() {
+        ModuleService::BackupModule("transfer", true);
+    }
+
 }// namespace AwsMock::Service

@@ -19,6 +19,7 @@
 #include <string>
 
 // Boost includes
+#include <boost/json.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
@@ -26,6 +27,27 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
+#include <awsmock/dto/apps/internal/DisableAllApplicationRequest.h>
+#include <awsmock/dto/apps/internal/DisableApplicationRequest.h>
+#include <awsmock/dto/apps/internal/EnableAllApplicationRequest.h>
+#include <awsmock/dto/apps/internal/EnableApplicationRequest.h>
+#include <awsmock/dto/apps/internal/ListApplicationCountersRequest.h>
+#include <awsmock/dto/apps/internal/RestartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StartAllApplicationsRequest.h>
+#include <awsmock/dto/apps/internal/StartApplicationRequest.h>
+#include <awsmock/dto/apps/internal/StopAllApplicationsRequest.h>
+#include <awsmock/dto/apps/internal/StopApplicationRequest.h>
+#include <awsmock/dto/apps/model/Application.h>
+#include <awsmock/dto/lambda/internal/DisableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/EnableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/EnableLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/StartAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
+#include <awsmock/dto/lambda/model/Function.h>
+#include <awsmock/dto/module/ExportInfrastructureRequest.h>
+#include <awsmock/dto/module/ListModuleNamesResponse.h>
 #include <awsmock/dto/module/model/GatewayConfig.h>
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/dto/transfer/model/Server.h>
@@ -67,28 +89,103 @@ namespace AwsMock::Controller {
         /**
          * @brief List all available services
          */
-        void ListServices() const;
+        void ListModules() const;
 
         /**
-         * @brief Start a module
+         * @brief Start one or more applications
          *
-         * @param modules list of modules names
+         * @param applications list of application names
          */
-        void StartService(std::vector<Dto::Module::Module> &modules) const;
+        void StartApplications(const std::vector<Dto::Apps::Application> &applications) const;
 
         /**
-         * @brief Restart a module
-         *
-         * @param modules list of modules names
+         * @brief Start all applications
          */
-        void RestartService(std::vector<Dto::Module::Module> &modules) const;
+        void StartAllApplications() const;
 
         /**
-         * @brief Stops a module
+         * @brief Enable one or more applications
          *
-         * @param modules list of modules names
+         * @param applications list of applications
          */
-        void StopService(std::vector<Dto::Module::Module> &modules) const;
+        void EnableApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Disable all applications
+         */
+        void EnableAllApplications() const;
+
+        /**
+         * @brief Disable one or more applications
+         *
+         * @param applications list of applications
+         */
+        void DisableApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Disable all applications
+         */
+        void DisableAllApplications() const;
+
+        /**
+         * @brief Restart one or more applications
+         *
+         * @param applications list of applications
+         */
+        void RestartApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Restart all applications
+         */
+        void RestartAllApplications() const;
+
+        /**
+         * @brief Stops one or more applications
+         *
+         * @param applications list of applications
+         */
+        void StopApplications(const std::vector<Dto::Apps::Application> &applications) const;
+
+        /**
+         * @brief Stops all applications
+         */
+        void StopAllApplications() const;
+
+        /**
+         * @brief Enable one or more lambdas
+         *
+         * @param lambdas list of lambdas
+         */
+        void EnableLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Disable all lambdas
+         */
+        void EnableAllLambdas() const;
+
+        /**
+         * @brief Disable one or more lambdas
+         *
+         * @param lambdas list of lambdas
+         */
+        void DisableLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Disable all lambdas
+         */
+        void DisableAllLambdas() const;
+
+        /**
+         * @brief Start one or more lambdas
+         *
+         * @param lambdas list of application names
+         */
+        void StartLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const;
+
+        /**
+         * @brief Start all lambdas
+         */
+        void StartAllLambdas() const;
 
 #ifdef HAS_SYSTEMD
         /**
@@ -98,7 +195,7 @@ namespace AwsMock::Controller {
 #endif
 
         /**
-         * @brief Sets the managers log level
+         * @brief Sets the manager's log level
          *
          * @param level log level
          */
@@ -110,13 +207,13 @@ namespace AwsMock::Controller {
         void GetConfig() const;
 
         /**
-         * @brief Dumps the current infrastructure as JSON file to stdout.
+         * @brief Dumps the current infrastructure as a JSON file to stdout.
          *
          * @param modules list of modules
          * @param pretty JSON pretty print (indent=4)
          * @param includeObjects include also objects
          */
-        void ExportInfrastructure(const std::vector<std::string> &modules, bool pretty = true, bool includeObjects = false) const;
+        void ExportInfrastructure(const std::vector<Dto::Module::Module> &modules, bool pretty = true, bool includeObjects = false) const;
 
         /**
          * @brief Imports the current infrastructure from stdin
@@ -148,23 +245,65 @@ namespace AwsMock::Controller {
          * @brief Add an authorization header.
          *
          * @param headers headers
+         * @param target awsmock target
          * @param action action to perform
          */
-        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &action) const;
+        void AddStandardHeaders(std::map<std::string, std::string> &headers, const std::string &target, const std::string &action) const;
+
+        /**
+         * @brief Get a list of applications
+         *
+         * @param commands command line arguments
+         * @param discards discard list
+         * @return list of applications
+         */
+        static std::vector<Dto::Apps::Application> GetApplications(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+
+        /**
+         * @brief Get a list of lambdas
+         *
+         * @param commands command line arguments
+         * @param discards discard list
+         * @return list of lambdas
+         */
+        static std::vector<Dto::Lambda::Function> GetLambdas(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+
+        /**
+         * @brief Get a list of modules
+         *
+         * @param commands command line arguments
+         * @param discards discard list
+         * @return list of modules
+         */
+        static std::vector<Dto::Module::Module> GetModules(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+
+        /**
+         * @brief Get a list of all applications.
+         *
+         * @return list of all applications.
+         */
+        [[nodiscard]] std::vector<Dto::Apps::Application> GetAllApplications() const;
+
+        /**
+         * @brief Get a list of all lambdas.
+         *
+         * @return list of all lambdas.
+         */
+        [[nodiscard]] std::vector<Dto::Lambda::Function> GetAllLambdas() const;
 
         /**
          * @brief Get a list of all modules.
          *
          * @return list of all modules.
          */
-        Dto::Module::Module::ModuleList GetAllModules() const;
+        [[nodiscard]] std::vector<Dto::Module::Module> GetAllModules() const;
 
         /**
          * @brief Get a list of all module names.
          *
          * @return list of all module names.
          */
-        std::vector<std::string> GetAllModuleNames() const;
+        [[nodiscard]] std::vector<std::string> GetAllModuleNames() const;
 
         /**
          * Commands

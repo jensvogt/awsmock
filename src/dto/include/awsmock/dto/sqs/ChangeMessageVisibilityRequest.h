@@ -9,18 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
-    struct ChangeMessageVisibilityRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct ChangeMessageVisibilityRequest final : Common::BaseCounter<ChangeMessageVisibilityRequest> {
 
         /**
          * Queue URL
@@ -35,42 +30,30 @@ namespace AwsMock::Dto::SQS {
         /**
          * Visibility timeout
          */
-        int visibilityTimeout;
+        long visibilityTimeout = 30;
 
-        /**
-         * Request ID
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ChangeMessageVisibilityRequest tag_invoke(boost::json::value_to_tag<ChangeMessageVisibilityRequest>, boost::json::value const &v) {
+            ChangeMessageVisibilityRequest r;
+            r.queueUrl = Core::Json::GetStringValue(v, "QueueUrl");
+            r.receiptHandle = Core::Json::GetStringValue(v, "ReceiptHandle");
+            r.visibilityTimeout = Core::Json::GetLongValue(v, "VisibilityTimeout");
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ChangeMessageVisibilityRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ChangeMessageVisibilityRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueUrl", obj.queueUrl},
+                    {"ReceiptHandle", obj.receiptHandle},
+                    {"VisibilityTimeout", obj.visibilityTimeout},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_SETVISIBILITYTIMEOUTREQUEST_H
+#endif// AWSMOCK_DTO_SQS_SET_VISIBILITY_TIMEOUT_REQUEST_H

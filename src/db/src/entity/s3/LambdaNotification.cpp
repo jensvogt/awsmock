@@ -40,7 +40,7 @@ namespace AwsMock::Database::Entity::S3 {
         return lambdaNotificationDoc.extract();
     }
 
-    LambdaNotification LambdaNotification::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    LambdaNotification LambdaNotification::FromDocument(const std::optional<view> &mResult) {
 
         try {
 
@@ -65,20 +65,9 @@ namespace AwsMock::Database::Entity::S3 {
 
         } catch (std::exception &exc) {
             log_error << exc.what();
-            throw Core::DatabaseException(exc.what());
+            throw Core::JsonException(exc.what());
         }
         return *this;
-    }
-
-    std::string LambdaNotification::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const LambdaNotification &n) {
-        os << "LambdaNotification=" << to_json(n.ToDocument());
-        return os;
     }
 
 }// namespace AwsMock::Database::Entity::S3

@@ -12,7 +12,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/utils/MongoUtils.h>
 
@@ -44,6 +44,9 @@ namespace AwsMock::Database::Entity::SSM {
 
         /**
          * Value
+         *
+         * @par
+         * In case the KMS key ID is not null, this attribute contains the base64 encoded and encrypted paramezter value.
          */
         std::string parameterValue;
 
@@ -71,6 +74,14 @@ namespace AwsMock::Database::Entity::SSM {
          * AWS ARN
          */
         std::string arn;
+
+        /**
+         * KMS key ARN
+         *
+         * @par
+         * If this is not null, the parameter will be encrypted and base64 encoded.
+         */
+        std::string kmsKeyArn;
 
         /**
          * Topic tags

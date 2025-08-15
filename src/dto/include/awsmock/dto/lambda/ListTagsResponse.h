@@ -11,36 +11,30 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListTagsResponse {
+    struct ListTagsResponse final : Common::BaseCounter<ListTagsResponse> {
 
         /**
          * Tags
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
+        friend ListTagsResponse tag_invoke(boost::json::value_to_tag<ListTagsResponse>, boost::json::value const &v) {
+            ListTagsResponse r;
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, ListTagsResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListTagsResponse const &obj) {
+            jv = {
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

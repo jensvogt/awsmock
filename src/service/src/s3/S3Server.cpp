@@ -9,12 +9,13 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::PeriodicScheduler &scheduler) : AbstractServer("s3") {
+    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3") {
 
         // Get HTTP configuration values
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _syncPeriod = configuration.GetValue<int>("awsmock.modules.s3.sync.period");
-        _counterPeriod = configuration.GetValue<int>("awsmock.modules.s3.counter.period");
+        _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync.period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.counter.period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.s3.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.backup.cron");
 
         // Check module active
         if (!IsActive("s3")) {
@@ -27,10 +28,18 @@ namespace AwsMock::Service {
         _s3CounterMap = _segment.find<Database::S3CounterMapType>(Database::S3_COUNTER_MAP_NAME).first;
 
         // Start S3 monitoring counters updates
-        scheduler.AddTask("s3-counter-updates", [this] { UpdateCounter(); }, _counterPeriod);
+        scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
 
         // Start synchronization of objects
-        scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod);
+        scheduler.AddTask("s3-sync-objects", [this] { SyncObjects(); }, _syncPeriod, _syncPeriod);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("s3-backup", [this] { this->BackupS3(); }, _backupCron);
+        }
+
+        // Set running
+        SetRunning();
 
         log_debug << "S3 server initialized";
     }
@@ -95,4 +104,9 @@ namespace AwsMock::Service {
         }
         log_debug << "S3 monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
+
+    void S3Server::BackupS3() {
+        ModuleService::BackupModule("s3", true);
+    }
+
 }// namespace AwsMock::Service

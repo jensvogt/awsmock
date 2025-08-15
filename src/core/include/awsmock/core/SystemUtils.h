@@ -19,7 +19,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/readable_pipe.hpp>
 #include <boost/process.hpp>
-#include <boost/thread/thread.hpp>
+#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>

@@ -14,11 +14,12 @@
 #include <boost/asio/thread_pool.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SecretsManagerDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 #define SECRETSMANAGER_DEFAULT_MONITORING_PERIOD 300
@@ -37,7 +38,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SecretsManagerServer(Core::PeriodicScheduler &scheduler);
+        explicit SecretsManagerServer(Core::Scheduler &scheduler);
 
       private:
 
@@ -45,6 +46,11 @@ namespace AwsMock::Service {
          * @brief Update counters
          */
         void UpdateCounter() const;
+
+        /**
+         * @brief Backup the secrets manager objects
+         */
+        static void BackupSecretsManger();
 
         /**
          * @brief Database connection
@@ -55,6 +61,24 @@ namespace AwsMock::Service {
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+
+        /**
+         * @brief Secrets manager backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Secrets manager backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Monitoring period

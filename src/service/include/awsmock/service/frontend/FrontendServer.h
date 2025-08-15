@@ -13,7 +13,7 @@
 #include <boost/asio/ip/tcp.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/service/frontend/FrontendWorker.h>
 

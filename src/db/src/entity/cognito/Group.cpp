@@ -34,14 +34,4 @@ namespace AwsMock::Database::Entity::Cognito {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
     }
 
-    std::string Group::ToString() const {
-        std::stringstream ss;
-        ss << *this;
-        return ss.str();
-    }
-
-    std::ostream &operator<<(std::ostream &os, const Group &u) {
-        os << "Group=" << to_json(u.ToDocument());
-        return os;
-    }
 }// namespace AwsMock::Database::Entity::Cognito

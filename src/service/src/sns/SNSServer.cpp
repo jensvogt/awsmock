@@ -6,13 +6,14 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::PeriodicScheduler &scheduler) : AbstractServer("sns") {
+    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns") {
 
         // Configuration
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _deletePeriod = configuration.GetValue<int>("awsmock.modules.sns.delete.period");
-        _counterPeriod = configuration.GetValue<int>("awsmock.modules.sns.counter.period");
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.sns.monitoring.period");
+        _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete.period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.counter.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.monitoring.period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sns.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sns.backup.cron");
 
         // Check module active
         if (!IsActive("sns")) {
@@ -26,10 +27,15 @@ namespace AwsMock::Service {
         _snsCounterMap = _segment.find<Database::SnsCounterMapType>(Database::SNS_COUNTER_MAP_NAME).first;
 
         // Start SNS monitoring update counters
-        scheduler.AddTask("sns-counter-update", [this] { UpdateCounter(); }, _counterPeriod);
+        scheduler.AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
 
         // Start the delete old messages task
         scheduler.AddTask("sns-delete-messages", [this] { DeleteOldMessages(); }, _deletePeriod);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("sns-backup", [this] { BackupSns(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -51,8 +57,6 @@ namespace AwsMock::Service {
             for (auto const &[key, val]: *_snsCounterMap) {
 
                 std::string labelValue = key;
-
-
                 _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(val.messages));
                 _metricService.SetGauge(SNS_TOPIC_SIZE, "topic", labelValue, static_cast<double>(val.size));
 
@@ -65,4 +69,9 @@ namespace AwsMock::Service {
         }
         log_debug << "SNS monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
+
+    void SNSServer::BackupSns() {
+        ModuleService::BackupModule("sns", true);
+    }
+
 }// namespace AwsMock::Service

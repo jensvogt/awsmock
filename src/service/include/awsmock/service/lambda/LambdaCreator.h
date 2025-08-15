@@ -10,9 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/TarUtils.h>
-#include <awsmock/dto/lambda/model/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
@@ -30,11 +29,11 @@ namespace AwsMock::Service {
      *
      * @par
      * Once the lambdas are written to the lambda directory, the creator decodes the lambda and check for a existing image in the docker registry. If it find a image, it will
-     * create a docker container and starts it. Otherwise, a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
+     * create a docker container and start it. Otherwise, a docker image is create using the AWS runtime (Java, Python, nodes.js, etc.) and creates a docker image from the
      * Dockerfile for that runtime. Then a container is created and started.
      *
      * @par
-     * To see the running container simply issue a 'docker ps'. The container has a name of 'lambda-function-name:version. The docker tag is taken from the lambda function
+     * To see the running container, issue a 'docker ps'. The container has a name of 'lambda-function-name:version. The docker tag is taken from the lambda function
      * tags. If a 'version' or 'dockerTag' exists in the lambda function, this is taken as the docker tag. Otherwise, 'latest' is used. If it is a function, which is loaded
      * from a versioned S3 bucket/key, the version tag of the S3 object is taken.
      *
@@ -59,13 +58,23 @@ namespace AwsMock::Service {
         explicit LambdaCreator() = default;
 
         /**
-         * @brief Create new lambda function
+         * @brief Create a new lambda function
          *
-         * @param functionCode zipped and BASE64 encoded function code
-         * @param functionId lambda function OID
+         * @param lambda lambda entity
          * @param instanceId instanceId
+         * @return updated lambda entity
          */
-        void operator()(const std::string &functionCode, const std::string &functionId, const std::string &instanceId) const;
+        Database::Entity::Lambda::Lambda CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId);
+
+        /**
+         * @brief Create a new version of an existing lambda function
+         *
+         * @param lambda lambda instance
+         * @param functionCode new function code
+         * @param newVersion new version
+         * @return
+         */
+        void UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion);
 
       private:
 
@@ -73,10 +82,11 @@ namespace AwsMock::Service {
          * @brief Create a lambda function instance
          *
          * @param instanceId name of the instance, lambda function name + '-' + 8 random hex digits
-         * @param lambdaEntity lambda entity
+         * @param lambda lambda entity
          * @param functionCode function code
+         * @return container ID
          */
-        static void CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &functionCode);
+        std::string CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode);
 
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder
@@ -85,24 +95,24 @@ namespace AwsMock::Service {
          * @param lambdaEntity lambda entity
          * @param dockerTag docker tag to use
          */
-        static void CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+        void CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
          * @brief Creates a new docker container, in case the container does not exists inside the docker daemon.
          *
-         * @param lambdaEntity lambda entity.
+         * @param lambda lambda entity.
          * @param instanceId lambda instance ID.
          * @param hostPort host port
          * @param dockerTag docker tag.
          * @see Database::Entity::Lambda::Lambda
          */
-        static void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &instanceId, int hostPort, const std::string &dockerTag);
+        void CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, int hostPort, const std::string &dockerTag);
 
         /**
          * @brief Converts the lambda environment to a vector of string, which is needed by the docker API
          *
          * @par
-         * Additionally the AWS_LAMBDA_FUNCTION_TIMEOUT variable will be added. This restricts the AWS Lambda RIE for the given timeout.
+         * Additionally, the AWS_LAMBDA_FUNCTION_TIMEOUT variable will be added. This restricts the AWS Lambda RIE for the given timeout.
          *
          * @param lambda lambda entity
          * @return vector of strings containing the runtime environment as key=value pairs
@@ -120,7 +130,7 @@ namespace AwsMock::Service {
          * @param runtime AWS lambda runtime name
          * @return code directory
          */
-        static std::string UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime);
+        std::string UnpackZipFile(const std::string &codeDir, const std::string &functionCode, const std::string &runtime);
 
         /**
          * @brief Returns a random host port in the range 32768 - 65536 for the host port of the docker container which is running the lambda function.
@@ -157,6 +167,16 @@ namespace AwsMock::Service {
          * @see Database::Entity::Lambda::Lambda
          */
         static std::string WriteBase64File(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambda, const std::string &dockerTag);
+
+        /**
+         * Lambda database connection
+         */
+        Database::LambdaDatabase &_lambdaDatabase = Database::LambdaDatabase::instance();
+
+        /**
+         * Dockerized flag
+         */
+        bool _dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     };
 
 }// namespace AwsMock::Service

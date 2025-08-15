@@ -11,27 +11,26 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
-
-    using std::chrono::system_clock;
 
     /**
      * @brief DynamoDB provisioned throughput
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ProvisionedThroughput {
+    struct ProvisionedThroughput final : Common::BaseEntity<ProvisionedThroughput> {
 
         /**
          * Read capacity units
          */
-        int readCapacityUnits = 0;
+        long readCapacityUnits = 0;
 
         /**
          * Write capacity units
          */
-        int writeCapacityUnits = 0;
+        long writeCapacityUnits = 0;
 
         /**
          * Last decrease time
@@ -44,40 +43,19 @@ namespace AwsMock::Database::Entity::DynamoDb {
         system_clock::time_point lastIncreaseDateTime;
 
         /**
-         * NUmber of decreases
+         * Number of decreases
          */
         long numberOfDecreasesToday = 0;
 
         /**
-         * Converts the entity to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert to a BSON document
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Convert from a BSON document
          */
-        void FromDocument(std::optional<view> document);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ProvisionedThroughput &r);
+        void FromDocument(const std::optional<view> &document);
     };
 
 }// namespace AwsMock::Database::Entity::DynamoDb

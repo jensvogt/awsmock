@@ -6,10 +6,10 @@
 #define AWSMOCK_DTO_S3_MAPPER_H
 
 // AwsMock includes
-#include <awsmock/dto/s3/GetBucketRequest.h>
-#include <awsmock/dto/s3/GetBucketResponse.h>
 #include <awsmock/dto/s3/ListObjectVersionsRequest.h>
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
+#include <awsmock/dto/s3/internal/GetBucketRequest.h>
+#include <awsmock/dto/s3/internal/GetBucketResponse.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
@@ -74,6 +74,15 @@ namespace AwsMock::Dto::S3 {
          * @see Bucket
          */
         static Bucket map(const Database::Entity::S3::Bucket &bucketEntity);
+
+        /**
+         * @brief Maps a S3 queue configuration entity to a queue configuration DTO
+         *
+         * @param lambdaConfigurationEntity lambda configuration entities
+         * @return LambdaConfiguration DTOs
+         * @see LambdaConfiguration
+         */
+        static LambdaConfiguration map(const Database::Entity::S3::LambdaNotification &lambdaConfigurationEntity);
 
       private:
 

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerService::SecretsManagerService() : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+    SecretsManagerService::SecretsManagerService(boost::asio::io_context &ioc) : _secretsManagerDatabase(Database::SecretsManagerDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
 
         // Initialize environment
         _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
@@ -162,16 +162,10 @@ namespace AwsMock::Service {
             response.arn = secret.arn;
             response.versionId = versionId;
             response.createdDate = Core::DateTimeUtils::UnixTimestamp(secret.createdDate);
-            response.versionStages = secret.versions[request.versionId].stages;
+            response.versionStages = secret.versions[versionId].stages;
 
             if (!secret.kmsKeyId.empty()) {
-                DecryptSecret(version, secret.kmsKeyId, version.secretString);
-                Dto::KMS::DecryptRequest decryptRequest;
-                decryptRequest.keyId = secret.kmsKeyId;
-                decryptRequest.ciphertext = version.secretString;
-                Dto::KMS::DecryptResponse kmsResponse = _kmsService.Decrypt(decryptRequest);
-                response.secretString = Core::Crypto::Base64Decode(kmsResponse.plaintext);
-                log_warning << "Secret string, stage: " << request.versionStage << ": " << response.secretString;
+                response.secretString = DecryptSecret(version, secret.kmsKeyId, version.secretString);
             } else if (!version.secretString.empty()) {
                 response.secretBinary = Core::Crypto::Base64Decode(version.secretBinary);
             }
@@ -318,7 +312,7 @@ namespace AwsMock::Service {
             // Get the object from the database
             Database::Entity::SecretsManager::Secret secret = _secretsManagerDatabase.GetSecretByArn(arn);
 
-            // Get  version
+            // Get version
             for (const auto &[fst, snd]: secret.versions) {
                 Dto::SecretsManager::SecretVersion secretVersion;
                 secretVersion.versionId = fst;
@@ -463,16 +457,22 @@ namespace AwsMock::Service {
             // Update database
             Database::Entity::SecretsManager::SecretVersion version;
             std::string versionId = Core::StringUtils::CreateRandomUuid();
-            version.secretString = request.secretString;
+            if (!secret.kmsKeyId.empty()) {
+                Dto::KMS::EncryptRequest encryptRequest;
+                encryptRequest.keyId = secret.kmsKeyId;
+                encryptRequest.plaintext = request.secretString;
+                Dto::KMS::EncryptResponse kmsResponse = _kmsService.Encrypt(encryptRequest);
+                version.secretString = kmsResponse.ciphertext;
+            } else {
+                version.secretString = request.secretString;
+            }
             version.secretBinary = request.secretBinary;
             version.stages.emplace_back(Dto::SecretsManager::VersionStateToString(Dto::SecretsManager::VersionStateType::AWSCURRENT));
 
-            secret.kmsKeyId = request.kmsKeyId;
             secret.versions[versionId] = version;
             secret.description = request.description;
             secret.lastChangedDate = system_clock::now();
             secret.ResetVersions(versionId);
-
             secret = _secretsManagerDatabase.UpdateSecret(secret);
 
             // Convert to DTO
@@ -509,6 +509,11 @@ namespace AwsMock::Service {
             // Updates are only possible on certain fields
             secret.rotationRules = Dto::SecretsManager::Mapper::map(request.secretDetails.rotationRules);
             secret.rotationLambdaARN = request.secretDetails.rotationLambdaARN;
+            if (!request.secretDetails.secretString.empty()) {
+                Database::Entity::SecretsManager::SecretVersion version = secret.GetVersion(secret.GetCurrentVersionId());
+                EncryptSecret(version, secret.kmsKeyId, request.secretDetails.secretString);
+                secret.versions[secret.GetCurrentVersionId()] = version;
+            }
             secret = _secretsManagerDatabase.UpdateSecret(secret);
 
             // Convert to DTO
@@ -610,7 +615,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SecretsManagerService::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::CreateSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -622,7 +627,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::SetSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -634,7 +639,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::TestSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -646,7 +651,7 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) const {
+    void SecretsManagerService::FinishSecret(const Database::Entity::SecretsManager::Secret &secret, const Database::Entity::Lambda::Lambda &lambda, const std::string &clientRequestToken) {
 
         // Sent create request to lambda function
         Dto::SecretsManager::LambdaInvocationRequest invocationRequest;
@@ -658,11 +663,12 @@ namespace AwsMock::Service {
         SendLambdaInvocationRequest(lambda, invocationRequest.ToJson());
     }
 
-    void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) const {
+    void SecretsManagerService::SendLambdaInvocationRequest(const Database::Entity::Lambda::Lambda &lambda, const std::string &body) {
         log_debug << "Invoke lambda function request, function: " << lambda.function << " body: " << body;
 
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        _lambdaService.InvokeLambdaFunction(region, lambda.function, body, {}, false);
+        std::string payload = body;
+        Dto::Lambda::LambdaResult result = _lambdaService.InvokeLambdaFunction(region, lambda.function, payload, Dto::Lambda::LambdaInvocationType::EVENT);
         log_debug << "Lambda send invocation request finished, function: " << lambda.function;
     }
 
@@ -684,12 +690,13 @@ namespace AwsMock::Service {
         version.secretString = encryptResponse.ciphertext;
     }
 
-    void SecretsManagerService::DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {
+    std::string SecretsManagerService::DecryptSecret(Database::Entity::SecretsManager::SecretVersion &version, const std::string &kmsKeyId, const std::string &secretString) const {
         Dto::KMS::DecryptRequest decryptRequest;
         decryptRequest.keyId = kmsKeyId;
-        decryptRequest.ciphertext = Core::Crypto::Base64Decode(secretString);
+        decryptRequest.ciphertext = secretString;
         const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
-        version.secretString = decryptResponse.plaintext;
+        log_trace << "Decrypt secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
+        return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 
     std::string SecretsManagerService::GetSecretString(Database::Entity::SecretsManager::Secret &secret) const {
@@ -700,6 +707,7 @@ namespace AwsMock::Service {
         decryptRequest.keyId = secret.kmsKeyId;
         decryptRequest.ciphertext = version.secretString;
         const Dto::KMS::DecryptResponse decryptResponse = _kmsService.Decrypt(decryptRequest);
+        log_trace << "GetSecretString secret, secretString: " << Core::Crypto::Base64Decode(decryptResponse.plaintext);
         return Core::Crypto::Base64Decode(decryptResponse.plaintext);
     }
 }// namespace AwsMock::Service

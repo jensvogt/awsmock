@@ -50,10 +50,10 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FieldAlloc.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 
 #define BUFFER_LEN 8092
 #define DEFAULT_MIME_TYPE "application/octet-stream"

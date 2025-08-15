@@ -15,7 +15,8 @@
 #include <boost/beast/core/bind_handler.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/AwsUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/gateway/GatewaySession.h>
 
@@ -59,7 +60,7 @@ namespace AwsMock::Service {
          * @param ec error code
          * @param socket HTTP socket
          */
-        void OnAccept(const boost::beast::error_code &ec, boost::asio::ip::tcp::socket socket);
+        void OnAccept(const boost::beast::error_code &ec, ip::tcp::socket socket);
 
         /**
          * Boost IO context
@@ -69,7 +70,7 @@ namespace AwsMock::Service {
         /**
          * Boost acceptor
          */
-        boost::asio::ip::tcp::acceptor _acceptor;
+        ip::tcp::acceptor _acceptor;
     };
 
 }// namespace AwsMock::Service

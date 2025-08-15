@@ -15,7 +15,7 @@
 #include <boost/beast.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
@@ -46,6 +46,71 @@ namespace AwsMock::Service {
      */
     class GatewaySession : public std::enable_shared_from_this<GatewaySession> {
 
+
+        // This queue is used for HTTP pipelining.
+        class queue {
+            // Maximum number of responses we will queue
+            int limit = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-queue");
+
+            // The type-erased, saved work item
+            struct work {
+                virtual ~work() = default;
+                virtual void operator()() = 0;
+            };
+
+            GatewaySession &self_;
+            std::vector<std::unique_ptr<work>> items_;
+
+          public:
+
+            explicit queue(GatewaySession &self) : self_(self) {
+                items_.reserve(limit);
+            }
+
+            // Returns `true` if we have reached the queue limit
+            bool is_full() const {
+                return items_.size() >= limit;
+            }
+
+            // Called when a message finishes sending
+            // Returns `true` if the caller should initiate a read
+            bool on_write() {
+                BOOST_ASSERT(!items_.empty());
+                auto const was_full = is_full();
+                items_.erase(items_.begin());
+                if (!items_.empty())
+                    (*items_.front())();
+                return was_full;
+            }
+
+            // Called by the HTTP handler to send a response.
+            template<bool isRequest, class Body, class Fields>
+            void operator()(http::message<isRequest, Body, Fields> &&msg) {
+                // This holds a work item
+                struct work_impl : work {
+                    GatewaySession &self_;
+                    http::message<isRequest, Body, Fields> msg_;
+
+                    work_impl(GatewaySession &self, http::message<isRequest, Body, Fields> &&msg) : self_(self), msg_(std::move(msg)) {
+                    }
+
+                    void operator()() override {
+                        http::async_write(
+                                self_._stream,
+                                msg_,
+                                boost::beast::bind_front_handler(&GatewaySession::OnWrite, self_.shared_from_this(), msg_.need_eof()));
+                    }
+                };
+
+                // Allocate and store the work
+                items_.push_back(boost::make_unique<work_impl>(self_, std::move(msg)));
+
+                // If there was no previous work, start this one
+                if (items_.size() == 1)
+                    (*items_.front())();
+            }
+        };
+
       public:
 
         /**
@@ -53,9 +118,10 @@ namespace AwsMock::Service {
          *
          * Takes ownership of the socket.
          *
+         * @param ioc boost asio IO context
          * @param socket
          */
-        explicit GatewaySession(ip::tcp::socket &&socket);
+        explicit GatewaySession(boost::asio::io_context &ioc, ip::tcp::socket &&socket);
 
         /**
          * @brief Start the session
@@ -90,10 +156,11 @@ namespace AwsMock::Service {
          * @tparam Body HTTP body
          * @tparam Allocator allocator
          * @param request HTTP request
+         * @param send send queue
          * @return
          */
-        template<class Body, class Allocator>
-        http::message_generator HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request);
+        template<class Body, class Allocator, class Send>
+        void HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send);
 
         /**
          * @brief Called to start/continue the write-loop.
@@ -117,11 +184,6 @@ namespace AwsMock::Service {
         void DoShutdown();
 
         /**
-         * @brief On clas callback
-         */
-        void DoClose();
-
-        /**
          * @brief Returns the authorization header
          *
          * @param request HTTP request
@@ -143,13 +205,21 @@ namespace AwsMock::Service {
          * @brief Handles continue request (HTTP status: 100)
          *
          * @param _stream HTTP socket stream
+         * @param request request
          */
-        static void HandleContinueRequest(boost::beast::tcp_stream &_stream);
+        static void HandleContinueRequest(boost::beast::tcp_stream &_stream, const http::request<http::dynamic_body> &request);
+
+        /**
+         * Boost asio IO context
+         */
+        boost::asio::io_context &_ioc;
 
         /**
          * TCP stream
          */
         boost::beast::tcp_stream _stream;
+
+        queue _queue;
 
         /**
          * Read buffer
@@ -177,6 +247,16 @@ namespace AwsMock::Service {
         bool _verifySignature;
 
         /**
+         * Default region
+         */
+        std::string _region;
+
+        /**
+         * Default user
+         */
+        std::string _user;
+
+        /**
          * HTTP request queue
          */
         std::queue<http::message_generator> _response_queue;
@@ -191,98 +271,6 @@ namespace AwsMock::Service {
          */
         Monitoring::MetricService _metricService = Monitoring::MetricService::instance();
     };
-
-
-    template<class SyncReadStream, class DynamicBuffer>
-    void PrintChunkedBody(std::ostream &os, SyncReadStream &stream, DynamicBuffer &buffer, boost::beast::error_code &ec) {
-
-        // Declare the parser with an empty body since
-        // we plan on capturing the chunks ourselves.
-        http::parser<true, http::empty_body> p;
-
-        // This container will hold the extensions for each chunk
-        http::chunk_extensions ce;
-
-        // This string will hold the body of each chunk
-        std::string chunk;
-
-        // Declare our chunk header callback. This is invoked
-        // after each chunk header and also after the last chunk.
-        auto header_cb = [&](const std::uint64_t size, const boost::string_view extensions, boost::beast::error_code &ev) {
-            // Parse the chunk extensions so we can access them easily
-            ce.parse(extensions, ev);
-            if (ev)
-                return;
-
-            // See if the chunk is too big
-            if (size > (std::numeric_limits<std::size_t>::max)()) {
-                ev = http::error::body_limit;
-                return;
-            }
-
-            // Make sure we have enough storage, and
-            // reset the container for the upcoming chunk
-            chunk.reserve(size);
-            chunk.clear();
-        };
-
-        // Set the callback. The function requires a non-const reference so we
-        // use a local variable, since temporaries can only bind to const refs.
-        p.on_chunk_header(header_cb);
-
-        // Declare the chunk body callback. This is called one or
-        // more times for each piece of a chunk body.
-        auto body_cb = [&](const std::uint64_t remain, const boost::string_view body, boost::beast::error_code &ec) {
-            // If this is the last piece of the chunk body, set the error so that the call to `read` returns,
-            // and we can process the chunk.
-            if (remain == body.size())
-                ec = http::error::end_of_chunk;
-
-            // Append this piece to our container
-            chunk.append(body.data(), body.size());
-
-            // The return value informs the parser of how much of the body we
-            // consumed. We will indicate that we consumed everything passed in.
-            return body.size();
-        };
-        p.on_chunk_body(body_cb);
-
-        while (!p.is_done()) {
-            // Read as much as we can. When we reach the end of the chunk, the chunk
-            // body callback will make the read return with the end_of_chunk error.
-            read(stream, buffer, p.get(), ec);
-            if (!ec)
-                continue;
-            if (ec != http::error::end_of_chunk)
-                return;
-            ec.assign(0, ec.category());
-
-            // We got a whole chunk, print the extensions:
-            for (const auto &[fst, snd]: ce) {
-                os << "Extension: " << fst;
-                if (!snd.empty())
-                    os << " = " << snd << std::endl;
-                else
-                    os << std::endl;
-            }
-
-            // Now print the chunk body
-            os << "Chunk Body: " << chunk << std::endl;
-        }
-
-        // Get a reference to the parsed message, this is for convenience
-        // Check each field promised in the "Trailer" header and output it
-        for (auto const &msg = p.get(); auto const &name: http::token_list{msg[http::field::trailer]}) {
-            // Find the trailer field
-            auto it = msg.find(name);
-            if (it == msg.end()) {
-                // Oops! They promised the field but failed to deliver it
-                os << "Missing Trailer: " << name << std::endl;
-                continue;
-            }
-            os << it->name() << ": " << it->value() << std::endl;
-        }
-    }
 
 }// namespace AwsMock::Service
 

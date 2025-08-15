@@ -13,7 +13,7 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/kms/model/KeySpec.h>
 #include <awsmock/dto/kms/model/KeyState.h>
 #include <awsmock/entity/kms/Key.h>

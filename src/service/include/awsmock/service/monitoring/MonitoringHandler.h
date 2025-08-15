@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/MonitoringClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MonitoringService.h>
@@ -32,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit MonitoringHandler() : AbstractHandler("monitoring-handler"){};
+        explicit MonitoringHandler(boost::asio::io_context &ioc) : AbstractHandler("monitoring-handler", ioc) {};
 
         /**
          * @brief HTTP POST request.

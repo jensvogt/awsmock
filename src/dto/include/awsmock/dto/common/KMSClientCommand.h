@@ -12,7 +12,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
@@ -34,6 +34,9 @@ namespace AwsMock::Dto::Common {
         LIST_KEYS,
         ENCRYPT,
         DECRYPT,
+        DELETE_KEY,
+        LIST_KEY_COUNTERS,
+        LIST_KEY_ARNS,
         UNKNOWN
     };
 
@@ -41,12 +44,15 @@ namespace AwsMock::Dto::Common {
             {KMSCommandType::CREATE_KEY, "create-key"},
             {KMSCommandType::SCHEDULE_KEY_DELETION, "schedule-key-deletion"},
             {KMSCommandType::DESCRIBE_KEY, "describe-key"},
+            {KMSCommandType::DELETE_KEY, "delete-key"},
             {KMSCommandType::ENCRYPT, "encrypt"},
             {KMSCommandType::DECRYPT, "decrypt"},
             {KMSCommandType::LIST_KEYS, "list-keys"},
+            {KMSCommandType::LIST_KEY_COUNTERS, "list-key-counters"},
+            {KMSCommandType::LIST_KEY_ARNS, "list-key-arns"},
     };
 
-    [[maybe_unused]] static std::string KMSCommandTypeToString(KMSCommandType commandType) {
+    [[maybe_unused]] static std::string KMSCommandTypeToString(const KMSCommandType &commandType) {
         return KMSCommandTypeNames[commandType];
     }
 
@@ -60,15 +66,15 @@ namespace AwsMock::Dto::Common {
     }
 
     /**
-     * KMS client command
-     * <p>
+     * @brief KMS client command
+     *
+     * @par
      * The KMS client command is used as a standardized way of interpreting the different ways the clients are calling the REST services. Each client type is using a different way of
      * calling the AWS REST services.
-     * </p>
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct KMSClientCommand : public BaseClientCommand {
+    struct KMSClientCommand : BaseClientCommand {
 
         /**
          * Client command
@@ -76,7 +82,7 @@ namespace AwsMock::Dto::Common {
         KMSCommandType command{};
 
         /**
-         * Returns the command from HTTP header
+         * @brief Returns the command from the HTTP header
          *
          * @param request HTTP request
          * @return command string
@@ -84,7 +90,7 @@ namespace AwsMock::Dto::Common {
         static std::string GetCommandFromHeader(const http::request<http::dynamic_body> &request);
 
         /**
-         * Gets the value from the user-agent string
+         * @brief Gets the value from the user-agent string
          *
          * @param request HTTP server request
          * @param region AWS region
@@ -93,21 +99,21 @@ namespace AwsMock::Dto::Common {
         void FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user);
 
         /**
-         * Convert to a JSON string
+         * @brief Convert to a JSON string
          *
          * @return JSON string
          */
         [[nodiscard]] std::string ToJson() const;
 
         /**
-         * Converts the DTO to a string representation.
+         * @brief Converts the DTO to a string representation.
          *
          * @return DTO as string
          */
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * Stream provider.
+         * @brief Stream provider.
          *
          * @return output stream
          */

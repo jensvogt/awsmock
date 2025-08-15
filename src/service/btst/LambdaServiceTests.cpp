@@ -27,9 +27,14 @@ namespace AwsMock::Service {
 
         LambdaServiceTest() {
             try {
-                Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest = {.functionName = FUNCTION_NAME, .qualifier = "latest"};
-                _lambdaService.DeleteFunction({.region = REGION, .functionName = FUNCTION_NAME, .qualifier = "latest"});
-                _s3Database.DeleteBucket({.region = REGION, .name = "lambda"});
+                Dto::Lambda::DeleteFunctionRequest deleteFunctionRequest;
+                deleteFunctionRequest.functionName = FUNCTION_NAME;
+                deleteFunctionRequest.qualifier = "latest";
+                _lambdaService.DeleteFunction(deleteFunctionRequest);
+                Database::Entity::S3::Bucket bucket;
+                bucket.region = REGION;
+                bucket.name = "lambda";
+                _s3Database.DeleteBucket(bucket);
             } catch (Core::ServiceException &ex) {
                 // Do nothing
             }
@@ -61,10 +66,11 @@ namespace AwsMock::Service {
             }
         }
 
+        boost::asio::io_context _ioContext;
         Core::Configuration &_configuration = Core::Configuration::instance();
         Database::LambdaDatabase &_database = Database::LambdaDatabase::instance();
         Database::S3Database &_s3Database = Database::S3Database::instance();
-        LambdaService _lambdaService;
+        LambdaService _lambdaService{_ioContext};
         std::string testFile;
     };
 
@@ -92,11 +98,11 @@ namespace AwsMock::Service {
         WaitForActive(REGION, FUNCTION_NAME);
 
         // act
-        auto [lambdaList, functions] = _lambdaService.ListFunctions(REGION);
+        auto functions = _lambdaService.ListFunctions(REGION);
 
         // assert
-        BOOST_CHECK_EQUAL(lambdaList.empty(), false);
-        BOOST_CHECK_EQUAL(lambdaList.front().function, FUNCTION_NAME);
+        BOOST_CHECK_EQUAL(functions.functions.empty(), false);
+        BOOST_CHECK_EQUAL(functions.functions.front().functionName, FUNCTION_NAME);
     }
 
     BOOST_FIXTURE_TEST_CASE(LambdaGetTest, LambdaServiceTest) {
@@ -168,7 +174,10 @@ namespace AwsMock::Service {
         WaitForActive(REGION, FUNCTION_NAME);
 
         // act
-        const Dto::Lambda::DeleteFunctionRequest deleteRequest = {.region = REGION, .functionName = FUNCTION_NAME, .qualifier = QUALIFIER};
+        Dto::Lambda::DeleteFunctionRequest deleteRequest;
+        deleteRequest.region = REGION;
+        deleteRequest.functionName = FUNCTION_NAME;
+        deleteRequest.qualifier = QUALIFIER;
         _lambdaService.DeleteFunction(deleteRequest);
         const long functionCount = _database.LambdaCount();
 

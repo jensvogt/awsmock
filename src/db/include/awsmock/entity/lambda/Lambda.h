@@ -17,24 +17,15 @@
 #include <bsoncxx/json.hpp>
 
 // AwsMock includes
+#include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/lambda/Code.h>
 #include <awsmock/entity/lambda/Environment.h>
 #include <awsmock/entity/lambda/EphemeralStorage.h>
 #include <awsmock/entity/lambda/EventSourceMapping.h>
 #include <awsmock/entity/lambda/Instance.h>
-#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database::Entity::Lambda {
-
-    using bsoncxx::to_json;
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda entity
@@ -122,7 +113,7 @@ namespace AwsMock::Database::Entity::Lambda {
             {FunctionError, "FunctionError"},
     };
 
-    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode lambdaStateReasonCode) {
+    [[maybe_unused]] static std::string LambdaStateReasonCodeToString(const LambdaStateReasonCode &lambdaStateReasonCode) {
         return LambdaStateReasonCodeNames[lambdaStateReasonCode];
     }
 
@@ -224,12 +215,12 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * Timeout in seconds
          */
-        int timeout = 3600;
+        long timeout = 3600;
 
         /**
          * Concurrency
          */
-        int concurrency = 5;
+        long concurrency = 5;
 
         /**
          * Environment
@@ -297,6 +288,11 @@ namespace AwsMock::Database::Entity::Lambda {
         long averageRuntime = 0;
 
         /**
+         * Enabled flag
+         */
+        bool enabled = false;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -343,11 +339,32 @@ namespace AwsMock::Database::Entity::Lambda {
         void RemoveInstance(const std::string &instanceId);
 
         /**
-         * @brief CHecks for any lambda instance with state 'inactive'.
+         * @brief Checks for any lambda instance with state 'inactive'.
          *
          * @return true if any idle instance has been found.
          */
         bool HasIdleInstance();
+
+        /**
+         * @brief Returns an idle instance
+         *
+         * @return idle instance
+         */
+        Instance GetIdleInstance();
+
+        /**
+         * @brief Returns the count of idle instances
+         *
+         * @return number of running instances
+         */
+        long CountIdleInstances();
+
+        /**
+         * @brief Returns the count of running instances
+         *
+         * @return number of running instances
+         */
+        long CountRunningInstances();
 
         /**
          * @brief Checks whether an event source with the given ARN exists already.
@@ -380,6 +397,30 @@ namespace AwsMock::Database::Entity::Lambda {
          * @return found notification or notifications.end().
          */
         [[nodiscard]] std::string GetTagValue(const std::string &key) const;
+
+        /**
+         * @brief Set the last invocation time for an instance
+         *
+         * @param instanceId instance ID
+         * @param host current host name
+         * @param port current port
+         */
+        void SetInstanceHostPort(const std::string &instanceId, const std::string &host, int port);
+
+        /**
+         * @brief Set the last invocation time for an instance
+         *
+         * @param instanceId instance ID
+         */
+        void SetInstanceLastInvocation(const std::string &instanceId);
+
+        /**
+         * @brief Set the last invocation time for an instance
+         *
+         * @param instanceId instance ID
+         * @param status instance status
+         */
+        void SetInstanceStatus(const std::string &instanceId, const LambdaInstanceStatus &status);
 
         /**
          * @brief Converts the entity to a MongoDB document
@@ -425,6 +466,28 @@ namespace AwsMock::Database::Entity::Lambda {
         return std::ranges::find_if(instances, [](const Instance &i) {
                    return i.status == InstanceIdle;
                }) != instances.end();
+    }
+
+    inline Instance Lambda::GetIdleInstance() {
+        const auto it = std::ranges::find_if(instances, [](const Instance &i) {
+            return i.status == InstanceIdle;
+        });
+        if (it != instances.end()) {
+            return *it;
+        }
+        return {};
+    }
+
+    inline long Lambda::CountIdleInstances() {
+        return std::ranges::count_if(instances, [](const Instance &i) {
+            return i.status == InstanceIdle;
+        });
+    }
+
+    inline long Lambda::CountRunningInstances() {
+        return std::ranges::count_if(instances, [](const Instance &i) {
+            return i.status == InstanceRunning;
+        });
     }
 
 }// namespace AwsMock::Database::Entity::Lambda

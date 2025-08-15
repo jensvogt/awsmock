@@ -5,19 +5,15 @@
 #ifndef AWSMOCK_DTO_DOCKER_PORT_BINDING_H
 #define AWSMOCK_DTO_DOCKER_PORT_BINDING_H
 
-
 // C++ includes
-#include <chrono>
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/docker/model/Port.h>
 
 namespace AwsMock::Dto::Docker {
-
-    using std::chrono::system_clock;
 
     /**
      * @brief Docker port binding object
@@ -35,10 +31,20 @@ namespace AwsMock::Dto::Docker {
          * @brief Returns the first public port for a given private port.
          *
          * @param privatePort private port
-         * @return
+         * @return public port
          */
-        int GetFirstPublicPort(const int privatePort) {
-            return portMap[std::to_string(privatePort)].at(0).publicPort;
+        int GetFirstPublicPort(const std::string &privatePort) {
+            std::vector<Port> ports = portMap[privatePort];
+            if (ports.empty()) {
+                ports = portMap[privatePort + "/tcp"];
+            }
+            const auto it = std::ranges::find_if(ports, [](const Port &port) {
+                return port.hostPort > 0;
+            });
+            if (it != ports.end()) {
+                return it->hostPort;
+            }
+            return -1;
         };
     };
 }// namespace AwsMock::Dto::Docker

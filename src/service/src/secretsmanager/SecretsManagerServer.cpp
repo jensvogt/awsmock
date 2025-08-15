@@ -9,11 +9,12 @@
 
 namespace AwsMock::Service {
 
-    SecretsManagerServer::SecretsManagerServer(Core::PeriodicScheduler &scheduler) : AbstractServer("secretsmanager") {
+    SecretsManagerServer::SecretsManagerServer(Core::Scheduler &scheduler) : AbstractServer("secretsmanager") {
 
-        // HTTP manager configuration
-        const Core::Configuration &configuration = Core::Configuration::instance();
-        _monitoringPeriod = configuration.GetValue<int>("awsmock.modules.secretsmanager.monitoring.period");
+        // Manager configuration
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.secretsmanager.monitoring.period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.secretsmanager.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.secretsmanager.backup.cron");
         log_debug << "SecretsManager rest module initialized";
 
         // Check module active
@@ -24,7 +25,12 @@ namespace AwsMock::Service {
         log_info << "SecretsManager server starting";
 
         // Start secrets manager monitoring update counters
-        scheduler.AddTask("monitoring-sns-counters", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        scheduler.AddTask("secretsmanager-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("secretsmanager-backup", [] { BackupSecretsManger(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -34,6 +40,10 @@ namespace AwsMock::Service {
         const long secrets = _secretsManagerDatabase.CountSecrets();
         _metricService.SetGauge(SECRETSMANAGER_SECRETS_COUNT, {}, {}, static_cast<double>(secrets));
         log_trace << "Secrets manager update counter finished";
+    }
+
+    void SecretsManagerServer::BackupSecretsManger() {
+        ModuleService::BackupModule("secretsmanager", true);
     }
 
 }// namespace AwsMock::Service

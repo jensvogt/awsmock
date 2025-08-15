@@ -9,10 +9,10 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/core/BsonUtils.h"
-#include "awsmock/core/LogStream.h"
-#include "awsmock/core/SystemUtils.h"
-#include "awsmock/core/exception/JsonException.h"
+#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/SystemUtils.h>
+#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Dto::Module {
 

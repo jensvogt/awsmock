@@ -5,12 +5,14 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::PeriodicScheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _counterPeriod = configuration.GetValue<int>("awsmock.modules.lambda.counter-period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
         _lifetime = configuration.GetValue<int>("awsmock.modules.lambda.lifetime");
-        _logRetentionPeriod = configuration.GetValue<int>("awsmock.modules.lambda.log-retention-period");
+        _logRetentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.log-retention-period");
+        _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.lambda.backup.active");
+        _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.backup.cron");
         log_debug << "Lambda remove period: " << _lifetime << ", counterPeriod: " << _counterPeriod << ", logRetentionPeriod: " << _logRetentionPeriod;
 
         // Directories
@@ -40,16 +42,21 @@ namespace AwsMock::Service {
         CreateContainers();
 
         // Start lambda monitoring update counters
-        scheduler.AddTask("monitoring-lambda-counters", [this] { UpdateCounter(); }, _counterPeriod);
+        scheduler.AddTask("lambda-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
         log_debug << "Lambda task started, name monitoring-lambda-counters, period: " << _counterPeriod;
 
         // Start the delete old lambda task
-        scheduler.AddTask("remove-lambdas", [this] { RemoveExpiredLambdas(); }, _lifetime);
+        scheduler.AddTask("lambda-remove", [this] { RemoveExpiredLambdas(); }, _lifetime);
         log_debug << "Lambda task started, name lambda-remove-lambdas, period: " << _lifetime;
 
         // Start the delete old lambda logs
-        scheduler.AddTask("remove-lambda-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
+        scheduler.AddTask("lambda-remove-logs", [this] { RemoveExpiredLambdaLogs(); }, _logRetentionPeriod * 24 * 60 * 60);
         log_debug << "Lambda task started, name remove-lambda-logs, period: " << _logRetentionPeriod;
+
+        // Start backup
+        if (_backupActive) {
+            scheduler.AddTask("lambda-backup", [this] { this->BackupLambda(); }, _backupCron);
+        }
 
         // Set running
         SetRunning();
@@ -77,9 +84,8 @@ namespace AwsMock::Service {
 
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_debug << "Lambda cleaned up, name: " << lambda.function;
+            log_info << "Lambda stopped, name: " << lambda.function;
         }
-        log_info << "All lambda instances stopped";
     }
 
     void LambdaServer::CleanupDocker() const {
@@ -93,7 +99,7 @@ namespace AwsMock::Service {
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
             log_debug << "Get containers";
             for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, lambda.dockerTag); const auto &container: containers) {
-                ContainerService::instance().StopContainer(container.id);
+                ContainerService::instance().KillContainer(container.id);
                 ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
@@ -177,7 +183,7 @@ namespace AwsMock::Service {
         for (const auto &lambda: lambdas) {
             double averageRuntime = 0.0;
             if ((*_lambdaCounterMap)[lambda.arn].invocations > 0) {
-                averageRuntime = (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
+                averageRuntime = (double) (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
             }
             _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function, (*_lambdaCounterMap)[lambda.arn].invocations);
             _metricService.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
@@ -200,18 +206,25 @@ namespace AwsMock::Service {
             // Loop over lambdas and create the containers
             log_info << "Start creating lambda functions, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
+                log_info << "Start creating lambda container, function: " << lambda.function;
+
                 Dto::Lambda::CreateFunctionRequest request;
                 request.region = _region;
                 request.functionName = lambda.function;
                 request.runtime = lambda.runtime;
                 Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
-                log_debug << "Lambda containers created, function: " << lambda.function;
+
+                log_debug << "Finished creating lambda container, function: " << lambda.function;
             }
             log_debug << "Lambda containers created, count: " << lambdas.size();
 
         } catch (Core::ServiceException &e) {
             log_error << e.message();
         }
+    }
+
+    void LambdaServer::BackupLambda() {
+        ModuleService::BackupModule("lambda");
     }
 
 }// namespace AwsMock::Service

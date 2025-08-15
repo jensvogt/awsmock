@@ -50,6 +50,7 @@ namespace AwsMock::Core {
         DomainSocketResult domainSocketResult;
         domainSocketResult.body = response.body();
         domainSocketResult.statusCode = response.result();
+        domainSocketResult.contentLength = static_cast<long>(response.payload_size().get());
         return domainSocketResult;
     }
 

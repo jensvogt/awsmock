@@ -17,7 +17,7 @@
 
 // AwsMock includes
 #include <awsmock/core/DomainSocketResult.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 
@@ -110,10 +110,22 @@ namespace AwsMock::Core {
          */
         [[nodiscard]] virtual DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) = 0;
 
+        /**
+         * @brief Send an attach-container command
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param headers optional HTTP headers
+         * @param ws web socket
+         * @return result struct
+         * @see Core::DomainSocketResult
+         */
+        [[nodiscard]] virtual boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) = 0;
+
       protected:
 
         /**
-         * @brief Prepare HTTP message
+         * @brief Prepare an HTTP message
          *
          * @param method HTTP method
          * @param path URL path
@@ -123,7 +135,7 @@ namespace AwsMock::Core {
         static request<string_body> PrepareJsonMessage(verb method, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers);
 
         /**
-         * @brief Prepare HTTP message
+         * @brief Prepare an HTTP message
          *
          * @param method HTTP method
          * @param path URL path

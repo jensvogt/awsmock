@@ -10,7 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -34,7 +34,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()){};
+        explicit CognitoDatabase() : _databaseName(GetDatabaseName()), _userpoolCollectionName("cognito_userpool"), _userCollectionName("cognito_user"), _groupCollectionName("cognito_group"), _memoryDb(CognitoMemoryDb::instance()) {};
 
         /**
          * @brief Singleton instance
@@ -223,13 +223,14 @@ namespace AwsMock::Database {
         Entity::Cognito::User GetUserByUserName(const std::string &region, const std::string &userPoolId, const std::string &userName) const;
 
         /**
-         * @brief Count all user pools
+         * @brief Count all users
          *
          * @param region aws-mock region.
          * @param userPoolId user pool ID
+         * @param groupName group name
          * @return total number of users.
          */
-        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
+        long CountUsers(const std::string &region = {}, const std::string &userPoolId = {}, const std::string &groupName = {}) const;
 
         /**
          * @brief Returns a list of cognito users.

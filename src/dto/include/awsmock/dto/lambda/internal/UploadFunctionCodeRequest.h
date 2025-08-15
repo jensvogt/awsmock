@@ -16,9 +16,9 @@ namespace AwsMock::Dto::Lambda {
      * Example:
      * @code{.json}
      * {
-     *   "Functionname": "string" ,
-     *   "Code": string,
-     *   "Version": string
+     *   "functionArn": "string",
+     *   "functionCode": "string",
+     *   "version": "string"
      * }
      * @endcode
      *

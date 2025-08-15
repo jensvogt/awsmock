@@ -8,10 +8,18 @@ namespace AwsMock::Database::Entity::SQS {
 
     view_or_value<view, value> Queue::ToDocument() const {
 
+        // Tags
         auto tagsDoc = document{};
         if (!tags.empty()) {
             for (const auto &[fst, snd]: tags) {
                 tagsDoc.append(kvp(fst, snd));
+            }
+        }
+
+        auto defaultMessageAttributeDoc = document{};
+        if (!defaultMessageAttributes.empty()) {
+            for (const auto &[fst, snd]: defaultMessageAttributes) {
+                defaultMessageAttributeDoc.append(kvp(fst, snd.ToDocument()));
             }
         }
 
@@ -21,8 +29,10 @@ namespace AwsMock::Database::Entity::SQS {
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueUrl", queueUrl);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueArn", queueArn);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "attributes", attributes.ToDocument());
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "tags", tagsDoc);
+        Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "defaultMessageAttributes", defaultMessageAttributeDoc);
         Core::Bson::BsonUtils::SetLongValue(rootDocument, "size", size);
         Core::Bson::BsonUtils::SetBoolValue(rootDocument, "isDlq", isDlq);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "mainQueue", mainQueue);
@@ -50,10 +60,21 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
+                tags.clear();
                 for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);
+                }
+            }
+
+            // Get default message attributes
+            if (mResult.value().find("defaultMessageAttributes") != mResult.value().end()) {
+                for (const view defaultMessageAttributeView = mResult.value()["defaultMessageAttributes"].get_document().value; const bsoncxx::document::element &element: defaultMessageAttributeView) {
+                    MessageAttribute attribute;
+                    std::string key = bsoncxx::string::to_string(element.key());
+                    attribute.FromDocument(defaultMessageAttributeView[key].get_document().value);
+                    defaultMessageAttributes[key] = attribute;
                 }
             }
 

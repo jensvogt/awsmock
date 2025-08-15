@@ -41,11 +41,6 @@ namespace AwsMock::Dto::Docker {
             array hostArray;
             hostArray.append(hostPortObject);
 
-            // DNS array
-            /*array dnsArray;
-            dnsArray.append("8.8.8.8");
-            hostConfigObject.append(kvp("Dns", dnsArray));*/
-
             // Port bindings
             document portBindingsObject;
             portBindingsObject.append(kvp(containerPort, hostArray));

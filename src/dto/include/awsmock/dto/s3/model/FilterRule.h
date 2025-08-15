@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/BaseDto.h>
@@ -56,7 +56,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Name
          */
-        NameType name;
+        NameType name = NameType::prefix;
 
         /**
          * Value

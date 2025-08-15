@@ -9,11 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
-#include <awsmock/core/scheduler/PeriodicScheduler.h>
+#include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
+#include <awsmock/service/module/ModuleService.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
@@ -31,7 +32,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit CognitoServer(Core::PeriodicScheduler &scheduler);
+        explicit CognitoServer(Core::Scheduler &scheduler);
 
       private:
 
@@ -39,6 +40,11 @@ namespace AwsMock::Service {
          * @brief Update counters
          */
         void UpdateCounter() const;
+
+        /**
+         * @brief Backup the cognito objects
+         */
+        static void BackupCognito();
 
         /**
          * @brief Metric service
@@ -49,6 +55,24 @@ namespace AwsMock::Service {
          * @brief Database connection
          */
         Database::CognitoDatabase &_cognitoDatabase = Database::CognitoDatabase::instance();
+
+        /**
+         * @brief Dynamo DB backup flag.
+         *
+         * @par
+         * If true, backup tables and items based on cron expression
+         */
+        bool _backupActive;
+
+        /**
+         * @brief Dynamo DB backup cron schedule.
+         *
+         * @par
+         * Cron schedule in form '* * * * * ?', with seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year (optional)
+         *
+         * @see @link(https://github.com/mariusbancila/croncpp)croncpp
+         */
+        std::string _backupCron;
 
         /**
          * Cognito module name
@@ -63,7 +87,7 @@ namespace AwsMock::Service {
         /**
          * Asynchronous task scheduler
          */
-        Core::PeriodicScheduler &_scheduler;
+        Core::Scheduler &_scheduler;
     };
 
 }// namespace AwsMock::Service

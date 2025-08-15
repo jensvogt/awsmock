@@ -9,7 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/BackupUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/Services.h>
 #include <awsmock/dto/dynamodb/CreateTableRequest.h>
 #include <awsmock/dto/module/CleanInfrastructureRequest.h>
@@ -21,6 +22,7 @@
 #include <awsmock/dto/module/model/Infrastructure.h>
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
+#include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/DynamoDbDatabase.h>
 #include <awsmock/repository/KMSDatabase.h>
@@ -59,7 +61,7 @@ namespace AwsMock::Service {
          *
          * @return list of all modules
          */
-        Database::Entity::Module::ModuleList ListModules() const;
+        [[nodiscard]] Database::Entity::Module::ModuleList ListModules() const;
 
         /**
          * @brief Starts a module
@@ -67,7 +69,7 @@ namespace AwsMock::Service {
          * @param modules list of modules
          * @return updated module list
          */
-        Dto::Module::Module::ModuleList StartModules(const Dto::Module::Module::ModuleList &modules) const;
+        [[nodiscard]] Dto::Module::Module::ModuleList StartModules(const Dto::Module::Module::ModuleList &modules) const;
 
         /**
          * @brief Stops one or several modules
@@ -82,7 +84,7 @@ namespace AwsMock::Service {
          *
          * @return JSON string
          */
-        Dto::Module::ListModuleNamesResponse ListModuleNames() const;
+        [[nodiscard]] Dto::Module::ListModuleNamesResponse ListModuleNames() const;
 
         /**
          * @brief Exports the current infrastructure
@@ -109,7 +111,7 @@ namespace AwsMock::Service {
          * @brief Cleans the current infrastructure.
          *
          * @par
-         * All SQS queues, SNS topics, S3 buckets etc. will be deleted, as well as all objects.
+         * All SQS queues, SNS topics, S3 buckets, etc. will be deleted, as well as all objects.
          *
          * @param request clean infrastructure request
          */
@@ -124,6 +126,21 @@ namespace AwsMock::Service {
          * @param request clean infrastructure request
          */
         static void CleanObjects(const Dto::Module::CleanInfrastructureRequest &request);
+
+        /**
+         * @brief Backup infrastructure
+         *
+         * @param module module name
+         * @param includeObjects include all objects
+         */
+        static void BackupModule(const std::string &module, bool includeObjects = false);
+
+        /**
+         * @brief Cleanup backups, keep only the number of backups which are defined in the module retention property
+         *
+         * @param module module name
+         */
+        static void BackupRetention(const std::string &module);
 
       private:
 

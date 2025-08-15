@@ -165,53 +165,26 @@ namespace AwsMock::Database {
         return _lambdas[it->first];
     }
 
-    void LambdaMemoryDb::SetInstanceStatus(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
+    void LambdaMemoryDb::SetInstanceValues(const std::string &containerId, const Entity::Lambda::LambdaInstanceStatus &status) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
         for (auto &val: _lambdas | std::views::values) {
             for (auto &instance: val.instances) {
                 if (instance.containerId == containerId) {
                     instance.status = status;
+                    instance.lastInvocation = system_clock::now();
                 }
             }
         }
     }
 
-    void LambdaMemoryDb::SetLastInvocation(const std::string &oid, const system_clock::time_point &timestamp) {
+    void LambdaMemoryDb::SetLambdaValues(const Entity::Lambda::Lambda &lambda, long invocations, long avgRuntime) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 
-        // Find by OID
-        const auto it = std::ranges::find_if(_lambdas,
-                                             [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                                                 return lambda.first == oid;
-                                             });
-
-        if (it == _lambdas.end()) {
-            log_error << "Set last invocation failed, oid: " << oid;
-            throw Core::DatabaseException("Set last invocation failed, oid: " + oid);
+        for (auto &val: _lambdas | std::views::values) {
+            val.invocations = invocations;
+            val.averageRuntime = avgRuntime;
         }
-
-        // Set average runtime
-        it->second.lastInvocation = timestamp;
-    }
-
-    void LambdaMemoryDb::SetAverageRuntime(const std::string &oid, const long millis) {
-        boost::mutex::scoped_lock lock(_lambdaMutex);
-
-        // Find by OID
-        const auto it = std::ranges::find_if(_lambdas,
-                                             [oid](const std::pair<std::string, Entity::Lambda::Lambda> &lambda) {
-                                                 return lambda.first == oid;
-                                             });
-
-        if (it == _lambdas.end()) {
-            log_error << "Set average runtime failed, oid: " << oid;
-            throw Core::DatabaseException("Set average runtime failed, oid: " + oid);
-        }
-
-        // Set average runtime
-        it->second.invocations++;
-        it->second.averageRuntime = (it->second.averageRuntime + millis) / it->second.invocations;
     }
 
     Entity::Lambda::LambdaResult LambdaMemoryDb::CreateLambdaResult(const Entity::Lambda::LambdaResult &lambdaResult) {

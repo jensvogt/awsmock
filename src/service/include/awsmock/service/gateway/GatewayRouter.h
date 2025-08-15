@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/service/apps/ApplicationHandler.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>
 #include <awsmock/service/kms/KMSHandler.h>
@@ -24,8 +25,6 @@
 
 namespace AwsMock::Service {
 
-    typedef std::map<std::string, std::shared_ptr<AbstractHandler>> RoutingTable;
-
     /**
      * @brief Gateway router
      *
@@ -38,30 +37,16 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit GatewayRouter();
-
-        /**
-         * @brief Singleton instance
-         */
-        static GatewayRouter &instance() {
-            static GatewayRouter gatewayRouter;
-            return gatewayRouter;
-        }
+        explicit GatewayRouter() {};
 
         /**
          * @brief Returns an HTTP request handler for a module.
          *
+         * @param ioc boost asio IO context
          * @param routingKey module name
          * @return pointer to module handler
          */
-        std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey);
-
-      private:
-
-        /**
-         * Routine table
-         */
-        RoutingTable _routingTable;
+        static std::shared_ptr<AbstractHandler> GetHandler(const std::string &routingKey, boost::asio::io_context &ioc);
     };
 
 }// namespace AwsMock::Service

@@ -265,8 +265,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    for (const auto [column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
@@ -298,7 +298,7 @@ namespace AwsMock::Database {
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
 
                 document query;
-                if (region.empty()) {
+                if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
                 count = _userPoolCollection.count_documents(query.extract());
@@ -490,7 +490,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetUserByOid(oid);
     }
 
-    long CognitoDatabase::CountUsers(const std::string &region, const std::string &userPoolId) const {
+    long CognitoDatabase::CountUsers(const std::string &region, const std::string &userPoolId, const std::string &groupName) const {
 
         if (HasDatabase()) {
 
@@ -506,6 +506,9 @@ namespace AwsMock::Database {
                 }
                 if (!userPoolId.empty()) {
                     query.append(kvp("userPoolId", userPoolId));
+                }
+                if (!groupName.empty()) {
+                    query.append(kvp("groups.groupName", groupName));
                 }
 
                 count = _userCollection.count_documents(query.extract());
@@ -566,8 +569,8 @@ namespace AwsMock::Database {
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
                     document sort = {};
-                    for (const auto sortColumn: sortColumns) {
-                        sort.append(kvp(sortColumn.column, sortColumn.sortDirection));
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }

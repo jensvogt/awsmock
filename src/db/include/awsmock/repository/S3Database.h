@@ -16,7 +16,7 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -30,14 +30,14 @@ namespace AwsMock::Database {
 
     using std::chrono::system_clock;
 
-    struct BucketMonitoringCounter {
+    struct S3MonitoringCounter {
         long keys{};
         long size{};
         system_clock::time_point modified = system_clock::now();
     };
 
-    using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, BucketMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using S3CounterMapType = boost::container::map<std::string, BucketMonitoringCounter, std::less<std::string>, S3ShmAllocator>;
+    using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, S3MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+    using S3CounterMapType = boost::container::map<std::string, S3MonitoringCounter, std::less<std::string>, S3ShmAllocator>;
 
     static constexpr auto S3_COUNTER_MAP_NAME = "S3BucketCounter";
 
@@ -80,7 +80,16 @@ namespace AwsMock::Database {
          * @return true if bucket exists
          * @throws DatabaseException
          */
-        bool BucketExists(const Entity::S3::Bucket &bucket) const;
+        [[nodiscard]] bool BucketExists(const Entity::S3::Bucket &bucket) const;
+
+        /**
+         * @brief Bucket exists by ARN
+         *
+         * @param bucketArn AWS ARN
+         * @return true if bucket exists
+         * @throws DatabaseException
+         */
+        [[nodiscard]] bool BucketExists(const std::string &bucketArn) const;
 
         /**
          * @brief Returns the total number of buckets
@@ -90,7 +99,7 @@ namespace AwsMock::Database {
          * @return total number of buckets
          * @throws DatabaseException
          */
-        long BucketCount(const std::string &region = {}, const std::string &prefix = {}) const;
+        [[nodiscard]] long BucketCount(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -99,7 +108,7 @@ namespace AwsMock::Database {
          * @return bucket, if existing
          * @throws DatabaseException
          */
-        Entity::S3::Bucket GetBucketById(bsoncxx::oid oid) const;
+        [[nodiscard]] Entity::S3::Bucket GetBucketById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns the bucket by userPoolId
@@ -117,7 +126,15 @@ namespace AwsMock::Database {
          * @param name bucket name
          * @return bucket entity
          */
-        Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name) const;
+        [[nodiscard]] Entity::S3::Bucket GetBucketByRegionName(const std::string &region, const std::string &name) const;
+
+        /**
+         * @brief Returns the bucket by AWS ARN
+         *
+         * @param bucketArn AWS region
+         * @return bucket entity
+         */
+        [[nodiscard]] Entity::S3::Bucket GetBucketByArn(const std::string &bucketArn) const;
 
         /**
          * @brief Create a new bucket in the S3 bucket table
@@ -138,7 +155,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::S3::BucketList ListBuckets(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export all buckets
@@ -146,7 +163,7 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return BucketList
          */
-        Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::S3::BucketList ExportBuckets(const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Check whether the bucket has still objects
@@ -332,7 +349,7 @@ namespace AwsMock::Database {
          * @return list of S3 object
          * @throws DatabaseException
          */
-        Entity::S3::ObjectList ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
+        std::vector<Entity::S3::Object> ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const;
 
         /**
          * @brief Gets an object from a bucket
@@ -359,7 +376,7 @@ namespace AwsMock::Database {
          * @param prefix S3 key prefix
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
+        std::vector<Entity::S3::Object> ListBucket(const std::string &bucket, const std::string &prefix = {}) const;
 
         /**
          * @brief List all objects.
@@ -372,7 +389,7 @@ namespace AwsMock::Database {
          * @param sortColumns list of sort columns
          * @return ObjectList
          */
-        Entity::S3::ObjectList ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        std::vector<Entity::S3::Object> ListObjects(const std::string &region = {}, const std::string &prefix = {}, const std::string &bucket = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Counts the number of keys in a bucket

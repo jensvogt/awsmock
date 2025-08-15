@@ -9,14 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct CreateBucketResponse {
+    struct CreateBucketResponse final : Common::BaseCounter<CreateBucketResponse> {
 
         /**
          * Bucket location
@@ -29,32 +27,32 @@ namespace AwsMock::Dto::S3 {
         std::string arn;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            boost::property_tree::ptree root;
+            root.add("CreateBucketResult.BucketArn", arn);
+            root.add("CreateBucketResult.Location", location);
+            return Core::XmlUtils::ToXmlString(root);
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateBucketResponse &r);
+      private:
+
+        friend CreateBucketResponse tag_invoke(boost::json::value_to_tag<CreateBucketResponse>, boost::json::value const &v) {
+            CreateBucketResponse r;
+            r.location = Core::Json::GetStringValue(v, "Location");
+            r.arn = Core::Json::GetStringValue(v, "BucketArn");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateBucketResponse const &obj) {
+            jv = {
+                    {"Location", obj.location},
+                    {"BucketArn", obj.arn},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

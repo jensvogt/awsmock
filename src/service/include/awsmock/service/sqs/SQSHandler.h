@@ -5,21 +5,23 @@
 #ifndef AWSMOCK_SERVICE_SQS_HANDLER_H
 #define AWSMOCK_SERVICE_SQS_HANDLER_H
 
-// Boost includes
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/SQSClientCommand.h>
-#include <awsmock/dto/sqs/DeleteMessageBatchEntry.h>
 #include <awsmock/dto/sqs/DeleteMessageBatchRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlRequest.h>
 #include <awsmock/dto/sqs/GetQueueUrlResponse.h>
+#include <awsmock/dto/sqs/internal/ListDefaultMessageAttributeCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
+#include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
+#include <awsmock/dto/sqs/model/DeleteMessageBatchEntry.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sqs/SQSService.h>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/spawn.hpp>
 
 #define DEFAULT_SQS_ACCOUNT_ID "000000000000"
 
@@ -31,8 +33,9 @@ namespace AwsMock::Service {
     /**
      * @brief AWS SQS mock handler.
      *
-     * <p>The SQS request are coming in two different flavours. Using the AWS CLI the queue URL is part of the HTTP parameters in the body of the message. Both are
-     * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.</p>
+     * @par
+     * The SQS request are coming in two different flavors. Using the AWS CLI, the queue URL is part of the HTTP parameters in the body of the message. Both are
+     * using POST request, whereas the Java SDK is providing the queue-url as part of the HTTP URL in the header of the request.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -43,7 +46,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SQSHandler() : AbstractHandler("sqs-handler") {}
+        explicit SQSHandler(boost::asio::io_context &ioc) : AbstractHandler("sqs-handler", ioc), _sqsService(ioc) {}
 
         /**
          * @brief HTTP POST request.

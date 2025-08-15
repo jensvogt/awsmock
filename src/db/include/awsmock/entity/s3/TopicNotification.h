@@ -16,16 +16,15 @@
 namespace AwsMock::Database::Entity::S3 {
 
     /**
-     * S3 bucket topic notification entity
+     * @brief S3 bucket topic notification entity
      *
-     * <p>
+     * @par
      * This is a child object of the bucket entity.
-     * </p>
      *
      * @see AwsMock::Database::Entity::Bucket
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct TopicNotification {
+    struct TopicNotification final : Common::BaseEntity<TopicNotification> {
 
         /**
          * ID
@@ -60,7 +59,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @return entity as MongoDB document.
          */
-        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[maybe_unused]] [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * Converts the MongoDB document to an entity
@@ -68,20 +67,6 @@ namespace AwsMock::Database::Entity::S3 {
          * @param mResult MongoDB document.
          */
         TopicNotification FromDocument(std::optional<bsoncxx::document::view> mResult);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const TopicNotification &q);
     };
 
 }// namespace AwsMock::Database::Entity::S3

@@ -9,10 +9,6 @@
 #include <map>
 #include <string>
 
-// AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/s3/model/Owner.h>
-
 namespace AwsMock::Dto::DynamoDb {
 
     /**

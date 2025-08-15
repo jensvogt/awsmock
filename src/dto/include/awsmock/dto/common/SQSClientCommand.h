@@ -34,6 +34,7 @@ namespace AwsMock::Dto::Common {
     enum class SqsCommandType {
         CREATE_QUEUE,
         PURGE_QUEUE,
+        PURGE_ALL_QUEUES,
         GET_QUEUE_ATTRIBUTES,
         SET_QUEUE_ATTRIBUTES,
         GET_QUEUE_URL,
@@ -43,25 +44,35 @@ namespace AwsMock::Dto::Common {
         LIST_QUEUES,
         LIST_QUEUE_TAGS,
         LIST_QUEUE_ARNS,
-        LIST_QUEUE_COUNTERS,
         DELETE_QUEUE,
         SEND_MESSAGE,
         SEND_MESSAGE_BATCH,
         RECEIVE_MESSAGE,
         CHANGE_MESSAGE_VISIBILITY,
         LIST_MESSAGES,
-        LIST_MESSAGE_COUNTERS,
         DELETE_MESSAGE,
         DELETE_MESSAGE_BATCH,
         // Awsmock
+        LIST_QUEUE_COUNTERS,
         LIST_QUEUE_ATTRIBUTE_COUNTERS,
         LIST_LAMBDA_TRIGGER_COUNTERS,
+        LIST_MESSAGE_COUNTERS,
+        LIST_MESSAGE_ATTRIBUTE_COUNTERS,
         LIST_TAG_COUNTERS,
         UPDATE_MESSAGE,
         REDRIVE_MESSAGES,
+        ADD_ATTRIBUTE,
+        LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS,
+        ADD_DEFAULT_MESSAGE_ATTRIBUTE,
+        UPDATE_DEFAULT_MESSAGE_ATTRIBUTE,
+        DELETE_DEFAULT_MESSAGE_ATTRIBUTE,
         DELETE_ATTRIBUTE,
         UPDATE_DLQ,
         RESEND_MESSAGE,
+        GET_EVENT_SOURCE,
+        EXPORT_MESSAGES,
+        IMPORT_MESSAGES,
+        RELOAD_COUNTERS,
         UNKNOWN
     };
 
@@ -69,6 +80,7 @@ namespace AwsMock::Dto::Common {
             // Queues
             {SqsCommandType::CREATE_QUEUE, "create-queue"},
             {SqsCommandType::PURGE_QUEUE, "purge-queue"},
+            {SqsCommandType::PURGE_ALL_QUEUES, "purge-all-queues"},
             {SqsCommandType::GET_QUEUE_ATTRIBUTES, "get-queue-attributes"},
             {SqsCommandType::SET_QUEUE_ATTRIBUTES, "set-queue-attributes"},
             {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},
@@ -93,15 +105,25 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::LIST_QUEUE_ATTRIBUTE_COUNTERS, "list-queue-attribute-counters"},
             {SqsCommandType::LIST_LAMBDA_TRIGGER_COUNTERS, "list-lambda-trigger-counters"},
             {SqsCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
+            {SqsCommandType::LIST_MESSAGE_ATTRIBUTE_COUNTERS, "list-message-attribute-counters"},
             {SqsCommandType::UPDATE_MESSAGE, "update-message"},
             {SqsCommandType::UPDATE_DLQ, "update-dlq"},
             {SqsCommandType::REDRIVE_MESSAGES, "redrive-messages"},
             {SqsCommandType::RESEND_MESSAGE, "resend-message"},
+            {SqsCommandType::GET_EVENT_SOURCE, "get-event-source"},
+            {SqsCommandType::ADD_ATTRIBUTE, "add-attribute"},
+            {SqsCommandType::LIST_DEFAULT_MESSAGE_ATTRIBUTE_COUNTERS, "list-default-message-attribute-counters"},
+            {SqsCommandType::ADD_DEFAULT_MESSAGE_ATTRIBUTE, "add-default-message-attribute-counter"},
+            {SqsCommandType::UPDATE_DEFAULT_MESSAGE_ATTRIBUTE, "update-default-message-attribute-counter"},
+            {SqsCommandType::DELETE_DEFAULT_MESSAGE_ATTRIBUTE, "delete-default-message-attribute-counter"},
             {SqsCommandType::DELETE_ATTRIBUTE, "delete-attribute"},
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
+            {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
+            {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
+            {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
     };
 
-    [[maybe_unused]] static std::string SqsCommandTypeToString(SqsCommandType commandType) {
+    [[maybe_unused]] static std::string SqsCommandTypeToString(const SqsCommandType &commandType) {
         return SqsCommandTypeNames[commandType];
     }
 

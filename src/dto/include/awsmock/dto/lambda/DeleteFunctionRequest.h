@@ -9,8 +9,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -19,12 +20,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DeleteFunctionRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct DeleteFunctionRequest final : Common::BaseCounter<DeleteFunctionRequest> {
 
         /**
          * Name of the function
@@ -36,33 +32,21 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string qualifier;
 
-        /**
-         * @brief Parse a JSON stream
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend DeleteFunctionRequest tag_invoke(boost::json::value_to_tag<DeleteFunctionRequest>, boost::json::value const &v) {
+            DeleteFunctionRequest r;
+            r.functionName = Core::Json::GetStringValue(v, "FunctionName");
+            r.qualifier = Core::Json::GetStringValue(v, "Qualifier");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteFunctionRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteFunctionRequest const &obj) {
+            jv = {
+                    {"FunctionName", obj.functionName},
+                    {"Qualifier", obj.qualifier},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

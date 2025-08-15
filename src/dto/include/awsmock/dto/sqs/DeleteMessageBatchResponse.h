@@ -9,29 +9,18 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/dto/sqs/model/BatchResultErrorEntry.h>
 #include <awsmock/dto/sqs/model/DeleteMessageBatchResultEntry.h>
 
 namespace AwsMock::Dto::SQS {
-    struct DeleteMessageBatchResultEntry;
-    struct BatchResultErrorEntry;
 
-    struct DeleteMessageBatchResponse {
+    struct DeleteMessageBatchResponse final : Common::BaseCounter<DeleteMessageBatchResponse> {
 
         /**
          * Resource
          */
         std::string resource = "SQS";
-
-        /**
-         * Resource
-         */
-        std::string requestId = Core::StringUtils::CreateRandomUuid();
 
         /**
          * Failed
@@ -41,35 +30,32 @@ namespace AwsMock::Dto::SQS {
         /**
          * Successful
          */
-        std::vector<DeleteMessageBatchResultEntry> successFull;
+        std::vector<DeleteMessageBatchResultEntry> successfull;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
+        friend DeleteMessageBatchResponse tag_invoke(boost::json::value_to_tag<DeleteMessageBatchResponse>, boost::json::value const &v) {
+            DeleteMessageBatchResponse r;
+            r.resource = Core::Json::GetStringValue(v, "Resource");
+            if (Core::Json::AttributeExists(v, "Successful")) {
+                r.successfull = boost::json::value_to<std::vector<DeleteMessageBatchResultEntry>>(v.at("Successful"));
+            }
+            if (Core::Json::AttributeExists(v, "Failed")) {
+                r.failed = boost::json::value_to<std::vector<BatchResultErrorEntry>>(v.at("Failed"));
+            }
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteMessageBatchResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMessageBatchResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Resource", obj.resource},
+                    {"Successful", boost::json::value_from(obj.successfull)},
+                    {"Failed", boost::json::value_from(obj.failed)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS
