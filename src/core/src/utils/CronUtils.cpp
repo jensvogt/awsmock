@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/CronUtils.h>
-#include <thread>
 
 namespace AwsMock::Core {
 
@@ -14,7 +13,11 @@ namespace AwsMock::Core {
             const std::time_t now = std::time(nullptr);
             const tm *temp = localtime(&now);
             std::tm nextStart = cron_next(cronExpression, *temp);
+#ifdef WIN32
+            return system_clock::from_time_t(mktime(&nextStart));
+#else
             return system_clock::from_time_t(timelocal(&nextStart));
+#endif
 
         } catch (bad_cronexpr const &ex) {
             log_error << "Invalid cron expression, cron: " << cron << ", error: " << ex.what();

@@ -195,7 +195,7 @@ namespace AwsMock::Manager {
         }
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::signal_set signals(_ioc, SIGINT, SIGQUIT, SIGTERM);
+        boost::asio::signal_set signals(_ioc, SIGINT, SIGTERM);
         signals.async_wait([&](beast::error_code const &ec, const int signal) {
             // Stop the `io_context`. This will cause `run()` to return immediately,
             // eventually destroying the `io_context` and all the sockets in it.

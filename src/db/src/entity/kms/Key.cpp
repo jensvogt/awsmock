@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::KMS {
                     kvp("hmac512Key", hmac512Key),
                     kvp("rsaPrivateKey", rsaPrivateKey),
                     kvp("rsaPublicKey", rsaPublicKey),
-                    kvp("pendingWindowInDays", pendingWindowInDays),
+                    kvp("pendingWindowInDays", bsoncxx::types::b_int64(pendingWindowInDays)),
                     kvp("created", bsoncxx::types::b_date(created)),
                     kvp("modified", bsoncxx::types::b_date(modified)));
 
