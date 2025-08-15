@@ -48,7 +48,7 @@ include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_
 # Shared library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS ${LIBRARY_STATIC} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale

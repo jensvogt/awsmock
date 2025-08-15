@@ -13,8 +13,8 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("name", name));
         applicationDocument.append(kvp("runtime", runtime));
         applicationDocument.append(kvp("type", type));
-        applicationDocument.append(kvp("privatePort", privatePort));
-        applicationDocument.append(kvp("publicPort", publicPort));
+        applicationDocument.append(kvp("privatePort", bsoncxx::types::b_int64(privatePort)));
+        applicationDocument.append(kvp("publicPort", bsoncxx::types::b_int64(publicPort)));
         applicationDocument.append(kvp("archive", archive));
         applicationDocument.append(kvp("version", version));
         applicationDocument.append(kvp("containerId", containerId));
@@ -22,7 +22,7 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("enabled", enabled));
         applicationDocument.append(kvp("status", status));
         applicationDocument.append(kvp("imageId", imageId));
-        applicationDocument.append(kvp("imageSize", imageSize));
+        applicationDocument.append(kvp("imageSize", bsoncxx::types::b_int64(imageSize)));
         applicationDocument.append(kvp("imageMd5", imageMd5));
         applicationDocument.append(kvp("description", description));
         applicationDocument.append(kvp("lastStarted", bsoncxx::types::b_date(lastStarted)));

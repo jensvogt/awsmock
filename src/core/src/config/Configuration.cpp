@@ -299,8 +299,8 @@ namespace AwsMock::Core {
             throw CoreException("Empty configuration filename");
         }
         if (!FileUtils::FileExists(filename)) {
-            log_warning << "Configuration file '" << filename << "' does not exist. Will use default.";
-            throw CoreException("Configuration file '" + filename + "' does not exist. Will use default.");
+            log_warning << "Configuration file '" << filename << "' does not exist. Will use defaults.";
+            throw CoreException("Configuration file '" + filename + "' does not exist. Will use defaults.");
         }
 
         // Save file name

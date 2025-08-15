@@ -63,6 +63,15 @@ namespace AwsMock::Service {
         void SetDlq() const;
 
         /**
+         * @brief Resets the queue URL.
+         *
+         * @par
+         * SQS queue URLs have the hostname in the name. In order to make the full.json copyable between hosts the URLs
+         * have to adjusted to the new hostname.
+         */
+        void SetUrl() const;
+
+        /**
          * @brief Backup the SQS queues and messages
          */
         static void BackupSqs();

@@ -30,11 +30,12 @@ namespace AwsMock::Service {
 
         // Start reset messages task
         scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
-        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, _resetPeriod, _resetPeriod);
+        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, -1);
+        scheduler.AddTask("sqs-seturl", [this] { this->SetUrl(); }, -1);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("sqs-backup", [this] { BackupSqs(); }, _backupCron);
+            scheduler.AddTask("sqs-backup", [] { BackupSqs(); }, _backupCron);
         }
 
         // Set running
@@ -102,6 +103,25 @@ namespace AwsMock::Service {
             }
         }
         log_trace << "SQS DQL finished, count: " << queueList.size();
+    }
+
+    void SQSServer::SetUrl() const {
+
+        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        log_trace << "SQS set URL task starting, count: " << queueList.size();
+
+        if (queueList.empty()) {
+            return;
+        }
+
+        // Loop over queues and do some maintenance work
+        for (auto &queue: queueList) {
+
+            queue.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.queueArn);
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_trace << "SQS queue updated, queueName" << queue.name;
+        }
+        log_trace << "SQS URL task finished, count: " << queueList.size();
     }
 
     void SQSServer::UpdateCounter() const {

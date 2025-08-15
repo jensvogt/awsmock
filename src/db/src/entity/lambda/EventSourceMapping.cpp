@@ -21,8 +21,8 @@ namespace AwsMock::Database::Entity::Lambda {
         document eventSourceMappingDoc{};
         eventSourceMappingDoc.append(kvp("type", type));
         eventSourceMappingDoc.append(kvp("eventSourceArn", eventSourceArn));
-        eventSourceMappingDoc.append(kvp("batchSize", batchSize));
-        eventSourceMappingDoc.append(kvp("maximumBatchingWindowInSeconds", maximumBatchingWindowInSeconds));
+        eventSourceMappingDoc.append(kvp("batchSize", bsoncxx::types::b_int64(batchSize)));
+        eventSourceMappingDoc.append(kvp("maximumBatchingWindowInSeconds", bsoncxx::types::b_int64(maximumBatchingWindowInSeconds)));
         eventSourceMappingDoc.append(kvp("enabled", enabled));
         eventSourceMappingDoc.append(kvp("uuid", uuid));
         return eventSourceMappingDoc.extract();
