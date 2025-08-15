@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_YAML_CONFIGURATION_H
-#define AWSMOCK_CORE_YAML_CONFIGURATION_H
+#ifndef AWSMOCK_CORE_JSON_CONFIGURATION_H
+#define AWSMOCK_CORE_JSON_CONFIGURATION_H
 
 // Standard C++ includes
 #include <ranges>
@@ -316,4 +316,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_YAML_CONFIGURATION_H
+#endif// AWSMOCK_CORE_JSON_CONFIGURATION_H
