@@ -31,7 +31,7 @@
 #ifdef _WIN32
 #define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.json")
 #else
-#define DEFAULT_CONFIG_FILE std::sting("/usr/local/awsmock/etc/awsmock.json")
+#define DEFAULT_CONFIG_FILE std::string("/usr/local/awsmock/etc/awsmock.json")
 #endif
 
 // Allowed actions
