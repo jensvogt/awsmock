@@ -321,7 +321,7 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 _lambdaCollection.update_one(make_document(kvp("_id", bsoncxx::oid(lambda.oid))),
-                                             make_document(kvp("$set", make_document(kvp("invocations", invocations), kvp("averageRuntime", avgRuntime)))));
+                                             make_document(kvp("$set", make_document(kvp("invocations", bsoncxx::types::b_int64(invocations)), kvp("averageRuntime", bsoncxx::types::b_int64(avgRuntime))))));
                 session.commit_transaction();
 
             } catch (mongocxx::exception::system_error &e) {

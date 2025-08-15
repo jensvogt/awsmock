@@ -8,6 +8,7 @@
 // C++ includes
 #include <chrono>
 #include <string>
+#include <thread>
 
 // Awsmock includes
 #include <awsmock/core/Cron.h>

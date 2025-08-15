@@ -17,7 +17,7 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief Echoes back all received WebSocket messages
+     * @brief Logs all log messages to a websocket
      *
      * @author jens.vogt\@opitz-consulting.com
      */

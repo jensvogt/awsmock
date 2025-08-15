@@ -29,9 +29,9 @@
 #include <awsmock/controller/Controller.h>
 
 #ifdef _WIN32
-#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.j́son"
+#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.json")
 #else
-#define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
+#define DEFAULT_CONFIG_FILE std::sting("/usr/local/awsmock/etc/awsmock.json")
 #endif
 
 // Allowed actions
@@ -49,7 +49,7 @@ static std::list<std::string> allowedActions() {
 void ShowHelp(const boost::program_options::options_description &desc) {
     constexpr int leftIndent = 40;
     std::cout << std::endl
-              << "AwsMock awsmockctl v" << AwsMock::Core::Configuration::GetVersion() << std::endl
+              << "AwsMock awsmockctl v" << PROJECT_VERSION << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awsmockctl [Options] Commands" << std::endl
@@ -89,7 +89,7 @@ void ShowHelp(const boost::program_options::options_description &desc) {
 }
 
 /**
- * Main routine.
+ * @brief Main routine.
  *
  * @param argc number of command line arguments.
  * @param argv command line arguments.

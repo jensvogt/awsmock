@@ -136,8 +136,11 @@ namespace AwsMock::Core {
             timeval timeout{};
             timeout.tv_sec = 1;
             timeout.tv_usec = 0;
+#ifdef WIN32
+            setsockopt(socket.native_handle(), SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
+#else
             setsockopt(socket.native_handle(), SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-
+#endif
             // Write to unix socket
             http::write(socket, request);
 
