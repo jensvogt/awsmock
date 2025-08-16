@@ -259,12 +259,12 @@ namespace AwsMock::Service {
                     std::map<std::string, std::string> metadata = GetMetadata(request);
                     if (clientCommand.copyRequest) {
 
-                        Dto::S3::CopyObjectRequest s3Request = {
-                                .region = clientCommand.region,
-                                .user = clientCommand.user,
-                                .targetBucket = clientCommand.bucket,
-                                .targetKey = clientCommand.key,
-                                .metadata = metadata};
+                        Dto::S3::CopyObjectRequest s3Request;
+                        s3Request.region = clientCommand.region;
+                        s3Request.user = clientCommand.user;
+                        s3Request.targetBucket = clientCommand.bucket;
+                        s3Request.targetKey = clientCommand.key;
+                        s3Request.metadata = metadata;
 
                         // Get S3 source bucket/key
                         GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
