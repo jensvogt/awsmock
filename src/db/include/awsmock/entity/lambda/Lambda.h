@@ -230,7 +230,7 @@ namespace AwsMock::Database::Entity::Lambda {
         /**
          * lambda state
          */
-        LambdaState state = Pending;
+        mutable LambdaState state = Pending;
 
         /**
          * State reason

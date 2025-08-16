@@ -93,6 +93,7 @@ namespace AwsMock::Controller {
                               << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
                               << std::setw(10) << std::left << lambda.state << std::endl;
                 }
+                break;
             }
 
             case CommandType::ENABLE_LAMBDA: {
@@ -212,6 +213,25 @@ namespace AwsMock::Controller {
             return;
         }
         std::cout << "All application enabled" << std::endl;
+    }
+
+    void AwsMockCtl::DisableApplications(const std::vector<Dto::Apps::Application> &applications) const {
+
+        std::map<std::string, std::string> headers;
+        AddStandardHeaders(headers, "application", "disable-application");
+        for (const auto &application: applications) {
+
+            Dto::Apps::DisableApplicationRequest appRequest;
+            appRequest.region = _region;
+            appRequest.application.name = application.name;
+            appRequest.application.region = application.region;
+
+            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
+                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
+                return;
+            }
+            std::cout << "Application " << application.name << " enabled" << std::endl;
+        }
     }
 
     void AwsMockCtl::DisableAllApplications() const {
@@ -359,25 +379,6 @@ namespace AwsMock::Controller {
         std::cout << "All lambdas enabled" << std::endl;
     }
 
-    void AwsMockCtl::DisableApplications(const std::vector<Dto::Apps::Application> &applications) const {
-
-        std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "application", "disable-application");
-        for (const auto &application: applications) {
-
-            Dto::Apps::DisableApplicationRequest appRequest;
-            appRequest.region = _region;
-            appRequest.application.name = application.name;
-            appRequest.application.region = application.region;
-
-            if (const Core::HttpSocketResponse response = Core::HttpSocket::SendJson(boost::beast::http::verb::post, _host, _port, "/", appRequest.ToJson(), headers); response.statusCode != boost::beast::http::status::ok) {
-                std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
-                return;
-            }
-            std::cout << "Application " << application.name << " enabled" << std::endl;
-        }
-    }
-
     void AwsMockCtl::DisableAllLambdas() const {
 
         std::map<std::string, std::string> headers;
@@ -414,7 +415,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::StartLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "lambda", "start-lambdas");
+        AddStandardHeaders(headers, "lambda", "start-lambda");
         for (const auto &lambda: lambdas) {
             Dto::Lambda::StartLambdaRequest appRequest;
             appRequest.region = _region;
@@ -445,7 +446,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::RestartLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "lambda", "restart-lambdas");
+        AddStandardHeaders(headers, "lambda", "restart-lambda");
         for (const auto &lambda: lambdas) {
             Dto::Lambda::StartLambdaRequest appRequest;
             appRequest.region = _region;
@@ -476,7 +477,7 @@ namespace AwsMock::Controller {
     void AwsMockCtl::StopLambdas(const std::vector<Dto::Lambda::Function> &lambdas) const {
 
         std::map<std::string, std::string> headers;
-        AddStandardHeaders(headers, "lambda", "stop-lambdas");
+        AddStandardHeaders(headers, "lambda", "stop-lambda");
         for (const auto &lambda: lambdas) {
             Dto::Lambda::StopLambdaRequest appRequest;
             appRequest.region = _region;

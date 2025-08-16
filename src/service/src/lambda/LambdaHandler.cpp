@@ -392,22 +392,40 @@ namespace AwsMock::Service {
                 return SendResponse(request, http::status::ok);
             }
 
-            if (clientCommand.command == Dto::Common::LambdaCommandType::START_FUNCTION) {
+            if (clientCommand.command == Dto::Common::LambdaCommandType::START_LAMBDA) {
 
                 Dto::Lambda::StartLambdaRequest lambdaRequest = Dto::Lambda::StartLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.StartFunction(lambdaRequest);
+                    _lambdaService.StartLambda(lambdaRequest);
                     log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
             }
 
-            if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_FUNCTION) {
+            if (clientCommand.command == Dto::Common::LambdaCommandType::START_ALL_LAMBDAS) {
+
+                boost::asio::post(_ioc, [this] {
+                    _lambdaService.StartAllLambdas();
+                    log_trace << "Started all lambda function";
+                });
+                return SendResponse(request, http::status::ok);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA) {
 
                 Dto::Lambda::StopLambdaRequest lambdaRequest = Dto::Lambda::StopLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.StopFunction(lambdaRequest);
+                    _lambdaService.StopLambda(lambdaRequest);
                     log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
+                });
+                return SendResponse(request, http::status::ok);
+            }
+
+            if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_ALL_LAMBDAS) {
+
+                boost::asio::post(_ioc, [this] {
+                    _lambdaService.StopAllLambdas();
+                    log_trace << "Stopped all lambda functions";
                 });
                 return SendResponse(request, http::status::ok);
             }
