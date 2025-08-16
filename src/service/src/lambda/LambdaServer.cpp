@@ -195,26 +195,27 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::CreateContainers() const {
+
         try {
 
             // Get the lambda list
-            const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
+            const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas(_region);
             if (lambdas.empty()) {
                 return;
             }
 
             // Loop over lambdas and create the containers
-            log_info << "Start creating lambda functions, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {
-                log_info << "Start creating lambda container, function: " << lambda.function;
 
-                Dto::Lambda::CreateFunctionRequest request;
-                request.region = _region;
-                request.functionName = lambda.function;
-                request.runtime = lambda.runtime;
-                Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
-
-                log_debug << "Finished creating lambda container, function: " << lambda.function;
+                if (lambda.enabled) {
+                    log_info << "Start creating lambda container, function: " << lambda.function;
+                    Dto::Lambda::CreateFunctionRequest request;
+                    request.region = _region;
+                    request.functionName = lambda.function;
+                    request.runtime = lambda.runtime;
+                    Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
+                    log_info << "Finished creating lambda container, function: " << lambda.function;
+                }
             }
             log_debug << "Lambda containers created, count: " << lambdas.size();
 

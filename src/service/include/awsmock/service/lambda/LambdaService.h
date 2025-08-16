@@ -70,6 +70,7 @@
 #include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
@@ -191,6 +192,14 @@ namespace AwsMock::Service {
          * @see ListLambdaEventSourceCountersResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaEventSourceCountersResponse ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const;
+
+        /**
+         * @brief Update a lambda function
+         *
+         * @param request update lambda request
+         * @see Dto::Lambda::UpdateLambdaRequest
+         */
+        void UpdateLambda(const Dto::Lambda::UpdateLambdaRequest &request) const;
 
         /**
          * @brief Add a lambda environment variable
