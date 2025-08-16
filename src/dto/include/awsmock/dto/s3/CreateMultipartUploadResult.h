@@ -9,19 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct CreateMultipartUploadResult {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct CreateMultipartUploadResult final : Common::BaseCounter<CreateMultipartUploadResult> {
 
         /**
          * Bucket name
@@ -39,39 +32,39 @@ namespace AwsMock::Dto::S3 {
         std::string uploadId;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+            boost::property_tree::ptree root;
+            root.add("InitiateMultipartUploadResult.Bucket", bucket);
+            root.add("InitiateMultipartUploadResult.Key", key);
+            root.add("InitiateMultipartUploadResult.UploadId", uploadId);
+            return Core::XmlUtils::ToXmlString(root);
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateMultipartUploadResult &r);
+        friend CreateMultipartUploadResult tag_invoke(boost::json::value_to_tag<CreateMultipartUploadResult>, boost::json::value const &v) {
+            CreateMultipartUploadResult r;
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.uploadId = Core::Json::GetStringValue(v, "uploadId");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateMultipartUploadResult const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"key", obj.key},
+                    {"uploadId", obj.uploadId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3
