@@ -87,6 +87,10 @@ namespace AwsMock::Database::Entity::Lambda {
         instances.erase(std::ranges::remove_if(instances, [instanceId](const Instance &i) { return instanceId == i.instanceId; }).begin(), instances.end());
     }
 
+    void Lambda::RemoveInstanceByContainerId(const std::string &containerId) {
+        instances.erase(std::ranges::remove_if(instances, [containerId](const Instance &i) { return containerId == i.containerId; }).begin(), instances.end());
+    }
+
     view_or_value<view, value> Lambda::ToDocument() const {
 
         // Convert instances

@@ -42,6 +42,7 @@ namespace AwsMock::Dto::Common {
         UPLOAD_FUNCTION_CODE,
         LIST_TAG_COUNTERS,
         LIST_ARNS,
+        UPDATE_LAMBDA,
         // Tags
         ADD_TAG,
         DELETE_TAG,
@@ -93,6 +94,8 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
             {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
             {LambdaCommandType::LIST_ARNS, "list-arns"},
+            // Generell
+            {LambdaCommandType::UPDATE_LAMBDA, "update-lambda"},
             // Tags
             {LambdaCommandType::ADD_TAG, "add-function-tag"},
             {LambdaCommandType::DELETE_TAG, "delete-function-tag"},

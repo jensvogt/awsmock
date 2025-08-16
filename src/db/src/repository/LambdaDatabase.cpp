@@ -233,6 +233,7 @@ namespace AwsMock::Database {
 
     Entity::Lambda::Lambda LambdaDatabase::UpdateLambda(Entity::Lambda::Lambda &lambda) const {
 
+        lambda.modified = system_clock::now();
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -248,7 +249,7 @@ namespace AwsMock::Database {
                 auto mResult = _lambdaCollection.find_one_and_update(make_document(kvp("region", lambda.region), kvp("function", lambda.function), kvp("runtime", lambda.runtime)), lambda.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Lambda updated: " << lambda.ToString();
-                if (mResult) {
+                if (mResult.has_value()) {
                     lambda.FromDocument(mResult.value());
                     return lambda;
                 }

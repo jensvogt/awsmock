@@ -276,6 +276,14 @@ namespace AwsMock::Service {
                 return SendResponse(request, http::status::ok);
             }
 
+            if (clientCommand.command == Dto::Common::LambdaCommandType::UPDATE_LAMBDA) {
+
+                Dto::Lambda::UpdateLambdaRequest lambdaRequest = Dto::Lambda::UpdateLambdaRequest::FromJson(clientCommand);
+                log_info << "Starting update lambda function, functionArn: " << lambdaRequest.functionArn;
+                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UpdateLambda(lambdaRequest); });
+                return SendResponse(request, http::status::ok);
+            }
+
             if (clientCommand.command == Dto::Common::LambdaCommandType::LIST_ARNS) {
 
                 Dto::Lambda::ListLambdaArnsResponse lambdaResponse = _lambdaService.ListLambdaArns();
@@ -431,8 +439,6 @@ namespace AwsMock::Service {
                     _lambdaService.DeleteFunction(lambdaRequest);
                     log_trace << "Delete function, functionName: " << lambdaRequest.functionName;
                 });
-
-
                 return SendResponse(request, http::status::ok);
             }
 
