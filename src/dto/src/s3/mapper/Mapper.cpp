@@ -13,15 +13,14 @@ namespace AwsMock::Dto::S3 {
         response.name = request.bucket;
         response.maxKeys = request.maxKeys;
         for (const auto &object: objectList) {
-            ObjectVersion version = {
-                    .key = object.key,
-                    .eTag = object.md5sum,
-                    .versionId = object.versionId,
-                    .storageClass = "STANDARD",
-                    .isLatest = false,
-                    .size = object.size,
-                    .lastModified = object.modified,
-            };
+            ObjectVersion version;
+            version.key = object.key;
+            version.eTag = object.md5sum;
+            version.versionId = object.versionId;
+            version.storageClass = "STANDARD";
+            version.isLatest = false;
+            version.size = object.size;
+            version.lastModified = object.modified;
             version.owner.id = object.owner;
             response.versions.emplace_back(version);
         }

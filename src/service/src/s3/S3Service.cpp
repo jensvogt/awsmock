@@ -416,7 +416,12 @@ namespace AwsMock::Service {
         object = _database.CreateOrUpdateObject(object);
 
         log_debug << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
-        return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};
+        Dto::S3::CreateMultipartUploadResult response;
+        response.region = request.region;
+        response.bucket = request.bucket;
+        response.key = request.key;
+        response.uploadId = uploadId;
+        return response;
     }
 
     std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, long length) {

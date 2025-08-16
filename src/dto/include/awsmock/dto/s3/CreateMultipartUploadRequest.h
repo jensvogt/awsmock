@@ -10,19 +10,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct CreateMultipartUploadRequest {
-
-        /**
-         * Bucket location
-         */
-        std::string region;
+    struct CreateMultipartUploadRequest final : Common::BaseCounter<CreateMultipartUploadRequest> {
 
         /**
          * Bucket name
@@ -35,11 +28,6 @@ namespace AwsMock::Dto::S3 {
         std::string key;
 
         /**
-         * AWS user
-         */
-        std::string user;
-
-        /**
          * AWS upload ID
          */
         std::string uploadId;
@@ -50,32 +38,48 @@ namespace AwsMock::Dto::S3 {
         std::map<std::string, std::string> metadata;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * @brief Convert from XML representation
          *
          * @param xmlString XML string
          */
-        void FromXml(const std::string &xmlString);
+        void FromXml(const std::string &xmlString) {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateMultipartUploadRequest &r);
+                boost::property_tree::ptree pt;
+                read_xml(xmlString, pt);
+                region = pt.get<std::string>("CreateBucketConfiguration.LocationConstraint");
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend CreateMultipartUploadRequest tag_invoke(boost::json::value_to_tag<CreateMultipartUploadRequest>, boost::json::value const &v) {
+            CreateMultipartUploadRequest r;
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.uploadId = Core::Json::GetStringValue(v, "uploadId");
+            if (Core::Json::AttributeExists(v, "metadata")) {
+                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateMultipartUploadRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"key", obj.key},
+                    {"uploadId", obj.uploadId},
+                    {"metadata", boost::json::value_from(obj.metadata)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

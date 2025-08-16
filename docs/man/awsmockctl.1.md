@@ -44,6 +44,12 @@ starts the controller with a given configuration file. Per default the configura
 file ```/etc/aws-mock.properties``` will
 be used. The path should be the absolute path to the configuration file.
 
+```--host <host>```:  
+sets the name of the manager host.
+
+```--port <port>```:  
+sets the port for the awsmock manager application.
+
 ```--help```    
 shows the usage screen and exists
 
@@ -52,31 +58,62 @@ shows the current version and exists.
 
 ## COMMANDS
 
-```list```  
-lists the currently running AwsMock modules like S3, SQS, SNS etc. Each line has the format:
+```list-applications```  
+lists the currently running AwsMock applications, the provided format is:
 
 ```
-SQS         RUNNING
-SNS         STOPPED
+application1           ENABLED RUNNING
+application2           DISABLED STOPPED
 ...
 ```
 
-```stop <module>```  
-stops the given module. Modules are S3, SQS, SNS, Transfer, Cognito. Modules names can be given case-insensitive.
+```enable-applications [<application1 application2]```  
+enables the given applications. If no application is given, all applications will be enabled. Spaces should  
+separate the different applications. If the application is not running, it will be started.
 
-```start <module>```  
-starts the given module.
+```disable-applications [<application1 application2]```  
+disabled the given applications. If no application is given, all applications will be disabled. Spaces should  
+separate the different applications. If the application is not running, it will be started.
 
-```restart <module>```  
-restarts the given module.
+```start-applications [<application1 application2]```  
+starts the given applications. If no application is given, all applications will be started. Spaces should  
+separate the different applications.
+
+```stop-applications [<application1 application2]```  
+stops the given applications. If no application is given, all applications will be stopped. Spaces should  
+separate the different applications.
+
+```restart-applications [<application1 application2]```  
+restarts the given applications. If no application is given, all applications will be restarted. Spaces should  
+separate the different applications.
+
+```enable-lambdas [<lambda1 lambda2]```  
+enables the given lambdas. If no lambda is given, all lambdas will be enabled. Spaces should  
+separate the different lambdas. If the lambda is not running, it will be started.
+
+```disable-lambdas [<lambda1 lambda2]```  
+disabled the given lambdas. If no lambda is given, all lambdas will be disabled. Spaces should  
+separate the different lambdas. If the lambda is not running, it will be started.
+
+```start-lambdas [<lambda1 lambda2]```  
+starts the given lambdas. If no lambda is given, all lambdas will be started. Spaces should  
+separate the different lambdas.
+
+```stop-lambdas [<lambda1 lambda2]```  
+stops the given lambdas. If no lambda is given, all lambdas will be stopped. Spaces should  
+separate the different lambdas.
+
+```restart-lambdas [<lambda1 lambda2]```  
+restarts the given lambdas. If no lambda is given, all lambdas will be restarted. Spaces should  
+separate the different lambdas.
 
 ```logs```  
 shows the console logs of the AwsMock manager application ```awsmockmgr```.
 See ```awsmockmgr(1)``` for details of the manager.
 
 ```loglevel```  
-sets the log level of the AwsMock manager ```awsmockmgr```. ```<loglevel>``` can be one of: verbose, debug, info,
-warning, error, fatal or none.
+sets the log level of the AwsMock manager ```awsmockmgr```. ```<loglevel>``` it can be one of: verbose, debug, info,
+warning, error, fatal, or none.
 
 ```config```  
 shows the configuration of the AwsMock API gateway.
@@ -89,10 +126,6 @@ the ```--include-objects``` also all object will be exported (SQS messages, SNS 
 ```import```  
 import the infrastructure from stdin in JSON format.
 
-```show-ftp-users```  
-shows the current FTP user (AWS Transfer Family) and their passwords. As AWS does not have the ability to see the
-password of a user (specially when you use the in-memory database, this provides a way to see the user passwords.
-
 ```clean```  
 cleans the infrastructure. This means all SQS queues plus messages, SNS topics plus messages, S3 buckets with all
 objects, transfer servers, and lambda functions will be deleted. ALl modules will be still running, but all AwsMock
@@ -100,33 +133,31 @@ objects will be emptied.
 
 ## EXAMPLES
 
-In oder to show the current running modules:
+To show the current running applications:
 
 ```
-/usr/bin/awsmockctl list
-SQS         RUNNING
-SNS         RUNNING
-S3          RUNNING
+/usr/bin/awsmockctl list-applications
+application1         ENABLED RUNNING
+application2         DISABLED STOPPED
 ```
 
-Stop the SNS module:
+Stop all applications:
 
 ```
-/usr/bin/awsmockctl stop SNS
-/usr/bin/awsmockctl list
-SQS         RUNNING
-SNS         STOPPED
-S3          RUNNING
+/usr/bin/awsmockctl stop-applications
+All application stopped
+/usr/bin/awsmockctl list-applications
+application1         ENABLED STOPPED
+application2         DISABLED STOPPED
 ```
 
-Start the SNS module:
+Start all applications:
 
 ```
-/usr/bin/awsmockctl start SNS
-/usr/bin/awsmockctl list
-SQS         RUNNING
-SNS         RUNNING
-S3          RUNNING
+/usr/bin/awsmockctl start-applications
+/usr/bin/awsmockctl list-applications
+application1         ENABLED RUNNING
+application2         ENABLED RUNNING
 ```
 
 Show the manager logs
@@ -141,7 +172,7 @@ Show the manager logs
 10-11-2023 16:56:51.429 [T] 17 SNSServer:94 - Queue updated, nametextannotation-result-queue
 ```
 
-Export the S3 infrastructure:
+Export the S3 and SQS infrastructure:
 
 ```
 /usr/bin/awsmockctl export s3 sqs
@@ -166,12 +197,6 @@ Export the S3 infrastructure to a file ```infrastrcture.json```:
 /usr/bin/awsmockctl export s3 sqs > infrastrcture.json
 ```
 
-Show a list of FTP users of server ```s-ed5ce1b1898c146f13e5```:
-
-```
-/usr/bin/awsmockctl show-ftp-user s-ed5ce1b1898c146f13e5
-```
-
 ## AUTHOR
 
 Jens Vogt <jens.vogt@opitz-consulting.com>
@@ -187,7 +212,5 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockmgr(1)```, ```awsmocksqs(1)```, ```awslocal(1)```, ```awsmocksqs(1)```, ```awsmocksns(1)```,
-```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
-```awsmocksqs(1)```,
-```awsmockssm(1)```
+```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```,
+```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```, ```awsmockssm(1)```
