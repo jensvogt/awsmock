@@ -70,6 +70,7 @@
 #include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
@@ -191,6 +192,14 @@ namespace AwsMock::Service {
          * @see ListLambdaEventSourceCountersResponse
          */
         [[nodiscard]] Dto::Lambda::ListLambdaEventSourceCountersResponse ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const;
+
+        /**
+         * @brief Update a lambda function
+         *
+         * @param request update lambda request
+         * @see Dto::Lambda::UpdateLambdaRequest
+         */
+        void UpdateLambda(const Dto::Lambda::UpdateLambdaRequest &request) const;
 
         /**
          * @brief Add a lambda environment variable
@@ -448,7 +457,14 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::StartFunctionRequest
          */
-        void StartFunction(const Dto::Lambda::StartLambdaRequest &request) const;
+        void StartLambda(const Dto::Lambda::StartLambdaRequest &request) const;
+
+        /**
+         * @brief Starts all lambda functions
+         *
+         * @throws Core::ServiceException
+         */
+        void StartAllLambdas() const;
 
         /**
          * @brief Stops the lambda function by stopping all running docker containers
@@ -457,7 +473,14 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::StopFunctionRequest
          */
-        void StopFunction(const Dto::Lambda::StopLambdaRequest &request) const;
+        void StopLambda(const Dto::Lambda::StopLambdaRequest &request) const;
+
+        /**
+         * @brief Stops all lambda functions
+         *
+         * @throws Core::ServiceException
+         */
+        void StopAllLambdas() const;
 
         /**
          * @brief Stops the lambda instance

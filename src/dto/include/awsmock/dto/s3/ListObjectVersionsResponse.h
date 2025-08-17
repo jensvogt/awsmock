@@ -72,7 +72,7 @@ namespace AwsMock::Dto::S3 {
      * </ListVersionsResult>
      * @endcode
      */
-    struct DeleteMarker {
+    struct DeleteMarker final : Common::BaseCounter<DeleteMarker> {
 
         /**
          * Is latest
@@ -85,11 +85,6 @@ namespace AwsMock::Dto::S3 {
         std::string key;
 
         /**
-         * Last modified
-         */
-        system_clock::time_point lastModified;
-
-        /**
          * Owner
          */
         Owner owner;
@@ -100,19 +95,60 @@ namespace AwsMock::Dto::S3 {
         std::string versionId;
 
         /**
+         * Last modified
+         */
+        system_clock::time_point lastModified;
+
+        /**
          * Convert to a JSON object
          *
          * @return JSON object
          */
-        view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+
+            try {
+
+                document rootDocument;
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Key", key);
+                Core::Bson::BsonUtils::SetBoolValue(rootDocument, "IsLatest", isLatest);
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
+                Core::Bson::BsonUtils::SetStringValue(rootDocument, "VersionId", versionId);
+                rootDocument.append(kvp("Owner", owner.ToDocument()));
+                return rootDocument.extract();
+
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend DeleteMarker tag_invoke(boost::json::value_to_tag<DeleteMarker>, boost::json::value const &v) {
+            DeleteMarker r;
+            r.key = Core::Json::GetStringValue(v, "Key");
+            r.owner = boost::json::value_to<Owner>(v.at("Owner"));
+            r.isLatest = Core::Json::GetBoolValue(v, "IsLatest");
+            r.versionId = Core::Json::GetStringValue(v, "VersionId");
+            r.lastModified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "LastModified"));
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteMarker const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"Key", obj.key},
+                    {"Owner", boost::json::value_from(obj.owner)},
+                    {"IsLatest", obj.isLatest},
+                    {"VersionId", obj.versionId},
+                    {"LastModified", Core::DateTimeUtils::ToISO8601(obj.lastModified)},
+            };
+        }
     };
 
-    struct ListObjectVersionsResponse {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListObjectVersionsResponse final : Common::BaseCounter<ListObjectVersionsResponse> {
 
         /**
          * Name
@@ -137,7 +173,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Maximal keys
          */
-        int maxKeys;
+        long maxKeys{};
 
         /**
          * Truncation flag
@@ -180,32 +216,121 @@ namespace AwsMock::Dto::S3 {
         std::vector<DeleteMarker> deleteMarkers;
 
         /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
          * Convert to XML representation
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+            try {
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListObjectVersionsResponse &r);
+                boost::property_tree::ptree root;
+                boost::property_tree::ptree listVersionResult;
+
+                listVersionResult.add("Region", region);
+                listVersionResult.add("Name", name);
+                listVersionResult.add("Prefix", prefix);
+                listVersionResult.add("Delimiter", delimiter);
+                listVersionResult.add("EncodingType", encodingType);
+                listVersionResult.add("MaxKeys", maxKeys);
+                listVersionResult.add("IsTruncated", isTruncated);
+                listVersionResult.add("KeyMarker", keyMarker);
+                listVersionResult.add("VersionIdMarker", versionIdMarker);
+                listVersionResult.add("NextKeyMarker", nextKeyMarker);
+                listVersionResult.add("NextVersionIdMarker", nextVersionIdMarker);
+
+                // Prefixes
+                if (!commonPrefixes.empty()) {
+                    boost::property_tree::ptree prefixArray;
+                    for (const auto &p: commonPrefixes) {
+                        prefixArray.push_back(boost::property_tree::basic_ptree<std::string, std::string>::value_type(std::make_pair("", p)));
+                    }
+                    listVersionResult.add_child("CommonPrefixes", prefixArray);
+                }
+
+                // Versions
+                if (!versions.empty()) {
+                    for (const auto &v: versions) {
+                        boost::property_tree::ptree jsonVersionObject;
+                        jsonVersionObject.add("Key", v.key);
+                        jsonVersionObject.add("ETag", v.eTag);
+                        jsonVersionObject.add("VersionId", v.versionId);
+                        jsonVersionObject.add("StorageClass", v.storageClass);
+                        jsonVersionObject.add("IsLatest", v.isLatest);
+                        jsonVersionObject.add("Size", v.size);
+                        jsonVersionObject.add("LastModified", Core::DateTimeUtils::ToISO8601(v.lastModified));
+                        listVersionResult.add_child("Version", jsonVersionObject);
+                    }
+                }
+
+                // Delete markers
+                if (!deleteMarkers.empty()) {
+                    for (const auto &m: deleteMarkers) {
+                        boost::property_tree::ptree jsonDeleteObject;
+                        jsonDeleteObject.add("Key", m.key);
+                        jsonDeleteObject.add("IsLatest", m.isLatest);
+                        jsonDeleteObject.add("VersionId", m.versionId);
+                        jsonDeleteObject.add("LastModified", Core::DateTimeUtils::ToISO8601(m.lastModified));
+                        listVersionResult.add_child("DeleteMarker", jsonDeleteObject);
+                    }
+                }
+                root.add_child("ListVersionResult", listVersionResult);
+
+                std::string tmp = Core::XmlUtils::ToXmlString(root);
+                return Core::XmlUtils::ToXmlString(root);
+
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend ListObjectVersionsResponse tag_invoke(boost::json::value_to_tag<ListObjectVersionsResponse>, boost::json::value const &v) {
+            ListObjectVersionsResponse r;
+            r.name = Core::Json::GetStringValue(v, "name");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.delimiter = Core::Json::GetStringValue(v, "delimiter");
+            r.encodingType = Core::Json::GetStringValue(v, "encodingType");
+            r.maxKeys = Core::Json::GetLongValue(v, "maxKeys");
+            r.isTruncated = Core::Json::GetBoolValue(v, "isTruncated");
+            r.keyMarker = Core::Json::GetStringValue(v, "keyMarker");
+            r.versionIdMarker = Core::Json::GetStringValue(v, "versionIdMarker");
+            r.nextKeyMarker = Core::Json::GetStringValue(v, "nextKeyMarker");
+            r.nextVersionIdMarker = Core::Json::GetStringValue(v, "nextVersionIdMarker");
+            if (Core::Json::AttributeExists(v, "commonPrefixes")) {
+                r.commonPrefixes = boost::json::value_to<std::vector<std::string>>(v.at("commonPrefixes"));
+            }
+            if (Core::Json::AttributeExists(v, "versions")) {
+                r.versions = boost::json::value_to<std::vector<ObjectVersion>>(v.at("versions"));
+            }
+            if (Core::Json::AttributeExists(v, "deleteMarkers")) {
+                r.deleteMarkers = boost::json::value_to<std::vector<DeleteMarker>>(v.at("deleteMarkers"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListObjectVersionsResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"name", obj.name},
+                    {"prefix", obj.prefix},
+                    {"delimiter", obj.delimiter},
+                    {"encodingType", obj.encodingType},
+                    {"maxKeys", obj.maxKeys},
+                    {"isTruncated", obj.isTruncated},
+                    {"keyMarker", obj.keyMarker},
+                    {"versionIdMarker", obj.versionIdMarker},
+                    {"nextKeyMarker", obj.nextKeyMarker},
+                    {"nextVersionIdMarker", obj.nextVersionIdMarker},
+                    {"commonPrefixes", boost::json::value_from(obj.commonPrefixes)},
+                    {"versions", boost::json::value_from(obj.versions)},
+                    {"deleteMarkers", boost::json::value_from(obj.deleteMarkers)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

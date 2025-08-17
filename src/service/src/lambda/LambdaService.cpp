@@ -46,10 +46,10 @@ namespace AwsMock::Service {
             lambda.code.zipFile = GetLambdaCodePath(lambda);
         }
 
-        // Create a response, if inactive
-        if (lambda.state == Database::Entity::Lambda::Inactive) {
+        // Create a response, if disabled
+        if (!lambda.enabled) {
             Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambda);
-            log_info << "Function inactive, name: " << request.functionName << " status: " << LambdaStateToString(lambda.state);
+            log_info << "Function disabled, name: " << request.functionName << " enabled: " << std::boolalpha << lambda.enabled;
             return response;
         }
 
@@ -322,6 +322,41 @@ namespace AwsMock::Service {
             });
             lambda = _lambdaDatabase.UpdateLambda(lambda);
             log_trace << "Lambda environments deleted, lambdaArn: " << lambda.arn << " count: " << count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void LambdaService::UpdateLambda(const Dto::Lambda::UpdateLambdaRequest &request) const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "update_lambda");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "update_lambda");
+        log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
+
+        if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
+            log_warning << "Lambda function does not exist, arn: " << request.functionArn;
+            throw Core::ServiceException("Lambda function does not exist, arn: " + request.functionArn);
+        }
+
+        try {
+
+            Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(request.functionArn);
+            lambda.enabled = request.enabled;
+            lambda = _lambdaDatabase.UpdateLambda(lambda);
+            log_trace << "Lambda updated, lambdaArn: " << lambda.arn;
+
+            if (!request.enabled) {
+                Dto::Lambda::StopLambdaRequest stopRequest;
+                stopRequest.functionArn = request.functionArn;
+                stopRequest.region = request.region;
+                StopLambda(stopRequest);
+            } else {
+                Dto::Lambda::StartLambdaRequest startRequest;
+                startRequest.functionArn = request.functionArn;
+                startRequest.region = request.region;
+                StartLambda(startRequest);
+            }
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -620,6 +655,8 @@ namespace AwsMock::Service {
             response.instances = static_cast<long>(lambda.instances.size());
             response.invocations = lambda.invocations;
             response.averageRuntime = lambda.averageRuntime;
+            response.enabled = lambda.enabled;
+            response.state = Database::Entity::Lambda::LambdaStateToString(lambda.state);
             response.lastStarted = lambda.lastStarted;
             response.lastInvocation = lambda.lastInvocation;
             response.created = lambda.created;
@@ -957,7 +994,7 @@ namespace AwsMock::Service {
         log_debug << "All lambdas disabled, region: " << request.region;
     }
 
-    void LambdaService::StartFunction(const Dto::Lambda::StartLambdaRequest &request) const {
+    void LambdaService::StartLambda(const Dto::Lambda::StartLambdaRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_function");
         log_debug << "Start function, functionArn: " + request.functionArn;
@@ -991,7 +1028,21 @@ namespace AwsMock::Service {
         log_info << "Lambda function started, functionArn: " + lambda.arn;
     }
 
-    void LambdaService::StopFunction(const Dto::Lambda::StopLambdaRequest &request) const {
+    void LambdaService::StartAllLambdas() const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_all_lambdas");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_all_lambdas");
+        log_debug << "Start all lambdas";
+
+        for (const auto &lambda: _lambdaDatabase.ListLambdas()) {
+            Dto::Lambda::StartLambdaRequest request;
+            request.functionArn = lambda.arn;
+            request.region = lambda.region;
+            StartLambda(request);
+        }
+        log_info << "All lambda function started";
+    }
+
+    void LambdaService::StopLambda(const Dto::Lambda::StopLambdaRequest &request) const {
         Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_function");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_function");
         log_debug << "Stop function, functionArn: " + request.functionArn;
@@ -1006,7 +1057,7 @@ namespace AwsMock::Service {
 
         // Check state
         if (lambda.state == Database::Entity::Lambda::Inactive) {
-            log_info << "Lambda function already running, functionArn: " << request.functionArn;
+            log_info << "Lambda function already inactive, functionArn: " << request.functionArn;
             return;
         }
 
@@ -1015,9 +1066,9 @@ namespace AwsMock::Service {
         for (const auto &instance: lambda.instances) {
             if (dockerService.ContainerExists(instance.containerId)) {
                 Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
-                dockerService.StopContainer(container.id);
-                dockerService.DeleteContainer(container);
-                log_debug << "Docker container stopped and deleted, containerId: " + container.id;
+                dockerService.KillContainer(container.id);
+                lambda.RemoveInstanceByContainerId(container.id);
+                log_debug << "Docker container stopped, containerId: " + container.id;
             }
         }
 
@@ -1028,6 +1079,20 @@ namespace AwsMock::Service {
         // Prune containers
         dockerService.PruneContainers();
         log_info << "Lambda function stopped, functionArn: " + lambda.arn;
+    }
+
+    void LambdaService::StopAllLambdas() const {
+        Monitoring::MetricServiceTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_all_lambdas");
+        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_all_lambdas");
+        log_debug << "Stop all lambdas";
+
+        for (const auto &lambda: _lambdaDatabase.ListLambdas()) {
+            Dto::Lambda::StopLambdaRequest request;
+            request.functionArn = lambda.arn;
+            request.region = lambda.region;
+            StopLambda(request);
+        }
+        log_info << "All lambda function stoped";
     }
 
     void LambdaService::StopLambdaInstance(const Dto::Lambda::StopLambdaInstanceRequest &request) const {

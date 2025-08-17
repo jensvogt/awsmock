@@ -416,7 +416,12 @@ namespace AwsMock::Service {
         object = _database.CreateOrUpdateObject(object);
 
         log_debug << "Multipart upload started, bucket: " << request.bucket << " key: " << request.key << " uploadId: " << uploadId;
-        return {.region = request.region, .bucket = request.bucket, .key = request.key, .uploadId = uploadId};
+        Dto::S3::CreateMultipartUploadResult response;
+        response.region = request.region;
+        response.bucket = request.bucket;
+        response.key = request.key;
+        response.uploadId = uploadId;
+        return response;
     }
 
     std::string S3Service::UploadPart(std::istream &stream, int part, const std::string &updateId, long length) {
@@ -686,7 +691,6 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Source object does not exist");
         }
 
-        Dto::S3::CopyObjectResponse response;
         Database::Entity::S3::Object targetObject;
         try {
 
@@ -736,7 +740,13 @@ namespace AwsMock::Service {
             log_error << "S3 copy object request failed, error: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
-        return {.eTag = targetObject.md5sum, .modified = system_clock::now()};
+
+        // Prepare response
+        Dto::S3::CopyObjectResponse response;
+        response.eTag = targetObject.md5sum;
+        response.modified = system_clock::now();
+
+        return response;
     }
 
     Dto::S3::MoveObjectResponse S3Service::MoveObject(const Dto::S3::MoveObjectRequest &request) {

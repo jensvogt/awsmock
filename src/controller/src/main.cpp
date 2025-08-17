@@ -29,7 +29,7 @@
 #include <awsmock/controller/Controller.h>
 
 #ifdef _WIN32
-#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.json")
+#define DEFAULT_CONFIG_FILE "C:/Program Files (x86)/awsmock/etc/awsmock.j́son"
 #else
 #define DEFAULT_CONFIG_FILE std::sting("/usr/local/awsmock/etc/awsmock.json")
 #endif

@@ -157,14 +157,14 @@ namespace AwsMock::Service {
                     }
 
                     // Build request
-                    Dto::S3::ListObjectVersionsRequest s3Request = {
-                            .region = clientCommand.region,
-                            .bucket = clientCommand.bucket,
-                            .prefix = clientCommand.prefix,
-                            .delimiter = delimiter,
-                            .encodingType = encodingType,
-                            .maxKeys = pageSize,
-                            .versionIdMarker = versionIdMarker};
+                    Dto::S3::ListObjectVersionsRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.prefix = clientCommand.prefix;
+                    s3Request.delimiter = delimiter;
+                    s3Request.encodingType = encodingType;
+                    s3Request.maxKeys = pageSize;
+                    s3Request.versionIdMarker = versionIdMarker;
 
                     // Get object versions
                     Dto::S3::ListObjectVersionsResponse s3Response = _s3Service.ListObjectVersions(s3Request);
@@ -259,12 +259,12 @@ namespace AwsMock::Service {
                     std::map<std::string, std::string> metadata = GetMetadata(request);
                     if (clientCommand.copyRequest) {
 
-                        Dto::S3::CopyObjectRequest s3Request = {
-                                .region = clientCommand.region,
-                                .user = clientCommand.user,
-                                .targetBucket = clientCommand.bucket,
-                                .targetKey = clientCommand.key,
-                                .metadata = metadata};
+                        Dto::S3::CopyObjectRequest s3Request;
+                        s3Request.region = clientCommand.region;
+                        s3Request.user = clientCommand.user;
+                        s3Request.targetBucket = clientCommand.bucket;
+                        s3Request.targetKey = clientCommand.key;
+                        s3Request.metadata = metadata;
 
                         // Get S3 source bucket/key
                         GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
@@ -458,7 +458,11 @@ namespace AwsMock::Service {
 
                         log_debug << "Starting multipart upload";
 
-                        Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
+                        Dto::S3::CreateMultipartUploadRequest s3Request;
+                        s3Request.region = clientCommand.region;
+                        s3Request.bucket = clientCommand.bucket;
+                        s3Request.key = clientCommand.key;
+                        s3Request.user = clientCommand.user;
                         Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);
 
                         log_info << "Copy object, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
@@ -503,7 +507,11 @@ namespace AwsMock::Service {
 
                     log_debug << "Starting multipart upload, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
-                    Dto::S3::CreateMultipartUploadRequest s3Request = {.region = clientCommand.region, .bucket = clientCommand.bucket, .key = clientCommand.key, .user = clientCommand.user};
+                    Dto::S3::CreateMultipartUploadRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.bucket = clientCommand.bucket;
+                    s3Request.key = clientCommand.key;
+                    s3Request.user = clientCommand.user;
                     s3Request.metadata = GetMetadata(request);
 
                     Dto::S3::CreateMultipartUploadResult result = _s3Service.CreateMultipartUpload(s3Request);

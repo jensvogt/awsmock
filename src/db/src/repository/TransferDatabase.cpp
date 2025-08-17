@@ -320,24 +320,21 @@ namespace AwsMock::Database {
 
     long TransferDatabase::CountServers(const std::string &region) const {
 
-        long count = 0;
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _serverCollection = (*client)[_databaseName][_serverCollectionName];
 
-            if (region.empty()) {
-                count = _serverCollection.count_documents({});
-            } else {
-                count = _serverCollection.count_documents(make_document(kvp("region", region)));
+            document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
             }
 
-        } else {
-
-            return _memoryDb.CountServers(region);
+            const long count = _serverCollection.count_documents(query.extract());
+            log_trace << "Count servers, result: " << count;
+            return count;
         }
-        log_trace << "Count servers, result: " << count;
-        return count;
+        return _memoryDb.CountServers(region);
     }
 
     long TransferDatabase::CountUsers(const std::string &region, const std::string &serverId) const {
