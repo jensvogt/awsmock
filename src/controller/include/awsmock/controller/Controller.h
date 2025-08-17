@@ -82,6 +82,7 @@ namespace AwsMock::Controller {
             {CommandType::LIST_APPLICATIONS, "list-applications"},
             {CommandType::START_APPLICATION, "start-application"},
             {CommandType::RESTART_APPLICATION, "restart-application"},
+            {CommandType::STOP_APPLICATION, "stop-application"},
             {CommandType::STOP_LAMBDA, "stop-lambda"},
             {CommandType::LIST_LAMBDAS, "list-lambdas"},
             {CommandType::START_LAMBDA, "start-lambda"},

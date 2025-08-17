@@ -91,7 +91,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc) {};
+        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc), _ioc(ioc) {};
 
         /**
          * @brief Creates a new topic
@@ -315,9 +315,10 @@ namespace AwsMock::Service {
          * If a SQS topic subscription is found, send the message to the SQS topic.
          *
          * @param request SNS publish request
+         * @param topic SNS topic entity
          * @param message SNS message entity
          */
-        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message);
+        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message);
 
         /**
          * @brief Send a SNS message to an SQS topic
@@ -349,7 +350,7 @@ namespace AwsMock::Service {
          * @param request SNS publish request.
          * @param message SNS message.
          */
-        void SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message);
+        void SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const;
 
         /**
          * @brief Send an SNS message to a lambda function endpoint.
@@ -384,6 +385,11 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
+
+        /**
+         * Boost asio IO context
+         */
+        boost::asio::io_context &_ioc;
     };
 
 }// namespace AwsMock::Service

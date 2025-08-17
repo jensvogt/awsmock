@@ -359,6 +359,13 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::RELOAD_ALL_COUNTERS: {
+
+                    Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
+                    boost::asio::post(_ioc, [this] { _sqsService.ReloadAllCounters(); });
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::UNKNOWN: {
 
                     log_error << "Unknown method";

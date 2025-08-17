@@ -458,6 +458,11 @@ namespace AwsMock::Service {
          */
         void ReloadCounters(const Dto::SQS::ReloadCountersRequest &request) const;
 
+        /**
+         * @brief Reload all SQS queue counters
+         */
+        void ReloadAllCounters() const;
+
       private:
 
         /**
@@ -466,7 +471,7 @@ namespace AwsMock::Service {
          * @param queueArn queue ARN
          * @param message SQS message.
          */
-        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message);
+        void CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const;
 
         /**
          * @brief Send a lambda invocation request for a message.

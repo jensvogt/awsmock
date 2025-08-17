@@ -561,16 +561,18 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSDatabase::CreateMessage(Entity::SNS::Message &message) const {
+
         if (HasDatabase()) {
+
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
+            mongocxx::collection _messageCollection = client->database(_databaseName)[_messageCollectionName];
             auto session = client->start_session();
 
             try {
                 session.start_transaction();
                 const auto result = _messageCollection.insert_one(message.ToDocument());
-                log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
+                log_trace << "Message created, oid: " << result->inserted_id().get_oid().value.to_string();
                 message.oid = result->inserted_id().get_oid().value.to_string();
 
             } catch (const mongocxx::exception &exc) {
@@ -676,7 +678,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountMessages(topicArn);
     }
 
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -757,7 +759,7 @@ namespace AwsMock::Database {
         return CreateMessage(message);
     }
 
-    void SNSDatabase::SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const {
+    void SNSDatabase::SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const {
 
         if (HasDatabase()) {
 
