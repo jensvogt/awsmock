@@ -33,10 +33,9 @@
         "host": "localhost",
         "address": "0.0.0.0",
         "port": 4566,
-        "max-queue": 10,
-        "max-threads": 50,
+        "max-queue": 512,
         "max-thread": 256,
-        "max-body": 104857600,
+        "max-body": 204857600,
         "timeout": 900
       }
     },
@@ -210,7 +209,12 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "monitoring-period": 300
+        "monitoring": {
+          "period": 300
+        },
+        "remove": {
+          "period": 300
+        }
       },
       "ssm": {
         "active": true,
@@ -306,7 +310,7 @@
       "active": true,
       "address": "0.0.0.0",
       "port": 4567,
-      "workers": 10,
+      "workers": 20,
       "timeout": 900,
       "doc-root": "/usr/local/awsmock/frontend"
     },

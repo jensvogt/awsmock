@@ -23,38 +23,38 @@ namespace AwsMock::Service {
      * @brief Accepts incoming connections and launches the sessions
      */
     class ApplicationLogListener : public std::enable_shared_from_this<ApplicationLogListener> {
-        boost::asio::io_context &ioc_;
-        boost::asio::ip::tcp::acceptor acceptor_;
+        boost::asio::io_context &_ioc;
+        boost::asio::ip::tcp::acceptor _acceptor;
 
       public:
 
-        ApplicationLogListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint) : ioc_(ioc), acceptor_(ioc) {
+        ApplicationLogListener(boost::asio::io_context &ioc, const boost::asio::ip::tcp::endpoint &endpoint) : _ioc(ioc), _acceptor(ioc) {
 
             boost::beast::error_code ec;
 
             // Open the acceptor
-            acceptor_.open(endpoint.protocol(), ec);
+            ec = _acceptor.open(endpoint.protocol(), ec);
             if (ec) {
                 log_error << "Open failed, errorCode: " << ec.message() << std::endl;
                 return;
             }
 
             // Allow address reuse
-            acceptor_.set_option(boost::asio::socket_base::reuse_address(true), ec);
+            ec = _acceptor.set_option(boost::asio::socket_base::reuse_address(true), ec);
             if (ec) {
                 log_error << "SetOptions failed, errorCode: " << ec.message() << std::endl;
                 return;
             }
 
             // Bind to the server address
-            acceptor_.bind(endpoint, ec);
+            ec = _acceptor.bind(endpoint, ec);
             if (ec) {
                 log_error << "Bind failed, errorCode: " << ec.message() << std::endl;
                 return;
             }
 
             // Start listening for connections
-            acceptor_.listen(boost::asio::socket_base::max_listen_connections, ec);
+            ec = _acceptor.listen(boost::asio::socket_base::max_listen_connections, ec);
             if (ec) {
                 log_error << "Listen failed, errorCode: " << ec.message() << std::endl;
                 return;
@@ -72,7 +72,7 @@ namespace AwsMock::Service {
 
         void do_accept() {
             // The new connection gets its own strand
-            acceptor_.async_accept(boost::asio::make_strand(ioc_), boost::beast::bind_front_handler(&ApplicationLogListener::on_accept, shared_from_this()));
+            _acceptor.async_accept(boost::asio::make_strand(_ioc), boost::beast::bind_front_handler(&ApplicationLogListener::on_accept, shared_from_this()));
         }
 
         void on_accept(const boost::beast::error_code &ec, boost::asio::ip::tcp::socket socket) {
