@@ -23,7 +23,7 @@ namespace AwsMock::Service {
      */
     class ApplicationLogSession : public std::enable_shared_from_this<ApplicationLogSession> {
 
-        boost::beast::websocket::stream<boost::beast::tcp_stream> ws_;
+        boost::beast::websocket::stream<boost::beast::tcp_stream> _ws;
         boost::beast::flat_buffer buffer_;
 
       public:
@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         /**
          * @brief Take ownership of the socket
          */
-        explicit ApplicationLogSession(boost::asio::ip::tcp::socket &&socket) : ws_(std::move(socket)) {}
+        explicit ApplicationLogSession(boost::asio::ip::tcp::socket &&socket) : _ws(std::move(socket)) {}
 
         /**
          * @brief Start the asynchronous operation
@@ -71,12 +71,12 @@ namespace AwsMock::Service {
         /**
          * Websocket backend
          */
-        boost::shared_ptr<Core::LogWebsocketSink> backend;
+        boost::shared_ptr<Core::LogWebsocketSink> _backend;
 
         /**
          * Websocket sink
          */
-        boost::shared_ptr<Core::webSocketSink_t> sink;
+        boost::shared_ptr<Core::webSocketSink_t> _sink;
     };
 
 }// namespace AwsMock::Service

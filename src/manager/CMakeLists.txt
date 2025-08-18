@@ -42,7 +42,7 @@ else ()
             boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process
             boost_coroutine boost_context ssl crypto archive magic ssh)
     if (APPLE)
-        add_link_options("-rpath /usr/local/lib")
+        add_link_options("-rpath /usr/local/awsmock/lib")
         set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")
     endif ()
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
