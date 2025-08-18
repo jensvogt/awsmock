@@ -105,3 +105,20 @@ x86
 **/*.bin
 **/*.sqlite
 **/CMake Overview
+
+# Tests
+src/service/btst/srv_kms_cli
+src/service/btst/srv_kms_java
+src/service/btst/srv_kms_service
+src/service/btst/srv_lambda_cli
+src/service/btst/srv_lambda_service
+src/service/btst/srv_s3_cli
+src/service/btst/srv_s3_java
+src/service/btst/srv_s3_service
+src/service/btst/srv_secret_service
+src/service/btst/srv_sns_cli
+src/service/btst/srv_sns_java
+src/service/btst/srv_sns_service
+src/service/btst/srv_sqs_cli
+src/service/btst/srv_sqs_java
+src/service/btst/srv_sqs_service
