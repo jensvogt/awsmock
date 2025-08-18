@@ -73,6 +73,7 @@ namespace AwsMock::Dto::Common {
         EXPORT_MESSAGES,
         IMPORT_MESSAGES,
         RELOAD_COUNTERS,
+        RELOAD_ALL_COUNTERS,
         UNKNOWN
     };
 
@@ -121,6 +122,7 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
             {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
             {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
+            {SqsCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
     };
 
     [[maybe_unused]] static std::string SqsCommandTypeToString(const SqsCommandType &commandType) {

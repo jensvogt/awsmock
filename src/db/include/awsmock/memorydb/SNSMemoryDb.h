@@ -255,7 +255,7 @@ namespace AwsMock::Database {
          * @param message SNS message
          * @param status new status
          */
-        void SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status);
+        void SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status);
 
         /**
          * @brief Count the number of messages by state

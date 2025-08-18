@@ -255,8 +255,9 @@ namespace AwsMock::Service {
             // Save message
             message = _snsDatabase.CreateMessage(message);
 
-            // Check subscriptions
-            CheckSubscriptions(request, message);
+            // Check subscriptions, asynchronously
+            //CheckSubscriptions(request, topic, message);
+            boost::asio::post(_ioc, [this, request, topic, message] { CheckSubscriptions(request, topic, message); });
 
             Dto::SNS::PublishResponse response;
             response.requestId = request.requestId;
@@ -291,7 +292,7 @@ namespace AwsMock::Service {
             }
 
             // Create a new subscription
-            const std::string accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
             Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
             const std::string subscriptionArn = Core::AwsUtils::CreateSNSSubscriptionArn(request.region, accountId, topic.topicName);
 
@@ -561,7 +562,7 @@ namespace AwsMock::Service {
             const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn);
 
             Dto::SNS::ListTagCountersResponse response;
-            response.total = topic.tags.size();
+            response.total = static_cast<long>(topic.tags.size());
             for (const auto &[fst, snd]: topic.tags) {
                 Dto::SNS::TagCounter tagCounter;
                 tagCounter.tagKey = fst;
@@ -635,33 +636,30 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, Database::Entity::SNS::Message &message) {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
-        log_trace << "Check subscriptions request: " << request.ToString();
+        log_trace << "Check subscriptions request: " << request;
 
-        if (const Database::Entity::SNS::Topic topic = _snsDatabase.GetTopicByArn(request.topicArn); !topic.subscriptions.empty()) {
+        for (const auto &it: topic.subscriptions) {
 
-            for (const auto &it: topic.subscriptions) {
+            if (Core::StringUtils::ToLower(it.protocol) == SQS_PROTOCOL) {
 
-                if (Core::StringUtils::ToLower(it.protocol) == SQS_PROTOCOL) {
+                SendSQSMessage(it, request);
+                _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+                log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
 
-                    SendSQSMessage(it, request);
-                    _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
-                    log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
+            } else if (Core::StringUtils::ToLower(it.protocol) == HTTP_PROTOCOL) {
 
-                } else if (Core::StringUtils::ToLower(it.protocol) == HTTP_PROTOCOL) {
+                SendHttpMessage(it, request);
+                _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+                log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
 
-                    SendHttpMessage(it, request);
-                    _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
-                    log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
+            } else if (Core::StringUtils::ToLower(it.protocol) == LAMBDA_ENDPOINT) {
 
-                } else if (Core::StringUtils::ToLower(it.protocol) == LAMBDA_ENDPOINT) {
-
-                    SendLambdaMessage(it, request, message);
-                    _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
-                    log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
-                }
+                SendLambdaMessage(it, request, message);
+                _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+                log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
             }
         }
     }
@@ -837,7 +835,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) {
+    void SNSService::SendLambdaMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Message &message) const {
 
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(subscription.endpoint);
         log_debug << "Found lambda, lambdaArn: " << lambda.arn;

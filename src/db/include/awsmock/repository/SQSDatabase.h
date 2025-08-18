@@ -23,9 +23,9 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -511,8 +511,10 @@ namespace AwsMock::Database {
 
         /**
          * @brief Initialize the counter-map.
+         *
+         * @brief queueArn ARN of the queue
          */
-        void InitializeCounters() const;
+        void InitializeCounters(const std::string &queueArn = {}) const;
 
       private:
 

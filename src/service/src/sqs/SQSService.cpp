@@ -889,7 +889,7 @@ namespace AwsMock::Service {
     void SQSService::ReloadCounters(const Dto::SQS::ReloadCountersRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "reload_counters");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "reload_counters");
-        log_trace << "Delete queue request, request: " << request.ToString();
+        log_trace << "Reload queue counters request, request: " << request;
 
         // Check existence
         if (!request.queueArn.empty() && !_sqsDatabase.QueueArnExists(request.queueArn)) {
@@ -899,8 +899,23 @@ namespace AwsMock::Service {
 
         try {
             // Delete all resources in queue
-            _sqsDatabase.InitializeCounters();
+            _sqsDatabase.InitializeCounters(request.queueArn);
             log_debug << "Count messages, queueArn: " << request.queueArn;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
+    void SQSService::ReloadAllCounters() const {
+        Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "reload_all_counters");
+        Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "reload_all_counters");
+        log_trace << "Reload all counters";
+
+        try {
+            // Delete all resources in queue
+            _sqsDatabase.InitializeCounters();
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -1396,7 +1411,7 @@ namespace AwsMock::Service {
                                     }) != attributes.end();
     }
 
-    void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) {
+    void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {
         if (const std::vector<Database::Entity::Lambda::Lambda> lambdas = Database::LambdaDatabase::instance().ListLambdasWithEventSource(queueArn); !lambdas.empty()) {
             log_debug << "Found lambda notification events, count: " << lambdas.size();
             for (const auto &lambda: lambdas) {

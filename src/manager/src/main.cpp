@@ -97,8 +97,9 @@ class Daemon {
 
   private:
 
+    boost::asio::io_context ioc;
     boost::thread frontendThread;
-    AwsMock::Manager::Manager awsMockManager;
+    AwsMock::Manager::Manager awsMockManager{ioc};
 };
 
 #ifdef _WIN32

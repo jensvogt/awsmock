@@ -6,11 +6,6 @@
 
 namespace AwsMock::Manager {
 
-    void CreateIndexes() {
-        Database::ModuleDatabase::instance().CreateIndexes();
-        log_debug << "Database indexes created";
-    }
-
     void Manager::Initialize() const {
 
         InitializeDatabase();
@@ -30,8 +25,9 @@ namespace AwsMock::Manager {
             _pool.Configure();
 
             // Create database indexes in a background thread
-            boost::thread t{CreateIndexes};
-            t.detach();
+            boost::asio::post(_ioc, [] {
+                Database::ModuleDatabase::instance().CreateIndexes();
+            });
 
         } else {
             log_info << "In-memory database initialized";
@@ -39,6 +35,8 @@ namespace AwsMock::Manager {
     }
 
     void Manager::AutoLoad() {
+
+        // Check active flag
         if (!Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
             return;
         }
@@ -66,7 +64,6 @@ namespace AwsMock::Manager {
                 log_info << "Loaded infrastructure, filename: " << autoLoadFile;
             }
         }
-
         log_info << "Autoload finished";
     }
 
@@ -138,8 +135,6 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        boost::asio::io_context _ioc;
-
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
@@ -189,10 +184,10 @@ namespace AwsMock::Manager {
 
         // Start listener threads
         const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
-        log_info << "Gateway starting, threads: " << maxThreads;
         for (auto i = 0; i < maxThreads; i++) {
-            _threadGroup.create_thread([&_ioc] { return _ioc.run(); });
+            _threadGroup.create_thread([this] { return _ioc.run(); });
         }
+        log_info << "Gateway starting, threads: " << maxThreads;
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
         boost::asio::signal_set signals(_ioc, SIGINT, SIGTERM);
@@ -210,6 +205,7 @@ namespace AwsMock::Manager {
             }
         });
         log_info << "Manager signal handler installed";
+        log_info << "Manager initialized and started";
 
         // Start IO context
         _ioc.run();
