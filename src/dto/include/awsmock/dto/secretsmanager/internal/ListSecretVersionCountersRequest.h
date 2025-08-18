@@ -13,7 +13,7 @@
 #include "awsmock/dto/common/SortColumn.h"
 
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SecretsManager {

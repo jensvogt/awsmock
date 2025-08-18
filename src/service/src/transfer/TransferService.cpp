@@ -2,6 +2,8 @@
 // Created by vogje01 on 30/05/2023.
 //
 
+#include "awsmock/dto/common/mapper/Mapper.h"
+#include "awsmock/dto/dynamodb/mapper/Mapper.h"
 #include "awsmock/dto/transfer/model/Tag.h"
 
 
@@ -14,7 +16,6 @@ namespace AwsMock::Service {
         log_debug << "Create transfer manager";
 
         // Check existence
-        // TODO: How can see that a server exists already
         if (_transferDatabase.TransferExists(request.region, ProtocolTypeToString(request.protocols[0]))) {
             log_error << "Transfer manager exists already";
             throw Core::ServiceException("Transfer manager exists already");
@@ -149,13 +150,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server_counters");
 
         try {
-            std::vector<Database::SortColumn> sortColumns;
-            for (const auto &s: request.sortColumns) {
-                Database::SortColumn sortColumn;
-                sortColumn.column = request.sortColumns[0].column;
-                sortColumn.sortDirection = request.sortColumns[0].sortDirection;
-                sortColumns.emplace_back(sortColumn);
-            }
+            const std::vector<Database::SortColumn> sortColumns = Dto::Common::Mapper::map(request.sortColumns);
             const std::vector<Database::Entity::Transfer::Transfer> servers = _transferDatabase.ListServers(request.region, request.prefix, request.pageSize, request.pageIndex, sortColumns);
 
             auto response = Dto::Transfer::ListServerCountersResponse();
@@ -236,15 +231,7 @@ namespace AwsMock::Service {
         Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
 
         try {
-            std::vector<Database::SortColumn> sortColumns;
-            for (const auto &s: request.sortColumns) {
-                Database::SortColumn sortColumn;
-                sortColumn.column = request.sortColumns[0].column;
-                sortColumn.sortDirection = request.sortColumns[0].sortDirection;
-                sortColumns.emplace_back(sortColumn);
-            }
-
-            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, sortColumns);
+            std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
 
             auto response = Dto::Transfer::ListUserCountersResponse();
             response.total = _transferDatabase.CountUsers(request.region, request.serverId);

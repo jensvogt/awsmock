@@ -6,15 +6,15 @@
 #define AWSMOCK_DB_ENTITY_DYNAMODB_TABLE_H
 
 // C++ includes
-#include <chrono>
 #include <map>
 #include <string>
 #include <vector>
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/entity/common/BaseEntity.h>
 #include <awsmock/entity/dynamodb/ProvisionedThroughput.h>
+#include <awsmock/entity/dynamodb/StreamSpecification.h>
 
 namespace AwsMock::Database::Entity::DynamoDb {
 
@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Table {
+    struct Table final : Common::BaseEntity<Table> {
 
         /**
          * ID
@@ -41,6 +41,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * Name
          */
         std::string name;
+
+        /**
+         * AWS ARN
+         */
+        std::string arn;
 
         /**
          * Table status
@@ -78,6 +83,11 @@ namespace AwsMock::Database::Entity::DynamoDb {
         ProvisionedThroughput provisionedThroughput;
 
         /**
+         * Stream specification
+         */
+        StreamSpecification streamSpecification;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -92,7 +102,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -100,29 +110,6 @@ namespace AwsMock::Database::Entity::DynamoDb {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the entity to a JSON string
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param d DynamoDB  entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Table &d);
     };
 
     typedef std::vector<Table> TableList;

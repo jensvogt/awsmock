@@ -11,10 +11,10 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
-#include <awsmock/dto/s3/CreateBucketConstraint.h>
+#include <awsmock/dto/s3/model/BucketConstraint.h>
 #include <awsmock/ftpserver/FtpServer.h>
 #include <awsmock/repository/TransferDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
@@ -36,14 +36,14 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit TransferServer(Core::Scheduler &scheduler);
+        explicit TransferServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
       private:
 
         /**
          * @brief Creates the transfer server bucket
          */
-        static void CreateTransferBucket();
+        void CreateTransferBucket() const;
 
         /**
          * @brief Creates the transfer server default directories
@@ -179,9 +179,14 @@ namespace AwsMock::Service {
         std::shared_ptr<FtpServer::FtpServer> _ftpServer;
 
         /**
-       * Actual SFTP manager
-       */
+         * Actual SFTP manager
+         */
         std::shared_ptr<SftpServer> _sftpServer;
+
+        /**
+         * Asynchronous task scheduler
+         */
+        boost::asio::io_context &_ioc;
     };
 }// namespace AwsMock::Service
 

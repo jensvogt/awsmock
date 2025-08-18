@@ -14,7 +14,11 @@
 #include <awsmock/dto/lambda/model/EventSourceMapping.h>
 
 namespace AwsMock::Dto::Lambda {
-
+    /**
+     * @brief List Lambda event sources response.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaEventSourceCountersResponse final : Common::BaseCounter<ListLambdaEventSourceCountersResponse> {
 
         /**

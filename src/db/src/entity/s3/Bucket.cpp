@@ -170,6 +170,7 @@ namespace AwsMock::Database::Entity::S3 {
 
         // SQS queue notification configuration
         if (mResult.value().find("queueNotifications") != mResult.value().end()) {
+            queueNotifications.clear();
             for (bsoncxx::array::view notificationView{mResult.value()["queueNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 QueueNotification notification;
                 queueNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
@@ -178,6 +179,7 @@ namespace AwsMock::Database::Entity::S3 {
 
         // SNS topic notification configuration
         if (mResult.value().find("topicNotifications") != mResult.value().end()) {
+            topicNotifications.clear();
             for (bsoncxx::array::view notificationView{mResult.value()["topicNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 TopicNotification notification;
                 topicNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
@@ -186,6 +188,7 @@ namespace AwsMock::Database::Entity::S3 {
 
         // Lambda function notification configuration
         if (mResult.value().find("lambdaConfigurations") != mResult.value().end()) {
+            lambdaNotifications.clear();
             for (bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 LambdaNotification notification;
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));

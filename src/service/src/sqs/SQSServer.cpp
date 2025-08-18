@@ -26,15 +26,16 @@ namespace AwsMock::Service {
 
         // Start SQS monitoring update counters
         scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _counterPeriod);
-        scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, 10);
+        scheduler.AddTask("sqs-monitoring-wait-time", [this] { this->CollectWaitingTimeStatistics(); }, _monitoringPeriod, _monitoringPeriod);
 
         // Start reset messages task
-        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, 10);
-        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, _resetPeriod, 10);
+        scheduler.AddTask("sqs-reset-messages", [this] { this->ResetMessages(); }, _resetPeriod, _resetPeriod);
+        scheduler.AddTask("sqs-setdlq", [this] { this->SetDlq(); }, -1);
+        scheduler.AddTask("sqs-seturl", [this] { this->SetUrl(); }, -1);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("sqs-backup", [this] { BackupSqs(); }, _backupCron);
+            scheduler.AddTask("sqs-backup", [] { BackupSqs(); }, _backupCron);
         }
 
         // Set running
@@ -80,7 +81,7 @@ namespace AwsMock::Service {
     }
 
     void SQSServer::SetDlq() const {
-        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
         log_trace << "SQS relocate messages starting, count: " << queueList.size();
 
         if (queueList.empty()) {
@@ -104,6 +105,25 @@ namespace AwsMock::Service {
         log_trace << "SQS DQL finished, count: " << queueList.size();
     }
 
+    void SQSServer::SetUrl() const {
+
+        Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        log_trace << "SQS set URL task starting, count: " << queueList.size();
+
+        if (queueList.empty()) {
+            return;
+        }
+
+        // Loop over queues and do some maintenance work
+        for (auto &queue: queueList) {
+
+            queue.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(queue.queueArn);
+            queue = _sqsDatabase.UpdateQueue(queue);
+            log_trace << "SQS queue updated, queueName" << queue.name;
+        }
+        log_trace << "SQS URL task finished, count: " << queueList.size();
+    }
+
     void SQSServer::UpdateCounter() const {
 
         log_trace << "SQS counter update starting";
@@ -113,11 +133,8 @@ namespace AwsMock::Service {
             long totalSize = 0;
             for (auto const &[key, val]: *_sqsCounterMap) {
 
-                std::string labelValue = key;
-
-
-                _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", labelValue, static_cast<double>(val.messages));
-                _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", labelValue, static_cast<double>(val.size));
+                _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", key, static_cast<double>(val.messages));
+                _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", key, static_cast<double>(val.size));
 
                 totalMessages += val.messages;
                 totalSize += val.size;

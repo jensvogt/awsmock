@@ -10,10 +10,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/StringUtils.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/sqs/model/Queue.h>
 #include <awsmock/entity/sqs/Queue.h>
 
 namespace AwsMock::Dto::SQS {
@@ -23,12 +22,12 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListQueuesResponse {
+    struct ListQueuesResponse final : Common::BaseCounter<ListQueuesResponse> {
 
         /**
          * List of queues
          */
-        Database::Entity::SQS::QueueList queueList;
+        std::vector<std::string> queueUrls;
 
         /**
          * Next token
@@ -38,35 +37,30 @@ namespace AwsMock::Dto::SQS {
         /**
          * Total number of queues
          */
-        long total;
+        long total{};
 
-        /**
-         * @brief Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
+      private:
 
-        /**
-         * @brief Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListQueuesResponse tag_invoke(boost::json::value_to_tag<ListQueuesResponse>, boost::json::value const &v) {
+            ListQueuesResponse r;
+            r.total = Core::Json::GetLongValue(v, "Total");
+            r.nextToken = Core::Json::GetStringValue(v, "NextToken");
+            if (Core::Json::AttributeExists(v, "QueueUrls")) {
+                r.queueUrls = boost::json::value_to<std::vector<std::string>>(v.at("QueueUrls"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListQueuesResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueuesResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Total", obj.total},
+                    {"NextToken", obj.nextToken},
+                    {"QueueUrls", boost::json::value_from(obj.queueUrls)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -41,10 +41,11 @@ namespace AwsMock::Service {
             _sqsDatabase.DeleteAllQueues();
         }
 
+        boost::asio::io_context _ioContext;
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
         Database::SQSDatabase &_sqsDatabase = Database::SQSDatabase::instance();
-        SNSService _snsService;
-        SQSService _sqsService;
+        SNSService _snsService{_ioContext};
+        SQSService _sqsService{_ioContext};
     };
 
     BOOST_FIXTURE_TEST_CASE(TopicCreateTest, SNSServiceTest) {
@@ -292,9 +293,11 @@ namespace AwsMock::Service {
 
         Dto::SQS::CreateQueueResponse queueResponse = _sqsService.CreateQueue(queueRequest);
 
-        Dto::SQS::GetQueueUrlRequest queueUrlRequest = {.region = REGION, .queueName = QUEUE};
-        auto [queueUrl] = _sqsService.GetQueueUrl(queueUrlRequest);
-        std::string resultQueueUrl = queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _sqsService.GetQueueUrl(getQueueUrlRequest).queueUrl;
+        const std::string &resultQueueUrl = queueUrl;
 
         Dto::SNS::SubscribeRequest subscribeRequest;
         subscribeRequest.region = REGION;

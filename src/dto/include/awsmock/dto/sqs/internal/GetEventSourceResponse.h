@@ -9,14 +9,13 @@
 #include "awsmock/dto/sqs/model/LambdaTriggerCounter.h"
 
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 
 namespace AwsMock::Dto::SQS {
 
     /**
      * @brief Get the event source as lambda configuration
-     *
      *
      * @author jens.vogt\@opitz-consulting.com
      */

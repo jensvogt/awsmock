@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 #define LAMBDA_INTERNAL_PORT 8080
 

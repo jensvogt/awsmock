@@ -24,20 +24,20 @@ namespace AwsMock::Database::Entity::SNS {
         return topicAttributeDoc;
     }
 
-    void TopicAttribute::FromDocument(std::optional<view> mResult) {
+    void TopicAttribute::FromDocument(const std::optional<view> &mResult) {
 
         try {
 
             deliveryPolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "deliveryPolicy");
             displayName = Core::Bson::BsonUtils::GetStringValue(mResult, "displayName");
-            fifoTopic = mResult.value()["fifoTopic"].get_bool().value;
+            fifoTopic = Core::Bson::BsonUtils::GetBoolValue(mResult, "fifoTopic");
             policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");
             signatureVersion = Core::Bson::BsonUtils::GetStringValue(mResult, "signatureVersion");
             tracingConfig = Core::Bson::BsonUtils::GetStringValue(mResult, "tracingConfig");
             kmsMasterKeyId = Core::Bson::BsonUtils::GetStringValue(mResult, "kmsMasterKeyId");
             archivePolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "archivePolicy");
-            beginningArchiveTime = bsoncxx::types::b_date(mResult.value()["beginningArchiveTime"].get_date().value);
-            contentBasedDeduplication = mResult.value()["contentBasedDeduplication"].get_bool().value;
+            beginningArchiveTime = Core::Bson::BsonUtils::GetDateValue(mResult, "beginningArchiveTime");
+            contentBasedDeduplication = Core::Bson::BsonUtils::GetBoolValue(mResult, "contentBasedDeduplication");
             availableMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "availableMessages");
 
         } catch (std::exception &exc) {

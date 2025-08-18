@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/module/model/Infrastructure.h>
 
 namespace AwsMock::Dto::Module {
@@ -51,7 +51,7 @@ namespace AwsMock::Dto::Module {
          *
          * @return payload json string
          */
-        std::string ToJson() const;
+        [[nodiscard]] std::string ToJson() const;
 
         /**
          * @brief Converts the DTO to a string representation.

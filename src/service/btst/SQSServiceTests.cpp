@@ -38,8 +38,9 @@ namespace AwsMock::Service {
             _database.DeleteAllMessages();
         }
 
+        boost::asio::io_context _ioContext;
         Database::SQSDatabase &_database = Database::SQSDatabase::instance();
-        SQSService _service;
+        SQSService _service{_ioContext};
     };
 
     BOOST_FIXTURE_TEST_CASE(QueueCreateTest, SQSServiceTest) {
@@ -70,25 +71,31 @@ namespace AwsMock::Service {
         request.owner = OWNER;
         request.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(request);
-        Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
+        Dto::SQS::ListQueuesRequest listQueuesRequest;
+        listQueuesRequest.region = REGION;
+        listQueuesRequest.maxResults = 100;
+        listQueuesRequest.nextToken = "";
 
         // act
         Dto::SQS::ListQueuesResponse response = _service.ListQueues(listQueuesRequest);
 
         // assert
-        BOOST_CHECK_EQUAL(response.queueList.empty(), false);
+        BOOST_CHECK_EQUAL(response.queueUrls.empty(), false);
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueListEmptyTest, SQSServiceTest) {
 
         // arrange
-        const Dto::SQS::ListQueuesRequest listQueuesRequest = {.region = REGION, .maxResults = 100, .nextToken = ""};
+        Dto::SQS::ListQueuesRequest listQueuesRequest;
+        listQueuesRequest.region = REGION;
+        listQueuesRequest.maxResults = 100;
+        listQueuesRequest.nextToken = "";
 
         // act
         const Dto::SQS::ListQueuesResponse response = _service.ListQueues(listQueuesRequest);
 
         // assert
-        BOOST_CHECK_EQUAL(response.queueList.empty(), true);
+        BOOST_CHECK_EQUAL(response.queueUrls.empty(), true);
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueNotExistenceTest, SQSServiceTest) {
@@ -153,11 +160,11 @@ namespace AwsMock::Service {
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
 
         // act
-        auto [queueArns] = _service.ListQueueArns();
+        Dto::SQS::ListQueueArnsResponse result = _service.ListQueueArns();
 
         // assert
-        BOOST_CHECK_EQUAL(1, queueArns.size());
-        BOOST_CHECK_EQUAL(queueArns.at(0), queueResponse.queueArn);
+        BOOST_CHECK_EQUAL(1, result.queueArns.size());
+        BOOST_CHECK_EQUAL(result.queueArns.at(0), queueResponse.queueArn);
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueListCountersTest, SQSServiceTest) {
@@ -174,15 +181,15 @@ namespace AwsMock::Service {
         sendMessageRequest.queueUrl = queueResponse.queueUrl;
         sendMessageRequest.body = BODY;
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
-        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest;
+        Dto::SQS::ListParameterCountersRequest listQueueCountersRequest;
         listQueueCountersRequest.region = REGION;
 
         // act
-        Dto::SQS::ListQueueCountersResponse response = _service.ListQueueCounters(listQueueCountersRequest);
+        Dto::SQS::ListParameterCountersResponse response = _service.ListQueueCounters(listQueueCountersRequest);
 
         // assert
         BOOST_CHECK_EQUAL(1, response.total);
-        BOOST_CHECK_EQUAL(1, response.queueCounters.at(0).available);
+        BOOST_CHECK_EQUAL(1, response.parameterCounters.at(0).available);
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueListTagsTest, SQSServiceTest) {
@@ -196,15 +203,17 @@ namespace AwsMock::Service {
         queueRequest.tags = inputTags;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        Dto::SQS::ListQueueTagsRequest listQueueTagsRequest = {.region = REGION, .queueUrl = queueResponse.queueUrl};
+        Dto::SQS::ListQueueTagsRequest listQueueTagsRequest;
+        listQueueTagsRequest.region = REGION;
+        listQueueTagsRequest.queueUrl = queueResponse.queueUrl;
 
         // act
-        auto [tags, total] = _service.ListQueueTags(listQueueTagsRequest);
+        Dto::SQS::ListQueueTagsResponse result = _service.ListQueueTags(listQueueTagsRequest);
 
         // assert
-        BOOST_CHECK_EQUAL(1, total);
-        BOOST_CHECK_EQUAL(1, tags.size());
-        BOOST_CHECK_EQUAL(tags["version"], "1.0");
+        BOOST_CHECK_EQUAL(1, result.total);
+        BOOST_CHECK_EQUAL(1, result.tags.size());
+        BOOST_CHECK_EQUAL(result.tags["version"], "1.0");
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueDeleteTest, SQSServiceTest) {
@@ -217,8 +226,13 @@ namespace AwsMock::Service {
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
 
-        std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
-        Dto::SQS::DeleteQueueRequest deleteRequest = {.region = REGION, .queueUrl = queueUrl};
+        Dto::SQS::GetQueueUrlRequest request;
+        request.region = REGION;
+        request.queueName = QUEUE;
+        std::string queueUrl = _service.GetQueueUrl(request).queueUrl;
+        Dto::SQS::DeleteQueueRequest deleteRequest;
+        deleteRequest.region = REGION;
+        deleteRequest.queueUrl = queueUrl;
         deleteRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         // act
@@ -239,7 +253,10 @@ namespace AwsMock::Service {
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _service.GetQueueUrl(getQueueUrlRequest).queueUrl;
 
         Dto::SQS::SendMessageRequest request;
         request.queueUrl = queueUrl;
@@ -268,7 +285,10 @@ namespace AwsMock::Service {
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
 
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _service.GetQueueUrl(getQueueUrlRequest).queueUrl;
 
         Dto::SQS::SendMessageRequest request1;
         request1.region = REGION;
@@ -306,7 +326,10 @@ namespace AwsMock::Service {
         queueRequest.owner = OWNER;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _service.GetQueueUrl(getQueueUrlRequest).queueUrl;
 
         Dto::SQS::SendMessageRequest msgRequest;
         msgRequest.region = REGION;
@@ -336,7 +359,10 @@ namespace AwsMock::Service {
         queueRequest.owner = OWNER;
         queueRequest.requestId = Core::StringUtils::CreateRandomUuid();
         Dto::SQS::CreateQueueResponse queueResponse = _service.CreateQueue(queueRequest);
-        std::string queueUrl = _service.GetQueueUrl({.region = REGION, .queueName = QUEUE}).queueUrl;
+        Dto::SQS::GetQueueUrlRequest getQueueUrlRequest;
+        getQueueUrlRequest.region = REGION;
+        getQueueUrlRequest.queueName = QUEUE;
+        std::string queueUrl = _service.GetQueueUrl(getQueueUrlRequest).queueUrl;
 
         Dto::SQS::SendMessageRequest msgRequest;
         msgRequest.region = REGION;

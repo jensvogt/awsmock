@@ -6,28 +6,45 @@
 
 namespace AwsMock::Service {
 
-    GatewayRouter::GatewayRouter() {
-
-        _routingTable = {
-                {"s3", std::make_shared<S3Handler>()},
-                {"s3api", std::make_shared<S3Handler>()},
-                {"sqs", std::make_shared<SQSHandler>()},
-                {"sns", std::make_shared<SNSHandler>()},
-                {"lambda", std::make_shared<LambdaHandler>()},
-                {"transfer", std::make_shared<TransferHandler>()},
-                {"cognito-idp", std::make_shared<CognitoHandler>()},
-                {"cognito-identity", std::make_shared<CognitoHandler>()},
-                {"secretsmanager", std::make_shared<SecretsManagerHandler>()},
-                {"kms", std::make_shared<KMSHandler>()},
-                {"ssm", std::make_shared<SSMHandler>()},
-                {"dynamodb", std::make_shared<DynamoDbHandler>()},
-                {"monitoring", std::make_shared<MonitoringHandler>()},
-                {"module", std::make_shared<ModuleHandler>()}};
-    }
-
-    std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey) {
-        if (_routingTable.contains(routingKey)) {
-            return _routingTable.at(routingKey);
+    std::shared_ptr<AbstractHandler> GatewayRouter::GetHandler(const std::string &routingKey, boost::asio::io_context &ioc) {
+        if (routingKey == "s3" || routingKey == "s3api") {
+            return std::make_shared<S3Handler>(ioc);
+        }
+        if (routingKey == "sqs") {
+            return std::make_shared<SQSHandler>(ioc);
+        }
+        if (routingKey == "sns") {
+            return std::make_shared<SNSHandler>(ioc);
+        }
+        if (routingKey == "lambda") {
+            return std::make_shared<LambdaHandler>(ioc);
+        }
+        if (routingKey == "transfer") {
+            return std::make_shared<TransferHandler>(ioc);
+        }
+        if (routingKey == "cognito-idp" || routingKey == "cognito-identity") {
+            return std::make_shared<CognitoHandler>(ioc);
+        }
+        if (routingKey == "secretsmanager") {
+            return std::make_shared<SecretsManagerHandler>(ioc);
+        }
+        if (routingKey == "kms") {
+            return std::make_shared<KMSHandler>(ioc);
+        }
+        if (routingKey == "ssm") {
+            return std::make_shared<SSMHandler>(ioc);
+        }
+        if (routingKey == "dynamodb" || routingKey == "dynamodbs") {
+            return std::make_shared<DynamoDbHandler>(ioc);
+        }
+        if (routingKey == "application") {
+            return std::make_shared<ApplicationHandler>(ioc);
+        }
+        if (routingKey == "monitoring") {
+            return std::make_shared<MonitoringHandler>(ioc);
+        }
+        if (routingKey == "module") {
+            return std::make_shared<ModuleHandler>(ioc);
         }
         log_error << "Routing table entry not found, routingKey: " << routingKey;
         return nullptr;

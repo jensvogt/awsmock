@@ -5,29 +5,12 @@
 #ifndef AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
 #define AWSMOCK_CORE_DTO_COPY_OBJECT_REQUEST_H
 
-// C++ standard includes
-#include <map>
-#include <string>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct CopyObjectRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
-
-        /**
-         * Region
-         */
-        std::string user;
+    struct CopyObjectRequest final : Common::BaseCounter<CopyObjectRequest> {
 
         /**
          * Source bucket
@@ -54,26 +37,33 @@ namespace AwsMock::Dto::S3 {
          */
         std::map<std::string, std::string> metadata;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend CopyObjectRequest tag_invoke(boost::json::value_to_tag<CopyObjectRequest>, boost::json::value const &v) {
+            CopyObjectRequest r;
+            r.sourceBucket = Core::Json::GetStringValue(v, "sourceBucket");
+            r.sourceKey = Core::Json::GetStringValue(v, "sourceKey");
+            r.targetBucket = Core::Json::GetStringValue(v, "targetBucket");
+            r.targetKey = Core::Json::GetStringValue(v, "targetKey");
+            r.sourceKey = Core::Json::GetStringValue(v, "sourceKey");
+            if (Core::Json::AttributeExists(v, "metadata")) {
+                r.metadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("metadata"));
+            }
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CopyObjectRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CopyObjectRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"sourceBucket", obj.sourceBucket},
+                    {"targetBucket", obj.targetBucket},
+                    {"targetKey", obj.targetKey},
+                    {"sourceKey", obj.sourceKey},
+                    {"metadata", boost::json::value_from(obj.metadata)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

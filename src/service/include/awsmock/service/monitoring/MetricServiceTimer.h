@@ -60,7 +60,10 @@ namespace AwsMock::Monitoring {
                 _metricService.SetGauge(_name, {}, {}, TIME_DIFF);
                 log_trace << "Timer deleted, name: " << _name;
             } else {
-                _metricService.SetGauge(_name, _labelName, _labelValue, TIME_DIFF);
+                const auto diff = TIME_DIFF;
+                if (_name == GATEWAY_HTTP_TIMER && _labelValue == "POST" && diff > 1000)
+                    return;
+                _metricService.SetGauge(_name, _labelName, _labelValue, diff);
                 log_trace << "Timer deleted, name: " << _name << " labelName: " << _labelName << " labelValue: " << _labelValue;
             }
         }

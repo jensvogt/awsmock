@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -85,7 +83,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateEventSourceMappingsResponse final : Common::BaseDto<CreateEventSourceMappingsResponse> {
+    struct CreateEventSourceMappingsResponse final : Common::BaseCounter<CreateEventSourceMappingsResponse> {
 
         /**
          * Name of the function
@@ -100,12 +98,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Batch size
          */
-        int batchSize;
+        long batchSize{};
 
         /**
          * Batch size
          */
-        int maximumBatchingWindowInSeconds;
+        long maximumBatchingWindowInSeconds{};
 
         /**
          * Enabled
@@ -117,19 +115,32 @@ namespace AwsMock::Dto::Lambda {
          */
         std::string uuid;
 
-        /**
-         * @brief Parse a JSON stream.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend CreateEventSourceMappingsResponse tag_invoke(boost::json::value_to_tag<CreateEventSourceMappingsResponse>, boost::json::value const &v) {
+            CreateEventSourceMappingsResponse r;
+            r.functionName = Core::Json::GetStringValue(v, "FunctionName");
+            r.eventSourceArn = Core::Json::GetStringValue(v, "EventSourceArn");
+            r.batchSize = Core::Json::GetLongValue(v, "BatchSize");
+            r.maximumBatchingWindowInSeconds = Core::Json::GetLongValue(v, "MaximumBatchingWindowInSeconds");
+            r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            r.uuid = Core::Json::GetStringValue(v, "UUID");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateEventSourceMappingsResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"FunctionName", obj.functionName},
+                    {"EventSourceArn", obj.eventSourceArn},
+                    {"BatchSize", obj.batchSize},
+                    {"MaximumBatchingWindowInSeconds", obj.maximumBatchingWindowInSeconds},
+                    {"Enabled", obj.enabled},
+                    {"UUID", obj.uuid},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

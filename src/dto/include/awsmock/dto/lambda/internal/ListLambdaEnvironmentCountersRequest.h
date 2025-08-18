@@ -19,6 +19,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief List Lambda environment counter request.
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaEnvironmentCountersRequest final : Common::BaseCounter<ListLambdaEnvironmentCountersRequest> {
 
         /**
@@ -34,12 +39,12 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Page size
          */
-        int pageSize{};
+        long pageSize{};
 
         /**
          * Page index
          */
-        int pageIndex{};
+        long pageIndex{};
 
         /**
          * Sort column

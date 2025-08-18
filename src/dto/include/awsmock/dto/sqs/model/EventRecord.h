@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/sqs/model/EventMessageAttribute.h>
 #include <awsmock/dto/sqs/model/MessageAttribute.h>
 
 namespace AwsMock::Dto::SQS {
@@ -21,11 +22,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Record {
-        /**
-         * Region
-         */
-        std::string region;
+    struct EventRecord final : Common::BaseCounter<EventRecord> {
 
         /**
          * Message ID
@@ -43,16 +40,6 @@ namespace AwsMock::Dto::SQS {
         std::string body;
 
         /**
-         * System attributes
-         */
-        std::map<std::string, std::string> attributes;
-
-        /**
-         * Message attributes
-         */
-        MessageAttributeList messageAttributes;
-
-        /**
          * MD5 sum
          */
         std::string md5Sum;
@@ -68,39 +55,46 @@ namespace AwsMock::Dto::SQS {
         std::string eventSourceArn;
 
         /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
+         * System attributes
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        std::map<std::string, std::string> attributes;
 
         /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @param document DTO as BSON document
+         * Message attributes
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        std::map<std::string, EventMessageAttribute> messageAttributes;
 
-        /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend EventRecord tag_invoke(boost::json::value_to_tag<EventRecord>, boost::json::value const &v) {
+            EventRecord r;
+            r.messageId = Core::Json::GetStringValue(v, "messageId");
+            r.receiptHandle = Core::Json::GetStringValue(v, "receiptHandle");
+            r.body = Core::Json::GetStringValue(v, "body");
+            r.md5Sum = Core::Json::GetStringValue(v, "md5Sum");
+            r.eventSource = Core::Json::GetStringValue(v, "eventSource");
+            r.eventSourceArn = Core::Json::GetStringValue(v, "eventSourceArn");
+            if (Core::Json::AttributeExists(v, "attributes")) {
+                r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
+            }
+            if (Core::Json::AttributeExists(v, "messageAttributes")) {
+                r.messageAttributes = boost::json::value_to<std::map<std::string, EventMessageAttribute>>(v.at("messageAttributes"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Record &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventRecord const &obj) {
+            jv = {
+                    {"messageId", obj.messageId},
+                    {"receiptHandle", obj.receiptHandle},
+                    {"body", obj.body},
+                    {"md5Sum", obj.md5Sum},
+                    {"eventSource", obj.eventSource},
+                    {"eventSourceArn", obj.eventSourceArn},
+                    {"attributes", boost::json::value_from(obj.attributes)},
+                    {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
+            };
+        }
     };
 }// namespace AwsMock::Dto::SQS
 

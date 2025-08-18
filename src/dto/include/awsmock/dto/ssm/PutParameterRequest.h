@@ -10,18 +10,18 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/ssm/model/ParameterType.h>
 
 namespace AwsMock::Dto::SSM {
 
-    struct PutParameterRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    /**
+     * @brief Put parameter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct PutParameterRequest final : Common::BaseCounter<PutParameterRequest> {
 
         /**
          * Parameter name
@@ -41,7 +41,7 @@ namespace AwsMock::Dto::SSM {
         /**
          * Parameter type
          */
-        ParameterType type;
+        ParameterType type = ParameterType::string;
 
         /**
          * KMS key ID
@@ -58,38 +58,34 @@ namespace AwsMock::Dto::SSM {
          */
         std::map<std::string, std::string> tags;
 
-        /**
-         * AWS request ID
-         */
-        std::string requestId;
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend PutParameterRequest tag_invoke(boost::json::value_to_tag<PutParameterRequest>, boost::json::value const &v) {
+            PutParameterRequest r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.parameterValue = Core::Json::GetStringValue(v, "Value");
+            r.description = Core::Json::GetStringValue(v, "Description");
+            r.type = ParameterTypeFromString(Core::Json::GetStringValue(v, "Type"));
+            r.keyId = Core::Json::GetStringValue(v, "KeyId");
+            r.tier = Core::Json::GetStringValue(v, "Tier");
+            r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tier"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the JSON string to DTO.
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PutParameterRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutParameterRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"Name", obj.name},
+                    {"Value", obj.parameterValue},
+                    {"Description", obj.description},
+                    {"Type", ParameterTypeToString(obj.type)},
+                    {"KeyId", obj.keyId},
+                    {"Tier", obj.tier},
+                    {"Tags", boost::json::value_from(obj.tags)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SSM

@@ -9,18 +9,16 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct DeleteBucketRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    /**
+     * @brief Delete bucket request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct DeleteBucketRequest final : Common::BaseCounter<DeleteBucketRequest> {
 
         /**
          * Region
@@ -32,26 +30,20 @@ namespace AwsMock::Dto::S3 {
          */
         std::string bucket;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const DeleteBucketRequest &r);
+        friend DeleteBucketRequest tag_invoke(boost::json::value_to_tag<DeleteBucketRequest>, boost::json::value const &v) {
+            DeleteBucketRequest r;
+            r.bucket = Core::Json::GetStringValue(v, "Bucket");
+            r.owner = Core::Json::GetStringValue(v, "Owner");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DeleteBucketRequest const &obj) {
+            jv = {
+                    {"Bucket", obj.bucket},
+                    {"Owner", obj.owner},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

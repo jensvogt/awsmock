@@ -10,8 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/NotFoundException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/DynamoDbClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbService.h>
@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit DynamoDbHandler() : AbstractHandler("dynamodb-handler") {}
+        explicit DynamoDbHandler(boost::asio::io_context &ioc) : AbstractHandler("dynamodb-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
         /**
          * DynamoDB service
          */
-        Service::DynamoDbService _dynamoDbService;
+        DynamoDbService _dynamoDbService;
     };
 
 }// namespace AwsMock::Service

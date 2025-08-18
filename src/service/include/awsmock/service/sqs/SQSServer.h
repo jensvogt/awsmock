@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_SQS_SERVER_H
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SQSDatabase.h>
@@ -61,6 +61,15 @@ namespace AwsMock::Service {
          * @brief Sets the DLQ flags
          */
         void SetDlq() const;
+
+        /**
+         * @brief Resets the queue URL.
+         *
+         * @par
+         * SQS queue URLs have the hostname in the name. In order to make the full.json copyable between hosts the URLs
+         * have to adjusted to the new hostname.
+         */
+        void SetUrl() const;
 
         /**
          * @brief Backup the SQS queues and messages

@@ -16,9 +16,10 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/memorydb/DynamoDbMemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
@@ -91,6 +92,16 @@ namespace AwsMock::Database {
          * @return created or updated DynamoDb table.
          */
         Entity::DynamoDb::Table CreateOrUpdateTable(Entity::DynamoDb::Table &table) const;
+
+        /**
+         * @brief Update table counters
+         *
+         * @param tableArn table ARN
+         * @param items number of items
+         * @param size table size
+         * @throws DatabaseException
+         */
+        void UpdateTableCounter(const std::string &tableArn, long items, long size) const;
 
         /**
          * @brief Returns a table entity by primary key
@@ -276,6 +287,11 @@ namespace AwsMock::Database {
          * @brief Item collection name
          */
         std::string _itemCollectionName;
+
+        /**
+         * @brief AWS account ID
+         */
+        std::string _accountId;
 
         /**
          * @brief DynamoDB in-memory database

@@ -6,17 +6,12 @@
 
 namespace AwsMock::Dto::Docker {
 
-    // Port::Port(const view_or_value<view, value> &object) {
-    //     FromDocument(object);
-    // }
-
     void Port::FromDocument(const view_or_value<view, value> &object) {
 
         try {
 
-            privatePort = Core::Bson::BsonUtils::GetIntValue(object, "PrivatePort");
-            publicPort = Core::Bson::BsonUtils::GetIntValue(object, "PublicPort");
-            type = Core::Bson::BsonUtils::GetStringValue(object, "type");
+            hostIp = Core::Bson::BsonUtils::GetStringValue(object, "HostIp");
+            hostPort = Core::Bson::BsonUtils::GetIntValue(object, "HostPort");
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
@@ -29,9 +24,8 @@ namespace AwsMock::Dto::Docker {
         try {
 
             document document;
-            Core::Bson::BsonUtils::SetIntValue(document, "privatePort", privatePort);
-            Core::Bson::BsonUtils::SetIntValue(document, "publicPort", publicPort);
-            Core::Bson::BsonUtils::SetStringValue(document, "type", type);
+            Core::Bson::BsonUtils::SetIntValue(document, "HostPort", hostPort);
+            Core::Bson::BsonUtils::SetStringValue(document, "HostIp", hostIp);
             return Core::Bson::BsonUtils::ToJsonString(document);
 
         } catch (bsoncxx::exception &exc) {

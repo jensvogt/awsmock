@@ -6,11 +6,6 @@
 
 namespace AwsMock::Manager {
 
-    void CreateIndexes() {
-        Database::ModuleDatabase::instance().CreateIndexes();
-        log_debug << "Database indexes created";
-    }
-
     void Manager::Initialize() const {
 
         InitializeDatabase();
@@ -30,8 +25,9 @@ namespace AwsMock::Manager {
             _pool.Configure();
 
             // Create database indexes in a background thread
-            boost::thread t{CreateIndexes};
-            t.detach();
+            boost::asio::post(_ioc, [] {
+                Database::ModuleDatabase::instance().CreateIndexes();
+            });
 
         } else {
             log_info << "In-memory database initialized";
@@ -39,29 +35,33 @@ namespace AwsMock::Manager {
     }
 
     void Manager::AutoLoad() {
-        if (Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
-            if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
-                for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
-                    if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
-                        Dto::Module::Infrastructure infrastructure;
-                        infrastructure.FromJson(jsonString);
-                        Dto::Module::ImportInfrastructureRequest importRequest;
-                        importRequest.cleanFirst = false;
-                        importRequest.infrastructure = infrastructure;
-                        Service::ModuleService::ImportInfrastructure(importRequest);
-                        log_info << "Loaded infrastructure, filename: " << file;
-                    }
-                }
-            } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
-                if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
+
+        // Check active flag
+        if (!Core::Configuration::instance().GetValue<bool>("awsmock.autoload.active")) {
+            return;
+        }
+
+        if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
+            for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
+                if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
                     Dto::Module::Infrastructure infrastructure;
                     infrastructure.FromJson(jsonString);
                     Dto::Module::ImportInfrastructureRequest importRequest;
                     importRequest.cleanFirst = false;
                     importRequest.infrastructure = infrastructure;
                     Service::ModuleService::ImportInfrastructure(importRequest);
-                    log_info << "Loaded infrastructure, filename: " << autoLoadFile;
+                    log_info << "Loaded infrastructure, filename: " << file;
                 }
+            }
+        } else if (const auto autoLoadFile = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.file"); Core::FileUtils::FileExists(autoLoadFile)) {
+            if (const std::string jsonString = Core::FileUtils::ReadFile(autoLoadFile); !jsonString.empty()) {
+                Dto::Module::Infrastructure infrastructure;
+                infrastructure.FromJson(jsonString);
+                Dto::Module::ImportInfrastructureRequest importRequest;
+                importRequest.cleanFirst = false;
+                importRequest.infrastructure = infrastructure;
+                Service::ModuleService::ImportInfrastructure(importRequest);
+                log_info << "Loaded infrastructure, filename: " << autoLoadFile;
             }
         }
         log_info << "Autoload finished";
@@ -135,13 +135,11 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
-        boost::asio::io_context _ios;
-        WorkGuardManager guard(_ios);
-
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
-        Core::Scheduler scheduler(_ios);
+        // Initialize monitoring
+        Core::Scheduler scheduler(_ioc);
         const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
 
@@ -149,12 +147,15 @@ namespace AwsMock::Manager {
         LoadModulesFromConfiguration();
         log_info << "Module configuration loaded";
 
+        // Autoload the init file before modules start
+        AutoLoad();
+
         Service::ModuleMap moduleMap = Service::ModuleMap::instance();
         const Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
         for (const Database::Entity::Module::ModuleList modules = moduleDatabase.ListModules(); const auto &module: modules) {
             log_debug << "Initializing module, name: " << module.name;
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(_ios));
+                moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
             } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -162,9 +163,9 @@ namespace AwsMock::Manager {
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
             } else if (module.name == "lambda" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler));
+                moduleMap.AddModule(module.name, std::make_shared<Service::LambdaServer>(scheduler, _ioc));
             } else if (module.name == "transfer" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler));
+                moduleMap.AddModule(module.name, std::make_shared<Service::TransferServer>(scheduler, _ioc));
             } else if (module.name == "cognito" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::CognitoServer>(scheduler));
             } else if (module.name == "dynamodb" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
@@ -175,34 +176,39 @@ namespace AwsMock::Manager {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SSMServer>(scheduler));
             } else if (module.name == "secretsmanager" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
+            } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                moduleMap.AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
             }
         }
         log_info << "Module started, count: " << moduleMap.GetSize();
 
-        // Auto load init file
-        AutoLoad();
-
         // Start listener threads
-        const int numProcs = Core::SystemUtils::GetNumberOfCores();
-        for (auto i = 0; i < numProcs; i++) {
-            _threadGroup.create_thread([&_ios] { return _ios.run(); });
+        const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");
+        for (auto i = 0; i < maxThreads; i++) {
+            _threadGroup.create_thread([this] { return _ioc.run(); });
         }
+        log_info << "Gateway starting, threads: " << maxThreads;
 
         // Capture SIGINT and SIGTERM to perform a clean shutdown
-        boost::asio::signal_set signals(_ios, SIGINT, SIGTERM);
-        signals.async_wait([&](beast::error_code const &, int) {
+        boost::asio::signal_set signals(_ioc, SIGINT, SIGTERM);
+        signals.async_wait([&](beast::error_code const &ec, const int signal) {
             // Stop the `io_context`. This will cause `run()` to return immediately,
             // eventually destroying the `io_context` and all the sockets in it.
-            log_info << "Backend stopping on signal";
-            StopModules(moduleMap);
-            _ios.stop();
-            log_info << "Backend IO context stopped";
-            log_info << "So long, and thanks for all the fish!";
+            if (!ec) {
+                log_info << "Backend stopping on signal: " << signal;
+                StopModules(moduleMap);
+                log_info << "Backend modules stopped";
+                _ioc.stop();
+                log_info << "Backend IO context stopped";
+                log_info << "So long, and thanks for all the fish!";
+                exit(0);
+            }
         });
         log_info << "Manager signal handler installed";
+        log_info << "Manager initialized and started";
 
         // Start IO context
-        _ios.run();
+        _ioc.run();
     }
 
 }// namespace AwsMock::Manager

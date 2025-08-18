@@ -8,20 +8,18 @@
 // C++ standard includes
 #include <string>
 
-// Boost includes
-#include <boost/thread/thread.hpp>
-
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/PagingUtils.h>
+#include <awsmock/core/Semaphore.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/TarUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/lambda/AccountSettingsResponse.h>
 #include <awsmock/dto/lambda/CreateEventSourceMappingsRequest.h>
@@ -45,6 +43,10 @@
 #include <awsmock/dto/lambda/internal/DeleteLambdaResultCounterRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteLambdaResultCountersRequest.h>
 #include <awsmock/dto/lambda/internal/DeleteTagRequest.h>
+#include <awsmock/dto/lambda/internal/DisableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
+#include <awsmock/dto/lambda/internal/EnableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/EnableLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersRequest.h>
 #include <awsmock/dto/lambda/internal/GetFunctionCountersResponse.h>
 #include <awsmock/dto/lambda/internal/GetLambdaResultCounterRequest.h>
@@ -63,14 +65,16 @@
 #include <awsmock/dto/lambda/internal/ListLambdaTagCountersRequest.h>
 #include <awsmock/dto/lambda/internal/ListLambdaTagCountersResponse.h>
 #include <awsmock/dto/lambda/internal/ResetFunctionCountersRequest.h>
-#include <awsmock/dto/lambda/internal/StartFunctionRequest.h>
-#include <awsmock/dto/lambda/internal/StopFunctionRequest.h>
+#include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/StopLambdaInstanceRequest.h>
+#include <awsmock/dto/lambda/internal/StopLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionEnvironmentRequest.h>
 #include <awsmock/dto/lambda/internal/UpdateFunctionTagRequest.h>
+#include <awsmock/dto/lambda/internal/UpdateLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/UploadFunctionCodeRequest.h>
 #include <awsmock/dto/lambda/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/Function.h>
+#include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/sqs/model/EventNotification.h>
@@ -86,8 +90,6 @@
 #define MAX_OUTPUT_LENGTH (4 * 1024)
 
 namespace AwsMock::Service {
-
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda service module. Handles all lambda related requests:
@@ -120,8 +122,10 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param ioc boost asio IO context
          */
-        explicit LambdaService() : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()) {};
+        explicit LambdaService(boost::asio::io_context &ioc) : _lambdaDatabase(Database::LambdaDatabase::instance()), _s3Database(Database::S3Database::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _snsDatabase(Database::SNSDatabase::instance()), _ioc(ioc) {}
 
         /**
          * @brief Create lambda function
@@ -190,6 +194,14 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Lambda::ListLambdaEventSourceCountersResponse ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const;
 
         /**
+         * @brief Update a lambda function
+         *
+         * @param request update lambda request
+         * @see Dto::Lambda::UpdateLambdaRequest
+         */
+        void UpdateLambda(const Dto::Lambda::UpdateLambdaRequest &request) const;
+
+        /**
          * @brief Add a lambda environment variable
          *
          * @param request add lambda environment variable request
@@ -200,7 +212,7 @@ namespace AwsMock::Service {
         /**
          * @brief Update a lambda environment variable
          *
-         * @param request update lambda environment variablerequest
+         * @param request update lambda environment variable request
          * @see Dto::Lambda::UpdateFunctionEnvironmentRequest
          */
         void UpdateLambdaEnvironment(const Dto::Lambda::UpdateFunctionEnvironmentRequest &request) const;
@@ -246,6 +258,38 @@ namespace AwsMock::Service {
         void UpdateLambdaTag(const Dto::Lambda::UpdateFunctionTagRequest &request) const;
 
         /**
+         * @brief Enable an lambda
+         *
+         * @param request enable lambda request
+         * @see Dto::Apps::EnableLambdaRequest
+         */
+        void EnableLambda(const Dto::Lambda::EnableLambdaRequest &request) const;
+
+        /**
+         * @brief Enable all lambdas
+         *
+         * @param request enable sll lambdas request
+         * @see Dto::Apps::EnableAllLambdaRequest
+         */
+        void EnableAllLambdas(const Dto::Lambda::EnableAllLambdasRequest &request) const;
+
+        /**
+         * @brief Disable an lambda
+         *
+         * @param request disable lambda request
+         * @see Dto::Apps::DisableLambdaRequest
+         */
+        void DisableLambda(const Dto::Lambda::DisableLambdaRequest &request) const;
+
+        /**
+         * @brief Disable all lambdas
+         *
+         * @param request disable sll lambdas request
+         * @see Dto::Apps::DisableAllLambdaRequest
+         */
+        void DisableAllLambdas(const Dto::Lambda::DisableAllLambdasRequest &request) const;
+
+        /**
          * @brief Delete a lambda tags
          *
          * @param request delete lambda tags request
@@ -261,10 +305,10 @@ namespace AwsMock::Service {
          * @param region AWS region
          * @param functionName lambda function name
          * @param payload SQS message
-         * @param receiptHandle receipt handle of the message which triggered the lambda
-         * @param detached detached thread
+         * @param invocationType invocation type synchronous/asynchronous
+         * @return lambda result in case of synchronous invocation, otherwise empty struct
          */
-        void InvokeLambdaFunction(const std::string &region, const std::string &functionName, const std::string &payload, const std::string &receiptHandle = {}, bool detached = true) const;
+        [[nodiscard]] Dto::Lambda::LambdaResult InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const;
 
         /**
          * @brief Create a new tag for a lambda function.
@@ -413,7 +457,14 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::StartFunctionRequest
          */
-        void StartFunction(const Dto::Lambda::StartFunctionRequest &request) const;
+        void StartLambda(const Dto::Lambda::StartLambdaRequest &request) const;
+
+        /**
+         * @brief Starts all lambda functions
+         *
+         * @throws Core::ServiceException
+         */
+        void StartAllLambdas() const;
 
         /**
          * @brief Stops the lambda function by stopping all running docker containers
@@ -422,7 +473,14 @@ namespace AwsMock::Service {
          * @throws Core::ServiceException
          * @see Dto::Lambda::StopFunctionRequest
          */
-        void StopFunction(const Dto::Lambda::StopFunctionRequest &request) const;
+        void StopLambda(const Dto::Lambda::StopLambdaRequest &request) const;
+
+        /**
+         * @brief Stops all lambda functions
+         *
+         * @throws Core::ServiceException
+         */
+        void StopAllLambdas() const;
 
         /**
          * @brief Stops the lambda instance
@@ -466,26 +524,18 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * @brief Invoke the lambda function synchronously.
+         * @brief Tries to find an idle lambda function instance
          *
-         * The output will be returned to the calling method.
-         *
-         * @param host lambda docker container host
-         * @param port lambda docker container port
-         * @param payload payload for the function
-         * @param oid lambda OID
-         * @param instanceId instance ID
-         * @return output from lambda invocation call
-         */
-        static std::string InvokeLambdaSynchronously(const std::string &host, int port, const std::string &payload, const std::string &oid, const std::string &instanceId);
-
-        /**
-         * @brief Tries to find an idle instance
+         * @par
+         * Tries to find an idle instance. If no instance is found and the current total number of lambda instances is below the
+         * concurrency limit, a new instance will be created, otherwise it will wait for an idle instance in a loop with 1 sec.
+         * Period time.
          *
          * @param lambda lambda entity to check
-         * @return containerId of the idle instance
+         * @param instance
+         * @return lambda instance
          */
-        static std::string FindIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+        void FindIdleInstance(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance) const;
 
         /**
          * @brief Stops all running instances and deleted any existing containers and images.
@@ -495,34 +545,6 @@ namespace AwsMock::Service {
         static void CleanupDocker(Database::Entity::Lambda::Lambda &lambda);
 
         /**
-         * @brief Returns the host name, to where we send lambda invocation notifications
-         *
-         * @par
-         * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
-         * host machine, the hostname to which we need to send the invocation notification differs. For a host manager we need
-         * to use 'localhost', for a dockerized manager we need to use the container name.
-         *
-         * @param instance lambda instance to check
-         * @return containerId of the idle instance
-         * @see Database::Entity::Lambda::Instance
-         */
-        static std::string GetHostname(Database::Entity::Lambda::Instance &instance);
-
-        /**
-         * @brief Returns the lambda port, to where we send lambda invocation notifications
-         *
-         * @par
-         * Depending on whether the lambda function is invoked from a dockerized AwsMock manager or a manager running on the
-         * host machine, the port to which we need to send the invocation notification differs. For a host manager we need
-         * to use the container exposed port, for a dockerized manager we need to use the container internal port, i.e. 8080.
-         *
-         * @param instance lambda instance to check
-         * @return containerId of the idle instance
-         * @see Database::Entity::Lambda::Instance
-         */
-        static int GetContainerPort(const Database::Entity::Lambda::Instance &instance);
-
-        /**
          * @brief Waits in a  loop for an idle lambda instance
          *
          * @par
@@ -530,9 +552,10 @@ namespace AwsMock::Service {
          * time is limited by the total timeout period of the lambda (i.e. 900sec.)
          *
          * @param lambda lambda entity to check
+         * @return idle instance
          * @see Database::Entity::Lambda::Lambda
          */
-        static void WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda);
+        Database::Entity::Lambda::Instance WaitForIdleInstance(Database::Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Returns the full path to the base64 encoded lambda function code.
@@ -558,6 +581,14 @@ namespace AwsMock::Service {
         void CreateResourceNotification(const Dto::Lambda::AddEventSourceRequest &request) const;
 
         /**
+         * @brief Writes the base64 ZIP file coming from the frontend to the local lambda data dir.
+         *
+         * @param base64File name of the file
+         * @param content base64 encoded content
+         */
+        static void WriteBase64File(const std::string &base64File, const std::string &content);
+
+        /**
          * Lambda database connection
          */
         Database::LambdaDatabase &_lambdaDatabase;
@@ -578,9 +609,19 @@ namespace AwsMock::Service {
         Database::SNSDatabase &_snsDatabase;
 
         /**
-         * Mutex
+         * Boost IO context
          */
-        static boost::mutex _mutex;
+        boost::asio::io_context &_ioc;
+
+        /**
+         * Lambda executor
+         */
+        LambdaExecutor lambdaExecutor;
+
+        /**
+         * Function mutexes
+         */
+        static std::map<std::string, std::shared_ptr<boost::mutex>> _instanceMutex;
     };
 
 }// namespace AwsMock::Service

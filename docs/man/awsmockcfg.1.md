@@ -78,7 +78,7 @@ awsmock.gateway.http.host                         AWSMOCK_MODULES_GATEWAY_HOST  
 awsmock.gateway.http.address                      AWSMOCK_MODULES_GATEWAY_ADDRESS                   listener IP address, default: 0.0.0.0
 awsmock.gateway.http.port                         AWSMOCK_MODULES_GATEWAY_PORT                      port, default: 4566
 awsmock.gateway.http.max-queue                    AWSMOCK_MODULES_GATEWAY_MAX_QUEUE                 maximal queue length, default: 250
-awsmock.gateway.http.max-threads                  AWSMOCK_MODULES_GATEWAY_MAX_THREADS               maximal threads, default: 50
+awsmock.gateway.http.max-thread                   AWSMOCK_MODULES_GATEWAY_MAX_THREAD                maximal threads, default: 256
 awsmock.gateway.http.max-body                     AWSMOCK_MODULES_GATEWAY_MAX_BODY                  maximal request body size in bytes, default: 104857600
 awsmock.gateway.timeout                           AWSMOCK_MODULES_GATEWAY_TIMEOUT                   HTTP request timeout in seconds, default: 900
 ```
@@ -165,6 +165,16 @@ awsmock.modules.ssm.backup.active                 AWSMOCK_MODULES_SSM_BACKUP_ACT
 awsmock.modules.ssm.backup.cron                   AWSMOCK_MODULES_SSM_BACKUP_CRON                   backup cron expression, default: 0 0 0 * * ?
 awsmock.modules.ssm.monitoring.period             AWSMOCK_MODULES_SSM_PERIOD                        monitoring polling period in seconds, default: 300
 awsmock.modules.ssm.remove.period                 AWSMOCK_MODULES_SSM_REMOVE_PERIOD                 parameter removal period in seconds, default: 300 
+```
+
+### Application module variables
+
+```
+awsmock.modules.application.active                AWSMOCK_MODULES_APPLICATION_ACTIVE               module activation, default: true
+awsmock.modules.application.backup.active         AWSMOCK_MODULES_APPLICATION_BACKUP_ACTIVE        backup activation flag, default: true
+awsmock.modules.application.backup.cron           AWSMOCK_MODULES_APPLICATION_BACKUP_CRON          backup cron expression, default: 0 0 0 * * ?
+awsmock.modules.application.monitoring.period     AWSMOCK_MODULES_APPLICATION_PERIOD               monitoring polling period in seconds, default: 300
+awsmock.modules.application.remove.period         AWSMOCK_MODULES_APPLICATION_REMOVE_PERIOD        parameter removal period in seconds, default: 300 
 ```
 
 ### Secrets Manager module variables
@@ -279,6 +289,8 @@ awsmock.mongodb.pool-size                         AWSMOCK_MONGODB_POOL_SIZE     
 ### Logging variables
 
 ```
+awsmock.logging.console-active                    AWSMOCK_LOG_CONSOLE_ACTIVE                        console appender activation flag
+awsmock.logging.file-active                       AWSMOCK_LOG_FILE_ACTIVE                           file appender activation flag
 awsmock.logging.level                             AWSMOCK_LOG_LEVEL                                 logging level, default: info, valid: trace, debug, info, warning, error, fatal
 awsmock.logging.dir                               AWSMOCK_LOG_DIR                                   logging file directory, default: /usr/local/awsmock/log
 awsmock.logging.prefix                            AWSMOCK_LOG_PREFIX                                prefix for the log files, default: awsmock

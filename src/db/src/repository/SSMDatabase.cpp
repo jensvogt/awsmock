@@ -86,20 +86,39 @@ namespace AwsMock::Database {
         return _memoryDb.GetParameterByName(name);
     }
 
-    Entity::SSM::ParameterList SSMDatabase::ListParameters(const std::string &region) const {
+    Entity::SSM::ParameterList SSMDatabase::ListParameters(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
 
-            bsoncxx::builder::basic::document query;
+            mongocxx::options::find opts;
+            if (pageSize > 0) {
+                opts.limit(pageSize);
+                if (pageIndex > 0) {
+                    opts.skip(pageSize * pageIndex);
+                }
+            }
+            opts.sort(make_document(kvp("_id", 1)));
+            if (!sortColumns.empty()) {
+                bsoncxx::builder::basic::document sort;
+                for (const auto &[column, sortDirection]: sortColumns) {
+                    sort.append(kvp(column, sortDirection));
+                }
+                opts.sort(sort.extract());
+            }
+
+            bsoncxx::builder::basic::document query = {};
+            if (!prefix.empty()) {
+                query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+            }
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }
 
             Entity::SSM::ParameterList parameterList;
-            for (auto parameterCursor = _parameterCollection.find(query.extract()); const auto &parameter: parameterCursor) {
+            for (auto parameterCursor = _parameterCollection.find(query.extract(), opts); const auto &parameter: parameterCursor) {
                 Entity::SSM::Parameter result;
                 result.FromDocument(parameter);
                 parameterList.push_back(result);
@@ -110,7 +129,7 @@ namespace AwsMock::Database {
         return _memoryDb.ListParameters(region);
     }
 
-    long SSMDatabase::CountParameters() const {
+    long SSMDatabase::CountParameters(const std::string &region, const std::string &prefix) const {
 
         if (HasDatabase()) {
 
@@ -118,7 +137,15 @@ namespace AwsMock::Database {
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
 
-                const long count = _parameterCollection.count_documents(make_document());
+                bsoncxx::builder::basic::document query = {};
+                if (!prefix.empty()) {
+                    query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                }
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+
+                const long count = _parameterCollection.count_documents(query.extract());
                 log_trace << "Parameter count: " << count;
                 return count;
 
@@ -135,6 +162,7 @@ namespace AwsMock::Database {
 
     Entity::SSM::Parameter SSMDatabase::CreateParameter(Entity::SSM::Parameter &parameter) const {
 
+        parameter.created = system_clock::now();
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -162,6 +190,7 @@ namespace AwsMock::Database {
 
     Entity::SSM::Parameter SSMDatabase::UpdateParameter(Entity::SSM::Parameter &parameter) const {
 
+        parameter.modified = system_clock::now();
         if (HasDatabase()) {
 
             mongocxx::options::find_one_and_update opts{};

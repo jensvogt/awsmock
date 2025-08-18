@@ -10,7 +10,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -212,6 +212,16 @@ namespace AwsMock::Dto::Lambda {
         long averageRuntime{};
 
         /**
+         * Enabled
+         */
+        bool enabled;
+
+        /**
+         * Status
+         */
+        std::string state;
+
+        /**
          * Environment
          */
         std::map<std::string, std::string> environment;
@@ -261,6 +271,8 @@ namespace AwsMock::Dto::Lambda {
             r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
             r.averageRuntime = Core::Json::GetLongValue(v, "averageRuntime");
+            r.enabled = Core::Json::GetBoolValue(v, "enabled");
+            r.state = Core::Json::GetStringValue(v, "state");
             r.environment = boost::json::value_to<std::map<std::string, std::string>>(v.at("environment"));
             r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
             r.lastInvocation = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastInvocation"));
@@ -290,6 +302,8 @@ namespace AwsMock::Dto::Lambda {
                     {"instances", obj.instances},
                     {"invocations", obj.invocations},
                     {"averageRuntime", obj.averageRuntime},
+                    {"enabled", obj.enabled},
+                    {"state", obj.state},
                     {"environment", boost::json::value_from(obj.environment)},
                     {"tags", boost::json::value_from(obj.tags)},
                     {"lastInvocation", Core::DateTimeUtils::ToISO8601(obj.lastInvocation)},

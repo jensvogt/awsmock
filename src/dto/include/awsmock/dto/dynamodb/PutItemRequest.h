@@ -11,9 +11,10 @@
 
 // AwsMock includes
 #include "model/ReturnConsumedCapacity.h"
+#include "model/ReturnItemCollectionMetrics.h"
 
 
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/dynamodb/model/AttributeValue.h>
 #include <awsmock/dto/dynamodb/model/ReturnValues.h>
@@ -78,7 +79,16 @@ namespace AwsMock::Dto::DynamoDb {
          * Determines the level of detail about either provisioned or on-demand throughput consumption that is returned in
          * the response: INDEXES | TOTAL | NONE
          */
-        ReturnConsumedCapacityType returnConsumedCapacity = ReturnConsumedCapacityType::NONE;
+        ReturnConsumedCapacityType returnConsumedCapacity = ReturnConsumedCapacityType::TOTAL;
+
+        /**
+         * Return item collection metrics.
+         *
+         * @par
+         * Determines whether item collection metrics are returned. If set to SIZE, the response includes statistics about item collections,
+         * if any, that were modified during the operation are returned in the response. If set to NONE (the default), no statistics are returned.
+         */
+        ReturnItemCollectionMetricsType returnItemCollectionMetrics = ReturnItemCollectionMetricsType::SIZE;
 
         /**
          * Return values
@@ -87,7 +97,7 @@ namespace AwsMock::Dto::DynamoDb {
          * Use ReturnValues if you want to get the item attributes as they appeared before they were updated with the
          * PutItem request. For PutItem, the valid values are: NONE | ALL_OLD.
          */
-        ReturnValuesType returnValues = ReturnValuesType::NONE;
+        ReturnValuesType returnValues = ReturnValuesType::ALL_OLD;
 
         /**
          * Original HTTP request body.
@@ -113,6 +123,7 @@ namespace AwsMock::Dto::DynamoDb {
             r.conditionalExpression = Core::Json::GetStringValue(v, "ConditionalExpression");
             r.returnValues = ReturnValuesTypeFromString(Core::Json::GetStringValue(v, "ReturnValues"));
             r.returnConsumedCapacity = ReturnConsumedCapacityTypeFromString(Core::Json::GetStringValue(v, "ReturnConsumedCapacity"));
+            r.returnItemCollectionMetrics = ReturnItemCollectionMetricsFromString(Core::Json::GetStringValue(v, "ReturnItemCollectionMetrics"));
 
             if (Core::Json::AttributeExists(v, "Item")) {
                 for (auto &attribute: v.at("Item").as_object()) {
@@ -125,8 +136,10 @@ namespace AwsMock::Dto::DynamoDb {
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutItemRequest const &obj) {
             jv = {
                     {"TableName", obj.tableName},
+                    {"ConditionalExpression", obj.conditionalExpression},
                     {"ReturnValues", ReturnValuesTypeToString(obj.returnValues)},
                     {"ReturnConsumedCapacity", ReturnConsumedCapacityTypeToString(obj.returnConsumedCapacity)},
+                    {"ReturnItemCollectionMetrics", ReturnItemCollectionMetricsToString(obj.returnItemCollectionMetrics)},
                     {"Item", boost::json::value_from(obj.attributes)},
             };
         }

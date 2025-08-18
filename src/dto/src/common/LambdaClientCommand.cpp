@@ -6,15 +6,12 @@
 
 namespace AwsMock::Dto::Common {
 
-    void LambdaClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &awsUser) {
-
-        UserAgent userAgent;
-        userAgent.FromRequest(request);
+    void LambdaClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &awsRegion, const std::string &user) {
 
         // Basic values
         this->method = request.method();
         this->region = awsRegion;
-        this->user = awsUser;
+        this->user = user;
         this->url = request.target();
         this->contentType = Core::HttpUtils::GetContentType(request);
         this->contentLength = Core::HttpUtils::GetContentLength(request);
@@ -22,13 +19,23 @@ namespace AwsMock::Dto::Common {
         this->headers = Core::HttpUtils::GetHeaders(request);
         this->requestId = Core::HttpUtils::GetHeaderValue(request, "RequestId", Core::AwsUtils::CreateRequestId());
 
-        if (userAgent.clientCommand.empty()) {
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "lambda") {
 
-            this->command = LambdaCommandTypeFromString(GetCommandFromHeader(request));
+            const std::string cmd = Core::StringUtils::ToSnakeCase(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
+            this->command = LambdaCommandTypeFromString(cmd);
 
         } else {
 
-            this->command = LambdaCommandTypeFromString(userAgent.clientCommand);
+            UserAgent userAgent;
+            userAgent.FromRequest(request);
+            if (userAgent.clientCommand.empty()) {
+
+                this->command = LambdaCommandTypeFromString(GetCommandFromHeader(request));
+
+            } else {
+
+                this->command = LambdaCommandTypeFromString(userAgent.clientCommand);
+            }
         }
     }
 

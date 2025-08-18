@@ -14,6 +14,8 @@
 
 namespace AwsMock::Dto::Monitoring {
 
+    using std::chrono::system_clock;
+
     /**
      * @brief Monitoring counter
      *

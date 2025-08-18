@@ -11,9 +11,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SQS {
 
@@ -31,7 +30,7 @@ namespace AwsMock::Dto::SQS {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct MessageFailed {
+    struct MessageFailed final : Common::BaseCounter<MessageFailed> {
 
         /**
          * Error code
@@ -51,42 +50,27 @@ namespace AwsMock::Dto::SQS {
         /**
          * Sender fault
          */
-        bool senderFault;
+        bool senderFault{};
 
-        /**
-         * @brief Converts the DTO to a JSON string.
-         *
-         * @return DTO as JSON string.
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        view_or_value<view, value> ToDocument() const;
+        friend MessageFailed tag_invoke(boost::json::value_to_tag<MessageFailed>, boost::json::value const &v) {
+            MessageFailed r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.code = Core::Json::GetStringValue(v, "Code");
+            r.message = Core::Json::GetStringValue(v, "Message");
+            r.senderFault = Core::Json::GetBoolValue(v, "SenderFault");
+            return r;
+        }
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const MessageFailed &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MessageFailed const &obj) {
+            jv = {
+                    {"Id", obj.id},
+                    {"Code", obj.code},
+                    {"Message", obj.message},
+                    {"SenderFault", obj.senderFault},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

@@ -259,7 +259,7 @@ namespace AwsMock::Database {
         return transfers;
     }
 
-    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix, int pageSize, int pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::Transfer::User> TransferDatabase::ListUsers(const std::string &region, const std::string &serverId, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Transfer::Transfer> transfers;
 
@@ -267,8 +267,25 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _transferCollection = (*client)[_databaseName][_serverCollectionName];
+
+                mongocxx::options::find opts;
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
+                }
+                if (pageIndex > 0) {
+                    opts.skip(pageIndex * pageSize);
+                }
+
+                opts.sort(make_document(kvp("_id", 1)));
+                if (!sortColumns.empty()) {
+                    document sort;
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
 
                 document query = {};
                 if (!region.empty()) {
@@ -277,8 +294,13 @@ namespace AwsMock::Database {
                 if (!serverId.empty()) {
                     query.append(kvp("serverId", serverId));
                 }
+                if (!prefix.empty()) {
+                    query.append(kvp("serverId", make_document(kvp("$regex", "^" + prefix))));
+                } else if (!serverId.empty()) {
+                    query.append(kvp("serverId", serverId));
+                }
 
-                if (auto mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
+                if (const auto mResult = _transferCollection.find_one(query.extract()); mResult.has_value()) {
                     Entity::Transfer::Transfer result;
                     result.FromDocument(mResult->view());
                     log_trace << "Got transfer server, serverId:" << serverId;
@@ -298,24 +320,21 @@ namespace AwsMock::Database {
 
     long TransferDatabase::CountServers(const std::string &region) const {
 
-        long count = 0;
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _serverCollection = (*client)[_databaseName][_serverCollectionName];
 
-            if (region.empty()) {
-                count = _serverCollection.count_documents({});
-            } else {
-                count = _serverCollection.count_documents(make_document(kvp("region", region)));
+            document query;
+            if (!region.empty()) {
+                query.append(kvp("region", region));
             }
 
-        } else {
-
-            return _memoryDb.CountServers(region);
+            const long count = _serverCollection.count_documents(query.extract());
+            log_trace << "Count servers, result: " << count;
+            return count;
         }
-        log_trace << "Count servers, result: " << count;
-        return count;
+        return _memoryDb.CountServers(region);
     }
 
     long TransferDatabase::CountUsers(const std::string &region, const std::string &serverId) const {

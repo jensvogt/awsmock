@@ -5,14 +5,12 @@
 #ifndef AWSMOCK_DB_ENTITY_COGNITO_USER_H
 #define AWSMOCK_DB_ENTITY_COGNITO_USER_H
 
-// C++ includes
-#include <string>
-
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/UserAttribute.h>
 #include <awsmock/entity/cognito/UserStatus.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::Cognito {
 
@@ -23,7 +21,7 @@ namespace AwsMock::Database::Entity::Cognito {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct User {
+    struct User final : Common::BaseEntity<User> {
 
         /**
          * MongoDB OID
@@ -86,7 +84,7 @@ namespace AwsMock::Database::Entity::Cognito {
         system_clock::time_point modified = system_clock::now();
 
         /**
-         * @brief Checks whether the user has already a group
+         * @brief Checks whether the user already has a group
          *
          * @param userPoolId user pool ID
          * @param groupName name of the group
@@ -98,7 +96,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
 
         /**
          * @brief Converts the MongoDB document to an entity
@@ -106,29 +104,6 @@ namespace AwsMock::Database::Entity::Cognito {
          * @param mResult query result.
          */
         void FromDocument(const std::optional<view> &mResult);
-
-        /**
-         * @brief Converts the DTO to a JSON string representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the entity to a string representation.
-         *
-         * @return entity as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param user user entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const User &user);
     };
 
     typedef std::vector<User> UserList;

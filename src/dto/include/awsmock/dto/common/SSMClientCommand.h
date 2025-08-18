@@ -13,7 +13,7 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
@@ -33,6 +33,12 @@ namespace AwsMock::Dto::Common {
         GET_PARAMETER,
         DESCRIBE_PARAMETERS,
         DELETE_PARAMETER,
+        // AwsMock internal
+        LIST_PARAMETER_COUNTERS,
+        GET_PARAMETER_COUNTER,
+        CREATE_PARAMETER_COUNTER,
+        UPDATE_PARAMETER_COUNTER,
+        DELETE_PARAMETER_COUNTER,
         UNKNOWN
     };
 
@@ -41,6 +47,12 @@ namespace AwsMock::Dto::Common {
             {SSMCommandType::GET_PARAMETER, "get-parameter"},
             {SSMCommandType::DESCRIBE_PARAMETERS, "describe-parameters"},
             {SSMCommandType::DELETE_PARAMETER, "delete-parameter"},
+            // AwsMock internal
+            {SSMCommandType::LIST_PARAMETER_COUNTERS, "list-parameter-counters"},
+            {SSMCommandType::GET_PARAMETER_COUNTER, "get-parameter-counter"},
+            {SSMCommandType::CREATE_PARAMETER_COUNTER, "create-parameter-counter"},
+            {SSMCommandType::UPDATE_PARAMETER_COUNTER, "update-parameter-counter"},
+            {SSMCommandType::DELETE_PARAMETER_COUNTER, "delete-parameter-counter"},
             {SSMCommandType::UNKNOWN, "unknown"},
     };
 

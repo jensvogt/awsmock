@@ -34,7 +34,7 @@
         "address": "0.0.0.0",
         "port": 4566,
         "max-queue": 10,
-        "max-threads": 50,
+        "max-threads": 250,
         "max-body": 104857600,
         "timeout": 900
       }
@@ -229,6 +229,34 @@
         "remove": {
           "period": 300
         }
+      },
+      "application": {
+        "active": true,
+        "data-dir": "/usr/local/awsmock/data/application",
+        "runtime": {
+          "java11": "alpine/java:11.0.22-jdk",
+          "java17": "openjdk:17-jdk-alpine",
+          "java21": "alpine/java:21-jdk",
+          "python3-9": "python:3.9",
+          "python3-10": "python:3.10",
+          "python3-11": "python:3.11",
+          "python3-12": "python:3.12",
+          "python3-13": "python:3.13",
+          "python3-14": "python:3.14",
+          "nodejs18-x": "public.ecr.aws/lambda/nodejs:18",
+          "nodejs20-x": "public.ecr.aws/lambda/nodejs:20",
+          "nodejs22-x": "public.ecr.aws/lambda/nodejs:22",
+          "provided-al2": "public.ecr.aws/lambda/provided:al2",
+          "provided-al2023": "public.ecr.aws/lambda/provided:al2023",
+          "provided-latest": "public.ecr.aws/lambda/provided:latest",
+          "go": "public.ecr.aws/lambda/provided:al2023"
+        },
+        "backup": {
+          "active": true,
+          "cron": "0 0 0 * * ?",
+          "count": 5
+        },
+        "monitoring-period": 300
       }
     },
     "docker": {
@@ -287,6 +315,8 @@
       "doc-root": "/usr/local/awsmock/frontend"
     },
     "logging": {
+      "file-active": false,
+      "console-active": true,
       "level": "info",
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",

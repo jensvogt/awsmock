@@ -2,8 +2,8 @@
 // Created by vogje01 on 22/08/2022.
 //
 
-#ifndef AWSMOCK_CORE_YAML_CONFIGURATION_H
-#define AWSMOCK_CORE_YAML_CONFIGURATION_H
+#ifndef AWSMOCK_CORE_JSON_CONFIGURATION_H
+#define AWSMOCK_CORE_JSON_CONFIGURATION_H
 
 // Standard C++ includes
 #include <ranges>
@@ -15,11 +15,11 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/TypeName.h>
 #include <awsmock/core/Version.h>
 #include <awsmock/core/exception/CoreException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 #ifdef _WIN32
 #define DEFAULT_MAGIC_FILE "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc"
@@ -167,7 +167,7 @@ namespace AwsMock::Core {
         [[nodiscard]] std::string ToString() const;
 
         /**
-         * @brief Dumps the configuration to std::cerr
+         * @brief Dumps the configuration to std::err
          */
         void Dump() const;
 
@@ -256,9 +256,6 @@ namespace AwsMock::Core {
                 value = envVariable == "true" || envVariable == "True" || envVariable == "TRUE" || envVariable == "1";
             }
         }
-        // if (typeName == TYPE_NAME_STRING) {
-        //     value = ReplaceEnvironmentVariables(value);
-        // }
         _treeConfiguration.put<T>(key, value);
         log_trace << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
@@ -276,7 +273,6 @@ namespace AwsMock::Core {
 
         boost::property_tree::ptree array;
         for (const std::vector<std::string> values = StringUtils::Split(value, ';'); auto &v: values) {
-            //            v = ReplaceEnvironmentVariables(v);
             boost::property_tree::ptree child;
             child.put("", v);
             array.push_back(std::make_pair("", child));
@@ -320,4 +316,4 @@ namespace AwsMock::Core {
 
 }// namespace AwsMock::Core
 
-#endif// AWSMOCK_CORE_YAML_CONFIGURATION_H
+#endif// AWSMOCK_CORE_JSON_CONFIGURATION_H

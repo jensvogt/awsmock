@@ -29,6 +29,7 @@ namespace AwsMock::Database::Entity::SQS {
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "name", name);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueUrl", queueUrl);
         Core::Bson::BsonUtils::SetStringValue(rootDocument, "queueArn", queueArn);
+        Core::Bson::BsonUtils::SetStringValue(rootDocument, "contentType", contentType);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "attributes", attributes.ToDocument());
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "tags", tagsDoc);
         Core::Bson::BsonUtils::SetDocumentValue(rootDocument, "defaultMessageAttributes", defaultMessageAttributeDoc);
@@ -59,6 +60,7 @@ namespace AwsMock::Database::Entity::SQS {
 
             // Get tags
             if (mResult.value().find("tags") != mResult.value().end()) {
+                tags.clear();
                 for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);

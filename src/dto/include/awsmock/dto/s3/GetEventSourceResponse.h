@@ -6,7 +6,7 @@
 #define AWSMOCK_DTO_S3_GET_EVENT_SOURCE_RESPONSE_H
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 
 namespace AwsMock::Dto::S3 {

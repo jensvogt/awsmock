@@ -10,7 +10,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/dynamodb/DescribeTableResponse.h>
 #include <awsmock/dto/dynamodb/ListTableResponse.h>
@@ -182,6 +182,16 @@ namespace AwsMock::Service {
          * Data directory
          */
         std::string _dataDir;
+
+        /**
+         * Shared memory segment
+         */
+        boost::interprocess::managed_shared_memory _segment;
+
+        /**
+         * Counter map in a shared memory segment
+         */
+        Database::DynamoDbCounterMapType *_dynamoDbCounterMap{};
     };
 
 }// namespace AwsMock::Service

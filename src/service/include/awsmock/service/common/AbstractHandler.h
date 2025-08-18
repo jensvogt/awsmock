@@ -15,11 +15,11 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/MemoryMappedFile.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ForbiddenException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/S3ClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -33,7 +33,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class AbstractHandler {
+    class AbstractHandler : public std::enable_shared_from_this<AbstractHandler> {
 
       public:
 
@@ -41,8 +41,11 @@ namespace AwsMock::Service {
 
         /**
          * @brief Default User-defined Constructor
+         *
+         * @param name handler name
+         * @param ioc boost asio IO context
          */
-        explicit AbstractHandler(std::string name) : _name(std::move(name)) {};
+        explicit AbstractHandler(const std::string &name, boost::asio::io_context &ioc) : _ioc(ioc), _name(std::move(name)) {};
 
         /**
          * @brief Handles the HTTP method GET.
@@ -170,16 +173,6 @@ namespace AwsMock::Service {
         static http::response<http::dynamic_body> SendRangeResponse(const http::request<http::dynamic_body> &request, const std::string &fileName, long min, long max, long size, long totalSize, const http::status &status, const std::map<std::string, std::string> &headers = {});
 
         /**
-         * @brief Send an HEAD response (HTTP state code 200) with not body
-         *
-         * @param request HTTP request object
-         * @param contentLength HTTP content length
-         * @param headers HTTP header map values, added to the default headers
-         * @return HTTP response
-         */
-        static http::response<http::dynamic_body> SendHeadResponse(const http::request<http::dynamic_body> &request, const long contentLength, const std::map<std::string, std::string> &headers = {});
-
-        /**
          * @brief Send continue response
          *
          * @param request HTTP request
@@ -188,9 +181,27 @@ namespace AwsMock::Service {
         static http::response<http::dynamic_body> SendContinueResponse(const http::request<http::dynamic_body> &request);
 
         /**
+         * @brief General response
+         *
+         * @param request HTTP request
+         * @param status HTTP status
+         * @param body message body
+         * @param headers HTTP header map values, added to the default headers
+         * @return HTTP response
+         */
+        static http::response<http::dynamic_body> SendResponse(const http::request<http::dynamic_body> &request, const http::status &status, const std::string &body = {}, const std::map<std::string, std::string> &headers = {});
+
+        /**
          * Get the name
          */
         std::string name() { return _name; }
+
+      protected:
+
+        /**
+         * Boost asio IO context
+         */
+        boost::asio::io_context &_ioc;
 
       private:
 

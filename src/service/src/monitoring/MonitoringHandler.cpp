@@ -9,6 +9,11 @@ namespace AwsMock::Service {
         Dto::Common::MonitoringClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
+        // Cloudwatch request
+        if (Core::StringUtils::Contains(clientCommand.payload, "Action")) {
+            return SendOkResponse(request, {});
+        }
+
         try {
             switch (clientCommand.command) {
 

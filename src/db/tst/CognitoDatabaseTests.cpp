@@ -9,7 +9,6 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
 #include <awsmock/repository/CognitoDatabase.h>
-#include <boost/test/unit_test_log.hpp>
 
 #define USER_POOL_ID std::string("test-user-pool_sdjhdjft")
 #define USER_POOL_NAME std::string("test-user-pool")
@@ -42,7 +41,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolCreateTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
 
         // act
         const Entity::Cognito::UserPool result = _cognitoDatabase.CreateUserPool(userPool);
@@ -55,7 +57,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolListTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -69,7 +74,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolExistsTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         const Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -82,7 +90,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolExistsIdTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         const Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -95,7 +106,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolGetByUserPoolIdTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         const Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -109,9 +123,14 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolGetByClientIdTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
-        const Entity::Cognito::UserPoolClient userPoolClient = {.userPoolId = USER_POOL_ID, .clientId = CLIENT_ID};
+        Entity::Cognito::UserPoolClient userPoolClient;
+        userPoolClient.userPoolId = USER_POOL_ID;
+        userPoolClient.clientId = CLIENT_ID;
         userPool.userPoolClients.emplace_back(userPoolClient);
         userPool = _cognitoDatabase.UpdateUserPool(userPool);
 
@@ -126,7 +145,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolGetByRegionNameTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -140,7 +162,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolUpdateTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -154,8 +179,14 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolClientFindTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPoolClient userPoolClient = {.userPoolId = USER_POOL_ID, .clientId = CLIENT_ID, .clientName = CLIENT_NAME};
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
+        Entity::Cognito::UserPoolClient userPoolClient;
+        userPoolClient.userPoolId = USER_POOL_ID;
+        userPoolClient.clientId = CLIENT_ID;
+        userPoolClient.clientName = CLIENT_NAME;
         userPool.userPoolClients.emplace_back(userPoolClient);
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
@@ -169,7 +200,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolCountTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
 
@@ -183,7 +217,10 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolDeleteTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         const Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
 
         // act
@@ -197,10 +234,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserPoolDeleteAllTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool1 = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool1;
+        userPool1.region = _region;
+        userPool1.userPoolId = USER_POOL_ID;
+        userPool1.name = USER_POOL_NAME;
         userPool1 = _cognitoDatabase.CreateUserPool(userPool1);
         BOOST_CHECK_EQUAL(userPool1.oid.empty(), false);
-        Entity::Cognito::UserPool userPool2 = {.region = _region, .userPoolId = USER_POOL_ID + "1", .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool2;
+        userPool2.region = _region;
+        userPool2.userPoolId = USER_POOL_ID;
+        userPool2.name = USER_POOL_NAME;
         userPool2 = _cognitoDatabase.CreateUserPool(userPool2);
         BOOST_CHECK_EQUAL(userPool2.oid.empty(), false);
 
@@ -217,9 +260,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserExistsTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = createUserPoolResult.userPoolId, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = createUserPoolResult.userPoolId;
+        user.userName = USER_NAME;
         const Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -232,9 +281,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserCreateTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
 
         // act
         const Entity::Cognito::User result = _cognitoDatabase.CreateUser(user);
@@ -248,10 +303,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserGetByOidTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         user = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -266,10 +327,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserGetByUserNameTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         user = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -284,10 +351,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserGetByIdTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         user = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -302,9 +375,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserCountTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -317,9 +396,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserListTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -333,9 +418,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserUpdateTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         user = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -349,9 +440,15 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserDeleteTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user = {.region = _region, .userPoolId = USER_POOL_ID, .userName = USER_NAME};
+        Entity::Cognito::User user;
+        user.region = _region;
+        user.userPoolId = USER_POOL_ID;
+        user.userName = USER_NAME;
         Entity::Cognito::User createdUser = _cognitoDatabase.CreateUser(user);
 
         // act
@@ -365,12 +462,21 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(UserDeleteAllTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
-        Entity::Cognito::User user1 = {.region = _region, .userPoolId = USER_POOL_ID, .userName = std::string(USER_NAME) + "1"};
+        Entity::Cognito::User user1;
+        user1.region = _region;
+        user1.userPoolId = USER_POOL_ID;
+        user1.userName = std::string(USER_NAME) + "1";
         user1 = _cognitoDatabase.CreateUser(user1);
         BOOST_CHECK_EQUAL(user1.oid.empty(), false);
-        Entity::Cognito::User user2 = {.region = _region, .userPoolId = USER_POOL_ID, .userName = std::string(USER_NAME) + "2"};
+        Entity::Cognito::User user2;
+        user2.region = _region;
+        user2.userPoolId = USER_POOL_ID;
+        user2.userName = std::string(USER_NAME) + "2";
         user2 = _cognitoDatabase.CreateUser(user2);
         BOOST_CHECK_EQUAL(user2.oid.empty(), false);
 
@@ -384,10 +490,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(GroupExistsTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
-        Entity::Cognito::Group group = {.region = _region, .userPoolId = USER_POOL_ID, .groupName = GROUP_NAME};
+        Entity::Cognito::Group group;
+        group.region = _region;
+        group.userPoolId = USER_POOL_ID;
+        group.groupName = GROUP_NAME;
         group = _cognitoDatabase.CreateGroup(group);
         BOOST_CHECK_EQUAL(group.oid.empty(), false);
 
@@ -401,10 +513,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(GroupGetByIdTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
-        Entity::Cognito::Group group = {.region = _region, .userPoolId = USER_POOL_ID, .groupName = GROUP_NAME};
+        Entity::Cognito::Group group;
+        group.region = _region;
+        group.userPoolId = USER_POOL_ID;
+        group.groupName = GROUP_NAME;
         group = _cognitoDatabase.CreateGroup(group);
         BOOST_CHECK_EQUAL(group.oid.empty(), false);
 
@@ -418,10 +536,16 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(GroupGetByNameTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
         userPool = _cognitoDatabase.CreateUserPool(userPool);
         BOOST_CHECK_EQUAL(userPool.oid.empty(), false);
-        Entity::Cognito::Group group = {.region = _region, .userPoolId = userPool.userPoolId, .groupName = GROUP_NAME};
+        Entity::Cognito::Group group;
+        group.region = _region;
+        group.userPoolId = userPool.userPoolId;
+        group.groupName = GROUP_NAME;
         group = _cognitoDatabase.CreateGroup(group);
         BOOST_CHECK_EQUAL(group.oid.empty(), false);
 
@@ -437,8 +561,13 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(ClientIdExistsTest, CognitoDatabaseDbTest) {
 
         // arrange
-        Entity::Cognito::UserPoolClient userPoolClient = {.clientId = "clientId", .clientName = "clientName"};
-        Entity::Cognito::UserPool userPool = {.region = _region, .userPoolId = USER_POOL_ID, .name = USER_POOL_NAME};
+        Entity::Cognito::UserPool userPool;
+        userPool.region = _region;
+        userPool.userPoolId = USER_POOL_ID;
+        userPool.name = USER_POOL_NAME;
+        Entity::Cognito::UserPoolClient userPoolClient;
+        userPoolClient.clientId = "clientId";
+        userPoolClient.clientName = "clientName";
         userPool.userPoolClients.emplace_back(userPoolClient);
         Entity::Cognito::UserPool result = _cognitoDatabase.CreateUserPool(userPool);
 

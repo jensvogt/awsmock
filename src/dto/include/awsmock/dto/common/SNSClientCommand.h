@@ -36,6 +36,7 @@ namespace AwsMock::Dto::Common {
         GET_TOPIC_ATTRIBUTES,
         GET_TOPIC_DETAILS,
         PURGE_TOPIC,
+        PURGE_ALL_TOPICS,
         PUBLISH,
         SUBSCRIBE,
         UNSUBSCRIBE,
@@ -63,6 +64,7 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::GET_TOPIC_ATTRIBUTES, "get-topic-attributes"},
             {SNSCommandType::GET_TOPIC_DETAILS, "get-topic-details"},
             {SNSCommandType::PURGE_TOPIC, "purge-topic"},
+            {SNSCommandType::PURGE_ALL_TOPICS, "purge-all-topics"},
             {SNSCommandType::PUBLISH, "publish"},
             {SNSCommandType::SUBSCRIBE, "subscribe"},
             {SNSCommandType::UNSUBSCRIBE, "unsubscribe"},
@@ -109,7 +111,7 @@ namespace AwsMock::Dto::Common {
         SNSCommandType command{};
 
         /**
-         * @brief Returns the command from HTTP header
+         * @brief Returns the command from the HTTP header
          *
          * @param request HTTP request
          * @return command string

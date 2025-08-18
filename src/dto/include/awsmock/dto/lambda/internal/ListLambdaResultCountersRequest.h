@@ -10,12 +10,17 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/SortColumn.h>
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief List Lambda result counter request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct ListLambdaResultCountersRequest final : Common::BaseCounter<ListLambdaResultCountersRequest> {
 
         /**

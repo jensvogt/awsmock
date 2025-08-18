@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseCounter.h>
@@ -24,6 +24,21 @@ namespace AwsMock::Dto::SQS {
      * @author jens.vogt\@opitz-consulting.com
      */
     struct DeleteMessageBatchResultEntry final : Common::BaseCounter<DeleteMessageBatchResultEntry> {
+
+
+        /**
+         * @brief Default constructor
+         */
+        explicit DeleteMessageBatchResultEntry() = default;
+
+        /**
+         * @brief Constructor
+         *
+         * @param id message ID
+         */
+        explicit DeleteMessageBatchResultEntry(const std::string &id) {
+            this->id = id;
+        }
 
         /**
          * Id

@@ -5,7 +5,6 @@
 #ifndef AWSMOCK_DTO_SECRETSMANAGER_SECRET_COUNTER_H
 #define AWSMOCK_DTO_SECRETSMANAGER_SECRET_COUNTER_H
 
-
 // C++ standard includes
 #include <string>
 
@@ -180,4 +179,4 @@ namespace AwsMock::Dto::SecretsManager {
 
 }// namespace AwsMock::Dto::SecretsManager
 
-#endif//A WSMOCK_DTO_SECRETSMANAGER_SECRET_COUNTER_H
+#endif// AWSMOCK_DTO_SECRETSMANAGER_SECRET_COUNTER_H

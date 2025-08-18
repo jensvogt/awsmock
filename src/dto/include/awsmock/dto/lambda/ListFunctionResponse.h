@@ -10,45 +10,32 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/dto/lambda/model/Environment.h>
 #include <awsmock/dto/lambda/model/Function.h>
 #include <awsmock/entity/lambda/Lambda.h>
 
 namespace AwsMock::Dto::Lambda {
 
-    struct ListFunctionResponse {
-
-        /**
-         * List of queues
-         */
-        Database::Entity::Lambda::LambdaList lambdaList;
+    struct ListFunctionResponse final : Common::BaseCounter<ListFunctionResponse> {
 
         /**
          * Name of the function
          */
-        FunctionList functions;
+        std::vector<Function> functions;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson();
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString();
+        friend ListFunctionResponse tag_invoke(boost::json::value_to_tag<ListFunctionResponse>, boost::json::value const &v) {
+            ListFunctionResponse r;
+            r.functions = boost::json::value_to<std::vector<Function>>(v.at("Functions"));
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, ListFunctionResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListFunctionResponse const &obj) {
+            jv = {
+                    {"Functions", boost::json::value_from(obj.functions)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

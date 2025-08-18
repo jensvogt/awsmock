@@ -34,6 +34,7 @@ namespace AwsMock::Dto::Common {
     enum class SqsCommandType {
         CREATE_QUEUE,
         PURGE_QUEUE,
+        PURGE_ALL_QUEUES,
         GET_QUEUE_ATTRIBUTES,
         SET_QUEUE_ATTRIBUTES,
         GET_QUEUE_URL,
@@ -71,6 +72,8 @@ namespace AwsMock::Dto::Common {
         GET_EVENT_SOURCE,
         EXPORT_MESSAGES,
         IMPORT_MESSAGES,
+        RELOAD_COUNTERS,
+        RELOAD_ALL_COUNTERS,
         UNKNOWN
     };
 
@@ -78,6 +81,7 @@ namespace AwsMock::Dto::Common {
             // Queues
             {SqsCommandType::CREATE_QUEUE, "create-queue"},
             {SqsCommandType::PURGE_QUEUE, "purge-queue"},
+            {SqsCommandType::PURGE_ALL_QUEUES, "purge-all-queues"},
             {SqsCommandType::GET_QUEUE_ATTRIBUTES, "get-queue-attributes"},
             {SqsCommandType::SET_QUEUE_ATTRIBUTES, "set-queue-attributes"},
             {SqsCommandType::GET_QUEUE_URL, "get-queue-url"},
@@ -117,9 +121,11 @@ namespace AwsMock::Dto::Common {
             {SqsCommandType::DELETE_MESSAGE_BATCH, "delete-message-batch"},
             {SqsCommandType::EXPORT_MESSAGES, "export-messages"},
             {SqsCommandType::IMPORT_MESSAGES, "import-messages"},
+            {SqsCommandType::RELOAD_COUNTERS, "reload-counters"},
+            {SqsCommandType::RELOAD_ALL_COUNTERS, "reload-all-counters"},
     };
 
-    [[maybe_unused]] static std::string SqsCommandTypeToString(SqsCommandType commandType) {
+    [[maybe_unused]] static std::string SqsCommandTypeToString(const SqsCommandType &commandType) {
         return SqsCommandTypeNames[commandType];
     }
 

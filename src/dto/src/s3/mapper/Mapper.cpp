@@ -13,15 +13,14 @@ namespace AwsMock::Dto::S3 {
         response.name = request.bucket;
         response.maxKeys = request.maxKeys;
         for (const auto &object: objectList) {
-            ObjectVersion version = {
-                    .key = object.key,
-                    .eTag = object.md5sum,
-                    .versionId = object.versionId,
-                    .storageClass = "STANDARD",
-                    .isLatest = false,
-                    .size = object.size,
-                    .lastModified = object.modified,
-            };
+            ObjectVersion version;
+            version.key = object.key;
+            version.eTag = object.md5sum;
+            version.versionId = object.versionId;
+            version.storageClass = "STANDARD";
+            version.isLatest = false;
+            version.size = object.size;
+            version.lastModified = object.modified;
             version.owner.id = object.owner;
             response.versions.emplace_back(version);
         }
@@ -29,20 +28,20 @@ namespace AwsMock::Dto::S3 {
     }
 
     GetBucketResponse Mapper::map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket) {
-        GetBucketResponse response = {
-                .id = bucket.oid,
-                .region = bucket.region,
-                .bucket = bucket.name,
-                .arn = bucket.arn,
-                .owner = bucket.owner,
-                .versionStatus = BucketVersionStatusToString(bucket.versionStatus),
-                .size = bucket.size,
-                .keys = bucket.keys,
-                .lambdaConfigurations = map(bucket.lambdaNotifications),
-                .queueConfigurations = map(bucket.queueNotifications),
-                .created = bucket.created,
-                .modified = bucket.modified};
-
+        GetBucketResponse response;
+        response.id = bucket.oid;
+        response.region = bucket.region;
+        response.bucket = bucket.name;
+        response.arn = bucket.arn;
+        response.owner = bucket.owner;
+        response.versionStatus = BucketVersionStatusToString(bucket.versionStatus);
+        response.size = bucket.size;
+        response.keys = bucket.keys;
+        response.lambdaConfigurations = map(bucket.lambdaNotifications);
+        response.queueConfigurations = map(bucket.queueNotifications);
+        response.topicConfigurations = map(bucket.topicNotifications);
+        response.created = bucket.created;
+        response.modified = bucket.modified;
         return response;
     }
 

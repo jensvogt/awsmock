@@ -10,16 +10,15 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
     using std::chrono::system_clock;
 
-    struct CopyObjectResponse {
+    struct CopyObjectResponse final : Common::BaseCounter<CopyObjectResponse> {
 
         /**
          * Etag
@@ -36,28 +35,32 @@ namespace AwsMock::Dto::S3 {
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            boost::property_tree::ptree root;
+            root.add("CopyObjectResult.ETag", eTag);
+            root.add("CopyObjectResult.LastModified", Core::DateTimeUtils::ToISO8601(modified));
+            return Core::XmlUtils::ToXmlString(root);
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CopyObjectResponse &r);
+        friend CopyObjectResponse tag_invoke(boost::json::value_to_tag<CopyObjectResponse>, boost::json::value const &v) {
+            CopyObjectResponse r;
+            r.eTag = Core::Json::GetStringValue(v, "eTag");
+            r.modified = Core::Json::GetDatetimeValue(v, "modified");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CopyObjectResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"eTag", obj.eTag},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

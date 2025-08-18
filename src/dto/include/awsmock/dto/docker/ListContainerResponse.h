@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/docker/model/Container.h>
 
 namespace AwsMock::Dto::Docker {
@@ -27,6 +27,11 @@ namespace AwsMock::Dto::Docker {
          * Container list
          */
         std::vector<Container> containerList;
+
+        /**
+         * HTTP status
+         */
+        boost::beast::http::status status;
 
         /**
          * @brief Constructor

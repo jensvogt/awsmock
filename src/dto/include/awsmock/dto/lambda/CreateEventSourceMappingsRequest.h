@@ -9,9 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/dto/common/BaseDto.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -81,7 +80,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateEventSourceMappingsRequest final : Common::BaseDto<CreateEventSourceMappingsRequest> {
+    struct CreateEventSourceMappingsRequest final : Common::BaseCounter<CreateEventSourceMappingsRequest> {
 
         /**
          * Name of the function
@@ -96,37 +95,42 @@ namespace AwsMock::Dto::Lambda {
         /**
          * Batch size
          */
-        int batchSize;
+        long batchSize{};
 
         /**
          * Batch size
          */
-        int maximumBatchingWindowInSeconds;
+        long maximumBatchingWindowInSeconds{};
 
         /**
          * Enabled
          */
         bool enabled = true;
 
-        /**
-         * @brief Parse a JSON stream.
-         *
-         * @code{.json}
-         * {
-         *   "JAVA_TOOL_OPTIONS":"-Duser.timezone=Europe/Berlin -Dspring.profiles.active=localhost"
-         * }
-         * @endcode
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Creates a JSON string from the object.
-         *
-         * @return JSON string
-         */
-        std::string ToJson() const override;
+        friend CreateEventSourceMappingsRequest tag_invoke(boost::json::value_to_tag<CreateEventSourceMappingsRequest>, boost::json::value const &v) {
+            CreateEventSourceMappingsRequest r;
+            r.functionName = Core::Json::GetStringValue(v, "FunctionName");
+            r.eventSourceArn = Core::Json::GetStringValue(v, "EventSourceArn");
+            r.batchSize = Core::Json::GetLongValue(v, "BatchSize");
+            r.maximumBatchingWindowInSeconds = Core::Json::GetLongValue(v, "MaximumBatchingWindowInSeconds");
+            r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateEventSourceMappingsRequest const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"FunctionName", obj.functionName},
+                    {"EventSourceArn", obj.eventSourceArn},
+                    {"BatchSize", obj.batchSize},
+                    {"MaximumBatchingWindowInSeconds", obj.maximumBatchingWindowInSeconds},
+                    {"Enabled", obj.enabled},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/common/BaseCounter.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/XmlUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
@@ -47,7 +50,7 @@ namespace AwsMock::Dto::SQS {
      * @author jens.vogt\@opitz-consulting.com
      *
      */
-    struct SendMessageBatchResponse {
+    struct SendMessageBatchResponse final : Common::BaseCounter<SendMessageBatchResponse> {
 
         /**
          * Successful messages
@@ -59,47 +62,32 @@ namespace AwsMock::Dto::SQS {
          */
         std::vector<MessageFailed> failed;
 
-        /**
-         * Convert to JSON representation
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Convert from JSON representation
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend SendMessageBatchResponse tag_invoke(boost::json::value_to_tag<SendMessageBatchResponse>, boost::json::value const &v) {
+            SendMessageBatchResponse r;
+            if (Core::Json::AttributeExists(v, "Successful")) {
+                r.successful = boost::json::value_to<std::vector<MessageSuccessful>>(v.at("Successful"));
+            }
+            if (Core::Json::AttributeExists(v, "Failed")) {
+                r.failed = boost::json::value_to<std::vector<MessageFailed>>(v.at("Failed"));
+            }
+            return r;
+        }
 
-        /**
-         * Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToXml() const;
-
-        /**
-         * Convert from XML representation
-         *
-         * @param xmlString  XML string
-         */
-        void FromXml(const std::string &xmlString);
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const SendMessageBatchResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, SendMessageBatchResponse const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+            };
+            if (!obj.successful.empty()) {
+                jv.as_object()["Successful"] = boost::json::value_from(obj.successful);
+            }
+            if (!obj.failed.empty()) {
+                jv.as_object()["Failed"] = boost::json::value_from(obj.failed);
+            }
+        }
     };
 
 }// namespace AwsMock::Dto::SQS

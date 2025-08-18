@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::DynamoDb {
@@ -43,7 +43,7 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * @brief Convert to a BSON document
          */
-        view ToDocument() const;
+        [[nodiscard]] view ToDocument() const;
 
         /**
          * @brief Convert from a BSON document
@@ -54,17 +54,17 @@ namespace AwsMock::Dto::DynamoDb {
 
         friend ConsumedCapacity tag_invoke(boost::json::value_to_tag<ConsumedCapacity>, boost::json::value const &v) {
             ConsumedCapacity r;
-            r.tableName = Core::Json::GetStringValue(v, "tableName");
-            r.readCapacityUnits = Core::Json::GetLongValue(v, "readCapacityUnits");
-            r.writeCapacityUnits = Core::Json::GetLongValue(v, "writeCapacityUnits");
+            r.tableName = Core::Json::GetStringValue(v, "TableName");
+            r.readCapacityUnits = Core::Json::GetLongValue(v, "ReadCapacityUnits");
+            r.writeCapacityUnits = Core::Json::GetLongValue(v, "WriteCapacityUnits");
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AttributeValue const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ConsumedCapacity const &obj) {
             jv = {
-                    {"tableName", obj.tableName},
-                    {"readCapacityUnits", obj.readCapacityUnits},
-                    {"writeCapacityUnits", obj.writeCapacityUnits},
+                    {"TableName", obj.tableName},
+                    {"ReadCapacityUnits", obj.readCapacityUnits},
+                    {"WriteCapacityUnits", obj.writeCapacityUnits},
             };
         }
     };

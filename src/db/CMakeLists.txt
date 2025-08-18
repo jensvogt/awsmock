@@ -29,12 +29,13 @@ set(SECRETSMANAGER_SOURCES src/entity/secretsmanager/Secret.cpp src/entity/secre
 set(KMS_SOURCES src/entity/kms/Key.cpp src/repository/KMSDatabase.cpp src/memorydb/KMSMemoryDb.cpp)
 set(SSM_SOURCES src/entity/ssm/Parameter.cpp src/repository/SSMDatabase.cpp src/memorydb/SSMMemoryDb.cpp)
 set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cpp src/memorydb/ModuleMemoryDb.cpp)
+set(APPS_SOURCES src/entity/apps/Application.cpp src/repository/ApplicationDatabase.cpp src/memorydb/ApplicationMemoryDb.cpp)
 set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp src/utils/SqsUtils.cpp)
 set(MONITORING_SOURCES src/entity/monitoring/Counter.cpp src/repository/MonitoringDatabase.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
+        ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${APPS_SOURCES} ${UTIL_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)
@@ -47,11 +48,9 @@ include_directories(./include ../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_
 # Shared library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS ${LIBRARY_STATIC} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
-    add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/utils/SqsUtils.h
-            src/utils/SqsUtils.cpp)
+    add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

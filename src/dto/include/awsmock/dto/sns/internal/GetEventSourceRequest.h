@@ -9,13 +9,13 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::SNS {
 
     /**
-     * @brief Get event source
+     * @brief Get the event source
      *
      * @author jens.vogt\@opitz-consulting.com
      */

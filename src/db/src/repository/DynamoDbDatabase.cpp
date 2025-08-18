@@ -12,6 +12,7 @@ namespace AwsMock::Database {
 
     DynamoDbDatabase::DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {
 
+        _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
         _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
         _dynamoDbCounterMap = _segment.find<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME).first;
         if (!_dynamoDbCounterMap) {
@@ -23,7 +24,7 @@ namespace AwsMock::Database {
             DynamoDbMonitoringCounter counter;
             counter.items = CountItems(table.region, table.name);
             counter.size = GetTableSize(table.region, table.name);
-            _dynamoDbCounterMap->insert_or_assign(table.name, counter);
+            _dynamoDbCounterMap->insert_or_assign(table.arn, counter);
         }
         log_debug << "DynamoDb counters initialized" << _dynamoDbCounterMap->size();
     }
@@ -176,13 +177,13 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
                 if (!sortColumns.empty()) {
                     document sort;
-                    for (const auto [column, sortDirection]: sortColumns) {
+                    for (const auto &[column, sortDirection]: sortColumns) {
                         sort.append(kvp(column, sortDirection));
                     }
                     opts.sort(sort.extract());
                 }
 
-                for (auto tableCursor = _tableCollection.find(query.extract()); auto table: tableCursor) {
+                for (auto tableCursor = _tableCollection.find(query.extract(), opts); auto table: tableCursor) {
                     Entity::DynamoDb::Table result;
                     result.FromDocument(table);
                     tables.push_back(result);
@@ -234,7 +235,7 @@ namespace AwsMock::Database {
 
             try {
                 mongocxx::pipeline p{};
-                p.match(make_document(kvp("region", region), kvp("name", tableName)));
+                p.match(make_document(kvp("region", region), kvp("tableName", tableName)));
                 p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
                 auto totalSizeCursor = _itemCollection.aggregate(p);
@@ -296,6 +297,44 @@ namespace AwsMock::Database {
             }
         }
         return _memoryDb.UpdateTable(table);
+    }
+
+    void DynamoDbDatabase::UpdateTableCounter(const std::string &tableArn, const long items, const long size) const {
+
+        if (HasDatabase()) {
+
+            mongocxx::options::find_one_and_update opts{};
+            opts.return_document(mongocxx::options::return_document::k_after);
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _bucketCollection = (*client)[_databaseName][_tableCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+
+                document filterQuery;
+                filterQuery.append(kvp("arn", tableArn));
+
+                document setQuery;
+                setQuery.append(kvp("items", static_cast<bsoncxx::types::b_int64>(items)));
+                setQuery.append(kvp("size", static_cast<bsoncxx::types::b_int64>(size)));
+
+                document updateQuery;
+                updateQuery.append(kvp("$set", setQuery));
+
+                _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                log_trace << "Bucket counter updated";
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+        _memoryDb.UpdateTableCounter(tableArn, items, size);
     }
 
     void DynamoDbDatabase::DeleteTable(const std::string &region, const std::string &tableName) const {
@@ -469,8 +508,7 @@ namespace AwsMock::Database {
 
     Entity::DynamoDb::Item DynamoDbDatabase::CreateItem(Entity::DynamoDb::Item &item) const {
 
-        item.created = item.created = system_clock::now();
-
+        item.created = system_clock::now();
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -486,15 +524,22 @@ namespace AwsMock::Database {
                 log_trace << "DynamoDb item created, oid: " << result->inserted_id().get_oid().value.to_string();
                 item.oid = result->inserted_id().get_oid().value.to_string();
 
-                return item;
-
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
+        } else {
+            item = _memoryDb.CreateItem(item);
         }
-        return _memoryDb.CreateItem(item);
+
+        Core::AwsUtils::CreateDynamoDbTableArn(_accountId, item.tableName);
+
+        // Update counter
+        (*_dynamoDbCounterMap)[item.tableName].items++;
+        (*_dynamoDbCounterMap)[item.tableName].size += item.size;
+
+        return item;
     }
 
     Entity::DynamoDb::Item DynamoDbDatabase::UpdateItem(Entity::DynamoDb::Item &item) const {

@@ -10,6 +10,11 @@
 
 namespace AwsMock::Dto::Lambda {
 
+    /**
+     * @brief Stop lambda instance request
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     struct StopLambdaInstanceRequest final : Common::BaseCounter<StopLambdaInstanceRequest> {
 
         /**

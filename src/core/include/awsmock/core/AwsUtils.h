@@ -20,11 +20,11 @@
 // AwsMock includes
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/SystemUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/UnauthorizedException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 #define S3_FILE_NAME_LENGTH 64
 #define S3_VERSION_ID_LENGTH 64
@@ -173,6 +173,14 @@ namespace AwsMock::Core {
         static std::string ConvertSQSQueueUrlToArn(const std::string &region, const std::string &queueUrl);
 
         /**
+         * @brief Converts a queue URL to a queue name
+         *
+         * @param queueUrl URL of the queue
+         * @return name of the queue
+         */
+        static std::string ConvertSQSQueueUrlToName(const std::string &queueUrl);
+
+        /**
          * @brief Creates a queue ARN
          *
          * @return SQS sender ID
@@ -261,6 +269,17 @@ namespace AwsMock::Core {
          * @return KMS key ARN
          */
         static std::string CreateKMSKeyArn(const std::string &region, const std::string &accountId, const std::string &kmsId);
+
+        /**
+         * @brief Create DynamoDB table ARN
+         *
+         * <p>Syntax arn:aws:dynamodb:ddblocal:123456789012:table/tableName</p>
+         *
+         * @param accountId AWS account ID
+         * @param tableName table name
+         * @return DynamoDb table ARN
+         */
+        static std::string CreateDynamoDbTableArn(const std::string &accountId, const std::string &tableName);
 
         /**
          * @brief Create Cognito user pool ID
@@ -639,10 +658,10 @@ namespace AwsMock::Core {
      */
     inline std::string CreateSQSQueueUrl(const std::string &queueName) {
         const std::string hostname = SystemUtils::GetHostName();
-        const std::string port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
-        const std::string region = Configuration::instance().GetValue<std::string>("awsmock.region");
-        const std::string accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        const std::string queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
+        const auto port = Configuration::instance().GetValue<std::string>("awsmock.gateway.http.port");
+        const auto region = Configuration::instance().GetValue<std::string>("awsmock.region");
+        const auto accountId = Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+        const auto queueUrl = "http://sqs." + region + "." + hostname + ":" + port + "/" + accountId + "/" + queueName;
         log_trace << "queueUrl: " << queueUrl;
         return queueUrl;
     }

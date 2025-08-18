@@ -29,14 +29,18 @@ if (WIN32)
             "$<$<CONFIG:DEBUG>:libboost_process-vc143-mt-sgd-x64-1_88.lib>"
             "$<$<CONFIG:RELEASE>:libboost_json-vc143-mt-s-x64-1_88.lib>"
             "$<$<CONFIG:DEBUG>:libboost_json-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_coroutine-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_coroutine-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_context-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_context-vc143-mt-sgd-x64-1_88.lib>"
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PUBLIC ./include ../dto/include ../db/include ../core/include ../service/include)
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process ssl crypto
-            archive magic ssh)
+            boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process
+            boost_coroutine boost_context ssl crypto archive magic ssh)
     if (APPLE)
         add_link_options("-rpath /usr/local/lib")
         set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")

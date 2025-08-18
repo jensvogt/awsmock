@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -20,12 +18,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListObjectVersionsRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct ListObjectVersionsRequest final : Common::BaseCounter<ListObjectVersionsRequest> {
 
         /**
          * Bucket name
@@ -50,38 +43,46 @@ namespace AwsMock::Dto::S3 {
         /**
          * Page size
          */
-        int pageSize;
+        long pageSize{};
 
         /**
          * Maximal number of keys
          */
-        int maxKeys;
+        long maxKeys{};
 
         /**
          * Version ID marker
          */
         std::string versionIdMarker;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend ListObjectVersionsRequest tag_invoke(boost::json::value_to_tag<ListObjectVersionsRequest>, boost::json::value const &v) {
+            ListObjectVersionsRequest r;
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.prefix = Core::Json::GetStringValue(v, "prefix");
+            r.delimiter = Core::Json::GetStringValue(v, "delimiter");
+            r.encodingType = Core::Json::GetStringValue(v, "encodingType");
+            r.pageSize = Core::Json::GetLongValue(v, "pageSize");
+            r.maxKeys = Core::Json::GetLongValue(v, "maxKeys");
+            r.versionIdMarker = Core::Json::GetStringValue(v, "versionIdMarker");
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListObjectVersionsRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListObjectVersionsRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"prefix", obj.prefix},
+                    {"delimiter", obj.delimiter},
+                    {"encodingType", obj.encodingType},
+                    {"pageSize", obj.pageSize},
+                    {"maxKeys", obj.maxKeys},
+                    {"versionIdMarker", obj.versionIdMarker},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

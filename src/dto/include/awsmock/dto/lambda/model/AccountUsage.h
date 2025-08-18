@@ -10,8 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/common/BaseDto.h>
-#include <awsmock/dto/lambda/model/EphemeralStorage.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
 
@@ -28,7 +27,7 @@ namespace AwsMock::Dto::Lambda {
      *
      * @author jens.vogt\@opitz--consulting.com
      */
-    struct AccountUsage final : Common::BaseDto<AccountUsage> {
+    struct AccountUsage final : Common::BaseCounter<AccountUsage> {
 
         /**
          * Function count
@@ -47,12 +46,21 @@ namespace AwsMock::Dto::Lambda {
          */
         view_or_value<view, value> ToDocument() const;
 
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        std::string ToJson() const override;
+      private:
+
+        friend AccountUsage tag_invoke(boost::json::value_to_tag<AccountUsage>, boost::json::value const &v) {
+            AccountUsage r;
+            r.functionCount = Core::Json::GetLongValue(v, "FunctionCount");
+            r.totalCodeSize = Core::Json::GetLongValue(v, "TotalCodeSize");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AccountUsage const &obj) {
+            jv = {
+                    {"FunctionCount", obj.functionCount},
+                    {"TotalCodeSize", obj.totalCodeSize},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Lambda

@@ -42,6 +42,7 @@ namespace AwsMock::Dto::Common {
         UPLOAD_FUNCTION_CODE,
         LIST_TAG_COUNTERS,
         LIST_ARNS,
+        UPDATE_LAMBDA,
         // Tags
         ADD_TAG,
         DELETE_TAG,
@@ -56,9 +57,17 @@ namespace AwsMock::Dto::Common {
         GET_LAMBDA_RESULT_COUNTER,
         DELETE_LAMBDA_RESULT_COUNTER,
         DELETE_LAMBDA_RESULT_COUNTERS,
+        // Enable/disable
+        ENABLE_LAMBDA,
+        ENABLE_ALL_LAMBDAS,
+        DISABLE_LAMBDA,
+        DISABLE_ALL_LAMBDAS,
         // Start/stop
-        START_FUNCTION,
-        STOP_FUNCTION,
+        START_LAMBDA,
+        START_ALL_LAMBDAS,
+        RESTART_ALL_LAMBDAS,
+        STOP_LAMBDA,
+        STOP_ALL_LAMBDAS,
         // Instances
         STOP_LAMBDA_INSTANCE,
         DELETE_IMAGE,
@@ -85,6 +94,8 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::UPLOAD_FUNCTION_CODE, "upload-function-code"},
             {LambdaCommandType::LIST_TAG_COUNTERS, "list-tag-counters"},
             {LambdaCommandType::LIST_ARNS, "list-arns"},
+            // Generell
+            {LambdaCommandType::UPDATE_LAMBDA, "update-lambda"},
             // Tags
             {LambdaCommandType::ADD_TAG, "add-function-tag"},
             {LambdaCommandType::DELETE_TAG, "delete-function-tag"},
@@ -99,9 +110,17 @@ namespace AwsMock::Dto::Common {
             {LambdaCommandType::GET_LAMBDA_RESULT_COUNTER, "get-lambda-result-counter"},
             {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTER, "delete-lambda-result-counter"},
             {LambdaCommandType::DELETE_LAMBDA_RESULT_COUNTERS, "delete-lambda-result-counters"},
+            // Enable/disable
+            {LambdaCommandType::ENABLE_LAMBDA, "enable-lambda"},
+            {LambdaCommandType::ENABLE_ALL_LAMBDAS, "enable-all-lambdas"},
+            {LambdaCommandType::DISABLE_LAMBDA, "disable-lambda"},
+            {LambdaCommandType::DISABLE_ALL_LAMBDAS, "disable-all-lambdas"},
             // Start/stop
-            {LambdaCommandType::START_FUNCTION, "start-function"},
-            {LambdaCommandType::STOP_FUNCTION, "stop-function"},
+            {LambdaCommandType::START_LAMBDA, "start-lambda"},
+            {LambdaCommandType::START_ALL_LAMBDAS, "start-all-lambdas"},
+            {LambdaCommandType::RESTART_ALL_LAMBDAS, "restart-all-lambdas"},
+            {LambdaCommandType::STOP_LAMBDA, "stop-lambda"},
+            {LambdaCommandType::STOP_ALL_LAMBDAS, "stop-all-lambdas"},
             // Instances
             {LambdaCommandType::LIST_INSTANCE_COUNTERS, "list-instance-counters"},
             {LambdaCommandType::STOP_LAMBDA_INSTANCE, "stop-instance"},

@@ -9,16 +9,12 @@
 #include <chrono>
 #include <ctime>
 #include <string>
-#include <thread>
-
-// Boost includes
-#include <boost/thread.hpp>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
@@ -33,6 +29,7 @@
 #include <awsmock/dto/kms/ScheduleKeyDeletionRequest.h>
 #include <awsmock/dto/kms/ScheduleKeyDeletionResponse.h>
 #include <awsmock/dto/kms/internal/DeleteKeyRequest.h>
+#include <awsmock/dto/kms/internal/ListKeyArnsResponse.h>
 #include <awsmock/dto/kms/internal/ListKeyCountersRequest.h>
 #include <awsmock/dto/kms/internal/ListKeyCountersResponse.h>
 #include <awsmock/dto/kms/model/Key.h>
@@ -84,6 +81,15 @@ namespace AwsMock::Service {
          * @see Dto::KMS::ListKeysResponse
          */
         [[nodiscard]] Dto::KMS::ListKeyCountersResponse ListKeyCounters(const Dto::KMS::ListKeyCountersRequest &request) const;
+
+        /**
+         * @brief List all key ARNs
+         *
+         * @return ListKeyArnsResponse
+         * @throws Core::DatabaseException
+         * @see Dto::KMS::ListKeyArnsResponse
+         */
+        [[nodiscard]] Dto::KMS::ListKeyArnsResponse ListKeyArns() const;
 
         /**
          * @brief Creates a new key

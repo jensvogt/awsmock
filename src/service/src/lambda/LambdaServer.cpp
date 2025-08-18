@@ -5,7 +5,7 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::Scheduler &scheduler) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
@@ -84,9 +84,8 @@ namespace AwsMock::Service {
 
             lambda.instances.clear();
             lambda = _lambdaDatabase.UpdateLambda(lambda);
-            log_debug << "Lambda cleaned up, name: " << lambda.function;
+            log_info << "Lambda stopped, name: " << lambda.function;
         }
-        log_info << "All lambda instances stopped";
     }
 
     void LambdaServer::CleanupDocker() const {
@@ -100,7 +99,7 @@ namespace AwsMock::Service {
         for (std::vector<Database::Entity::Lambda::Lambda> lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
             log_debug << "Get containers";
             for (std::vector<Dto::Docker::Container> containers = _dockerService.ListContainerByImageName(lambda.function, lambda.dockerTag); const auto &container: containers) {
-                ContainerService::instance().StopContainer(container.id);
+                ContainerService::instance().KillContainer(container.id);
                 ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
@@ -184,7 +183,7 @@ namespace AwsMock::Service {
         for (const auto &lambda: lambdas) {
             double averageRuntime = 0.0;
             if ((*_lambdaCounterMap)[lambda.arn].invocations > 0) {
-                averageRuntime = (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
+                averageRuntime = (double) (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
             }
             _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function, (*_lambdaCounterMap)[lambda.arn].invocations);
             _metricService.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
@@ -196,25 +195,26 @@ namespace AwsMock::Service {
     }
 
     void LambdaServer::CreateContainers() const {
+
         try {
 
-            // Get the lambda list
-            const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
-            if (lambdas.empty()) {
-                return;
-            }
-
             // Loop over lambdas and create the containers
-            log_info << "Start creating lambda functions, count: " << lambdas.size();
-            for (const auto &lambda: lambdas) {
-                Dto::Lambda::CreateFunctionRequest request;
-                request.region = _region;
-                request.functionName = lambda.function;
-                request.runtime = lambda.runtime;
-                Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
-                log_debug << "Lambda containers created, function: " << lambda.function;
+            for (Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
+
+                if (lambda.enabled) {
+                    log_info << "Start creating lambda container, function: " << lambda.function;
+                    Dto::Lambda::CreateFunctionRequest request;
+                    request.region = _region;
+                    request.functionName = lambda.function;
+                    request.runtime = lambda.runtime;
+                    Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
+                    log_info << "Finished creating lambda container, function: " << lambda.function;
+                } else {
+                    lambda.state = Database::Entity::Lambda::Inactive;
+                    _lambdaDatabase.UpdateLambda(lambda);
+                }
             }
-            log_debug << "Lambda containers created, count: " << lambdas.size();
+            log_debug << "Lambda containers created";
 
         } catch (Core::ServiceException &e) {
             log_error << e.message();

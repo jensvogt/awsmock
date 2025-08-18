@@ -12,16 +12,9 @@
 
 // AwsMOck includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::Lambda {
-
-    using bsoncxx::view_or_value;
-    using bsoncxx::builder::basic::kvp;
-    using bsoncxx::builder::basic::make_array;
-    using bsoncxx::builder::basic::make_document;
-    using bsoncxx::document::value;
-    using bsoncxx::document::view;
-    using std::chrono::system_clock;
 
     /**
      * @brief Lambda instance status enum
@@ -31,6 +24,7 @@ namespace AwsMock::Database::Entity::Lambda {
     enum LambdaInstanceStatus {
         InstanceIdle,
         InstanceRunning,
+        InstanceSuccess,
         InstanceFailed,
         InstanceUnknown
     };
@@ -38,6 +32,7 @@ namespace AwsMock::Database::Entity::Lambda {
     static std::map<LambdaInstanceStatus, std::string> LambdaInstanceStatusNames{
             {InstanceIdle, "Idle"},
             {InstanceRunning, "Running"},
+            {InstanceSuccess, "Success"},
             {InstanceFailed, "Failed"},
             {InstanceUnknown, "Unknown"},
     };
@@ -64,32 +59,42 @@ namespace AwsMock::Database::Entity::Lambda {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Instance {
+    struct Instance final : Common::BaseEntity<Instance> {
 
         /**
          * Instance ID, will be appended to the container name, in case of multiple instances.
          */
-        std::string instanceId;
+        std::string instanceId{};
 
         /**
          * Container ID
          */
-        std::string containerId;
+        std::string containerId{};
 
         /**
          * Container name
          */
-        std::string containerName;
+        std::string containerName{};
 
         /**
          * Host port
          */
-        int hostPort;
+        int hostPort{};
+
+        /**
+         * Host name
+         */
+        std::string hostName{};
 
         /**
          * Status
          */
-        LambdaInstanceStatus status;
+        LambdaInstanceStatus status = InstanceUnknown;
+
+        /**
+         * Last invocation timestamp
+         */
+        system_clock::time_point lastInvocation;
 
         /**
          * Created timestamp
@@ -101,37 +106,14 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<bsoncxx::document::view> &mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document
          *
          * @return entity as MongoDB document.
          */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the entity to a JSON object
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument();
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @param os output stream
-         * @param tag tag entity
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Instance &tag);
+        [[nodiscard]] view_or_value<view, value> ToDocument() const override;
     };
 
 }// namespace AwsMock::Database::Entity::Lambda

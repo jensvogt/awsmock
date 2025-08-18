@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/dto/docker/CreateNetworkRequest.h>
@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaServer(Core::Scheduler &scheduler);
+        explicit LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc);
 
         /**
          * @brief Shutdown server

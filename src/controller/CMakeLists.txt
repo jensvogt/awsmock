@@ -10,11 +10,29 @@ if (WIN32)
     target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static awsmockcore_static
             bsoncxx-v_noabi-rhs-x64-v143-md.lib mongocxx-v_noabi-rhs-x64-v143-md.lib bson-1.0.lib mongoc-1.0.lib
             libssl.lib libcrypto.lib archive_static.lib libmagic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
-            libboost_filesystem-vc143-mt-s-x64-1_88.lib libboost_url-vc143-mt-s-x64-1_88.lib
-            libboost_thread-vc143-mt-s-x64-1_88.lib libboost_locale-vc143-mt-s-x64-1_88.lib
-            libboost_program_options-vc143-mt-s-x64-1_88.lib libboost_log-vc143-mt-s-x64-1_88.lib
-            libboost_log_setup-vc143-mt-s-x64-1_88.lib libboost_process-vc143-mt-s-x64-1_88.lib ssh.lib crypt32.lib
-            Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
+            "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_url-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_url-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_thread-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_thread-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_locale-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_locale-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_program_options-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_program_options-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_log-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_log-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_log_setup-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_log_setup-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_process-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_process-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_json-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_json-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_coroutine-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_coroutine-vc143-mt-sgd-x64-1_88.lib>"
+            "$<$<CONFIG:RELEASE>:libboost_context-vc143-mt-s-x64-1_88.lib>"
+            "$<$<CONFIG:DEBUG>:libboost_context-vc143-mt-sgd-x64-1_88.lib>"
+            ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 else ()
     add_executable(${BINARY} ${SOURCES})
     # Check systemd

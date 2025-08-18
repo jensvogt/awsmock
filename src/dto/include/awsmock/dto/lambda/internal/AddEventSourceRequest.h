@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Lambda {
@@ -90,13 +90,15 @@ namespace AwsMock::Dto::Lambda {
             r.type = Core::Json::GetStringValue(v, "Type");
             r.functionArn = Core::Json::GetStringValue(v, "FunctionArn");
             r.eventSourceArn = Core::Json::GetStringValue(v, "EventSourceArn");
-            r.events = boost::json::value_to<std::vector<std::string>>(v.at("Events"));
             r.filterRuleType = Core::Json::GetStringValue(v, "FilterRuleType");
             r.filterRuleValue = Core::Json::GetStringValue(v, "FilterRuleValue");
             r.batchSize = Core::Json::GetLongValue(v, "BatchSize");
             r.maximumBatchingWindowInSeconds = Core::Json::GetLongValue(v, "MaximumBatchingWindowInSeconds");
             r.uuid = Core::Json::GetStringValue(v, "UUID");
             r.enabled = Core::Json::GetBoolValue(v, "Enabled");
+            if (Core::Json::AttributeExists(v, "Events")) {
+                r.events = boost::json::value_to<std::vector<std::string>>(v.at("Events"));
+            }
             return r;
         }
 

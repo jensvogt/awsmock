@@ -18,7 +18,7 @@
 // AwsMock includes
 #include <awsmock/core/DomainSocket.h>
 #include <awsmock/core/DomainSocketResult.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 
@@ -81,7 +81,7 @@ namespace AwsMock::Core {
          * @brief Send JSON data
          *
          * @par
-         * This will send a JSON string as boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
+         * This will send a JSON string as a boost http request to the domain socket and waits for the response. The call is synchronous and the response is converted
          * to boost http response.
          *
          * @param method HTTP method
@@ -121,6 +121,18 @@ namespace AwsMock::Core {
          * @see Core::DomainSocketResult
          */
         DomainSocketResult SendBinary(verb method, const std::string &path, const std::string &fileName, const std::map<std::string, std::string> &headers) override;
+
+        /**
+         * @brief Send an attach-container command
+         *
+         * @param method HTTP method
+         * @param path URL path
+         * @param headers optional HTTP headers
+         * @param ws web socket
+         * @return result struct
+         * @see Core::DomainSocketResult
+         */
+        [[nodiscard]] boost::asio::local::stream_protocol::socket SendAttach(verb method, const std::string &path, const std::map<std::string, std::string> &headers, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) override;
 
       private:
 

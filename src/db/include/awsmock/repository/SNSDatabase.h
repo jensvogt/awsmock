@@ -22,9 +22,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
@@ -335,7 +335,7 @@ namespace AwsMock::Database {
          * @return list of SNS messages
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, int pageSize = 0, int pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Updates an existing message
@@ -361,7 +361,7 @@ namespace AwsMock::Database {
          * @param message SNS message
          * @param status new status
          */
-        void SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const;
+        void SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const;
 
         /**
          * @brief Deletes a message.

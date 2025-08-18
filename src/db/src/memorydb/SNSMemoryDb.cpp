@@ -341,10 +341,8 @@ namespace AwsMock::Database {
         return _messages[it->first];
     }
 
-    void SNSMemoryDb::SetMessageStatus(Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) {
+    void SNSMemoryDb::SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) {
         boost::mutex::scoped_lock lock(_snsMessageMutex);
-
-        message.modified = system_clock::now();
 
         std::string oid = message.oid;
         const auto it =
@@ -352,6 +350,7 @@ namespace AwsMock::Database {
                     return message.second.oid == oid;
                 });
         _messages[it->first].status = status;
+        _messages[it->first].modified = system_clock::now();
     }
 
     void SNSMemoryDb::DeleteMessage(const Entity::SNS::Message &message) {

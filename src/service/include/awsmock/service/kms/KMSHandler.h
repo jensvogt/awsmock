@@ -6,7 +6,7 @@
 #define AWSMOCK_SERVICE_KMS_HANDLER_H
 
 // AwsMock includes
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/KMSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/kms/KMSService.h>
@@ -29,7 +29,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit KMSHandler() : AbstractHandler("kms-handler") {}
+        explicit KMSHandler(boost::asio::io_context &ioc) : AbstractHandler("kms-handler", ioc) {}
 
         /**
          * @brief HTTP POST request.

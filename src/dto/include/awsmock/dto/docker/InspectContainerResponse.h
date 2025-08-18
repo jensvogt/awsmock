@@ -15,7 +15,7 @@
 
 
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/LogStream.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/docker/model/State.h>
 
@@ -59,7 +59,7 @@ namespace AwsMock::Dto::Docker {
         HostConfig hostConfig;
 
         /**
-         * he total size of all files in the read-only layers from the image that the container uses. These layers can be shared between containers.
+         * The total size of all files in the read-only layers from the image that the container uses. These layers can be shared between containers.
          */
         long sizeRootFs;
 
@@ -67,6 +67,11 @@ namespace AwsMock::Dto::Docker {
          * The size of files that have been created or changed by this container.
          */
         long sizeRw;
+
+        /**
+         * Status of the HTTP call
+         */
+        boost::beast::http::status status;
 
         /**
          * @brief Convert to a JSON string

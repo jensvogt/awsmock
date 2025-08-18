@@ -58,6 +58,8 @@
 // Dynamodb
 #define DYNAMODB_TABLE_COUNT "dynamodb_table_counter"
 #define DYNAMODB_ITEM_COUNT "dynamodb_item_counter"
+#define DYNAMODB_ITEMS_BY_TABLE "dynamodb_items_by_table_counter"
+#define DYNAMODB_SIZE_BY_TABLE "dynamodb_size_by_table_counter"
 #define DYNAMODB_SERVICE_TIMER "dynamodb_service_timer"
 #define DYNAMODB_SERVICE_COUNTER "dynamodb_service_counter"
 
@@ -95,5 +97,12 @@
 #define SSM_PARAMETER_COUNT "ssm_parameter_counter"
 #define SSM_SERVICE_TIMER "ssm_service_timer"
 #define SSM_SERVICE_COUNTER "ssm_service_counter"
+
+// Applications
+#define APPLICATION_COUNT "application_counter"
+#define APPLICATION_SERVICE_TIMER "application_service_timer"
+#define APPLICATION_SERVICE_COUNTER "application_service_counter"
+#define APPLICATION_CPU_USAGE "application_cpu_usage"
+#define APPLICATION_MEMORY_USAGE "application_mem_usage"
 
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H
