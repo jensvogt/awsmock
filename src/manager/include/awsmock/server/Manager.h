@@ -11,8 +11,8 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/apps/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
@@ -28,27 +28,6 @@
 #include <awsmock/service/transfer/TransferServer.h>
 
 namespace AwsMock::Manager {
-
-    class WorkGuardManager {
-
-        boost::asio::io_context &ioContext_;
-        std::unique_ptr<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>> workGuard_;
-
-      public:
-
-        explicit WorkGuardManager(boost::asio::io_context &ctx) : ioContext_(ctx),
-                                                                  workGuard_(std::make_unique<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>>(ioContext_.get_executor())) {}
-
-        void stop() {
-            workGuard_.reset();
-        }
-
-        void restart() {
-            if (!workGuard_) {
-                workGuard_ = std::make_unique<boost::asio::executor_work_guard<boost::asio::io_context::executor_type>>(ioContext_.get_executor());
-            }
-        }
-    };
 
     /**
      * @brief Main application class for the awsmock manager.
@@ -71,7 +50,7 @@ namespace AwsMock::Manager {
 
       public:
 
-        Manager() = default;//: guard(_ios) {};
+        explicit Manager(boost::asio::io_context &ioc) : _ioc(ioc) {};
 
         /**
          * @brief Initialization
@@ -86,7 +65,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Stop processing-
          */
-        void Stop() { /*_ios.stop();*/ };
+        void Stop() const { _ioc.stop(); }
 
         /**
          * @brief Automatically loading the init file
@@ -144,6 +123,8 @@ namespace AwsMock::Manager {
          * Global shared memory segment
          */
         std::unique_ptr<boost::interprocess::managed_shared_memory> _shm;
+
+        boost::asio::io_context &_ioc;
     };
 
 }// namespace AwsMock::Manager
