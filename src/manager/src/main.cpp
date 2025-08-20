@@ -287,7 +287,7 @@ int main(const int argc, char *argv[]) {
     WindowsWorker worker(app_context);
 
     // add termination handler
-    boost::application::handler<>::callback termination_callback = boost::bind(&WindowsWorker::Stop);
+    boost::application::handler<>::callback termination_callback = [] { return WindowsWorker::Stop(); };
 
     app_context.insert<boost::application::termination_handler>(boost::make_shared<boost::application::termination_handler_default_behaviour>(termination_callback));
 
