@@ -19,8 +19,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
@@ -69,11 +69,28 @@ namespace AwsMock::Database {
         explicit DatabaseBase();
 
         /**
-         * @brief Returns a MongoDB connection from the pool
+         * @brief Returns a MongoDB collection from the pool
+         *
+         * @param collectionName name of the collection
+         * @return MongoDB database collection
+         */
+        [[nodiscard]] mongocxx::collection GetCollection(const std::string &collectionName) const;
+
+        /**
+         * @brief Returns a MongoDB client from the pool
          *
          * @return MongoDB database client
          */
-        [[nodiscard]] mongocxx::database GetConnection() const;
+        [[nodiscard]] mongocxx::pool::entry GetClient() const;
+
+        /**
+         * @brief Create and start a session for transactional queries
+         *
+         * @param collectionName collection name
+         * @param collection collection object
+         * @return mongo session
+         */
+        mongocxx::client_session GetSession(const std::string &collectionName, mongocxx::collection &collection) const;
 
         /**
          * @brief Check all indexes.
@@ -94,16 +111,6 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] std::string GetDatabaseName() const;
 
-        /**
-         * @brief Start the database
-         */
-        void StartDatabase();
-
-        /**
-         * @brief Stops the database
-         */
-        void StopDatabase();
-
       private:
 
         /**
@@ -117,12 +124,12 @@ namespace AwsMock::Database {
         /**
          * Database name
          */
-        std::string _name;
+        std::string _databaseName;
 
         /**
          * Database client
          */
-        std::unique_ptr<mongocxx::pool> _pool{};
+        ConnectionPool &_pool;
 
         /**
          * Database flag

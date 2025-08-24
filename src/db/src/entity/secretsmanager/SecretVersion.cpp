@@ -23,7 +23,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return secretVersionDoc.extract();
     }
 
-    void SecretVersion::FromDocument(const std::optional<view> &mResult) {
+    void SecretVersion::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
             secretString = Core::Bson::BsonUtils::GetStringValue(mResult, "secretString");
@@ -32,8 +32,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
             lastAccessed = Core::Bson::BsonUtils::GetDateValue(mResult, "lastAccessed");
 
             // Get stages
-            if (mResult.value().find("stages") != mResult.value().end()) {
-                for (const view versionsView = mResult.value()["stages"].get_array().value; const auto &element: versionsView) {
+            if (mResult.view().find("stages") != mResult.view().end()) {
+                for (const view versionsView = mResult.view()["stages"].get_array().value; const auto &element: versionsView) {
                     stages.emplace_back(Core::Bson::BsonUtils::GetStringValue(element));
                 }
             }

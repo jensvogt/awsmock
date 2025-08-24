@@ -73,7 +73,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        QueueNotification FromDocument(const std::optional<view> &mResult);
+        QueueNotification FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::S3

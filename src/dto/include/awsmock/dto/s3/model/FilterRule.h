@@ -10,10 +10,9 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/common/BaseDto.h>
 
@@ -33,7 +32,7 @@ namespace AwsMock::Dto::S3 {
             {NameType::prefix, "prefix"},
             {NameType::suffix, "suffix"}};
 
-    [[maybe_unused]] static std::string NameTypeToString(NameType nameType) {
+    [[maybe_unused]] static std::string NameTypeToString(const NameType &nameType) {
         return NameTypeNames[nameType];
     }
 
@@ -45,6 +44,10 @@ namespace AwsMock::Dto::S3 {
         }
         return NameType::prefix;
     }
+
+    BOOST_DESCRIBE_ENUM(NameType,
+                        prefix,
+                        prefix);
 
     /**
      * @brief Filter rule for the S3 bucket notification to SQS queues
@@ -64,25 +67,23 @@ namespace AwsMock::Dto::S3 {
         std::string filterValue;
 
         /**
-         * @brief Converts the DTO to a JSON object.
-         *
-         * @return DTO as object.
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
-        /**
          * @brief Convert from an XML string
          *
          * @param pt boost a property tree
          */
-        void FromXml(const boost::property_tree::ptree &pt);
+        void FromXml(const boost::property_tree::ptree &pt) {
+            if (pt.get_child_optional("S3Key")) {
+                if (const boost::property_tree::ptree s3KeyNode = pt.get_child("S3Key"); s3KeyNode.get_child_optional("FilterRule")) {
+                    const boost::property_tree::ptree filterRuleNode = s3KeyNode.get_child("FilterRule");
+                    if (filterRuleNode.get_optional<std::string>("Name")) {
+                        name = NameTypeFromString(filterRuleNode.get<std::string>("Name"));
+                    }
+                    if (filterRuleNode.get_optional<std::string>("Value")) {
+                        filterValue = filterRuleNode.get<std::string>("Value");
+                    }
+                }
+            }
+        }
 
       private:
 

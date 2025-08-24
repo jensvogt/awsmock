@@ -66,7 +66,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        TopicNotification FromDocument(std::optional<bsoncxx::document::view> mResult);
+        TopicNotification FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::S3

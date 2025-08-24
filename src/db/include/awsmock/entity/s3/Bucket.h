@@ -285,7 +285,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(std::optional<view> mResult);
+        [[maybe_unused]] void FromDocument(const view_or_value<view, value> &mResult);
     };
 
     typedef std::vector<Bucket> BucketList;

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void Instance::FromDocument(const std::optional<view> &mResult) {
+    void Instance::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 

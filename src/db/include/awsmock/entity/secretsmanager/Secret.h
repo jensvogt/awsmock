@@ -238,7 +238,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
     };
 
     typedef std::vector<Secret> SecretList;

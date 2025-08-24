@@ -327,14 +327,17 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::SYMMETRIC_DEFAULT: {
 
                 // Preparation
-                unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
+                auto rawKey = (unsigned char *) malloc(key.aes256Key.length() / 2);
+                Core::Crypto::HexDecode(key.aes256Key, rawKey);
                 const std::string rawPlaintext = Core::Crypto::Base64Decode(plainText);
                 int plaintextLen = static_cast<int>(rawPlaintext.size());
 
                 // Encryption
                 unsigned char *rawCiphertext = Core::Crypto::Aes256EncryptString((unsigned char *) rawPlaintext.c_str(), &plaintextLen, rawKey);
                 log_debug << "Encrypted plaintext, length: " << plaintextLen;
-                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawCiphertext), static_cast<size_t>(plaintextLen)});
+                std::string output = Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawCiphertext), static_cast<size_t>(plaintextLen)});
+                free(rawKey);
+                return output;
             }
 
             case Dto::KMS::KeySpec::RSA_2048:
@@ -415,14 +418,19 @@ namespace AwsMock::Service {
             case Dto::KMS::KeySpec::SYMMETRIC_DEFAULT: {
 
                 // Preparation
-                const unsigned char *rawKey = Core::Crypto::HexDecode(key.aes256Key);
+                const auto rawKey = (unsigned char *) malloc(key.aes256Key.length() / 2);
+                Core::Crypto::HexDecode(key.aes256Key, rawKey);
                 const std::string rawCiphertext = Core::Crypto::Base64Decode(ciphertext);
                 int ciphertextLen = static_cast<int>(rawCiphertext.size());
 
                 // Description
-                unsigned char *rawPlaintext = Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLen, rawKey);
+                const auto rawPlaintext = (unsigned char *) malloc(rawCiphertext.length() * 2);
+                Core::Crypto::Aes256DecryptString((unsigned char *) rawCiphertext.c_str(), &ciphertextLen, rawKey, rawPlaintext);
                 log_debug << "Decrypted plaintext, length: " << ciphertextLen;
-                return Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext), static_cast<size_t>(ciphertextLen)});
+                std::string output = Core::Crypto::Base64Encode({reinterpret_cast<char *>(rawPlaintext), static_cast<size_t>(ciphertextLen)});
+                free(rawKey);
+                free(rawPlaintext);
+                return output;
             }
 
             case Dto::KMS::KeySpec::RSA_2048:

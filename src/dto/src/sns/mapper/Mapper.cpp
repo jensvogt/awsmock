@@ -2,6 +2,12 @@
 // Created by vogje01 on 5/10/24.
 //
 
+#include "awsmock/dto/s3/model/Bucket.h"
+#include "awsmock/dto/s3/model/EventNotification.h"
+#include "awsmock/entity/s3/Bucket.h"
+#include "awsmock/entity/s3/Object.h"
+
+
 #include <awsmock/dto/sns/mapper/Mapper.h>
 
 namespace AwsMock::Dto::SNS {
@@ -129,4 +135,5 @@ namespace AwsMock::Dto::SNS {
         }
         return messageAttributes;
     }
+
 }// namespace AwsMock::Dto::SNS

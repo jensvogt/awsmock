@@ -87,7 +87,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Initialize database
          */
-        void InitializeDatabase() const;
+        static void InitializeDatabase();
 
         /**
          * @brief Load the modules from the configuration file.

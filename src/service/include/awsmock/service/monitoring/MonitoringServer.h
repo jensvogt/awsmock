@@ -45,7 +45,7 @@ namespace AwsMock::Service {
         /**
          * Database connection
          */
-        Database::MonitoringDatabase &_monitoringDatabase = Database::MonitoringDatabase::instance();
+        Database::MonitoringDatabase _monitoringDatabase;
     };
 
 }// namespace AwsMock::Service

@@ -89,7 +89,6 @@ class Daemon {
         frontendThread = boost::thread{boost::ref(server)};
 
         // Start manager
-        awsMockManager.Initialize();
         awsMockManager.Run();
 
         return EXIT_SUCCESS;

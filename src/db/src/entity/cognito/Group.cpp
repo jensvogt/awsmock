@@ -20,7 +20,7 @@ namespace AwsMock::Database::Entity::Cognito {
         return userDocument;
     }
 
-    void Group::FromDocument(const std::optional<view> &mResult) {
+    void Group::FromDocument(const view_or_value<view, value> &mResult) {
 
         // Could be null, in case the group is part of a user
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");

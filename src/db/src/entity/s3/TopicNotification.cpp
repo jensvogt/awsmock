@@ -39,15 +39,15 @@ namespace AwsMock::Database::Entity::S3 {
         return topicNotificationDoc.extract();
     }
 
-    TopicNotification TopicNotification::FromDocument(std::optional<view> mResult) {
+    TopicNotification TopicNotification::FromDocument(const view_or_value<view, value> &mResult) {
         try {
-            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
-            topicArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["topicArn"]);
+            id = Core::Bson::BsonUtils::GetStringValue(mResult.view()["id"]);
+            topicArn = Core::Bson::BsonUtils::GetStringValue(mResult.view()["topicArn"]);
 
             // Extract filter rules
-            if (mResult.value().find("filterRules") != mResult.value().end()) {
+            if (mResult.view().find("filterRules") != mResult.view().end()) {
                 filterRules.clear();
-                for (const bsoncxx::array::view filterRulesView{mResult.value()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
+                for (const bsoncxx::array::view filterRulesView{mResult.view()["filterRules"].get_array().value}; const bsoncxx::array::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document());
                     filterRules.emplace_back(filterRule);

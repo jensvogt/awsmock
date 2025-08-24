@@ -42,7 +42,7 @@ namespace AwsMock::Database::Entity::Cognito {
         return userDocument.extract();
     }
 
-    void User::FromDocument(const std::optional<view> &mResult) {
+    void User::FromDocument(const view_or_value<view, value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -56,16 +56,16 @@ namespace AwsMock::Database::Entity::Cognito {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Attributes
-        if (mResult.value().find("userAttributes") != mResult.value().end()) {
-            for (const bsoncxx::array::view attributesView{mResult.value()["userAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
+        if (mResult.view().find("userAttributes") != mResult.view().end()) {
+            for (const bsoncxx::array::view attributesView{mResult.view()["userAttributes"].get_array().value}; const bsoncxx::array::element &attributeElement: attributesView) {
                 userAttributes.push_back({.name = Core::Bson::BsonUtils::GetStringValue(attributeElement, "name"),
                                           .value = Core::Bson::BsonUtils::GetStringValue(attributeElement, "value")});
             }
         }
 
         // Groups
-        if (mResult.value().find("groups") != mResult.value().end()) {
-            for (const bsoncxx::array::view groupsView{mResult.value()["groups"].get_array().value}; const bsoncxx::array::element &groupElement: groupsView) {
+        if (mResult.view().find("groups") != mResult.view().end()) {
+            for (const bsoncxx::array::view groupsView{mResult.view()["groups"].get_array().value}; const bsoncxx::array::element &groupElement: groupsView) {
                 Group group;
                 group.FromDocument(groupElement.get_document().view());
                 groups.push_back(group);

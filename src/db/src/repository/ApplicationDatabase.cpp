@@ -28,9 +28,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-                const int64_t count = _applicationCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+                mongocxx::collection applicationCollection = GetCollection(_applicationCollectionName);
+
+                const int64_t count = applicationCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
                 log_trace << "Application exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -46,14 +46,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection applicationCollection;
+            auto session = GetSession(_applicationCollectionName, applicationCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _applicationCollection.insert_one(application.ToDocument());
+                const auto result = applicationCollection.insert_one(application.ToDocument());
                 session.commit_transaction();
                 log_trace << "Application created, oid: " << result->inserted_id().get_oid().value.to_string();
                 application.oid = result->inserted_id().get_oid().value.to_string();
@@ -82,17 +81,16 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             try {
+                mongocxx::collection applicationCollection = GetCollection(_applicationCollectionName);
 
-                if (const auto client = ConnectionPool::instance().GetConnection()) {
-                    mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-                    const auto result = _applicationCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
-                    log_trace << "Application retrieved, region: " << region << ", name: " << name;
-                    if (result) {
-                        Entity::Apps::Application application;
-                        application.FromDocument(result->view());
-                        return application;
-                    }
+                const auto result = applicationCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                log_trace << "Application retrieved, region: " << region << ", name: " << name;
+                if (result) {
+                    Entity::Apps::Application application;
+                    application.FromDocument(result->view());
+                    return application;
                 }
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
@@ -103,13 +101,11 @@ namespace AwsMock::Database {
 
     std::vector<Entity::Apps::Application> ApplicationDatabase::ListApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        std::vector<Entity::Apps::Application> applications;
         if (HasDatabase()) {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                mongocxx::collection applicationCollection = GetCollection(_applicationCollectionName);
 
                 document query;
                 if (!region.empty()) {
@@ -132,24 +128,20 @@ namespace AwsMock::Database {
                     opts.limit(pageSize);
                 }
 
-                for (auto applicationCursor = _applicationCollection.find(query.extract(), opts); auto application: applicationCursor) {
+                std::vector<Entity::Apps::Application> applications;
+                for (auto applicationCursor = applicationCollection.find(query.extract(), opts); auto application: applicationCursor) {
                     Entity::Apps::Application result;
                     result.FromDocument(application);
                     applications.push_back(result);
                 }
+                return applications;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            applications = _memoryDb.ListApplications(region, prefix, pageSize, pageIndex, sortColumns);
         }
-
-        log_trace << "Got application list, size:" << applications.size();
-        return applications;
+        return _memoryDb.ListApplications(region, prefix, pageSize, pageIndex, sortColumns);
     }
 
     long ApplicationDatabase::CountApplications(const std::string &region, const std::string &prefix) const {
@@ -188,19 +180,18 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection applicationCollection;
+            auto session = GetSession(_applicationCollectionName, applicationCollection);
 
             try {
 
                 session.start_transaction();
-                const auto mResult = _applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
+                const auto mResult = applicationCollection.find_one_and_update(make_document(kvp("region", application.region), kvp("name", application.name)), application.ToDocument(), opts);
                 session.commit_transaction();
 
                 if (mResult) {
                     log_trace << "Application updated: " << application;
-                    application.FromDocument(mResult.value());
+                    application.FromDocument(mResult->view());
                     return application;
                 }
                 return {};
@@ -224,8 +215,8 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                mongocxx::collection _applicationCollection = client->database(_databaseName)[_applicationCollectionName];
-                const auto result = _applicationCollection.delete_many(make_document(kvp("region", region), kvp("name", name)));
+                mongocxx::collection applicationCollection = client->database(_databaseName)[_applicationCollectionName];
+                const auto result = applicationCollection.delete_many(make_document(kvp("region", region), kvp("name", name)));
                 session.commit_transaction();
                 log_trace << "Application deleted: " << result.value().deleted_count();
                 return result.value().deleted_count();

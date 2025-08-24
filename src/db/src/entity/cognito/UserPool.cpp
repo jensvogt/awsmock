@@ -49,7 +49,7 @@ namespace AwsMock::Database::Entity::Cognito {
         return userPoolDocument;
     }
 
-    void UserPool::FromDocument(const std::optional<view> &mResult) {
+    void UserPool::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 
@@ -66,8 +66,8 @@ namespace AwsMock::Database::Entity::Cognito {
             domain.domain = Core::Bson::BsonUtils::GetStringValue(mResult, "domain");
 
             // Get clients
-            if (mResult.value().find("userPoolClients") != mResult.value().end()) {
-                for (const bsoncxx::array::view userPoolClientView{mResult.value()["userPoolClients"].get_array().value}; const bsoncxx::array::element &userPoolClientElement: userPoolClientView) {
+            if (mResult.view().find("userPoolClients") != mResult.view().end()) {
+                for (const bsoncxx::array::view userPoolClientView{mResult.view()["userPoolClients"].get_array().value}; const bsoncxx::array::element &userPoolClientElement: userPoolClientView) {
                     UserPoolClient userPoolClient;
                     userPoolClient.FromDocument(userPoolClientElement.get_document().view());
                     userPoolClients.push_back(userPoolClient);
@@ -75,8 +75,8 @@ namespace AwsMock::Database::Entity::Cognito {
             }
 
             // Get tags
-            if (mResult.value().find("tags") != mResult.value().end()) {
-                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            if (mResult.view().find("tags") != mResult.view().end()) {
+                for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);

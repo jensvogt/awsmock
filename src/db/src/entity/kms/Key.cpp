@@ -52,7 +52,7 @@ namespace AwsMock::Database::Entity::KMS {
         }
     }
 
-    void Key::FromDocument(const std::optional<view> &mResult) {
+    void Key::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -76,8 +76,8 @@ namespace AwsMock::Database::Entity::KMS {
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get tags
-            if (mResult.value().find("tags") != mResult.value().end()) {
-                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            if (mResult.view().find("tags") != mResult.view().end()) {
+                for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);

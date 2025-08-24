@@ -44,9 +44,9 @@
 // AwsMock includes
 #include <awsmock/core/Base64Utils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 
 // 64 kB buffer
 #define AWSMOCK_BUFFER_SIZE 4096
@@ -224,9 +224,10 @@ namespace AwsMock::Core {
          * @param ciphertext input string
          * @param len ciphertext length
          * @param key encryption key
+         * @param out output buffer
          * @return decrypted string
          */
-        static unsigned char *Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key);
+        static void Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key, unsigned char *out);
 
         /**
          * @brief AES256 encryption of a file
@@ -316,9 +317,10 @@ namespace AwsMock::Core {
          * @brief Decodes a hex string to an unsigned char array.
          *
          * @param hex hex string
+         * @param out out char array
          * @return unsigned char array.
          */
-        static unsigned char *HexDecode(const std::string &hex);
+        static unsigned char *HexDecode(const std::string &hex, unsigned char *out);
 
         /**
          * @brief Generate an RSA key pair of the given length.
@@ -331,14 +333,14 @@ namespace AwsMock::Core {
         /**
          * @brief Converts the public key to a string.
          *
-         * @param pRSA pointer to RSA key pair
+         * @param pRSA pointer to an RSA key pair
          */
         static std::string GetRsaPublicKey(const EVP_PKEY *pRSA);
 
         /**
          * @brief Converts the private key to a string.
          *
-         * @param pRSA pointer to RSA key pair
+         * @param pRSA pointer to an RSA key pair
          */
         static std::string GetRsaPrivateKey(const EVP_PKEY *pRSA);
 

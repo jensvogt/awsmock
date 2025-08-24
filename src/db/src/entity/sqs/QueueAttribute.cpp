@@ -25,7 +25,7 @@ namespace AwsMock::Database::Entity::SQS {
         return queueAttributeDoc;
     }
 
-    void QueueAttribute::FromDocument(const std::optional<view> &mResult) {
+    void QueueAttribute::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 
@@ -35,12 +35,15 @@ namespace AwsMock::Database::Entity::SQS {
             policy = Core::Bson::BsonUtils::GetStringValue(mResult, "policy");
             receiveMessageWaitTime = Core::Bson::BsonUtils::GetIntValue(mResult, "receiveMessageWaitTime");
             visibilityTimeout = Core::Bson::BsonUtils::GetIntValue(mResult, "visibilityTimeout");
-            redrivePolicy.FromDocument(mResult.value()["redrivePolicy"].get_document().value);
             redriveAllowPolicy = Core::Bson::BsonUtils::GetStringValue(mResult, "redriveAllowPolicy");
             approximateNumberOfMessages = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessages");
             approximateNumberOfMessagesDelayed = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesDelayed");
             approximateNumberOfMessagesNotVisible = Core::Bson::BsonUtils::GetLongValue(mResult, "approximateNumberOfMessagesNotVisible");
             queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
+
+            if (mResult.view().find("redrivePolicy") != mResult.view().end()) {
+                redrivePolicy.FromDocument(mResult.view()["redrivePolicy"].get_document().value);
+            }
 
         } catch (std::exception &exc) {
             log_error << exc.what();

@@ -46,9 +46,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                if (auto result = _moduleCollection.find_one(make_document(kvp("name", name)))) {
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                if (auto result = moduleCollection.find_one(make_document(kvp("name", name)))) {
                     Entity::Module::Module module;
                     module.FromDocument(result->view());
                     log_trace << "Module state: " << ModuleStateToString(module.state);
@@ -72,13 +72,12 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
 
                 document query;
                 query.append(kvp("name", name));
 
-                const auto result = _moduleCollection.find_one(query.extract());
+                const auto result = moduleCollection.find_one(query.extract());
                 log_trace << "Module exists, name: " << name << ", exists: " << std::boolalpha << result.has_value();
                 return result.has_value();
 
@@ -97,10 +96,9 @@ namespace AwsMock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+            mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
 
-            if (auto mResult = _moduleCollection.find_one(make_document(kvp("_id", oid)))) {
+            if (auto mResult = moduleCollection.find_one(make_document(kvp("_id", oid)))) {
                 Entity::Module::Module module;
                 module.FromDocument(mResult->view());
                 return module;
@@ -128,9 +126,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                if (auto mResult = _moduleCollection.find_one(make_document(kvp("name", name)))) {
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                if (auto mResult = moduleCollection.find_one(make_document(kvp("name", name)))) {
                     Entity::Module::Module modules;
                     modules.FromDocument(mResult->view());
                     return modules;
@@ -152,10 +150,10 @@ namespace AwsMock::Database {
 
             try {
 
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
                 std::vector<std::string> moduleNameList;
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                for (auto serviceCursor = _moduleCollection.find({}); auto service: serviceCursor) {
+                for (auto serviceCursor = moduleCollection.find({}); const auto service: serviceCursor) {
                     Entity::Module::Module result;
                     result.FromDocument(service);
                     moduleNameList.push_back(result.name);
@@ -176,9 +174,9 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                auto mResult = _moduleCollection.insert_one(module.ToDocument());
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                auto mResult = moduleCollection.insert_one(module.ToDocument());
                 log_trace << "Module created, oid: " << mResult->inserted_id().get_oid().value.to_string();
 
                 if (mResult) {
@@ -203,9 +201,9 @@ namespace AwsMock::Database {
                 mongocxx::options::find_one_and_update opts{};
                 opts.return_document(mongocxx::options::return_document::k_after);
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                const auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                const auto mResult = moduleCollection.find_one_and_update(make_document(kvp("name", module.name)), module.ToDocument(), opts);
                 log_trace << "Module updated: " << module.ToString();
 
                 if (mResult) {
@@ -228,16 +226,17 @@ namespace AwsMock::Database {
     Entity::Module::Module ModuleDatabase::SetState(const std::string &name, const Entity::Module::ModuleState &state) {
 
         if (HasDatabase()) {
+
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-            auto session = client->start_session();
+
+            mongocxx::collection moduleCollection;
+            auto session = GetSession(_moduleCollectionName, moduleCollection);
 
             try {
 
                 session.start_transaction();
-                const auto mResult = _moduleCollection.find_one_and_update(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", ModuleStateToString(state))))), opts);
+                const auto mResult = moduleCollection.find_one_and_update(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("state", ModuleStateToString(state))))), opts);
                 log_trace << "Module state updated, name: " << name << " state: " << ModuleStateToString(state);
                 session.commit_transaction();
                 if (mResult) {
@@ -272,9 +271,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("status", ModuleStatusToString(status))))));
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                auto mResult = moduleCollection.update_one(make_document(kvp("name", name)), make_document(kvp("$set", make_document(kvp("status", ModuleStatusToString(status))))));
                 log_trace << "Module status updated, name: " << name << " state: " << ModuleStatusToString(status);
 
             } catch (mongocxx::exception::system_error &e) {
@@ -293,10 +292,10 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                auto mResult = _moduleCollection.update_one(make_document(kvp("name", name)),
-                                                            make_document(kvp("$set", make_document(kvp("port", port)))));
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                auto mResult = moduleCollection.update_one(make_document(kvp("name", name)),
+                                                           make_document(kvp("$set", make_document(kvp("port", port)))));
                 log_trace << "Module port updated, name: " << name << " port: " << port;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -323,9 +322,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
-                const int64_t count = _moduleCollection.count_documents(make_document());
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                const int64_t count = moduleCollection.count_documents(make_document());
                 log_trace << "Service state: " << std::boolalpha << count;
                 return static_cast<int>(count);
 
@@ -344,11 +343,10 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+            mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
 
             Entity::Module::ModuleList modulesList;
-            for (auto serviceCursor = _moduleCollection.find({}); auto service: serviceCursor) {
+            for (auto serviceCursor = moduleCollection.find({}); auto service: serviceCursor) {
                 Entity::Module::Module result;
                 result.FromDocument(service);
                 modulesList.push_back(result);
@@ -364,10 +362,10 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             try {
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
 
-                const auto result = _moduleCollection.delete_many(make_document(kvp("name", module.name)));
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
+
+                const auto result = moduleCollection.delete_many(make_document(kvp("name", module.name)));
                 log_debug << "Module deleted, count: " << result->deleted_count();
 
             } catch (mongocxx::exception::system_error &e) {
@@ -385,11 +383,10 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             try {
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _moduleCollection = (*client)[_databaseName][_moduleCollectionName];
+                mongocxx::collection moduleCollection = GetCollection(_moduleCollectionName);
 
-                const auto result = _moduleCollection.delete_many(make_document());
-                log_debug << "All module deleted, count: " << result->deleted_count();
+                const auto result = moduleCollection.delete_many(make_document());
+                log_debug << "All modules deleted, count: " << result->deleted_count();
                 return result->deleted_count();
 
             } catch (mongocxx::exception::system_error &e) {

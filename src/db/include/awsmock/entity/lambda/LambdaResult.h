@@ -98,7 +98,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::Lambda

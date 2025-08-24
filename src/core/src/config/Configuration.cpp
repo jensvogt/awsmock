@@ -252,6 +252,7 @@ namespace AwsMock::Core {
 
         // Database
         DefineProperty<bool>("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
+        DefineProperty<bool>("awsmock.mongodb.create-indexes", "AWSMOCK_MONGODB_CREATE_INDEXES", false);
         DefineProperty<std::string>("awsmock.mongodb.name", "AWSMOCK_MONGODB_NAME", "awsmock");
         DefineProperty<std::string>("awsmock.mongodb.host", "AWSMOCK_MONGODB_HOST", "localhost");
         DefineProperty<int>("awsmock.mongodb.port", "AWSMOCK_MONGODB_PORT", 27017);

@@ -957,7 +957,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) {
+    Dto::SQS::SendMessageResponse SQSService::SendMessage(const Dto::SQS::SendMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "send_message");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "send_message");
         log_trace << "Sending message request, queueUrl: " << request.queueUrl;
@@ -1022,7 +1022,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) {
+    Dto::SQS::SendMessageBatchResponse SQSService::SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "send_message_batch");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "send_message_batch");
         log_trace << "Send message batch request, queueUrl: " << request.queueUrl;
@@ -1210,7 +1210,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) {
+    void SQSService::ResendMessage(const Dto::SQS::ResendMessageRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "resend_message");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "resend_message");
         log_trace << "Resend message request, queueArn: " << request.queueArn;

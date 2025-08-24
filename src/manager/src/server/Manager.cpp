@@ -17,17 +17,17 @@ namespace AwsMock::Manager {
         log_info << "Dockerized: " << std::boolalpha << Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
     }
 
-    void Manager::InitializeDatabase() const {
+    void Manager::InitializeDatabase() {
 
         // Get database variables
         if (Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.active")) {
 
-            _pool.Configure();
+            Database::ConnectionPool::instance().Configure();
 
-            // Create database indexes in a background thread
-            boost::asio::post(_ioc, [] {
+            // Create database indexes if needed
+            if (Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.create-indexes")) {
                 Database::ModuleDatabase::instance().CreateIndexes();
-            });
+            }
 
         } else {
             log_info << "In-memory database initialized";
@@ -135,6 +135,8 @@ namespace AwsMock::Manager {
 
     void Manager::Run() {
 
+        Initialize();
+
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
@@ -157,8 +159,9 @@ namespace AwsMock::Manager {
             if (module.name == "gateway" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::GatewayServer>(_ioc));
             } else if (module.name == "s3" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
-                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler));
-            } else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
+                mongocxx::pool::entry connection = Database::ConnectionPool::instance().GetConnection();
+                moduleMap.AddModule(module.name, std::make_shared<Service::S3Server>(scheduler, connection));
+            } /* else if (module.name == "sqs" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SQSServer>(scheduler));
             } else if (module.name == "sns" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SNSServer>(scheduler));
@@ -178,9 +181,9 @@ namespace AwsMock::Manager {
                 moduleMap.AddModule(module.name, std::make_shared<Service::SecretsManagerServer>(scheduler));
             } else if (module.name == "application" && module.status == Database::Entity::Module::ModuleStatus::ACTIVE) {
                 moduleMap.AddModule(module.name, std::make_shared<Service::ApplicationServer>(scheduler, _ioc));
-            }
+            }*/
         }
-        log_info << "Module started, count: " << moduleMap.GetSize();
+        log_info << "All modules started, count: " << moduleMap.GetSize();
 
         // Start listener threads
         const int maxThreads = Core::Configuration::instance().GetValue<int>("awsmock.gateway.http.max-thread");

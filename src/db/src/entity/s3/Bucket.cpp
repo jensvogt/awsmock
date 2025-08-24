@@ -155,41 +155,41 @@ namespace AwsMock::Database::Entity::S3 {
         return bucketDoc;
     }
 
-    void Bucket::FromDocument(std::optional<view> mResult) {
+    void Bucket::FromDocument(const view_or_value<view, value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
         arn = Core::Bson::BsonUtils::GetStringValue(mResult, "arn");
-        size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
-        keys = Core::Bson::BsonUtils::GetLongValue(mResult.value()["keys"]);
+        size = Core::Bson::BsonUtils::GetLongValue(mResult.view()["size"]);
+        keys = Core::Bson::BsonUtils::GetLongValue(mResult.view()["keys"]);
         versionStatus = BucketVersionStatusFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "versionStatus"));
-        created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
-        modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult.view()["created"]);
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult.view()["modified"]);
 
         // SQS queue notification configuration
-        if (mResult.value().find("queueNotifications") != mResult.value().end()) {
+        if (mResult.view().find("queueNotifications") != mResult.view().end()) {
             queueNotifications.clear();
-            for (bsoncxx::array::view notificationView{mResult.value()["queueNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
+            for (bsoncxx::array::view notificationView{mResult.view()["queueNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 QueueNotification notification;
                 queueNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
 
         // SNS topic notification configuration
-        if (mResult.value().find("topicNotifications") != mResult.value().end()) {
+        if (mResult.view().find("topicNotifications") != mResult.view().end()) {
             topicNotifications.clear();
-            for (bsoncxx::array::view notificationView{mResult.value()["topicNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
+            for (bsoncxx::array::view notificationView{mResult.view()["topicNotifications"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 TopicNotification notification;
                 topicNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }
         }
 
         // Lambda function notification configuration
-        if (mResult.value().find("lambdaConfigurations") != mResult.value().end()) {
+        if (mResult.view().find("lambdaConfigurations") != mResult.view().end()) {
             lambdaNotifications.clear();
-            for (bsoncxx::array::view notificationView{mResult.value()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
+            for (bsoncxx::array::view notificationView{mResult.view()["lambdaConfigurations"].get_array().value}; const bsoncxx::array::element &notificationElement: notificationView) {
                 LambdaNotification notification;
                 lambdaNotifications.emplace_back(notification.FromDocument(notificationElement.get_document().view()));
             }

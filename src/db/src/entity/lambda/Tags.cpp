@@ -19,10 +19,10 @@ namespace AwsMock::Database::Entity::Lambda {
         return it->second;
     }
 
-    void Tags::FromDocument(const std::optional<view> &mResult) {
+    void Tags::FromDocument(const view_or_value<view, value> &mResult) {
 
         std::vector<std::string> keys;
-        std::transform(mResult->begin(), mResult->end(), std::back_inserter(keys), [](const bsoncxx::document::element &ele) {
+        std::transform(mResult.view().begin(), mResult.view().end(), std::back_inserter(keys), [](const bsoncxx::document::element &ele) {
             return bsoncxx::string::to_string(ele.key());
         });
 

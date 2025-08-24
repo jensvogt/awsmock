@@ -36,7 +36,7 @@ namespace AwsMock::Service {
                 module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::RUNNING);
 
                 if (module.name == "database") {
-                    _moduleDatabase.StartDatabase();
+                    //_moduleDatabase.StartDatabase();
                 } else {
                     //moduleMap.GetModule(module.name)->Start();
                 }
@@ -54,19 +54,9 @@ namespace AwsMock::Service {
             if (Database::Entity::Module::Module module = _moduleDatabase.GetModuleByName(m.name); module.state == Database::Entity::Module::ModuleState::RUNNING) {
 
                 // Set state
+                ModuleMap::instance().GetModuleMap()[module.name]->Shutdown();
                 module = _moduleDatabase.SetState(m.name, Database::Entity::Module::ModuleState::STOPPED);
-                log_info << "Module " << module.name << " topped";
-
-                // Stop module
-                if (m.name == "database") {
-                    _moduleDatabase.StopDatabase();
-                } else {
-                    for (const auto &[fst, snd]: ModuleMap::instance().GetModuleMap()) {
-                        if (m.name == fst) {
-                            //server.second->Stop();
-                        }
-                    }
-                }
+                log_info << "Module " << module.name << " stopped";
             }
             log_info << "Module " + m.name + " stopped";
         }

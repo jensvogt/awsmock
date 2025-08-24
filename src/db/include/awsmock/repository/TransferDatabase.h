@@ -13,9 +13,9 @@
 #include "awsmock/utils/SortColumn.h"
 
 
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/transfer/Transfer.h>
 #include <awsmock/memorydb/TransferMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -221,7 +221,7 @@ namespace AwsMock::Database {
         /**
          * Server collection name
          */
-        std::string _serverCollectionName;
+        std::string _transferCollectionName;
 
         /**
          * Transfer in-memory database

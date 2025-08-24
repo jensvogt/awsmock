@@ -50,7 +50,9 @@ if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
     install(TARGETS ${LIBRARY_STATIC} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/repository/MongoDBAccess.h
+            include/awsmock/repository/MongoDBInstance.h)
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

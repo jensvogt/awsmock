@@ -318,7 +318,7 @@ namespace AwsMock::Service {
          * @param topic SNS topic entity
          * @param message SNS message entity
          */
-        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message);
+        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) const;
 
         /**
          * @brief Send a SNS message to an SQS topic
@@ -326,7 +326,7 @@ namespace AwsMock::Service {
          * @param subscription SNS subscription
          * @param request SNS publish request
          */
-        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
+        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Adjust topic counters

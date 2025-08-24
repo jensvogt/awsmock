@@ -9,19 +9,9 @@
 #include <string>
 #include <vector>
 
-// Boost includes
-#include <boost/describe.hpp>
-#include <boost/json.hpp>
-#include <boost/mp11.hpp>
-#include <boost/version.hpp>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/common/BaseDto.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/ObjectVersion.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
@@ -93,20 +83,6 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point modified;
 
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @param jsonObject JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &jsonObject);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
       private:
 
         friend Bucket tag_invoke(boost::json::value_to_tag<Bucket>, boost::json::value const &v) {
@@ -138,7 +114,7 @@ namespace AwsMock::Dto::S3 {
             };
         }
     };
-    //BOOST_DESCRIBE_STRUCT(Bucket, (Common::BaseDto<Bucket>), (region, bucketName, owner, arn, keys, size, versionStatus))
+
 }// namespace AwsMock::Dto::S3
 
 #endif//AWSMOCK_DTO_S3_MODEL_BUCKET_H

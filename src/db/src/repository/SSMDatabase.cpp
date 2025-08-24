@@ -12,9 +12,8 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-                const int64_t count = _parameterCollection.count_documents(make_document(kvp("name", name)));
+                mongocxx::collection parameterCollection = GetCollection(_parameterCollectionName);
+                const int64_t count = parameterCollection.count_documents(make_document(kvp("name", name)));
                 log_trace << "Parameter exists: " << std::boolalpha << (count > 0);
                 return count > 0;
 
@@ -30,9 +29,9 @@ namespace AwsMock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _topicCollection = (*client)[_databaseName][_parameterCollectionName];
-            const auto mResult = _topicCollection.find_one(make_document(kvp("_id", oid)));
+            mongocxx::collection parameterCollection = GetCollection(_parameterCollectionName);
+
+            const auto mResult = parameterCollection.find_one(make_document(kvp("_id", oid)));
             if (mResult->empty()) {
                 log_error << "ssm parameter not found, oid" << oid.to_string();
                 throw Core::DatabaseException("ssm parameter not found, oid" + oid.to_string());
@@ -62,12 +61,11 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection parameterCollection = GetCollection(_parameterCollectionName);
 
             try {
 
-                const auto mResult = _parameterCollection.find_one(make_document(kvp("name", name)));
+                const auto mResult = parameterCollection.find_one(make_document(kvp("name", name)));
                 if (mResult->empty()) {
                     log_error << "SSM parameter not found, name: " << name;
                     throw Core::DatabaseException("ssm parameter not found, name" + name);
@@ -90,8 +88,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
+            mongocxx::collection parameterCollection = GetCollection(_parameterCollectionName);
 
             mongocxx::options::find opts;
             if (pageSize > 0) {
@@ -118,7 +115,7 @@ namespace AwsMock::Database {
             }
 
             Entity::SSM::ParameterList parameterList;
-            for (auto parameterCursor = _parameterCollection.find(query.extract(), opts); const auto &parameter: parameterCursor) {
+            for (auto parameterCursor = parameterCollection.find(query.extract(), opts); const auto &parameter: parameterCursor) {
                 Entity::SSM::Parameter result;
                 result.FromDocument(parameter);
                 parameterList.push_back(result);
@@ -134,8 +131,8 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             try {
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
+
+                mongocxx::collection parameterCollection = GetCollection(_parameterCollectionName);
 
                 bsoncxx::builder::basic::document query = {};
                 if (!prefix.empty()) {
@@ -145,7 +142,7 @@ namespace AwsMock::Database {
                     query.append(kvp("region", region));
                 }
 
-                const long count = _parameterCollection.count_documents(query.extract());
+                const long count = parameterCollection.count_documents(query.extract());
                 log_trace << "Parameter count: " << count;
                 return count;
 
@@ -165,14 +162,13 @@ namespace AwsMock::Database {
         parameter.created = system_clock::now();
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection parameterCollection;
+            auto session = GetSession(_parameterCollectionName, parameterCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _parameterCollection.insert_one(parameter.ToDocument());
+                const auto result = parameterCollection.insert_one(parameter.ToDocument());
                 session.commit_transaction();
                 log_trace << "Parameter created, oid: " << result->inserted_id().get_oid().value.to_string();
 
@@ -196,14 +192,13 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection parameterCollection;
+            auto session = GetSession(_parameterCollectionName, parameterCollection);
 
             try {
 
                 session.start_transaction();
-                const auto mResult = _parameterCollection.find_one_and_update(make_document(kvp("name", parameter.parameterName)), parameter.ToDocument(), opts);
+                const auto mResult = parameterCollection.find_one_and_update(make_document(kvp("name", parameter.parameterName)), parameter.ToDocument(), opts);
                 log_trace << "Parameter updated: " << parameter.ToString();
                 session.commit_transaction();
 
@@ -235,14 +230,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection parameterCollection;
+            auto session = GetSession(_parameterCollectionName, parameterCollection);
 
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _parameterCollection.delete_one(make_document(kvp("name", parameter.parameterName)));
+                const auto delete_many_result = parameterCollection.delete_one(make_document(kvp("name", parameter.parameterName)));
                 session.commit_transaction();
                 log_debug << "ssm parameter deleted, count: " << delete_many_result->deleted_count();
 
@@ -262,14 +256,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _parameterCollection = (*client)[_databaseName][_parameterCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection parameterCollection;
+            auto session = GetSession(_parameterCollectionName, parameterCollection);
 
             try {
 
                 session.start_transaction();
-                const auto delete_many_result = _parameterCollection.delete_many({});
+                const auto delete_many_result = parameterCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All ssm parameters deleted, count: " << delete_many_result->deleted_count();
                 return delete_many_result->deleted_count();

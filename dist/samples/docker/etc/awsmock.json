@@ -299,6 +299,7 @@
     },
     "mongodb": {
       "active": true,
+      "create-indexes": false,
       "name": "awsmock",
       "host": "mongodb",
       "port": 27017,

@@ -42,7 +42,7 @@ namespace AwsMock::Database::Entity::SQS {
         return rootDocument.extract();
     }
 
-    Queue Queue::FromDocument(const std::optional<view> &mResult) {
+    void Queue::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -51,17 +51,21 @@ namespace AwsMock::Database::Entity::SQS {
             owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
             queueUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "queueUrl");
             queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
-            attributes.FromDocument(mResult.value()["attributes"].get_document().value);
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             isDlq = Core::Bson::BsonUtils::GetBoolValue(mResult, "isDlq");
             mainQueue = Core::Bson::BsonUtils::GetStringValue(mResult, "mainQueue");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
+            // Get attributes
+            if (mResult.view().find("attributes") != mResult.view().end()) {
+                attributes.FromDocument(mResult.view()["attributes"].get_document().value);
+            }
+
             // Get tags
-            if (mResult.value().find("tags") != mResult.value().end()) {
+            if (mResult.view().find("tags") != mResult.view().end()) {
                 tags.clear();
-                for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+                for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                     std::string key = bsoncxx::string::to_string(tagElement.key());
                     std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                     tags.emplace(key, value);
@@ -69,8 +73,8 @@ namespace AwsMock::Database::Entity::SQS {
             }
 
             // Get default message attributes
-            if (mResult.value().find("defaultMessageAttributes") != mResult.value().end()) {
-                for (const view defaultMessageAttributeView = mResult.value()["defaultMessageAttributes"].get_document().value; const bsoncxx::document::element &element: defaultMessageAttributeView) {
+            if (mResult.view().find("defaultMessageAttributes") != mResult.view().end()) {
+                for (const view defaultMessageAttributeView = mResult.view()["defaultMessageAttributes"].get_document().value; const bsoncxx::document::element &element: defaultMessageAttributeView) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(element.key());
                     attribute.FromDocument(defaultMessageAttributeView[key].get_document().value);
@@ -82,7 +86,6 @@ namespace AwsMock::Database::Entity::SQS {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-        return *this;
     }
 
 }// namespace AwsMock::Database::Entity::SQS

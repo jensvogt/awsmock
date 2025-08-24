@@ -1,7 +1,7 @@
+
 //
 // Created by vogje01 on 29/05/2023.
 //
-
 #include <awsmock/repository/SQSDatabase.h>
 
 namespace AwsMock::Database {
@@ -45,10 +45,9 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
-            const int64_t count = _queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+            const int64_t count = queueCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
             log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
         }
@@ -59,8 +58,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
             document query;
             if (!region.empty()) {
@@ -70,7 +68,7 @@ namespace AwsMock::Database {
                 query.append(kvp("queueUrl", queueUrl));
             }
 
-            const int64_t count = _queueCollection.count_documents(query.extract());
+            const int64_t count = queueCollection.count_documents(query.extract());
             log_trace << "Queue exists: " << std::boolalpha << (count > 0);
             return count > 0;
         }
@@ -81,10 +79,9 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
-            const int64_t count = _queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
+            const int64_t count = queueCollection.count_documents(make_document(kvp("queueArn", queueArn)));
             log_trace << "Queue exists: " << std::boolalpha << count;
             return count > 0;
         }
@@ -95,14 +92,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection queueCollection;
+            auto session = GetSession(_queueCollectionName, queueCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _queueCollection.insert_one(queue.ToDocument());
+                const auto result = queueCollection.insert_one(queue.ToDocument());
                 log_trace << "Queue created, oid: " << result->inserted_id().get_oid().value.to_string();
                 session.commit_transaction();
 
@@ -120,10 +116,9 @@ namespace AwsMock::Database {
 
     Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) const {
 
-        const auto client = ConnectionPool::instance().GetConnection();
-        mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+        auto queueCollection = GetCollection(_queueCollectionName);
 
-        const auto mResult = _queueCollection.find_one(make_document(kvp("_id", oid)));
+        const auto mResult = queueCollection.find_one(make_document(kvp("_id", oid)));
         if (mResult->empty()) {
             log_error << "Queue not found, oid: " << oid.to_string();
             throw Core::DatabaseException("Queue not found, oid: " + oid.to_string());
@@ -147,18 +142,17 @@ namespace AwsMock::Database {
 
         Entity::SQS::Queue queue;
         if (HasDatabase()) {
-            Entity::SQS::Queue result;
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            auto queueCollection = GetCollection(_queueCollectionName);
 
-            const auto mResult = _queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
+            const auto mResult = queueCollection.find_one(make_document(kvp("queueArn", queueArn)));
 
-            if (!mResult) {
+            if (!mResult.has_value()) {
                 log_error << "Queue not found, queueArn: " << queueArn;
                 throw Core::DatabaseException("Queue not found, queueArn: " + queueArn);
             }
-            queue = result.FromDocument(mResult->view());
+            queue.FromDocument(mResult->view());
+
         } else {
             queue = _memoryDb.GetQueueByArn(queueArn);
         }
@@ -176,16 +170,16 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             Entity::SQS::Queue result;
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            auto queueCollection = GetCollection(_queueCollectionName);
 
-            const auto mResult = _queueCollection.find_one(make_document(kvp("attributes.redrivePolicy.deadLetterTargetArn", dlqQueueArn)));
+            const auto mResult = queueCollection.find_one(make_document(kvp("attributes.redrivePolicy.deadLetterTargetArn", dlqQueueArn)));
 
             if (!mResult) {
                 log_error << "Queue not found, queueArn: " << dlqQueueArn;
                 throw Core::DatabaseException("Queue not found, queueArn: " + dlqQueueArn);
             }
-            return result.FromDocument(mResult->view());
+            result.FromDocument(mResult->view());
+            return result;
         }
         return _memoryDb.GetQueueByDlq(dlqQueueArn);
     }
@@ -194,8 +188,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            auto queueCollection = GetCollection(_queueCollectionName);
 
             document query;
             if (!region.empty()) {
@@ -204,12 +197,13 @@ namespace AwsMock::Database {
             if (!queueUrl.empty()) {
                 query.append(kvp("queueUrl", queueUrl));
             }
-            if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
+            if (const auto mResult = queueCollection.find_one(query.extract()); !mResult.has_value()) {
                 log_error << "Queue not found, region: " << region << " queueUrl: " << queueUrl;
                 throw Core::DatabaseException("Queue not found, region: " + region + " queueUrl: " + queueUrl);
             } else {
                 Entity::SQS::Queue result;
-                return result.FromDocument(mResult->view());
+                result.FromDocument(mResult->view());
+                return result;
             }
         }
         return _memoryDb.GetQueueByUrl(queueUrl);
@@ -219,8 +213,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
             document query;
             if (!region.empty()) {
@@ -230,7 +223,7 @@ namespace AwsMock::Database {
                 query.append(kvp("name", queueName));
             }
 
-            if (const auto mResult = _queueCollection.find_one(query.extract()); !mResult) {
+            if (const auto mResult = queueCollection.find_one(query.extract()); !mResult) {
 
                 log_warning << "GetQueueByName failed, region: " << region << " name: " << queueName;
                 throw Core::DatabaseException("Queue not found, region: " + region + " name: " + queueName);
@@ -238,7 +231,8 @@ namespace AwsMock::Database {
             } else {
                 Entity::SQS::Queue result;
                 log_info << "GetQueueByName succeeded, region: " << region << " name: " << queueName;
-                return result.FromDocument(mResult->view());
+                result.FromDocument(mResult->view());
+                return result;
             }
         }
         return _memoryDb.GetQueueByName(region, queueName);
@@ -252,8 +246,7 @@ namespace AwsMock::Database {
 
             mongocxx::options::find opts;
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
             document query = {};
             if (!prefix.empty()) {
@@ -279,7 +272,7 @@ namespace AwsMock::Database {
                 opts.sort(sort.extract());
             }
 
-            for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
+            for (auto queueCursor = queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
                 result.size = (*_sqsCounterMap)[result.queueArn].size;
@@ -302,8 +295,7 @@ namespace AwsMock::Database {
 
             mongocxx::options::find opts;
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
             const document query = {};
             if (!sortColumns.empty()) {
@@ -316,7 +308,7 @@ namespace AwsMock::Database {
                 opts.sort(make_document(kvp("_id", 1)));
             }
 
-            for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
+            for (auto queueCursor = queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
                 queueList.push_back(result);
@@ -342,17 +334,15 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            Entity::SQS::QueueList queueList;
-
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
             document query = {};
             if (!region.empty()) {
                 query.append(kvp("region", region));
             }
 
-            for (auto queueCursor = _queueCollection.find(query.extract()); auto queue: queueCursor) {
+            Entity::SQS::QueueList queueList;
+            for (auto queueCursor = queueCollection.find(query.extract()); const auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
                 queueList.push_back(result);
@@ -368,9 +358,8 @@ namespace AwsMock::Database {
         long purged = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -405,9 +394,8 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection queueCollection;
+            auto session = GetSession(_queueCollectionName, queueCollection);
 
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
@@ -416,7 +404,7 @@ namespace AwsMock::Database {
 
                 session.start_transaction();
                 queue.modified = system_clock::now();
-                const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
+                const auto mResult = queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
 
@@ -454,9 +442,8 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _bucketCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection queueCollection;
+            auto session = GetSession(_queueCollectionName, queueCollection);
 
             try {
 
@@ -474,7 +461,7 @@ namespace AwsMock::Database {
                 document updateQuery;
                 updateQuery.append(kvp("$set", setQuery));
 
-                _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                queueCollection.update_one(filterQuery.extract(), updateQuery.extract());
                 log_trace << "Bucket counter updated";
                 session.commit_transaction();
 
@@ -492,8 +479,7 @@ namespace AwsMock::Database {
         long count;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
+            mongocxx::collection queueCollection = GetCollection(_queueCollectionName);
 
             document query = {};
             if (!prefix.empty()) {
@@ -504,7 +490,7 @@ namespace AwsMock::Database {
                 query.append(kvp("region", region));
             }
 
-            count = _queueCollection.count_documents(query.extract());
+            count = queueCollection.count_documents(query.extract());
 
         } else {
 
@@ -518,8 +504,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _objectCollection = client->database(_databaseName)[_messageCollectionName];
+            mongocxx::collection _objectCollection = GetCollection(_messageCollectionName);
 
             try {
                 mongocxx::pipeline p{};
@@ -545,14 +530,13 @@ namespace AwsMock::Database {
         long deleted = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection queueCollection;
+            auto session = GetSession(_queueCollectionName, queueCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
+                const auto result = queueCollection.delete_many(make_document(kvp("region", queue.region), kvp("queueUrl", queue.queueUrl)));
                 session.commit_transaction();
                 log_debug << "Queue deleted, count: " << result->deleted_count();
                 deleted = result->deleted_count();
@@ -575,14 +559,13 @@ namespace AwsMock::Database {
         long deleted = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection queueCollection;
+            auto session = GetSession(_queueCollectionName, queueCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _queueCollection.delete_many({});
+                const auto result = queueCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All queues deleted, count: " << result->deleted_count();
                 deleted = result->deleted_count();
@@ -607,9 +590,8 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -625,6 +607,7 @@ namespace AwsMock::Database {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException(exc.what());
             }
+
         } else {
             message = _memoryDb.CreateMessage(message);
         }
@@ -641,8 +624,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             try {
 
@@ -665,8 +647,8 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
+
             try {
 
                 const auto result = messageCollection.find_one(make_document(kvp("messageId", messageId)));
@@ -683,8 +665,7 @@ namespace AwsMock::Database {
 
     Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) const {
 
-        const auto client = ConnectionPool::instance().GetConnection();
-        auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+        auto messageCollection = GetCollection(_messageCollectionName);
 
         const auto mResult = messageCollection.find_one(make_document(kvp("_id", oid)));
         Entity::SQS::Message result;
@@ -697,8 +678,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             if (const auto mResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle)))) {
                 Entity::SQS::Message result;
@@ -714,8 +694,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             if (const auto mResult = messageCollection.find_one(make_document(kvp("messageId", messageId)))) {
                 Entity::SQS::Message result;
@@ -743,9 +722,8 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -785,8 +763,7 @@ namespace AwsMock::Database {
 
             Entity::SQS::MessageList messageList;
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             document query;
             if (!region.empty()) {
@@ -809,8 +786,7 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             mongocxx::options::find opts;
             if (pageSize > 0) {
@@ -852,9 +828,8 @@ namespace AwsMock::Database {
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            const auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
                 session.start_transaction();
@@ -886,9 +861,8 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -999,9 +973,8 @@ namespace AwsMock::Database {
         long updated = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             const auto newReset = system_clock::now() + std::chrono::seconds{visibility};
 
@@ -1049,9 +1022,8 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
                 std::string dlqQueueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(redrivePolicy.deadLetterTargetArn);
@@ -1092,9 +1064,8 @@ namespace AwsMock::Database {
         long updated = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
                 const auto now = system_clock::now();
@@ -1138,9 +1109,8 @@ namespace AwsMock::Database {
         long updated = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             const auto newReset = system_clock::now() + std::chrono::seconds{originalQueue.attributes.visibilityTimeout};
             try {
@@ -1199,9 +1169,8 @@ namespace AwsMock::Database {
         long deleted = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -1242,8 +1211,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             long count = 0;
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             document query = {};
             if (!queueArn.empty()) {
@@ -1265,8 +1233,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             mongocxx::pipeline p{};
             if (!queueArn.empty()) {
@@ -1291,8 +1258,7 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+                auto messageCollection = GetCollection(_messageCollectionName);
 
                 const long count = messageCollection.count_documents(make_document(kvp("queueArn", queueArn), kvp("status", MessageStatusToString(status))));
                 log_trace << "Count resources by status, status: " << MessageStatusToString(status) << " result: " << count;
@@ -1310,8 +1276,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            auto messageCollection = GetCollection(_messageCollectionName);
 
             try {
                 Entity::SQS::MessageWaitTime waitTime;
@@ -1360,9 +1325,8 @@ namespace AwsMock::Database {
         long deleted = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -1397,9 +1361,8 @@ namespace AwsMock::Database {
         long deleted = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
@@ -1438,12 +1401,12 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 
-                if (const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle))); !findResult->empty()) {
+                if (const auto findResult = messageCollection.find_one(make_document(kvp("receiptHandle", receiptHandle))); findResult.has_value()) {
                     Entity::SQS::Message message;
                     message.FromDocument(findResult->view());
                     return DeleteMessage(message);
@@ -1463,10 +1426,8 @@ namespace AwsMock::Database {
         long deleted = 0;
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            auto messageCollection = client->database(_databaseName)[_messageCollectionName];
-            auto queueCollection = client->database(_databaseName)[_queueCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection messageCollection;
+            auto session = GetSession(_messageCollectionName, messageCollection);
 
             try {
 

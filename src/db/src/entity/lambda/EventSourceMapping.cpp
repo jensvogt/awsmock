@@ -6,7 +6,7 @@
 
 namespace AwsMock::Database::Entity::Lambda {
 
-    void EventSourceMapping::FromDocument(const std::optional<view> &mResult) {
+    void EventSourceMapping::FromDocument(const view_or_value<view, value> &mResult) {
 
         type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
         eventSourceArn = Core::Bson::BsonUtils::GetStringValue(mResult, "eventSourceArn");

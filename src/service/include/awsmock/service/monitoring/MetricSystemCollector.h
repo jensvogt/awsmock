@@ -91,7 +91,7 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get AwsMock CPU utilization on Linux
          */
-        void GetCpuInfoAwsmockLinux();
+        void GetCpuInfoAwsmockLinux() const;
 
         /**
          * @brief Get total CPU utilization on Linux

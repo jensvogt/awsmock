@@ -55,7 +55,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * @brief Convert from a BSON document
          */
-        void FromDocument(const std::optional<view> &document);
+        void FromDocument(const view_or_value<view, value> &document);
     };
 
 }// namespace AwsMock::Database::Entity::DynamoDb

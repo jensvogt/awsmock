@@ -6,40 +6,49 @@
 #define AWSMOCK_RESTORE_STATUS_H
 
 // C++ includes
-#include <sstream>
-#include <string>
+#include <chrono>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
+
+    using std::chrono::system_clock;
 
     /**
      * @brief S3 object restore status DTO
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct RestoreStatus {
+    struct RestoreStatus final : Common::BaseCounter<RestoreStatus> {
 
         /**
          * Is restore in progress
          */
-        bool isRestoreInProgress;
+        bool isRestoreInProgress = false;
 
         /**
          * Expiration datetime
          */
         system_clock::time_point restoreExpiryDate;
 
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        view_or_value<view, value> ToDocument() const;
+      private:
+
+        friend RestoreStatus tag_invoke(boost::json::value_to_tag<RestoreStatus>, boost::json::value const &v) {
+            RestoreStatus r;
+            r.isRestoreInProgress = Core::Json::GetBoolValue(v, "isRestoreInProgress");
+            r.restoreExpiryDate = Core::Json::GetDatetimeValue(v, "Owner");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RestoreStatus const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"isRestoreInProgress", obj.isRestoreInProgress},
+                    {"restoreExpiryDate", Core::DateTimeUtils::ToISO8601(obj.restoreExpiryDate)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

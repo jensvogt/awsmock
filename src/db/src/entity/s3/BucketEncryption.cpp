@@ -17,10 +17,10 @@ namespace AwsMock::Database::Entity::S3 {
         }
     }
 
-    void BucketEncryption::FromDocument(const std::optional<view> &mResult) {
+    void BucketEncryption::FromDocument(const view_or_value<view, value> &mResult) {
         try {
-            sseAlgorithm = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sseAlgorithm"]);
-            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(mResult.value()["kmsKeyId"]);
+            sseAlgorithm = Core::Bson::BsonUtils::GetStringValue(mResult.view()["sseAlgorithm"]);
+            kmsKeyId = Core::Bson::BsonUtils::GetStringValue(mResult.view()["kmsKeyId"]);
         } catch (std::exception &exc) {
             log_error << exc.what();
             throw Core::DatabaseException(exc.what());

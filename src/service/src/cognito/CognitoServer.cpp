@@ -25,7 +25,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("cognito-backup", [this] { BackupCognito(); }, _backupCron);
+            scheduler.AddTask("cognito-backup", [] { BackupCognito(); }, _backupCron);
         }
 
         // Set running

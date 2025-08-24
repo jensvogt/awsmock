@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         return document.extract();
     }
 
-    void ProvisionedThroughput::FromDocument(const std::optional<view> &document) {
+    void ProvisionedThroughput::FromDocument(const view_or_value<view, value> &document) {
         readCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "ReadCapacityUnits");
         writeCapacityUnits = Core::Bson::BsonUtils::GetIntValue(document, "WriteCapacityUnits");
         lastDecreaseDateTime = Core::Bson::BsonUtils::GetDateValue(document, "LastDecreaseDateTime");

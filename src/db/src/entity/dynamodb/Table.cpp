@@ -65,7 +65,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
     }
 
-    void Table::FromDocument(const std::optional<view> &mResult) {
+    void Table::FromDocument(const view_or_value<view, value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -79,9 +79,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get tags
-        if (mResult.value().find("tags") != mResult.value().end()) {
+        if (mResult.view().find("tags") != mResult.view().end()) {
             tags.clear();
-            for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::map<std::string, std::string> tag;
                 tag["Key"] = bsoncxx::string::to_string(tagElement.key());
                 tag["Value"] = bsoncxx::string::to_string(tagElement.get_string().value);
@@ -90,9 +90,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
 
         // Get attributes
-        if (mResult.value().find("attributes") != mResult.value().end()) {
+        if (mResult.view().find("attributes") != mResult.view().end()) {
             attributes.clear();
-            for (const view tagsView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            for (const view tagsView = mResult.view()["attributes"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::map<std::string, std::string> attribute;
                 attribute["AttributeName"] = bsoncxx::string::to_string(tagElement.key());
                 attribute["AttributeType"] = bsoncxx::string::to_string(tagElement.get_string().value);
@@ -101,9 +101,9 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
 
         // Key schemas
-        if (mResult.value().find("keySchemas") != mResult.value().end()) {
+        if (mResult.view().find("keySchemas") != mResult.view().end()) {
             keySchemas.clear();
-            for (const view keySchemaView = mResult.value()["keySchemas"].get_document().value; const bsoncxx::document::element &keySchemaElement: keySchemaView) {
+            for (const view keySchemaView = mResult.view()["keySchemas"].get_document().value; const bsoncxx::document::element &keySchemaElement: keySchemaView) {
                 std::map<std::string, std::string> key;
                 key["AttributeName"] = bsoncxx::string::to_string(keySchemaElement.key());
                 key["KeyType"] = bsoncxx::string::to_string(keySchemaElement.get_string().value);
@@ -112,13 +112,13 @@ namespace AwsMock::Database::Entity::DynamoDb {
         }
 
         // Provisioned throughput
-        if (mResult.value().find("provisionedThroughput") != mResult.value().end()) {
-            provisionedThroughput.FromDocument(mResult.value()["provisionedThroughput"].get_document().value);
+        if (mResult.view().find("provisionedThroughput") != mResult.view().end()) {
+            provisionedThroughput.FromDocument(mResult.view()["provisionedThroughput"].get_document().value);
         }
 
         // Stream specification
-        if (mResult.value().find("streamSpecification") != mResult.value().end()) {
-            streamSpecification.FromDocument(mResult.value()["streamSpecification"].get_document().value);
+        if (mResult.view().find("streamSpecification") != mResult.view().end()) {
+            streamSpecification.FromDocument(mResult.view()["streamSpecification"].get_document().value);
         }
     }
 

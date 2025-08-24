@@ -124,7 +124,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @param mResult MongoDB document.
          */
-        Queue FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
     };
 
     typedef std::vector<Queue> QueueList;

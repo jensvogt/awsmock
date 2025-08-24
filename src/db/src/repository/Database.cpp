@@ -35,14 +35,32 @@ namespace AwsMock::Database {
             {"monitoring_idx3", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}}}},
     };
 
-    DatabaseBase::DatabaseBase() : _useDatabase(false) {
-        _useDatabase = Core::Configuration::instance().GetValue<bool>("awsmock.mongodb.active");
-        _name = Core::Configuration::instance().GetValue<std::string>("awsmock.mongodb.name");
+    DatabaseBase::DatabaseBase() : _pool(ConnectionPool::instance()), _useDatabase(false) {
+
+        const Core::Configuration &configuration = Core::Configuration::instance();
+        _useDatabase = configuration.GetValue<bool>("awsmock.mongodb.active");
+        _databaseName = configuration.GetValue<std::string>("awsmock.mongodb.name");
     }
 
-    mongocxx::database DatabaseBase::GetConnection() const {
-        const mongocxx::pool::entry _client = _pool->acquire();
-        return (*_client)[_name];
+    mongocxx::collection DatabaseBase::GetCollection(const std::string &collectionName) const {
+        const mongocxx::pool::entry connection = _pool.GetConnection();
+        return connection->database(_databaseName)[collectionName];
+    }
+
+    mongocxx::pool::entry DatabaseBase::GetClient() const {
+
+        mongocxx::pool::entry connection = _pool.GetConnection();
+        if (!connection) {
+            log_error << "Mongo database connection failure, error: no connection available";
+            throw Core::DatabaseException("No connection available");
+        }
+        return connection;
+    }
+
+    mongocxx::client_session DatabaseBase::GetSession(const std::string &collectionName, mongocxx::collection &collection) const {
+        const mongocxx::pool::entry client = GetClient();
+        collection = client->database(_databaseName)[collectionName];
+        return client->start_session();
     }
 
     bool DatabaseBase::HasDatabase() {
@@ -50,36 +68,14 @@ namespace AwsMock::Database {
     }
 
     std::string DatabaseBase::GetDatabaseName() const {
-        return _name;
-    }
-
-    void DatabaseBase::StartDatabase() {
-
-        _useDatabase = true;
-        Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", true);
-
-        // Update module database
-        const mongocxx::pool::entry _client = _pool->acquire();
-        (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-        log_info << "Database module started";
-    }
-
-    void DatabaseBase::StopDatabase() {
-
-        // Update module database
-        Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", false);
-        const mongocxx::pool::entry _client = _pool->acquire();
-        (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
-                                               make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
-
-        _useDatabase = false;
-        log_info << "Database module stopped";
+        return _databaseName;
     }
 
     void DatabaseBase::CreateIndexes() const {
         if (_useDatabase) {
-            const auto client = ConnectionPool::instance().GetConnection();
-            const mongocxx::database database = (*client)[_name];
+
+            const auto client = GetClient();
+            const mongocxx::database database = (*client)[_databaseName];
 
             log_info << "Start creating indexes";
 

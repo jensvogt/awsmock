@@ -106,7 +106,7 @@ namespace AwsMock::Database::Entity::Lambda {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+        [[maybe_unused]] void FromDocument(const view_or_value<view, value> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document

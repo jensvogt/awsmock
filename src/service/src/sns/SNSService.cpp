@@ -257,6 +257,7 @@ namespace AwsMock::Service {
 
             // Check subscriptions, asynchronously
             //CheckSubscriptions(request, topic, message);
+            // TODO: check asynchronous call
             boost::asio::post(_ioc, [this, request, topic, message] { CheckSubscriptions(request, topic, message); });
 
             Dto::SNS::PublishResponse response;
@@ -636,7 +637,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request;
@@ -736,7 +737,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Get queue by ARN

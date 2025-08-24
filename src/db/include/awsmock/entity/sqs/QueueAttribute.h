@@ -128,7 +128,7 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+        [[maybe_unused]] void FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::SQS

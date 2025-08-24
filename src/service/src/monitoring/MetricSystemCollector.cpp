@@ -43,28 +43,32 @@ namespace AwsMock::Monitoring {
 
 #ifdef __linux__
 
-    void MetricSystemCollector::GetCpuInfoAwsmockLinux() {
+    void MetricSystemCollector::GetCpuInfoAwsmockLinux() const {
+
+        std::ifstream file("/proc/uptime");
+        double uptimeSeconds;
+        file >> uptimeSeconds;
+        file.close();
 
         std::ifstream ifs("/proc/self/stat");
         if (ifs) {
             std::string line;
             std::getline(ifs, line);
             std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            unsigned long userCpu = std::stoul(tokens[13]);
-            unsigned long systemCpu = std::stoul(tokens[14]);
+            double userCpu = static_cast<double>(std::stoul(tokens[13])) / 100;
+            double systemCpu = static_cast<double>(std::stoul(tokens[14])) / 100;
+            double start = static_cast<double>(std::stoul(tokens[21])) / 100;
 
-            if (_lastAwsmockTotalCPU > 0) {
-                double percentUserCpu = static_cast<double>(userCpu - _lastAwsmockUserCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
-                double percentSystemCpu = static_cast<double>(systemCpu - _lastAwsmockSysCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
-                double percentTotalCpu = percentUserCpu + percentSystemCpu;
+            if (double elapsed = uptimeSeconds - start; elapsed > 0) {
+                auto totalCpu = userCpu + systemCpu;
+                double percentUserCpu = userCpu / totalCpu / _numProcessors * 100;
+                double percentSystemCpu = systemCpu / totalCpu / _numProcessors * 100;
+                double percentTotalCpu = percentSystemCpu + percentUserCpu;
                 MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percentUserCpu);
                 MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percentSystemCpu);
                 MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percentTotalCpu);
                 log_trace << "AwsMock CPU collector, total: " << percentTotalCpu << ", system: " << percentSystemCpu << ", user: " << percentUserCpu;
             }
-            _lastAwsmockUserCPU = userCpu;
-            _lastAwsmockSysCPU = systemCpu;
-            _lastAwsmockTotalCPU = userCpu + systemCpu;
         }
         ifs.close();
     }

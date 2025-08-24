@@ -48,7 +48,6 @@
 #include <awsmock/dto/s3/ListObjectVersionsResponse.h>
 #include <awsmock/dto/s3/MoveObjectRequest.h>
 #include <awsmock/dto/s3/MoveObjectResponse.h>
-#include <awsmock/dto/s3/PurgeBucketRequest.h>
 #include <awsmock/dto/s3/PutBucketEncryptionRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationRequest.h>
 #include <awsmock/dto/s3/PutBucketNotificationConfigurationResponse.h>
@@ -68,6 +67,7 @@
 #include <awsmock/dto/s3/internal/ListBucketCounterResponse.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterRequest.h>
 #include <awsmock/dto/s3/internal/ListObjectCounterResponse.h>
+#include <awsmock/dto/s3/internal/PurgeBucketRequest.h>
 #include <awsmock/dto/s3/internal/TouchObjectRequest.h>
 #include <awsmock/dto/s3/internal/UpdateObjectRequest.h>
 #include <awsmock/dto/s3/mapper/Mapper.h>
@@ -401,9 +401,9 @@ namespace AwsMock::Service {
         /**
          * @brief Send lambda function invocation request to lambda module.
          *
-         * <p>This will send a lambda invocation request to the lambda module. The
-         * lambda module will StartServer the corresponding lambda function and will
-         * send the S3 notification request to the lambda function.</p>
+         * @par
+         * This will send a lambda invocation request to the lambda module. The lambda module will StartServer the corresponding lambda function and will
+         * send the S3 notification request to the lambda function.
          *
          * @param eventNotification S3 event notification
          * @param lambdaNotification S3 lambda notification
@@ -417,9 +417,10 @@ namespace AwsMock::Service {
          * @param bucket bucket name.
          * @param key S3 object key.
          * @param size S3 object size in bytes.
+         * @param eTag S3 object eTag.
          * @param event S3 event type.
          */
-        void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &event);
+        void CheckNotifications(const std::string &region, const std::string &bucket, const std::string &key, long size, const std::string &eTag, const std::string &event);
 
         /**
          * @brief Checks the encryption status and encrypt the internal file using the

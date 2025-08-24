@@ -147,7 +147,7 @@ namespace AwsMock::Database::Entity::Apps {
          *
          * @param mResult query result.
          */
-        void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::Apps

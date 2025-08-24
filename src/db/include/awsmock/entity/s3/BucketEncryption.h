@@ -10,8 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/common/BaseEntity.h>
 
 namespace AwsMock::Database::Entity::S3 {
@@ -47,7 +47,7 @@ namespace AwsMock::Database::Entity::S3 {
          *
          * @param mResult MongoDB document.
          */
-        void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::S3

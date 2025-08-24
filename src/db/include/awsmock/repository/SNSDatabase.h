@@ -26,6 +26,7 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/sns/Message.h>
+#include <awsmock/entity/sns/MessageStatus.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
 #include <awsmock/repository/Database.h>

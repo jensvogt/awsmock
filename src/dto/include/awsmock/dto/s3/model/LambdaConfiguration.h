@@ -10,7 +10,6 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/FilterRule.h>
 #include <awsmock/dto/s3/model/NotificationEvent.h>
@@ -69,25 +68,27 @@ namespace AwsMock::Dto::S3 {
         std::vector<NotificationEventType> events;
 
         /**
-         * @brief Convert from a JSON object
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
          * @brief Convert from an XML string
          *
          * @param pt boost a property tree
          */
-        void FromXml(const boost::property_tree::ptree &pt);
+        void FromXml(const boost::property_tree::ptree &pt) {
+
+            if (pt.get_optional<std::string>("Id")) {
+                id = pt.get<std::string>("Id");
+            }
+            if (pt.get_optional<std::string>("CloudFunction")) {
+                lambdaArn = pt.get<std::string>("CloudFunction");
+            }
+            if (pt.get_optional<std::string>("Filter")) {
+                FilterRule filter;
+                filter.FromXml(pt.get_child("Filter"));
+                filterRules.emplace_back(filter);
+            }
+            if (pt.get_optional<std::string>("Event")) {
+                events.emplace_back(EventTypeFromString(pt.get<std::string>("Event")));
+            }
+        }
 
       private:
 

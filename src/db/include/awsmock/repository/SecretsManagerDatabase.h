@@ -12,8 +12,8 @@
 // AwsMock includes
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/secretsmanager/Secret.h>
 #include <awsmock/memorydb/SecretsManagerMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -193,7 +193,7 @@ namespace AwsMock::Database {
         /**
          * Database collection name
          */
-        std::string _collectionName;
+        std::string _secretsCollectionName;
 
         /**
          * Lambda in-memory database

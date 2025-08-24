@@ -22,7 +22,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SQSServer : public AbstractServer {
+    class SQSServer final : public AbstractServer {
 
       public:
 
@@ -67,7 +67,7 @@ namespace AwsMock::Service {
          *
          * @par
          * SQS queue URLs have the hostname in the name. In order to make the full.json copyable between hosts the URLs
-         * have to adjusted to the new hostname.
+         * have to adjust to the new hostname.
          */
         void SetUrl() const;
 
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
         /**
          * SQS database
          */
-        Database::SQSDatabase _sqsDatabase;
+        Database::SQSDatabase &_sqsDatabase;
 
         /**
          * SQS monitoring period

@@ -326,7 +326,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
         /**
          * @brief Creates a new queue
@@ -335,7 +335,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request);
+        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
 
         /**
          * @brief Receive a list of resources
@@ -391,7 +391,7 @@ namespace AwsMock::Service {
          * @throws ServiceException
          * @see ResendMessage
          */
-        void ResendMessage(const Dto::SQS::ResendMessageRequest &request);
+        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
 
         /**
          * @brief Export messages

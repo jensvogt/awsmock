@@ -67,7 +67,7 @@ namespace AwsMock::Database::Entity::SQS {
         return messageDoc.extract();
     }
 
-    void Message::FromDocument(const std::optional<view> &mResult) {
+    void Message::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 
@@ -89,9 +89,9 @@ namespace AwsMock::Database::Entity::SQS {
             modified = MongoUtils::GetDatetime(mResult, "modified");
 
             // Attributes
-            if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+            if (mResult.view().find("messageAttributes") != mResult.view().end()) {
                 messageAttributes.clear();
-                for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
+                for (const view messageAttributeObject = mResult.view()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(a.key());
                     attribute.FromDocument(a.get_document().value);
@@ -100,9 +100,9 @@ namespace AwsMock::Database::Entity::SQS {
             }
 
             // Get attributes
-            if (mResult.value().find("attributes") != mResult.value().end()) {
+            if (mResult.view().find("attributes") != mResult.view().end()) {
                 attributes.clear();
-                for (const view attributesView = mResult.value()["attributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
+                for (const view attributesView = mResult.view()["attributes"].get_document().value; const bsoncxx::document::element &attributeElement: attributesView) {
                     std::string key = bsoncxx::string::to_string(attributeElement.key());
                     std::string value = bsoncxx::string::to_string(attributesView[key].get_string().value);
                     attributes.emplace(key, value);

@@ -9,13 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/common/BaseCounter.h"
-
-
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -35,27 +30,6 @@ namespace AwsMock::Dto::S3 {
          * Display name
          */
         std::string displayName;
-
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-
-                Core::Bson::BsonUtils::SetStringValue(document, "id", id);
-                Core::Bson::BsonUtils::SetStringValue(document, "displayName", displayName);
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
 
       private:
 

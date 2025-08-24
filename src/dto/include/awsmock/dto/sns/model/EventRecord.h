@@ -62,20 +62,6 @@ namespace AwsMock::Dto::SNS {
          */
         std::string eventSourceArn;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @param document DTO as BSON document
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
       private:
 
         friend Record tag_invoke(boost::json::value_to_tag<Record>, boost::json::value const &v) {

@@ -160,7 +160,7 @@ namespace AwsMock::Database::Entity::Lambda {
         return lambdaDoc.extract();
     }
 
-    void Lambda::FromDocument(const std::optional<view> &mResult) {
+    void Lambda::FromDocument(const view_or_value<view, value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -170,7 +170,6 @@ namespace AwsMock::Database::Entity::Lambda {
         role = Core::Bson::BsonUtils::GetStringValue(mResult, "role");
         handler = Core::Bson::BsonUtils::GetStringValue(mResult, "handler");
         memorySize = Core::Bson::BsonUtils::GetLongValue(mResult, "memorySize");
-        ephemeralStorage.FromDocument(mResult.value()["ephemeralStorage"].get_document().value);
         codeSize = Core::Bson::BsonUtils::GetLongValue(mResult, "codeSize");
         imageId = Core::Bson::BsonUtils::GetStringValue(mResult, "imageId");
         imageSize = Core::Bson::BsonUtils::GetLongValue(mResult, "imageSize");
@@ -183,8 +182,8 @@ namespace AwsMock::Database::Entity::Lambda {
         state = LambdaStateFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "state"));
         stateReason = Core::Bson::BsonUtils::GetStringValue(mResult, "stateReason");
         stateReasonCode = LambdaStateReasonCodeFromString(Core::Bson::BsonUtils::GetStringValue(mResult, "stateReasonCode"));
-        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastStarted"]);
-        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.value()["lastInvocation"]);
+        lastStarted = Core::Bson::BsonUtils::GetDateValue(mResult.view()["lastStarted"]);
+        lastInvocation = Core::Bson::BsonUtils::GetDateValue(mResult.view()["lastInvocation"]);
         invocations = Core::Bson::BsonUtils::GetLongValue(mResult, "invocations");
         averageRuntime = Core::Bson::BsonUtils::GetLongValue(mResult, "averageRuntime");
         dockerTag = Core::Bson::BsonUtils::GetStringValue(mResult, "dockerTag");
@@ -193,12 +192,19 @@ namespace AwsMock::Database::Entity::Lambda {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Environment
-        environment.FromDocument(mResult.value()["environment"].get_document().value);
+        if (mResult.view().find("environment") != mResult.view().end()) {
+            environment.FromDocument(mResult.view()["environment"].get_document().value);
+        }
+
+        // Ephemeral storage
+        if (mResult.view().find("ephemeralStorage") != mResult.view().end()) {
+            ephemeralStorage.FromDocument(mResult.view()["ephemeralStorage"].get_document().value);
+        }
 
         // Get tags
-        if (mResult.value().find("tags") != mResult.value().end()) {
+        if (mResult.view().find("tags") != mResult.view().end()) {
             tags.clear();
-            for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+            for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);
@@ -206,14 +212,14 @@ namespace AwsMock::Database::Entity::Lambda {
         }
 
         // Get code
-        if (mResult.value().find("code") != mResult.value().end()) {
-            code.FromDocument(mResult.value()["code"].get_document().value);
+        if (mResult.view().find("code") != mResult.view().end()) {
+            code.FromDocument(mResult.view()["code"].get_document().value);
         }
 
         // Get instances
-        if (mResult.value().find("instances") != mResult.value().end()) {
+        if (mResult.view().find("instances") != mResult.view().end()) {
             instances.clear();
-            for (const view instancesView = mResult.value()["instances"].get_array().value; const bsoncxx::document::element &instanceElement: instancesView) {
+            for (const view instancesView = mResult.view()["instances"].get_array().value; const bsoncxx::document::element &instanceElement: instancesView) {
                 Instance instance;
                 instance.FromDocument(instanceElement.get_document().view());
                 instances.emplace_back(instance);
@@ -221,9 +227,9 @@ namespace AwsMock::Database::Entity::Lambda {
         }
 
         // Get event sources
-        if (mResult.value().find("eventSources") != mResult.value().end()) {
+        if (mResult.view().find("eventSources") != mResult.view().end()) {
             eventSources.clear();
-            for (const view eventSourcesView = mResult.value()["eventSources"].get_array().value; const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
+            for (const view eventSourcesView = mResult.view()["eventSources"].get_array().value; const bsoncxx::document::element &eventSourceElement: eventSourcesView) {
                 EventSourceMapping eventSourceMapping;
                 eventSourceMapping.FromDocument(eventSourceElement.get_document().view());
                 eventSources.emplace_back(eventSourceMapping);

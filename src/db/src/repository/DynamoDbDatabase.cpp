@@ -35,14 +35,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection tableCollection;
+            auto session = GetSession(_tableCollectionName, tableCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _tableCollection.insert_one(table.ToDocument());
+                const auto result = tableCollection.insert_one(table.ToDocument());
                 session.commit_transaction();
                 table.oid = result->inserted_id().get_oid().value.to_string();
 
@@ -63,9 +62,9 @@ namespace AwsMock::Database {
 
         try {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            const auto mResult = _tableCollection.find_one(make_document(kvp("_id", oid)));
+            mongocxx::collection tableCollection = GetCollection(_tableCollectionName);
+
+            const auto mResult = tableCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: Table not found ";
                 throw Core::DatabaseException("Database exception, Table not found ");
@@ -88,9 +87,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-                const auto mResult = _tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
+                mongocxx::collection tableCollection = GetCollection(_tableCollectionName);
+
+                const auto mResult = tableCollection.find_one(make_document(kvp("region", region), kvp("name", name)));
                 if (!mResult) {
                     log_error << "Database exception: Table not found ";
                     throw Core::DatabaseException("Database exception, Table not found ");
@@ -124,8 +123,7 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                mongocxx::collection tableCollection = GetCollection(_tableCollectionName);
 
                 document query;
                 if (!region.empty()) {
@@ -135,7 +133,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", tableName));
                 }
 
-                const int64_t count = _tableCollection.count_documents(query.extract());
+                const int64_t count = tableCollection.count_documents(query.extract());
                 log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
 
@@ -153,11 +151,7 @@ namespace AwsMock::Database {
 
             try {
 
-                mongocxx::options::find opts;
-
-                Entity::DynamoDb::TableList tables;
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                mongocxx::collection tableCollection = GetCollection(_tableCollectionName);
 
                 document query = {};
                 if (!region.empty()) {
@@ -167,6 +161,7 @@ namespace AwsMock::Database {
                     query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
                 }
 
+                mongocxx::options::find opts;
                 if (pageSize > 0) {
                     opts.limit(pageSize);
                 }
@@ -183,7 +178,8 @@ namespace AwsMock::Database {
                     opts.sort(sort.extract());
                 }
 
-                for (auto tableCursor = _tableCollection.find(query.extract(), opts); auto table: tableCursor) {
+                Entity::DynamoDb::TableList tables;
+                for (auto tableCursor = tableCollection.find(query.extract(), opts); auto table: tableCursor) {
                     Entity::DynamoDb::Table result;
                     result.FromDocument(table);
                     tables.push_back(result);
@@ -206,8 +202,7 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
+                mongocxx::collection tableCollection = GetCollection(_tableCollectionName);
 
                 document query = {};
                 if (!region.empty()) {
@@ -216,7 +211,7 @@ namespace AwsMock::Database {
                 if (!prefix.empty()) {
                     query.append(kvp("name", bsoncxx::types::b_regex{"^" + prefix + ".*"}));
                 }
-                return _tableCollection.count_documents(query.extract());
+                return tableCollection.count_documents(query.extract());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -230,15 +225,14 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+            mongocxx::collection itemCollection = GetCollection(_itemCollectionName);
 
             try {
                 mongocxx::pipeline p{};
                 p.match(make_document(kvp("region", region), kvp("tableName", tableName)));
                 p.group(make_document(kvp("_id", ""), kvp("totalSize", make_document(kvp("$sum", "$size")))));
                 p.project(make_document(kvp("_id", 0), kvp("totalSize", "$totalSize")));
-                auto totalSizeCursor = _itemCollection.aggregate(p);
+                auto totalSizeCursor = itemCollection.aggregate(p);
                 if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
                     return t["totalSize"].get_int64().value;
                 }
@@ -266,9 +260,8 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection tableCollection;
+            auto session = GetSession(_tableCollectionName, tableCollection);
 
             try {
 
@@ -280,7 +273,7 @@ namespace AwsMock::Database {
                 query.append(kvp("name", table.name));
 
                 session.start_transaction();
-                const auto mResult = _tableCollection.find_one_and_update(query.extract(), table.ToDocument(), opts);
+                const auto mResult = tableCollection.find_one_and_update(query.extract(), table.ToDocument(), opts);
                 session.commit_transaction();
 
                 if (mResult) {
@@ -306,9 +299,8 @@ namespace AwsMock::Database {
             mongocxx::options::find_one_and_update opts{};
             opts.return_document(mongocxx::options::return_document::k_after);
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _bucketCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection tableCollection;
+            auto session = GetSession(_tableCollectionName, tableCollection);
 
             try {
 
@@ -324,7 +316,7 @@ namespace AwsMock::Database {
                 document updateQuery;
                 updateQuery.append(kvp("$set", setQuery));
 
-                _bucketCollection.update_one(filterQuery.extract(), updateQuery.extract());
+                tableCollection.update_one(filterQuery.extract(), updateQuery.extract());
                 log_trace << "Bucket counter updated";
                 session.commit_transaction();
 
@@ -341,14 +333,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection tableCollection;
+            auto session = GetSession(_tableCollectionName, tableCollection);
 
             try {
 
                 session.start_transaction();
-                auto result = _tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
+                auto result = tableCollection.delete_many(make_document(kvp("region", region), kvp("name", tableName)));
                 session.commit_transaction();
                 log_debug << "DynamoDB table deleted, tableName: " << tableName << " region: " << region;
 
@@ -368,14 +359,13 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _tableCollection = (*client)[_databaseName][_tableCollectionName];
-            auto session = client->start_session();
+            mongocxx::collection tableCollection;
+            auto session = GetSession(_tableCollectionName, tableCollection);
 
             try {
 
                 session.start_transaction();
-                const auto result = _tableCollection.delete_many({});
+                const auto result = tableCollection.delete_many({});
                 session.commit_transaction();
                 log_debug << "All DynamoDb tables deleted, count: " << result->deleted_count();
                 return result->deleted_count();
@@ -395,10 +385,9 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+                mongocxx::collection itemCollection = GetCollection(_itemCollectionName);
 
-                Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
+                const Entity::DynamoDb::Table table = GetTableByRegionName(item.region, item.tableName);
 
                 document query;
                 if (!item.region.empty()) {
@@ -432,7 +421,7 @@ namespace AwsMock::Database {
                         }
                     }
                 }
-                const int64_t count = _itemCollection.count_documents(query.extract());
+                const int64_t count = itemCollection.count_documents(query.extract());
 
                 log_trace << "DynamoDb table exists: " << std::boolalpha << count;
                 return count > 0;
@@ -451,7 +440,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
+            mongocxx::collection itemCollection = (*client)[_databaseName]["dynamodb_item"];
             try {
 
                 document query;
@@ -463,7 +452,7 @@ namespace AwsMock::Database {
                     query.append(kvp("tableName", tableName));
                 }
 
-                for (auto itemCursor = _itemCollection.find(query.extract()); const auto item: itemCursor) {
+                for (auto itemCursor = itemCollection.find(query.extract()); const auto item: itemCursor) {
                     Entity::DynamoDb::Item result;
                     result.FromDocument(item);
                     items.push_back(result);
@@ -488,8 +477,8 @@ namespace AwsMock::Database {
         try {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-            const auto mResult = _itemCollection.find_one(make_document(kvp("_id", oid)));
+            mongocxx::collection itemCollection = (*client)[_databaseName][_itemCollectionName];
+            const auto mResult = itemCollection.find_one(make_document(kvp("_id", oid)));
             if (!mResult) {
                 log_error << "Database exception: item not found ";
                 throw Core::DatabaseException("Database exception, item not found ");
@@ -512,13 +501,13 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+            mongocxx::collection itemCollection = (*client)[_databaseName][_itemCollectionName];
             auto session = client->start_session();
 
             try {
 
                 session.start_transaction();
-                const auto result = _itemCollection.insert_one(item.ToDocument());
+                const auto result = itemCollection.insert_one(item.ToDocument());
                 session.commit_transaction();
 
                 log_trace << "DynamoDb item created, oid: " << result->inserted_id().get_oid().value.to_string();
@@ -549,7 +538,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+            mongocxx::collection itemCollection = (*client)[_databaseName][_itemCollectionName];
             auto session = client->start_session();
 
             try {
@@ -593,7 +582,7 @@ namespace AwsMock::Database {
                 }
 
                 session.start_transaction();
-                const auto result = _itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
+                const auto result = itemCollection.find_one_and_update(query.extract(), item.ToDocument(), opts);
                 session.commit_transaction();
                 if (result.has_value()) {
                     item = Entity::DynamoDb::Item().FromDocument(result->view());
@@ -624,8 +613,7 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+                mongocxx::collection itemCollection = GetCollection(_itemCollectionName);
 
                 document query;
                 if (!region.empty()) {
@@ -637,7 +625,7 @@ namespace AwsMock::Database {
                 if (!prefix.empty()) {
                     query.append(kvp("prefix", prefix));
                 }
-                return _itemCollection.count_documents(query.extract());
+                return itemCollection.count_documents(query.extract());
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
@@ -653,8 +641,7 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
+                mongocxx::collection itemCollection = GetCollection(_itemCollectionName);
 
                 document query;
                 query.append(kvp("region", region));
@@ -670,7 +657,7 @@ namespace AwsMock::Database {
                         query.append(kvp(fst + "NULL", *snd.nullValue));
                     }
                 }
-                const auto result = _itemCollection.delete_one(make_document(kvp("tableName", tableName)));
+                const auto result = itemCollection.delete_one(make_document(kvp("tableName", tableName)));
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
@@ -690,9 +677,8 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName][_itemCollectionName];
-                const auto result = _itemCollection.delete_many(make_document(kvp("tableName", tableName)));
+                mongocxx::collection itemCollection = GetCollection(_itemCollectionName);
+                const auto result = itemCollection.delete_many(make_document(kvp("tableName", tableName)));
                 log_debug << "DynamoDB item deleted, tableName: " << tableName << " count: " << result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
@@ -712,11 +698,11 @@ namespace AwsMock::Database {
 
             try {
 
-                const auto client = ConnectionPool::instance().GetConnection();
-                mongocxx::collection _itemCollection = (*client)[_databaseName]["dynamodb_item"];
-                const auto result = _itemCollection.delete_many({});
+                mongocxx::collection itemCollection = GetCollection(_itemCollectionName);
+
+                const auto result = itemCollection.delete_many({});
                 log_debug << "DynamoDB items deleted, count: " << result->deleted_count();
-                return static_cast<long>(result->deleted_count());
+                return result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();

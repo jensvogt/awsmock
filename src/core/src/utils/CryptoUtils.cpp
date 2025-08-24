@@ -291,7 +291,7 @@ namespace AwsMock::Core {
         return ciphertext;
     }
 
-    unsigned char *Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key) {
+    void Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key, unsigned char *out) {
 
         int p_len = 0, f_len = 0;
 
@@ -305,7 +305,8 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX_free(ctx);
 
         *len = p_len + f_len;
-        return plaintext;
+        memcpy(out, plaintext, *len);
+        free(plaintext);
     }
 
     void Crypto::Aes256EncryptFile(const std::string &filename, unsigned char *key) {
@@ -540,10 +541,11 @@ namespace AwsMock::Core {
         return sResult;
     }
 
-    unsigned char *Crypto::HexDecode(const std::string &hex) {
+    unsigned char *Crypto::HexDecode(const std::string &hex, unsigned char *out) {
         long len;
-        unsigned char *out = OPENSSL_hexstr2buf(hex.data(), &len);
-        out[len] = '\0';
+        unsigned char *hexOut = OPENSSL_hexstr2buf(hex.c_str(), &len);
+        std::memcpy(out, hexOut, len);
+        OPENSSL_free(hexOut);
         return out;
     }
 

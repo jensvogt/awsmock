@@ -44,10 +44,10 @@ namespace AwsMock::Database::Entity::SQS {
          *
          * @param mResult MongoDB document.
          */
-        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
+        [[maybe_unused]] void FromDocument(const view_or_value<view, value> &mResult);
 
         void FromJson(const std::string &json) {
-            value jsonObject = bsoncxx::from_json(json);
+            const view_or_value<view, value> jsonObject = bsoncxx::from_json(json);
             FromDocument(jsonObject);
         };
     };

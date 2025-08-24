@@ -31,7 +31,7 @@ namespace AwsMock::Database::Entity::SSM {
         return parameterDocument.extract();
     }
 
-    auto Parameter::FromDocument(const std::optional<view> &mResult) -> void {
+    auto Parameter::FromDocument(const view_or_value<view, value> &mResult) -> void {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -47,8 +47,8 @@ namespace AwsMock::Database::Entity::SSM {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get tags
-        if (mResult.value().find("tags") != mResult.value().end()) {
-            for (const view tagsView = mResult.value()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
+        if (mResult.view().find("tags") != mResult.view().end()) {
+            for (const view tagsView = mResult.view()["tags"].get_document().value; const bsoncxx::document::element &tagElement: tagsView) {
                 std::string key = bsoncxx::string::to_string(tagElement.key());
                 std::string value = bsoncxx::string::to_string(tagsView[key].get_string().value);
                 tags.emplace(key, value);

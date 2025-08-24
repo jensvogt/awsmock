@@ -308,11 +308,11 @@ namespace AwsMock::Service {
                     log_debug << "Object move request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
 
-                    Dto::S3::MoveObjectRequest s3Request = {
-                            .region = clientCommand.region,
-                            .user = clientCommand.user,
-                            .targetBucket = clientCommand.bucket,
-                            .targetKey = clientCommand.key};
+                    Dto::S3::MoveObjectRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.user = clientCommand.user;
+                    s3Request.targetBucket = clientCommand.bucket;
+                    s3Request.targetKey = clientCommand.key;
 
                     // Get S3 source bucket/key
                     GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);

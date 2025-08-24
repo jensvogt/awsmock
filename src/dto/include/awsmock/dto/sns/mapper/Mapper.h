@@ -6,14 +6,17 @@
 #define AWSMOCK_DTO_SNS_MAPPER_H
 
 // AwsMock includes
+#include <awsmock/dto/s3/model/Bucket.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/ListMessagesRequest.h>
 #include <awsmock/dto/sns/internal/ListMessagesResponse.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersRequest.h>
 #include <awsmock/dto/sns/internal/ListTopicCountersResponse.h>
+#include <awsmock/dto/sns/model/EventNotification.h>
 #include <awsmock/dto/sns/model/Message.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/entity/s3/TopicNotification.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 

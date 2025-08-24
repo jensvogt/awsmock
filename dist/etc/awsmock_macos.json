@@ -295,6 +295,7 @@
     },
     "mongodb": {
       "active": true,
+      "create-indexes": false,
       "name": "awsmock",
       "host": "localhost",
       "port": 27017,

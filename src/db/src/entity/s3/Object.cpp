@@ -33,26 +33,26 @@ namespace AwsMock::Database::Entity::S3 {
         return objectDoc;
     }
 
-    void Object::FromDocument(const std::optional<view> &mResult) {
-        oid = Core::Bson::BsonUtils::GetOidValue(mResult.value()["_id"]);
-        region = Core::Bson::BsonUtils::GetStringValue(mResult.value()["region"]);
-        bucket = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucket"]);
-        bucketArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucketArn"]);
-        key = Core::Bson::BsonUtils::GetStringValue(mResult.value()["key"]);
-        owner = Core::Bson::BsonUtils::GetStringValue(mResult.value()["owner"]);
-        size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
-        md5sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["md5sum"]);
-        sha1sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sha1sum"]);
-        sha256sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sha256sum"]);
-        contentType = Core::Bson::BsonUtils::GetStringValue(mResult.value()["contentType"]);
-        internalName = Core::Bson::BsonUtils::GetStringValue(mResult.value()["internalName"]);
-        versionId = Core::Bson::BsonUtils::GetStringValue(mResult.value()["versionId"]);
-        created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
-        modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
+    void Object::FromDocument(const view_or_value<view, value> &mResult) {
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult.view()["_id"]);
+        region = Core::Bson::BsonUtils::GetStringValue(mResult.view()["region"]);
+        bucket = Core::Bson::BsonUtils::GetStringValue(mResult.view()["bucket"]);
+        bucketArn = Core::Bson::BsonUtils::GetStringValue(mResult.view()["bucketArn"]);
+        key = Core::Bson::BsonUtils::GetStringValue(mResult.view()["key"]);
+        owner = Core::Bson::BsonUtils::GetStringValue(mResult.view()["owner"]);
+        size = Core::Bson::BsonUtils::GetLongValue(mResult.view()["size"]);
+        md5sum = Core::Bson::BsonUtils::GetStringValue(mResult.view()["md5sum"]);
+        sha1sum = Core::Bson::BsonUtils::GetStringValue(mResult.view()["sha1sum"]);
+        sha256sum = Core::Bson::BsonUtils::GetStringValue(mResult.view()["sha256sum"]);
+        contentType = Core::Bson::BsonUtils::GetStringValue(mResult.view()["contentType"]);
+        internalName = Core::Bson::BsonUtils::GetStringValue(mResult.view()["internalName"]);
+        versionId = Core::Bson::BsonUtils::GetStringValue(mResult.view()["versionId"]);
+        created = Core::Bson::BsonUtils::GetDateValue(mResult.view()["created"]);
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult.view()["modified"]);
 
         // Get metadata
-        if (mResult.value().find("metadata") != mResult.value().end()) {
-            for (const view metadataView = mResult.value()["metadata"].get_document().value; const bsoncxx::document::element &metadataElement: metadataView) {
+        if (mResult.view().find("metadata") != mResult.view().end()) {
+            for (const view metadataView = mResult.view()["metadata"].get_document().value; const bsoncxx::document::element &metadataElement: metadataView) {
                 std::string metadataKey = bsoncxx::string::to_string(metadataElement.key());
                 std::string metadataValue = bsoncxx::string::to_string(metadataView[metadataKey].get_string().value);
                 metadata.emplace(metadataKey, metadataValue);

@@ -27,7 +27,7 @@ namespace AwsMock::Database::Entity::Lambda {
         return lambdaDocResult.extract();
     }
 
-    void LambdaResult::FromDocument(const std::optional<view> &mResult) {
+    void LambdaResult::FromDocument(const view_or_value<view, value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

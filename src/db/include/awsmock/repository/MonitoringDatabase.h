@@ -21,8 +21,8 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
 
@@ -58,7 +58,7 @@ namespace AwsMock::Database {
         /**
          * @brief Increments a metric counter
          *
-         * @param name metric counter name
+         * @param name metric counter-name
          * @param labelName metric label name
          * @param labelValue metric label name
          * @param value metric value

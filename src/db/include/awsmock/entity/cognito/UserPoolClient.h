@@ -81,7 +81,7 @@ namespace AwsMock::Database::Entity::Cognito {
          *
          * @param mResult query result.
          */
-        void FromDocument(std::optional<view> mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
     };
 
 }// namespace AwsMock::Database::Entity::Cognito

@@ -30,7 +30,7 @@ namespace AwsMock::Database::Entity::SNS {
         return messageDoc.extract();
     }
 
-    void Message::FromDocument(const std::optional<view> &mResult) {
+    void Message::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -47,9 +47,9 @@ namespace AwsMock::Database::Entity::SNS {
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Attributes
-            if (mResult.value().find("messageAttributes") != mResult.value().end()) {
+            if (mResult.view().find("messageAttributes") != mResult.view().end()) {
                 messageAttributes.clear();
-                for (const view messageAttributeObject = mResult.value()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
+                for (const view messageAttributeObject = mResult.view()["messageAttributes"].get_document().value; const auto &a: messageAttributeObject) {
                     MessageAttribute attribute;
                     std::string key = bsoncxx::string::to_string(a.key());
                     attribute.FromDocument(a.get_document().value);

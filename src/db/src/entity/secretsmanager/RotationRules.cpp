@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return rotationRulesDoc.extract();
     }
 
-    void RotationRules::FromDocument(const std::optional<view> &mResult) {
+    void RotationRules::FromDocument(const view_or_value<view, value> &mResult) {
 
         automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(mResult, "automaticallyAfterDays");
         duration = Core::Bson::BsonUtils::GetStringValue(mResult, "duration");

@@ -537,6 +537,7 @@ namespace AwsMock::Database {
          * SQS in-memory database
          */
         SQSMemoryDb &_memoryDb;
+
         /**
          * Shared memory segment
          */

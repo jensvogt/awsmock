@@ -9,7 +9,7 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3") {
+    S3Server::S3Server(Core::Scheduler &scheduler, mongocxx::pool::entry &connection) : AbstractServer("s3"), _connection(connection) {
 
         // Get HTTP configuration values
         _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync.period");
@@ -97,7 +97,7 @@ namespace AwsMock::Service {
 
                 totalKeys += val.keys;
                 totalSize += val.size;
-                _s3Database.UpdateBucketCounter(key, val.keys, val.size);
+                _s3Database.UpdateBucketCounter(_connection, key, val.keys, val.size);
             }
             _metricService.SetGauge(S3_BUCKET_COUNT, {}, {}, static_cast<double>(_s3CounterMap->size()));
             _metricService.SetGauge(S3_OBJECT_COUNT, {}, {}, static_cast<double>(totalKeys));

@@ -11,14 +11,17 @@
 #include <awsmock/dto/s3/internal/GetBucketRequest.h>
 #include <awsmock/dto/s3/internal/GetBucketResponse.h>
 #include <awsmock/dto/s3/model/Bucket.h>
+#include <awsmock/dto/s3/model/EventNotification.h>
 #include <awsmock/dto/s3/model/LambdaConfiguration.h>
 #include <awsmock/dto/s3/model/QueueConfiguration.h>
 #include <awsmock/dto/s3/model/TopicConfiguration.h>
+#include <awsmock/dto/sqs/model/EventNotification.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/LambdaNotification.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/entity/s3/QueueNotification.h>
 #include <awsmock/entity/s3/TopicNotification.h>
+
 
 namespace AwsMock::Dto::S3 {
 
@@ -84,6 +87,17 @@ namespace AwsMock::Dto::S3 {
          */
         static LambdaConfiguration map(const Database::Entity::S3::LambdaNotification &lambdaConfigurationEntity);
 
+        /**
+         * @brief Maps a S3 event notification to an SNS topic event notification.
+         *
+         * @param notificationId S3 notification ID
+         * @param bucket corresponding S3 bucket
+         * @param object corresponding S3 object
+         * @param event SNS event notification
+         * @return
+         */
+        static EventNotification map(const std::string &notificationId, Bucket &bucket, Object &object, const std::string &event);
+
       private:
 
         /**
@@ -112,6 +126,22 @@ namespace AwsMock::Dto::S3 {
          * @see LambdaConfiguration
          */
         static std::vector<LambdaConfiguration> map(const std::vector<Database::Entity::S3::LambdaNotification> &lambdaConfigurationEntities);
+
+        /**
+         * @brief Maps lambda event entities to lambda event entities DTOs
+         *
+         * @param lambdaNotificationEventTypeEntities
+         * @return vector of strings
+         */
+        static std::vector<std::string> map(const std::vector<NotificationEventType> &lambdaNotificationEventTypeEntities);
+
+        /**
+         * @brief Maps a lambda filter rule DTO to a lambda filter rule Entity
+         *
+         * @param filterRulesDtos
+         * @return
+         */
+        static std::vector<Database::Entity::S3::FilterRule> map(const std::vector<FilterRule> &filterRulesDtos);
 
         /**
          * @brief Maps event string to event types.

@@ -9,13 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include "awsmock/dto/common/BaseCounter.h"
-
-
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/utils/SortColumn.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 

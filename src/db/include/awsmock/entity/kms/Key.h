@@ -17,8 +17,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/MongoUtils.h>
 
 namespace AwsMock::Database::Entity::KMS {
@@ -147,7 +147,7 @@ namespace AwsMock::Database::Entity::KMS {
          *
          * @param mResult MongoDB document view.
          */
-        void FromDocument(const std::optional<view> &mResult);
+        void FromDocument(const view_or_value<view, value> &mResult);
 
         /**
          * @brief Converts the DTO to a JSON string representation.

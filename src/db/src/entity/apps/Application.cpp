@@ -59,7 +59,7 @@ namespace AwsMock::Database::Entity::Apps {
         return applicationDocument.extract();
     }
 
-    void Application::FromDocument(const std::optional<view> &mResult) {
+    void Application::FromDocument(const view_or_value<view, value> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
@@ -83,9 +83,9 @@ namespace AwsMock::Database::Entity::Apps {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Environment
-        if (mResult.value().find("environment") != mResult.value().end()) {
+        if (mResult.view().find("environment") != mResult.view().end()) {
             environment.clear();
-            for (const view environmentObject = mResult.value()["environment"].get_document().value; const auto &e: environmentObject) {
+            for (const view environmentObject = mResult.view()["environment"].get_document().value; const auto &e: environmentObject) {
                 const std::string key = bsoncxx::string::to_string(e.key());
                 const std::string value = bsoncxx::string::to_string(environmentObject[key].get_string().value);
                 environment[key] = value;
@@ -93,9 +93,9 @@ namespace AwsMock::Database::Entity::Apps {
         }
 
         // Tags
-        if (mResult.value().find("tags") != mResult.value().end()) {
+        if (mResult.view().find("tags") != mResult.view().end()) {
             tags.clear();
-            for (const view tagsObject = mResult.value()["tags"].get_document().value; const auto &t: tagsObject) {
+            for (const view tagsObject = mResult.view()["tags"].get_document().value; const auto &t: tagsObject) {
                 const std::string key = bsoncxx::string::to_string(t.key());
                 const std::string value = bsoncxx::string::to_string(tagsObject[key].get_string().value);
                 tags[key] = value;
@@ -103,9 +103,9 @@ namespace AwsMock::Database::Entity::Apps {
         }
 
         // Dependencies
-        if (mResult.value().find("dependencies") != mResult.value().end()) {
+        if (mResult.view().find("dependencies") != mResult.view().end()) {
             dependencies.clear();
-            for (const view dependenciesArray = mResult.value()["dependencies"].get_array().value; const auto &d: dependenciesArray) {
+            for (const view dependenciesArray = mResult.view()["dependencies"].get_array().value; const auto &d: dependenciesArray) {
                 dependencies.emplace_back(d.get_string().value);
             }
         }

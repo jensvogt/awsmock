@@ -35,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit S3Server(Core::Scheduler &scheduler);
+        explicit S3Server(Core::Scheduler &scheduler, mongocxx::pool::entry &connection);
 
       private:
 
@@ -106,6 +106,8 @@ namespace AwsMock::Service {
          * Counter map in a shared memory segment
          */
         Database::S3CounterMapType *_s3CounterMap{};
+
+        mongocxx::pool::entry &_connection;
     };
 
 }// namespace AwsMock::Service

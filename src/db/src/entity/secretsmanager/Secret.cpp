@@ -43,7 +43,7 @@ namespace AwsMock::Database::Entity::SecretsManager {
         return secretDoc.extract();
     }
 
-    void Secret::FromDocument(const std::optional<view> &mResult) {
+    void Secret::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
             oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
@@ -67,8 +67,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
             // Get versions
-            if (mResult.value().find("versions") != mResult.value().end()) {
-                for (const view versionsView = mResult.value()["versions"].get_document().value; const auto &element: versionsView) {
+            if (mResult.view().find("versions") != mResult.view().end()) {
+                for (const view versionsView = mResult.view()["versions"].get_document().value; const auto &element: versionsView) {
                     std::string versionId = bsoncxx::string::to_string(element.key());
                     SecretVersion version;
                     version.FromDocument(element.get_document().value);
@@ -77,8 +77,8 @@ namespace AwsMock::Database::Entity::SecretsManager {
             }
 
             // Get rotation rules
-            if (mResult.value().find("rotationRules") != mResult.value().end()) {
-                const view rotationView = mResult.value()["rotationRules"].get_document().value;
+            if (mResult.view().find("rotationRules") != mResult.view().end()) {
+                const view rotationView = mResult.view()["rotationRules"].get_document().value;
                 rotationRules.automaticallyAfterDays = Core::Bson::BsonUtils::GetLongValue(rotationView, "automaticallyAfterDays");
                 rotationRules.duration = Core::Bson::BsonUtils::GetStringValue(rotationView, "duration");
                 rotationRules.scheduleExpression = Core::Bson::BsonUtils::GetStringValue(rotationView, "scheduleExpression");

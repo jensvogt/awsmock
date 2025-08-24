@@ -15,8 +15,9 @@
 #include <mongocxx/pool.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Database {
 
@@ -58,17 +59,27 @@ namespace AwsMock::Database {
          */
         void Shutdown();
 
+        /**
+         * @brief Shutdown the connection pool
+         */
+        std::unique_ptr<mongocxx::pool> GetPool() { return std::move(_pool); }
+
       private:
 
         /**
          * MongoDB instance
          */
-        std::shared_ptr<mongocxx::instance> _instance = nullptr;
+        std::unique_ptr<mongocxx::instance> _instance;
 
         /**
          * Connection pool
          */
-        std::shared_ptr<mongocxx::pool> _pool = nullptr;
+        std::unique_ptr<mongocxx::pool> _pool;
+
+        /**
+         * Connection mutex
+         */
+        static boost::mutex _mutex;
     };
 
 }// namespace AwsMock::Database

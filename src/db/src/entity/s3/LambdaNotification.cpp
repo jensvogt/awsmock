@@ -40,23 +40,23 @@ namespace AwsMock::Database::Entity::S3 {
         return lambdaNotificationDoc.extract();
     }
 
-    LambdaNotification LambdaNotification::FromDocument(const std::optional<view> &mResult) {
+    LambdaNotification LambdaNotification::FromDocument(const view_or_value<view, value> &mResult) {
 
         try {
 
-            id = Core::Bson::BsonUtils::GetStringValue(mResult.value()["id"]);
-            lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["lambdaArn"]);
+            id = Core::Bson::BsonUtils::GetStringValue(mResult.view()["id"]);
+            lambdaArn = Core::Bson::BsonUtils::GetStringValue(mResult.view()["lambdaArn"]);
 
             // Extract events
-            if (mResult.value().find("events") != mResult.value().end()) {
-                for (const view eventsView = mResult.value()["events"].get_array().value; bsoncxx::document::element event: eventsView) {
+            if (mResult.view().find("events") != mResult.view().end()) {
+                for (const view eventsView = mResult.view()["events"].get_array().value; bsoncxx::document::element event: eventsView) {
                     events.emplace_back(event.get_string().value);
                 }
             }
 
             // Extract filter rules
-            if (mResult.value().find("filterRules") != mResult.value().end()) {
-                for (const view filterRulesView = mResult.value()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
+            if (mResult.view().find("filterRules") != mResult.view().end()) {
+                for (const view filterRulesView = mResult.view()["filterRules"].get_array().value; const bsoncxx::document::element &filterRuleElement: filterRulesView) {
                     FilterRule filterRule;
                     filterRule.FromDocument(filterRuleElement.get_document().view());
                     filterRules.emplace_back(filterRule);

@@ -16,10 +16,10 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
@@ -214,13 +214,14 @@ namespace AwsMock::Database {
         /**
          * @brief Updates a bucket
          *
+         * @param connection database connection
          * @param bucketArn bucker ARN
          * @param keys number of keys
          * @param size bucket size
          * @return created bucket entity
          * @throws DatabaseException
          */
-        void UpdateBucketCounter(const std::string &bucketArn, long keys, long size) const;
+        void UpdateBucketCounter(const mongocxx::pool::entry &connection, const std::string &bucketArn, long keys, long size) const;
 
         /**
          * @brief Returns the total bucket size.

@@ -15,7 +15,7 @@ namespace AwsMock::Database::Entity::SQS {
         return redrivePolicyDoc.extract();
     }
 
-    void RedrivePolicy::FromDocument(const std::optional<view> &mResult) {
+    void RedrivePolicy::FromDocument(const view_or_value<view, value> &mResult) {
 
         deadLetterTargetArn = Core::Bson::BsonUtils::GetStringValue(mResult, "deadLetterTargetArn");
         maxReceiveCount = Core::Bson::BsonUtils::GetIntValue(mResult, "maxReceiveCount");
