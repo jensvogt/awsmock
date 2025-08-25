@@ -273,7 +273,7 @@ namespace AwsMock::Core {
         }
     }
 
-    unsigned char *Crypto::Aes256EncryptString(const unsigned char *plaintext, int *len, unsigned char *key) {
+    unsigned char *Crypto::Aes256EncryptString(const unsigned char *plaintext, int *len, const unsigned char *key) {
 
         int f_len = 0, p_len = *len;
 

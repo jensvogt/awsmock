@@ -44,9 +44,9 @@
 // AwsMock includes
 #include <awsmock/core/Base64Utils.h>
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/RandomUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 
 // 64 kB buffer
 #define AWSMOCK_BUFFER_SIZE 4096
@@ -216,7 +216,7 @@ namespace AwsMock::Core {
          * @param key encryption key
          * @return encrypted string
          */
-        static unsigned char *Aes256EncryptString(const unsigned char *plaintext, int *len, unsigned char *key);
+        static unsigned char *Aes256EncryptString(const unsigned char *plaintext, int *len, const unsigned char *key);
 
         /**
          * @brief AES256 decryption of a string.
