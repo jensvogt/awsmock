@@ -29,6 +29,9 @@ namespace AwsMock::Database {
             {"module_idx1", {"module", {{"name", 1}, {"state", 1}}}},
             // KMS
             {"kms_idx1", {"kms", {{"region", 1}, {"keyId", 1}}}},
+            // Applications
+            {"application_idx1", {"apps_application", {{"region", 1}, {"name", 1}}}},
+            {"application_idx2", {"apps_application", {{"region", 1}, {"name", 1}, {"status", 1}}}},
             // Monitoring
             {"monitoring_idx1", {"monitoring", {{"name", 1}, {"created", 1}}}},
             {"monitoring_idx2", {"monitoring", {{"name", 1}, {"labelName", 1}, {"labelValue", 1}, {"created", 1}}}},
@@ -51,29 +54,6 @@ namespace AwsMock::Database {
 
     std::string DatabaseBase::GetDatabaseName() const {
         return _name;
-    }
-
-    void DatabaseBase::StartDatabase() {
-
-        _useDatabase = true;
-        Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", true);
-
-        // Update module database
-        const mongocxx::pool::entry _client = _pool->acquire();
-        (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")), make_document(kvp("$set", make_document(kvp("state", "RUNNING")))));
-        log_info << "Database module started";
-    }
-
-    void DatabaseBase::StopDatabase() {
-
-        // Update module database
-        Core::Configuration::instance().SetValue<bool>("awsmock.mongodb.active", false);
-        const mongocxx::pool::entry _client = _pool->acquire();
-        (*_client)[_name]["module"].update_one(make_document(kvp("name", "database")),
-                                               make_document(kvp("$set", make_document(kvp("state", "STOPPED")))));
-
-        _useDatabase = false;
-        log_info << "Database module stopped";
     }
 
     void DatabaseBase::CreateIndexes() const {

@@ -308,11 +308,11 @@ namespace AwsMock::Service {
                     log_debug << "Object move request, bucket: " << clientCommand.bucket << " key: " << clientCommand.key;
 
 
-                    Dto::S3::MoveObjectRequest s3Request = {
-                            .region = clientCommand.region,
-                            .user = clientCommand.user,
-                            .targetBucket = clientCommand.bucket,
-                            .targetKey = clientCommand.key};
+                    Dto::S3::MoveObjectRequest s3Request;
+                    s3Request.region = clientCommand.region;
+                    s3Request.user = clientCommand.user;
+                    s3Request.targetBucket = clientCommand.bucket;
+                    s3Request.targetKey = clientCommand.key;
 
                     // Get S3 source bucket/key
                     GetBucketKeyFromHeader(Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source"), s3Request.sourceBucket, s3Request.sourceKey);
@@ -577,13 +577,14 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::S3CommandType::PURGE_BUCKET: {
-                    log_debug << "S3 purge bucket request";
+                    log_debug << "S3 purge bucket request, bucket: " << clientCommand.bucket;
 
                     // Build request
                     Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
-                    boost::asio::spawn(_ioc, [this, s3Request](const boost::asio::yield_context &) {
-                        const long deleted = _s3Service.PurgeBucket(s3Request);
-                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: "<<deleted; }, boost::asio::detached);
+                    boost::asio::post(_ioc, [this, s3Request] {
+                        const S3Service service(_ioc);
+                        const long deleted = service.PurgeBucket(s3Request);
+                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: " << deleted; });
                     return SendResponse(request, http::status::ok, {});
                 }
 
@@ -767,7 +768,7 @@ namespace AwsMock::Service {
             }
             return SendResponse(request, http::status::ok, {}, headers);
 
-        } catch (Core::NotFoundException &exc) {
+        } catch ([[maybe_unused]] Core::NotFoundException &exc) {
             return SendResponse(request, http::status::not_found);
         } catch (std::exception &exc) {
             return SendResponse(request, http::status::internal_server_error, exc.what());

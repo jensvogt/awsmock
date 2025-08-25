@@ -50,7 +50,7 @@ namespace AwsMock::Service {
     long S3Service::PurgeBucket(const Dto::S3::PurgeBucketRequest &request) const {
         Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER, "action", "purge_bucket");
         Monitoring::MetricService::instance().IncrementCounter(S3_SERVICE_COUNTER, "action", "purge_bucket");
-        log_trace << "Purge bucket request, s3Request: " << request.ToString();
+        log_trace << "Purge bucket request, s3Request: " << request;
 
         CheckBucketExistence(request.region, request.bucketName);
 
@@ -766,7 +766,6 @@ namespace AwsMock::Service {
             throw Core::NotFoundException("Source object does not exist");
         }
 
-        Dto::S3::CopyObjectResponse response;
         Database::Entity::S3::Object targetObject;
         try {
             // Check the existence of the target bucket
@@ -808,11 +807,16 @@ namespace AwsMock::Service {
             // Check notification
             CheckNotifications(targetObject.region, targetObject.bucket, targetObject.key, targetObject.size, "ObjectCreated");
             log_debug << "Move object succeeded, sourceBucket: " << request.sourceBucket << " sourceKey: " << request.sourceKey << " targetBucket: " << request.targetBucket << " targetKey: " << request.targetKey;
+
         } catch (bsoncxx::exception &ex) {
             log_error << "S3 copy object request failed, message: " << ex.what();
             throw Core::ServiceException(ex.what());
         }
-        return {.eTag = targetObject.md5sum, .lastModified = Core::DateTimeUtils::ToISO8601(system_clock::now())};
+
+        Dto::S3::MoveObjectResponse response;
+        response.eTag = targetObject.md5sum;
+        response.lastModified = Core::DateTimeUtils::ToISO8601(system_clock::now());
+        return response;
     }
 
     void S3Service::DeleteObject(const Dto::S3::DeleteObjectRequest &request) {
@@ -977,7 +981,11 @@ namespace AwsMock::Service {
         Database::Entity::S3::Bucket bucketEntity = _database.GetBucketByRegionName(region, bucket);
 
         // Create S3 bucket and object
-        Dto::S3::Object s3Object = {.key = key, .size = size, .etag = Core::StringUtils::CreateRandomUuid()};
+        Dto::S3::Object s3Object;
+        s3Object.key = key;
+        s3Object.size = size;
+        s3Object.etag = Core::StringUtils::CreateRandomUuid();
+
         Dto::S3::Bucket s3Bucket;
         s3Bucket.bucketName = bucketEntity.name;
 
@@ -988,10 +996,16 @@ namespace AwsMock::Service {
                 Dto::S3::NotificationBucket notificationBucket;
                 notificationBucket.name = s3Bucket.bucketName;
                 notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.principalId = s3Bucket.owner;
-                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = notificationBucket, .object = s3Object};
+                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                Dto::S3::S3 s3;
+                s3.configurationId = notification.id;
+                s3.bucket = notificationBucket;
+                s3.object = s3Object;
 
-                Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
+                Dto::S3::Record record;
+                record.region = region;
+                record.eventName = event;
+                record.s3 = s3;
                 Dto::S3::EventNotification eventNotification;
 
                 eventNotification.records.push_back(record);
@@ -1011,10 +1025,17 @@ namespace AwsMock::Service {
                 Dto::S3::NotificationBucket notificationBucket;
                 notificationBucket.name = s3Bucket.bucketName;
                 notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.principalId = s3Bucket.owner;
-                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = notificationBucket, .object = s3Object};
+                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                Dto::S3::S3 s3;
+                s3.configurationId = notification.id;
+                s3.bucket = notificationBucket;
+                s3.object = s3Object;
 
-                Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
+                Dto::S3::Record record;
+                record.region = region;
+                record.eventName = event;
+                record.s3 = s3;
+
                 Dto::S3::EventNotification eventNotification;
 
                 eventNotification.records.push_back(record);
@@ -1034,10 +1055,16 @@ namespace AwsMock::Service {
                 Dto::S3::NotificationBucket notificationBucket;
                 notificationBucket.name = s3Bucket.bucketName;
                 notificationBucket.arn = s3Bucket.arn;
-                notificationBucket.ownerIdentity.principalId = s3Bucket.owner;
-                Dto::S3::S3 s3 = {.configurationId = notification.id, .bucket = notificationBucket, .object = s3Object};
+                notificationBucket.ownerIdentity.displayName = s3Bucket.owner;
+                Dto::S3::S3 s3;
+                s3.configurationId = notification.id;
+                s3.bucket = notificationBucket;
+                s3.object = s3Object;
 
-                Dto::S3::Record record = {.region = region, .eventName = event, .s3 = s3};
+                Dto::S3::Record record;
+                record.region = region;
+                record.eventName = event;
+                record.s3 = s3;
                 Dto::S3::EventNotification eventNotification;
 
                 eventNotification.records.push_back(record);
@@ -1504,8 +1531,10 @@ namespace AwsMock::Service {
             const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
             const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
             log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
-            unsigned char *rawKey = Core::Crypto::HexDecode(kmsKey.aes256Key);
+            const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
+            Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
             Core::Crypto::Aes256EncryptFile(dataS3Dir + "/" + object.internalName, rawKey);
+            free(rawKey);
         }
     }
 
@@ -1516,8 +1545,10 @@ namespace AwsMock::Service {
             const Database::KMSDatabase &kmsDatabase = Database::KMSDatabase::instance();
             const Database::Entity::KMS::Key kmsKey = kmsDatabase.GetKeyByKeyId(bucket.bucketEncryption.kmsKeyId);
             log_debug << kmsKey.keyId << " " << kmsKey.aes256Key;
-            unsigned char *rawKey = Core::Crypto::HexDecode(kmsKey.aes256Key);
+            const auto rawKey = static_cast<unsigned char *>(malloc(kmsKey.aes256Key.length() * 2));
+            Core::Crypto::HexDecode(kmsKey.aes256Key, rawKey);
             Core::Crypto::Aes256DecryptFile(dataS3Dir + "/" + object.internalName, outFile, rawKey);
+            free(rawKey);
         }
     }
 

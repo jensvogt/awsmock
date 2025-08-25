@@ -9,8 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/s3/model/Bucket.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -22,45 +21,29 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PurgeBucketRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct PurgeBucketRequest final : Common::BaseCounter<PurgeBucketRequest> {
 
         /**
          * Bucket name
          */
         std::string bucketName;
 
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param jsonString json input stream
-         */
-        static PurgeBucketRequest FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend PurgeBucketRequest tag_invoke(boost::json::value_to_tag<PurgeBucketRequest>, boost::json::value const &v) {
+            PurgeBucketRequest r;
+            r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PurgeBucketRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PurgeBucketRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"eTag", obj.bucketName},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3
