@@ -395,7 +395,7 @@ namespace AwsMock::Core {
          * @param salt salt value
          * @param ctx openssl model
          */
-        static int Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx);
+        static int Aes256EncryptionInit(const unsigned char *key_data, int key_data_len, const unsigned char *salt, EVP_CIPHER_CTX *ctx);
 
         /**
          * @brief Create a 256 bit key and IV using the supplied key_data.

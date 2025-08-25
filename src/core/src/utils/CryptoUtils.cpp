@@ -396,14 +396,14 @@ namespace AwsMock::Core {
         free(out_buf);
     }
 
-    int Crypto::Aes256EncryptionInit(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *ctx) {
+    int Crypto::Aes256EncryptionInit(const unsigned char *key_data, const int key_data_len, const unsigned char *salt, EVP_CIPHER_CTX *ctx) {
 
-        int nrounds = 5;
+        constexpr int nRounds = 5;
         unsigned char key[CRYPTO_AES256_KEY_SIZE], iv[CRYPTO_AES256_BLOCK_SIZE];
 
         // Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material. nrounds is the number of times
         // we hash the material. More rounds are more secure but slower.
-        if (const int i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv); i != 32) {
+        if (const int i = EVP_BytesToKey(EVP_aes_256_gcm(), EVP_sha1(), salt, key_data, key_data_len, nRounds, key, iv); i != 32) {
             log_error << "Key size is " << i << " bits - should be 256 bits";
             return -1;
         }
