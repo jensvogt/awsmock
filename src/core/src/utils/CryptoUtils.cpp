@@ -273,7 +273,7 @@ namespace AwsMock::Core {
         }
     }
 
-    unsigned char *Crypto::Aes256EncryptString(const unsigned char *plaintext, int *len, unsigned char *key) {
+    void Crypto::Aes256EncryptString(const unsigned char *plaintext, int *len, const unsigned char *key, unsigned char *out) {
 
         int f_len = 0, p_len = *len;
 
@@ -288,10 +288,11 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX_free(ctx);
 
         *len = p_len + f_len;
-        return ciphertext;
+        memcpy(out, ciphertext, *len);
+        free(ciphertext);
     }
 
-    unsigned char *Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key) {
+    void Crypto::Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key, unsigned char *out) {
 
         int p_len = 0, f_len = 0;
 
@@ -305,7 +306,8 @@ namespace AwsMock::Core {
         EVP_CIPHER_CTX_free(ctx);
 
         *len = p_len + f_len;
-        return plaintext;
+        memcpy(out, plaintext, *len);
+        free(plaintext);
     }
 
     void Crypto::Aes256EncryptFile(const std::string &filename, unsigned char *key) {
@@ -448,9 +450,9 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
-        int dataB64_len = strlen(encodedString.c_str());
+        int dataB64_len = static_cast<int>(strlen(encodedString.c_str()));
         int data_len = 3 * dataB64_len / 4;
-        const auto data = (unsigned char *) calloc(data_len, 1);
+        const auto data = static_cast<unsigned char *>(calloc(data_len, 1));
         EVP_DecodeBlock(data, reinterpret_cast<const unsigned char *>(encodedString.c_str()), dataB64_len);
         while (encodedString[--dataB64_len] == '=') data_len--;
         std::string dst = {reinterpret_cast<char *>(data), static_cast<std::string::size_type>(data_len)};
@@ -540,11 +542,11 @@ namespace AwsMock::Core {
         return sResult;
     }
 
-    unsigned char *Crypto::HexDecode(const std::string &hex) {
+    void Crypto::HexDecode(const std::string &hex, unsigned char *out) {
         long len;
-        unsigned char *out = OPENSSL_hexstr2buf(hex.data(), &len);
-        out[len] = '\0';
-        return out;
+        unsigned char *hexOut = OPENSSL_hexstr2buf(hex.data(), &len);
+        memcpy(out, hexOut, len);
+        OPENSSL_free(hexOut);
     }
 
     EVP_PKEY *Crypto::GenerateRsaKeys(const unsigned int keyLength) {

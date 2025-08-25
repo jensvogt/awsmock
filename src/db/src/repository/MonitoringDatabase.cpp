@@ -68,7 +68,6 @@ namespace AwsMock::Database {
                     return;
                 }
 
-                session.start_transaction();
                 document newDocument;
                 newDocument.append(kvp("value", value));
                 newDocument.append(kvp("count", 1));
@@ -80,6 +79,8 @@ namespace AwsMock::Database {
                     newDocument.append(kvp("labelValue", labelValue));
                 }
                 newDocument.append(kvp("created", bsoncxx::types::b_date(system_clock::now())));
+
+                session.start_transaction();
                 _monitoringCollection.insert_one(newDocument.extract());
                 session.commit_transaction();
 

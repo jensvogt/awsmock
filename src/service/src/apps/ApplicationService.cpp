@@ -283,8 +283,8 @@ namespace AwsMock::Service {
         application = _database.UpdateApplication(application);
 
         // Get code base64 file name
-        const auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
-        const auto fullBase64File = dataDir + Core::FileUtils::separator() + Core::FileUtils::separator() + application.name + "-" + application.version + ".b64";
+        auto dataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
+        std::string fullBase64File = Core::FileUtils::appendPath(dataDir, "/", application.name, "-", application.version, ".b64");
 
         // Get container id, if already running
         if (application.containerName.empty()) {

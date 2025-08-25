@@ -19,8 +19,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/utils/ConnectionPool.h>
 
 namespace AwsMock::Database {
@@ -93,16 +93,6 @@ namespace AwsMock::Database {
          * @return database name
          */
         [[nodiscard]] std::string GetDatabaseName() const;
-
-        /**
-         * @brief Start the database
-         */
-        void StartDatabase();
-
-        /**
-         * @brief Stops the database
-         */
-        void StopDatabase();
 
       private:
 

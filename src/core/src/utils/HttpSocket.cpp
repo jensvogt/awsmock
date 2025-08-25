@@ -104,10 +104,10 @@ namespace AwsMock::Core {
             }
 
             // Cleanup
-            ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+            ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
             if (ec) {
                 log_error << "Shutdown socket failed, error: " << ec.message();
-                return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                //return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
             return PrepareResult(response);
 
