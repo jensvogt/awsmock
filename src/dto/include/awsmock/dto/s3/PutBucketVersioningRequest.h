@@ -10,23 +10,13 @@
 #include <string>
 
 // AwsMock include
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct PutBucketVersioningRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
-
-        /**
-         * AWS user
-         */
-        std::string owner;
+    struct PutBucketVersioningRequest final : Common::BaseCounter<PutBucketVersioningRequest> {
 
         /**
          * Bucket name
@@ -43,28 +33,38 @@ namespace AwsMock::Dto::S3 {
          *
          * @param xmlString XML string
          */
-        void FromXml(const std::string &xmlString);
+        void FromXml(const std::string &xmlString) {
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                boost::property_tree::ptree pt;
+                Core::XmlUtils::ReadXml(xmlString, &pt);
+                status = pt.get<std::string>("VersioningConfiguration.Status");
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PutBucketVersioningRequest &r);
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend PutBucketVersioningRequest tag_invoke(boost::json::value_to_tag<PutBucketVersioningRequest>, boost::json::value const &v) {
+            PutBucketVersioningRequest r;
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.status = Core::Json::GetStringValue(v, "status");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutBucketVersioningRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"status", obj.status},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

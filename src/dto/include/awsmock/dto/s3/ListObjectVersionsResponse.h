@@ -99,29 +99,6 @@ namespace AwsMock::Dto::S3 {
          */
         system_clock::time_point lastModified;
 
-        /**
-         * Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document rootDocument;
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "Key", key);
-                Core::Bson::BsonUtils::SetBoolValue(rootDocument, "IsLatest", isLatest);
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "LastModified", Core::DateTimeUtils::ToISO8601(lastModified));
-                Core::Bson::BsonUtils::SetStringValue(rootDocument, "VersionId", versionId);
-                rootDocument.append(kvp("Owner", owner.ToDocument()));
-                return rootDocument.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
       private:
 
         friend DeleteMarker tag_invoke(boost::json::value_to_tag<DeleteMarker>, boost::json::value const &v) {

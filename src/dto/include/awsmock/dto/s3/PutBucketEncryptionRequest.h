@@ -11,12 +11,9 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/dto/s3/model/LambdaConfiguration.h>
-#include <awsmock/dto/s3/model/QueueConfiguration.h>
-#include <awsmock/dto/s3/model/TopicConfiguration.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -45,12 +42,7 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PutBucketEncryptionRequest {
-
-        /**
-         * AWS region
-         */
-        std::string region;
+    struct PutBucketEncryptionRequest final : Common::BaseCounter<PutBucketEncryptionRequest> {
 
         /**
          * Bucket
@@ -72,28 +64,42 @@ namespace AwsMock::Dto::S3 {
           *
           * @param xmlString XML string
           */
-        void FromXml(const std::string &xmlString);
+        void FromXml(const std::string &xmlString) {
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                boost::property_tree::ptree pt;
+                Core::XmlUtils::ReadXml(xmlString, &pt);
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PutBucketEncryptionRequest &r);
+                sseAlgorithm = pt.get<std::string>("ServerSideEncryptionConfiguration.Rule.ApplyServerSideEncryptionByDefault.SSEAlgorithm");
+                kmsKeyId = pt.get<std::string>("ServerSideEncryptionConfiguration.Rule.ApplyServerSideEncryptionByDefault.KMSMasterKeyID");
+
+            } catch (std::exception &e) {
+                log_error << e.what();
+                throw Core::JsonException(e.what());
+            }
+        }
+
+      private:
+
+        friend PutBucketEncryptionRequest tag_invoke(boost::json::value_to_tag<PutBucketEncryptionRequest>, boost::json::value const &v) {
+            PutBucketEncryptionRequest r;
+            r.bucket = Core::Json::GetStringValue(v, "bucket");
+            r.sseAlgorithm = Core::Json::GetStringValue(v, "sseAlgorithm");
+            r.kmsKeyId = Core::Json::GetStringValue(v, "kmsKeyId");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PutBucketEncryptionRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", obj.bucket},
+                    {"sseAlgorithm", obj.sseAlgorithm},
+                    {"kmsKeyId", obj.kmsKeyId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

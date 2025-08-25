@@ -10,11 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/s3/model/FilterRule.h>
 #include <awsmock/dto/s3/model/NotificationEvent.h>
 
@@ -72,44 +69,38 @@ namespace AwsMock::Dto::S3 {
         std::vector<NotificationEventType> events;
 
         /**
-         * @brief Convert from a JSON object
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
-
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
          * @brief Convert from an XML string
          *
          * @param pt boost a property tree
          */
-        void FromXml(const boost::property_tree::ptree &pt);
+        void FromXml(const boost::property_tree::ptree &pt) {
+            if (pt.get_optional<std::string>("Id")) {
+                id = pt.get<std::string>("Id");
+            }
+            if (pt.get_optional<std::string>("Topic")) {
+                topicArn = pt.get<std::string>("Topic");
+            }
+            if (pt.get_optional<std::string>("Filter")) {
+                FilterRule filter;
+                filter.FromXml(pt.get_child("Filter"));
+                filterRules.emplace_back(filter);
+            }
+            if (pt.get_optional<std::string>("Event")) {
+                events.emplace_back(EventTypeFromString(pt.get<std::string>("Event")));
+            }
+        }
 
       private:
 
         friend TopicConfiguration tag_invoke(boost::json::value_to_tag<TopicConfiguration>, boost::json::value const &v) {
             TopicConfiguration r;
-            r.id = v.at("id").as_string();
-            r.topicArn = v.at("topicArn").as_string();
-
-            // Filter rules
-            for (auto filterRules = v.at("filterRules").as_array(); const auto &filterRule: filterRules) {
-                FilterRule filterRuleDto;
-                filterRuleDto.filterValue = filterRule.at("filterValue").as_string();
-                filterRuleDto.name = NameTypeFromString(filterRule.at("name").as_string().data());
-                r.filterRules.push_back(filterRuleDto);
+            r.id = Core::Json::GetStringValue(v, "id");
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            if (Core::Json::AttributeExists(v, "filterRules")) {
+                r.filterRules = boost::json::value_to<std::vector<FilterRule>>(v.at("topicArn"));
             }
-
-            // Events
-            for (auto events = v.at("events").as_array(); const auto &event: events) {
-                r.events.push_back(EventTypeFromString(event.as_string().data()));
+            if (Core::Json::AttributeExists(v, "events")) {
+                r.events = boost::json::value_to<std::vector<NotificationEventType>>(v.at("events"));
             }
             return r;
         }

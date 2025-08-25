@@ -9,18 +9,11 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct UploadPartCopyRequest {
-
-        /**
-         * Region
-         */
-        std::string region;
+    struct UploadPartCopyRequest final : Common::BaseCounter<UploadPartCopyRequest> {
 
         /**
          * Upload ID
@@ -30,7 +23,7 @@ namespace AwsMock::Dto::S3 {
         /**
          * Part number
          */
-        int partNumber;
+        long partNumber;
 
         /**
          * Source bucket
@@ -62,26 +55,36 @@ namespace AwsMock::Dto::S3 {
          */
         long max;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend UploadPartCopyRequest tag_invoke(boost::json::value_to_tag<UploadPartCopyRequest>, boost::json::value const &v) {
+            UploadPartCopyRequest r;
+            r.uploadId = Core::Json::GetStringValue(v, "uploadId");
+            r.partNumber = Core::Json::GetLongValue(v, "partNumber");
+            r.sourceBucket = Core::Json::GetStringValue(v, "sourceBucket");
+            r.sourceKey = Core::Json::GetStringValue(v, "sourceKey");
+            r.targetBucket = Core::Json::GetStringValue(v, "targetBucket");
+            r.targetKey = Core::Json::GetStringValue(v, "targetKey");
+            r.min = Core::Json::GetLongValue(v, "min");
+            r.max = Core::Json::GetLongValue(v, "max");
+            return r;
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UploadPartCopyRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UploadPartCopyRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"uploadId", obj.uploadId},
+                    {"partNumber", obj.partNumber},
+                    {"sourceBucket", obj.sourceBucket},
+                    {"sourceKey", obj.sourceKey},
+                    {"targetBucket", obj.targetBucket},
+                    {"targetKey", obj.targetKey},
+                    {"min", obj.min},
+                    {"max", obj.max},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

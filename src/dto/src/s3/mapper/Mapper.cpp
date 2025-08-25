@@ -81,8 +81,8 @@ namespace AwsMock::Dto::S3 {
             Database::Entity::S3::LambdaNotification lambdaNotification;
             lambdaNotification.id = lambdaConfigurationDto.id;
             lambdaNotification.lambdaArn = lambdaConfigurationDto.lambdaArn;
-            //lambdaNotification.events = map(lambdaConfigurationDto.events);
-            //lambdaNotification.filterRules = map(lambdaConfigurationDto.filterRules);
+            lambdaNotification.events = map(lambdaConfigurationDto.events);
+            lambdaNotification.filterRules = map(lambdaConfigurationDto.filterRules);
             lambdaNotificationEntities.emplace_back(lambdaNotification);
         }
         return lambdaNotificationEntities;
@@ -94,6 +94,26 @@ namespace AwsMock::Dto::S3 {
             lambdaConfigurations.emplace_back(map(lambdaConfigurationEntity));
         }
         return lambdaConfigurations;
+    }
+
+    auto Mapper::map(const std::vector<NotificationEventType> &lambdaNotificationEventTypeEntities) -> std::vector<std::string> {
+        std::vector<std::string> eventDtos;
+        for (const auto &lambdaNotificationEventTypeEntity: lambdaNotificationEventTypeEntities) {
+            eventDtos.emplace_back(EventTypeToString(lambdaNotificationEventTypeEntity));
+        }
+        return eventDtos;
+    }
+
+    auto Mapper::map(const std::vector<FilterRule> &filterRulesDtos) -> std::vector<Database::Entity::S3::FilterRule> {
+        std::vector<Database::Entity::S3::FilterRule> fileRulesEntities;
+        for (const auto &filterRulesDto: filterRulesDtos) {
+            Database::Entity::S3::FilterRule filterRuleEntity;
+            filterRuleEntity.region = filterRulesDto.region;
+            filterRuleEntity.name = NameTypeToString(filterRulesDto.name);
+            filterRuleEntity.value = filterRulesDto.filterValue;
+            fileRulesEntities.emplace_back(filterRuleEntity);
+        }
+        return fileRulesEntities;
     }
 
     auto Mapper::map(const Database::Entity::S3::LambdaNotification &lambdaConfigurationEntity) -> LambdaConfiguration {
@@ -150,4 +170,29 @@ namespace AwsMock::Dto::S3 {
         return filterRuleDtos;
     }
 
+    EventNotification Mapper::map(const std::string &notificationId, Bucket &bucket, Object &object, const std::string &event) {
+
+        NotificationBucket notificationBucket;
+        notificationBucket.name = bucket.bucketName;
+        notificationBucket.arn = bucket.arn;
+        notificationBucket.ownerIdentity.displayName = bucket.owner;
+
+        S3 s3;
+        s3.configurationId = notificationId;
+        s3.bucket = notificationBucket;
+        s3.object.key = object.key;
+        s3.object.etag = object.etag;
+        s3.object.size = object.size;
+        s3.object.versionId = object.versionId;
+
+        Record record;
+        record.region = bucket.region;
+        record.eventName = event;
+        record.s3 = s3;
+
+        EventNotification eventNotification;
+        eventNotification.records.push_back(record);
+
+        return eventNotification;
+    }
 }// namespace AwsMock::Dto::S3

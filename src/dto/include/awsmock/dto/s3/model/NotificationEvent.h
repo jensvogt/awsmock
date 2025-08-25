@@ -6,12 +6,7 @@
 #define AWSMOCK_DTO_S3_EVENT_H
 
 // C++ standard includes
-#include <boost/describe.hpp>
 #include <string>
-
-// AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -75,4 +70,5 @@ namespace AwsMock::Dto::S3 {
                         OBJECT_TAGGING);
 
 }// namespace AwsMock::Dto::S3
+
 #endif// AWSMOCK_DTO_S3_EVENT_H
