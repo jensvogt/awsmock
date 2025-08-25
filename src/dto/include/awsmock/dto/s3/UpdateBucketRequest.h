@@ -5,11 +5,8 @@
 #ifndef AWSMOCK_DTO_S3_UPDATE_BUCKET_REQUEST_H
 #define AWSMOCK_DTO_S3_UPDATE_BUCKET_REQUEST_H
 
-// C++ standard includes
-#include <string>
-
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/s3/model/Bucket.h>
 
 namespace AwsMock::Dto::S3 {
@@ -19,40 +16,29 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UpdateBucketRequest {
+    struct UpdateBucketRequest final : Common::BaseCounter<UpdateBucketRequest> {
 
         /**
          * Bucket
          */
         Bucket bucket;
 
-        /**
-         * @brief Parse values from a JSON stream
-         *
-         * @param body json input stream
-         */
-        static UpdateBucketRequest FromJson(const std::string &body);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend UpdateBucketRequest tag_invoke(boost::json::value_to_tag<UpdateBucketRequest>, boost::json::value const &v) {
+            UpdateBucketRequest r;
+            r.bucket = boost::json::value_to<Bucket>(v.at("bucket"));
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UpdateBucketRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UpdateBucketRequest const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"bucket", boost::json::value_from(obj.bucket)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

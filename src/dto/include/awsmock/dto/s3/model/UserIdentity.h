@@ -9,10 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
@@ -21,40 +18,28 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct UserIdentity {
+    struct UserIdentity final : Common::BaseCounter<UserIdentity> {
 
         /**
          * AWS principal ID
          */
         std::string principalId;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const UserIdentity &r);
+        friend UserIdentity tag_invoke(boost::json::value_to_tag<UserIdentity>, boost::json::value const &v) {
+            UserIdentity r;
+            r.principalId = Core::Json::GetStringValue(v, "principalId");
+            return r;
+        }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, UserIdentity const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"principalId", obj.principalId},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

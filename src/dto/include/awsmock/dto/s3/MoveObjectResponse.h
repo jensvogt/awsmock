@@ -9,14 +9,18 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/XmlUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::S3 {
 
-    struct MoveObjectResponse {
+    /**
+     * @brief Move object response
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct MoveObjectResponse final : Common::BaseCounter<MoveObjectResponse> {
 
         /**
          * Etag
@@ -33,28 +37,39 @@ namespace AwsMock::Dto::S3 {
          *
          * @return XML string
          */
-        [[nodiscard]] std::string ToXml() const;
+        [[nodiscard]] std::string ToXml() const {
 
-        /**
-         * @brief Convert to XML representation
-         *
-         * @return XML string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                boost::property_tree::ptree root;
+                root.add("MoveObjectResult.ETag", eTag);
+                root.add("MoveObjectResult.LastModified", lastModified);
+                return Core::XmlUtils::ToXmlString(root);
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const MoveObjectResponse &r);
+            } catch (std::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend MoveObjectResponse tag_invoke(boost::json::value_to_tag<MoveObjectResponse>, boost::json::value const &v) {
+            MoveObjectResponse r;
+            r.eTag = Core::Json::GetStringValue(v, "eTag");
+            r.lastModified = Core::Json::GetStringValue(v, "lastModified");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, MoveObjectResponse const &obj) {
+            jv = {
+                    {"region", obj.region},
+                    {"user", obj.user},
+                    {"requestId", obj.requestId},
+                    {"eTag", obj.eTag},
+                    {"lastModified", obj.lastModified},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::S3

@@ -11,7 +11,9 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/s3/model/Owner.h>
 #include <awsmock/dto/s3/model/UserIdentity.h>
 
 namespace AwsMock::Dto::S3 {
@@ -65,7 +67,7 @@ namespace AwsMock::Dto::S3 {
      *   ]
      * }
      */
-    struct RequestParameter {
+    struct RequestParameter final : Common::BaseCounter<RequestParameter> {
 
         /**
          * Request parameters
@@ -77,49 +79,27 @@ namespace AwsMock::Dto::S3 {
          */
         std::string sourceIPAddress;
 
-        /**
-         * @brief Convert to JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
+      private:
 
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "requestParameters", requestParameters);
-                Core::Bson::BsonUtils::SetStringValue(document, "sourceIPAddress", sourceIPAddress);
-                return Core::Bson::BsonUtils::ToJsonString(document);
-
-            } catch (bsoncxx::exception &e) {
-                log_error << e.what();
-                throw Core::JsonException(e.what());
-            }
+        friend RequestParameter tag_invoke(boost::json::value_to_tag<RequestParameter>, boost::json::value const &v) {
+            RequestParameter r;
+            r.requestParameters = Core::Json::GetStringValue(v, "requestParameters");
+            r.sourceIPAddress = Core::Json::GetStringValue(v, "sourceIPAddress");
+            return r;
         }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const RequestParameter &r) {
-            os << "RequestParameter=" << r.ToString();
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RequestParameter const &obj) {
+            jv = {
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"requestParameters", obj.requestParameters},
+                    {"sourceIPAddress", obj.sourceIPAddress},
+            };
         }
     };
 
-    struct ResponseElements {
+    struct ResponseElements final : Common::BaseCounter<ResponseElements> {
 
         /**
          * Request ID
@@ -131,123 +111,24 @@ namespace AwsMock::Dto::S3 {
          */
         std::string xAmzId2;
 
-        /**
-         * @brief Convert to JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
+      private:
 
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "xAmzRequestId", xAmzRequestId);
-                Core::Bson::BsonUtils::SetStringValue(document, "xAmzId2", xAmzId2);
-                return Core::Bson::BsonUtils::ToJsonString(document);
-
-            } catch (bsoncxx::exception &e) {
-                log_error << e.what();
-                throw Core::JsonException(e.what());
-            }
+        friend ResponseElements tag_invoke(boost::json::value_to_tag<ResponseElements>, boost::json::value const &v) {
+            ResponseElements r;
+            r.xAmzRequestId = Core::Json::GetStringValue(v, "xAmzRequestId");
+            r.xAmzId2 = Core::Json::GetStringValue(v, "xAmzId2");
+            return r;
         }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ResponseElements &r) {
-            os << "ResponseElements=" << r.ToJson();
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ResponseElements const &obj) {
+            jv = {
+                    {"xAmzRequestId", obj.xAmzRequestId},
+                    {"xAmzId2", obj.xAmzId2},
+            };
         }
     };
 
-    struct OwnerIdentity {
-
-        /**
-         * Principal ID
-         */
-        std::string principalId;
-
-        /**
-         * @brief Convert to JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
-            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-        }
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "principalId", principalId);
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-
-                principalId = Core::Bson::BsonUtils::GetStringValue(document, "principalId");
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const OwnerIdentity &o) {
-            os << "OwnerIdentity=" << o.ToJson();
-            return os;
-        }
-    };
-
-    struct Object {
+    struct Object final : Common::BaseCounter<Object> {
 
         /**
          * S3 object key
@@ -274,82 +155,30 @@ namespace AwsMock::Dto::S3 {
          */
         std::string sequencer;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      private:
 
-            try {
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "key", key);
-                Core::Bson::BsonUtils::SetLongValue(document, "size", size);
-                Core::Bson::BsonUtils::SetStringValue(document, "etag", etag);
-                Core::Bson::BsonUtils::SetStringValue(document, "versionId", versionId);
-                Core::Bson::BsonUtils::SetStringValue(document, "sequencer", sequencer);
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
+        friend Object tag_invoke(boost::json::value_to_tag<Object>, boost::json::value const &v) {
+            Object r;
+            r.key = Core::Json::GetStringValue(v, "key");
+            r.size = Core::Json::GetLongValue(v, "size");
+            r.etag = Core::Json::GetStringValue(v, "etag");
+            r.versionId = Core::Json::GetStringValue(v, "versionId");
+            r.sequencer = Core::Json::GetStringValue(v, "sequencer");
+            return r;
         }
 
-        /**
-         * @brief Converts a JSON representation to a DTO.
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-
-                key = Core::Bson::BsonUtils::GetStringValue(document, "key");
-                size = Core::Bson::BsonUtils::GetLongValue(document, "size");
-                etag = Core::Bson::BsonUtils::GetStringValue(document, "etag");
-                versionId = Core::Bson::BsonUtils::GetStringValue(document, "versionId");
-                sequencer = Core::Bson::BsonUtils::GetStringValue(document, "sequencer");
-                key = Core::Bson::BsonUtils::GetStringValue(document, "key");
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
-            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-        }
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Object &o) {
-            os << "Object=" << o.ToJson();
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Object const &obj) {
+            jv = {
+                    {"key", obj.key},
+                    {"size", obj.size},
+                    {"etag", boost::json::value_from(obj.etag)},
+                    {"versionId", obj.versionId},
+                    {"sequencer", obj.sequencer},
+            };
         }
     };
 
-    struct NotificationBucket {
+    struct NotificationBucket final : Common::BaseCounter<NotificationBucket> {
 
         /**
          * Bucket name
@@ -364,52 +193,28 @@ namespace AwsMock::Dto::S3 {
         /**
          * Owner identity
          */
-        OwnerIdentity ownerIdentity;
+        Owner ownerIdentity;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      private:
 
-            try {
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "name", name);
-                Core::Bson::BsonUtils::SetStringValue(document, "arn", arn);
-                Core::Bson::BsonUtils::SetDocumentValue(document, "ownerIdentity", ownerIdentity.ToDocument());
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
+        friend NotificationBucket tag_invoke(boost::json::value_to_tag<NotificationBucket>, boost::json::value const &v) {
+            NotificationBucket r;
+            r.name = Core::Json::GetStringValue(v, "s3SchemaVersion");
+            r.arn = Core::Json::GetStringValue(v, "arn");
+            r.ownerIdentity = boost::json::value_to<Owner>(v.at("ownerIdentity"));
+            return r;
         }
 
-
-        /**
-         * @brief Converts a JSON representation to a DTO.
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-
-                name = Core::Bson::BsonUtils::GetStringValue(document, "name");
-                arn = Core::Bson::BsonUtils::GetStringValue(document, "arn");
-                if (document.view().find("ownerIdentity") != document.view().end()) {
-                    ownerIdentity.FromDocument(document.view()["ownerIdentity"].get_document().value);
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, NotificationBucket const &obj) {
+            jv = {
+                    {"name", obj.name},
+                    {"arn", obj.arn},
+                    {"ownerIdentity", boost::json::value_from(obj.ownerIdentity)},
+            };
         }
     };
 
-    struct S3 {
+    struct S3 final : Common::BaseCounter<S3> {
 
         /**
          * Schema version
@@ -431,86 +236,28 @@ namespace AwsMock::Dto::S3 {
          */
         Object object;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const {
-            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
+      private:
+
+        friend S3 tag_invoke(boost::json::value_to_tag<S3>, boost::json::value const &v) {
+            S3 r;
+            r.s3SchemaVersion = Core::Json::GetStringValue(v, "s3SchemaVersion");
+            r.configurationId = Core::Json::GetStringValue(v, "configurationId");
+            r.bucket = boost::json::value_to<NotificationBucket>(v.at("bucket"));
+            r.object = boost::json::value_to<Object>(v.at("object"));
+            return r;
         }
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
-
-            try {
-
-                // Fix dates
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "s3SchemaVersion", s3SchemaVersion);
-                Core::Bson::BsonUtils::SetStringValue(document, "configurationId", configurationId);
-                document.append(kvp("bucket", bucket.ToDocument()));
-                document.append(kvp("object", object.ToDocument()));
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-
-                s3SchemaVersion = Core::Bson::BsonUtils::GetStringValue(document, "s3SchemaVersion");
-                configurationId = Core::Bson::BsonUtils::GetStringValue(document, "configurationId");
-
-                if (document.view().find("bucket") != document.view().end()) {
-                    bucket.FromDocument(document.view()["bucket"].get_document().value);
-                }
-                if (document.view().find("object") != document.view().end()) {
-                    object.FromDocument(document.view()["object"].get_document().value);
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const S3 &s) {
-            os << "S3=" << s.ToJson();
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, S3 const &obj) {
+            jv = {
+                    {"s3SchemaVersion", obj.s3SchemaVersion},
+                    {"configurationId", obj.configurationId},
+                    {"bucket", boost::json::value_from(obj.bucket)},
+                    {"object", boost::json::value_from(obj.object)},
+            };
         }
     };
 
-    struct Record {
+    struct Record final : Common::BaseCounter<Record> {
 
         /**
          * Record version
@@ -521,11 +268,6 @@ namespace AwsMock::Dto::S3 {
          * Event source
          */
         std::string eventSource = "aws:s3";
-
-        /**
-         * Region
-         */
-        std::string region;
 
         /**
          * Event time
@@ -557,85 +299,32 @@ namespace AwsMock::Dto::S3 {
          */
         S3 s3;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const {
+      private:
 
-            try {
-                document document;
-                Core::Bson::BsonUtils::SetStringValue(document, "eventVersion", eventVersion);
-                Core::Bson::BsonUtils::SetStringValue(document, "eventSource", eventSource);
-                Core::Bson::BsonUtils::SetStringValue(document, "awsRegion", region);
-                Core::Bson::BsonUtils::SetStringValue(document, "eventTime", Core::DateTimeUtils::ToISO8601(eventTime));
-                Core::Bson::BsonUtils::SetStringValue(document, "eventName", eventName);
-
-                document.append(kvp("userIdentity", userIdentity.ToDocument()));
-                document.append(kvp("s3", s3.ToDocument()));
-
-                return document.extract();
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
+        friend Record tag_invoke(boost::json::value_to_tag<Record>, boost::json::value const &v) {
+            Record r;
+            r.eventVersion = Core::Json::GetStringValue(v, "eventVersion");
+            r.eventSource = Core::Json::GetStringValue(v, "eventSource");
+            r.eventTime = Core::Json::GetDatetimeValue(v, "eventTime");
+            r.eventName = Core::Json::GetStringValue(v, "eventName");
+            r.userIdentity = boost::json::value_to<UserIdentity>(v.at("eventName"));
+            r.requestParameter = boost::json::value_to<RequestParameter>(v.at("requestParameter"));
+            r.responseElements = boost::json::value_to<ResponseElements>(v.at("responseElements"));
+            r.s3 = boost::json::value_to<S3>(v.at("s3"));
+            return r;
         }
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param document JSON object.
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
-
-            try {
-                eventVersion = Core::Bson::BsonUtils::GetStringValue(document, "eventVersion");
-                eventSource = Core::Bson::BsonUtils::GetStringValue(document, "eventSource");
-                region = Core::Bson::BsonUtils::GetStringValue(document, "region");
-                eventTime = Core::Bson::BsonUtils::GetDateValue(document, "eventTime");
-                eventName = Core::Bson::BsonUtils::GetStringValue(document, "eventName");
-
-                // S3
-                if (document.view().find("s3") != document.view().end()) {
-                    s3.FromDocument(document.view()["s3"].get_document().value);
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts the DTO to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const {
-            return Core::Bson::BsonUtils::ToJsonString(ToDocument());
-        }
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Record &r) {
-            os << "Record=" << r.ToJson();
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Record const &obj) {
+            jv = {
+                    {"eventVersion", obj.eventVersion},
+                    {"eventSource", obj.eventSource},
+                    {"eventTime", Core::DateTimeUtils::ToISO8601(obj.eventTime)},
+                    {"eventName", obj.eventName},
+                    {"userIdentity", boost::json::value_from(obj.userIdentity)},
+                    {"requestParameter", boost::json::value_from(obj.requestParameter)},
+                    {"responseElements", boost::json::value_from(obj.responseElements)},
+                    {"s3", boost::json::value_from(obj.s3)},
+            };
         }
     };
 
@@ -647,82 +336,27 @@ namespace AwsMock::Dto::S3 {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct EventNotification {
+    struct EventNotification final : Common::BaseCounter<EventNotification> {
 
         /**
          * S3 event record
          */
         std::vector<Record> records;
 
-        /**
-         * @brief Converts the DTO to a JSON representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToJson() const {
+      private:
 
-            try {
-
-                document document;
-                if (!records.empty()) {
-                    array recordsJsonArray;
-                    for (const auto &record: records) {
-                        recordsJsonArray.append(record.ToDocument());
-                    }
-                    document.append(kvp("Records", recordsJsonArray));
-                }
-
-                return Core::Bson::BsonUtils::ToJsonString(document);
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
+        friend EventNotification tag_invoke(boost::json::value_to_tag<EventNotification>, boost::json::value const &v) {
+            EventNotification r;
+            if (!r.records.empty()) {
+                r.records = boost::json::value_to<std::vector<Record>>(v.at("Records"));
             }
+            return r;
         }
 
-        /**
-         * @brief Converts a JSON representation to s DTO.
-         *
-         * @param jsonString JSON string.
-         */
-        void FromJson(const std::string &jsonString) {
-
-            try {
-
-                // Record parsing
-                if (const value document = bsoncxx::from_json(jsonString); document.view().find("Records") != document.view().end()) {
-                    for (const bsoncxx::array::view recordArray = document.view()["Records"].get_array().value; const auto &it: recordArray) {
-                        Record record;
-                        record.FromDocument(it.get_document().value);
-                        records.push_back(record);
-                    }
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
-        }
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const {
-            std::stringstream ss;
-            ss << *this;
-            return ss.str();
-        }
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const EventNotification &e) {
-            os << "EventNotification=" << e.ToJson();
-            return os;
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, EventNotification const &obj) {
+            jv = {
+                    {"Records", boost::json::value_from(obj.records)},
+            };
         }
     };
 
