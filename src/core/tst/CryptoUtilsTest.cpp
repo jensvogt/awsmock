@@ -215,11 +215,14 @@ namespace AwsMock::Core {
         int len = static_cast<int>(testText.length());
 
         // act
-        const unsigned char *result1 = Crypto::Aes256EncryptString((unsigned char *) testText.c_str(), &len, (unsigned char *) key.c_str());
-        const unsigned char *result2 = Crypto::Aes256DecryptString(result1, &len, (unsigned char *) key.c_str());
+        const auto cyphertext = static_cast<unsigned char *>(malloc(testText.length() * 2));
+        Crypto::Aes256EncryptString(reinterpret_cast<const unsigned char *>(testText.c_str()), &len, reinterpret_cast<const unsigned char *>(key.c_str()), cyphertext);
+
+        const auto plaintext = static_cast<unsigned char *>(malloc(testText.length() * 2));
+        Crypto::Aes256DecryptString(cyphertext, &len, reinterpret_cast<const unsigned char *>(key.c_str()), plaintext);
 
         // assert
-        BOOST_CHECK_EQUAL(reinterpret_cast<const char *>(result2), reinterpret_cast<const char *>(testText.c_str()));
+        BOOST_CHECK_EQUAL(reinterpret_cast<const char *>(plaintext), testText.c_str());
     }
 
     BOOST_AUTO_TEST_CASE(GenerateRsaKeyTest) {
@@ -264,7 +267,8 @@ namespace AwsMock::Core {
 
         // act
         const std::string encoded = Crypto::HexEncode(reinterpret_cast<unsigned char *>(testString.data()), testString.length());
-        unsigned char *decoded = Crypto::HexDecode(encoded);
+        const auto decoded = static_cast<unsigned char *>(malloc(encoded.length() * 2));
+        Crypto::HexDecode(encoded, decoded);
 
         // assert
         BOOST_CHECK_EQUAL(testString.c_str(), reinterpret_cast<char *>(decoded));

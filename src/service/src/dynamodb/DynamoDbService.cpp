@@ -481,7 +481,7 @@ namespace AwsMock::Service {
 
         const Core::HttpSocketResponse response = Core::HttpSocket::SendAuthorizedJson(http::verb::post, "dynamodb", _containerHost, _containerPort, "/", "content-type;host;x-amz-date;x-amz-security-token;x-amz-target", headers, body);
         if (response.statusCode != http::status::ok) {
-            log_error << "HTTP error, status: " << response.statusCode << ", responseBody: " << response.body << ", requestBody: " << body;
+            log_error << "HTTP error, status: " << response.statusCode << ", responseBody: " << response.body << ", requestBody: " << body << ", host: " << _containerHost << ":" << _containerPort;
             throw Core::ServiceException("HTTP error, status: " + boost::lexical_cast<std::string>(response.statusCode) + " reason: " + response.body);
         }
         log_debug << "Success, returnBody: " << response.body;

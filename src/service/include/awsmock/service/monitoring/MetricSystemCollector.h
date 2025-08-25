@@ -147,13 +147,14 @@ namespace AwsMock::Monitoring {
 #ifdef __APPLE__
 
         /**
-         * Calculate the total CPU
+         * @brief Calculate the total CPU
+         *
+         * @par
+         * On macOS only the total CPU usage can be retrieved from the system, User and system usage are not available.
          */
         void CalculateCPULoadMac(unsigned long long idleTicks, unsigned long long totalTicks);
         unsigned long long _previousTotalTicks;
         unsigned long long _previousIdleTicks;
-        unsigned long long _previousSystemTicks;
-        unsigned long long _previousUserTicks;
 
 #elif __linux__
 

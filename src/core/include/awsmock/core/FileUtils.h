@@ -398,6 +398,13 @@ namespace AwsMock::Core {
          * Mime types from file extensions
          */
         const static std::map<std::string, std::string> MimeTypes;
+
+        template<typename... Ts>
+        static std::string appendPath(Ts &&...args) {
+            std::ostringstream oss;
+            (oss << ... << std::forward<Ts>(args));
+            return oss.str();
+        }
     };
 
     inline std::string FileUtils::SetFileSeparator(std::string &filePath) {
@@ -412,6 +419,7 @@ namespace AwsMock::Core {
         return "/";
 #endif
     }
+
 
 }// namespace AwsMock::Core
 

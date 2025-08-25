@@ -112,15 +112,18 @@ namespace AwsMock::Service {
 
                     Dto::Apps::StartApplicationRequest serviceRequest = Dto::Apps::StartApplicationRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.StartApplication(serviceRequest);
-                        log_info << "Application started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
+                        const ApplicationService service{_ioc};
+                        service.StartApplication(serviceRequest);
+                        log_info << "Application started, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::ApplicationCommandType::START_ALL_APPLICATIONS: {
 
                     boost::asio::post(_ioc, [this] {
-                        const long count = _applicationService.StartAllApplications();
+                        const ApplicationService service{_ioc};
+                        const long count = service.StartAllApplications();
                         log_info << "All applications started, count: " << count; });
                     return SendResponse(request, http::status::ok);
                 }
@@ -129,7 +132,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::RestartApplicationRequest serviceRequest = Dto::Apps::RestartApplicationRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.RestartApplication(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.RestartApplication(serviceRequest);
                         log_info << "Applications restarted, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendOkResponse(request);
                 }
@@ -137,7 +141,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::RESTART_ALL_APPLICATIONS: {
 
                     boost::asio::post(_ioc, [this] {
-                        const long count = _applicationService.RestartAllApplications();
+                        const ApplicationService service{_ioc};
+                        const long count = service.RestartAllApplications();
                         log_info << "All applications restarted, count: " << count; });
                     return SendOkResponse(request);
                 }
@@ -146,7 +151,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::StopApplicationRequest serviceRequest = Dto::Apps::StopApplicationRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.StopApplication(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.StopApplication(serviceRequest);
                         log_info << "Applications stopped, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendOkResponse(request);
                 }
@@ -154,7 +160,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApplicationCommandType::STOP_ALL_APPLICATIONS: {
 
                     boost::asio::post(_ioc, [this] {
-                        const long count = _applicationService.StopAllApplications();
+                        const ApplicationService service{_ioc};
+                        const long count = service.StopAllApplications();
                         log_info << "All applications stopped, count: " << count; });
                     return SendOkResponse(request);
                 }

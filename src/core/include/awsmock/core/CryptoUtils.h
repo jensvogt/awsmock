@@ -214,9 +214,9 @@ namespace AwsMock::Core {
          * @param plaintext input string
          * @param len plaintext length
          * @param key encryption key
-         * @return encrypted string
+         * @param out output string
          */
-        static unsigned char *Aes256EncryptString(const unsigned char *plaintext, int *len, const unsigned char *key);
+        static void Aes256EncryptString(const unsigned char *plaintext, int *len, const unsigned char *key, unsigned char *out);
 
         /**
          * @brief AES256 decryption of a string.
@@ -224,16 +224,15 @@ namespace AwsMock::Core {
          * @param ciphertext input string
          * @param len ciphertext length
          * @param key encryption key
-         * @return decrypted string
+         * @param out output string
          */
-        static unsigned char *Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key);
+        static void Aes256DecryptString(const unsigned char *ciphertext, int *len, const unsigned char *key, unsigned char *out);
 
         /**
          * @brief AES256 encryption of a file
          *
-         * <p>
+         * @par
          * The original plaintext file will be replaced by the encrypted file.
-         * </p>
          *
          * @param filename input file name
          * @param key encryption key
@@ -243,9 +242,8 @@ namespace AwsMock::Core {
         /**
          * @brief AES256 decryption of a file.
          *
-         * <p>
+         * @par
          * The actual file will stay encrypted. Outfile must be deleted after is has been send to client.
-         * </p>
          *
          * @param filename input file name
          * @param outFilename output filename
@@ -316,9 +314,10 @@ namespace AwsMock::Core {
          * @brief Decodes a hex string to an unsigned char array.
          *
          * @param hex hex string
+         * @param out output string
          * @return unsigned char array.
          */
-        static unsigned char *HexDecode(const std::string &hex);
+        static void HexDecode(const std::string &hex, unsigned char *out);
 
         /**
          * @brief Generate an RSA key pair of the given length.

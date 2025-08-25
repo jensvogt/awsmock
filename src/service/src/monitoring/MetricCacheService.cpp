@@ -19,9 +19,8 @@ namespace AwsMock::Monitoring {
     void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         boost::mutex::scoped_lock lock(_cacheMutex);
 
-        const auto count = std::erase_if(_metricCache, [this, name, labelName, labelValue](const auto &item) {
-            auto const &[key, value] = item;
-            return key == GetId(name, labelName, labelValue);
+        const auto count = std::erase_if(_metricCache, [name, labelName, labelValue](const auto &item) {
+            return item.first == GetId(name, labelName, labelValue);
         });
         log_trace << "Counter cleared, count: " << count;
     }
