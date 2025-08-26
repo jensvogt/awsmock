@@ -173,8 +173,7 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SQS::GetQueueDetailsResponse
-    SQSService::GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const {
+    Dto::SQS::GetQueueDetailsResponse SQSService::GetQueueDetails(const Dto::SQS::GetQueueDetailsRequest &request) const {
         Monitoring::MetricServiceTimer measure(SQS_SERVICE_TIMER, "action", "get_queue_details");
         Monitoring::MetricService::instance().IncrementCounter(SQS_SERVICE_COUNTER, "action", "get_queue_details");
         log_trace << "Get queue details request, queueArn: " << request.queueArn;

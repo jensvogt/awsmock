@@ -247,7 +247,10 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::DELETE_TAG) {
 
                 Dto::Lambda::DeleteTagRequest lambdaRequest = Dto::Lambda::DeleteTagRequest::FromJson(clientCommand);
-                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.DeleteLambdaTag(lambdaRequest); });
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    const LambdaService service(_ioc);
+                    service.DeleteLambdaTag(lambdaRequest);
+                });
                 log_info << "Lambda tag deleted, lambda: " << lambdaRequest.functionArn << ", tag: " << lambdaRequest.tagKey;
                 return SendResponse(request, http::status::ok);
             }
@@ -263,7 +266,10 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::RESET_FUNCTION_COUNTERS) {
 
                 Dto::Lambda::ResetFunctionCountersRequest lambdaRequest = Dto::Lambda::ResetFunctionCountersRequest::FromJson(clientCommand);
-                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.ResetFunctionCounters(lambdaRequest); });
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    const LambdaService service(_ioc);
+                    service.ResetFunctionCounters(lambdaRequest);
+                });
                 log_info << "Reset function counters list";
                 return SendResponse(request, http::status::ok);
             }
@@ -272,7 +278,10 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::UploadFunctionCodeRequest lambdaRequest = Dto::Lambda::UploadFunctionCodeRequest::FromJson(clientCommand);
                 log_info << "Starting upload function code, functionArn: " << lambdaRequest.functionArn;
-                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UploadFunctionCode(lambdaRequest); });
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    const LambdaService service(_ioc);
+                    service.UploadFunctionCode(lambdaRequest);
+                });
                 return SendResponse(request, http::status::ok);
             }
 
@@ -280,7 +289,10 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::UpdateLambdaRequest lambdaRequest = Dto::Lambda::UpdateLambdaRequest::FromJson(clientCommand);
                 log_info << "Starting update lambda function, functionArn: " << lambdaRequest.functionArn;
-                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UpdateLambda(lambdaRequest); });
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    const LambdaService service(_ioc);
+                    service.UpdateLambda(lambdaRequest);
+                });
                 return SendResponse(request, http::status::ok);
             }
 
@@ -312,7 +324,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteLambdaResultCounterRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCounterRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    const long count = _lambdaService.DeleteLambdaResultCounter(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    const long count = service.DeleteLambdaResultCounter(lambdaRequest);
                     log_trace << "Delete lambda result counter, count: " << count;
                 });
                 return SendResponse(request, http::status::ok);
@@ -322,7 +335,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteLambdaResultCountersRequest lambdaRequest = Dto::Lambda::DeleteLambdaResultCountersRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    const long count = _lambdaService.DeleteLambdaResultCounters(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    const long count = service.DeleteLambdaResultCounters(lambdaRequest);
                     log_trace << "Delete lambda result counters, count: " << count;
                 });
                 return SendResponse(request, http::status::ok);
@@ -340,7 +354,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::AddEventSourceRequest lambdaRequest = Dto::Lambda::AddEventSourceRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.AddEventSource(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.AddEventSource(lambdaRequest);
                     log_trace << "Add event source, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
@@ -350,7 +365,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteEventSourceRequest lambdaRequest = Dto::Lambda::DeleteEventSourceRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.DeleteEventSource(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.DeleteEventSource(lambdaRequest);
                     log_trace << "Delete event source, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
@@ -360,7 +376,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::EnableLambdaRequest lambdaRequest = Dto::Lambda::EnableLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.EnableLambda(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.EnableLambda(lambdaRequest);
                     log_info << "Lambda enabled, region: " << lambdaRequest.region << ", name: " << lambdaRequest.function.functionName; });
                 return SendResponse(request, http::status::ok);
             }
@@ -369,7 +386,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::EnableAllLambdasRequest lambdaRequest = Dto::Lambda::EnableAllLambdasRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.EnableAllLambdas(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.EnableAllLambdas(lambdaRequest);
                     log_info << "All lambdas enabled, region: " << lambdaRequest.region; });
                 return SendResponse(request, http::status::ok);
             }
@@ -378,7 +396,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DisableLambdaRequest lambdaRequest = Dto::Lambda::DisableLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.DisableLambda(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.DisableLambda(lambdaRequest);
                     log_info << "Lambda disabled, region: " << lambdaRequest.region << ", name: " << lambdaRequest.function.functionName; });
                 return SendResponse(request, http::status::ok);
             }
@@ -387,7 +406,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DisableAllLambdasRequest lambdaRequest = Dto::Lambda::DisableAllLambdasRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.DisableAllLambdas(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.DisableAllLambdas(lambdaRequest);
                     log_info << "All lambdas disabled, region: " << lambdaRequest.region; });
                 return SendResponse(request, http::status::ok);
             }
@@ -396,7 +416,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::StartLambdaRequest lambdaRequest = Dto::Lambda::StartLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.StartLambda(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.StartLambda(lambdaRequest);
                     log_trace << "Start lambda function, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
@@ -405,7 +426,8 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_ALL_LAMBDAS) {
 
                 boost::asio::post(_ioc, [this] {
-                    _lambdaService.StartAllLambdas();
+                    const LambdaService service(_ioc);
+                    service.StartAllLambdas();
                     log_trace << "Started all lambda function";
                 });
                 return SendResponse(request, http::status::ok);
@@ -415,7 +437,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::StopLambdaRequest lambdaRequest = Dto::Lambda::StopLambdaRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.StopLambda(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.StopLambda(lambdaRequest);
                     log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
@@ -424,7 +447,8 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_ALL_LAMBDAS) {
 
                 boost::asio::post(_ioc, [this] {
-                    _lambdaService.StopAllLambdas();
+                    const LambdaService service(_ioc);
+                    service.StopAllLambdas();
                     log_trace << "Stopped all lambda functions";
                 });
                 return SendResponse(request, http::status::ok);
@@ -434,7 +458,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::StopLambdaInstanceRequest lambdaRequest = Dto::Lambda::StopLambdaInstanceRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.StopLambdaInstance(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.StopLambdaInstance(lambdaRequest);
                     log_trace << "Stop lambda instance, functionArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
                 });
                 return SendResponse(request, http::status::ok);
@@ -444,7 +469,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteImageRequest lambdaRequest = Dto::Lambda::DeleteImageRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.DeleteImage(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.DeleteImage(lambdaRequest);
                     log_trace << "Delete image, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
@@ -454,7 +480,8 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::DeleteFunctionRequest lambdaRequest = Dto::Lambda::DeleteFunctionRequest::FromJson(clientCommand);
                 boost::asio::post(_ioc, [this, lambdaRequest] {
-                    _lambdaService.DeleteFunction(lambdaRequest);
+                    const LambdaService service(_ioc);
+                    service.DeleteFunction(lambdaRequest);
                     log_trace << "Delete function, functionName: " << lambdaRequest.functionName;
                 });
                 return SendResponse(request, http::status::ok);
