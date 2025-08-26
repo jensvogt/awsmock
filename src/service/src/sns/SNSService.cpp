@@ -256,8 +256,7 @@ namespace AwsMock::Service {
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions, asynchronously
-            //CheckSubscriptions(request, topic, message);
-            boost::asio::post(_ioc, [this, request, topic, message] { CheckSubscriptions(request, topic, message); });
+            CheckSubscriptions(request, topic, message);
 
             Dto::SNS::PublishResponse response;
             response.requestId = request.requestId;
