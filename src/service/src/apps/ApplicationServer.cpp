@@ -30,7 +30,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [this] { BackupApplication(); }, _backupCron);
+            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
         }
 
         // Start the application
@@ -54,7 +54,7 @@ namespace AwsMock::Service {
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {
 
-            if (!application.containerId.empty() && application.status == Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
+            if (!application.containerId.empty() && ContainerService::instance().ContainerExists(application.containerId)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
                 const auto cpuDelta = (double) (containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
                 const auto systemCpuDelta = (double) (containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);

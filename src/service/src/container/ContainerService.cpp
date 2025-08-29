@@ -149,22 +149,22 @@ namespace AwsMock::Service {
         log_debug << "Image deleted, id: " << id;
     }
 
-    bool ContainerService::ContainerExists(const std::string &id) const {
+    bool ContainerService::ContainerExists(const std::string &containerId) const {
 
         if (_isDocker) {
-            const std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + id + "\"]}");
+            const std::string filters = Core::StringUtils::UrlEncode(R"({"id":[")" + containerId + "\"]}");
             if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters); statusCode == http::status::ok) {
                 const Dto::Docker::ListContainerResponse response(body);
-                log_debug << "Docker container found, id: " << id;
+                log_debug << "Docker container found, id: " << containerId;
                 return !response.containerList.empty();
             } else {
                 log_warning << "Docker container exists failed, statusCode: " << statusCode;
                 return false;
             }
         } else {
-            if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/v5.0.0/libpod/containers/" + id + "/exists"); statusCode == http::status::ok) {
+            if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/v5.0.0/libpod/containers/" + containerId + "/exists"); statusCode == http::status::ok) {
                 const Dto::Docker::ListContainerResponse response(body);
-                log_debug << "Docker container found, id: " << id;
+                log_debug << "Docker container found, id: " << containerId;
                 return !response.containerList.empty();
             } else {
                 log_warning << "Docker container exists failed, statusCode: " << statusCode;

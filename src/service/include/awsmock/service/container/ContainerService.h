@@ -190,10 +190,10 @@ namespace AwsMock::Service {
         /**
          * @brief Checks whether a container exists by ID.
          *
-         * @param id container ID
+         * @param containerId container ID
          * @return true if the container exists, otherwise false
          */
-        [[nodiscard]] bool ContainerExists(const std::string &id) const;
+        [[nodiscard]] bool ContainerExists(const std::string &containerId) const;
 
         /**
          * @brief Checks whether a container exists by name.
