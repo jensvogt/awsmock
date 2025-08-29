@@ -33,7 +33,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class AbstractHandler : public std::enable_shared_from_this<AbstractHandler> {
+    class AbstractHandler {
 
       public:
 
