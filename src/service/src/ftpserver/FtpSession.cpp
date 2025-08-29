@@ -64,7 +64,7 @@ namespace AwsMock::FtpServer {
         async_write(command_socket_,
                     boost::asio::buffer(command_output_queue_.front()),
                     command_write_strand_.wrap(
-                            [me = shared_from_this()](const boost::beast::error_code ec, std::size_t /*bytes_to_transfer*/) {
+                            [me = shared_from_this()](const boost::beast::error_code &ec, std::size_t /*bytes_to_transfer*/) {
                                 if (!ec) {
                                     me->command_output_queue_.pop_front();
 
@@ -81,7 +81,7 @@ namespace AwsMock::FtpServer {
         async_read_until(command_socket_,
                          command_input_stream_,
                          "\r\n",
-                         [me = shared_from_this()](const boost::beast::error_code ec, const std::size_t length) {
+                         [me = shared_from_this()](const boost::beast::error_code &ec, const std::size_t length) {
                              if (ec) {
                                  if (ec != boost::asio::error::eof) {
                                      log_error << "Read_until error: " << ec.message();
@@ -1104,9 +1104,46 @@ namespace AwsMock::FtpServer {
         sendFtpMessage(FtpReplyCode::COMMAND_NOT_IMPLEMENTED_FOR_PARAMETER, "Unrecognized parameter");
     }
 
-    ////////////////////////////////////////////////////////
-    // FTP data-socket send
-    ////////////////////////////////////////////////////////
+    /**
+     * Sends a directory listing to the connected FTP client.
+     *
+     * This function asynchronously accepts a data connection request,
+     * generates a Unix-like directory listing (formatted as per FTP standards),
+     * and sends the listing to the client. If a connection error occurs,
+     * the transfer is aborted, and an appropriate FTP message is sent.
+     *
+     * @param directory_content A map containing the directory contents to be listed.
+     * Each key is a string representing the filename, and the value is a FileStatus
+     * object that provides metadata such as type, size, permissions, owner, and group.
+     *
+     * Error Handling:
+     * - If an error occurs during the acceptance of the data connection, an appropriate
+     *   FTP message is sent to indicate a transfer abortion.
+     *
+     * Implementation Notes:
+     * - The directory content is converted into a Unix-style file list string using
+     *   `std::stringstream`. Each entry includes file attributes and details in a
+     *   formatted output.
+     * - The directory listing is copied into a raw character vector (`std::vector<char>`)
+     *   for efficient transfer over the network.
+     * - Two calls to addDataToBufferAndSend are made:
+     *   1. To send the actual directory data.
+     *   2. To send an empty buffer, denoting the end of the transfer.
+     *
+     * Design Considerations:
+     * - The function uses `shared_from_this` to ensure the session object remains
+     *   valid during asynchronous operations.
+     * - A weak pointer (`data_socket_weakptr_`) is maintained for the data socket
+     *   to prevent dangling references.
+     *
+     * Asynchronous Behavior:
+     * - The method relies on Boost.Asio asynchronous operations for handling the
+     *   client connection and data transfer.
+     *
+     * TODOs:
+     * - Close the acceptor after the socket connects.
+     * - Extend the implementation to fetch file data from S3 buckets/keys if required.
+     */
 
     void FtpSession::sendDirectoryListing(const std::map<std::string, FileStatus> &directory_content) {
         auto data_socket = std::make_shared<boost::asio::ip::tcp::socket>(_io_service);

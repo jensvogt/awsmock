@@ -196,8 +196,8 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::PURGE_ALL_TOPICS: {
 
-                    boost::asio::post(_ioc, [this] {
-                        const long purged = _snsService.PurgeAllTopics();
+                    boost::asio::post(_ioc, [self = shared_from_this()] {
+                        const long purged = self->_snsService.PurgeAllTopics();
                         log_info << "All topic purged, count: " << purged; });
                     return SendResponse(request, http::status::ok);
                 }
@@ -225,8 +225,8 @@ namespace AwsMock::Service {
                 case Dto::Common::SNSCommandType::DELETE_MESSAGE: {
 
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
-                    boost::asio::post(_ioc, [this, snsRequest] {
-                        _snsService.DeleteMessage(snsRequest);
+                    boost::asio::post(_ioc, [snsRequest, self = shared_from_this()] {
+                        self->_snsService.DeleteMessage(snsRequest);
                         log_info << "Message deleted, messageId: " << snsRequest.messageId; });
                     return SendResponse(request, http::status::ok);
                 }

@@ -219,6 +219,9 @@ namespace AwsMock::Service {
          */
         boost::beast::tcp_stream _stream;
 
+        /**
+         * Request queue
+         */
         queue _queue;
 
         /**
