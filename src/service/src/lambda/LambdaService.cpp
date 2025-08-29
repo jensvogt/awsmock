@@ -1240,6 +1240,7 @@ namespace AwsMock::Service {
             // Create lambda
             LambdaCreator lambdaCreator;
             lambda = lambdaCreator.CreateLambda(lambda, instanceId);
+            _instanceMutex[lambda.function] = std::make_shared<boost::mutex>();
             log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", totalSize: " << lambda.instances.size();
             instance = lambda.GetInstance(instanceId);
 
