@@ -7,12 +7,10 @@
 
 // C++ standard includes
 #include <map>
+#include <memory>
 #include <string>
 
 // AwsMock includes
-#include "awsmock/service/lambda/LambdaService.h"
-
-
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/PagingUtils.h>
@@ -70,6 +68,7 @@
 #include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
+#include <boost/asio/strand.hpp>
 
 #define SQS_PROTOCOL "sqs"
 #define HTTP_PROTOCOL "http"
@@ -80,18 +79,18 @@
 namespace AwsMock::Service {
 
     /**
-     * @brief SNS server thread
+     * @brief SNS service thread
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSService {
+    class SNSService /*: public std::enable_shared_from_this<SNSService>*/ {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc), _ioc(ioc) {};
+        explicit SNSService(boost::asio::io_context &ioc) : _snsDatabase(Database::SNSDatabase::instance()), _sqsDatabase(Database::SQSDatabase::instance()), _lambdaDatabase(Database::LambdaDatabase::instance()), _sqsService(ioc), _lambdaService(ioc), _ioc(ioc) {}
 
         /**
          * @brief Creates a new topic
@@ -137,7 +136,7 @@ namespace AwsMock::Service {
          * @param request AWS region
          * @return PublishResponse
          */
-        [[nodiscard]] Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request);
+        [[nodiscard]] Dto::SNS::PublishResponse Publish(const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Subscribe to a topic
@@ -318,15 +317,15 @@ namespace AwsMock::Service {
          * @param topic SNS topic entity
          * @param message SNS message entity
          */
-        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message);
+        void CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) const;
 
         /**
-         * @brief Send a SNS message to an SQS topic
+         * @brief Send an SNS message to an SQS topic
          *
          * @param subscription SNS subscription
          * @param request SNS publish request
          */
-        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request);
+        void SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const;
 
         /**
          * @brief Adjust topic counters

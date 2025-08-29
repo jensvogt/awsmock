@@ -24,7 +24,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSHandler final : public AbstractHandler {
+    class SNSHandler final : public AbstractHandler, public std::enable_shared_from_this<SNSHandler> {
 
       public:
 
