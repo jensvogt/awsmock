@@ -7,7 +7,7 @@
 namespace AwsMock::Database {
     ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {
 
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _applicationCounterMap = _segment.find<ApplicationCounterMapType>(APPLICATION_COUNTER_MAP_NAME).first;
         if (!_applicationCounterMap) {
             _applicationCounterMap = _segment.construct<ApplicationCounterMapType>(APPLICATION_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());

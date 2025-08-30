@@ -290,7 +290,7 @@
     "monitoring": {
       "active": true,
       "port": 9091,
-      "period": 60,
+      "period": 300,
       "prometheus": false,
       "internal": true,
       "retention": 3,

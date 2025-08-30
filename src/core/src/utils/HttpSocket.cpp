@@ -2,9 +2,7 @@
 // Created by vogje01 on 5/28/24.
 //
 
-#include "awsmock/core/DateTimeUtils.h"
-
-
+#include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/HttpSocket.h>
 
 namespace AwsMock::Core {
@@ -12,12 +10,12 @@ namespace AwsMock::Core {
     HttpSocketResponse HttpSocket::SendJson(http::verb method, const std::string &host, int port, const std::string &path, const std::string &body, const std::map<std::string, std::string> &headers) {
 
         boost::asio::io_context ctx;
-
         boost::asio::ip::tcp::resolver resolver(ctx);
         boost::beast::tcp_stream stream(ctx);
 
-        // Resolve host/port
         try {
+
+            // Resolve host/port
             boost::system::error_code ec;
             auto const results = resolver.resolve(host, std::to_string(port));
 
@@ -39,6 +37,7 @@ namespace AwsMock::Core {
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
+            // Read the response
             boost::beast::flat_buffer buffer;
             http::response<http::string_body> response;
             http::read(stream, buffer, response);
@@ -50,8 +49,7 @@ namespace AwsMock::Core {
             // Cleanup
             ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
             if (ec) {
-                log_error << "Shutdown socket failed, error: " << ec.message();
-                //return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                log_warning << "Shutdown socket failed, error: " << ec.message();
             }
             return PrepareResult(response);
 
@@ -64,12 +62,12 @@ namespace AwsMock::Core {
     HttpSocketResponse HttpSocket::SendAuthorizedJson(http::verb method, const std::string &module, const std::string &host, int port, const std::string &path, const std::string &signedHeaders, std::map<std::string, std::string> &headers, const std::string &body) {
 
         boost::asio::io_context ctx;
-
         boost::asio::ip::tcp::resolver resolver(ctx);
         boost::beast::tcp_stream stream(ctx);
 
-        // Resolve host/port
         try {
+
+            // Resolve host/port
             boost::system::error_code ec;
             const auto result = resolver.resolve(host, std::to_string(port));
 
@@ -94,9 +92,9 @@ namespace AwsMock::Core {
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
+            // Read the response
             boost::beast::flat_buffer buffer;
             http::response<http::string_body> response;
-
             http::read(stream, buffer, response);
             if (ec) {
                 log_error << "Read from " << host << ":" << port << " failed, error: " << ec.message();
@@ -106,8 +104,7 @@ namespace AwsMock::Core {
             // Cleanup
             ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
             if (ec) {
-                log_error << "Shutdown socket failed, error: " << ec.message();
-                //return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                log_warning << "Shutdown socket failed, error: " << ec.message();
             }
             return PrepareResult(response);
 
@@ -120,22 +117,22 @@ namespace AwsMock::Core {
     HttpSocketResponse HttpSocket::SendBinary(http::verb method, const std::string &host, int port, const std::string &path, const std::string &filename, const std::map<std::string, std::string> &headers) {
 
         boost::asio::io_context ctx;
-
         boost::asio::ip::tcp::resolver resolver(ctx);
         boost::beast::tcp_stream stream(ctx);
 
         try {
-            boost::system::error_code ec;
             // Prepare the message
             http::request<http::file_body> request = PrepareBinaryMessage(method, path, filename, headers);
 
             // Write to socket
+            boost::system::error_code ec;
             http::write(stream, request);
             if (ec) {
                 log_error << "Send to " << host << ":" << port << " failed, error: " << ec.message();
                 return {.statusCode = http::status::internal_server_error, .body = ec.message()};
             }
 
+            // Read the response
             boost::beast::flat_buffer buffer;
             http::response<http::dynamic_body> response;
             read(stream, buffer, response, ec);
@@ -146,8 +143,7 @@ namespace AwsMock::Core {
 
             ec = stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
             if (ec) {
-                log_error << "Shutdown socket failed, error: " << ec.message();
-                return {.statusCode = http::status::internal_server_error, .body = ec.message()};
+                log_warning << "Shutdown socket failed, error: " << ec.message();
             }
             return PrepareResult(response);
 

@@ -23,7 +23,7 @@ namespace AwsMock::Service {
         _region = configuration.GetValue<std::string>("awsmock.region");
 
         // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _lambdaCounterMap = _segment.find<Database::LambdaCounterMapType>(Database::LAMBDA_COUNTER_MAP_NAME).first;
 
         // Create lambda directory

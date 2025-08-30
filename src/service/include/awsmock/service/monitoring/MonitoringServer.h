@@ -5,7 +5,14 @@
 #ifndef AWSMOCK_SERVICE_MONITORING_SERVER_H
 #define AWSMOCK_SERVICE_MONITORING_SERVER_H
 
+// C++ includes
+#include <set>
+
+// Boost includes
+#include <boost/container/map.hpp>
+
 // AwsMock includes
+#include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
@@ -36,6 +43,8 @@ namespace AwsMock::Service {
         [[maybe_unused]] void DeleteMonitoringData() const;
 
       private:
+
+        void Collector() const;
 
         /**
          * Monitoring system collector

@@ -73,7 +73,7 @@ namespace AwsMock::Monitoring {
             Core::StringUtils::Replace(lv, "-", "_");
             counter->Add({{labelName, lv}}).Increment(value);
         }
-        _metricCacheService.IncrementCounter(name, value, labelName, labelValue);
+        //_metricCacheService.IncrementCounter(name, value, labelName, labelValue);
         log_trace << "Counter incremented, name: " << name << " labelName: " << labelName << " labelValue: " << labelValue;
     }
 
@@ -114,7 +114,7 @@ namespace AwsMock::Monitoring {
             Core::StringUtils::Replace(lv, "-", "_");
             _gaugeMap[name]->Add({{labelName, lv}}).Set(value);
         }
-        _metricCacheService.SetGauge(name, value, labelName, labelValue);
+        //_metricCacheService.SetGauge(name, value, labelName, labelValue);
         log_trace << "Gauge value set, name: " << name;
     }
 

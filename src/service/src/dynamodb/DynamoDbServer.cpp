@@ -36,7 +36,7 @@ namespace AwsMock::Service {
         log_info << "DynamoDb server starting";
 
         // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _dynamoDbCounterMap = _segment.find<Database::DynamoDbCounterMapType>(Database::DYNAMODB_COUNTER_MAP_NAME).first;
 
         // Create a local network if it is not existing yet

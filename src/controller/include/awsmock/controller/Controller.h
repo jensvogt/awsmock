@@ -58,6 +58,11 @@
 
 namespace AwsMock::Controller {
 
+    /**
+     * @brief Command types
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
     enum class CommandType {
         CONFIG,
         LOG_LEVEL,
@@ -80,10 +85,13 @@ namespace AwsMock::Controller {
             {CommandType::CONFIG, "config"},
             {CommandType::LOG_LEVEL, "log-level"},
             {CommandType::LIST_APPLICATIONS, "list-applications"},
+            {CommandType::ENABLE_APPLICATION, "enable-application"},
+            {CommandType::DISABLE_APPLICATION, "disable-application"},
             {CommandType::START_APPLICATION, "start-application"},
             {CommandType::RESTART_APPLICATION, "restart-application"},
             {CommandType::STOP_APPLICATION, "stop-application"},
-            {CommandType::STOP_LAMBDA, "stop-lambda"},
+            {CommandType::ENABLE_LAMBDA, "enable-lambda"},
+            {CommandType::DISABLE_LAMBDA, "disable-lambda"},
             {CommandType::LIST_LAMBDAS, "list-lambdas"},
             {CommandType::START_LAMBDA, "start-lambda"},
             {CommandType::RESTART_LAMBDA, "restart-lambda"},
