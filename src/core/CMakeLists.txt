@@ -14,8 +14,9 @@ set(EXCEPTION_SOURCES src/exception/CoreException.cpp src/exception/DatabaseExce
         src/exception/UnauthorizedException.cpp src/exception/BadRequestException.cpp)
 set(LOGGING_SOURCES src/logging/LogStream.cpp src/logging/LogWebsocketSink.cpp)
 set(BACKUP_SOURCES src/logging/LogStream.cpp src/logging/LogWebsocketSink.cpp)
+set(MONITORING_SOURCES src/monitoring/SharedMemoryUtils.cpp)
 
-set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES})
+set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)

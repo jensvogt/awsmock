@@ -15,6 +15,9 @@ namespace AwsMock::Service {
         scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.CollectSystemCounter(); }, period);
         log_debug << "System collector started";
 
+        scheduler.AddTask("monitoring-collector", [this] { this->Collector(); }, period);
+        log_debug << "System collector started";
+
         // Start the database cleanup worker thread every day
         scheduler.AddTask("monitoring-cleanup-database", [this] { this->DeleteMonitoringData(); }, 24 * 3600, Core::DateTimeUtils::GetSecondsUntilMidnight());
         log_debug << "Cleanup started";
@@ -32,6 +35,10 @@ namespace AwsMock::Service {
         const long deletedCount = _monitoringDatabase.DeleteOldMonitoringData(retentionPeriod);
 
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;
+    }
+
+    void MonitoringServer::Collector() const {
+        _monitoringDatabase.UpdateMonitoringCounters();
     }
 
 }// namespace AwsMock::Service

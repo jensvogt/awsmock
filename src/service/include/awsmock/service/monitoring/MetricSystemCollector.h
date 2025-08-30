@@ -9,6 +9,7 @@
 #ifndef _WIN32
 #include <sys/times.h>
 #endif
+#include "../../../../../core/include/awsmock/core/monitoring/SharedMemoryUtils.h"
 
 #ifdef __linux__
 #include <sys/sysinfo.h>
@@ -38,10 +39,12 @@
 
 namespace AwsMock::Monitoring {
 
+    using std::chrono::microseconds;
+
     /**
      * @brief Collect system information like CPU and Memory.
      *
-     * Runs as background thread with a given timeout in ms.
+     * Runs as a background thread with a given timeout in ms.
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -219,6 +222,11 @@ namespace AwsMock::Monitoring {
          * Monitoring period
          */
         int _period = 60;
+
+        /**
+         * Map of monitoring counters
+         */
+        Core::SharedMemoryUtils _shmUtils;
     };
 
 }// namespace AwsMock::Monitoring

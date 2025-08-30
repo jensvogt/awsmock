@@ -21,7 +21,7 @@ namespace AwsMock::Service {
         log_info << "SQS server starting";
 
         // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _sqsCounterMap = _segment.find<Database::SqsCounterMapType>(Database::SQS_COUNTER_MAP_NAME).first;
 
         // Start SQS monitoring update counters
