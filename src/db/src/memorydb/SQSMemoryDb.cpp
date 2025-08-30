@@ -2,9 +2,6 @@
 // Created by vogje01 on 11/19/23.
 //
 
-#include "awsmock/core/SharedMemoryUtils.h"
-
-
 #include <awsmock/memorydb/SQSMemoryDb.h>
 
 namespace AwsMock::Database {
@@ -14,7 +11,7 @@ namespace AwsMock::Database {
 
     SQSMemoryDb::SQSMemoryDb() {
 
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _sqsCounterMap = _segment.find<SqsCounterMapType>(SQS_COUNTER_MAP_NAME).first;
         if (!_sqsCounterMap) {
             _sqsCounterMap = _segment.construct<SqsCounterMapType>(SQS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());

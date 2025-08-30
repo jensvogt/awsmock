@@ -7,7 +7,7 @@
 #include "awsmock/core/TestUtils.h"
 #include "awsmock/utils/TestUtils.h"
 
-std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
+//std::unique_ptr<boost::interprocess::managed_shared_memory> shm;
 AwsMock::Database::ConnectionPool &pool = AwsMock::Database::ConnectionPool::instance();
 
 namespace AwsMock::Service {
@@ -103,12 +103,12 @@ namespace AwsMock::Service {
     void TestBase::InitializeShm() {
 
         // As Awsmock is not running under root set shared memory permissions
-        boost::interprocess::permissions unrestricted_permissions;
-        unrestricted_permissions.set_unrestricted();
+        //boost::interprocess::permissions unrestricted_permissions;
+        //unrestricted_permissions.set_unrestricted();
 
         // Create a managed shared memory segment.
-        boost::interprocess::shared_memory_object::remove(SHARED_MEMORY_SEGMENT_NAME);
-        shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, SHARED_MEMORY_SEGMENT_NAME, 65000, nullptr, unrestricted_permissions);
+        //boost::interprocess::shared_memory_object::remove(MONITORING_SEGMENT_NAME);
+        //shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, MONITORING_SEGMENT_NAME, 65000, nullptr, unrestricted_permissions);
     }
 
     void TestBase::StartContainer() {

@@ -21,8 +21,9 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/entity/monitoring/Counter.h>
 #include <awsmock/repository/Database.h>
 
@@ -98,6 +99,11 @@ namespace AwsMock::Database {
          * @return list of label values
          */
         [[nodiscard]] std::vector<std::string> GetDistinctLabelValues(const std::string &name, const std::string &labelName, long limit = -1) const;
+
+        /**
+         * @brief Saves the monitoring data to the database
+         */
+        void UpdateMonitoringCounters() const;
 
         /**
          * @brief Deletes old monitoring data

@@ -230,7 +230,7 @@ namespace AwsMock::Controller {
                 std::cerr << "Error: application: " << application.name << ", httpStatus" << response.statusCode << ", body: " << response.body << std::endl;
                 return;
             }
-            std::cout << "Application " << application.name << " enabled" << std::endl;
+            std::cout << "Application " << application.name << " disabled" << std::endl;
         }
     }
 

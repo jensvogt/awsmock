@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
+//#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {

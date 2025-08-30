@@ -10,7 +10,7 @@
 namespace AwsMock::Database {
     SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
 
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _snsCounterMap = _segment.find<SnsCounterMapType>(SNS_COUNTER_MAP_NAME).first;
         if (!_snsCounterMap) {
             _snsCounterMap = _segment.construct<SnsCounterMapType>(SNS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());

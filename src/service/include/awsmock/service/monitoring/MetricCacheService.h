@@ -16,9 +16,11 @@
 #include <prometheus/registry.h>
 
 // Boost include
+//#include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/thread/mutex.hpp>
 
 // AwsMock utils
+//#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/repository/MonitoringDatabase.h>
 
 namespace AwsMock::Monitoring {

@@ -67,7 +67,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::RebuildApplicationCodeRequest serviceRequest = Dto::Apps::RebuildApplicationCodeRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.RebuildApplication(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.RebuildApplication(serviceRequest);
                         log_info << "Applications rebuild, region: " << serviceRequest.region; });
                     return SendResponse(request, http::status::ok);
                 }
@@ -76,7 +77,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::EnableApplicationRequest serviceRequest = Dto::Apps::EnableApplicationRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.EnableApplication(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.EnableApplication(serviceRequest);
                         log_info << "Application enabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendResponse(request, http::status::ok);
                 }
@@ -85,7 +87,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::EnableAllApplicationsRequest serviceRequest = Dto::Apps::EnableAllApplicationsRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.EnableAllApplications(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.EnableAllApplications(serviceRequest);
                         log_info << "Application enabled, region: " << serviceRequest.region; });
                     return SendResponse(request, http::status::ok);
                 }
@@ -94,7 +97,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::DisableApplicationRequest serviceRequest = Dto::Apps::DisableApplicationRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.DisableApplication(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.DisableApplication(serviceRequest);
                         log_info << "Application disabled, region: " << serviceRequest.region << ", name: " << serviceRequest.application.name; });
                     return SendResponse(request, http::status::ok);
                 }
@@ -103,7 +107,8 @@ namespace AwsMock::Service {
 
                     Dto::Apps::DisableAllApplicationsRequest serviceRequest = Dto::Apps::DisableAllApplicationsRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, serviceRequest] {
-                        _applicationService.DisableAllApplications(serviceRequest);
+                        const ApplicationService service{_ioc};
+                        service.DisableAllApplications(serviceRequest);
                         log_info << "Application disabled, region: " << serviceRequest.region; });
                     return SendResponse(request, http::status::ok);
                 }
