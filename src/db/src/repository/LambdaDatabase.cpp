@@ -8,7 +8,7 @@ namespace AwsMock::Database {
 
     LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {
 
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _lambdaCounterMap = _segment.find<LambdaCounterMapType>(LAMBDA_COUNTER_MAP_NAME).first;
         if (!_lambdaCounterMap) {
             _lambdaCounterMap = _segment.construct<LambdaCounterMapType>(LAMBDA_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());

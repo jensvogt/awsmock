@@ -23,7 +23,7 @@ namespace AwsMock::Service {
         log_info << "SNS server starting";
 
         // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _snsCounterMap = _segment.find<Database::SnsCounterMapType>(Database::SNS_COUNTER_MAP_NAME).first;
 
         // Start SNS monitoring update counters

@@ -16,15 +16,18 @@
 #include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
+
+#define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_counter"
+#define S3_SIZE_BY_BUCKET_COUNT "s3_size_by_bucket_counter"
 
 namespace AwsMock::Database {
 
@@ -35,11 +38,11 @@ namespace AwsMock::Database {
         long size{};
         system_clock::time_point modified = system_clock::now();
     };
-
+    /*
     using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, S3MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
     using S3CounterMapType = boost::container::map<std::string, S3MonitoringCounter, std::less<std::string>, S3ShmAllocator>;
 
-    static constexpr auto S3_COUNTER_MAP_NAME = "S3BucketCounter";
+    static constexpr auto S3_COUNTER_MAP_NAME = "S3BucketCounter";*/
 
     /**
      * @brief S3 MongoDB database.
@@ -143,7 +146,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket) const;
+        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket);
 
         /**
          * @brief List all buckets
@@ -238,7 +241,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const;
+        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket);
 
         /**
          * @brief Create a new S3 object in the S3 object table
@@ -490,14 +493,9 @@ namespace AwsMock::Database {
         S3MemoryDb &_memoryDb;
 
         /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
          * Map of monitoring counters
          */
-        S3CounterMapType *_s3CounterMap;
+        Core::SharedMemoryUtils _shmUtils;
     };
 
 }// namespace AwsMock::Database

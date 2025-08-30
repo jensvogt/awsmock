@@ -13,7 +13,6 @@ namespace AwsMock::Monitoring {
         if (_aggregationPeriod < 60) {
             _aggregationPeriod = 60;
         }
-        log_debug << "Metric cache service initialized, aggregation period: " << _aggregationPeriod << " seconds";
     }
 
     void MetricCacheService::ClearCounter(const std::string &name, const std::string &labelName, const std::string &labelValue) {

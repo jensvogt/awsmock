@@ -12,7 +12,7 @@ namespace AwsMock::Service {
         _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
 
         // Initialize shared memory
-        auto _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        auto _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         Database::LambdaCounterMapType *lambdaCounterMap = _segment.find<Database::LambdaCounterMapType>(Database::LAMBDA_COUNTER_MAP_NAME).first;
 
         // Monitoring

@@ -15,7 +15,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>

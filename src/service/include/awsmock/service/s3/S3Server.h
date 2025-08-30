@@ -12,6 +12,7 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 // AwsMock includes
+//#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
@@ -100,12 +101,12 @@ namespace AwsMock::Service {
         /**
          * Shared memory segment
          */
-        boost::interprocess::managed_shared_memory _segment;
+        //boost::interprocess::managed_shared_memory _segment;
 
         /**
          * Counter map in a shared memory segment
          */
-        Database::S3CounterMapType *_s3CounterMap{};
+        //Database::S3CounterMapType *_s3CounterMap{};
     };
 
 }// namespace AwsMock::Service

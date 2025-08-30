@@ -211,7 +211,7 @@ namespace AwsMock::Service {
         return response;
     }
 
-    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) {
+    Dto::SNS::PublishResponse SNSService::Publish(const Dto::SNS::PublishRequest &request) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "publish");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "publish");
         log_trace << "Publish message request: " << request.ToString();
@@ -256,8 +256,7 @@ namespace AwsMock::Service {
             message = _snsDatabase.CreateMessage(message);
 
             // Check subscriptions, asynchronously
-            //CheckSubscriptions(request, topic, message);
-            boost::asio::post(_ioc, [this, request, topic, message] { CheckSubscriptions(request, topic, message); });
+            boost::asio::post(_ioc, [this, request, topic, message]() { CheckSubscriptions(request, topic, message); });
 
             Dto::SNS::PublishResponse response;
             response.requestId = request.requestId;
@@ -636,7 +635,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) {
+    void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) const {
         Monitoring::MetricServiceTimer measure(SNS_SERVICE_TIMER, "action", "check_subscriptions");
         Monitoring::MetricService::instance().IncrementCounter(SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request;
@@ -646,19 +645,19 @@ namespace AwsMock::Service {
             if (Core::StringUtils::ToLower(it.protocol) == SQS_PROTOCOL) {
 
                 SendSQSMessage(it, request);
-                _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+                Database::SNSDatabase::instance().SetMessageStatus(message, Database::Entity::SNS::SEND);
                 log_debug << "Message send to SQS queue, queueArn: " << it.endpoint;
 
             } else if (Core::StringUtils::ToLower(it.protocol) == HTTP_PROTOCOL) {
 
                 SendHttpMessage(it, request);
-                _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+                Database::SNSDatabase::instance().SetMessageStatus(message, Database::Entity::SNS::SEND);
                 log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
 
             } else if (Core::StringUtils::ToLower(it.protocol) == LAMBDA_ENDPOINT) {
 
                 SendLambdaMessage(it, request, message);
-                _snsDatabase.SetMessageStatus(message, Database::Entity::SNS::SEND);
+                Database::SNSDatabase::instance().SetMessageStatus(message, Database::Entity::SNS::SEND);
                 log_debug << "Message send to HTTP endpoint, endpoint: " << it.endpoint;
             }
         }
@@ -736,7 +735,7 @@ namespace AwsMock::Service {
         }
     }
 
-    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) {
+    void SNSService::SendSQSMessage(const Database::Entity::SNS::Subscription &subscription, const Dto::SNS::PublishRequest &request) const {
         log_debug << "Send to SQS queue, queueUrl: " << subscription.endpoint;
 
         // Get queue by ARN
@@ -767,7 +766,8 @@ namespace AwsMock::Service {
             sendMessageRequest.messageAttributes[fst] = messageAttribute;
         }
 
-        const Dto::SQS::SendMessageResponse response = _sqsService.SendMessage(sendMessageRequest);
+        SQSService service{_ioc};
+        const Dto::SQS::SendMessageResponse response = service.SendMessage(sendMessageRequest);
         log_trace << "SNS SendMessage response: " << response.ToString();
     }
 

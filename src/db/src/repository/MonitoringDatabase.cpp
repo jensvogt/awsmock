@@ -191,6 +191,53 @@ namespace AwsMock::Database {
         return {};
     }
 
+    void MonitoringDatabase::UpdateMonitoringCounters() const {
+
+        if (HasDatabase()) {
+
+            // Initialize shared memory
+            auto _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
+            Core::SharedMemoryUtils::CounterMapType *counterMap = _segment.find<Core::SharedMemoryUtils::CounterMapType>(MONITORING_MAP_NAME).first;
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            const auto messageCollection = client->database(_databaseName)[_monitoringCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                auto collection = mongocxx::collection{messageCollection};
+                auto bulk = collection.create_bulk_write();
+
+                for (const auto &val: *counterMap | std::views::values) {
+
+                    const double avg = val.value / static_cast<double>(val.count);
+                    document updateQuery;
+                    updateQuery.append(kvp("name", val.name));
+                    updateQuery.append(kvp("labelName", val.labelName));
+                    updateQuery.append(kvp("labelValue", val.labelValue));
+                    updateQuery.append(kvp("value", avg));
+                    updateQuery.append((kvp("created", bsoncxx::types::b_date(val.timestamp))));
+
+                    const mongocxx::model::insert_one insert_op{updateQuery.view()};
+                    bulk.append(insert_op);
+                }
+
+                // Execute bulk update
+                const auto result = bulk.execute();
+                session.commit_transaction();
+                log_info << "Imported monitoring values: " << result->inserted_count();
+
+                counterMap->clear();
+
+            } catch (mongocxx::exception &e) {
+                log_error << "Collection transaction exception: " << e.what();
+                session.abort_transaction();
+                throw Core::DatabaseException(e.what());
+            }
+        }
+    }
+
     long MonitoringDatabase::DeleteOldMonitoringData(const int retentionPeriod) const {
         log_trace << "Deleting old monitoring data, retention:: " << retentionPeriod;
 
@@ -202,7 +249,7 @@ namespace AwsMock::Database {
             try {
                 // Find and delete counters
                 session.start_transaction();
-                const auto retention = Core::DateTimeUtils::UtcDateTimeNow() - std::chrono::hours(retentionPeriod * 24);
+                const auto retention = Core::DateTimeUtils::UtcDateTimeNow() - std::chrono::days(retentionPeriod);
                 const auto mResult = _monitoringCollection.delete_many(make_document(kvp("created", make_document(kvp("$lte", bsoncxx::types::b_date(retention))))));
                 log_debug << "Counters deleted, count: " << mResult.value().deleted_count();
                 session.commit_transaction();

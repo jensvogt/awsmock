@@ -22,9 +22,9 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/SharedMemoryUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>

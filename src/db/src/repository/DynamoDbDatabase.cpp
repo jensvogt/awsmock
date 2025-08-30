@@ -13,7 +13,7 @@ namespace AwsMock::Database {
     DynamoDbDatabase::DynamoDbDatabase() : _databaseName(GetDatabaseName()), _tableCollectionName("dynamodb_table"), _itemCollectionName("dynamodb_item"), _memoryDb(DynamoDbMemoryDb::instance()) {
 
         _accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, SHARED_MEMORY_SEGMENT_NAME);
+        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _dynamoDbCounterMap = _segment.find<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME).first;
         if (!_dynamoDbCounterMap) {
             _dynamoDbCounterMap = _segment.construct<DynamoDbCounterMapType>(DYNAMODB_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());

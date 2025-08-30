@@ -5,12 +5,17 @@
 #ifndef AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 #define AWSMOCK_SERVICE_LAMBDA_HANDLER_H
 
+// C++ includes
+#include <memory>
+
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/LambdaClientCommand.h>
+#include <awsmock/dto/lambda/internal/DisableAllLambdasRequest.h>
+#include <awsmock/dto/lambda/internal/DisableLambdaRequest.h>
 #include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/service/common/AbstractHandler.h>
 #include <awsmock/service/lambda/LambdaService.h>
@@ -26,7 +31,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class LambdaHandler final : public AbstractHandler {
+    class LambdaHandler final : public AbstractHandler, std::enable_shared_from_this<LambdaHandler> {
 
       public:
 

@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
+//#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sns/SNSService.h>
 
 namespace AwsMock::Service {
@@ -24,7 +24,7 @@ namespace AwsMock::Service {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class SNSHandler final : public AbstractHandler {
+    class SNSHandler final : public AbstractHandler, public std::enable_shared_from_this<SNSHandler> {
 
       public:
 
