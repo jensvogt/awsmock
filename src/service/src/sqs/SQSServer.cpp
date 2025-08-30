@@ -128,7 +128,7 @@ namespace AwsMock::Service {
 
         log_trace << "SQS counter update starting";
 
-        if (_sqsCounterMap) {
+        /* if (_sqsCounterMap) {
             long totalMessages = 0;
             long totalSize = 0;
             for (auto const &[key, val]: *_sqsCounterMap) {
@@ -142,7 +142,7 @@ namespace AwsMock::Service {
             }
             _metricService.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(_sqsCounterMap->size()));
             _metricService.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
-        }
+        }*/
         log_debug << "SQS monitoring finished, freeShmSize: " << _segment.get_free_memory();
     }
 

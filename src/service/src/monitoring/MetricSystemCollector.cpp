@@ -6,7 +6,7 @@
 
 namespace AwsMock::Monitoring {
 
-    MetricSystemCollector::MetricSystemCollector() {
+    MetricSystemCollector::MetricSystemCollector() : _shmUtils(Core::SharedMemoryUtils::instance()) {
 
         _startTime = system_clock::now();
         _numProcessors = Core::SystemUtils::GetNumberOfCores();
@@ -57,9 +57,9 @@ namespace AwsMock::Monitoring {
                 double percentUserCpu = static_cast<double>(userCpu - _lastAwsmockUserCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
                 double percentSystemCpu = static_cast<double>(systemCpu - _lastAwsmockSysCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
                 double percentTotalCpu = percentUserCpu + percentSystemCpu;
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percentUserCpu);
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percentSystemCpu);
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percentTotalCpu);
+                Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percentUserCpu);
+                Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percentSystemCpu);
+                Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percentTotalCpu);
                 log_trace << "AwsMock CPU collector, total: " << percentTotalCpu << ", system: " << percentSystemCpu << ", user: " << percentUserCpu;
             }
             _lastAwsmockUserCPU = userCpu;
@@ -75,15 +75,15 @@ namespace AwsMock::Monitoring {
 
         if (now - _lastTotalTime > 0) {
             const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastTotalSysCPU + (timeSample.tms_utime - _lastTotalUserCPU)) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+            Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
             log_trace << "Total CPU: " << totalPercent;
 
             const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastTotalUserCPU) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
+            Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
             log_trace << "User CPU: " << userPercent;
 
             const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastTotalSysCPU) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
+            Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
             log_trace << "System CPU: " << systemPercent;
         }
         _lastTotalTime = now;
@@ -97,9 +97,9 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
+            Core::SharedMemoryUtils::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
             log_trace << "Virtual memory: " << std::stol(tokens[22]);
-            MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * sysconf(_SC_PAGESIZE));
+            Core::SharedMemoryUtils::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
             log_trace << "Real Memory: " << std::stol(tokens[23]);
         }
         ifs.close();
@@ -125,7 +125,7 @@ namespace AwsMock::Monitoring {
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100;
-        MetricService::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+        Core::SharedMemoryUtils::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
     }
 
     void MetricSystemCollector::GetThreadInfoAwsmockLinux() {
@@ -133,7 +133,7 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, std::stod(tokens[19]));
+            Core::SharedMemoryUtils::instance().SetGauge(TOTAL_THREADS, {}, {}, std::stod(tokens[19]));
             log_trace << "Total threads: " << std::stol(tokens[22]);
         }
         ifs.close();

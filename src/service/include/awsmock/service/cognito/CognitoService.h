@@ -13,10 +13,12 @@
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SrpUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/cognito/AdminAddUserToGroupRequest.h>
 #include <awsmock/dto/cognito/AdminConfirmUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
@@ -72,8 +74,6 @@
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/repository/CognitoDatabase.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
-#include <awsmock/service/monitoring/MetricServiceTimer.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {

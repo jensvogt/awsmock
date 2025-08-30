@@ -25,6 +25,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -537,15 +538,11 @@ namespace AwsMock::Database {
          * SQS in-memory database
          */
         SQSMemoryDb &_memoryDb;
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
 
         /**
          * Map of monitoring counters
          */
-        SqsCounterMapType *_sqsCounterMap;
+        Core::SharedMemoryUtils &_shmUtils;
     };
 
 }// namespace AwsMock::Database

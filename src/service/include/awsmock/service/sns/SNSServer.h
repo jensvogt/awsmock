@@ -10,12 +10,12 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/scheduler/PeriodicTask.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {

@@ -723,7 +723,7 @@ namespace AwsMock::Service {
     }
 
     http::response<http::dynamic_body> S3Handler::HandleHeadRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
-        Monitoring::MetricServiceTimer measure(S3_SERVICE_TIMER);
+        Monitoring::MonitoringTimer measure(S3_SERVICE_TIMER);
         log_trace << "S3 HEAD request, URI: " << request.target() << " region: " << region << " user: " << user;
 
         Dto::Common::S3ClientCommand clientCommand;

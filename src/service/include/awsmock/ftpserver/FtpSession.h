@@ -20,11 +20,11 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/ftpserver/Filesystem.h>
 #include <awsmock/ftpserver/FtpMessage.h>
 #include <awsmock/ftpserver/FtpUser.h>
 #include <awsmock/ftpserver/UserDatabase.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/s3/S3Service.h>
 
 namespace AwsMock::FtpServer {

@@ -15,7 +15,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::CreateTableResponse DynamoDbService::CreateTable(const Dto::DynamoDb::CreateTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "create_table");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "create_table");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "create_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
@@ -58,7 +58,7 @@ namespace AwsMock::Service {
     }
 
     bool DynamoDbService::ExistTable(const std::string &region, const std::string &tableName) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_tables");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_tables");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_tables");
         log_debug << "Starting exists table request, region: " << region << ", tableName: " << tableName;
 
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListTableResponse DynamoDbService::ListTables(const Dto::DynamoDb::ListTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_tables");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_tables");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_tables");
         log_debug << "Starting list table request, region: " << request.region;
 
@@ -103,7 +103,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListTableCountersResponse DynamoDbService::ListTableCounters(const Dto::DynamoDb::ListTableCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_counters");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_counters");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_table_counters");
         log_debug << "Starting list table request, region: " << request.region;
 
@@ -129,7 +129,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::GetTableDetailCountersResponse DynamoDbService::GetTableDetailCounters(const Dto::DynamoDb::GetTableDetailCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_table_detail_counters");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_table_detail_counters");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "get_table_detail_counters");
         log_debug << "Starting get table detail request, region: " << request.region << ", tableName: " << request.tableName;
 
@@ -153,7 +153,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListTableArnsResponse DynamoDbService::ListTableArns(const std::string &region) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_arns");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_table_arns");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_table_arns");
         log_debug << "Starting list table arns request, region: " << region;
 
@@ -172,7 +172,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListStreamsResponse DynamoDbService::ListStreams(const Dto::DynamoDb::ListStreamsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_streams");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_streams");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_streams");
         log_debug << "Starting list streams request, region: " << request.region;
 
@@ -191,7 +191,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ListItemCountersResponse DynamoDbService::ListItemCounters(const Dto::DynamoDb::ListItemCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_item_counters");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "list_item_counters");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "list_item_counters");
         log_debug << "Starting list item request, region: " << request.region;
 
@@ -208,7 +208,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DescribeTableResponse DynamoDbService::DescribeTable(const Dto::DynamoDb::DescribeTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "describe_table");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "describe_table");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "describe_table");
         log_debug << "Describe DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
@@ -227,7 +227,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DeleteTableResponse DynamoDbService::DeleteTable(const Dto::DynamoDb::DeleteTableRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_table");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_table");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "delete_table");
         log_debug << "Start creating a new DynamoDb table, region: " << request.region << " name: " << request.tableName;
 
@@ -256,7 +256,7 @@ namespace AwsMock::Service {
     }
 
     long DynamoDbService::DeleteAllTables() const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_all_tables");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_all_tables");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "delete_all_tables");
         log_debug << "Deleting all tables";
 
@@ -283,7 +283,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::GetItemResponse DynamoDbService::GetItem(const Dto::DynamoDb::GetItemRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_item");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "get_item");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "get_item");
         log_debug << "Start get item, region: " << request.region << " name: " << request.tableName;
 
@@ -309,7 +309,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::PutItemResponse DynamoDbService::PutItem(const Dto::DynamoDb::PutItemRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "put_item");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "put_item");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "put_item");
         log_debug << "Start put item, region: " << request.region << " name: " << request.tableName;
 
@@ -345,7 +345,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::QueryResponse DynamoDbService::Query(const Dto::DynamoDb::QueryRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "query");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "query");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "query");
         log_debug << "Start query, region: " << request.region << " name: " << request.tableName;
 
@@ -371,7 +371,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::ScanResponse DynamoDbService::Scan(const Dto::DynamoDb::ScanRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "scan");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "scan");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "scan");
         log_debug << "Start scan, region: " << request.region << " name: " << request.tableName;
 
@@ -396,7 +396,7 @@ namespace AwsMock::Service {
     }
 
     Dto::DynamoDb::DeleteItemResponse DynamoDbService::DeleteItem(const Dto::DynamoDb::DeleteItemRequest &request) const {
-        Monitoring::MetricServiceTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_item");
+        Monitoring::MonitoringTimer measure(DYNAMODB_SERVICE_TIMER, "action", "delete_item");
         Monitoring::MetricService::instance().IncrementCounter(DYNAMODB_SERVICE_COUNTER, "action", "delete_item");
         log_debug << "Start creating a new DynamoDb item, region: " << request.region << " table: " << request.tableName;
 

@@ -6,6 +6,8 @@
 #define AWSMOCK_SERVICE_TRANSFER_SERVICE_H
 
 // AwsMock includes
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/transfer/CreateProtocolRequest.h>
 #include <awsmock/dto/transfer/CreateServerRequest.h>
 #include <awsmock/dto/transfer/CreateServerResponse.h>
@@ -32,8 +34,6 @@
 #include <awsmock/dto/transfer/internal/ListUserCountersResponse.h>
 #include <awsmock/dto/transfer/mapper/Mapper.h>
 #include <awsmock/repository/TransferDatabase.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
-#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 #define TRANSFER_DEFAULT_FTP_PORT 21
 

@@ -15,6 +15,8 @@
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/common/mapper/Mapper.h>
 #include <awsmock/dto/kms/CreateKeyRequest.h>
 #include <awsmock/dto/kms/CreateKeyResponse.h>
@@ -36,9 +38,7 @@
 #include <awsmock/dto/kms/model/KeyCounter.h>
 #include <awsmock/repository/KMSDatabase.h>
 #include <awsmock/service/kms/KMSCreator.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
-#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 #define DEFAULT_KMS_ACCOUNT_ID "000000000000"
 
