@@ -77,17 +77,13 @@ namespace AwsMock::Monitoring {
          */
         ~MonitoringTimer() {
             if (!_counterName.empty()) {
-                _shmUtils.IncGauge(_counterName, _labelName, _labelValue, 1.0);
-                return;
+                _shmUtils.IncrementCounter(_counterName, _labelName, _labelValue, 1.0);
             }
             if (_labelName.empty()) {
                 _shmUtils.SetGauge(_timerName, {}, {}, TIME_DIFF);
                 log_trace << "Timer deleted, name: " << _timerName;
             } else {
-                const auto diff = TIME_DIFF;
-                if (_timerName == GATEWAY_HTTP_TIMER && _labelValue == "POST" && diff > 1000)
-                    return;
-                _shmUtils.SetGauge(_timerName, _labelName, _labelValue, diff);
+                _shmUtils.SetGauge(_timerName, _labelName, _labelValue, TIME_DIFF);
                 log_trace << "Timer deleted, name: " << _timerName << " labelName: " << _labelName << " labelValue: " << _labelValue;
             }
         }

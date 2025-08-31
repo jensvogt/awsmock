@@ -108,4 +108,8 @@
 #define APPLICATION_CPU_USAGE "application_cpu_usage"
 #define APPLICATION_MEMORY_USAGE "application_mem_usage"
 
+// Database
+#define DATABASE_TIMER "database_timer"
+#define DATABASE_COUNTER "database_counter"
+
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H

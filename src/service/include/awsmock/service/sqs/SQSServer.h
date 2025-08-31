@@ -120,14 +120,9 @@ namespace AwsMock::Service {
         std::string _backupCron;
 
         /**
-         * Shared memory segment
+         * Shared memory
          */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Counter map in a shared memory segment
-         */
-        Database::SqsCounterMapType *_sqsCounterMap{};
+        Core::SharedMemoryUtils &_shmUtils;
     };
 
 }// namespace AwsMock::Service

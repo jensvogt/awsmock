@@ -83,8 +83,8 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
 
                     Dto::SQS::ListParameterCountersRequest sqsRequest = Dto::SQS::ListParameterCountersRequest::FromJson(clientCommand);
-                    Dto::SQS::ListParameterCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
-                    log_debug << "List queue counters, count: " << sqsResponse.parameterCounters.size();
+                    Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
+                    log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 

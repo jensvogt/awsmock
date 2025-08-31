@@ -9,8 +9,7 @@ namespace AwsMock::Service {
     std::map<std::string, std::shared_ptr<boost::mutex>> LambdaService::_instanceMutex;
 
     Dto::Lambda::CreateFunctionResponse LambdaService::CreateFunction(Dto::Lambda::CreateFunctionRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "create_function");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "create_function");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_function");
         log_debug << "Create function request, name: " << request.functionName;
 
         const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
@@ -75,8 +74,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::UploadFunctionCode(const Dto::Lambda::UploadFunctionCodeRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "upload_function_code");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "upload_function_code");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "upload_function_code");
         log_debug << "Upload function code request, arn: " << request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -119,8 +117,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListFunctionResponse LambdaService::ListFunctions(const std::string &region) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_functions");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_functions");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_functions");
         log_debug << "List functions request, region: " << region;
 
         try {
@@ -139,8 +136,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListFunctionCountersResponse LambdaService::ListFunctionCounters(const Dto::Lambda::ListFunctionCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_function_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_function_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_function_counters");
         log_debug << "List function counters request, region: " << request.region;
 
         try {
@@ -161,8 +157,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListLambdaEnvironmentCountersResponse LambdaService::ListLambdaEnvironmentCounters(const Dto::Lambda::ListLambdaEnvironmentCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_environment_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_environment_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_environment_counters");
         log_debug << "List lambda environment counters request, lambdaArn: " << request.lambdaArn;
 
         try {
@@ -211,8 +206,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListLambdaEventSourceCountersResponse LambdaService::ListLambdaEventSourceCounters(const Dto::Lambda::ListLambdaEventSourceCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_event_source_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_event_source_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_event_source_counters");
         log_debug << "List lambda event source counters request, lambdaArn: " << request.lambdaArn;
 
         try {
@@ -259,8 +253,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::AddLambdaEnvironment(const Dto::Lambda::AddEnvironmentRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_lambda_environment");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_lambda_environment");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_lambda_environment");
         log_debug << "List lambda environment counters request, functionArn: " << request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -281,8 +274,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::UpdateLambdaEnvironment(const Dto::Lambda::UpdateFunctionEnvironmentRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "update_lambda_environment");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "update_lambda_environment");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda_environment");
         log_debug << "Update lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey << ", value: " << request.environmentValue;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -303,8 +295,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteLambdaEnvironment(const Dto::Lambda::DeleteEnvironmentRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_environment");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_environment");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_environment");
         log_debug << "Delete lambda environment request, functionArn: " << request.functionArn << ", key: " << request.environmentKey;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -330,8 +321,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::UpdateLambda(const Dto::Lambda::UpdateLambdaRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "update_lambda");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "update_lambda");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda");
         log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -365,8 +355,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::AddEventSource(const Dto::Lambda::AddEventSourceRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_event_source");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_event_source");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_event_source");
         log_debug << "Add lambda event source counters request, functionArn: " << request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -399,8 +388,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteEventSource(const Dto::Lambda::DeleteEventSourceRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_event_source");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_event_source");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_event_source");
         log_debug << "Delete lambda event source request, functionArn: " << request.functionArn << ", eventSourceArn: " << request.eventSourceArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -425,8 +413,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListLambdaTagCountersResponse LambdaService::ListLambdaTagCounters(const Dto::Lambda::ListLambdaTagCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_tag_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_tag_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_tag_counters");
         log_debug << "List lambda tag counters request, lambdaArn: " << request.lambdaArn;
 
         try {
@@ -475,8 +462,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListLambdaInstanceCountersResponse LambdaService::ListLambdaInstanceCounters(const Dto::Lambda::ListLambdaInstanceCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_instance_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_instance_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_instance_counters");
         log_debug << "List lambda instance counters request, lambdaArn: " << request.lambdaArn;
 
         try {
@@ -536,8 +522,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::AddLambdaTag(const Dto::Lambda::AddTagRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "add_lambda_tag");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "add_lambda_tag");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "add_lambda_tag");
         log_debug << "List lambda tag counters request, functionArn: " << request.functionArn;
 
         try {
@@ -554,8 +539,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::UpdateLambdaTag(const Dto::Lambda::UpdateFunctionTagRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "update_lambda_tag");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "update_lambda_tag");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "update_lambda_tag");
         log_debug << "Update lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey << ", value: " << request.tagValue;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -577,8 +561,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteLambdaTag(const Dto::Lambda::DeleteTagRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_tag");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_tag");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_tag");
         log_debug << "Delete lambda tag request, functionArn: " << request.functionArn << ", key: " << request.tagKey;
 
         try {
@@ -599,8 +582,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::GetFunctionResponse LambdaService::GetFunction(const std::string &region, const std::string &name) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "get_function");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "get_function");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "get_function");
         log_debug << "Get function request, region: " << region << " name: " << name;
 
         try {
@@ -630,8 +612,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::GetFunctionCountersResponse LambdaService::GetFunctionCounters(const Dto::Lambda::GetFunctionCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "get_function_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "get_function_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "get_function_counters");
         log_debug << "Get function request, functionArn: " << request.functionArn;
 
         try {
@@ -672,8 +653,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::ResetFunctionCounters(const Dto::Lambda::ResetFunctionCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "reset_function_counters");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "reset_function_counters");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "reset_function_counters");
         log_debug << "Reset function counters request, region: " << request.region << " name: " << request.functionName;
 
         try {
@@ -690,8 +670,7 @@ namespace AwsMock::Service {
 
     Dto::Lambda::LambdaResult LambdaService::InvokeLambdaFunction(const std::string &region, const std::string &functionName, std::string &payload, const Dto::Lambda::LambdaInvocationType &invocationType) const {
 
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "invoke_lambda_function");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "invoke_lambda_function");
         log_debug << "Invocation lambda function, functionName: " << functionName;
 
         const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
@@ -720,8 +699,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CreateTag(const Dto::Lambda::CreateTagRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "create_tag");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "create_tag");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_tag");
         log_debug << "Create tag request, arn: " << request.arn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {
@@ -739,8 +717,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListTagsResponse LambdaService::ListTags(const std::string &arn) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_tags");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_tags");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_tags");
         log_debug << "List tags request, arn: " << arn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(arn)) {
@@ -760,8 +737,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::AccountSettingsResponse LambdaService::GetAccountSettings() const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "get_account_settings");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "get_account_settings");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "get_account_settings");
         log_debug << "Get account settings";
 
         Dto::Lambda::AccountSettingsResponse response;
@@ -785,8 +761,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::CreateEventSourceMappingsResponse LambdaService::CreateEventSourceMappings(const Dto::Lambda::CreateEventSourceMappingsRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "create_event_source_mapping");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "create_event_source_mapping");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "create_event_source_mapping");
         log_debug << "Create event source mapping, arn: " << request.functionName << " sourceArn: " << request.eventSourceArn;
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
@@ -827,8 +802,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListEventSourceMappingsResponse LambdaService::ListEventSourceMappings(const Dto::Lambda::ListEventSourceMappingsRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_event_source_mapping");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_event_source_mapping");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_event_source_mapping");
         log_debug << "List event source mappings, functionName: " << request.functionName << " sourceArn: " << request.eventSourceArn;
 
         if (!_lambdaDatabase.LambdaExists(request.functionName)) {
@@ -843,8 +817,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListLambdaArnsResponse LambdaService::ListLambdaArns() const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_lambda_arns");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_lambda_arns");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_lambda_arns");
         log_trace << "List all queues ARNs request";
 
         try {
@@ -862,8 +835,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::GetLambdaResultCounterResponse LambdaService::GetLambdaResultCounter(const Dto::Lambda::GetLambdaResultCounterRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "get_lambda_result");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "get_lambda_result");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "get_lambda_result");
         log_debug << "Get lambda result counter request, region: " << request.region << ", oid: " << request.oid;
 
         if (!_lambdaDatabase.LambdaResultExists(request.oid)) {
@@ -878,8 +850,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Lambda::ListLambdaResultCountersResponse LambdaService::ListLambdaResultCounters(const Dto::Lambda::ListLambdaResultCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "list_lambda_results");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "list_lambda_results");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "list_lambda_results");
         log_debug << "List function counters request, region: " << request.region;
 
         try {
@@ -900,8 +871,7 @@ namespace AwsMock::Service {
     }
 
     long LambdaService::DeleteLambdaResultCounter(const Dto::Lambda::DeleteLambdaResultCounterRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_result");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_result");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_result");
         log_debug << "Delete lambda result counters request, region: " << request.region;
 
         try {
@@ -918,8 +888,7 @@ namespace AwsMock::Service {
 
 
     long LambdaService::DeleteLambdaResultCounters(const Dto::Lambda::DeleteLambdaResultCountersRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_lambda_result");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_result");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_lambda_result");
         log_debug << "Delete lambda result counters request, region: " << request.region;
 
         try {
@@ -935,8 +904,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::EnableLambda(const Dto::Lambda::EnableLambdaRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "enable_lambda");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "enable_lambda");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "enable_lambda");
         log_debug << "Enable lambda request, name: " << request.function.functionName;
 
         if (!_lambdaDatabase.LambdaExists(request.function.functionName)) {
@@ -952,8 +920,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::EnableAllLambdas(const Dto::Lambda::EnableAllLambdasRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "enable_all_lambdas");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "enable_all_lambdas");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "enable_all_lambdas");
         log_debug << "Enable all lambdas request, region: " << request.region;
 
         // Get lambda
@@ -965,8 +932,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DisableLambda(const Dto::Lambda::DisableLambdaRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_lambda");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_lambda");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "disable_lambda");
         log_debug << "Disable lambda request, name: " << request.function.functionName;
 
         if (!_lambdaDatabase.LambdaExists(request.function.functionName)) {
@@ -982,8 +948,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DisableAllLambdas(const Dto::Lambda::DisableAllLambdasRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_all_lambdas");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_all_lambdas");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "disable_all_lambdas");
         log_debug << "Disable all lambdas request, region: " << request.region;
 
         // Get lambda
@@ -995,8 +960,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::StartLambda(const Dto::Lambda::StartLambdaRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_function");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_function");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "start_function");
         log_debug << "Start function, functionArn: " + request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -1029,8 +993,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::StartAllLambdas() const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "start_all_lambdas");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "start_all_lambdas");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "start_all_lambdas");
         log_debug << "Start all lambdas";
 
         for (const auto &lambda: _lambdaDatabase.ListLambdas()) {
@@ -1043,8 +1006,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::StopLambda(const Dto::Lambda::StopLambdaRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_function");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_function");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "stop_function");
         log_debug << "Stop function, functionArn: " + request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -1082,8 +1044,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::StopAllLambdas() const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_all_lambdas");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_all_lambdas");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "stop_all_lambdas");
         log_debug << "Stop all lambdas";
 
         for (const auto &lambda: _lambdaDatabase.ListLambdas()) {
@@ -1096,8 +1057,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::StopLambdaInstance(const Dto::Lambda::StopLambdaInstanceRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "stop_instance");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "stop_instance");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "stop_instance");
         log_debug << "Stop instance, functionArn: " + request.functionArn << ", instanceId: " + request.instanceId;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -1135,8 +1095,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteImage(const Dto::Lambda::DeleteImageRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_image");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_image");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_image");
         log_debug << "Delete image, functionArn: " + request.functionArn;
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.functionArn)) {
@@ -1160,8 +1119,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteFunction(const Dto::Lambda::DeleteFunctionRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_function");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_function");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_function");
         log_debug << "Delete function: " + request.ToString();
 
         ContainerService &dockerService = ContainerService::instance();
@@ -1198,8 +1156,7 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::DeleteTags(const Dto::Lambda::DeleteTagsRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "delete_tags");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "delete_tags");
+        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, LAMBDA_SERVICE_COUNTER, "action", "delete_tags");
         log_trace << "Delete tags: " + request.ToString();
 
         if (!_lambdaDatabase.LambdaExistsByArn(request.arn)) {

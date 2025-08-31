@@ -3,36 +3,10 @@
 //
 
 #include <awsmock/repository/SQSDatabase.h>
-#include <queue>
 
 namespace AwsMock::Database {
 
-    SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()), _shmUtils(Core::SharedMemoryUtils::instance()) {
-
-        // Initialize the counters
-        InitializeCounters();
-    }
-
-    void SQSDatabase::InitializeCounters(const std::string &queueArn) const {
-        if (queueArn.empty()) {
-            for (const auto &queue: ListQueues()) {
-                _shmUtils.SetGauge(SQS_QUEUE_SIZE, "queue", queue.name, GetQueueSize(queue.queueArn));
-                _shmUtils.SetGauge(SQS_MESSAGE_COUNT, "queue", queue.name, CountMessages(queue.queueArn));
-                _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, CountMessages(queue.queueArn));
-                _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", queue.name, CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL));
-                _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", queue.name, CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE));
-                _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", queue.name, CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED));
-            }
-        } else {
-            const std::string queueName = Core::AwsUtils::ConvertSQSQueueArnToName(queueArn);
-            _shmUtils.SetGauge(SQS_QUEUE_SIZE, "queue", queueName, GetQueueSize(queueArn));
-            _shmUtils.SetGauge(SQS_MESSAGE_COUNT, "queue", queueName, CountMessages(queueArn));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queueName, CountMessages(queueArn));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", queueName, CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INITIAL));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", queueName, CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INVISIBLE));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", queueName, CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::DELAYED));
-        }
-    }
+    SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {}
 
     bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) const {
 
@@ -155,12 +129,6 @@ namespace AwsMock::Database {
         } else {
             queue = _memoryDb.GetQueueByArn(queueArn);
         }
-
-        // Update counters
-        queue.size = _shmUtils.GetGauge<long>(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn));
-        queue.attributes.approximateNumberOfMessages = _shmUtils.GetGauge<long>(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn));
-        queue.attributes.approximateNumberOfMessagesNotVisible = _shmUtils.GetGauge<long>(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn));
-        queue.attributes.approximateNumberOfMessagesDelayed = _shmUtils.GetGauge<long>(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn));
         return queue;
     }
 
@@ -275,10 +243,6 @@ namespace AwsMock::Database {
             for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
-                result.size = _shmUtils.GetGauge<long>(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(result.queueArn));
-                result.attributes.approximateNumberOfMessages = _shmUtils.GetGauge<long>(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(result.queueArn));
-                result.attributes.approximateNumberOfMessagesNotVisible = _shmUtils.GetGauge<long>(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(result.queueArn));
-                result.attributes.approximateNumberOfMessagesDelayed = _shmUtils.GetGauge<long>(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(result.queueArn));
                 queueList.push_back(result);
             }
             log_trace << "Got queue list, size: " << queueList.size();
@@ -382,19 +346,12 @@ namespace AwsMock::Database {
         } else {
             purged = _memoryDb.PurgeQueue(queueArn);
         }
-
-        // Update the counter-map
-        if (purged > 0) {
-            _shmUtils.SetGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), 0.0);
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), 0.0);
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), 0.0);
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), 0.0);
-        }
         return purged;
     }
 
     Entity::SQS::Queue SQSDatabase::UpdateQueue(Entity::SQS::Queue &queue) const {
 
+        queue.modified = system_clock::now();
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -407,7 +364,6 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                queue.modified = system_clock::now();
                 const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
@@ -557,12 +513,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteQueue(queue);
         }
-
-        // Update the counter-map
-        _shmUtils.SetGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queue.queueArn), 0.0);
-        _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queue.queueArn), 0.0);
-        _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queue.queueArn), 0.0);
-        _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queue.queueArn), 0.0);
         return deleted;
     }
 
@@ -591,10 +541,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteAllQueues();
         }
-
-        // Clear the counter-map
-        _shmUtils.Clear();
-
         return deleted;
     }
 
@@ -623,11 +569,6 @@ namespace AwsMock::Database {
         } else {
             message = _memoryDb.CreateMessage(message);
         }
-
-        // Update the counter-map
-        _shmUtils.IncGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), (long) 1);
-        _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), (long) 1);
-        _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), (long) 1);
         return message;
     }
 
@@ -863,9 +804,6 @@ namespace AwsMock::Database {
                 session.commit_transaction();
                 log_info << "Imported messages: " << result->inserted_count();
 
-                // Update the counter-map
-                InitializeCounters();
-
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
                 session.abort_transaction();
@@ -946,10 +884,7 @@ namespace AwsMock::Database {
                         updateQuery.append(kvp("$set", setQuery));
 
                         queueBulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
-
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
-                        _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), -1.0);
-                        _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), 1.0);
                     }
                 }
 
@@ -1023,13 +958,6 @@ namespace AwsMock::Database {
         } else {
             updated = _memoryDb.ResetMessages(queueArn, visibility);
         }
-
-        // Update the counter-map
-        if (updated > 0) {
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), updated);
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), -updated);
-        }
-
         return updated;
     }
 
@@ -1112,12 +1040,6 @@ namespace AwsMock::Database {
         } else {
             updated = _memoryDb.ResetDelayedMessages(queueArn);
         }
-
-        // Update the counter-map
-        if (updated > 0) {
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), updated);
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), -updated);
-        }
         return updated;
     }
 
@@ -1163,20 +1085,6 @@ namespace AwsMock::Database {
         } else {
             updated = _memoryDb.RedriveMessages(originalQueue, dlqQueue);
         }
-
-        // Update the counter-map
-        if (updated > 0) {
-            const long totalOriginal = CountMessages(originalQueue.queueArn);
-            const long totalDql = CountMessages(dlqQueue.queueArn);
-            const long sizeOriginal = GetQueueSize(originalQueue.queueArn);
-            const long sizeDql = GetQueueSize(dlqQueue.queueArn);
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(originalQueue.queueArn), totalOriginal);
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(originalQueue.queueArn), totalOriginal);
-            _shmUtils.IncGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(originalQueue.queueArn), sizeOriginal);
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(dlqQueue.queueArn), -totalDql);
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(dlqQueue.queueArn), -totalDql);
-            _shmUtils.IncGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(dlqQueue.queueArn), sizeDql);
-        }
         return updated;
     }
 
@@ -1210,15 +1118,6 @@ namespace AwsMock::Database {
             }
         } else {
             deleted = _memoryDb.MessageRetention(queueArn, retentionPeriod);
-        }
-
-        // Update the counter-map
-        if (deleted > 0) {
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessages(queueArn));
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INITIAL));
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INVISIBLE));
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::DELAYED));
-            _shmUtils.IncGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), GetQueueSize(queueArn));
         }
         return deleted;
     }
@@ -1366,15 +1265,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteMessages(queueArn);
         }
-
-        // Update the counter-map
-        if (deleted > 0) {
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessages(queueArn));
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INITIAL));
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INVISIBLE));
-            _shmUtils.IncGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::DELAYED));
-            _shmUtils.IncGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(queueArn), GetQueueSize(queueArn));
-        }
         return deleted;
     }
 
@@ -1403,15 +1293,6 @@ namespace AwsMock::Database {
             }
         } else {
             deleted = _memoryDb.DeleteMessage(message);
-        }
-
-        // Update the counter-map
-        if (deleted > 0) {
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), CountMessages(message.queueArn));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), CountMessagesByStatus(message.queueArn, Entity::SQS::MessageStatus::INITIAL));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), CountMessagesByStatus(message.queueArn, Entity::SQS::MessageStatus::INVISIBLE));
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), CountMessagesByStatus(message.queueArn, Entity::SQS::MessageStatus::DELAYED));
-            _shmUtils.SetGauge(SQS_QUEUE_SIZE, "queue", Core::AwsUtils::ConvertSQSQueueArnToName(message.queueArn), GetQueueSize(message.queueArn));
         }
         return deleted;
     }
@@ -1469,7 +1350,92 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        _shmUtils.Clear(SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE);
         return deleted;
     }
+
+    void SQSDatabase::AdjustMessageCounters(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(DATABASE_TIMER, DATABASE_COUNTER, "action", "adjust_message_counter");
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+            auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+            auto session = client->start_session();
+
+            try {
+                mongocxx::pipeline p{};
+                document facetDocument;
+
+                array initialArray;
+                initialArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INITIAL")))))));
+                initialArray.append(make_document(kvp("$count", "initial")));
+                facetDocument.append(kvp("initial", initialArray));
+
+                array invisibleArray;
+                invisibleArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INVISIBLE")))))));
+                invisibleArray.append(make_document(kvp("$count", "invisible")));
+                facetDocument.append(kvp("invisible", invisibleArray));
+
+                array delayedArray;
+                delayedArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "DELAYED")))))));
+                delayedArray.append(make_document(kvp("$count", "delayed")));
+                facetDocument.append(kvp("delayed", delayedArray));
+                array sizeFacet;
+                sizeFacet.append(make_document(kvp("$match", make_document(kvp("size", make_document(kvp("$gte", 0)))))));
+
+                // Extract well-named pieces for readability
+                sizeFacet.append(make_document(
+                        kvp("$group",
+                            make_document(
+                                    kvp("_id", bsoncxx::types::b_null()),
+                                    kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0))))))))));
+                facetDocument.append(kvp("size", sizeFacet));
+
+                document projectDocument;
+                projectDocument.append(kvp("queueArn", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$queueArn.queueArn", 0)))));
+                projectDocument.append(kvp("initial", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$initial.initial", 0)))));
+                projectDocument.append(kvp("invisible", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$invisible.invisible", 0)))));
+                projectDocument.append(kvp("delayed", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$delayed.delayed", 0)))));
+                projectDocument.append(kvp("size", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$size.size", 0)))));
+
+                p.match(make_document(kvp("queueArn", queueArn)));
+                p.facet(facetDocument.extract());
+                p.project(projectDocument.extract());
+
+                p.group(make_document(
+                        kvp("_id", "$attributes.queueArn"),
+                        kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0)))))),
+                        kvp("initial", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$initial", 0)))))),
+                        kvp("invisible", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$invisible", 0)))))),
+                        kvp("delayed", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$delayed", 0))))))));
+
+                session.start_transaction();
+                auto totalSizeCursor = messageCollection.aggregate(p);
+                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
+                                               make_document(kvp("$set", make_document(
+                                                                                 kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
+                                                                                 kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
+                    log_debug << queueArn << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                } else {
+                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
+                                               make_document(kvp("$set", make_document(
+                                                                                 kvp("size", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessages", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", 0)))));
+                }
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+    }
+
 }// namespace AwsMock::Database

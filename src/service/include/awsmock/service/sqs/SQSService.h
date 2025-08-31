@@ -67,10 +67,10 @@
 #include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
 #include <awsmock/dto/sqs/internal/ListParameterCountersRequest.h>
-#include <awsmock/dto/sqs/internal/ListParameterCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueArnsResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueTagsRequest.h>
@@ -143,7 +143,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListParameterCountersResponse ListQueueCounters(const Dto::SQS::ListParameterCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListParameterCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags
@@ -326,7 +326,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request);
+        [[nodiscard]] Dto::SQS::SendMessageResponse SendMessage(const Dto::SQS::SendMessageRequest &request) const;
 
         /**
          * @brief Creates a new queue
@@ -335,7 +335,7 @@ namespace AwsMock::Service {
          * @return SendMessageResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request);
+        [[nodiscard]] Dto::SQS::SendMessageBatchResponse SendMessageBatch(const Dto::SQS::SendMessageBatchRequest &request) const;
 
         /**
          * @brief Receive a list of resources
@@ -391,7 +391,7 @@ namespace AwsMock::Service {
          * @throws ServiceException
          * @see ResendMessage
          */
-        void ResendMessage(const Dto::SQS::ResendMessageRequest &request);
+        void ResendMessage(const Dto::SQS::ResendMessageRequest &request) const;
 
         /**
          * @brief Export messages

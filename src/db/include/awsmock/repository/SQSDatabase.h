@@ -26,6 +26,7 @@
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/core/monitoring/SharedMemoryUtils.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
@@ -509,13 +510,10 @@ namespace AwsMock::Database {
          */
         auto DeleteAllMessages() const -> long;
 
-
         /**
-         * @brief Initialize the counter-map.
-         *
-         * @brief queueArn ARN of the queue
+         * @brief Adjust all queue counters
          */
-        void InitializeCounters(const std::string &queueArn = {}) const;
+        void AdjustMessageCounters(const std::string &queueArn) const;
 
       private:
 
@@ -538,11 +536,6 @@ namespace AwsMock::Database {
          * SQS in-memory database
          */
         SQSMemoryDb &_memoryDb;
-
-        /**
-         * Map of monitoring counters
-         */
-        Core::SharedMemoryUtils &_shmUtils;
     };
 
 }// namespace AwsMock::Database

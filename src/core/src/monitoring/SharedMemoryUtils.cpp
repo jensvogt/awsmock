@@ -2,9 +2,6 @@
 // Created by vogje01 on 12/19/24.
 //
 
-#include "awsmock/core/config/Configuration.h"
-
-
 #include <awsmock/core/monitoring/SharedMemoryUtils.h>
 
 namespace AwsMock::Core {
@@ -12,6 +9,8 @@ namespace AwsMock::Core {
     boost::mutex SharedMemoryUtils::_monitoringMutex;
 
     SharedMemoryUtils::SharedMemoryUtils() {
+
+        _period = Configuration::instance().GetValue<unsigned long>("awsmock.monitoring.period");
 
         try {
             _segment = {boost::interprocess::open_only, MONITORING_SEGMENT_NAME};
@@ -21,7 +20,7 @@ namespace AwsMock::Core {
             boost::interprocess::shared_memory_object::remove(MONITORING_SEGMENT_NAME);
             _segment = {boost::interprocess::create_only, MONITORING_SEGMENT_NAME, sharedMemorySize};
         }
-        MapAllocator map_alloc(_segment.get_segment_manager());
+        MapAllocator map_alloc = _segment.get_segment_manager();
 
         // Construct the map in shared memory
         _counterMap = _segment.construct<ShmemMap>(MONITORING_MAP_NAME)(std::less<>(), map_alloc);
@@ -59,7 +58,6 @@ namespace AwsMock::Core {
         boost::mutex::scoped_lock lock(_monitoringMutex);
 
         const ShmemAllocator<char> char_alloc(_segment.get_segment_manager());
-
         if (ShmemString k(GetId(name, {}, {}).c_str(), char_alloc); _counterMap->find(k) == _counterMap->end()) {
             MonitoringCounter v(char_alloc);
             v.name = ShmemString(name.c_str(), char_alloc);
@@ -84,7 +82,6 @@ namespace AwsMock::Core {
         boost::mutex::scoped_lock lock(_monitoringMutex);
 
         const ShmemAllocator<char> char_alloc(_segment.get_segment_manager());
-
         if (ShmemString k(GetId(name, labelName, labelValue).c_str(), char_alloc); _counterMap->find(k) != _counterMap->end()) {
             MonitoringCounter counter = _counterMap->at(k);
             counter.count++;
@@ -102,17 +99,15 @@ namespace AwsMock::Core {
         boost::mutex::scoped_lock lock(_monitoringMutex);
 
         const ShmemAllocator<char> char_alloc(_segment.get_segment_manager());
-
         if (ShmemString k(GetId(name, labelName, labelValue).c_str(), char_alloc); _counterMap->find(k) == _counterMap->end()) {
             MonitoringCounter v(char_alloc);
             v.name = ShmemString(name.c_str(), char_alloc);
             v.labelName = ShmemString(labelName.c_str(), char_alloc);
             v.labelValue = ShmemString(labelValue.c_str(), char_alloc);
             v.type = COUNTER;
-            v.count = 1;
-            v.value = value;
+            v.count = _period;
+            v.value += value;
             _counterMap->emplace(boost::move(k), boost::move(v));
-            log_info << "Free SHM: " << _segment.get_free_memory();
         } else {
             MonitoringCounter counter = _counterMap->at(k);
             counter.count++;
@@ -162,7 +157,7 @@ namespace AwsMock::Core {
 
     std::ostream &operator<<(std::ostream &os, const SharedMemoryUtils &s) {
         const auto sharedMemorySize = Configuration::instance().GetValue<unsigned long>("awsmock.shm-size");
-        os << "SharedMemory: " << s.Size() << "/" << sharedMemorySize;
+        os << "SharedMemory: " << s.Size() << "/" << sharedMemorySize << " (used/total)";
         return os;
     }
 

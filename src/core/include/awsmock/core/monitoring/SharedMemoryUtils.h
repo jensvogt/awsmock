@@ -18,6 +18,7 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 
 #define MONITORING_SEGMENT_NAME "MonitoringShmSegment"
@@ -240,6 +241,11 @@ namespace AwsMock::Core {
          * Mutex
          */
         static boost::mutex _monitoringMutex;
+
+        /**
+         * Monitoring period
+         */
+        long _period;
     };
 
     template<class T>

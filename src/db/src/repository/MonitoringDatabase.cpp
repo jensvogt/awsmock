@@ -195,7 +195,7 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            // Get the counter map
+            // Get the map of counters
             Core::ShmemMap *counterMap = Core::SharedMemoryUtils::instance().GetCounterMap();
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -209,16 +209,19 @@ namespace AwsMock::Database {
 
                 for (auto &val: *counterMap | std::views::values) {
 
-                    const double avg = val.value / static_cast<double>(val.count);
+                    // Average
+                    double avg = val.count > 0 ? val.value / static_cast<double>(val.count) : 0.0;
+
+                    // Prepare insert query
                     document insertQuery;
                     insertQuery.append(kvp("name", bsoncxx::types::b_string(val.name)));
                     insertQuery.append(kvp("labelName", bsoncxx::types::b_string(val.labelName)));
                     insertQuery.append(kvp("labelValue", bsoncxx::types::b_string(val.labelValue)));
                     insertQuery.append(kvp("value", avg));
                     insertQuery.append(kvp("created", bsoncxx::types::b_date(val.timestamp)));
+                    bulk.append(mongocxx::model::insert_one(insertQuery.view()));
 
-                    const mongocxx::model::insert_one insert_op{insertQuery.view()};
-                    bulk.append(insert_op);
+                    // Reset counter
                     val.count = 0;
                     val.value = 0;
                 }

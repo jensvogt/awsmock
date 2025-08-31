@@ -69,9 +69,7 @@
         "reset": {
           "period": 30
         },
-        "counter": {
-          "period": 10
-        },
+        "counter-period": 60,
         "receive-poll": 1000
       },
       "sns": {
