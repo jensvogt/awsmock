@@ -11,12 +11,12 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListParameterCountersResponse final : Common::BaseCounter<ListParameterCountersResponse> {
+    struct ListQueueCountersResponse final : Common::BaseCounter<ListQueueCountersResponse> {
 
         /**
          * List of queues ARNs
          */
-        std::vector<QueueCounter> parameterCounters;
+        std::vector<QueueCounter> queueCounters;
 
         /**
          * Total number of queues
@@ -25,22 +25,22 @@ namespace AwsMock::Dto::SQS {
 
       private:
 
-        friend ListParameterCountersResponse tag_invoke(boost::json::value_to_tag<ListParameterCountersResponse>, boost::json::value const &v) {
-            ListParameterCountersResponse r;
+        friend ListQueueCountersResponse tag_invoke(boost::json::value_to_tag<ListQueueCountersResponse>, boost::json::value const &v) {
+            ListQueueCountersResponse r;
             r.total = Core::Json::GetLongValue(v, "total");
             if (Core::Json::AttributeExists(v, "queueCounters")) {
-                r.parameterCounters = boost::json::value_to<std::vector<QueueCounter>>(v.at("queueCounters"));
+                r.queueCounters = boost::json::value_to<std::vector<QueueCounter>>(v.at("queueCounters"));
             }
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListParameterCountersResponse const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueueCountersResponse const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"total", obj.total},
-                    {"queueCounters", boost::json::value_from(obj.parameterCounters)},
+                    {"queueCounters", boost::json::value_from(obj.queueCounters)},
             };
         }
     };

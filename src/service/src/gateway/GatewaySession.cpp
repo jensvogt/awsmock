@@ -68,15 +68,11 @@ namespace AwsMock::Service {
 
         // Send the response
         HandleRequest(_parser->release(), _queue);
-        //QueueWrite();
+
         // If we aren't at the queue limit, try to pipeline another request
         if (!_queue.is_full())
             DoRead();
 
-        // If we aren't at the queue limit, try to pipeline another request
-        /*if (_response_queue.size() < _queueLimit) {
-            DoRead();
-        }*/
         log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
 
@@ -108,7 +104,7 @@ namespace AwsMock::Service {
         // Ping request
         if (request.method() == http::verb::connect) {
             log_debug << "Handle CONNECT request";
-            Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
+            Monitoring::MonitoringTimer headTimer(GATEWAY_HTTP_TIMER, "method", "CONNECT");
             Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "CONNECT");
             send(std::move(Core::HttpUtils::Ok(request)));
             return;
@@ -163,32 +159,27 @@ namespace AwsMock::Service {
         if (handler) {
             switch (request.method()) {
                 case http::verb::get: {
-                    Monitoring::MetricServiceTimer getTimer(GATEWAY_HTTP_TIMER, "method", "GET");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "GET");
+                    Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "GET"};
                     send(std::move(handler->HandleGetRequest(request, _region, _user)));
                     break;
                 }
                 case http::verb::put: {
-                    Monitoring::MetricServiceTimer putTimer(GATEWAY_HTTP_TIMER, "method", "PUT");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "PUT");
+                    Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "PUT"};
                     send(std::move(handler->HandlePutRequest(request, _region, _user)));
                     break;
                 }
                 case http::verb::post: {
-                    Monitoring::MetricServiceTimer postTimer(GATEWAY_HTTP_TIMER, "method", "POST");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "POST");
+                    Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "POST"};
                     send(std::move(handler->HandlePostRequest(request, _region, _user)));
                     break;
                 }
                 case http::verb::delete_: {
-                    Monitoring::MetricServiceTimer deleteTimer(GATEWAY_HTTP_TIMER, "method", "DELETE");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "DELETE");
+                    Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "DELETE"};
                     send(std::move(handler->HandleDeleteRequest(request, _region, _user)));
                     break;
                 }
                 case http::verb::head: {
-                    Monitoring::MetricServiceTimer headTimer(GATEWAY_HTTP_TIMER, "method", "HEAD");
-                    Monitoring::MetricService::instance().IncrementCounter(GATEWAY_HTTP_COUNTER, "method", "HEAD");
+                    Monitoring::MonitoringTimer measure{GATEWAY_HTTP_TIMER, GATEWAY_HTTP_COUNTER, "method", "HEAD"};
                     send(std::move(handler->HandleHeadRequest(request, _region, _user)));
                     break;
                 }

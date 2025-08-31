@@ -13,7 +13,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::CreateSecretResponse SecretsManagerService::CreateSecret(const Dto::SecretsManager::CreateSecretRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "create_secret");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "create_secret");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "create_secret");
         log_trace << "Create secret request, request: " << request.ToString();
 
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::DescribeSecretResponse SecretsManagerService::DescribeSecret(const Dto::SecretsManager::DescribeSecretRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "describe_secret");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "describe_secret");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "describe_secret");
         log_trace << "Describe secret request: " << request.ToString();
 
@@ -123,7 +123,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::GetSecretValueResponse SecretsManagerService::GetSecretValue(const Dto::SecretsManager::GetSecretValueRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret_value");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret_value");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret_value");
         log_trace << "Get secret value request: " << request.ToString();
 
@@ -185,7 +185,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::PutSecretValueResponse SecretsManagerService::PutSecretValue(const Dto::SecretsManager::PutSecretValueRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "put_secret_value");
         log_trace << "Put secret value request: " << request.ToString();
 
@@ -250,7 +250,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretsResponse SecretsManagerService::ListSecrets(const Dto::SecretsManager::ListSecretsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
         log_trace << "List secrets request: " << request;
 
@@ -293,7 +293,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretVersionIdsResponse SecretsManagerService::ListSecretVersionIds(const Dto::SecretsManager::ListSecretVersionIdsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
         log_trace << "List secret version Ids request: " << request;
 
@@ -338,7 +338,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretCountersResponse SecretsManagerService::ListSecretCounters(const Dto::SecretsManager::ListSecretCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secrets");
         log_trace << "List secret counters request: " << request;
 
@@ -383,7 +383,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::ListSecretVersionCountersResponse SecretsManagerService::ListSecretVersionCounters(const Dto::SecretsManager::ListSecretVersionCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "list_secret_versions");
         log_trace << "List secret versions request: " << request;
 
@@ -414,7 +414,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::GetSecretDetailsResponse SecretsManagerService::GetSecretDetails(const Dto::SecretsManager::GetSecretDetailsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "get_secret");
         log_trace << "Get secret details request: " << request;
 
@@ -439,7 +439,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::UpdateSecretResponse SecretsManagerService::UpdateSecret(const Dto::SecretsManager::UpdateSecretRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
         log_trace << "Update secret request: " << request.ToString();
 
@@ -491,7 +491,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::UpdateSecretDetailsResponse SecretsManagerService::UpdateSecretDetails(const Dto::SecretsManager::UpdateSecretDetailsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "update_secrets");
         log_trace << "Update secret details request: " << request;
 
@@ -527,7 +527,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::RotateSecretResponse SecretsManagerService::RotateSecret(const Dto::SecretsManager::RotateSecretRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "rotate_secrets");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "rotate_secrets");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "rotate_secrets");
         log_trace << "Rotate secret request: " << request.ToString();
 
@@ -581,7 +581,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SecretsManager::DeleteSecretResponse SecretsManagerService::DeleteSecret(const Dto::SecretsManager::DeleteSecretRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "delete_secrets");
+        Monitoring::MonitoringTimer measure(SECRETSMANAGER_SERVICE_TIMER, "action", "delete_secrets");
         Monitoring::MetricService::instance().IncrementCounter(SECRETSMANAGER_SERVICE_TIMER, "action", "delete_secrets");
         log_trace << "Delete secret request: " << request.ToString();
 

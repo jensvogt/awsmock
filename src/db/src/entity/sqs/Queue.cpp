@@ -51,7 +51,6 @@ namespace AwsMock::Database::Entity::SQS {
             owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
             queueUrl = Core::Bson::BsonUtils::GetStringValue(mResult, "queueUrl");
             queueArn = Core::Bson::BsonUtils::GetStringValue(mResult, "queueArn");
-            attributes.FromDocument(mResult.value()["attributes"].get_document().value);
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             isDlq = Core::Bson::BsonUtils::GetBoolValue(mResult, "isDlq");
             mainQueue = Core::Bson::BsonUtils::GetStringValue(mResult, "mainQueue");
@@ -76,6 +75,11 @@ namespace AwsMock::Database::Entity::SQS {
                     attribute.FromDocument(defaultMessageAttributeView[key].get_document().value);
                     defaultMessageAttributes[key] = attribute;
                 }
+            }
+
+            // Attributes
+            if (mResult.value().find("attributes") != mResult.value().end()) {
+                attributes.FromDocument(mResult.value()["attributes"].get_document().value);
             }
 
         } catch (std::exception &exc) {

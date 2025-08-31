@@ -34,7 +34,10 @@
 #define SQS_QUEUE_COUNT "sqs_queue_counter"
 #define SQS_QUEUE_SIZE "sqs_queue_size"
 #define SQS_MESSAGE_COUNT "sqs_message_counter"
-#define SQS_MESSAGE_BY_QUEUE_COUNT "sqs_message_by_queue_counter"
+#define SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL "sqs_message_by_queue_counter"
+#define SQS_MESSAGE_BY_QUEUE_COUNT_INITIAL "sqs_message_by_queue_initial_counter"
+#define SQS_MESSAGE_BY_QUEUE_COUNT_INVISIBLE "sqs_message_by_queue_initial_counter"
+#define SQS_MESSAGE_BY_QUEUE_COUNT_DELAYED "sqs_message_by_queue_delayed_counter"
 #define SQS_SERVICE_TIMER "sqs_service_timer"
 #define SQS_SERVICE_COUNTER "sqs_service_counter"
 #define SQS_MESSAGE_WAIT_TIME "sqs_message_wait_time"
@@ -104,5 +107,9 @@
 #define APPLICATION_SERVICE_COUNTER "application_service_counter"
 #define APPLICATION_CPU_USAGE "application_cpu_usage"
 #define APPLICATION_MEMORY_USAGE "application_mem_usage"
+
+// Database
+#define DATABASE_TIMER "database_timer"
+#define DATABASE_COUNTER "database_counter"
 
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H
