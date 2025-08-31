@@ -62,7 +62,6 @@ namespace AwsMock::Monitoring {
             const auto procDiff = utimeDiff + stimeDiff;
 
             if (sysDiff > 0 && nproc > 0) {
-                log_info << "user: " << (100.0 * utimeDiff) / sysDiff / nproc << ", system: " << (100.0 * stimeDiff) / sysDiff / nproc << ", total: " << (100.0 * procDiff) / sysDiff / nproc;
                 Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", (100.0 * utimeDiff) / sysDiff / nproc);
                 Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", (100.0 * stimeDiff) / sysDiff / nproc);
                 Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", (100.0 * procDiff) / sysDiff / nproc);
