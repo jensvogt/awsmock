@@ -6,11 +6,11 @@
 
 namespace AwsMock::Service {
 
-    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3") {
+    S3Server::S3Server(Core::Scheduler &scheduler) : AbstractServer("s3"), _monitoringCollector(Core::MonitoringCollector::instance()) {
 
         // Get HTTP configuration values
-        _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync.period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.counter.period");
+        _syncPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.sync-period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.s3.counter-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.s3.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.backup.cron");
 
@@ -20,10 +20,6 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Initialize shared memory
-        // _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, COUNTER_SHARED_MEMORY_SEGMENT_NAME);
-        //_s3CounterMap = _segment.find<Database::S3CounterMapType>(Database::S3_COUNTER_MAP_NAME).first;
-
         // Start S3 monitoring counters updates
         scheduler.AddTask("s3-monitoring", [this] { UpdateCounter(); }, _counterPeriod, _counterPeriod);
 
@@ -32,7 +28,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("s3-backup", [this] { this->BackupS3(); }, _backupCron);
+            scheduler.AddTask("s3-backup", [] { BackupS3(); }, _backupCron);
         }
 
         // Set running
@@ -79,27 +75,27 @@ namespace AwsMock::Service {
         log_debug << "Object synchronized finished, bucketCount: " << buckets.size() << " fileDeleted: " << filesDeleted << " objectsDeleted: " << objectsDeleted;
     }
 
-    void S3Server::UpdateCounter() {
+    void S3Server::UpdateCounter() const {
+
         log_trace << "S3 Monitoring starting";
 
-        /*if (_s3CounterMap) {
-            long totalKeys = 0;
-            long totalSize = 0;
-            for (auto const &[key, val]: *_s3CounterMap) {
+        long totalKeys = 0;
+        long totalSize = 0;
 
-                std::string labelValue = key;
+        const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
+        for (const auto &bucket: buckets) {
 
-                _metricService.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.keys));
-                _metricService.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", labelValue, static_cast<double>(val.size));
+            _s3Database.AdjustObjectCounters(bucket.arn);
 
-                totalKeys += val.keys;
-                totalSize += val.size;
-                _s3Database.UpdateBucketCounter(key, val.keys, val.size);
-            }
-            _metricService.SetGauge(S3_BUCKET_COUNT, {}, {}, static_cast<double>(_s3CounterMap->size()));
-            _metricService.SetGauge(S3_OBJECT_COUNT, {}, {}, static_cast<double>(totalKeys));
+            _monitoringCollector.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, static_cast<double>(bucket.keys));
+            _monitoringCollector.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, static_cast<double>(bucket.size));
+            totalKeys += bucket.keys;
+            totalSize += bucket.size;
         }
-        log_debug << "S3 monitoring finished, freeShmSize: " << _segment.get_free_memory();*/
+        _monitoringCollector.SetGauge(S3_BUCKET_COUNT, {}, {}, static_cast<double>(buckets.size()));
+        _monitoringCollector.SetGauge(S3_BUCKET_SIZE_COUNT, {}, {}, static_cast<double>(totalSize));
+        _monitoringCollector.SetGauge(S3_OBJECT_COUNT, {}, {}, static_cast<double>(totalKeys));
+        log_debug << "S3 monitoring finished";
     }
 
     void S3Server::BackupS3() {

@@ -5,7 +5,8 @@
 #include <awsmock/service/lambda/LambdaServer.h>
 
 namespace AwsMock::Service {
-    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc) {
+    LambdaServer::LambdaServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("lambda"), _lambdaDatabase(Database::LambdaDatabase::instance()), _lambdaService(ioc),
+                                                                                           _monitoringCollector(Core::MonitoringCollector::instance()) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
         _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
@@ -21,10 +22,6 @@ namespace AwsMock::Service {
 
         // Create environment
         _region = configuration.GetValue<std::string>("awsmock.region");
-
-        // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _lambdaCounterMap = _segment.find<Database::LambdaCounterMapType>(Database::LAMBDA_COUNTER_MAP_NAME).first;
 
         // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
@@ -178,10 +175,12 @@ namespace AwsMock::Service {
         if (lambdas.empty()) {
             return;
         }
-        _metricService.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas.size()));
+        _monitoringCollector.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas.size()));
 
         for (const auto &lambda: lambdas) {
+
             double averageRuntime = 0.0;
+            /*
             if ((*_lambdaCounterMap)[lambda.arn].invocations > 0) {
                 averageRuntime = (double) (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
             }
@@ -189,7 +188,7 @@ namespace AwsMock::Service {
             _metricService.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
             _metricService.SetGauge(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function, averageRuntime);
             (*_lambdaCounterMap)[lambda.arn].invocations = 0;
-            (*_lambdaCounterMap)[lambda.arn].averageRuntime = 0.0;
+            (*_lambdaCounterMap)[lambda.arn].averageRuntime = 0.0;*/
         }
         log_trace << "Lambda monitoring finished";
     }

@@ -35,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() = default;
+        explicit LambdaExecutor() : _monitoringCollector(Core::MonitoringCollector::instance()) {}
 
         /**
          * @brief Executes a lambda function synchronized
@@ -49,9 +49,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Metric module
+         * Monitoring collector
          */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+        Core::MonitoringCollector &_monitoringCollector;
 
         /**
          * Lambda database connection

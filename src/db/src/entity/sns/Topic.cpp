@@ -50,6 +50,8 @@ namespace AwsMock::Database::Entity::SNS {
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "topicArn", topicArn);
         Core::Bson::BsonUtils::SetStringValue(topicDoc, "targetArn", targetArn);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "messages", messages);
+        Core::Bson::BsonUtils::SetLongValue(topicDoc, "messagesSend", messagesSend);
+        Core::Bson::BsonUtils::SetLongValue(topicDoc, "messagesResend", messagesResend);
         Core::Bson::BsonUtils::SetLongValue(topicDoc, "size", size);
         Core::Bson::BsonUtils::SetDateValue(topicDoc, "created", created);
         Core::Bson::BsonUtils::SetDateValue(topicDoc, "modified", modified);
@@ -72,6 +74,8 @@ namespace AwsMock::Database::Entity::SNS {
             targetArn = Core::Bson::BsonUtils::GetStringValue(mResult, "targetArn");
             size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
             messages = Core::Bson::BsonUtils::GetLongValue(mResult, "messages");
+            messagesSend = Core::Bson::BsonUtils::GetLongValue(mResult, "messagesSend");
+            messagesResend = Core::Bson::BsonUtils::GetLongValue(mResult, "messagesResend");
             created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
             modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 

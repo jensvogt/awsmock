@@ -12,7 +12,7 @@
 #include <boost/container/map.hpp>
 
 // AwsMock includes
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/scheduler/Scheduler.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>

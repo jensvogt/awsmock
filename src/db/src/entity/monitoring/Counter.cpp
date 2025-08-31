@@ -18,7 +18,7 @@ namespace AwsMock::Database::Entity::Monitoring {
         return counterDoc;
     }
 
-    void Counter::FromDocument(std::optional<bsoncxx::document::view> mResult) {
+    void Counter::FromDocument(const std::optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");

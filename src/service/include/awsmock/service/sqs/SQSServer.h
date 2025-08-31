@@ -120,9 +120,9 @@ namespace AwsMock::Service {
         std::string _backupCron;
 
         /**
-         * Shared memory
+         * Monitoring collector
          */
-        Core::SharedMemoryUtils &_shmUtils;
+        Core::MonitoringCollector &_monitoringCollector;
     };
 
 }// namespace AwsMock::Service
