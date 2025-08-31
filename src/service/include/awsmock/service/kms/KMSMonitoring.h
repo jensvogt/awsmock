@@ -6,8 +6,8 @@
 #define AWSMOCK_SERVICE_KMS_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/repository/KMSDatabase.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {

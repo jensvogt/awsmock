@@ -10,7 +10,7 @@ namespace AwsMock::Database {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {
+    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()), _shmUtils(Core::SharedMemoryUtils::instance()) {
 
         // Initialize the counters
         for (const auto &bucket: ListBuckets()) {
@@ -68,7 +68,7 @@ namespace AwsMock::Database {
         return BucketExists(bucket.region, bucket.name);
     }
 
-    Entity::S3::Bucket S3Database::CreateBucket(Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::CreateBucket(Entity::S3::Bucket &bucket) const {
 
         if (HasDatabase()) {
 
@@ -95,8 +95,8 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, 0);
-        _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, 0);
+        _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
+        _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
 
         return bucket;
     }
@@ -120,6 +120,8 @@ namespace AwsMock::Database {
 
                 const long count = _bucketCollection.count_documents(query.extract());
                 log_trace << "Bucket count: " << count;
+
+                _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, count);
                 return count;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -348,8 +350,8 @@ namespace AwsMock::Database {
         }
 
         // Update counters
-        _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, 0);
-        _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, 0);
+        _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
+        _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
 
         return purged;
     }

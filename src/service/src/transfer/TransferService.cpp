@@ -12,7 +12,7 @@
 namespace AwsMock::Service {
 
     Dto::Transfer::CreateServerResponse TransferService::CreateTransferServer(Dto::Transfer::CreateServerRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_transfer_server");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_transfer_server");
         log_debug << "Create transfer manager";
 
         // Check existence
@@ -50,7 +50,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::CreateUserResponse TransferService::CreateUser(Dto::Transfer::CreateUserRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_user");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_user");
         log_debug << "Create user request";
 
         Database::Entity::Transfer::Transfer transferEntity;
@@ -95,7 +95,7 @@ namespace AwsMock::Service {
     }
 
     void TransferService::CreateProtocol(Dto::Transfer::CreateProtocolRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_protocol");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "create_protocol");
         log_debug << "Create protocol request";
 
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
@@ -120,7 +120,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::ListServerResponse TransferService::ListServers(const Dto::Transfer::ListServerRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_servers");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_servers");
 
         try {
             std::string nextToken = request.nextToken;
@@ -147,7 +147,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::ListServerCountersResponse TransferService::ListServerCounters(const Dto::Transfer::ListServerCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server_counters");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_server_counters");
 
         try {
             const std::vector<Database::SortColumn> sortColumns = Dto::Common::Mapper::map(request.sortColumns);
@@ -178,7 +178,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::GetServerDetailsResponse TransferService::GetServerDetails(const Dto::Transfer::GetServerDetailsRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "get_server_details");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "get_server_details");
 
         // Check existence
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
@@ -210,7 +210,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::ListUsersResponse TransferService::ListUsers(const Dto::Transfer::ListUsersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_users");
 
         try {
             const std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId);
@@ -228,7 +228,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::ListUserCountersResponse TransferService::ListUserCounters(const Dto::Transfer::ListUserCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_user_counters");
 
         try {
             std::vector<Database::Entity::Transfer::User> users = _transferDatabase.ListUsers(request.region, request.serverId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
@@ -254,7 +254,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::ListTagCountersResponse TransferService::ListTagCounters(const Dto::Transfer::ListTagCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_tag_counters");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_tag_counters");
 
         try {
             std::vector<Database::SortColumn> sortColumns;
@@ -288,7 +288,7 @@ namespace AwsMock::Service {
     }
 
     Dto::Transfer::ListProtocolCountersResponse TransferService::ListProtocolCounters(const Dto::Transfer::ListProtocolCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_protocol_counters");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "list_protocol_counters");
 
         try {
             const Database::Entity::Transfer::Transfer server = _transferDatabase.GetTransferByServerId(request.region, request.serverId);
@@ -311,7 +311,7 @@ namespace AwsMock::Service {
     }
 
     void TransferService::StartServer(const Dto::Transfer::StartServerRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "start_server");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "start_server");
 
         Database::Entity::Transfer::Transfer server;
         try {
@@ -340,7 +340,7 @@ namespace AwsMock::Service {
     }
 
     void TransferService::StopServer(const Dto::Transfer::StopServerRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "stop_server");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "stop_server");
 
         Database::Entity::Transfer::Transfer server;
         try {
@@ -368,7 +368,7 @@ namespace AwsMock::Service {
     }
 
     void TransferService::DeleteServer(const Dto::Transfer::DeleteServerRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_server");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_server");
 
         Database::Entity::Transfer::Transfer server;
         try {
@@ -400,7 +400,7 @@ namespace AwsMock::Service {
     }
 
     void TransferService::DeleteUser(const Dto::Transfer::DeleteUserRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_user");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_user");
 
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
             log_error << "Transfer server does not exist, serverId: " << request.serverId;
@@ -432,7 +432,7 @@ namespace AwsMock::Service {
     }
 
     void TransferService::DeleteProtocol(const Dto::Transfer::DeleteProtocolRequest &request) const {
-        Monitoring::MetricServiceTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_protocol");
+        Monitoring::MonitoringTimer measure(TRANSFER_SERVICE_TIMER, "method", "delete_protocol");
 
         if (!_transferDatabase.TransferExists(request.region, request.serverId)) {
             log_error << "Transfer server does not exist, serverId: " << request.serverId;

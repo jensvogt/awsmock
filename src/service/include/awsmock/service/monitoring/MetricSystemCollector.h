@@ -27,7 +27,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 #ifdef _WIN32
@@ -65,7 +65,7 @@ namespace AwsMock::Monitoring {
 #ifdef __APPLE__
 
         /**
-        * @brief Get number of threads on macOS
+        * @brief Get the number of threads on macOS
         */
         static void GetThreadInfoMac();
 
@@ -226,7 +226,7 @@ namespace AwsMock::Monitoring {
         /**
          * Map of monitoring counters
          */
-        Core::SharedMemoryUtils _shmUtils;
+        Core::SharedMemoryUtils &_shmUtils;
     };
 
 }// namespace AwsMock::Monitoring

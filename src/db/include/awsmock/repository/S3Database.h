@@ -33,11 +33,11 @@ namespace AwsMock::Database {
 
     using std::chrono::system_clock;
 
-    struct S3MonitoringCounter {
-        long keys{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
+    // struct S3MonitoringCounter {
+    //     long keys{};
+    //     long size{};
+    //     system_clock::time_point modified = system_clock::now();
+    // };
     /*
     using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, S3MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
     using S3CounterMapType = boost::container::map<std::string, S3MonitoringCounter, std::less<std::string>, S3ShmAllocator>;
@@ -146,7 +146,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief List all buckets
@@ -463,7 +463,7 @@ namespace AwsMock::Database {
          *
          * @return number of objects deleted.
          */
-        long DeleteAllObjects() const;
+        [[nodiscard]] long DeleteAllObjects() const;
 
       private:
 
@@ -495,7 +495,7 @@ namespace AwsMock::Database {
         /**
          * Map of monitoring counters
          */
-        Core::SharedMemoryUtils _shmUtils;
+        Core::SharedMemoryUtils &_shmUtils;
     };
 
 }// namespace AwsMock::Database

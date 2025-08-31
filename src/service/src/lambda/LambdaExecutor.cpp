@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
     Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const {
 
-        Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function);
+        Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function);
         _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
 
         // Initialize shared memory
