@@ -51,7 +51,7 @@ namespace AwsMock::Database::Entity::Monitoring {
          *
          * @param mResult MongoDB document view.
          */
-        [[maybe_unused]] void FromDocument(std::optional<view> mResult);
+        [[maybe_unused]] void FromDocument(const std::optional<view> &mResult);
 
         /**
          * @brief Converts the entity to a MongoDB document

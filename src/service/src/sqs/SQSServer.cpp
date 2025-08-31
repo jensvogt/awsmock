@@ -5,10 +5,10 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 namespace AwsMock::Service {
-    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _shmUtils(Core::SharedMemoryUtils::instance()) {
+    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _monitoringCollector(Core::MonitoringCollector::instance()) {
 
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring.period");
-        _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring-period");
+        _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset-period");
         _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.counter-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sqs.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sqs.backup.cron");
@@ -132,13 +132,13 @@ namespace AwsMock::Service {
 
             _sqsDatabase.AdjustMessageCounters(queue.queueArn);
 
-            _shmUtils.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
-            _shmUtils.SetGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
+            _monitoringCollector.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
+            _monitoringCollector.SetGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
             totalMessages += queue.attributes.approximateNumberOfMessages;
             totalSize += queue.size;
         }
-        _shmUtils.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(queueList.size()));
-        _shmUtils.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+        _monitoringCollector.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(queueList.size()));
+        _monitoringCollector.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
         log_debug << "SQS monitoring finished";
     }
 
@@ -150,7 +150,7 @@ namespace AwsMock::Service {
 
         if (!waitTime.empty()) {
             for (auto &[fst, snd]: waitTime) {
-                _shmUtils.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
+                _monitoringCollector.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
             }
         }
         log_trace << "SQS wait time update finished";

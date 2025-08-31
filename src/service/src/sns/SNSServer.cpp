@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns") {
+    SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _monitoringCollector(Core::MonitoringCollector::instance()) {
 
         // Configuration
         _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete.period");
@@ -22,10 +22,6 @@ namespace AwsMock::Service {
         }
         log_info << "SNS server starting";
 
-        // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _snsCounterMap = _segment.find<Database::SnsCounterMapType>(Database::SNS_COUNTER_MAP_NAME).first;
-
         // Start SNS monitoring update counters
         scheduler.AddTask("sns-monitoring", [this] { UpdateCounter(); }, _counterPeriod);
 
@@ -34,7 +30,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("sns-backup", [this] { BackupSns(); }, _backupCron);
+            scheduler.AddTask("sns-backup", [] { BackupSns(); }, _backupCron);
         }
 
         // Set running
@@ -49,25 +45,25 @@ namespace AwsMock::Service {
     }
 
     void SNSServer::UpdateCounter() const {
-        log_trace << "SNS Monitoring starting";
 
-        if (_snsCounterMap) {
-            long totalMessages = 0;
-            long totalSize = 0;
-            for (auto const &[key, val]: *_snsCounterMap) {
+        log_trace << "SNS counter update starting";
 
-                std::string labelValue = key;
-                _metricService.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", labelValue, static_cast<double>(val.messages));
-                _metricService.SetGauge(SNS_TOPIC_SIZE, "topic", labelValue, static_cast<double>(val.size));
+        long totalMessages = 0;
+        long totalSize = 0;
 
-                totalMessages += val.messages;
-                totalSize += val.size;
-                _snsDatabase.UpdateTopicCounter(key, val.messages, val.size, val.initial, val.send, val.resend);
-            }
-            _metricService.SetGauge(SNS_TOPIC_COUNT, {}, {}, static_cast<double>(_snsCounterMap->size()));
-            _metricService.SetGauge(SNS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+        const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
+        for (auto &topic: topicList) {
+
+            _snsDatabase.AdjustMessageCounters(topic.topicArn);
+
+            _monitoringCollector.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", topic.topicName, static_cast<double>(topic.messages));
+            _monitoringCollector.SetGauge(SNS_TOPIC_SIZE, "topic", topic.topicName, static_cast<double>(topic.size));
+            totalMessages += topic.messages;
+            totalSize += topic.size;
         }
-        log_debug << "SNS monitoring finished, freeShmSize: " << _segment.get_free_memory();
+        _monitoringCollector.SetGauge(SNS_TOPIC_COUNT, {}, {}, static_cast<double>(topicList.size()));
+        _monitoringCollector.SetGauge(SNS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+        log_debug << "SNS monitoring finished";
     }
 
     void SNSServer::BackupSns() {

@@ -19,7 +19,7 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/lambda/Lambda.h>
 #include <awsmock/entity/lambda/LambdaResult.h>
 #include <awsmock/memorydb/LambdaMemoryDb.h>

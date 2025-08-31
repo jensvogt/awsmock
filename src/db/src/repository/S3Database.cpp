@@ -2,6 +2,10 @@
 // Created by vogje01 on 29/05/2023.
 //
 
+#include "awsmock/core/monitoring/MonitoringDefinition.h"
+#include "awsmock/core/monitoring/MonitoringTimer.h"
+
+
 #include <awsmock/repository/S3Database.h>
 
 namespace AwsMock::Database {
@@ -10,17 +14,7 @@ namespace AwsMock::Database {
             {"Created", {"s3:ObjectCreated:Put", "s3:ObjectCreated:Post", "s3:ObjectCreated:Copy", "s3:ObjectCreated:CompleteMultipartUpload"}},
             {"Deleted", {"s3:ObjectRemoved:Delete", "s3:ObjectRemoved:DeleteMarkerCreated"}}};
 
-    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()), _shmUtils(Core::SharedMemoryUtils::instance()) {
-
-        // Initialize the counters
-        for (const auto &bucket: ListBuckets()) {
-            const long objects = GetBucketObjectCount(bucket.region, bucket.name);
-            const long size = GetBucketSize(bucket.region, bucket.name);
-            _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, objects);
-            _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, size);
-        }
-        log_debug << "Bucket counters initialized" << _shmUtils.Size();
-    }
+    S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {}
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) const {
 
@@ -93,11 +87,6 @@ namespace AwsMock::Database {
         } else {
             bucket = _memoryDb.CreateBucket(bucket);
         }
-
-        // Update counters
-        _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
-        _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
-
         return bucket;
     }
 
@@ -120,8 +109,6 @@ namespace AwsMock::Database {
 
                 const long count = _bucketCollection.count_documents(query.extract());
                 log_trace << "Bucket count: " << count;
-
-                _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, count);
                 return count;
 
             } catch (mongocxx::exception::system_error &e) {
@@ -348,11 +335,6 @@ namespace AwsMock::Database {
         } else {
             purged = _memoryDb.PurgeBucket(bucket);
         }
-
-        // Update counters
-        _shmUtils.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
-        _shmUtils.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, 0.0);
-
         return purged;
     }
 
@@ -428,7 +410,7 @@ namespace AwsMock::Database {
         _memoryDb.UpdateBucketCounter(bucketArn, keys, size);
     }
 
-    Entity::S3::Bucket S3Database::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) {
+    Entity::S3::Bucket S3Database::CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const {
 
         if (BucketExists(bucket)) {
             return UpdateBucket(bucket);
@@ -1009,12 +991,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteAllObjects();
         }
-
-        // Update counters
-        /*        for (const auto &key: *_s3CounterMap | std::views::keys) {
-            (*_s3CounterMap)[key].keys = 0;
-            (*_s3CounterMap)[key].size = 0;
-        }*/
         return deleted;
     }
 
@@ -1082,6 +1058,73 @@ namespace AwsMock::Database {
         log_trace << "Bucket notification deleted, notification: " << bucketNotification.ToString();
 
         return UpdateBucket(internBucket);
+    }
+
+    void S3Database::AdjustObjectCounters(const std::string &bucketArn) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "adjust_object_counter");
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto objectCollection = (*client)[_databaseName][_objectCollectionName];
+            auto bucketCollection = (*client)[_databaseName][_bucketCollectionName];
+            auto session = client->start_session();
+
+            try {
+                mongocxx::pipeline p{};
+                document facetDocument;
+
+                array keyArray;
+                keyArray.append(make_document(kvp("$count", "keys")));
+                facetDocument.append(kvp("keys", keyArray));
+
+                array sizeFacet;
+                sizeFacet.append(make_document(kvp("$match", make_document(kvp("size", make_document(kvp("$gte", 0)))))));
+
+                // Extract well-named pieces for readability
+                sizeFacet.append(make_document(
+                        kvp("$group",
+                            make_document(
+                                    kvp("_id", bsoncxx::types::b_null()),
+                                    kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0))))))))));
+                facetDocument.append(kvp("size", sizeFacet));
+
+                document projectDocument;
+                projectDocument.append(kvp("bucketName", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$bucketName.bucketName", 0)))));
+                projectDocument.append(kvp("keys", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$keys.keys", 0)))));
+                projectDocument.append(kvp("size", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$size.size", 0)))));
+
+                p.match(make_document(kvp("bucketArn", bucketArn)));
+                p.facet(facetDocument.extract());
+                p.project(projectDocument.extract());
+
+                p.group(make_document(
+                        kvp("_id", "$attributes.bucketArn"),
+                        kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0)))))),
+                        kvp("keys", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$keys", 0))))))));
+
+                session.start_transaction();
+                auto totalSizeCursor = objectCollection.aggregate(p);
+                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                    bucketCollection.update_one(make_document(kvp("bucketArn", bucketArn)),
+                                                make_document(kvp("$set", make_document(
+                                                                                  kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
+                                                                                  kvp("keys", Core::Bson::BsonUtils::GetLongValue(t, "initial"))))));
+                    log_debug << bucketArn << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " keys: " << Core::Bson::BsonUtils::GetLongValue(t, "keys");
+                } else {
+                    bucketCollection.update_one(make_document(kvp("bucketArn", bucketArn)),
+                                                make_document(kvp("$set", make_document(
+                                                                                  kvp("size", 0),
+                                                                                  kvp("keys", 0)))));
+                }
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
     }
 
 }// namespace AwsMock::Database

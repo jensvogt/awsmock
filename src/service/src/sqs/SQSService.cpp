@@ -702,11 +702,10 @@ namespace AwsMock::Service {
             int count = 0;
             if (!request.tags.empty()) {
                 for (const auto &tag: request.tags) {
-                    count += static_cast<int>(std::erase_if(queue.tags,
-                                                            [tag](const auto &item) {
-                                                                auto const &[k, v] = item;
-                                                                return k == tag;
-                                                            }));
+                    count += static_cast<int>(std::erase_if(queue.tags, [tag](const auto &item) {
+                        auto const &[k, v] = item;
+                        return k == tag;
+                    }));
                 }
             }
             queue = _sqsDatabase.UpdateQueue(queue);
@@ -1123,12 +1122,7 @@ namespace AwsMock::Service {
         try {
             const long total = _sqsDatabase.CountMessages(request.queueArn);
 
-            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(
-                    request.queueArn,
-                    {},
-                    request.pageSize,
-                    request.pageIndex,
-                    Dto::Common::Mapper::map(request.sortColumns));
+            const Database::Entity::SQS::MessageList messages = _sqsDatabase.ListMessages(request.queueArn, {}, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
 
             Dto::SQS::ListMessagesResponse listMessagesResponse;
             listMessagesResponse.total = total;
@@ -1396,10 +1390,9 @@ namespace AwsMock::Service {
     }
 
     bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
-        return std::ranges::find_if(attributes,
-                                    [&value](const std::string &attribute) {
-                                        return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-                                    }) != attributes.end();
+        return std::ranges::find_if(attributes, [&value](const std::string &attribute) {
+                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+               }) != attributes.end();
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {

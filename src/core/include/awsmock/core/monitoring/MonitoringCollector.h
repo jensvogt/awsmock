@@ -2,8 +2,8 @@
 // Created by vogje01 on 12/19/24.
 //
 
-#ifndef AWS_MOCK_CORE_SHARED_MEMORY_UTILS_H
-#define AWS_MOCK_CORE_SHARED_MEMORY_UTILS_H
+#ifndef AWS_MOCK_CORE_MONITORING_COLLECTOR_H
+#define AWS_MOCK_CORE_MONITORING_COLLECTOR_H
 
 // C++ includes
 #include <map>
@@ -23,7 +23,7 @@
 
 #define MONITORING_SEGMENT_NAME "MonitoringShmSegment"
 #define MONITORING_MAP_NAME "MonitoringCounter"
-#define MONITORING_SHM_SIZE 1024 * 1024
+#define MONITORING_SHM_SIZE (1024 * 1024)
 
 namespace AwsMock::Core {
 
@@ -31,31 +31,32 @@ namespace AwsMock::Core {
     using SegmentManager = boost::interprocess::managed_shared_memory::segment_manager;
 
     template<class T>
-    using ShmemAllocator = boost::interprocess::allocator<T, SegmentManager>;
-    using ShmemString = boost::interprocess::basic_string<char, std::char_traits<char>, ShmemAllocator<char>>;
+    using ShmAllocator = boost::interprocess::allocator<T, SegmentManager>;
+    using ShmString = boost::interprocess::basic_string<char, std::char_traits<char>, ShmAllocator<char>>;
 
     enum CounterType {
-        COUNTER,
+        COUNT_PER_SECOND,
+        COUNT_ABSOLUTE,
         GAUGE,
         HISTOGRAM,
         UNKNOWN
     };
 
     struct MonitoringCounter {
-        ShmemString name;
-        ShmemString labelName;
-        ShmemString labelValue;
+        ShmString name;
+        ShmString labelName;
+        ShmString labelValue;
         double value{};
         long count{};
         CounterType type = UNKNOWN;
         system_clock::time_point timestamp;
 
         // The default constructor must accept an allocator for in-place construction
-        explicit MonitoringCounter(const ShmemAllocator<char> &alloc)
+        explicit MonitoringCounter(const ShmAllocator<char> &alloc)
             : name(alloc), labelName(alloc), labelValue(alloc), timestamp(system_clock::now()) {}
 
-        MonitoringCounter(ShmemString name, const ShmemString &labelName, const ShmemString &labelValue, const double value, const CounterType type)
-            : name(std::move(name)), labelName(labelName), labelValue(labelValue), value(value), count(1), type(type), timestamp(system_clock::now()) {}
+        MonitoringCounter(ShmString name, ShmString labelName, ShmString labelValue, const double value, const CounterType type)
+            : name(std::move(name)), labelName(std::move(labelName)), labelValue(std::move(labelValue)), value(value), count(1), type(type), timestamp(system_clock::now()) {}
 
         // Allow copying/moving (the string already knows its allocator)
         MonitoringCounter(const MonitoringCounter &) = default;
@@ -63,16 +64,21 @@ namespace AwsMock::Core {
     };
 
     // std::map with allocator rebound to the pair type. Note: std::map is allocator-aware.
-    using MapValueType = std::pair<const ShmemString, MonitoringCounter>;
-    using MapAllocator = ShmemAllocator<MapValueType>;
-    using ShmemMap = boost::container::map<ShmemString, MonitoringCounter, std::less<>, MapAllocator>;
+    using MapValueType = std::pair<const ShmString, MonitoringCounter>;
+    using MapAllocator = ShmAllocator<MapValueType>;
+    using ShmMap = boost::container::map<ShmString, MonitoringCounter, std::less<>, MapAllocator>;
 
-    class SharedMemoryUtils {
+    /**
+    * @brief Shared memory manager for the monitoring counters
+    *
+    * @author jens.vogt\@opitz-consulting.com
+    */
+    class MonitoringCollector {
 
       public:
 
-        using ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-        using CounterMapType = boost::container::map<std::string, MonitoringCounter, std::less<std::string>, ShmAllocator>;
+        //using ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
+        //using CounterMapType = boost::container::map<std::string, MonitoringCounter, std::less<std::string>, ShmAllocator>;
 
         /**
          * @brief Constructor
@@ -80,13 +86,13 @@ namespace AwsMock::Core {
          * @par
          * Creates the shared memory segment and initializes the monitoring counter map.
          */
-        explicit SharedMemoryUtils();
+        explicit MonitoringCollector();
 
         /**
          * @brief Singleton instance
          */
-        static SharedMemoryUtils &instance() {
-            static SharedMemoryUtils shmUtils;
+        static MonitoringCollector &instance() {
+            static MonitoringCollector shmUtils;
             return shmUtils;
         }
 
@@ -157,14 +163,24 @@ namespace AwsMock::Core {
         [[nodiscard]] T GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
-         * @brief Increment a counter map value
+         * @brief Increment a counter per second map value
          *
          * @param name gauge name
          * @param labelName label name
          * @param labelValue value of the label
          * @param value increment value, default: 1.0
          */
-        void IncrementCounter(const std::string &name, const std::string &labelName, const std::string &labelValue, double value = 1.0) const;
+        void IncCountPerSec(const std::string &name, const std::string &labelName, const std::string &labelValue, double value = 1.0) const;
+
+        /**
+         * @brief Increment an absolute counter map value
+         *
+         * @param name gauge name
+         * @param labelName label name
+         * @param labelValue value of the label
+         * @param value increment value, default: 1.0
+         */
+        void IncCountAbs(const std::string &name, const std::string &labelName, const std::string &labelValue, double value = 1.0) const;
 
         /**
          * @brief Returns the size of the shared memory segment
@@ -174,11 +190,11 @@ namespace AwsMock::Core {
         [[nodiscard]] long Size() const;
 
         /**
-         * @brief Return the counter map
+         * @brief Return the map of counters
          *
          * @return counter map
          */
-        [[nodiscard]] ShmemMap *GetCounterMap() const;
+        [[nodiscard]] ShmMap *GetCounterMap() const;
 
         /**
          * @brief Returns the ID of a monitoring counter map key
@@ -223,7 +239,7 @@ namespace AwsMock::Core {
          *
          * @return output stream
          */
-        friend std::ostream &operator<<(std::ostream &os, const SharedMemoryUtils &s);
+        friend std::ostream &operator<<(std::ostream &os, const MonitoringCollector &s);
 
       private:
 
@@ -235,7 +251,7 @@ namespace AwsMock::Core {
         /**
          * Monitoring counter-map
          */
-        ShmemMap *_counterMap;
+        ShmMap *_counterMap;
 
         /**
          * Mutex
@@ -249,14 +265,14 @@ namespace AwsMock::Core {
     };
 
     template<class T>
-    T SharedMemoryUtils::GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
+    T MonitoringCollector::GetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue) {
         boost::mutex::scoped_lock lock(_monitoringMutex);
-        const ShmemAllocator<char> char_alloc(_segment.get_segment_manager());
-        if (const ShmemString k(GetId(name, labelName, labelValue).c_str(), char_alloc); _counterMap->contains(k)) {
+        const ShmAllocator<char> char_alloc(_segment.get_segment_manager());
+        if (const ShmString k(GetId(name, labelName, labelValue).c_str(), char_alloc); _counterMap->contains(k)) {
             return static_cast<T>(_counterMap->at(k).value);
         }
         return static_cast<T>(0);
     }
 }// namespace AwsMock::Core
 
-#endif// AWS_MOCK_CORE_SHARED_MEMORY_UTILS_H
+#endif// AWS_MOCK_CORE_MONITORING_COLLECTOR_H
