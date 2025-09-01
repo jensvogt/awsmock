@@ -2,6 +2,10 @@
 // Created by vogje01 on 04/01/2023.
 //
 
+#include "awsmock/service/apps/ApplicationService.h"
+#include "awsmock/service/container/ContainerService.h"
+
+
 #include <awsmock/service/monitoring/MonitoringServer.h>
 
 namespace AwsMock::Service {
@@ -15,6 +19,9 @@ namespace AwsMock::Service {
 
         // Start monitoring system collector
         scheduler.AddTask("monitoring-system-collector", [this] { this->_metricSystemCollector.CollectSystemCounter(); }, systemPeriod);
+        log_debug << "System collector started";
+
+        scheduler.AddTask("monitoring-docker-collector", [] { CollectDockerCounter(); }, systemPeriod);
         log_debug << "System collector started";
 
         scheduler.AddTask("monitoring-collector", [this] { this->Collector(); }, averagePeriod);
@@ -37,6 +44,36 @@ namespace AwsMock::Service {
         const long deletedCount = _monitoringDatabase.DeleteOldMonitoringData(retentionPeriod);
 
         log_trace << "Monitoring worker finished, retentionPeriod: " << retentionPeriod << " deletedCount: " << deletedCount;
+    }
+
+    void MonitoringServer::CollectDockerCounter() {
+
+        // Get the container list
+        if (const std::vector<Dto::Docker::Container> containers = ContainerService::instance().ListContainers(); !containers.empty()) {
+
+            for (const auto &container: containers) {
+
+                // Get statistics
+                const Dto::Docker::ContainerStat stats = ContainerService::instance().GetContainerStats(container.id);
+
+                // CPU
+                const double timeDiff = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(stats.read - stats.preRead).count());
+
+                const auto numCpus = static_cast<double>(stats.cpuStats.onlineCpus);
+                const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
+                if (timeDiff > 0 && numCpus > 0) {
+                    const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
+                    Core::MonitoringCollector::instance().SetGauge(DOCKER_CPU_TOTAL, "container", container.names.front(), cpuPercent);
+                }
+
+                // Memory
+                const auto availableMem = static_cast<double>(stats.memoryStats.limit);
+                const auto usedMem = static_cast<double>(stats.memoryStats.usage - stats.memoryStats.stats.cache);
+                const auto memPercent = usedMem / availableMem * 100.0;
+                Core::MonitoringCollector::instance().SetGauge(DOCKER_MEMORY_TOTAL, "container", container.names.front(), memPercent);
+            }
+            Core::MonitoringCollector::instance().SetGauge(DOCKER_CONTAINER_COUNT, static_cast<long>(containers.size()));
+        }
     }
 
     void MonitoringServer::Collector() const {

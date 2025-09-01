@@ -26,6 +26,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
@@ -205,6 +206,16 @@ namespace AwsMock::Monitoring {
          * Current total CPU counter
          */
         CpuTimes _currentCpuTimes;
+
+        /**
+         * Previous total CPU counter
+         */
+        CpuTimes _previousProcCpuTimes;
+
+        /**
+         * Current total CPU counter
+         */
+        CpuTimes _currentProcCpuTimes;
 
         /**
          * Previous process CPU counter

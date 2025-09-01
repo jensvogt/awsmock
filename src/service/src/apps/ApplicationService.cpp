@@ -125,7 +125,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::UploadApplicationCode(const Dto::Apps::UploadApplicationCodeRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "upload_application_code");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "upload_application_code");
         log_debug << "Upload application code request, name: " << request.applicationName;
 
         if (!_database.ApplicationExists(request.region, request.applicationName)) {
@@ -162,7 +162,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "rebuild_application");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "rebuild_application");
         log_debug << "Rebuild application code request, name: " << request.application.name;
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
@@ -195,7 +195,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::EnableApplication(const Dto::Apps::EnableApplicationRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_application");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_application");
         log_debug << "Enable application request, name: " << request.application.name;
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
@@ -211,7 +211,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::EnableAllApplications(const Dto::Apps::EnableAllApplicationsRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_all_applications");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_all_applications");
         log_debug << "Enable all applications request, region: " << request.region;
 
         // Get application
@@ -223,7 +223,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::DisableApplication(const Dto::Apps::DisableApplicationRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, "action", "disable_application");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, "action", "disable_application");
         Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_application");
         log_debug << "Diable application request, name: " << request.application.name;
 
@@ -240,7 +240,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::DisableAllApplications(const Dto::Apps::DisableAllApplicationsRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "disable_all_applications");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "disable_all_applications");
         log_debug << "Disable all applications request, region: " << request.region;
 
         // Get application
@@ -252,7 +252,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::StartApplication(const Dto::Apps::StartApplicationRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "start_application");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "start_application");
         log_debug << "Start application request, name: " << request.application.name;
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
@@ -323,7 +323,7 @@ namespace AwsMock::Service {
     }
 
     long ApplicationService::StartAllApplications() const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "start_all_applications");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "start_all_applications");
         log_debug << "Start all applications request";
 
         // Loop over applications
@@ -339,7 +339,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::RestartApplication(const Dto::Apps::RestartApplicationRequest &request) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "restart_application");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "restart_application");
         log_debug << "Restart application request, name: " << request.application.name;
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
@@ -403,7 +403,7 @@ namespace AwsMock::Service {
     }
 
     long ApplicationService::RestartAllApplications() const {
-        Monitoring::MonitoringTimer measure(LAMBDA_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "restart_all_applications");
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "restart_all_applications");
         log_debug << "Restart all applications request";
 
         long count = StopAllApplications();

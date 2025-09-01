@@ -74,7 +74,7 @@ namespace AwsMock::Core {
         static int HexToInt(const std::string &hex);
 
         /**
-         * @brief Returns a integer from a string
+         * @brief Returns an integer from a string
          *
          * @par
          * Returns -1 in case str is empty.
@@ -83,6 +83,17 @@ namespace AwsMock::Core {
          * @return converted integer
          */
         static int ToInt(const std::string &str);
+
+        /**
+         * @brief Returns a double from a string
+         *
+         * @par
+         * Returns -1 in case str is empty.
+         *
+         * @param str string
+         * @return converted double
+         */
+        static double ToDouble(const std::string &str);
     };
 
 }// namespace AwsMock::Core

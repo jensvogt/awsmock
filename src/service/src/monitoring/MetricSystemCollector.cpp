@@ -48,26 +48,32 @@ namespace AwsMock::Monitoring {
 
         // first snapshot
         _currentProcCpuTime = ReadProcCpuTimes();
-        _currentCpuTimes = ReadCpuTimes();
+        _currentProcCpuTimes = ReadCpuTimes();
 
         if (_previousProcCpuTime.initialized) {
 
             // second snapshot
             _currentProcCpuTime = ReadProcCpuTimes();
-            _currentCpuTimes = ReadCpuTimes();
+            _currentProcCpuTimes = ReadCpuTimes();
 
             const auto utimeDiff = static_cast<double>(_currentProcCpuTime.utime - _previousProcCpuTime.utime);
             const auto stimeDiff = static_cast<double>(_currentProcCpuTime.stime - _previousProcCpuTime.stime);
-            const auto sysDiff = static_cast<double>(_currentCpuTimes.total - _previousCpuTimes.total);
+            const auto sysDiff = static_cast<double>(_currentProcCpuTimes.total - _previousProcCpuTimes.total);
             const auto procDiff = utimeDiff + stimeDiff;
 
             if (sysDiff > 0 && nproc > 0) {
-                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", (100.0 * utimeDiff) / sysDiff / nproc);
-                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", (100.0 * stimeDiff) / sysDiff / nproc);
-                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", (100.0 * procDiff) / sysDiff / nproc);
+                if (const auto userPercent = 100.0 * utimeDiff / sysDiff / nproc; std::isnormal(userPercent)) {
+                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", userPercent);
+                }
+                if (const auto systemPercent = 100.0 * stimeDiff / sysDiff / nproc; std::isnormal(systemPercent)) {
+                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", systemPercent);
+                }
+                if (const auto totalPercent = 100.0 * procDiff / sysDiff / nproc; std::isnormal(totalPercent)) {
+                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", totalPercent);
+                }
             }
         }
-        _previousCpuTimes = _currentCpuTimes;
+        _previousProcCpuTimes = _currentProcCpuTimes;
         _previousProcCpuTime = _currentProcCpuTime;
     }
 
@@ -82,12 +88,13 @@ namespace AwsMock::Monitoring {
                     std::istringstream ss(line);
                     std::string cpuLabel;
                     ss >> cpuLabel >> cpu.user >> cpu.nice >> cpu.system >> cpu.idle >> cpu.iowait >> cpu.irq >> cpu.softirq >> cpu.steal;
-                    cpu.total = cpu.user + cpu.nice + cpu.system + cpu.idle + cpu.iowait + cpu.irq + cpu.softirq + cpu.steal;
+                    cpu.total = cpu.user + cpu.nice + cpu.system + cpu.idle + cpu.iowait + cpu.irq + cpu.softirq - cpu.steal;
                     cpu.initialized = true;
                     break;
                 }
             }
         }
+        file.close();
         return cpu;
     }
 
@@ -119,9 +126,15 @@ namespace AwsMock::Monitoring {
             const auto idleDiff = static_cast<double>(_currentCpuTimes.idle + _currentCpuTimes.iowait - (_previousCpuTimes.idle + _previousCpuTimes.iowait));
 
             const auto totalDiff = userDiff + systemDiff + idleDiff + static_cast<double>(_currentCpuTimes.steal - _previousCpuTimes.steal);
-            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", 100.0 - 100.0 * idleDiff / totalDiff);
-            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", 100.0 * systemDiff / totalDiff);
-            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", 100.0 * userDiff / totalDiff);
+            if (const auto totalPercent = 100.0 - 100.0 * idleDiff / totalDiff; std::isnormal(totalPercent)) {
+                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+            }
+            if (const auto systemPercent = 100.0 * systemDiff / totalDiff; std::isnormal(systemPercent)) {
+                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
+            }
+            if (const auto userPercent = 100.0 * userDiff / totalDiff; std::isnormal(userPercent)) {
+                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
+            }
         }
         _previousCpuTimes = _currentCpuTimes;
     }
@@ -158,8 +171,9 @@ namespace AwsMock::Monitoring {
             // Ignore the rest of the line
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100;
-        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+        if (const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100; std::isnormal(percentUsed)) {
+            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+        }
     }
 
     void MetricSystemCollector::GetThreadInfoAwsmockLinux() {
@@ -167,8 +181,8 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, {}, {}, std::stod(tokens[19]));
-            log_trace << "Total threads: " << std::stol(tokens[22]);
+            Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, Core::NumberUtils::ToDouble(tokens[19]));
+            log_debug << "Total threads: " << std::stod(tokens[19]);
         }
         ifs.close();
     }
