@@ -336,6 +336,13 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::Docker::Container GetContainerByName(const std::string &name) const;
 
         /**
+         * @brief List all containers
+         *
+         * @return list of containers
+         */
+        [[nodiscard]] std::vector<Dto::Docker::Container> ListContainers() const;
+
+        /**
          * @brief List all containers of a given image.
          *
          * @param name image name

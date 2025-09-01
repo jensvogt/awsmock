@@ -40,13 +40,12 @@ namespace AwsMock::Core {
             v.type = GAUGE;
             v.count = 1;
             v.value = value;
+            v.timestamp = system_clock::now();
             _counterMap->emplace(boost::move(k), boost::move(v));
         } else {
-            MonitoringCounter v = _counterMap->at(k);
-            v.count++;
-            v.value += value;
-            v.timestamp = system_clock::now();
-            _counterMap->emplace(std::move(k), std::move(v));
+            _counterMap->at(k).count++;
+            _counterMap->at(k).value += value;
+            _counterMap->at(k).timestamp = system_clock::now();
         }
     }
 
@@ -55,44 +54,11 @@ namespace AwsMock::Core {
     }
 
     void MonitoringCollector::SetGauge(const std::string &name, const double value) const {
-        boost::mutex::scoped_lock lock(_monitoringMutex);
-
-        const ShmAllocator<char> char_alloc(_segment.get_segment_manager());
-        if (ShmString k(GetId(name, {}, {}).c_str(), char_alloc); _counterMap->find(k) == _counterMap->end()) {
-            MonitoringCounter v(char_alloc);
-            v.name = ShmString(name.c_str(), char_alloc);
-            v.type = GAUGE;
-            v.count = 1;
-            v.value = value;
-            _counterMap->emplace(boost::move(k), boost::move(v));
-        } else {
-            MonitoringCounter v = _counterMap->at(k);
-            v.count++;
-            v.value += value;
-            v.timestamp = system_clock::now();
-            _counterMap->emplace(std::move(k), std::move(v));
-        }
+        SetGauge(name, {}, {}, value);
     }
 
     void MonitoringCollector::SetGauge(const std::string &name, const long value) const {
         SetGauge(name, static_cast<double>(value));
-    }
-
-    void MonitoringCollector::IncGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) const {
-        boost::mutex::scoped_lock lock(_monitoringMutex);
-
-        const ShmAllocator<char> char_alloc(_segment.get_segment_manager());
-        if (ShmString k(GetId(name, labelName, labelValue).c_str(), char_alloc); _counterMap->find(k) != _counterMap->end()) {
-            MonitoringCounter v = _counterMap->at(k);
-            v.count++;
-            v.value += value;
-            v.timestamp = system_clock::now();
-            _counterMap->emplace(std::move(k), std::move(v));
-        }
-    }
-
-    void MonitoringCollector::IncGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, const long value) const {
-        IncGauge(name, labelName, labelValue, static_cast<double>(value));
     }
 
     void MonitoringCollector::IncCountPerSec(const std::string &name, const std::string &labelName, const std::string &labelValue, const double value) const {
@@ -107,13 +73,11 @@ namespace AwsMock::Core {
             v.type = COUNT_PER_SECOND;
             v.count = _period;
             v.value += value;
+            v.timestamp = system_clock::now();
             _counterMap->emplace(boost::move(k), boost::move(v));
         } else {
-            MonitoringCounter v = _counterMap->at(k);
-            v.count++;
-            v.value += value;
-            v.timestamp = system_clock::now();
-            _counterMap->emplace(std::move(k), std::move(v));
+            _counterMap->at(k).value += value;
+            _counterMap->at(k).timestamp = system_clock::now();
         }
     }
 
@@ -128,13 +92,16 @@ namespace AwsMock::Core {
             v.labelValue = ShmString(labelValue.c_str(), char_alloc);
             v.type = COUNT_ABSOLUTE;
             v.value += value;
+            v.timestamp = system_clock::now();
             _counterMap->emplace(boost::move(k), boost::move(v));
         } else {
-            MonitoringCounter v = _counterMap->at(k);
-            v.value += value;
-            v.timestamp = system_clock::now();
-            _counterMap->emplace(std::move(k), std::move(v));
+            _counterMap->at(k).value = value;
+            _counterMap->at(k).timestamp = system_clock::now();
         }
+    }
+
+    void MonitoringCollector::IncCountAbs(const std::string &name, const double value) const {
+        IncCountAbs(name, {}, {}, value);
     }
 
     long MonitoringCollector::Size() const {
@@ -144,6 +111,12 @@ namespace AwsMock::Core {
 
     ShmMap *MonitoringCollector::GetCounterMap() const {
         return _counterMap;
+    }
+
+    void MonitoringCollector::DumpCounterMap() const {
+        for (const auto &[fst, snd]: *_counterMap) {
+            log_info << fst << ", type: " << snd.type << " value: " << snd.value << " count: " << snd.count;
+        }
     }
 
     void MonitoringCollector::Clear(const std::string &name) const {

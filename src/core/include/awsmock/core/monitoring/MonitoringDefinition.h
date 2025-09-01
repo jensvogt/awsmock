@@ -116,6 +116,11 @@
 #define APPLICATION_CPU_USAGE "application_cpu_usage"
 #define APPLICATION_MEMORY_USAGE "application_mem_usage"
 
-// Database
+// Docker
+#define DOCKER_CONTAINER_COUNT "docker_container_counter"
+#define DOCKER_CPU_TOTAL "docker_cpu_total_counter"
+#define DOCKER_CPU_USER "docker_cpu_user_counter"
+#define DOCKER_CPU_SYSTEM "docker_cpu_system_counter"
+#define DOCKER_MEMORY_TOTAL "docker_memory_counter"
 
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H

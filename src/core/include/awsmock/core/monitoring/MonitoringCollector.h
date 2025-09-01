@@ -133,26 +133,6 @@ namespace AwsMock::Core {
         void SetGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value) const;
 
         /**
-         * @brief Increment a gauge value
-         *
-         * @param name gauge name
-         * @param labelName label name
-         * @param labelValue value of the label
-         * @param value gauge value
-         */
-        void IncGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, long value = 1) const;
-
-        /**
-         * @brief Increment a gauge value
-         *
-         * @param name gauge name
-         * @param labelName label name
-         * @param labelValue value of the label
-         * @param value gauge value
-         */
-        void IncGauge(const std::string &name, const std::string &labelName, const std::string &labelValue, double value = 1.0) const;
-
-        /**
          * @brief Sets a gauge value
          *
          * @param name gauge name
@@ -171,6 +151,14 @@ namespace AwsMock::Core {
          * @param value increment value, default: 1.0
          */
         void IncCountPerSec(const std::string &name, const std::string &labelName, const std::string &labelValue, double value = 1.0) const;
+
+        /**
+         * @brief Increment an absolute counter map value
+         *
+         * @param name gauge name
+         * @param value increment value, default: 1.0
+         */
+        void IncCountAbs(const std::string &name, double value = 1.0) const;
 
         /**
          * @brief Increment an absolute counter map value
@@ -195,6 +183,11 @@ namespace AwsMock::Core {
          * @return counter map
          */
         [[nodiscard]] ShmMap *GetCounterMap() const;
+
+        /**
+         * @brief Dumps the content of the counter map to info logger
+         */
+        void DumpCounterMap() const;
 
         /**
          * @brief Returns the ID of a monitoring counter map key

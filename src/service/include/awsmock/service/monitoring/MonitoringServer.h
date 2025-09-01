@@ -35,16 +35,24 @@ namespace AwsMock::Service {
         explicit MonitoringServer(Core::Scheduler &scheduler);
 
         /**
-       * @brief Delete monitoring data older than the retention period.
-       *
-       * @par
-       * Delete all monitoring data older than the retention period. Default is 3 days, which means monitoring data older than 3 days will be deleted.
-       */
+         * @brief Delete monitoring data older than the retention period.
+         *
+         * @par
+         * Delete all monitoring data older than the retention period. Default is 3 days, which means monitoring data older than 3 days will be deleted.
+         */
         [[maybe_unused]] void DeleteMonitoringData() const;
 
       private:
 
+        /**
+         * Monitoring data collector
+         */
         void Collector() const;
+
+        /**
+         * Docker counter collector
+         */
+        static void CollectDockerCounter();
 
         /**
          * Monitoring system collector

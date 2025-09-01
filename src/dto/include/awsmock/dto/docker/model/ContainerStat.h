@@ -34,6 +34,11 @@ namespace AwsMock::Dto::Docker {
         system_clock::time_point read;
 
         /**
+         * Pre read timestamp
+         */
+        system_clock::time_point preRead;
+
+        /**
          * Container memory statistics
          */
         MemoryStat memoryStats;
@@ -56,6 +61,7 @@ namespace AwsMock::Dto::Docker {
             r.cpuStats = boost::json::value_to<CpuStat>(v.at("cpu_stats"));
             r.preCpuStats = boost::json::value_to<CpuStat>(v.at("precpu_stats"));
             r.read = Core::Json::GetDatetimeValue(v, "read");
+            r.preRead = Core::Json::GetDatetimeValue(v, "preread");
             return r;
         }
 
@@ -65,6 +71,7 @@ namespace AwsMock::Dto::Docker {
                     {"cpu_stats", boost::json::value_from(obj.cpuStats)},
                     {"precpu_stats", boost::json::value_from(obj.preCpuStats)},
                     {"read", Core::DateTimeUtils::ToISO8601(obj.read)},
+                    {"preread", Core::DateTimeUtils::ToISO8601(obj.preRead)},
             };
         }
     };

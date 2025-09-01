@@ -30,7 +30,7 @@ namespace AwsMock::Core {
     }
 
     int NumberUtils::HexToInt(const std::string &hex) {
-        return std::stoul(hex, nullptr, 16);
+        return static_cast<int>(std::stoul(hex, nullptr, 16));
     }
 
     int NumberUtils::ToInt(const std::string &str) {
@@ -38,6 +38,13 @@ namespace AwsMock::Core {
             return std::stoi(str);
         }
         return -1;
+    }
+
+    double NumberUtils::ToDouble(const std::string &str) {
+        if (!str.empty()) {
+            return std::stod(str);
+        }
+        return -1.0;
     }
 
 }// namespace AwsMock::Core
