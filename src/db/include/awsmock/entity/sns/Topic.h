@@ -86,6 +86,16 @@ namespace AwsMock::Database::Entity::SNS {
         long messages = 0;
 
         /**
+         * Total number of all messages send
+         */
+        long messagesSend = 0;
+
+        /**
+         * Total number of all messages resend
+         */
+        long messagesResend = 0;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();
@@ -99,7 +109,7 @@ namespace AwsMock::Database::Entity::SNS {
          * @brief Checks whether a subscription with the given protocol/endpoint exists already.
          *
          * @param subscription subscription object
-         * @return true if subscription exists.
+         * @return true if a subscription exists.
          */
         bool HasSubscription(const Subscription &subscription);
 
@@ -107,7 +117,7 @@ namespace AwsMock::Database::Entity::SNS {
          * @brief Checks whether a subscription with the given ARN exists already.
          *
          * @param subscriptionArn subscription ARN
-         * @return true if subscription with the given ARN exists.
+         * @return true if a subscription with the given ARN exists.
          */
         bool HasSubscription(const std::string &subscriptionArn);
 

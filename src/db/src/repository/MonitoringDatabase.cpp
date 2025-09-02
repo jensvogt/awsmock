@@ -196,7 +196,7 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
 
             // Get the map of counters
-            Core::ShmemMap *counterMap = Core::SharedMemoryUtils::instance().GetCounterMap();
+            Core::ShmMap *counterMap = Core::MonitoringCollector::instance().GetCounterMap();
 
             const auto client = ConnectionPool::instance().GetConnection();
             const auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
@@ -204,37 +204,39 @@ namespace AwsMock::Database {
 
             try {
 
-                auto collection = mongocxx::collection{monitoringCollection};
-                auto bulk = collection.create_bulk_write();
-
+                std::vector<value> documents;
                 for (auto &val: *counterMap | std::views::values) {
 
-                    // Average
-                    double avg = val.count > 0 ? val.value / static_cast<double>(val.count) : 0.0;
+                    double databaseValue = 0.0;
+                    if (val.type == Core::CounterType::COUNT_PER_SECOND || val.type == Core::CounterType::GAUGE) {
+                        // Average over number of counters or measuring period
+                        databaseValue = val.count > 0 ? val.value / static_cast<double>(val.count) : 0.0;
+                    } else if (val.type == Core::CounterType::COUNT_ABSOLUTE) {
+                        // Absolute value; will be kept
+                        databaseValue = val.value;
+                    }
 
                     // Prepare insert query
                     document insertQuery;
                     insertQuery.append(kvp("name", bsoncxx::types::b_string(val.name)));
                     insertQuery.append(kvp("labelName", bsoncxx::types::b_string(val.labelName)));
                     insertQuery.append(kvp("labelValue", bsoncxx::types::b_string(val.labelValue)));
-                    insertQuery.append(kvp("value", avg));
+                    insertQuery.append(kvp("value", databaseValue));
                     insertQuery.append(kvp("created", bsoncxx::types::b_date(val.timestamp)));
-                    bulk.append(mongocxx::model::insert_one(insertQuery.view()));
-
-                    // Reset counter
+                    documents.emplace_back(insertQuery.extract());
                     val.count = 0;
                     val.value = 0;
                 }
 
                 // Execute bulk update
-                if (!bulk.empty()) {
+                auto collection = mongocxx::collection{monitoringCollection};
+                if (!documents.empty()) {
                     session.start_transaction();
-                    const auto result = bulk.execute();
+                    const auto result = collection.insert_many(documents);
                     session.commit_transaction();
                     log_info << "Imported monitoring values: " << result->inserted_count();
                 }
-
-                log_info << Core::SharedMemoryUtils::instance().ToString();
+                log_info << Core::MonitoringCollector::instance().ToString();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();

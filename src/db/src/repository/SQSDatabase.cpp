@@ -1354,7 +1354,7 @@ namespace AwsMock::Database {
     }
 
     void SQSDatabase::AdjustMessageCounters(const std::string &queueArn) const {
-        Monitoring::MonitoringTimer measure(DATABASE_TIMER, DATABASE_COUNTER, "action", "adjust_message_counter");
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "adjust_message_counter");
 
         if (HasDatabase()) {
 

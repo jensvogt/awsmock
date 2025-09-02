@@ -10,8 +10,8 @@
 #include <utility>
 
 // Awsmock include
+#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
 
 #define TIME_DIFF (duration_cast<std::chrono::milliseconds>(system_clock::now() - _start).count())
 
@@ -39,7 +39,7 @@ namespace AwsMock::Monitoring {
          *
          * @param name name of the underlying timer
          */
-        explicit MonitoringTimer(std::string name) : _shmUtils(Core::SharedMemoryUtils::instance()), _timerName(std::move(name)), _start(system_clock::now()) {}
+        explicit MonitoringTimer(std::string name) : _shmUtils(Core::MonitoringCollector::instance()), _timerName(std::move(name)), _start(system_clock::now()) {}
 
         /**
          * @brief Constructor
@@ -51,7 +51,7 @@ namespace AwsMock::Monitoring {
          * @param labelName label name of the underlying timer
          * @param labelValue label value of the underlying timer
          */
-        explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : _shmUtils(Core::SharedMemoryUtils::instance()), _timerName(std::move(name)),
+        explicit MonitoringTimer(std::string name, std::string labelName, std::string labelValue) : _shmUtils(Core::MonitoringCollector::instance()), _timerName(std::move(name)),
                                                                                                     _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {}
 
         /**
@@ -65,7 +65,7 @@ namespace AwsMock::Monitoring {
          * @param labelName label name of the underlying timer
          * @param labelValue label value of the underlying timer
          */
-        explicit MonitoringTimer(std::string timerName, std::string counterName, std::string labelName, std::string labelValue) : _shmUtils(Core::SharedMemoryUtils::instance()),
+        explicit MonitoringTimer(std::string timerName, std::string counterName, std::string labelName, std::string labelValue) : _shmUtils(Core::MonitoringCollector::instance()),
                                                                                                                                   _timerName(std::move(timerName)), _counterName(std::move(counterName)),
                                                                                                                                   _labelName(std::move(labelName)), _labelValue(std::move(labelValue)), _start(system_clock::now()) {}
 
@@ -77,7 +77,7 @@ namespace AwsMock::Monitoring {
          */
         ~MonitoringTimer() {
             if (!_counterName.empty()) {
-                _shmUtils.IncrementCounter(_counterName, _labelName, _labelValue, 1.0);
+                _shmUtils.IncCountPerSec(_counterName, _labelName, _labelValue, 1.0);
             }
             if (_labelName.empty()) {
                 _shmUtils.SetGauge(_timerName, {}, {}, TIME_DIFF);
@@ -108,7 +108,7 @@ namespace AwsMock::Monitoring {
         /**
          * Metric module
          */
-        Core::SharedMemoryUtils &_shmUtils;
+        Core::MonitoringCollector &_shmUtils;
 
         /**
          * Name of the timer

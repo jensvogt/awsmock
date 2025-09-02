@@ -335,6 +335,23 @@ namespace AwsMock::Service {
         return inspectContainerResponse;
     }
 
+    std::vector<Dto::Docker::Container> ContainerService::ListContainers() const {
+
+        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
+        if (statusCode != http::status::ok) {
+            log_warning << "Get docker containers failed, state: " << statusCode;
+            return {};
+        }
+
+        Dto::Docker::ListContainerResponse response(body);
+        if (response.containerList.empty()) {
+            log_info << "Docker containers not found";
+            return {};
+        }
+        log_debug << "Docker containers found";
+        return response.containerList;
+    }
+
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {
 
         if (_isDocker) {

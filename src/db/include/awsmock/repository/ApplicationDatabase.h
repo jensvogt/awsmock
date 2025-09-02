@@ -15,7 +15,7 @@
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -108,7 +108,7 @@ namespace AwsMock::Database {
          * @param sortColumns vector of sort columns and direction
          * @return list of applications
          */
-        std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] std::vector<Entity::Apps::Application> ListApplications(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Count all applications by region and prefix
@@ -117,7 +117,7 @@ namespace AwsMock::Database {
          * @param prefix name prefix
          * @return number of applications
          */
-        long CountApplications(const std::string &region = {}, const std::string &prefix = {}) const;
+        [[nodiscard]] long CountApplications(const std::string &region = {}, const std::string &prefix = {}) const;
 
         /**
          * @brief Deletes an application
@@ -154,16 +154,6 @@ namespace AwsMock::Database {
          * Application in-memory database
          */
         ApplicationMemoryDb &_memoryDb;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        ApplicationCounterMapType *_applicationCounterMap;
     };
 
 }// namespace AwsMock::Database

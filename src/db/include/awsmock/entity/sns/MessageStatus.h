@@ -27,7 +27,7 @@ namespace AwsMock::Database::Entity::SNS {
             {RESEND, "RESEND"},
     };
 
-    [[maybe_unused]] static std::string MessageStatusToString(MessageStatus messageStatus) {
+    [[maybe_unused]] static std::string MessageStatusToString(const MessageStatus &messageStatus) {
         return MessageStatusNames[messageStatus];
     }
 

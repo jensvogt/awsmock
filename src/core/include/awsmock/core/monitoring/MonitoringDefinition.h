@@ -29,6 +29,8 @@
 #define SNS_MESSAGE_BY_TOPIC_COUNT "sns_message_by_topic_counter"
 #define SNS_SERVICE_TIMER "sns_service_timer"
 #define SNS_SERVICE_COUNTER "sns_service_counter"
+#define SNS_DATABASE_TIMER "sns_database_timer"
+#define SNS_DATABASE_COUNTER "sns_database_counter"
 
 // SQS counter, timer
 #define SQS_QUEUE_COUNT "sqs_queue_counter"
@@ -41,20 +43,26 @@
 #define SQS_SERVICE_TIMER "sqs_service_timer"
 #define SQS_SERVICE_COUNTER "sqs_service_counter"
 #define SQS_MESSAGE_WAIT_TIME "sqs_message_wait_time"
+#define SQS_DATABASE_TIMER "sqs_database_timer"
+#define SQS_DATABASE_COUNTER "sqs_database_counter"
 
 // S3 counter, timer
 #define S3_BUCKET_COUNT "s3_bucket_counter"
 #define S3_OBJECT_COUNT "s3_object_counter"
+#define S3_BUCKET_SIZE_COUNT "s3_bucket_size_counter"
 #define S3_OBJECT_BY_BUCKET_COUNT "s3_object_by_bucket_counter"
 #define S3_SIZE_BY_BUCKET_COUNT "s3_size_by_bucket_counter"
 #define S3_SERVICE_TIMER "s3_service_timer"
 #define S3_SERVICE_COUNTER "s3_service_counter"
+#define S3_DATABASE_TIMER "s3_database_timer"
+#define S3_DATABASE_COUNTER "s3_database_counter"
 
 // Lambda counter, timer
 #define LAMBDA_FUNCTION_COUNT "lambda_function_counter"
 #define LAMBDA_SERVICE_TIMER "lambda_service_timer"
 #define LAMBDA_SERVICE_COUNTER "lambda_service_counter"
 #define LAMBDA_INVOCATION_TIMER "lambda_invocation_timer"
+#define LAMBDA_RUNTIME_TIMER "lambda_runtime_timer"
 #define LAMBDA_INVOCATION_COUNT "lambda_invocation_counter"
 #define LAMBDA_INSTANCES_COUNT "lambda_instances_counter"
 
@@ -108,8 +116,11 @@
 #define APPLICATION_CPU_USAGE "application_cpu_usage"
 #define APPLICATION_MEMORY_USAGE "application_mem_usage"
 
-// Database
-#define DATABASE_TIMER "database_timer"
-#define DATABASE_COUNTER "database_counter"
+// Docker
+#define DOCKER_CONTAINER_COUNT "docker_container_counter"
+#define DOCKER_CPU_TOTAL "docker_cpu_total_counter"
+#define DOCKER_CPU_USER "docker_cpu_user_counter"
+#define DOCKER_CPU_SYSTEM "docker_cpu_system_counter"
+#define DOCKER_MEMORY_TOTAL "docker_memory_counter"
 
 #endif// AWSMOCK_CORE_METRIC_DEFINITION_H

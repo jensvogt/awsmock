@@ -243,12 +243,12 @@ namespace AwsMock::Core {
 
         // Monitoring
         DefineProperty<int>("awsmock.monitoring.port", "AWSMOCK_MONITORING_PORT", 9091);
-        DefineProperty<int>("awsmock.monitoring.period", "AWSMOCK_MONITORING_PERIOD", 60);
+        DefineProperty<int>("awsmock.monitoring.system-period", "AWSMOCK_MONITORING_SYSTEM_PERIOD", 60);
         DefineProperty<bool>("awsmock.monitoring.prometheus", "AWSMOCK_MONITORING_PROMETHEUS", false);
         DefineProperty<bool>("awsmock.monitoring.internal", "AWSMOCK_MONITORING_INTERN", true);
         DefineProperty<int>("awsmock.monitoring.retention", "AWSMOCK_MONITORING_RETENTION", 3);
         DefineProperty<bool>("awsmock.monitoring.smooth", "AWSMOCK_MONITORING_SMOOTH", false);
-        DefineProperty<int>("awsmock.monitoring.average", "AWSMOCK_MONITORING_AVERAGE", 300);
+        DefineProperty<int>("awsmock.monitoring.average-period", "AWSMOCK_MONITORING_AVERAGE_PERIOD", 300);
 
         // Database
         DefineProperty<bool>("awsmock.mongodb.active", "AWSMOCK_MONGODB_ACTIVE", true);
