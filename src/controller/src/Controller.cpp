@@ -21,6 +21,8 @@ namespace AwsMock::Controller {
     void AwsMockCtl::Initialize(const boost::program_options::variables_map &vm, const std::vector<std::string> &commands) {
         _commands = commands;
         _vm = vm;
+        _lambdas = GetAllLambdas();
+        _applications = GetAllApplications();
     }
 
     void AwsMockCtl::Run() {
@@ -38,147 +40,179 @@ namespace AwsMock::Controller {
                 break;
             }
 
-            case CommandType::LIST_APPLICATIONS: {
-                for (const std::vector<Dto::Apps::Application> applications = GetAllApplications(); const auto &application: applications) {
-                    std::cout << "  " << std::setw(32) << std::left << application.name
-                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+            case CommandType::LIST: {
+                if (_commands.empty() || _commands[0] == "applications") {
+                    std::cout << "Applications: " << std::endl;
+                    for (const auto &application: _applications) {
+                        std::cout << "  " << std::setw(32) << std::left << application.name
+                                  << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                                  << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                    }
+                }
+                if (_commands.empty() || _commands[0] == "lambdas") {
+                    std::cout << "Lambdas: " << std::endl;
+                    for (const auto &lambda: _lambdas) {
+                        std::cout << "  " << std::setw(32) << std::left << lambda.functionName
+                                  << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                                  << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                    }
                 }
                 break;
             }
 
-            case CommandType::ENABLE_APPLICATION: {
-                const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands, {"enable-application", "all"});
-                if (applications.empty()) {
+            case CommandType::ENABLE: {
+                if (_commands.empty()) {
+                    EnableAllApplications();
+                    EnableAllLambdas();
+                    return;
+                }
+                if (_commands[0] == "applications") {
                     return EnableAllApplications();
                 }
-                return EnableApplications(applications);
-            }
-
-            case CommandType::DISABLE_APPLICATION: {
-                const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands, {"disable-application", "all"});
-                if (applications.empty()) {
-                    return DisableAllApplications();
+                if (_commands[0] == "lambdas") {
+                    return EnableAllLambdas();
                 }
-                return DisableApplications(applications);
-            }
-
-            case CommandType::START_APPLICATION: {
-                const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands, {"start-application", "all"});
-                if (applications.empty()) {
-                    return StartAllApplications();
+                if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                    EnableApplications(applications);
                 }
-                return StartApplications(applications);
-            }
-
-            case CommandType::RESTART_APPLICATION: {
-                const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands, {"restart-application", "all"});
-                if (applications.empty()) {
-                    return RestartAllApplications();
-                }
-                return RestartApplications(applications);
-            }
-
-            case CommandType::STOP_APPLICATION: {
-                const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands, {"stop-application", "all"});
-                if (applications.empty()) {
-                    return StopAllApplications();
-                }
-                return StopApplications(applications);
-            }
-
-            case CommandType::LIST_LAMBDAS: {
-                for (const std::vector<Dto::Lambda::Function> lambdas = GetAllLambdas(); const auto &lambda: lambdas) {
-                    std::cout << "  " << std::setw(32) << std::left << lambda.functionName
-                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
-                              << std::setw(10) << std::left << lambda.state << std::endl;
+                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                    EnableLambdas(lambdas);
                 }
                 break;
             }
 
-            case CommandType::ENABLE_LAMBDA: {
-                const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands, {"enable-lambda", "all"});
-                if (lambdas.empty()) {
-                    return EnableAllLambdas();
+            case CommandType::DISABLE: {
+                if (_commands.empty()) {
+                    DisableAllApplications();
+                    DisableAllLambdas();
+                    return;
                 }
-                return EnableLambdas(lambdas);
-            }
-
-            case CommandType::DISABLE_LAMBDA: {
-                const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands, {"disable-lambda", "all"});
-                if (lambdas.empty()) {
+                if (_commands[0] == "applications") {
+                    return DisableAllApplications();
+                }
+                if (_commands[0] == "lambdas") {
                     return DisableAllLambdas();
                 }
-                return DisableLambdas(lambdas);
+                if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                    DisableApplications(applications);
+                }
+                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                    DisableLambdas(lambdas);
+                }
+                break;
             }
 
-            case CommandType::START_LAMBDA: {
-                const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands, {"start-lambda", "all"});
-                if (lambdas.empty()) {
+            case CommandType::START: {
+                if (_commands.empty()) {
+                    StartAllApplications();
+                    StartAllLambdas();
+                    return;
+                }
+                if (_commands[0] == "applications") {
+                    return StartAllApplications();
+                }
+                if (_commands[0] == "lambdas") {
                     return StartAllLambdas();
                 }
-                return StartLambdas(lambdas);
+                if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                    StartApplications(applications);
+                }
+                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                    StartLambdas(lambdas);
+                }
+                break;
             }
 
-            case CommandType::RESTART_LAMBDA: {
-                const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands, {"restart-lambda", "all"});
-                if (lambdas.empty()) {
+            case CommandType::RESTART: {
+                if (_commands.empty()) {
+                    RestartAllApplications();
+                    RestartAllLambdas();
+                    return;
+                }
+                if (_commands[0] == "applications") {
+                    return RestartAllApplications();
+                }
+                if (_commands[0] == "lambdas") {
                     return RestartAllLambdas();
                 }
-                return RestartLambdas(lambdas);
+                if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                    RestartApplications(applications);
+                }
+                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                    RestartLambdas(lambdas);
+                }
+                break;
             }
 
-            case CommandType::STOP_LAMBDA: {
-                const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands, {"stop-lambda", "all"});
-                if (lambdas.empty()) {
+            case CommandType::STOP: {
+                if (_commands.empty()) {
+                    StopAllApplications();
+                    StopAllLambdas();
+                    return;
+                }
+                if (_commands[0] == "applications") {
+                    return StopAllApplications();
+                }
+                if (_commands[0] == "lambdas") {
                     return StopAllLambdas();
                 }
-                return StopLambdas(lambdas);
+                if (const std::vector<Dto::Apps::Application> applications = GetApplicationFromCommands(_commands); !applications.empty()) {
+                    StopApplications(applications);
+                }
+                if (const std::vector<Dto::Lambda::Function> lambdas = GetLambdasFromCommand(_commands); !lambdas.empty()) {
+                    StopLambdas(lambdas);
+                }
+                break;
             }
+
+            case CommandType::IMPORT: {
+                ImportInfrastructure();
+                break;
+            }
+
+            case CommandType::EXPORT: {
+                std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
+                if (modules.empty()) {
+                    modules = GetAllModules();
+                }
+
+                const bool pretty = _vm.contains("pretty");
+                const bool includeObjects = _vm.contains("include-objects");
+
+                ExportInfrastructure(modules, pretty, includeObjects);
+                break;
+            }
+
+            case CommandType::CLEAN: {
+                std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
+                if (modules.empty()) {
+                    modules = GetAllModules();
+                }
+                CleanInfrastructure(modules);
+                break;
+            }
+
+            case CommandType::CLEAN_OBJECTS: {
+                std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands);
+                CleanObjects(modules);
+                break;
+            }
+
+            case CommandType::PING: {
+                PingManager();
+                break;
+            }
+
+#ifdef HAS_SYSTEMD
+            case CommandType::LOGS: {
+                ShowServiceLogs();
+                break;
+            }
+#endif
 
             default:
-                return;
+                std::cout << "Unknown command: " << _commands[0] << std::endl;
         }
-
-        if (std::ranges::find(_commands, "import") != _commands.end()) {
-
-            ImportInfrastructure();
-
-        } else if (std::ranges::find(_commands, "export") != _commands.end()) {
-
-            std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands, {"export", "all"});
-            if (modules.empty()) {
-                modules = GetAllModules();
-            }
-
-            const bool pretty = _vm.contains("pretty");
-            const bool includeObjects = _vm.contains("include-objects");
-
-            ExportInfrastructure(modules, pretty, includeObjects);
-
-        } else if (std::ranges::find(_commands, "clean") != _commands.end()) {
-
-            std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands, {"clean"});
-            if (modules.empty()) {
-                modules = GetAllModules();
-            }
-
-            CleanInfrastructure(modules);
-
-        } else if (std::ranges::find(_commands, "clean-objects") != _commands.end()) {
-
-            std::vector<Dto::Module::Module> modules = GetModulesFromCommand(_commands, {"clean-objects"});
-            CleanObjects(modules);
-
-        } else if (std::ranges::find(_commands, "ping") != _commands.end()) {
-            PingManager();
-        }
-#ifdef HAS_SYSTEMD
-        else if (std::ranges::find(_commands, "logs") != _commands.end()) {
-
-            ShowServiceLogs();
-        }
-#endif
     }
 
     void AwsMockCtl::EnableApplications(const std::vector<Dto::Apps::Application> &applications) const {
@@ -759,34 +793,30 @@ namespace AwsMock::Controller {
         return modules;
     }
 
-    std::vector<Dto::Apps::Application> AwsMockCtl::GetApplicationFromCommands(const std::vector<std::string> &commands, const std::vector<std::string> &discards) {
+    std::vector<Dto::Apps::Application> AwsMockCtl::GetApplicationFromCommands(const std::vector<std::string> &commands) {
         std::vector<Dto::Apps::Application> applications;
         for (const auto &command: commands) {
-            if (std::ranges::find(discards, command) == discards.end()) {
-                Dto::Apps::Application application;
-                application.name = command;
-                applications.push_back(application);
+            if (const auto it = std::ranges::find(_applications, command, &Dto::Apps::Application::name); it != _applications.end()) {
+                applications.push_back(*it);
             }
         }
         return applications;
     }
 
-    std::vector<Dto::Lambda::Function> AwsMockCtl::GetLambdasFromCommand(const std::vector<std::string> &commands, const std::vector<std::string> &discards) {
+    std::vector<Dto::Lambda::Function> AwsMockCtl::GetLambdasFromCommand(const std::vector<std::string> &commands) {
         std::vector<Dto::Lambda::Function> lambdas;
         for (const auto &command: commands) {
-            if (std::ranges::find(discards, command) == discards.end()) {
-                Dto::Lambda::Function lambda;
-                lambda.functionName = command;
-                lambdas.push_back(lambda);
+            if (const auto it = std::ranges::find(_lambdas, command, &Dto::Lambda::Function::functionName); it != _lambdas.end()) {
+                lambdas.push_back(*it);
             }
         }
         return lambdas;
     }
 
-    std::vector<Dto::Module::Module> AwsMockCtl::GetModulesFromCommand(const std::vector<std::string> &commands, const std::vector<std::string> &discards) {
+    std::vector<Dto::Module::Module> AwsMockCtl::GetModulesFromCommand(const std::vector<std::string> &commands) {
         std::vector<Dto::Module::Module> modules;
         for (const auto &command: commands) {
-            if (std::ranges::find(discards, command) == discards.end()) {
+            if (std::ranges::find(_lambdas, command, &Dto::Lambda::Function::functionName) == _lambdas.end()) {
                 Dto::Module::Module module;
                 module.name = command;
                 modules.push_back(module);
