@@ -37,9 +37,7 @@
 // Allowed actions
 static std::list<std::string> allowedActions() {
     return {
-            "logLevel", "logs",
-            "list-applications", "enable-application", "disable-application", "start-application", "stop-application", "restart-application",
-            "list-lambdas", "enable-lambda", "disable-lambda", "start-lambda", "stop-lambda", "restart-lambda",
+            "logLevel", "logs", "list", "enable", "disable", "start", "stop", "restart",
             "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"};
 }
 
@@ -47,27 +45,26 @@ static std::list<std::string> allowedActions() {
  * Show help
  */
 void ShowHelp(const boost::program_options::options_description &desc) {
-    constexpr int leftIndent = 40;
+    constexpr int leftIndent = 64;
     std::cout << std::endl
               << "AwsMock awsmockctl v" << PROJECT_VERSION << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awsmockctl [Options] Commands" << std::endl
               << std::endl
-              << desc << std::endl
+              << "Options:" << std::endl
+              << std::left << std::setw(leftIndent) << "  --help" << ": show this usage" << std::endl
+              << std::left << std::setw(leftIndent) << "  --version" << ": show current version" << std::endl
+              << std::left << std::setw(leftIndent) << "  --host" << ": connect to manager on 'host'" << std::endl
+              << std::left << std::setw(leftIndent) << "  --port" << ": use 'port' for the manager connection" << std::endl
+              << std::endl
               << "Commands: " << std::endl
-              << std::left << std::setw(leftIndent) << "  list-applications" << ": lists all available applications" << std::endl
-              << std::left << std::setw(leftIndent) << "  enable-application [<application>]" << ": enable the given application(s). If no argument is given, enables all applications. Several applications should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  disable-application [<application>]" << ": disable the given application(s). If no argument is given, disables all applications. Several applications should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  start-application [<application>]" << ": starts the given application(s). If no argument is given, starts all applications. Several applications should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  stop-application [<application>]" << ": stops the given application(s). If no argument is given, stops all applications. Several applications should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  restart-application [<application>]" << ": restarts the given application(s). If no argument is given, restarts all applications. Several applications should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  list-lambdas" << ": lists all available lambdas" << std::endl
-              << std::left << std::setw(leftIndent) << "  enable-lambda [<lambda>]" << ": enable the given lambda function. If no argument is given, enables all lambda functions. Several lambdas should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  disable-lambda [<lambda>]" << ": disable the given lambda function. If no argument is given, disables all lambda functions. Several lambdas should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  start-lambda [<lambda>]" << ": starts the given lambda. If no argument is given, starts all lambdas. Several lambdas should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  stop-lambda [<lambda>]" << ": stops the given lambda. If no argument is given, stops all lambdas. Several lambdas should be sparated by spaces." << std::endl
-              << std::left << std::setw(leftIndent) << "  restart-lambda [<lambda>]" << ": restarts the given lambda. If no argument is given, restarts all lambdas. Several lambdas should be sparated by spaces." << std::endl;
+              << std::left << std::setw(leftIndent) << "  list [applications|lambdas]" << ": list all available applications or lambdas. If no argument is given, both are listed." << std::endl
+              << std::left << std::setw(leftIndent) << "  enable [applications|lambdas|<applications...>|<lambda...>]" << ": enable the given application(s) or lambda(s). If no argument is given, enables all applications and lambdas. Several applications should be separated by spaces." << std::endl
+              << std::left << std::setw(leftIndent) << "  disable [applications|lambdas|<applications...>|<lambda...>]" << ": disable the given application(s) or lambda(s). If no argument is given, disables all applications and lambdas. Several applications should be separated by spaces." << std::endl
+              << std::left << std::setw(leftIndent) << "  start [applications|lambdas|<applications...>|<lambda...>]" << ": starts the given application(s) or lambda(s). If no argument is given, starts all applications and lambdas. Several applications should be separated by spaces." << std::endl
+              << std::left << std::setw(leftIndent) << "  stop [applications|lambdas|<applications...>|<lambda...>]" << ": stops the given application(s) or lambda(s). If no argument is given, stops all applications and lambdas. Several applications should be separated by spaces." << std::endl
+              << std::left << std::setw(leftIndent) << "  restart [applications|lambdas|<applications...>|<lambda...>]" << ": restarts the given application(s) or lambda(s). If no argument is given, restarts all applications and lambdas. Several applications should be separated by spaces." << std::endl;
 #ifdef HAS_SYSTEMD
     std::cout << std::left << std::setw(leftIndent) << "  logs" << ": shows the manager logs" << std::endl;
 #endif
@@ -81,8 +78,6 @@ void ShowHelp(const boost::program_options::options_description &desc) {
               << "\nExport options:\n"
               << std::left << std::setw(leftIndent) << "  --include-objects" << ": export objects as well" << std::endl
               << std::left << std::setw(leftIndent) << "  --pretty" << ": indent output" << std::endl
-              << std::left << std::setw(leftIndent) << "  --host" << ": awsmock host name, default: localhost" << std::endl
-              << std::left << std::setw(leftIndent) << "  --port" << ": awsmock port, default: 4566" << std::endl
               << "\nValid log levels are: fatal, error, warning, info, debug, verbose." << std::endl
               << std::endl;
 }

@@ -400,8 +400,8 @@ namespace AwsMock::Service {
             }
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::START_ALL_LAMBDAS) {
-                boost::asio::post(_ioc, [self = shared_from_this()] {
-                    self->_lambdaService.StartAllLambdas();
+                boost::asio::post(_ioc, [this] {
+                    _lambdaService.StartAllLambdas();
                     log_trace << "Started all lambda function";
                 });
                 return SendResponse(request, http::status::ok);
@@ -410,8 +410,8 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA) {
 
                 Dto::Lambda::StopLambdaRequest lambdaRequest = Dto::Lambda::StopLambdaRequest::FromJson(clientCommand);
-                boost::asio::post(_ioc, [lambdaRequest, self = shared_from_this()] {
-                    self->_lambdaService.StopLambda(lambdaRequest);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.StopLambda(lambdaRequest);
                     log_trace << "Stop lambda function, functionArn: " << lambdaRequest.functionArn;
                 });
                 return SendResponse(request, http::status::ok);
@@ -419,8 +419,8 @@ namespace AwsMock::Service {
 
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_ALL_LAMBDAS) {
 
-                boost::asio::post(_ioc, [self = shared_from_this()] {
-                    self->_lambdaService.StopAllLambdas();
+                boost::asio::post(_ioc, [this] {
+                    _lambdaService.StopAllLambdas();
                     log_trace << "Stopped all lambda functions";
                 });
                 return SendResponse(request, http::status::ok);
@@ -429,8 +429,8 @@ namespace AwsMock::Service {
             if (clientCommand.command == Dto::Common::LambdaCommandType::STOP_LAMBDA_INSTANCE) {
 
                 Dto::Lambda::StopLambdaInstanceRequest lambdaRequest = Dto::Lambda::StopLambdaInstanceRequest::FromJson(clientCommand);
-                boost::asio::post(_ioc, [lambdaRequest, self = shared_from_this()] {
-                    self->_lambdaService.StopLambdaInstance(lambdaRequest);
+                boost::asio::post(_ioc, [this, lambdaRequest] {
+                    _lambdaService.StopLambdaInstance(lambdaRequest);
                     log_trace << "Stop lambda instance, functionArn: " << lambdaRequest.functionArn << ", instanceId: " << lambdaRequest.instanceId;
                 });
                 return SendResponse(request, http::status::ok);

@@ -53,6 +53,12 @@ namespace AwsMock::Service {
 
             for (const auto &container: containers) {
 
+                // Sanitize name
+                std::string containerName = container.image;
+                if (Core::StringUtils::Contains(containerName, ":")) {
+                    containerName = containerName.substr(0, containerName.find(':'));
+                }
+
                 // Get statistics
                 const Dto::Docker::ContainerStat stats = ContainerService::instance().GetContainerStats(container.id);
 
@@ -63,14 +69,14 @@ namespace AwsMock::Service {
                 const auto cpuDelta = static_cast<double>(stats.cpuStats.cpuUsage.total - stats.preCpuStats.cpuUsage.total);
                 if (timeDiff > 0 && numCpus > 0) {
                     const auto cpuPercent = cpuDelta / timeDiff / numCpus * 100.0;
-                    Core::MonitoringCollector::instance().SetGauge(DOCKER_CPU_TOTAL, "container", container.names.front(), cpuPercent);
+                    Core::MonitoringCollector::instance().SetGauge(DOCKER_CPU_TOTAL, "container", containerName, cpuPercent);
                 }
 
                 // Memory
                 const auto availableMem = static_cast<double>(stats.memoryStats.limit);
                 const auto usedMem = static_cast<double>(stats.memoryStats.usage - stats.memoryStats.stats.cache);
                 const auto memPercent = usedMem / availableMem * 100.0;
-                Core::MonitoringCollector::instance().SetGauge(DOCKER_MEMORY_TOTAL, "container", container.names.front(), memPercent);
+                Core::MonitoringCollector::instance().SetGauge(DOCKER_MEMORY_TOTAL, "container", containerName, memPercent);
             }
             Core::MonitoringCollector::instance().SetGauge(DOCKER_CONTAINER_COUNT, static_cast<long>(containers.size()));
         }

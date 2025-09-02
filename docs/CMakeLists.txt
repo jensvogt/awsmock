@@ -21,7 +21,7 @@ if (NOT WIN32)
         set(version ${PROJECT_VERSION})
         set(date ${PROJECT_BUILDDATE})
         add_custom_command(OUTPUT ${mf}
-                COMMAND ${PANDOC_EXECUTABLE} ${ms} --template ${ms} -V version=${version} -V builddate=${date} | ${PANDOC_EXECUTABLE} -s -t man -o ${mf}
+                COMMAND ${PANDOC_EXECUTABLE} ${ms} --template ${ms} -V version=${version} -V builddate=${date} | ${PANDOC_EXECUTABLE} -s -t man -o ${mf} -f markdown-tex_math_dollars
                 DEPENDS ${ms}
                 COMMENT "Building manpage ${mf}"
                 VERBATIM)
@@ -45,4 +45,4 @@ if (NOT WIN32)
     install(FILES man/awsmocksecretsmanager.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
     install(FILES man/awsmockkms.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
     install(FILES man/awsmockssm.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
-endif()
+endif ()
