@@ -2,6 +2,9 @@
 // Created by vogje01 on 29/05/2023.
 //
 
+#include "awsmock/core/exception/DatabaseException.h"
+
+
 #include <awsmock/repository/Database.h>
 
 namespace AwsMock::Database {
@@ -44,7 +47,11 @@ namespace AwsMock::Database {
     }
 
     mongocxx::database DatabaseBase::GetConnection() const {
-        const mongocxx::pool::entry _client = _pool->acquire();
+        const std::optional _client = _pool->acquire();
+        if (!_client) {
+            log_error << "Database connection not available";
+            throw Core::DatabaseException("Database connection not available");
+        }
         return (*_client)[_name];
     }
 

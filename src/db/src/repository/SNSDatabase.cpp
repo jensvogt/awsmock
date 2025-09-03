@@ -925,82 +925,51 @@ namespace AwsMock::Database {
         return deleted;
     }
 
-    void SNSDatabase::AdjustMessageCounters(const std::string &topicArn) const {
+    void SNSDatabase::AdjustMessageCounters() const {
         Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "adjust_message_counter");
+        using bsoncxx::builder::basic::make_array;
 
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
             auto messageCollection = (*client)[_databaseName][_messageCollectionName];
-            auto queueCollection = (*client)[_databaseName][_topicCollectionName];
+            auto topicCollection = (*client)[_databaseName][_topicCollectionName];
             auto session = client->start_session();
 
             try {
                 mongocxx::pipeline p{};
-                document facetDocument;
-
-                array initialArray;
-                initialArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INITIAL")))))));
-                initialArray.append(make_document(kvp("$count", "initial")));
-                facetDocument.append(kvp("initial", initialArray));
-
-                array invisibleArray;
-                invisibleArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "SEND")))))));
-                invisibleArray.append(make_document(kvp("$count", "send")));
-                facetDocument.append(kvp("send", invisibleArray));
-
-                array delayedArray;
-                delayedArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "RESEND")))))));
-                delayedArray.append(make_document(kvp("$count", "resend")));
-                facetDocument.append(kvp("resend", delayedArray));
-                array sizeFacet;
-                sizeFacet.append(make_document(kvp("$match", make_document(kvp("size", make_document(kvp("$gte", 0)))))));
-
-                // Extract well-named pieces for readability
-                sizeFacet.append(make_document(
-                        kvp("$group",
-                            make_document(
-                                    kvp("_id", bsoncxx::types::b_null()),
-                                    kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0))))))))));
-                facetDocument.append(kvp("size", sizeFacet));
+                p.group(make_document(
+                        kvp("_id", "$topicArn"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("total", make_document(kvp("$sum", 1))),
+                        kvp("initial", make_document(kvp("$sum",
+                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::INITIAL)))), 1, 0)))))),
+                        kvp("send", make_document(kvp("$sum",
+                                                      make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
+                        kvp("resend", make_document(kvp("$sum",
+                                                        make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::RESEND)))), 1, 0))))))));
 
                 document projectDocument;
-                projectDocument.append(kvp("queueArn", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$queueArn.queueArn", 0)))));
-                projectDocument.append(kvp("initial", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$initial.initial", 0)))));
-                projectDocument.append(kvp("send", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$send.send", 0)))));
-                projectDocument.append(kvp("resend", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$resend.resend", 0)))));
-                projectDocument.append(kvp("size", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$size.size", 0)))));
-
-                p.match(make_document(kvp("topicArn", topicArn)));
-                p.facet(facetDocument.extract());
-                p.project(projectDocument.extract());
-
-                p.group(make_document(
-                        kvp("_id", "$attributes.queueArn"),
-                        kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0)))))),
-                        kvp("initial", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$initial", 0)))))),
-                        kvp("send", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$send", 0)))))),
-                        kvp("resend", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$resend", 0))))))));
+                projectDocument.append(kvp("_id", 0),
+                                       kvp("topicArn", "$_id"),
+                                       kvp("total", 1),
+                                       kvp("initial", 1),
+                                       kvp("send", 1),
+                                       kvp("resend", 1),
+                                       kvp("size", 1));
 
                 session.start_transaction();
-                auto totalSizeCursor = messageCollection.aggregate(p);
-                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    queueCollection.update_one(make_document(kvp("topicArn", topicArn)),
+                for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
+                    topicCollection.update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
                                                make_document(kvp("$set", make_document(
                                                                                  kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
                                                                                  kvp("messages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
                                                                                  kvp("messagesSend", Core::Bson::BsonUtils::GetLongValue(t, "send")),
                                                                                  kvp("messagesResend", Core::Bson::BsonUtils::GetLongValue(t, "resend"))))));
-                    log_debug << topicArn << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
-                } else {
-                    queueCollection.update_one(make_document(kvp("topicArn", topicArn)),
-                                               make_document(kvp("$set", make_document(
-                                                                                 kvp("size", 0),
-                                                                                 kvp("messages", 0),
-                                                                                 kvp("messagesSend", 0),
-                                                                                 kvp("messagesResend", 0)))));
+                    log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();
+
 
             } catch (const mongocxx::exception &exc) {
                 session.abort_transaction();
