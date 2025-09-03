@@ -6,40 +6,7 @@
 
 namespace AwsMock::Database {
 
-    SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {
-
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _sqsCounterMap = _segment.find<SqsCounterMapType>(SQS_COUNTER_MAP_NAME).first;
-        if (!_sqsCounterMap) {
-            _sqsCounterMap = _segment.construct<SqsCounterMapType>(SQS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
-        }
-
-        // Initialize the counters
-        InitializeCounters();
-    }
-
-    void SQSDatabase::InitializeCounters(const std::string &queueArn) const {
-        if (queueArn.empty()) {
-            for (const auto &queue: ListQueues()) {
-                QueueMonitoringCounter counter;
-                counter.initial = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
-                counter.invisible = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE);
-                counter.delayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
-                counter.messages = CountMessages(queue.queueArn);
-                counter.size = GetQueueSize(queue.queueArn);
-                _sqsCounterMap->insert_or_assign(queue.queueArn, counter);
-            }
-        } else {
-            QueueMonitoringCounter counter;
-            counter.initial = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INITIAL);
-            counter.invisible = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INVISIBLE);
-            counter.delayed = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::DELAYED);
-            counter.messages = CountMessages(queueArn);
-            counter.size = GetQueueSize(queueArn);
-            _sqsCounterMap->insert_or_assign(queueArn, counter);
-        }
-        log_debug << "SQS queues counters initialized: size: " << _sqsCounterMap->size();
-    }
+    SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {}
 
     bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) const {
 
@@ -162,12 +129,6 @@ namespace AwsMock::Database {
         } else {
             queue = _memoryDb.GetQueueByArn(queueArn);
         }
-
-        // Update counters
-        queue.size = (*_sqsCounterMap)[queueArn].size;
-        queue.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[queueArn].messages;
-        queue.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[queueArn].invisible;
-        queue.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[queueArn].delayed;
         return queue;
     }
 
@@ -282,10 +243,6 @@ namespace AwsMock::Database {
             for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
                 Entity::SQS::Queue result;
                 result.FromDocument(queue);
-                result.size = (*_sqsCounterMap)[result.queueArn].size;
-                result.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[result.queueArn].messages;
-                result.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[result.queueArn].invisible;
-                result.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[result.queueArn].delayed;
                 queueList.push_back(result);
             }
             log_trace << "Got queue list, size: " << queueList.size();
@@ -389,20 +346,12 @@ namespace AwsMock::Database {
         } else {
             purged = _memoryDb.PurgeQueue(queueArn);
         }
-
-        // Update the counter-map
-        if (purged > 0) {
-            (*_sqsCounterMap)[queueArn].size = 0;
-            (*_sqsCounterMap)[queueArn].messages = 0;
-            (*_sqsCounterMap)[queueArn].initial = 0;
-            (*_sqsCounterMap)[queueArn].invisible = 0;
-            (*_sqsCounterMap)[queueArn].delayed = 0;
-        }
         return purged;
     }
 
     Entity::SQS::Queue SQSDatabase::UpdateQueue(Entity::SQS::Queue &queue) const {
 
+        queue.modified = system_clock::now();
         if (HasDatabase()) {
 
             const auto client = ConnectionPool::instance().GetConnection();
@@ -415,7 +364,6 @@ namespace AwsMock::Database {
             try {
 
                 session.start_transaction();
-                queue.modified = system_clock::now();
                 const auto mResult = _queueCollection.find_one_and_update(make_document(kvp("queueArn", queue.queueArn)), queue.ToDocument(), opts);
                 session.commit_transaction();
                 log_trace << "Queue updated: " << Core::Bson::BsonUtils::ToJsonString(queue.ToDocument());
@@ -565,9 +513,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteQueue(queue);
         }
-
-        // Update the counter-map
-        _sqsCounterMap->erase(queue.queueArn);
         return deleted;
     }
 
@@ -596,10 +541,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteAllQueues();
         }
-
-        // Clear the counter-map
-        _sqsCounterMap->clear();
-
         return deleted;
     }
 
@@ -628,12 +569,6 @@ namespace AwsMock::Database {
         } else {
             message = _memoryDb.CreateMessage(message);
         }
-
-        // Update the counter-map
-        (*_sqsCounterMap)[message.queueArn].messages++;
-        (*_sqsCounterMap)[message.queueArn].initial++;
-        (*_sqsCounterMap)[message.queueArn].size += message.size;
-
         return message;
     }
 
@@ -869,9 +804,6 @@ namespace AwsMock::Database {
                 session.commit_transaction();
                 log_info << "Imported messages: " << result->inserted_count();
 
-                // Update the counter-map
-                InitializeCounters();
-
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
                 session.abort_transaction();
@@ -933,12 +865,6 @@ namespace AwsMock::Database {
                         dqlBulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
 
                         log_debug << "Message send to DQL, id: " << result.oid << " queueArn: " << dlQueueArn;
-                        (*_sqsCounterMap)[queueArn].initial--;
-                        (*_sqsCounterMap)[queueArn].messages--;
-                        (*_sqsCounterMap)[queueArn].size -= result.size;
-                        (*_sqsCounterMap)[dlQueueArn].initial++;
-                        (*_sqsCounterMap)[dlQueueArn].messages++;
-                        (*_sqsCounterMap)[dlQueueArn].size += result.size;
 
                     } else {
 
@@ -958,10 +884,7 @@ namespace AwsMock::Database {
                         updateQuery.append(kvp("$set", setQuery));
 
                         queueBulk.append(mongocxx::model::update_one{filterQuery.extract(), updateQuery.extract()});
-
                         log_debug << "Message updated, id: " << result.oid << " queueArn: " << queueArn;
-                        (*_sqsCounterMap)[queueArn].initial--;
-                        (*_sqsCounterMap)[queueArn].invisible++;
                     }
                 }
 
@@ -1035,13 +958,6 @@ namespace AwsMock::Database {
         } else {
             updated = _memoryDb.ResetMessages(queueArn, visibility);
         }
-
-        // Update the counter-map
-        if (updated > 0) {
-            (*_sqsCounterMap)[queueArn].initial += updated;
-            (*_sqsCounterMap)[queueArn].invisible -= updated;
-        }
-
         return updated;
     }
 
@@ -1124,12 +1040,6 @@ namespace AwsMock::Database {
         } else {
             updated = _memoryDb.ResetDelayedMessages(queueArn);
         }
-
-        // Update the counter-map
-        if (updated > 0) {
-            (*_sqsCounterMap)[queueArn].delayed -= updated;
-            (*_sqsCounterMap)[queueArn].initial += updated;
-        }
         return updated;
     }
 
@@ -1175,20 +1085,6 @@ namespace AwsMock::Database {
         } else {
             updated = _memoryDb.RedriveMessages(originalQueue, dlqQueue);
         }
-
-        // Update the counter-map
-        if (updated > 0) {
-            const long totalOriginal = CountMessages(originalQueue.queueArn);
-            const long totalDql = CountMessages(dlqQueue.queueArn);
-            const long sizeOriginal = GetQueueSize(originalQueue.queueArn);
-            const long sizeDql = GetQueueSize(dlqQueue.queueArn);
-            (*_sqsCounterMap)[originalQueue.queueArn].messages += totalOriginal;
-            (*_sqsCounterMap)[originalQueue.queueArn].initial += totalOriginal;
-            (*_sqsCounterMap)[originalQueue.queueArn].size += sizeOriginal;
-            (*_sqsCounterMap)[dlqQueue.queueArn].messages -= totalDql;
-            (*_sqsCounterMap)[dlqQueue.queueArn].initial -= totalDql;
-            (*_sqsCounterMap)[dlqQueue.queueArn].size -= sizeDql;
-        }
         return updated;
     }
 
@@ -1222,17 +1118,6 @@ namespace AwsMock::Database {
             }
         } else {
             deleted = _memoryDb.MessageRetention(queueArn, retentionPeriod);
-        }
-
-        // Update the counter-map
-        if (deleted > 0) {
-            QueueMonitoringCounter counter;
-            counter.initial = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INITIAL);
-            counter.invisible = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::INVISIBLE);
-            counter.delayed = CountMessagesByStatus(queueArn, Entity::SQS::MessageStatus::DELAYED);
-            counter.messages = CountMessages(queueArn);
-            counter.size = GetQueueSize(queueArn);
-            _sqsCounterMap->insert_or_assign(queueArn, counter);
         }
         return deleted;
     }
@@ -1380,15 +1265,6 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteMessages(queueArn);
         }
-
-        // Update the counter-map
-        if (deleted > 0) {
-            (*_sqsCounterMap)[queueArn].messages = 0;
-            (*_sqsCounterMap)[queueArn].initial = 0;
-            (*_sqsCounterMap)[queueArn].invisible = 0;
-            (*_sqsCounterMap)[queueArn].delayed = 0;
-            (*_sqsCounterMap)[queueArn].size = 0;
-        }
         return deleted;
     }
 
@@ -1417,19 +1293,6 @@ namespace AwsMock::Database {
             }
         } else {
             deleted = _memoryDb.DeleteMessage(message);
-        }
-
-        // Update the counter-map
-        if (deleted > 0) {
-            (*_sqsCounterMap)[message.queueArn].size -= message.size;
-            (*_sqsCounterMap)[message.queueArn].messages -= deleted;
-            if (message.status == Entity::SQS::MessageStatus::INITIAL) {
-                (*_sqsCounterMap)[message.queueArn].initial -= deleted;
-            } else if (message.status == Entity::SQS::MessageStatus::DELAYED) {
-                (*_sqsCounterMap)[message.queueArn].delayed -= deleted;
-            } else if (message.status == Entity::SQS::MessageStatus::INVISIBLE) {
-                (*_sqsCounterMap)[message.queueArn].invisible -= deleted;
-            }
         }
         return deleted;
     }
@@ -1487,7 +1350,92 @@ namespace AwsMock::Database {
         }
 
         // Update the counter-map
-        _sqsCounterMap->clear();
         return deleted;
     }
+
+    void SQSDatabase::AdjustMessageCounters(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "adjust_message_counter");
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            auto messageCollection = (*client)[_databaseName][_messageCollectionName];
+            auto queueCollection = (*client)[_databaseName][_queueCollectionName];
+            auto session = client->start_session();
+
+            try {
+                mongocxx::pipeline p{};
+                document facetDocument;
+
+                array initialArray;
+                initialArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INITIAL")))))));
+                initialArray.append(make_document(kvp("$count", "initial")));
+                facetDocument.append(kvp("initial", initialArray));
+
+                array invisibleArray;
+                invisibleArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INVISIBLE")))))));
+                invisibleArray.append(make_document(kvp("$count", "invisible")));
+                facetDocument.append(kvp("invisible", invisibleArray));
+
+                array delayedArray;
+                delayedArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "DELAYED")))))));
+                delayedArray.append(make_document(kvp("$count", "delayed")));
+                facetDocument.append(kvp("delayed", delayedArray));
+                array sizeFacet;
+                sizeFacet.append(make_document(kvp("$match", make_document(kvp("size", make_document(kvp("$gte", 0)))))));
+
+                // Extract well-named pieces for readability
+                sizeFacet.append(make_document(
+                        kvp("$group",
+                            make_document(
+                                    kvp("_id", bsoncxx::types::b_null()),
+                                    kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0))))))))));
+                facetDocument.append(kvp("size", sizeFacet));
+
+                document projectDocument;
+                projectDocument.append(kvp("queueArn", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$queueArn.queueArn", 0)))));
+                projectDocument.append(kvp("initial", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$initial.initial", 0)))));
+                projectDocument.append(kvp("invisible", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$invisible.invisible", 0)))));
+                projectDocument.append(kvp("delayed", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$delayed.delayed", 0)))));
+                projectDocument.append(kvp("size", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$size.size", 0)))));
+
+                p.match(make_document(kvp("queueArn", queueArn)));
+                p.facet(facetDocument.extract());
+                p.project(projectDocument.extract());
+
+                p.group(make_document(
+                        kvp("_id", "$attributes.queueArn"),
+                        kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0)))))),
+                        kvp("initial", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$initial", 0)))))),
+                        kvp("invisible", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$invisible", 0)))))),
+                        kvp("delayed", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$delayed", 0))))))));
+
+                session.start_transaction();
+                auto totalSizeCursor = messageCollection.aggregate(p);
+                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
+                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
+                                               make_document(kvp("$set", make_document(
+                                                                                 kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
+                                                                                 kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
+                    log_debug << queueArn << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                } else {
+                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
+                                               make_document(kvp("$set", make_document(
+                                                                                 kvp("size", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessages", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", 0),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", 0)))));
+                }
+                session.commit_transaction();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException(exc.what());
+            }
+        }
+    }
+
 }// namespace AwsMock::Database

@@ -195,40 +195,48 @@ namespace AwsMock::Database {
 
         if (HasDatabase()) {
 
-            // Initialize shared memory
-            auto _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-            Core::SharedMemoryUtils::CounterMapType *counterMap = _segment.find<Core::SharedMemoryUtils::CounterMapType>(MONITORING_MAP_NAME).first;
+            // Get the map of counters
+            Core::ShmMap *counterMap = Core::MonitoringCollector::instance().GetCounterMap();
 
             const auto client = ConnectionPool::instance().GetConnection();
-            const auto messageCollection = client->database(_databaseName)[_monitoringCollectionName];
+            const auto monitoringCollection = client->database(_databaseName)[_monitoringCollectionName];
             auto session = client->start_session();
 
             try {
 
-                session.start_transaction();
-                auto collection = mongocxx::collection{messageCollection};
-                auto bulk = collection.create_bulk_write();
+                std::vector<value> documents;
+                for (auto &val: *counterMap | std::views::values) {
 
-                for (const auto &val: *counterMap | std::views::values) {
+                    double databaseValue = 0.0;
+                    if (val.type == Core::CounterType::COUNT_PER_SECOND || val.type == Core::CounterType::GAUGE) {
+                        // Average over number of counters or measuring period
+                        databaseValue = val.count > 0 ? val.value / static_cast<double>(val.count) : 0.0;
+                    } else if (val.type == Core::CounterType::COUNT_ABSOLUTE) {
+                        // Absolute value; will be kept
+                        databaseValue = val.value;
+                    }
 
-                    const double avg = val.value / static_cast<double>(val.count);
-                    document updateQuery;
-                    updateQuery.append(kvp("name", val.name));
-                    updateQuery.append(kvp("labelName", val.labelName));
-                    updateQuery.append(kvp("labelValue", val.labelValue));
-                    updateQuery.append(kvp("value", avg));
-                    updateQuery.append((kvp("created", bsoncxx::types::b_date(val.timestamp))));
-
-                    const mongocxx::model::insert_one insert_op{updateQuery.view()};
-                    bulk.append(insert_op);
+                    // Prepare insert query
+                    document insertQuery;
+                    insertQuery.append(kvp("name", bsoncxx::types::b_string(val.name)));
+                    insertQuery.append(kvp("labelName", bsoncxx::types::b_string(val.labelName)));
+                    insertQuery.append(kvp("labelValue", bsoncxx::types::b_string(val.labelValue)));
+                    insertQuery.append(kvp("value", databaseValue));
+                    insertQuery.append(kvp("created", bsoncxx::types::b_date(val.timestamp)));
+                    documents.emplace_back(insertQuery.extract());
+                    val.count = 0;
+                    val.value = 0;
                 }
 
                 // Execute bulk update
-                const auto result = bulk.execute();
-                session.commit_transaction();
-                log_info << "Imported monitoring values: " << result->inserted_count();
-
-                counterMap->clear();
+                auto collection = mongocxx::collection{monitoringCollection};
+                if (!documents.empty()) {
+                    session.start_transaction();
+                    const auto result = collection.insert_many(documents);
+                    session.commit_transaction();
+                    log_info << "Imported monitoring values: " << result->inserted_count();
+                }
+                log_info << Core::MonitoringCollector::instance().ToString();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();

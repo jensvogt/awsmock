@@ -24,7 +24,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/sns/Message.h>
 #include <awsmock/entity/sns/Topic.h>
 #include <awsmock/memorydb/SNSMemoryDb.h>
@@ -404,6 +404,11 @@ namespace AwsMock::Database {
          * @throws Core::DatabaseException
          */
         long DeleteAllMessages() const;
+
+        /**
+         * @brief Adjust all topic counters
+         */
+        void AdjustMessageCounters(const std::string &topicArn) const;
 
       private:
 

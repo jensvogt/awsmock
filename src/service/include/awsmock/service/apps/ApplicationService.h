@@ -11,6 +11,8 @@
 
 // AwsMock includes
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/apps/internal/CreateApplicationRequest.h>
 #include <awsmock/dto/apps/internal/CreateApplicationResponse.h>
 #include <awsmock/dto/apps/internal/DeleteApplicationRequest.h>
@@ -35,8 +37,6 @@
 #include <awsmock/dto/ssm/mapper/Mapper.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/apps/ApplicationCreator.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
-#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 
 namespace AwsMock::Service {

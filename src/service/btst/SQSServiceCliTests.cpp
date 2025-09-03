@@ -31,9 +31,11 @@ namespace AwsMock::Service {
             _endpoint = GetEndpoint();
 
             // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllMessages();
+            long deleted = _sqsDatabase.DeleteAllMessages();
+            log_debug << "Deleted messages, count: " << deleted;
             // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllQueues();
+            deleted = _sqsDatabase.DeleteAllQueues();
+            log_debug << "Deleted messages, count: " << deleted;
         }
 
         static std::string GetReceiptHandle(const std::string &jsonString) {

@@ -16,6 +16,7 @@
 #include <awsmock/core/PagingUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/dto/dynamodb/mapper/Mapper.h>
 #include <awsmock/dto/lambda/model/InvocationType.h>
 #include <awsmock/dto/sns/CreateTopicRequest.h>
@@ -65,7 +66,6 @@
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/lambda/LambdaService.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
 #include <boost/asio/strand.hpp>

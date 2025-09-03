@@ -19,7 +19,7 @@
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/MonitoringCollector.h>
 #include <awsmock/entity/s3/Bucket.h>
 #include <awsmock/entity/s3/Object.h>
 #include <awsmock/memorydb/S3MemoryDb.h>
@@ -32,17 +32,6 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
-
-    struct S3MonitoringCounter {
-        long keys{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
-    /*
-    using S3ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, S3MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using S3CounterMapType = boost::container::map<std::string, S3MonitoringCounter, std::less<std::string>, S3ShmAllocator>;
-
-    static constexpr auto S3_COUNTER_MAP_NAME = "S3BucketCounter";*/
 
     /**
      * @brief S3 MongoDB database.
@@ -146,7 +135,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateBucket(Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief List all buckets
@@ -241,7 +230,7 @@ namespace AwsMock::Database {
          * @return created bucket entity
          * @throws DatabaseException
          */
-        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket);
+        Entity::S3::Bucket CreateOrUpdateBucket(Entity::S3::Bucket &bucket) const;
 
         /**
          * @brief Create a new S3 object in the S3 object table
@@ -463,7 +452,12 @@ namespace AwsMock::Database {
          *
          * @return number of objects deleted.
          */
-        long DeleteAllObjects() const;
+        [[nodiscard]] long DeleteAllObjects() const;
+
+        /**
+         * @brief Adjust all object counters
+         */
+        void AdjustObjectCounters(const std::string &bucketArn) const;
 
       private:
 
@@ -491,11 +485,6 @@ namespace AwsMock::Database {
          * S3 in-memory database
          */
         S3MemoryDb &_memoryDb;
-
-        /**
-         * Map of monitoring counters
-         */
-        Core::SharedMemoryUtils _shmUtils;
     };
 
 }// namespace AwsMock::Database

@@ -6,7 +6,7 @@
 
 namespace AwsMock::Monitoring {
 
-    MetricSystemCollector::MetricSystemCollector() {
+    MetricSystemCollector::MetricSystemCollector() : _shmUtils(Core::MonitoringCollector::instance()) {
 
         _startTime = system_clock::now();
         _numProcessors = Core::SystemUtils::GetNumberOfCores();
@@ -44,52 +44,99 @@ namespace AwsMock::Monitoring {
 #ifdef __linux__
 
     void MetricSystemCollector::GetCpuInfoAwsmockLinux() {
+        const auto nproc = static_cast<double>(sysconf(_SC_NPROCESSORS_ONLN));
 
-        std::ifstream ifs("/proc/self/stat");
-        if (ifs) {
-            std::string line;
-            std::getline(ifs, line);
-            std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            unsigned long userCpu = std::stoul(tokens[13]);
-            unsigned long systemCpu = std::stoul(tokens[14]);
+        // first snapshot
+        _currentProcCpuTime = ReadProcCpuTimes();
+        _currentProcCpuTimes = ReadCpuTimes();
 
-            if (_lastAwsmockTotalCPU > 0) {
-                double percentUserCpu = static_cast<double>(userCpu - _lastAwsmockUserCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
-                double percentSystemCpu = static_cast<double>(systemCpu - _lastAwsmockSysCPU) / static_cast<double>(userCpu + systemCpu - _lastAwsmockTotalCPU);
-                double percentTotalCpu = percentUserCpu + percentSystemCpu;
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percentUserCpu);
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percentSystemCpu);
-                MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percentTotalCpu);
-                log_trace << "AwsMock CPU collector, total: " << percentTotalCpu << ", system: " << percentSystemCpu << ", user: " << percentUserCpu;
+        if (_previousProcCpuTime.initialized) {
+
+            // second snapshot
+            _currentProcCpuTime = ReadProcCpuTimes();
+            _currentProcCpuTimes = ReadCpuTimes();
+
+            const auto utimeDiff = static_cast<double>(_currentProcCpuTime.utime - _previousProcCpuTime.utime);
+            const auto stimeDiff = static_cast<double>(_currentProcCpuTime.stime - _previousProcCpuTime.stime);
+            const auto sysDiff = static_cast<double>(_currentProcCpuTimes.total - _previousProcCpuTimes.total);
+            const auto procDiff = utimeDiff + stimeDiff;
+
+            if (sysDiff > 0 && nproc > 0) {
+                if (const auto userPercent = 100.0 * utimeDiff / sysDiff / nproc; std::isnormal(userPercent)) {
+                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", userPercent);
+                }
+                if (const auto systemPercent = 100.0 * stimeDiff / sysDiff / nproc; std::isnormal(systemPercent)) {
+                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", systemPercent);
+                }
+                if (const auto totalPercent = 100.0 * procDiff / sysDiff / nproc; std::isnormal(totalPercent)) {
+                    Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", totalPercent);
+                }
             }
-            _lastAwsmockUserCPU = userCpu;
-            _lastAwsmockSysCPU = systemCpu;
-            _lastAwsmockTotalCPU = userCpu + systemCpu;
         }
-        ifs.close();
+        _previousProcCpuTimes = _currentProcCpuTimes;
+        _previousProcCpuTime = _currentProcCpuTime;
+    }
+
+    CpuTimes MetricSystemCollector::ReadCpuTimes() {
+        std::ifstream file("/proc/stat");
+        CpuTimes cpu;
+
+        if (file.is_open()) {
+            std::string line;
+            while (std::getline(file, line)) {
+                if (line.rfind("cpu ", 0) == 0) {// first line "cpu ..."
+                    std::istringstream ss(line);
+                    std::string cpuLabel;
+                    ss >> cpuLabel >> cpu.user >> cpu.nice >> cpu.system >> cpu.idle >> cpu.iowait >> cpu.irq >> cpu.softirq >> cpu.steal;
+                    cpu.total = cpu.user + cpu.nice + cpu.system + cpu.idle + cpu.iowait + cpu.irq + cpu.softirq - cpu.steal;
+                    cpu.initialized = true;
+                    break;
+                }
+            }
+        }
+        file.close();
+        return cpu;
+    }
+
+    CpuProcTimes MetricSystemCollector::ReadProcCpuTimes() {
+        std::ifstream file("/proc/self/stat");
+        std::string line;
+        CpuProcTimes pt;
+        if (!file.is_open()) return pt;
+
+        std::getline(file, line);
+        std::istringstream ss(line);
+        std::string token;
+
+        // skip first 13 fields
+        for (int i = 0; i < 13; i++) ss >> token;
+
+        ss >> pt.utime >> pt.stime;// fields 14 and 15
+        pt.initialized = true;
+        return pt;
     }
 
     void MetricSystemCollector::GetCpuInfoTotalLinux() {
-        tms timeSample{};
-        const clock_t now = times(&timeSample);
 
-        if (now - _lastTotalTime > 0) {
-            const auto totalPercent = static_cast<double>(timeSample.tms_stime - _lastTotalSysCPU + (timeSample.tms_utime - _lastTotalUserCPU)) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
-            log_trace << "Total CPU: " << totalPercent;
+        _currentCpuTimes = ReadCpuTimes();
+        if (_previousCpuTimes.initialized) {
 
-            const auto userPercent = static_cast<double>(timeSample.tms_utime - _lastTotalUserCPU) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
-            log_trace << "User CPU: " << userPercent;
+            const auto userDiff = static_cast<double>(_currentCpuTimes.user + _currentCpuTimes.nice - (_previousCpuTimes.user + _previousCpuTimes.nice));
+            const auto systemDiff = static_cast<double>(_currentCpuTimes.system + _currentCpuTimes.irq + _currentCpuTimes.softirq - (_previousCpuTimes.system + _previousCpuTimes.irq + _previousCpuTimes.softirq));
+            const auto idleDiff = static_cast<double>(_currentCpuTimes.idle + _currentCpuTimes.iowait - (_previousCpuTimes.idle + _previousCpuTimes.iowait));
 
-            const auto systemPercent = static_cast<double>(timeSample.tms_stime - _lastTotalSysCPU) / static_cast<double>(now - _lastTotalTime) / _numProcessors * 100;
-            MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
-            log_trace << "System CPU: " << systemPercent;
+            const auto totalDiff = userDiff + systemDiff + idleDiff + static_cast<double>(_currentCpuTimes.steal - _previousCpuTimes.steal);
+            if (const auto totalPercent = 100.0 - 100.0 * idleDiff / totalDiff; std::isnormal(totalPercent)) {
+                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+            }
+            if (const auto systemPercent = 100.0 * systemDiff / totalDiff; std::isnormal(systemPercent)) {
+                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", systemPercent);
+            }
+            if (const auto userPercent = 100.0 * userDiff / totalDiff; std::isnormal(userPercent)) {
+                Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", userPercent);
+            }
         }
-        _lastTotalTime = now;
-        _lastTotalSysCPU = timeSample.tms_stime;
-        _lastTotalUserCPU = timeSample.tms_utime;
-        log_trace << "System collector finished";
+        _previousCpuTimes = _currentCpuTimes;
     }
 
     void MetricSystemCollector::GetMemoryInfoAwsmockLinux() {
@@ -97,9 +144,9 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
+            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
             log_trace << "Virtual memory: " << std::stol(tokens[22]);
-            MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * sysconf(_SC_PAGESIZE));
+            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
             log_trace << "Real Memory: " << std::stol(tokens[23]);
         }
         ifs.close();
@@ -124,8 +171,9 @@ namespace AwsMock::Monitoring {
             // Ignore the rest of the line
             file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
-        const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100;
-        MetricService::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+        if (const double percentUsed = static_cast<double>(total - free) / static_cast<double>(total) * 100; std::isnormal(percentUsed)) {
+            Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", percentUsed);
+        }
     }
 
     void MetricSystemCollector::GetThreadInfoAwsmockLinux() {
@@ -133,8 +181,8 @@ namespace AwsMock::Monitoring {
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
             const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
-            MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, std::stod(tokens[19]));
-            log_trace << "Total threads: " << std::stol(tokens[22]);
+            Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, Core::NumberUtils::ToDouble(tokens[19]));
+            log_debug << "Total threads: " << std::stod(tokens[19]);
         }
         ifs.close();
     }

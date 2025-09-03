@@ -6,8 +6,8 @@
 #define AWSMOCK_MANAGER_MONITORING_H
 
 // AwsMock includes
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/repository/ModuleDatabase.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/monitoring/MetricSystemCollector.h>
 
@@ -33,7 +33,7 @@ namespace AwsMock::Manager {
         /**
          * @brief Constructor
          */
-        ManagerMonitoring(){};
+        ManagerMonitoring() {};
 
       private:
 

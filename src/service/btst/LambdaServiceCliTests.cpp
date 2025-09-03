@@ -49,7 +49,8 @@ namespace AwsMock::Service {
 
                 // Delete all S3 objects
                 // ReSharper disable once CppExpressionWithoutSideEffects
-                _s3Database.DeleteAllObjects();
+                long deleted = _s3Database.DeleteAllObjects();
+                log_debug << "Deleted queues, count: " << deleted;
                 // ReSharper disable once CppExpressionWithoutSideEffects
                 _s3Database.DeleteAllBuckets();
                 // ReSharper disable once CppExpressionWithoutSideEffects

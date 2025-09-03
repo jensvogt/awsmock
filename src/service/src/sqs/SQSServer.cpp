@@ -5,11 +5,11 @@
 #include <awsmock/service/sqs/SQSServer.h>
 
 namespace AwsMock::Service {
-    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs") {
+    SQSServer::SQSServer(Core::Scheduler &scheduler) : AbstractServer("sqs"), _monitoringCollector(Core::MonitoringCollector::instance()) {
 
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring.period");
-        _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset.period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.counter.period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.monitoring-period");
+        _resetPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.reset-period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sqs.counter-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sqs.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sqs.backup.cron");
 
@@ -19,10 +19,6 @@ namespace AwsMock::Service {
             return;
         }
         log_info << "SQS server starting";
-
-        // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _sqsCounterMap = _segment.find<Database::SqsCounterMapType>(Database::SQS_COUNTER_MAP_NAME).first;
 
         // Start SQS monitoring update counters
         scheduler.AddTask("sqs-monitoring", [this] { this->UpdateCounter(); }, _counterPeriod);
@@ -128,22 +124,22 @@ namespace AwsMock::Service {
 
         log_trace << "SQS counter update starting";
 
-        if (_sqsCounterMap) {
-            long totalMessages = 0;
-            long totalSize = 0;
-            for (auto const &[key, val]: *_sqsCounterMap) {
+        long totalMessages = 0;
+        long totalSize = 0;
 
-                _metricService.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT, "bucket", key, static_cast<double>(val.messages));
-                _metricService.SetGauge(SQS_QUEUE_SIZE, "bucket", key, static_cast<double>(val.size));
+        const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
+        for (auto &queue: queueList) {
 
-                totalMessages += val.messages;
-                totalSize += val.size;
-                _sqsDatabase.UpdateQueueCounter(key, val.messages, val.size, val.initial, val.invisible, val.delayed);
-            }
-            _metricService.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(_sqsCounterMap->size()));
-            _metricService.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+            _sqsDatabase.AdjustMessageCounters(queue.queueArn);
+
+            _monitoringCollector.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
+            _monitoringCollector.SetGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
+            totalMessages += queue.attributes.approximateNumberOfMessages;
+            totalSize += queue.size;
         }
-        log_debug << "SQS monitoring finished, freeShmSize: " << _segment.get_free_memory();
+        _monitoringCollector.SetGauge(SQS_QUEUE_COUNT, {}, {}, static_cast<double>(queueList.size()));
+        _monitoringCollector.SetGauge(SQS_MESSAGE_COUNT, {}, {}, static_cast<double>(totalMessages));
+        log_debug << "SQS monitoring finished";
     }
 
     void SQSServer::CollectWaitingTimeStatistics() const {
@@ -154,7 +150,7 @@ namespace AwsMock::Service {
 
         if (!waitTime.empty()) {
             for (auto &[fst, snd]: waitTime) {
-                _metricService.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
+                _monitoringCollector.SetGauge(SQS_MESSAGE_WAIT_TIME, "queue", fst, snd);
             }
         }
         log_trace << "SQS wait time update finished";

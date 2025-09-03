@@ -9,7 +9,7 @@
 #ifndef _WIN32
 #include <sys/times.h>
 #endif
-#include "../../../../../core/include/awsmock/core/monitoring/SharedMemoryUtils.h"
+#include "../../../../../core/include/awsmock/core/monitoring/MonitoringCollector.h"
 
 #ifdef __linux__
 #include <sys/sysinfo.h>
@@ -26,8 +26,9 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/NumberUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
 
 #ifdef _WIN32
@@ -40,6 +41,27 @@
 namespace AwsMock::Monitoring {
 
     using std::chrono::microseconds;
+#ifdef __linux__
+    struct CpuTimes {
+        unsigned long long user = 0;
+        unsigned long long nice = 0;
+        unsigned long long system = 0;
+        unsigned long long idle = 0;
+        unsigned long long iowait = 0;
+        unsigned long long irq = 0;
+        unsigned long long softirq = 0;
+        unsigned long long steal = 0;
+        unsigned long long total = 0;
+        bool initialized = false;
+    };
+
+    struct CpuProcTimes {
+        unsigned long long utime = 0;
+        unsigned long long stime = 0;
+        bool initialized = false;
+    };
+
+#endif
 
     /**
      * @brief Collect system information like CPU and Memory.
@@ -65,7 +87,7 @@ namespace AwsMock::Monitoring {
 #ifdef __APPLE__
 
         /**
-        * @brief Get number of threads on macOS
+        * @brief Get the number of threads on macOS
         */
         static void GetThreadInfoMac();
 
@@ -85,6 +107,20 @@ namespace AwsMock::Monitoring {
         static void GetMemoryInfoMac();
 
 #elif __linux__
+
+        /**
+         * @brief Returns the total CPU counter
+         *
+         * @return total CPU counter
+         */
+        static CpuTimes ReadCpuTimes();
+
+        /**
+         * @brief Returns the AwsMock CPU counter
+         *
+         * @return AwsMock CPU counter
+         */
+        static CpuProcTimes ReadProcCpuTimes();
 
         /**
          * @brief Get the number of threads on macOS
@@ -162,44 +198,34 @@ namespace AwsMock::Monitoring {
 #elif __linux__
 
         /**
-         * Last collection timestamp
+         * Previous total CPU counter
          */
-        clock_t _lastTotalTime = 0;
+        CpuTimes _previousCpuTimes;
 
         /**
-         * Last collection timestamp for total CPU utilization
+         * Current total CPU counter
          */
-        clock_t _lastTotalCPU = 0;
+        CpuTimes _currentCpuTimes;
 
         /**
-         * Last collection timestamp for system CPU utilization
+         * Previous total CPU counter
          */
-        clock_t _lastTotalSysCPU = 0;
+        CpuTimes _previousProcCpuTimes;
 
         /**
-         * Last collection timestamp for user CPU utilization
+         * Current total CPU counter
          */
-        clock_t _lastTotalUserCPU = 0;
+        CpuTimes _currentProcCpuTimes;
 
         /**
-         * Last collection timestamp
+         * Previous process CPU counter
          */
-        clock_t _lastAwsmockTime = 0;
+        CpuProcTimes _previousProcCpuTime;
 
         /**
-         * Last collection timestamp for Awsmock CPU utilization
+         * Current process CPU counter
          */
-        unsigned long _lastAwsmockTotalCPU = 0;
-
-        /**
-         * Last collection timestamp for system CPU utilization
-         */
-        unsigned long _lastAwsmockSysCPU = 0;
-
-        /**
-         * Last collection timestamp for user CPU utilization
-         */
-        unsigned long _lastAwsmockUserCPU = 0;
+        CpuProcTimes _currentProcCpuTime;
 
 #elif _WIN32
 
@@ -226,7 +252,7 @@ namespace AwsMock::Monitoring {
         /**
          * Map of monitoring counters
          */
-        Core::SharedMemoryUtils _shmUtils;
+        Core::MonitoringCollector &_shmUtils;
     };
 
 }// namespace AwsMock::Monitoring

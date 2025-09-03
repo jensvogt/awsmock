@@ -2,7 +2,7 @@
 // Created by vogje01 on 03/06/2023.
 //
 
-#include "awsmock/service/monitoring/MetricDefinition.h"
+#include "../../../core/include/awsmock/core/monitoring/MonitoringDefinition.h"
 
 
 #include <awsmock/service/secretsmanager/SecretsManagerServer.h>

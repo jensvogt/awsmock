@@ -9,13 +9,13 @@
 #include <awsmock/core/HttpSocket.h>
 #include <awsmock/core/HttpSocketResponse.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/lambda/model/LambdaResult.h>
 #include <awsmock/repository/LambdaDatabase.h>
 #include <awsmock/repository/SQSDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
 #include <awsmock/service/monitoring/MetricService.h>
-#include <awsmock/service/monitoring/MetricServiceTimer.h>
 
 namespace AwsMock::Service {
 
@@ -35,7 +35,7 @@ namespace AwsMock::Service {
         /**
          * @brief Constructor
          */
-        explicit LambdaExecutor() = default;
+        explicit LambdaExecutor() : _monitoringCollector(Core::MonitoringCollector::instance()) {}
 
         /**
          * @brief Executes a lambda function synchronized
@@ -49,9 +49,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Metric module
+         * Monitoring collector
          */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
+        Core::MonitoringCollector &_monitoringCollector;
 
         /**
          * Lambda database connection

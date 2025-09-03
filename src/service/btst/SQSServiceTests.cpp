@@ -185,11 +185,11 @@ namespace AwsMock::Service {
         listQueueCountersRequest.region = REGION;
 
         // act
-        Dto::SQS::ListParameterCountersResponse response = _service.ListQueueCounters(listQueueCountersRequest);
+        Dto::SQS::ListQueueCountersResponse response = _service.ListQueueCounters(listQueueCountersRequest);
 
         // assert
         BOOST_CHECK_EQUAL(1, response.total);
-        BOOST_CHECK_EQUAL(1, response.parameterCounters.at(0).available);
+        BOOST_CHECK_EQUAL(1, response.queueCounters.at(0).available);
     }
 
     BOOST_FIXTURE_TEST_CASE(QueueListTagsTest, SQSServiceTest) {

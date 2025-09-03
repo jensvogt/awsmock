@@ -6,17 +6,21 @@
 #define AWSMOCK_SERVICE_COGNITO_SERVICE_H
 
 // C++ standard includes
-#include <openssl/bn.h>
 #include <string>
+
+// OpenSSL includes
+#include <openssl/bn.h>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/JwtUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/SrpUtils.h>
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/cognito/AdminAddUserToGroupRequest.h>
 #include <awsmock/dto/cognito/AdminConfirmUserRequest.h>
 #include <awsmock/dto/cognito/AdminCreateUserRequest.h>
@@ -72,8 +76,6 @@
 #include <awsmock/dto/cognito/mapper/Mapper.h>
 #include <awsmock/dto/cognito/model/ChallengeName.h>
 #include <awsmock/repository/CognitoDatabase.h>
-#include <awsmock/service/monitoring/MetricDefinition.h>
-#include <awsmock/service/monitoring/MetricServiceTimer.h>
 #include <awsmock/service/secretsmanager/SecretsManagerService.h>
 
 namespace AwsMock::Service {
@@ -99,7 +101,7 @@ namespace AwsMock::Service {
         /**
          * @brief Create a new cognito user pool
          *
-         * @param request create user pool request
+         * @param request create a user pool request
          * @return CreateUserPoolRequest DTO
          */
         Dto::Cognito::CreateUserPoolResponse CreateUserPool(const Dto::Cognito::CreateUserPoolRequest &request) const;
@@ -227,7 +229,7 @@ namespace AwsMock::Service {
         /**
          * @brief Create a new cognito user pool
          *
-         * @param request create user pool request
+         * @param request create a user pool request
          * @return CreateUserPoolResponse DTO
          */
         Dto::Cognito::CreateGroupResponse CreateGroup(const Dto::Cognito::CreateGroupRequest &request) const;
@@ -267,6 +269,7 @@ namespace AwsMock::Service {
          *
          * @par
          * AWS Cognito challenges page: https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-authentication-flow-methods.html#amazon-cognito-user-pools-authentication-flow-methods-password
+         *
          * @par
          * For USER_SRP see: https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol
          *
@@ -278,7 +281,7 @@ namespace AwsMock::Service {
         Dto::Cognito::InitiateAuthResponse InitiateAuth(Dto::Cognito::InitiateAuthRequest &request) const;
 
         /**
-         * @brief Respond to auth challenge
+         * @brief Respond to an auth challenge
          *
          * @par
          * Some API operations in a user pool generate a challenge, like a prompt for an MFA code, for device authentication that bypasses MFA, or for a custom authentication
@@ -293,12 +296,12 @@ namespace AwsMock::Service {
         Dto::Cognito::RespondToAuthChallengeResponse RespondToAuthChallenge(Dto::Cognito::RespondToAuthChallengeRequest &request) const;
 
         /**
-         * @brief Global sign out request
+         * @brief Global sign-out request
          *
          * @param request sign out request
          * @see GlobalSignOutRequest
          */
-        void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request);
+        static void GlobalSignOut(const Dto::Cognito::GlobalSignOutRequest &request);
 
         /**
          * @brief Create a new cognito user

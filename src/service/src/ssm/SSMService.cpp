@@ -16,7 +16,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::PutParameterResponse SSMService::PutParameter(const Dto::SSM::PutParameterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "put_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "put_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "put_parameter");
         log_trace << "Put parameter request: " << request.ToString();
 
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::ListParameterCountersResponse SSMService::CreateParameter(const Dto::SSM::CreateParameterCounterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "create_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "create_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "create_parameter");
         log_trace << "Create parameter request: " << request.ToString();
 
@@ -111,7 +111,7 @@ namespace AwsMock::Service {
 
 
     Dto::SSM::ListParameterCountersResponse SSMService::UpdateParameter(const Dto::SSM::UpdateParameterCounterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "update_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "update_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "update_parameter");
         log_trace << "Create parameter request: " << request.ToString();
 
@@ -157,7 +157,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::GetParameterResponse SSMService::GetParameter(const Dto::SSM::GetParameterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
         log_trace << "Get parameter request, name: " << request.name;
 
@@ -186,7 +186,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::GetParameterCounterResponse SSMService::GetParameterCounter(const Dto::SSM::GetParameterCounterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "get_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "get_parameter");
         log_trace << "Get parameter counter request: " << request.ToString();
 
@@ -217,7 +217,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::DescribeParametersResponse SSMService::DescribeParameters(const Dto::SSM::DescribeParametersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "describe_parameters");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "describe_parameters");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "describe_parameters");
         log_trace << "Describe parameters request: " << request.ToString();
 
@@ -235,7 +235,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::ListParameterCountersResponse SSMService::ListParameterCounters(const Dto::SSM::ListParameterCountersRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "list_parameter_counters");
         log_trace << "List parameter counters region: " << request.region << ", prefix: " << request.prefix;
 
@@ -266,7 +266,7 @@ namespace AwsMock::Service {
     }
 
     void SSMService::DeleteParameter(const Dto::SSM::DeleteParameterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 
@@ -289,7 +289,7 @@ namespace AwsMock::Service {
     }
 
     Dto::SSM::ListParameterCountersResponse SSMService::DeleteParameterCounter(const Dto::SSM::DeleteParameterCounterRequest &request) const {
-        Monitoring::MetricServiceTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
+        Monitoring::MonitoringTimer measure(SSM_SERVICE_TIMER, "action", "delete_parameter");
         Monitoring::MetricService::instance().IncrementCounter(SSM_SERVICE_TIMER, "action", "delete_parameter");
         log_trace << "Delete parameter request: " << request.ToString();
 

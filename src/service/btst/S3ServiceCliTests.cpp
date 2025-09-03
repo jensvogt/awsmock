@@ -36,9 +36,11 @@ namespace AwsMock::Service {
 
             // Cleanup
             // ReSharper disable once CppExpressionWithoutSideEffects
-            _database.DeleteAllObjects();
+            long deleted = _database.DeleteAllObjects();
+            log_debug << "Objects deleted, count: " << deleted;
             // ReSharper disable once CppExpressionWithoutSideEffects
-            _database.DeleteAllBuckets();
+            deleted = _database.DeleteAllBuckets();
+            log_debug << "Buckets deleted, count: " << deleted;
         }
 
         std::string _endpoint, _output, _region;
@@ -64,7 +66,7 @@ namespace AwsMock::Service {
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
 
         // act
-        std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "ls", "--endpoint", _endpoint});
+        const std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "ls", "--endpoint", _endpoint});
 
         // assert
         BOOST_CHECK_EQUAL(output2.empty(), false);
@@ -155,7 +157,7 @@ namespace AwsMock::Service {
 
         // arrange: CreateMultipartUpload
         Dto::S3::CreateMultipartUploadResult s3Result;
-        s3Result.FromJson(output2);
+        Dto::S3::CreateMultipartUploadResult::FromJson(output2);
 
         // act
         std::string filename = Core::FileUtils::CreateTempFile("json", 10 * 1024 * 1024);

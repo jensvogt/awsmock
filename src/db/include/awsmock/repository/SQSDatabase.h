@@ -25,7 +25,9 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/DatabaseException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/monitoring/SharedMemoryUtils.h>
+#include <awsmock/core/monitoring/MonitoringCollector.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/entity/sqs/Message.h>
 #include <awsmock/entity/sqs/MessageWaitTime.h>
 #include <awsmock/entity/sqs/Queue.h>
@@ -480,7 +482,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        auto DeleteMessages(const std::string &queueArn) const -> long;
+        [[nodiscard]] auto DeleteMessages(const std::string &queueArn) const -> long;
 
         /**
          * @brief Deletes a message.
@@ -489,7 +491,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        auto DeleteMessage(const Entity::SQS::Message &message) const -> long;
+        [[nodiscard]] auto DeleteMessage(const Entity::SQS::Message &message) const -> long;
 
         /**
          * @brief Deletes a message by its receipt handle.
@@ -498,7 +500,7 @@ namespace AwsMock::Database {
          * @return number of messages deleted
          * @throws Core::DatabaseException
          */
-        auto DeleteMessage(const std::string &receiptHandle) const -> long;
+        [[nodiscard]] auto DeleteMessage(const std::string &receiptHandle) const -> long;
 
         /**
          * @brief Deletes a resources.
@@ -506,15 +508,12 @@ namespace AwsMock::Database {
          * @return total number of messages deleted
          * @throws Core::DatabaseException
          */
-        auto DeleteAllMessages() const -> long;
-
+        [[nodiscard]] auto DeleteAllMessages() const -> long;
 
         /**
-         * @brief Initialize the counter-map.
-         *
-         * @brief queueArn ARN of the queue
+         * @brief Adjust all queue counters
          */
-        void InitializeCounters(const std::string &queueArn = {}) const;
+        void AdjustMessageCounters(const std::string &queueArn) const;
 
       private:
 
@@ -537,15 +536,6 @@ namespace AwsMock::Database {
          * SQS in-memory database
          */
         SQSMemoryDb &_memoryDb;
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        SqsCounterMapType *_sqsCounterMap;
     };
 
 }// namespace AwsMock::Database

@@ -7,13 +7,7 @@
 namespace AwsMock::Service {
 
     Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const {
-
-        Monitoring::MetricServiceTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function);
-        _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
-
-        // Initialize shared memory
-        auto _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        Database::LambdaCounterMapType *lambdaCounterMap = _segment.find<Database::LambdaCounterMapType>(Database::LAMBDA_COUNTER_MAP_NAME).first;
+        Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function);
 
         // Monitoring
         log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.hostPort;
@@ -49,8 +43,9 @@ namespace AwsMock::Service {
         lambdaResult.duration = runtime;
         _lambdaDatabase.CreateLambdaResult(lambdaResult);
 
-        (*lambdaCounterMap)[lambda.arn].invocations++;
-        (*lambdaCounterMap)[lambda.arn].averageRuntime += runtime;
+        // Set Counters
+        _monitoringCollector.SetGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, runtime);
+        _monitoringCollector.IncCountAbs(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
 
         log_debug << "Lambda invocation finished, lambda: " << lambda.function << " output: " << response.body;
         log_info << "Lambda invocation finished, lambda: " << lambda.function;
