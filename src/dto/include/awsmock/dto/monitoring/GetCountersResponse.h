@@ -22,6 +22,11 @@ namespace AwsMock::Dto::Monitoring {
     struct GetCountersResponse final : Common::BaseCounter<GetCountersResponse> {
 
         /**
+         * Name
+         */
+        std::string name;
+
+        /**
          * Counters
          */
         std::vector<Counter> counters;
@@ -36,7 +41,10 @@ namespace AwsMock::Dto::Monitoring {
                 v.emplace_back(c.performanceValue);
                 countersJson.emplace_back(v);
             }
-            jv = {{"counters", countersJson}};
+            jv = {
+                    {"name", obj.name},
+                    {"counters", countersJson},
+            };
         }
     };
 

@@ -2,33 +2,30 @@
 // Created by vogje01 on 04/01/2023.
 //
 
-#ifndef AWSMOCK_SERVICE_APPLICATION_HANDLER_H
-#define AWSMOCK_SERVICE_APPLICATION_HANDLER_H
+#ifndef AWSMOCK_SERVICE_API_GATEWAY_HANDLER_H
+#define AWSMOCK_SERVICE_API_GATEWAY_HANDLER_H
 
 // AwsMock includes
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
-#include <awsmock/dto/common/ApplicationClientCommand.h>
-#include <awsmock/service/apps/ApplicationService.h>
+#include <awsmock/dto/common/ApiGatewayClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
-
 
 namespace AwsMock::Service {
 
     /**
-     * @brief Application HTTP handler
+     * @brief API gateway HTTP handler
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    class ApplicationHandler final : public AbstractHandler {
+    class ApiGatewayHandler final : public AbstractHandler {
 
       public:
 
         /**
          * @brief Constructor
          */
-        explicit ApplicationHandler(boost::asio::io_context &ioc) : AbstractHandler("application-handler", ioc), _applicationService(ioc) {}
+        explicit ApiGatewayHandler(boost::asio::io_context &ioc) : AbstractHandler("api-gateway-handler", ioc), _apiGatewayService(ioc) {}
 
         /**
          * @brief HTTP POST request.
@@ -44,9 +41,9 @@ namespace AwsMock::Service {
       private:
 
         /**
-         * Application service
+         * API gateway service
          */
-        ApplicationService _applicationService;
+        ApiGatewayService _apiGatewayService;
     };
 
 }// namespace AwsMock::Service

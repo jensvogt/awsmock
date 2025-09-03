@@ -24,9 +24,10 @@ namespace AwsMock::Service {
         _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
         _applicationCounterMap = _segment.find<Database::ApplicationCounterMapType>(Database::APPLICATION_COUNTER_MAP_NAME).first;
 
-        // Start application monitoring update counters
+        // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod, _monitoringPeriod);
+        _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
 
         // Start backup
         if (_backupActive) {
@@ -37,7 +38,7 @@ namespace AwsMock::Service {
         StartApplicationLogServer();
 
         // Start the application
-        StartApplications();
+        //StartApplications();
 
         // Set running
         SetRunning();
@@ -125,6 +126,11 @@ namespace AwsMock::Service {
 
     void ApplicationServer::BackupApplication() {
         ModuleService::BackupModule("application", true);
+    }
+
+    void ApplicationServer::RestartApplications() const {
+        const long restarted = _applicationService.RestartAllApplications();
+        log_info << "Applications restarted, count: " << restarted;
     }
 
     void ApplicationServer::Shutdown() {

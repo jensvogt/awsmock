@@ -315,7 +315,7 @@ namespace AwsMock::Service {
                 application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
                 application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application = _database.UpdateApplication(application);
-                log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;
+                log_info << "Application started, name: " << request.application.name << ", publicPort: " << application.publicPort;
             } else {
                 log_error << "Could not get the status of the container, name: " << application.containerName;
             }

@@ -408,7 +408,7 @@ namespace AwsMock::Database {
         /**
          * @brief Adjust all topic counters
          */
-        void AdjustMessageCounters(const std::string &topicArn) const;
+        void AdjustMessageCounters() const;
 
       private:
 

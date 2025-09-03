@@ -48,13 +48,13 @@ namespace AwsMock::Service {
 
         log_trace << "SNS counter update starting";
 
+        // Reload the counters first
+        _snsDatabase.AdjustMessageCounters();
+
         long totalMessages = 0;
         long totalSize = 0;
-
         const Database::Entity::SNS::TopicList topicList = _snsDatabase.ListTopics();
         for (auto &topic: topicList) {
-
-            _snsDatabase.AdjustMessageCounters(topic.topicArn);
 
             _monitoringCollector.SetGauge(SNS_MESSAGE_BY_TOPIC_COUNT, "topic", topic.topicName, static_cast<double>(topic.messages));
             _monitoringCollector.SetGauge(SNS_TOPIC_SIZE, "topic", topic.topicName, static_cast<double>(topic.size));
