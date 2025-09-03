@@ -6,6 +6,8 @@
 
 namespace AwsMock::Service {
 
+    boost::mutex SQSService::_subscriptionMutex;
+
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
@@ -876,7 +878,7 @@ namespace AwsMock::Service {
 
         try {
             // Delete all resources in queue
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
+            _sqsDatabase.AdjustMessageCounters();
             log_debug << "Count messages, queueArn: " << request.queueArn;
 
         } catch (Core::DatabaseException &ex) {
@@ -890,10 +892,7 @@ namespace AwsMock::Service {
         log_trace << "Reload all counters";
 
         try {
-            std::vector<Database::Entity::SQS::Queue> queues = _sqsDatabase.ListQueues();
-            for (const auto &queue: queues) {
-                _sqsDatabase.AdjustMessageCounters(queue.queueArn);
-            }
+            _sqsDatabase.AdjustMessageCounters();
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -970,10 +969,6 @@ namespace AwsMock::Service {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
 
-            // Adjust counters
-            queue.attributes.approximateNumberOfMessages++;
-            queue.size += message.size;
-
             // Set parameters
             message.queueArn = queue.queueArn;
             message.queueName = queue.name;
@@ -989,7 +984,6 @@ namespace AwsMock::Service {
 
             // Update database
             message = _sqsDatabase.CreateMessage(message);
-            queue = _sqsDatabase.UpdateQueue(queue);
             log_debug << "Message send, queueName: " << queue.name;
 
             // Find Lambdas with this as an event source

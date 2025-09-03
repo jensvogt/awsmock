@@ -389,6 +389,8 @@ namespace AwsMock::Service {
          * Boost asio IO context
          */
         boost::asio::io_context &_ioc;
+
+        static boost::mutex _subscriptionMutex;
     };
 
 }// namespace AwsMock::Service

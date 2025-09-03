@@ -32,10 +32,10 @@ namespace AwsMock::Service {
     struct SQSServiceTest : TestBase {
 
         SQSServiceTest() {
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _database.DeleteAllQueues();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _database.DeleteAllMessages();
+            long deleted = _database.DeleteAllQueues();
+            log_debug << "Queues deleted: " << deleted << std::endl;
+            deleted = _database.DeleteAllMessages();
+            log_debug << "Messages deleted: " << deleted << std::endl;
         }
 
         boost::asio::io_context _ioContext;

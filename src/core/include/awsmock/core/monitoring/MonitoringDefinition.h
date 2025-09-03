@@ -116,6 +116,10 @@
 #define APPLICATION_CPU_USAGE "application_cpu_usage"
 #define APPLICATION_MEMORY_USAGE "application_mem_usage"
 
+// Api gateway
+#define API_GATEWAY_SERVICE_TIMER "api_gateway_service_timer"
+#define API_GATEWAY_SERVICE_COUNTER "api_gateway_service_counter"
+
 // Docker
 #define DOCKER_CONTAINER_COUNT "docker_container_counter"
 #define DOCKER_CPU_TOTAL "docker_cpu_total_counter"

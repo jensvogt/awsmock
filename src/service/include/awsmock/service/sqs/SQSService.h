@@ -504,6 +504,8 @@ namespace AwsMock::Service {
          * Lambda service
          */
         LambdaService _lambdaService;
+
+        static boost::mutex _subscriptionMutex;
     };
 }// namespace AwsMock::Service
 

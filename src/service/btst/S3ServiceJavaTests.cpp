@@ -41,10 +41,10 @@ namespace AwsMock::Service {
             _baseUrl = "/api/s3/";
 
             // Cleanup
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _s3Database.DeleteAllObjects();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _s3Database.DeleteAllBuckets();
+            long deleted = _s3Database.DeleteAllObjects();
+            log_debug << "Deleted objects: " << deleted << " objects";
+            deleted = _s3Database.DeleteAllBuckets();
+            log_debug << "Deleted buckets: " << deleted << " objects";
         }
 
         static Core::HttpSocketResponse SendGetCommand(const std::string &url, const std::string &payload) {
