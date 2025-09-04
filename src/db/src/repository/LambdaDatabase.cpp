@@ -351,6 +351,7 @@ namespace AwsMock::Database {
                 }
 
                 for (auto lambdaCursor = _lambdaCollection.find(query.extract()); auto lambda: lambdaCursor) {
+                    log_info << "Lambda found: " << bsoncxx::to_json(lambda);
                     Entity::Lambda::Lambda result;
                     result.FromDocument(lambda);
                     lambdas.push_back(result);

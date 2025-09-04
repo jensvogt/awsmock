@@ -193,7 +193,9 @@ namespace AwsMock::Database::Entity::Lambda {
         modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Environment
-        environment.FromDocument(mResult.value()["environment"].get_document().value);
+        if (mResult.value().find("environment") != mResult.value().end()) {
+            environment.FromDocument(mResult.value()["environment"].get_document().value);
+        }
 
         // Get tags
         if (mResult.value().find("tags") != mResult.value().end()) {
