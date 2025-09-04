@@ -269,7 +269,7 @@ namespace AwsMock::Service {
 
                 Dto::Lambda::UploadFunctionCodeRequest lambdaRequest = Dto::Lambda::UploadFunctionCodeRequest::FromJson(clientCommand);
                 log_info << "Starting upload function code, functionArn: " << lambdaRequest.functionArn;
-                boost::asio::post(_ioc, [this, lambdaRequest] { _lambdaService.UploadFunctionCode(lambdaRequest); });
+                _lambdaService.UploadFunctionCode(lambdaRequest);
                 return SendResponse(request, http::status::ok);
             }
 
