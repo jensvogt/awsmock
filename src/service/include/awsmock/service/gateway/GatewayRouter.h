@@ -9,6 +9,7 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/service/apigateway/ApiGatewayHandler.h>
 #include <awsmock/service/apps/ApplicationHandler.h>
 #include <awsmock/service/cognito/CognitoHandler.h>
 #include <awsmock/service/dynamodb/DynamoDbHandler.h>

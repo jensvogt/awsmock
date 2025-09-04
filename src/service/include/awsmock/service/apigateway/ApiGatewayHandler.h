@@ -9,6 +9,7 @@
 #include <awsmock/core/exception/BadRequestException.h>
 #include <awsmock/core/exception/NotFoundException.h>
 #include <awsmock/dto/common/ApiGatewayClientCommand.h>
+#include <awsmock/service/apigateway/ApiGatewayService.h>
 #include <awsmock/service/common/AbstractHandler.h>
 
 namespace AwsMock::Service {
