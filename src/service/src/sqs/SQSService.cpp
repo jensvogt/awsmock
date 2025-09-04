@@ -6,6 +6,8 @@
 
 namespace AwsMock::Service {
 
+    boost::mutex SQSService::_subscriptionMutex;
+
     Dto::SQS::CreateQueueResponse SQSService::CreateQueue(const Dto::SQS::CreateQueueRequest &request) const {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "create_queue");
         log_trace << "Create queue request, region: " << request.region << " name: " << request.queueName;
@@ -876,7 +878,7 @@ namespace AwsMock::Service {
 
         try {
             // Delete all resources in queue
-            _sqsDatabase.AdjustMessageCounters(request.queueArn);
+            _sqsDatabase.AdjustMessageCounters();
             log_debug << "Count messages, queueArn: " << request.queueArn;
 
         } catch (Core::DatabaseException &ex) {
@@ -890,10 +892,7 @@ namespace AwsMock::Service {
         log_trace << "Reload all counters";
 
         try {
-            std::vector<Database::Entity::SQS::Queue> queues = _sqsDatabase.ListQueues();
-            for (const auto &queue: queues) {
-                _sqsDatabase.AdjustMessageCounters(queue.queueArn);
-            }
+            _sqsDatabase.AdjustMessageCounters();
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
@@ -938,14 +937,18 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "send_message");
         log_trace << "Sending message request, queueUrl: " << request.queueUrl;
 
-        if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
-            log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+        // Queue URL contains the host name and is therefore not reliable
+        const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
+
+        if (!request.queueUrl.empty() && !_sqsDatabase.QueueArnExists(queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + queueArn);
         }
 
         try {
-            // Get queue by URL
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+
+            // Get queue by ARN
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
 
             // Entity
             Database::Entity::SQS::Message message = Dto::SQS::Mapper::map(request);
@@ -970,10 +973,6 @@ namespace AwsMock::Service {
                 message.reset = system_clock::now() + std::chrono::seconds(queue.attributes.visibilityTimeout);
             }
 
-            // Adjust counters
-            queue.attributes.approximateNumberOfMessages++;
-            queue.size += message.size;
-
             // Set parameters
             message.queueArn = queue.queueArn;
             message.queueName = queue.name;
@@ -989,7 +988,6 @@ namespace AwsMock::Service {
 
             // Update database
             message = _sqsDatabase.CreateMessage(message);
-            queue = _sqsDatabase.UpdateQueue(queue);
             log_debug << "Message send, queueName: " << queue.name;
 
             // Find Lambdas with this as an event source
@@ -1049,15 +1047,20 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "receive_messages");
         log_trace << "Receive message request: " << request.ToString();
 
+        // Queue URL contains the host name and is therefore not reliable
+        const std::string queueArn = Core::AwsUtils::ConvertSQSQueueUrlToArn(request.region, request.queueUrl);
+
         // Check input parameter
-        if (!request.queueUrl.empty() && !_sqsDatabase.QueueUrlExists(request.region, request.queueUrl)) {
-            log_error << "Queue does not exist, region: " << request.region << " queueUrl: " << request.queueUrl;
-            throw Core::ServiceException("Queue does not exist, region: " + request.region + " queueUrl: " + request.queueUrl);
+        if (!request.queueUrl.empty() && !_sqsDatabase.QueueArnExists(queueArn)) {
+            log_error << "Queue does not exist, queueArn: " << queueArn;
+            throw Core::ServiceException("Queue does not exist, queueArn: " + queueArn);
         }
 
         const long pollPeriod = Core::Configuration::instance().GetValue<long>("awsmock.modules.sqs.receive-poll");
         try {
-            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByUrl(request.region, request.queueUrl);
+
+            // Get the queue
+            Database::Entity::SQS::Queue queue = _sqsDatabase.GetQueueByArn(queueArn);
 
             // Check re-drive policy
             std::string dlQueueArn{};

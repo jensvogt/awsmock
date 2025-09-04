@@ -78,6 +78,10 @@ namespace AwsMock::Service {
         void DoAddApplication(const Database::Entity::Apps::Application &application) const;
 
         /**
+         * @brief Restart all application during startup.
+         */
+        void RestartApplications() const;
+        /**
          * @brief Metric service
          */
         Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();

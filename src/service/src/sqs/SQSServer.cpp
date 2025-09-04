@@ -78,7 +78,7 @@ namespace AwsMock::Service {
 
     void SQSServer::SetDlq() const {
         const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
-        log_trace << "SQS relocate messages starting, count: " << queueList.size();
+        log_trace << "SQS set DLQ task starting, count: " << queueList.size();
 
         if (queueList.empty()) {
             return;
@@ -124,14 +124,13 @@ namespace AwsMock::Service {
 
         log_trace << "SQS counter update starting";
 
+        // Reload the counters first
+        _sqsDatabase.AdjustMessageCounters();
+
         long totalMessages = 0;
         long totalSize = 0;
-
         const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues();
         for (auto &queue: queueList) {
-
-            _sqsDatabase.AdjustMessageCounters(queue.queueArn);
-
             _monitoringCollector.SetGauge(SQS_MESSAGE_BY_QUEUE_COUNT_TOTAL, "queue", queue.name, static_cast<double>(queue.attributes.approximateNumberOfMessages));
             _monitoringCollector.SetGauge(SQS_QUEUE_SIZE, "queue", queue.name, static_cast<double>(queue.size));
             totalMessages += queue.attributes.approximateNumberOfMessages;

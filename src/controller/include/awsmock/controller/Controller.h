@@ -66,36 +66,35 @@ namespace AwsMock::Controller {
     enum class CommandType {
         CONFIG,
         LOG_LEVEL,
-        LIST_APPLICATIONS,
-        ENABLE_APPLICATION,
-        DISABLE_APPLICATION,
-        START_APPLICATION,
-        RESTART_APPLICATION,
-        STOP_APPLICATION,
-        LIST_LAMBDAS,
-        ENABLE_LAMBDA,
-        DISABLE_LAMBDA,
-        START_LAMBDA,
-        RESTART_LAMBDA,
-        STOP_LAMBDA,
+        LIST,
+        ENABLE,
+        DISABLE,
+        START,
+        RESTART,
+        STOP,
+        IMPORT,
+        EXPORT,
+        CLEAN,
+        CLEAN_OBJECTS,
+        LOGS,
+        PING,
         UNKNOWN
     };
 
     static std::map<CommandType, std::string> CommandTypeNames{
             {CommandType::CONFIG, "config"},
             {CommandType::LOG_LEVEL, "log-level"},
-            {CommandType::LIST_APPLICATIONS, "list-applications"},
-            {CommandType::ENABLE_APPLICATION, "enable-application"},
-            {CommandType::DISABLE_APPLICATION, "disable-application"},
-            {CommandType::START_APPLICATION, "start-application"},
-            {CommandType::RESTART_APPLICATION, "restart-application"},
-            {CommandType::STOP_APPLICATION, "stop-application"},
-            {CommandType::ENABLE_LAMBDA, "enable-lambda"},
-            {CommandType::DISABLE_LAMBDA, "disable-lambda"},
-            {CommandType::LIST_LAMBDAS, "list-lambdas"},
-            {CommandType::START_LAMBDA, "start-lambda"},
-            {CommandType::RESTART_LAMBDA, "restart-lambda"},
-            {CommandType::STOP_LAMBDA, "stop-lambda"},
+            {CommandType::LIST, "list"},
+            {CommandType::ENABLE, "enable"},
+            {CommandType::DISABLE, "disable"},
+            {CommandType::START, "start"},
+            {CommandType::RESTART, "restart"},
+            {CommandType::STOP, "stop"},
+            {CommandType::IMPORT, "import"},
+            {CommandType::EXPORT, "export"},
+            {CommandType::CLEAN, "clean"},
+            {CommandType::CLEAN_OBJECTS, "clean-objects"},
+            {CommandType::PING, "ping"},
             {CommandType::UNKNOWN, "unknown"},
     };
 
@@ -330,28 +329,25 @@ namespace AwsMock::Controller {
          * @brief Get a list of applications
          *
          * @param commands command line arguments
-         * @param discards discard list
          * @return list of applications
          */
-        static std::vector<Dto::Apps::Application> GetApplicationFromCommands(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+        std::vector<Dto::Apps::Application> GetApplicationFromCommands(const std::vector<std::string> &commands);
 
         /**
          * @brief Get a list of lambdas
          *
          * @param commands command line arguments
-         * @param discards discard list
          * @return list of lambdas
          */
-        static std::vector<Dto::Lambda::Function> GetLambdasFromCommand(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+        std::vector<Dto::Lambda::Function> GetLambdasFromCommand(const std::vector<std::string> &commands);
 
         /**
          * @brief Get a list of modules
          *
          * @param commands command line arguments
-         * @param discards discard list
          * @return list of modules
          */
-        static std::vector<Dto::Module::Module> GetModulesFromCommand(const std::vector<std::string> &commands, const std::vector<std::string> &discards);
+        std::vector<Dto::Module::Module> GetModulesFromCommand(const std::vector<std::string> &commands);
 
         /**
          * @brief Get a list of all applications.
@@ -413,6 +409,16 @@ namespace AwsMock::Controller {
          * AWS region
          */
         std::string _region;
+
+        /**
+         * List of applications
+         */
+        std::vector<Dto::Apps::Application> _applications;
+
+        /**
+         * List of lamba functions
+         */
+        std::vector<Dto::Lambda::Function> _lambdas;
     };
 
 }// namespace AwsMock::Controller

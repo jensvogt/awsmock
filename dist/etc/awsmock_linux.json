@@ -282,9 +282,9 @@
       "prometheus": false,
       "internal": true,
       "port": 9091,
-      "system-period": 60,
       "retention": 3,
       "smooth": false,
+      "system-period": 60,
       "average-period": 300
     },
     "mongodb": {

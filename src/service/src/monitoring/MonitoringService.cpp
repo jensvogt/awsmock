@@ -11,6 +11,7 @@ namespace AwsMock::Service {
 
         try {
             Dto::Monitoring::GetCountersResponse response;
+            response.name = request.name;
 
             // Get counters from the database
             response.counters = Dto::Monitoring::Mapper::map(_database.GetMonitoringValues(request.name, request.start, request.end, request.step));

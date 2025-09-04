@@ -14,6 +14,7 @@
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
+#include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
 

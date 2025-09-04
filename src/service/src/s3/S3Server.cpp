@@ -82,10 +82,10 @@ namespace AwsMock::Service {
         long totalKeys = 0;
         long totalSize = 0;
 
+        _s3Database.AdjustObjectCounters();
+
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         for (const auto &bucket: buckets) {
-
-            _s3Database.AdjustObjectCounters(bucket.arn);
 
             _monitoringCollector.SetGauge(S3_OBJECT_BY_BUCKET_COUNT, "bucket", bucket.name, static_cast<double>(bucket.keys));
             _monitoringCollector.SetGauge(S3_SIZE_BY_BUCKET_COUNT, "bucket", bucket.name, static_cast<double>(bucket.size));

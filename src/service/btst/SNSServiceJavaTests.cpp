@@ -43,14 +43,14 @@ namespace AwsMock::Service {
             _sqsBaseUrl = "/api/sqs/";
 
             // Cleanup
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _snsDatabase.DeleteAllMessages();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _snsDatabase.DeleteAllTopics();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllMessages();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllQueues();
+            long deleted = _snsDatabase.DeleteAllMessages();
+            log_debug << "SNS messages deleted, count: " << deleted;
+            deleted = _snsDatabase.DeleteAllTopics();
+            log_debug << "SNS topics deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllMessages();
+            log_debug << "SQS messages deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllQueues();
+            log_debug << "SQS queues deleted, count: " << deleted;
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {

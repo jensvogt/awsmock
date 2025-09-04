@@ -9,12 +9,6 @@
 #include <string>
 #include <vector>
 
-// Boost includes
-#include <boost/container/map.hpp>
-#include <boost/container/string.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
-
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
@@ -28,26 +22,6 @@
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
-
-    struct LambdaMonitoringCounter {
-        long instances{};
-        long invocations{};
-        long averageRuntime{};
-        system_clock::time_point modified = system_clock::now();
-    };
-
-    using LambdaShmAllocator = boost::interprocess::allocator<std::pair<const std::string, LambdaMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using LambdaCounterMapType = boost::container::map<std::string, LambdaMonitoringCounter, std::less<std::string>, LambdaShmAllocator>;
-
-    static constexpr auto LAMBDA_COUNTER_MAP_NAME = "LambdaCounter";
-
-    struct LambdaInstanceCounter {
-        std::string containerId;
-        boost::beast::http::status status;
-        std::string resultString;
-    };
-    using LambdaInstanceType = boost::container::map<std::string, LambdaInstanceCounter, std::less<std::string>, LambdaShmAllocator>;
-
 
     /**
      * Lambda MongoDB database.
@@ -80,7 +54,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const;
+        [[nodiscard]] bool LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const;
 
         /**
          * Check the existence of lambda
@@ -89,7 +63,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const Entity::Lambda::Lambda &lambda) const;
+        [[nodiscard]] bool LambdaExists(const Entity::Lambda::Lambda &lambda) const;
 
         /**
          * @brief Check the existence of lambda
@@ -98,7 +72,7 @@ namespace AwsMock::Database {
          * @return true if lambda already exists
          * @throws DatabaseException
          */
-        bool LambdaExists(const std::string &functionName) const;
+        [[nodiscard]] bool LambdaExists(const std::string &functionName) const;
 
         /**
          * @brief Check the existence of lambda
@@ -156,7 +130,7 @@ namespace AwsMock::Database {
          * @return lambda entity
          * @throws DatabaseException
          */
-        Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid) const;
+        [[nodiscard]] Entity::Lambda::Lambda GetLambdaById(bsoncxx::oid oid) const;
 
         /**
          * @brief Returns a lambda entity by primary key
@@ -307,14 +281,14 @@ namespace AwsMock::Database {
          * @param lambdaArn lambda function ARN
          * @return number of results deleted
          */
-        long DeleteResultsCounters(const std::string &lambdaArn) const;
+        [[nodiscard]] long DeleteResultsCounters(const std::string &lambdaArn) const;
 
         /**
          * @brief Deletes all lambda result counters
          *
          * @return number of results deleted
          */
-        long DeleteAllResultsCounters() const;
+        [[nodiscard]] long DeleteAllResultsCounters() const;
 
         /**
          * @brief Deletes an existing lambda function
@@ -330,7 +304,7 @@ namespace AwsMock::Database {
          * @return number of lambda objects deleted
          * @throws DatabaseException
          */
-        long DeleteAllLambdas() const;
+        [[nodiscard]] long DeleteAllLambdas() const;
 
       private:
 
@@ -353,16 +327,6 @@ namespace AwsMock::Database {
          * Lambda in-memory database
          */
         LambdaMemoryDb &_memoryDb;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        LambdaCounterMapType *_lambdaCounterMap;
     };
 
 }// namespace AwsMock::Database

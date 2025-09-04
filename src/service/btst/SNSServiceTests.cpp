@@ -31,14 +31,14 @@ namespace AwsMock::Service {
       protected:
 
         SNSServiceTest() {
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _snsDatabase.DeleteAllMessages();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _snsDatabase.DeleteAllTopics();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllMessages();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllQueues();
+            long deleted = _snsDatabase.DeleteAllMessages();
+            log_debug << "Deleted SNS messages, count: " << deleted;
+            deleted = _snsDatabase.DeleteAllTopics();
+            log_debug << "Deleted SNS topics, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllMessages();
+            log_debug << "Deleted SQS messages, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllQueues();
+            log_debug << "Deleted SQS queues, count: " << deleted;
         }
 
         boost::asio::io_context _ioContext;

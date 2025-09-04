@@ -1060,7 +1060,7 @@ namespace AwsMock::Database {
         return UpdateBucket(internBucket);
     }
 
-    void S3Database::AdjustObjectCounters(const std::string &bucketArn) const {
+    void S3Database::AdjustObjectCounters() const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "adjust_object_counter");
 
         if (HasDatabase()) {
@@ -1072,50 +1072,24 @@ namespace AwsMock::Database {
 
             try {
                 mongocxx::pipeline p{};
-                document facetDocument;
-
-                array keyArray;
-                keyArray.append(make_document(kvp("$count", "keys")));
-                facetDocument.append(kvp("keys", keyArray));
-
-                array sizeFacet;
-                sizeFacet.append(make_document(kvp("$match", make_document(kvp("size", make_document(kvp("$gte", 0)))))));
-
-                // Extract well-named pieces for readability
-                sizeFacet.append(make_document(
-                        kvp("$group",
-                            make_document(
-                                    kvp("_id", bsoncxx::types::b_null()),
-                                    kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0))))))))));
-                facetDocument.append(kvp("size", sizeFacet));
+                p.group(make_document(
+                        kvp("_id", "$bucketArn"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("keys", make_document(kvp("$sum", 1)))));
 
                 document projectDocument;
-                projectDocument.append(kvp("bucketName", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$bucketName.bucketName", 0)))));
-                projectDocument.append(kvp("keys", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$keys.keys", 0)))));
-                projectDocument.append(kvp("size", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$size.size", 0)))));
-
-                p.match(make_document(kvp("bucketArn", bucketArn)));
-                p.facet(facetDocument.extract());
-                p.project(projectDocument.extract());
-
-                p.group(make_document(
-                        kvp("_id", "$attributes.bucketArn"),
-                        kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0)))))),
-                        kvp("keys", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$keys", 0))))))));
+                projectDocument.append(kvp("_id", 0),
+                                       kvp("bucketArn", "$_id"),
+                                       kvp("size", 1),
+                                       kvp("keys", 1));
 
                 session.start_transaction();
-                auto totalSizeCursor = objectCollection.aggregate(p);
-                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    bucketCollection.update_one(make_document(kvp("bucketArn", bucketArn)),
+                for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
+                    bucketCollection.update_one(make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
                                                 make_document(kvp("$set", make_document(
-                                                                                  kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
-                                                                                  kvp("keys", Core::Bson::BsonUtils::GetLongValue(t, "initial"))))));
-                    log_debug << bucketArn << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " keys: " << Core::Bson::BsonUtils::GetLongValue(t, "keys");
-                } else {
-                    bucketCollection.update_one(make_document(kvp("bucketArn", bucketArn)),
-                                                make_document(kvp("$set", make_document(
-                                                                                  kvp("size", 0),
-                                                                                  kvp("keys", 0)))));
+                                                                                  kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                  kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys")))))));
+                    log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " keys: " << Core::Bson::BsonUtils::GetLongValue(t, "keys");
                 }
                 session.commit_transaction();
 

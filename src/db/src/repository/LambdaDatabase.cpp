@@ -6,24 +6,7 @@
 
 namespace AwsMock::Database {
 
-    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {
-
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _lambdaCounterMap = _segment.find<LambdaCounterMapType>(LAMBDA_COUNTER_MAP_NAME).first;
-        if (!_lambdaCounterMap) {
-            _lambdaCounterMap = _segment.construct<LambdaCounterMapType>(LAMBDA_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
-        }
-
-        // Initialize the counters
-        for (const auto &lambda: ListLambdas()) {
-            LambdaMonitoringCounter counter;
-            counter.instances = static_cast<long>(lambda.instances.size());
-            counter.invocations = lambda.invocations;
-            counter.averageRuntime = lambda.averageRuntime;
-            _lambdaCounterMap->insert_or_assign(lambda.arn, counter);
-        }
-        log_debug << "Lambda counters initialized" << _lambdaCounterMap->size();
-    }
+    LambdaDatabase::LambdaDatabase() : _databaseName(GetDatabaseName()), _lambdaCollectionName("lambda"), _lambdaResultCollectionName("lambda_result"), _memoryDb(LambdaMemoryDb::instance()) {}
 
     bool LambdaDatabase::LambdaExists(const std::string &region, const std::string &function, const std::string &runtime) const {
 
@@ -139,10 +122,6 @@ namespace AwsMock::Database {
 
             lambda = _memoryDb.CreateLambda(lambda);
         }
-
-        // Update counters
-        _lambdaCounterMap->insert_or_assign(lambda.arn, LambdaMonitoringCounter{.instances = 0, .invocations = 0, .averageRuntime = 0});
-
         return lambda;
     }
 

@@ -18,21 +18,21 @@ awsmockctl [OPTIONS] [COMMAND]
 
 ## DESCRIPTION
 
-awsmockctl controls and show some insides of the AwsMock AWS cloud simulation. Supported AWS modules are: SQS, SNS
+awsmockctl controls and shows some insides of the AwsMock AWS cloud simulation. Supported AWS modules are: SQS, SNS
 S3, Cognito, TransferServer, Lambda. AwsMock is written in C++ and has a module structure, using different modules for
 each AWS service plus a API gateway, which routes the requests to the different modules.
 
-Per default the gateway runs on port 4566, but can be changed in the configuration file. The default configuration file
+Per default, the gateway runs on port 4566 but can be changed in the configuration file. The default configuration file
 ```/etc/aws-mock.properties```, which can be changed on the command using the ```--config <config-file-path>``` option.
 
-awsmockctl provides a series of commands, which control the different modules. It allows to start/stop different modules
-as well as to show the current configuration.
+awsmockctl provides a series of commands which control the different modules. It allows to start/stop different modules
+as well as showing the current configuration.
 
 ## OPTIONS
 
 ```--include-objects```:  
 adds objects to the export. By default, only the infrastructure elements are export (SQS queues,
-SNS topic, S3 buckets etc.). Settings this option will export also all object (S3 objects, SQS messages, SNS messages,
+SNS topic, S3 buckets, etc.). Settings this option will export also all object (S3 objects, SQS messages, SNS messages,
 etc.). Exporting also the objects will result in a rather huge output file, depending on your objects in the different
 infrastructure elements.
 
@@ -58,54 +58,48 @@ shows the current version and exists.
 
 ## COMMANDS
 
-```list-applications```  
-lists the currently running AwsMock applications, the provided format is:
+```list [applications|lambdas|<application...>|<lambdas...>]```  
+lists the currently running AwsMock applications, lambdas, or both, the provided format is:
 
 ```
-application1           ENABLED RUNNING
-application2           DISABLED STOPPED
-...
+Applications:
+  application1           ENABLED RUNNING
+  application2           DISABLED STOPPED
+  ...
+Lambdas:
+  lambda1                ENABLED ACTIVE
+  lambda2                DISABLED INACTIVE
+  ...
 ```
 
-```enable-applications [<application1 application2]```  
-enables the given applications. If no application is given, all applications will be enabled. Spaces should  
-separate the different applications. If the application is not running, it will be started.
+Without arguments, all applications and lambdas will be listed. With the ```applications``` argument only the
+applications will be listed. With the ```lambdas``` argument only the lambdas will be listed. Additionally, you can
+provide a list of applications and/or lambdas to list only these elements. Separate list elements by spaces.
 
-```disable-applications [<application1 application2]```  
-disabled the given applications. If no application is given, all applications will be disabled. Spaces should  
-separate the different applications. If the application is not running, it will be started.
+```enable [applications|lambdas|<application...>|<lambdas...>]```  
+enables the given applications, lambdas, or both. With the ```applications``` argument only the
+applications will be listed. With the ```lambdas``` argument only the lambdas will be listed. Additionally, you can
+provide a list of applications and/or lambdas to enable only these elements. Separate list elements by spaces.
 
-```start-applications [<application1 application2]```  
-starts the given applications. If no application is given, all applications will be started. Spaces should  
-separate the different applications.
+```disable [applications|lambdas|<application...>|<lambdas...>]```  
+disabled the given applications, lambdas, or both. With the ```applications``` argument only the
+applications will be listed. With the ```lambdas``` argument only the lambdas will be listed. Additionally, you can
+provide a list of applications and/or lambdas to disable only these elements. Separate list elements by spaces
 
-```stop-applications [<application1 application2]```  
-stops the given applications. If no application is given, all applications will be stopped. Spaces should  
-separate the different applications.
+```start [applications|lambdas|<application...>|<lambdas...>]```  
+starts the given applications, lambdas, or both. With the ```applications``` argument only the
+applications will be listed. With the ```lambdas``` argument only the lambdas will be listed. Additionally, you can
+provide a list of applications and/or lambdas to start only these elements. Separate list elements by spaces
 
-```restart-applications [<application1 application2]```  
-restarts the given applications. If no application is given, all applications will be restarted. Spaces should  
-separate the different applications.
+```stop [applications|lambdas|<application...>|<lambdas...>]```  
+stops the given applications, lambdas, or both. With the ```applications``` argument only the
+applications will be listed. With the ```lambdas``` argument only the lambdas will be listed. Additionally, you can
+provide a list of applications and/or lambdas to stop only these elements. Separate list elements by spaces
 
-```enable-lambdas [<lambda1 lambda2]```  
-enables the given lambdas. If no lambda is given, all lambdas will be enabled. Spaces should  
-separate the different lambdas. If the lambda is not running, it will be started.
-
-```disable-lambdas [<lambda1 lambda2]```  
-disabled the given lambdas. If no lambda is given, all lambdas will be disabled. Spaces should  
-separate the different lambdas. If the lambda is not running, it will be started.
-
-```start-lambdas [<lambda1 lambda2]```  
-starts the given lambdas. If no lambda is given, all lambdas will be started. Spaces should  
-separate the different lambdas.
-
-```stop-lambdas [<lambda1 lambda2]```  
-stops the given lambdas. If no lambda is given, all lambdas will be stopped. Spaces should  
-separate the different lambdas.
-
-```restart-lambdas [<lambda1 lambda2]```  
-restarts the given lambdas. If no lambda is given, all lambdas will be restarted. Spaces should  
-separate the different lambdas.
+```restart [applications|lambdas|<application...>|<lambdas...>]```  
+restarts the given applications, lambdas, or both. With the ```applications``` argument only the
+applications will be listed. With the ```lambdas``` argument only the lambdas will be listed. Additionally, you can
+provide a list of applications and/or lambdas to restart only these elements. Separate list elements by spaces
 
 ```logs```  
 shows the console logs of the AwsMock manager application ```awsmockmgr```.
@@ -136,17 +130,21 @@ objects will be emptied.
 To show the current running applications:
 
 ```
-/usr/bin/awsmockctl list-applications
-application1         ENABLED RUNNING
-application2         DISABLED STOPPED
+$$root:>> awsmockctl list
+Applications:
+  application1         ENABLED RUNNING
+  application2         DISABLED STOPPED
+Lambdas:
+  lambda1              ENABLED ACTIVE
+  lambda2              DISABLED INACTIVE
 ```
 
 Stop all applications:
 
 ```
-/usr/bin/awsmockctl stop-applications
-All application stopped
-/usr/bin/awsmockctl list-applications
+$$root:> awsmockctl stop applications
+All applications stopped
+$$root:> awsmockctl list
 application1         ENABLED STOPPED
 application2         DISABLED STOPPED
 ```
@@ -154,16 +152,39 @@ application2         DISABLED STOPPED
 Start all applications:
 
 ```
-/usr/bin/awsmockctl start-applications
-/usr/bin/awsmockctl list-applications
+$$root:> awsmockctl start
+All applications started
+$$root:> awsmockctl list
 application1         ENABLED RUNNING
 application2         ENABLED RUNNING
+```
+
+Stop some applications:
+
+```
+$$root:> awsmockctl stop application1 application2
+Application application1 stopped
+Application application2 stopped
+$$root:> awsmockctl list
+application1         ENABLED STOPPED
+application2         DISABLED STOPPED
+```
+
+Stop some lambdas:
+
+```
+$$root:> awsmockctl stop lambda1 lambda2
+Lambda lambda1 stopped
+Lambda lambda2 stopped
+$$root:> awsmockctl list
+application1         ENABLED STOPPED
+application2         DISABLED STOPPED
 ```
 
 Show the manager logs
 
 ```
-/usr/bin/awsmockctl logs
+$$root:> awsmockctl logs
 08-11-2023 20:02:58.800 [I] 125 S3ServiceHandler:57 - Requested multipart download range: 9667870720-9673113599
 10-11-2023 13:31:57.053 [T] 55 AbstractHandler:559 - Getting header values, name: RequestId
 10-11-2023 14:19:51.902 [T] 17 SNSServer:94 - Queue updated, nametextannotation-result-queue
@@ -175,26 +196,26 @@ Show the manager logs
 Export the S3 and SQS infrastructure:
 
 ```
-/usr/bin/awsmockctl export s3 sqs
+$$root:> awsmockctl export s3 sqs
 {
     "infrastructure": {
-     "s3-buckets": [
+      "s3-buckets": [
             {
                 "name": "transfer-server",
                 "notifications": [
                     {
                         "event": "s3:ObjectCreated:Put",
-                        "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:ftp-file-copy",
+                        "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:lambda1",
                         "notificationId": "1234567890123",
                         "queueArn": ""
                     },
                     ....
 ```
 
-Export the S3 infrastructure to a file ```infrastrcture.json```:
+Export the S3 and SQS infrastructure to a file ```infrastructure.json```:
 
 ```
-/usr/bin/awsmockctl export s3 sqs > infrastrcture.json
+$$root:> awsmockctl export s3 sqs > infrastructure.json
 ```
 
 ## AUTHOR

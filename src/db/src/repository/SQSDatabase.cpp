@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/repository/SQSDatabase.h>
+#include <boost/serialization/array_wrapper.hpp>
 
 namespace AwsMock::Database {
 
@@ -1353,8 +1354,10 @@ namespace AwsMock::Database {
         return deleted;
     }
 
-    void SQSDatabase::AdjustMessageCounters(const std::string &queueArn) const {
+    void SQSDatabase::AdjustMessageCounters() const {
         Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "adjust_message_counter");
+
+        using bsoncxx::builder::basic::make_array;
 
         if (HasDatabase()) {
 
@@ -1365,68 +1368,35 @@ namespace AwsMock::Database {
 
             try {
                 mongocxx::pipeline p{};
-                document facetDocument;
-
-                array initialArray;
-                initialArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INITIAL")))))));
-                initialArray.append(make_document(kvp("$count", "initial")));
-                facetDocument.append(kvp("initial", initialArray));
-
-                array invisibleArray;
-                invisibleArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "INVISIBLE")))))));
-                invisibleArray.append(make_document(kvp("$count", "invisible")));
-                facetDocument.append(kvp("invisible", invisibleArray));
-
-                array delayedArray;
-                delayedArray.append(make_document(kvp("$match", make_document(kvp("status", make_document(kvp("$eq", "DELAYED")))))));
-                delayedArray.append(make_document(kvp("$count", "delayed")));
-                facetDocument.append(kvp("delayed", delayedArray));
-                array sizeFacet;
-                sizeFacet.append(make_document(kvp("$match", make_document(kvp("size", make_document(kvp("$gte", 0)))))));
-
-                // Extract well-named pieces for readability
-                sizeFacet.append(make_document(
-                        kvp("$group",
-                            make_document(
-                                    kvp("_id", bsoncxx::types::b_null()),
-                                    kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0))))))))));
-                facetDocument.append(kvp("size", sizeFacet));
+                p.group(make_document(
+                        kvp("_id", "$queueArn"),
+                        kvp("size", make_document(kvp("$sum", "$size"))),
+                        kvp("total", make_document(kvp("$sum", 1))),
+                        kvp("initial", make_document(kvp("$sum",
+                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INITIAL)))), 1, 0)))))),
+                        kvp("invisible", make_document(kvp("$sum",
+                                                           make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::INVISIBLE)))), 1, 0)))))),
+                        kvp("delayed", make_document(kvp("$sum",
+                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SQS::MessageStatus::DELAYED)))), 1, 0))))))));
 
                 document projectDocument;
-                projectDocument.append(kvp("queueArn", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$queueArn.queueArn", 0)))));
-                projectDocument.append(kvp("initial", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$initial.initial", 0)))));
-                projectDocument.append(kvp("invisible", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$invisible.invisible", 0)))));
-                projectDocument.append(kvp("delayed", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$delayed.delayed", 0)))));
-                projectDocument.append(kvp("size", make_document(kvp("$arrayElemAt", bsoncxx::builder::basic::make_array("$size.size", 0)))));
-
-                p.match(make_document(kvp("queueArn", queueArn)));
-                p.facet(facetDocument.extract());
-                p.project(projectDocument.extract());
-
-                p.group(make_document(
-                        kvp("_id", "$attributes.queueArn"),
-                        kvp("size", make_document(kvp("$sum", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$size", 0)))))),
-                        kvp("initial", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$initial", 0)))))),
-                        kvp("invisible", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$invisible", 0)))))),
-                        kvp("delayed", make_document(kvp("$first", make_document(kvp("$ifNull", bsoncxx::builder::basic::make_array("$delayed", 0))))))));
+                projectDocument.append(kvp("_id", 0),
+                                       kvp("queueArn", "$_id"),
+                                       kvp("total", 1),
+                                       kvp("initial", 1),
+                                       kvp("invisible", 1),
+                                       kvp("delayed", 1),
+                                       kvp("size", 1));
 
                 session.start_transaction();
-                auto totalSizeCursor = messageCollection.aggregate(p);
-                if (const auto t = *totalSizeCursor.begin(); !t.empty()) {
-                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
+                for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
+                    queueCollection.update_one(make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
-                                                                                 kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
-                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
-                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
-                    log_debug << queueArn << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
-                } else {
-                    queueCollection.update_one(make_document(kvp("queueArn", queueArn)),
-                                               make_document(kvp("$set", make_document(
-                                                                                 kvp("size", 0),
-                                                                                 kvp("attributes.approximateNumberOfMessages", 0),
-                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", 0),
-                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", 0)))));
+                                                                                 kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                 kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible")))))));
+                    log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();
 

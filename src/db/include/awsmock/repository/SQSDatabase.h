@@ -513,7 +513,7 @@ namespace AwsMock::Database {
         /**
          * @brief Adjust all queue counters
          */
-        void AdjustMessageCounters(const std::string &queueArn) const;
+        void AdjustMessageCounters() const;
 
       private:
 

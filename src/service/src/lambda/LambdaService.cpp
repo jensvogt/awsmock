@@ -680,6 +680,12 @@ namespace AwsMock::Service {
         Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
         log_debug << "Got lambda entity, name: " << lambda.function;
 
+        // Check status
+        if (!lambda.enabled) {
+            log_warning << "Lambda function is disabled, arn: " << lambdaArn;
+            throw Core::ServiceException("Lambda function is disabled, arn: " + lambdaArn);
+        }
+
         // Find an idle instance
         Database::Entity::Lambda::Instance instance;
         FindIdleInstance(lambda, instance);

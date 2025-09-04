@@ -40,6 +40,9 @@ namespace AwsMock::Service {
         if (routingKey == "application") {
             return std::make_shared<ApplicationHandler>(ioc);
         }
+        if (routingKey == "apigateway") {
+            return std::make_shared<ApiGatewayHandler>(ioc);
+        }
         if (routingKey == "monitoring") {
             return std::make_shared<MonitoringHandler>(ioc);
         }
