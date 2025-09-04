@@ -9,8 +9,9 @@ namespace AwsMock::Service {
                                                                                            _monitoringCollector(Core::MonitoringCollector::instance()) {
 
         const Core::Configuration &configuration = Core::Configuration::instance();
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
+        _region = configuration.GetValue<std::string>("awsmock.region");
         _lifetime = configuration.GetValue<int>("awsmock.modules.lambda.lifetime");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.counter-period");
         _logRetentionPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.lambda.log-retention-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.lambda.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.backup.cron");
@@ -18,13 +19,8 @@ namespace AwsMock::Service {
 
         // Directories
         _lambdaDir = configuration.GetValue<std::string>("awsmock.modules.lambda.data-dir");
-        log_debug << "Lambda directory: " << _lambdaDir;
-
-        // Create environment
-        _region = configuration.GetValue<std::string>("awsmock.region");
-
-        // Create lambda directory
         Core::DirUtils::EnsureDirectory(_lambdaDir);
+        log_debug << "Lambda directory: " << _lambdaDir;
 
         // Cleanup instances
         CleanupInstances();
@@ -52,7 +48,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("lambda-backup", [this] { this->BackupLambda(); }, _backupCron);
+            scheduler.AddTask("lambda-backup", [] { BackupLambda(); }, _backupCron);
         }
 
         // Set running
@@ -172,23 +168,14 @@ namespace AwsMock::Service {
 
         // Get the lambda list
         const Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas();
+        _monitoringCollector.SetGauge(LAMBDA_FUNCTION_COUNT, static_cast<double>(lambdas.size()));
+
         if (lambdas.empty()) {
             return;
         }
-        _monitoringCollector.SetGauge(LAMBDA_FUNCTION_COUNT, {}, {}, static_cast<double>(lambdas.size()));
 
         for (const auto &lambda: lambdas) {
-
-            double averageRuntime = 0.0;
-            /*
-            if ((*_lambdaCounterMap)[lambda.arn].invocations > 0) {
-                averageRuntime = (double) (*_lambdaCounterMap)[lambda.arn].averageRuntime / (double) (*_lambdaCounterMap)[lambda.arn].invocations;
-            }
-            _metricService.IncrementCounter(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function, (*_lambdaCounterMap)[lambda.arn].invocations);
-            _metricService.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
-            _metricService.SetGauge(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function, averageRuntime);
-            (*_lambdaCounterMap)[lambda.arn].invocations = 0;
-            (*_lambdaCounterMap)[lambda.arn].averageRuntime = 0.0;*/
+            _monitoringCollector.SetGauge(LAMBDA_INSTANCES_COUNT, "function_name", lambda.function, static_cast<double>(lambda.instances.size()));
         }
         log_trace << "Lambda monitoring finished";
     }
