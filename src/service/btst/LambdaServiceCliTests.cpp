@@ -47,14 +47,13 @@ namespace AwsMock::Service {
             // Cleanup
             try {
 
-                // Delete all S3 objects
-                // ReSharper disable once CppExpressionWithoutSideEffects
+                // Cleanup
                 long deleted = _s3Database.DeleteAllObjects();
                 log_debug << "Deleted queues, count: " << deleted;
-                // ReSharper disable once CppExpressionWithoutSideEffects
-                _s3Database.DeleteAllBuckets();
-                // ReSharper disable once CppExpressionWithoutSideEffects
-                _lambdaDatabase.DeleteAllLambdas();
+                deleted = _s3Database.DeleteAllBuckets();
+                log_debug << "Deleted queues, count: " << deleted;
+                deleted = _lambdaDatabase.DeleteAllLambdas();
+                log_debug << "Deleted queues, count: " << deleted;
 
             } catch (Core::ServiceException &ex) {
                 // Do nothing

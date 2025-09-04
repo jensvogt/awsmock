@@ -1060,7 +1060,7 @@ namespace AwsMock::Database {
         return UpdateBucket(internBucket);
     }
 
-    void S3Database::AdjustObjectCounters(const std::string &bucketArn) const {
+    void S3Database::AdjustObjectCounters() const {
         Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "adjust_object_counter");
 
         if (HasDatabase()) {
