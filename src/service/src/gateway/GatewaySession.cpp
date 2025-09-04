@@ -55,8 +55,10 @@ namespace AwsMock::Service {
         // Read the header
         boost::beast::error_code ev;
         read_header(_stream, _buffer, *_parser, ev);
-        if (ec)
+        if (ec) {
+            log_error << "Read header failed, error: " << ec.message();
             return;
+        }
 
         // Handle 100-continue requests
         if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
