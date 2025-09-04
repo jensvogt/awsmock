@@ -204,7 +204,7 @@ namespace AwsMock::Monitoring {
         if (res != KERN_SUCCESS) {
             return;
         }
-        Core::SharedMemoryUtils::instance().SetGauge(TOTAL_THREADS, {}, {}, numberOfThreads);
+        Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, static_cast<double>(numberOfThreads));
         log_trace << "Total Threads: " << numberOfThreads;
     }
 
@@ -222,19 +222,19 @@ namespace AwsMock::Monitoring {
             // User CPU
             long micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec;
             double percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
-            Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
+            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", percent);
             log_trace << "User CPU: " << percent;
 
             // System CPU
             micros = r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
-            Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
+            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", percent);
             log_trace << "System CPU: " << percent;
 
             // Total CPU
             micros = r_usage.ru_utime.tv_sec * TO_MICROS + r_usage.ru_utime.tv_usec + r_usage.ru_stime.tv_sec * TO_MICROS + r_usage.ru_stime.tv_usec;
             percent = static_cast<double>(micros) / static_cast<double>(diff) * 100;
-            Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
+            Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", percent);
             log_trace << "Total CPU: " << percent;
         }
     }
@@ -256,7 +256,7 @@ namespace AwsMock::Monitoring {
         const unsigned long long totalTicksSinceLastTime = totalTicks - _previousTotalTicks;
         const unsigned long long idleTicksSinceLastTime = idleTicks - _previousIdleTicks;
         const float totalPercent = 1.0f - (totalTicksSinceLastTime > 0 ? static_cast<float>(idleTicksSinceLastTime) / static_cast<float>(totalTicksSinceLastTime) : 0);
-        Core::SharedMemoryUtils::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", totalPercent);
         _previousTotalTicks = totalTicks;
         _previousIdleTicks = idleTicks;
     }
@@ -271,8 +271,8 @@ namespace AwsMock::Monitoring {
             return;
         }
 
-        Core::SharedMemoryUtils::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
-        Core::SharedMemoryUtils::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(t_info.resident_size));
+        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(t_info.virtual_size));
+        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(t_info.resident_size));
         log_trace << "Virtual memory, virtual: " << t_info.virtual_size << " real: " << t_info.resident_size;
     }
 

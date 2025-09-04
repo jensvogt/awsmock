@@ -11,7 +11,7 @@
     "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\",
     "temp-dir": "C:\\Program Files (x86)\\awsmock\\tmp\\",
     "backup-dir": "C:\\Program Files (x86)\\awsmock\\data\\backup",
-    "shm-size": 65536,
+    "shm-size": 1048576,
     "json": {
       "pretty": false
     },
@@ -278,9 +278,9 @@
       "prometheus": false,
       "internal": true,
       "port": 9091,
-      "system-period": 60,
       "retention": 3,
       "smooth": false,
+      "system-period": 60,
       "average-period": 300
     },
     "mongodb": {
