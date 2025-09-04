@@ -1392,10 +1392,10 @@ namespace AwsMock::Database {
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     queueCollection.update_one(make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
-                                                                                 kvp("attributes.approximateNumberOfMessages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
-                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", Core::Bson::BsonUtils::GetLongValue(t, "delayed")),
-                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))));
+                                                                                 kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                 kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible")))))));
                     log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();

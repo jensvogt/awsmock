@@ -77,9 +77,6 @@ namespace AwsMock::Core {
 
       public:
 
-        //using ShmAllocator = boost::interprocess::allocator<std::pair<const std::string, MonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-        //using CounterMapType = boost::container::map<std::string, MonitoringCounter, std::less<std::string>, ShmAllocator>;
-
         /**
          * @brief Constructor
          *

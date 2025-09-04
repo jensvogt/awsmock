@@ -1087,8 +1087,8 @@ namespace AwsMock::Database {
                 for (auto cursor = objectCollection.aggregate(p); const auto t: cursor) {
                     bucketCollection.update_one(make_document(kvp("arn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
                                                 make_document(kvp("$set", make_document(
-                                                                                  kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
-                                                                                  kvp("keys", Core::Bson::BsonUtils::GetLongValue(t, "keys"))))));
+                                                                                  kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                  kvp("keys", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "keys")))))));
                     log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " keys: " << Core::Bson::BsonUtils::GetLongValue(t, "keys");
                 }
                 session.commit_transaction();

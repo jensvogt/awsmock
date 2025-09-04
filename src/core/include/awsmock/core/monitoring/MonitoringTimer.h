@@ -80,10 +80,10 @@ namespace AwsMock::Monitoring {
                 _shmUtils.IncCountPerSec(_counterName, _labelName, _labelValue, 1.0);
             }
             if (_labelName.empty()) {
-                _shmUtils.SetGauge(_timerName, {}, {}, TIME_DIFF);
+                _shmUtils.SetGauge(_timerName, static_cast<double>(TIME_DIFF));
                 log_trace << "Timer deleted, name: " << _timerName;
             } else {
-                _shmUtils.SetGauge(_timerName, _labelName, _labelValue, TIME_DIFF);
+                _shmUtils.SetGauge(_timerName, _labelName, _labelValue, static_cast<double>(TIME_DIFF));
                 log_trace << "Timer deleted, name: " << _timerName << " labelName: " << _labelName << " labelValue: " << _labelValue;
             }
         }
