@@ -33,7 +33,7 @@ namespace AwsMock::Core {
 
         if (ShmString k(GetId(name, labelName, labelValue).c_str(), char_alloc); _counterMap->find(k) == _counterMap->end()) {
             MonitoringCounter v(char_alloc);
-            v.name = ShmString(name, char_alloc);
+            v.name = ShmString(name.c_str(), char_alloc);
             v.labelName = ShmString(labelName.c_str(), char_alloc);
             v.labelValue = ShmString(labelValue.c_str(), char_alloc);
             v.type = GAUGE;
