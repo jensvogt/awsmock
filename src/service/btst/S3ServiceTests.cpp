@@ -32,10 +32,10 @@ namespace AwsMock::Service {
             testFile = Core::FileUtils::CreateTempFile("/tmp", "json", 10);
 
             // Cleanup
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _database.DeleteAllObjects();
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _database.DeleteAllBuckets();
+            long deleted = _database.DeleteAllObjects();
+            log_debug << "Objects deleted, count: " << deleted;
+            deleted = _database.DeleteAllBuckets();
+            log_debug << "Buckets deleted, count: " << deleted;
             Core::FileUtils::DeleteFile(testFile);
         }
 

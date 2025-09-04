@@ -20,10 +20,9 @@ namespace AwsMock::Core {
             boost::interprocess::shared_memory_object::remove(MONITORING_SEGMENT_NAME);
             _segment = {boost::interprocess::create_only, MONITORING_SEGMENT_NAME, sharedMemorySize};
         }
-        MapAllocator map_alloc = _segment.get_segment_manager();
 
         // Construct the map in shared memory
-        _counterMap = _segment.construct<ShmMap>(MONITORING_MAP_NAME)(std::less<>(), map_alloc);
+        _counterMap = _segment.construct<ShmMap>(MONITORING_MAP_NAME)(std::less<>(), _segment.get_segment_manager());
         log_debug << "Counter map initialized, name: " << std::string(MONITORING_MAP_NAME);
     }
 

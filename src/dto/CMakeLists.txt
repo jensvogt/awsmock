@@ -30,6 +30,7 @@ set(DYNAMODB_SOURCES src/dynamodb/mapper/Mapper.cpp)
 set(SECRETSMANAGER_SOURCES src/secretsmanager/mapper/Mapper.cpp)
 set(SSM_SOURCES src/ssm/mapper/Mapper.cpp)
 set(APPS_SOURCES src/apps/mapper/Mapper.cpp)
+set(API_GATEWAY_SOURCES src/apigateway/mapper/Mapper.cpp)
 set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cpp src/module/mapper/Mapper.cpp
         src/module/ExportInfrastructureResponse.cpp
         src/module/CleanInfrastructureRequest.cpp src/module/ListModuleNamesResponse.cpp
@@ -38,7 +39,7 @@ set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
         ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
-        ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${MONITORING_SOURCES})
+        ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory
 if (NOT WIN32)

@@ -457,7 +457,7 @@ namespace AwsMock::Database {
         /**
          * @brief Adjust all object counters
          */
-        void AdjustObjectCounters(const std::string &bucketArn) const;
+        void AdjustObjectCounters() const;
 
       private:
 

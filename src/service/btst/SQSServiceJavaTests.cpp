@@ -91,11 +91,10 @@ namespace AwsMock::Service {
         }
 
         ~SQSServiceJavaTest() {
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllMessages();
-
-            // ReSharper disable once CppExpressionWithoutSideEffects
-            _sqsDatabase.DeleteAllQueues();
+            long deleted = _sqsDatabase.DeleteAllMessages();
+            log_debug << "Messages deleted, count: " << deleted;
+            deleted = _sqsDatabase.DeleteAllQueues();
+            log_debug << "Queues deleted, count: " << deleted;
         }
 
         static Core::HttpSocketResponse SendPostCommand(const std::string &url, const std::string &payload) {

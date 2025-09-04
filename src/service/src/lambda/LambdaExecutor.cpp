@@ -7,11 +7,8 @@
 namespace AwsMock::Service {
 
     Database::Entity::Lambda::LambdaResult LambdaExecutor::Invocation(Database::Entity::Lambda::Lambda &lambda, Database::Entity::Lambda::Instance &instance, std::string &payload) const {
-        Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, "function_name", lambda.function);
-
-        // Monitoring
+        Monitoring::MonitoringTimer measure(LAMBDA_INVOCATION_TIMER, LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
         log_debug << "Sending lambda invocation request, function: " << lambda.function << " endpoint: " << instance.hostName << ":" << instance.hostPort;
-        log_trace << "Sending lambda invocation request, payload: " << payload;
 
         // Send request to lambda docker container
         const system_clock::time_point start = system_clock::now();
@@ -45,7 +42,6 @@ namespace AwsMock::Service {
 
         // Set Counters
         _monitoringCollector.SetGauge(LAMBDA_RUNTIME_TIMER, "function_name", lambda.function, runtime);
-        _monitoringCollector.IncCountAbs(LAMBDA_INVOCATION_COUNT, "function_name", lambda.function);
 
         log_debug << "Lambda invocation finished, lambda: " << lambda.function << " output: " << response.body;
         log_info << "Lambda invocation finished, lambda: " << lambda.function;

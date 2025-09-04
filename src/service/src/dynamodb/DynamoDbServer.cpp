@@ -2,11 +2,6 @@
 // Created by vogje01 on 20/12/2023.
 //
 
-#include "awsmock/core/BackupUtils.h"
-#include "awsmock/dto/module/ExportInfrastructureRequest.h"
-#include "awsmock/service/module/ModuleService.h"
-
-
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
 
 namespace AwsMock::Service {
@@ -34,10 +29,6 @@ namespace AwsMock::Service {
             return;
         }
         log_info << "DynamoDb server starting";
-
-        // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _dynamoDbCounterMap = _segment.find<Database::DynamoDbCounterMapType>(Database::DYNAMODB_COUNTER_MAP_NAME).first;
 
         // Create a local network if it is not existing yet
         CreateLocalNetwork();
@@ -89,9 +80,7 @@ namespace AwsMock::Service {
         // Check container image
         if (!_containerService.ContainerExistsByImageName(_imageName, _imageTag)) {
             const Dto::Docker::CreateContainerResponse response = _containerService.CreateContainer(_imageName, _imageTag, _containerName, _containerPort, _containerPort);
-            _containerService.StartDockerContainer(response.id, _containerName);
-            _containerService.WaitForContainer(response.id);
-            log_trace << "CreateContainer, containerName: " << _containerName << " id: " << response.id;
+            log_info << "Docker container created, name: " << _containerName << " id: " << response.id;
         }
 
         // Start the docker container, in case it is not already running.
@@ -119,7 +108,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Container does not exist");
         }
 
-        // Stop docker container, in case it is running.
+        // Stop the docker container, in case it is running.
         if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(_imageName, _imageTag);
             container.state == "running") {
             _containerService.StopContainer(container);
@@ -182,7 +171,7 @@ namespace AwsMock::Service {
 
                     Database::Entity::DynamoDb::Table table = _dynamoDbDatabase.GetTableByRegionName(_region, tableName);
 
-                    long size = 0;
+                    const long size = 0;
                     Dto::DynamoDb::ScanRequest scanRequest;
                     scanRequest.region = _region;
                     scanRequest.tableName = tableName;
@@ -231,22 +220,26 @@ namespace AwsMock::Service {
     void DynamoDbServer::UpdateCounter() const {
         log_trace << "Dynamodb monitoring starting";
 
-        if (_dynamoDbCounterMap) {
-            long totalItems = 0;
-            long totalSize = 0;
-            for (auto const &[key, val]: *_dynamoDbCounterMap) {
-
-                _metricService.SetGauge(DYNAMODB_ITEMS_BY_TABLE, "table", key, static_cast<double>(val.items));
-                _metricService.SetGauge(DYNAMODB_SIZE_BY_TABLE, "table", key, static_cast<double>(val.size));
-
-                totalItems += val.items;
-                totalSize += val.size;
-                _dynamoDbDatabase.UpdateTableCounter(key, val.items, val.size);
-            }
-            _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(_dynamoDbCounterMap->size()));
-            _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(totalItems));
+        std::vector<Database::Entity::DynamoDb::Table> tables = _dynamoDbDatabase.ListTables();
+        if (tables.empty()) {
+            return;
         }
-        log_trace << "DynamoDb monitoring finished, freeShmSize: " << _segment.get_free_memory();
+
+        long totalItems = 0;
+        long totalSize = 0;
+        for (auto const &table: tables) {
+
+            totalItems += table.itemCount;
+            totalSize += table.size;
+
+            _metricService.SetGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, static_cast<double>(table.itemCount));
+            _metricService.SetGauge(DYNAMODB_SIZE_BY_TABLE, "table", table.name, static_cast<double>(table.size));
+        }
+        _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables.size()));
+        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(totalItems));
+        _metricService.SetGauge(DYNAMODB_TABLE_SIZE, {}, {}, static_cast<double>(totalSize));
+
+        log_trace << "DynamoDb monitoring finished";
     }
 
     void DynamoDbServer::BackupDynamoDb() {

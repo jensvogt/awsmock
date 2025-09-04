@@ -962,10 +962,10 @@ namespace AwsMock::Database {
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     topicCollection.update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
                                                make_document(kvp("$set", make_document(
-                                                                                 kvp("size", Core::Bson::BsonUtils::GetLongValue(t, "size")),
-                                                                                 kvp("messages", Core::Bson::BsonUtils::GetLongValue(t, "initial")),
-                                                                                 kvp("messagesSend", Core::Bson::BsonUtils::GetLongValue(t, "send")),
-                                                                                 kvp("messagesResend", Core::Bson::BsonUtils::GetLongValue(t, "resend"))))));
+                                                                                 kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                 kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                                                 kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                                                                 kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend")))))));
                     log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();

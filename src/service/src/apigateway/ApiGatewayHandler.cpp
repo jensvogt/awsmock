@@ -12,8 +12,18 @@ namespace AwsMock::Service {
         Dto::Common::ApiGatewayClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
+        Core::HttpUtils::DumpRequest(request);
+
         try {
             switch (clientCommand.command) {
+
+                case Dto::Common::ApiGatewayCommandType::CREATE_API_KEY: {
+
+                    Dto::ApiGateway::CreateApiKeyRequest serviceRequest = Dto::ApiGateway::CreateApiKeyRequest::FromJson(clientCommand);
+                    const Dto::ApiGateway::CreateApiKeyResponse serviceResponse = _apiGatewayService.CreateApiKey(serviceRequest);
+                    log_info << "API key created, name: " << serviceRequest.name;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
 
                 default:
                     log_error << "Unknown action";

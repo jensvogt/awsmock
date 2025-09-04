@@ -37,6 +37,22 @@ namespace AwsMock::Database {
             return apiGatewayDatabase;
         }
 
+        /**
+         * @brief Initialize the database
+         *
+         * @param region AWS region
+         * @param name API key name
+         */
+        [[nodiscard]] bool ApiKeyExists(const std::string &region, const std::string &name) const;
+
+        /**
+         * @brief Create a new API gateway key
+         *
+         * @param key API gateway key to create
+         * @return created api key
+         */
+        Entity::ApiGateway::Key CreateKey(Entity::ApiGateway::Key &key) const;
+
       private:
 
         /**
@@ -45,9 +61,9 @@ namespace AwsMock::Database {
         std::string _databaseName;
 
         /**
-         * APIO gateway collection name
+         * API gateway key collection name
          */
-        std::string _apiGatewayCollectionName;
+        std::string _apiKeyCollectionName;
 
         /**
          * Application in-memory database
