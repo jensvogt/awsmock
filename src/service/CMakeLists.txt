@@ -29,13 +29,12 @@ set(APPLICATION_SOURCES src/apps/ApplicationHandler.cpp src/apps/ApplicationServ
         src/apps/ApplicationCreator.cpp src/apps/ApplicationLogServer.cpp src/apps/ApplicationLogSession.cpp)
 set(API_GATEWAY_SOURCES src/apigateway/ApiGatewayService.cpp src/apigateway/ApiGatewayHandler.cpp)
 set(MONITORING_SOURCES src/monitoring/MetricService.cpp src/monitoring/MetricSystemCollector.cpp
-        src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp src/monitoring/MonitoringService.cpp
-)
+        src/monitoring/MonitoringHandler.cpp src/monitoring/MonitoringServer.cpp src/monitoring/MonitoringService.cpp)
 set(FRONTEND_SOURCES src/frontend/FrontendWorker.cpp src/frontend/FrontendServer.cpp)
 
 set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES}
         ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES}
-        ${CONTAINER_SOURCES} ${GATEWAY_SOURCES} ${APPLICATION_SOURCES} ${APIGATEWAY_SOURCES} ${MODULE_SOURCES}
+        ${CONTAINER_SOURCES} ${GATEWAY_SOURCES} ${APPLICATION_SOURCES} ${API_GATEWAY_SOURCES} ${MODULE_SOURCES}
         ${MONITORING_SOURCES} ${FRONTEND_SOURCES})
 
 # Test directory

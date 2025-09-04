@@ -34,11 +34,11 @@ namespace AwsMock::Dto::Common {
             {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 
-    [[maybe_unused]] static std::string ApplicationCommandTypeToString(const ApiGatewayCommandType commandType) {
+    [[maybe_unused]] static std::string ApiGatewayCommandTypeToString(const ApiGatewayCommandType commandType) {
         return ApiGatewayCommandTypeNames[commandType];
     }
 
-    [[maybe_unused]] static ApiGatewayCommandType ApplicationCommandTypeFromString(const std::string &commandType) {
+    [[maybe_unused]] static ApiGatewayCommandType ApiGatewayCommandTypeFromString(const std::string &commandType) {
         for (auto &[fst, snd]: ApiGatewayCommandTypeNames) {
             if (Core::StringUtils::EqualsIgnoreCase(commandType, snd)) {
                 return fst;
@@ -57,7 +57,7 @@ namespace AwsMock::Dto::Common {
         /**
          * Client command
          */
-        ApiGatewayCommandType command;
+        ApiGatewayCommandType command{};
 
         /**
          * @brief Convert to a JSON string

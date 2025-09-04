@@ -15,6 +15,9 @@
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/mapper/Mapper.h>
+#include <awsmock/entity/apigateway/Key.h>
+#include <awsmock/repository/ApiGatewayDatabase.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 
 namespace AwsMock::Service {
@@ -35,8 +38,18 @@ namespace AwsMock::Service {
 
         /**
          * @brief Constructor
+         *
+         * @param ioc boost IO context
          */
-        explicit ApiGatewayService(boost::asio::io_context &ioc);
+        explicit ApiGatewayService(boost::asio::io_context &ioc) : _apiGatewayDatabase(Database::ApiGatewayDatabase::instance()), _ioc(ioc) {}
+
+        /**
+         * @brief Creates a new API key
+         *
+         * @param request Api gateway create key request
+         * @return API gateway create key response
+         */
+        Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
 
       private:
 

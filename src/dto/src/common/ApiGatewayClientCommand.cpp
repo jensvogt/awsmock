@@ -14,13 +14,13 @@ namespace AwsMock::Dto::Common {
         // From AwsMock UI
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "application") {
 
-            this->command = ApplicationCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
+            this->command = ApiGatewayCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
 
         } else {
 
             UserAgent userAgent;
             userAgent.FromRequest(request);
-            this->command = ApplicationCommandTypeFromString(Core::StringUtils::ToSnakeCase(userAgent.clientCommand));
+            this->command = ApiGatewayCommandTypeFromString(Core::StringUtils::ToSnakeCase(userAgent.clientCommand));
         }
 
         // Basic values
@@ -42,7 +42,7 @@ namespace AwsMock::Dto::Common {
             document document;
             Core::Bson::BsonUtils::SetStringValue(document, "method", boost::lexical_cast<std::string>(method));
             Core::Bson::BsonUtils::SetStringValue(document, "region", region);
-            Core::Bson::BsonUtils::SetStringValue(document, "command", ApplicationCommandTypeToString(command));
+            Core::Bson::BsonUtils::SetStringValue(document, "command", ApiGatewayCommandTypeToString(command));
             Core::Bson::BsonUtils::SetStringValue(document, "url", url);
             Core::Bson::BsonUtils::SetStringValue(document, "contentType", contentType);
             Core::Bson::BsonUtils::SetLongValue(document, "contentLength", contentLength);
