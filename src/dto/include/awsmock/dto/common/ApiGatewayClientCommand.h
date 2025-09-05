@@ -26,11 +26,15 @@ namespace AwsMock::Dto::Common {
      */
     enum class ApiGatewayCommandType {
         CREATE_API_KEY,
+        GET_API_KEYS,
+        DELETE_API_KEY,
         UNKNOWN
     };
 
     static std::map<ApiGatewayCommandType, std::string> ApiGatewayCommandTypeNames{
             {ApiGatewayCommandType::CREATE_API_KEY, "create-api-key"},
+            {ApiGatewayCommandType::GET_API_KEYS, "get-api-keys"},
+            {ApiGatewayCommandType::DELETE_API_KEY, "delete-api-key"},
             {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 

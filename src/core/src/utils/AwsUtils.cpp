@@ -17,6 +17,14 @@ namespace AwsMock::Core {
         return CreateArn("lambda", region, accountId, "function:" + function);
     }
 
+    std::string AwsUtils::CreateApiGatewayKeyId() {
+        return StringUtils::GenerateRandomAlphanumericString(12);
+    }
+
+    std::string AwsUtils::CreateApiGatewayApiKey() {
+        return StringUtils::GenerateRandomString(42);
+    }
+
     std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &queueArn) {
         std::string endpoint = GetEndpoint();
         std::vector<std::string> parts = StringUtils::Split(queueArn, ':');

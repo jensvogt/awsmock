@@ -53,7 +53,8 @@ include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 else ()
-    add_library(${LIBRARY} SHARED ${SOURCES})
+    add_library(${LIBRARY} SHARED ${SOURCES}
+            include/awsmock/dto/apigateway/model/Key.h)
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
