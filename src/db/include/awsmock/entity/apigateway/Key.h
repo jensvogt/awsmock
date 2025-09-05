@@ -24,6 +24,11 @@ namespace AwsMock::Database::Entity::ApiGateway {
         std::string oid;
 
         /**
+         * API ID
+         */
+        std::string id;
+
+        /**
          * Aws region
          */
         std::string region;

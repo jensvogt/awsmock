@@ -10,11 +10,15 @@
 #include <string>
 
 // AwsMock includes
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
+#include <awsmock/dto/apigateway/GetApiKeysRequest.h>
+#include <awsmock/dto/apigateway/GetApiKeysResponse.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/Key.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
@@ -50,6 +54,21 @@ namespace AwsMock::Service {
          * @return API gateway create key response
          */
         Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
+
+        /**
+         * @brief Creates a new API key
+         *
+         * @param request Api gateway create key request
+         * @return API gateway create key response
+         */
+        Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
+
+        /**
+         * @brief Deletes an API gateway key
+         *
+         * @param request delete API key request
+         */
+        void DeleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
 
       private:
 

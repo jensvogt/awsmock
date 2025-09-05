@@ -234,9 +234,9 @@ namespace AwsMock::Database {
                     session.start_transaction();
                     const auto result = collection.insert_many(documents);
                     session.commit_transaction();
-                    log_info << "Imported monitoring values: " << result->inserted_count();
+                    log_debug << "Imported monitoring values: " << result->inserted_count();
                 }
-                log_info << Core::MonitoringCollector::instance().ToString();
+                log_debug << Core::MonitoringCollector::instance().ToString();
 
             } catch (mongocxx::exception &e) {
                 log_error << "Collection transaction exception: " << e.what();
