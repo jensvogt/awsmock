@@ -52,6 +52,16 @@ namespace AwsMock::Dto::ApiGateway {
          */
         std::string value;
 
+        /**
+         * Created
+         */
+        system_clock::time_point created;
+
+        /**
+         * Modified
+         */
+        system_clock::time_point modified;
+
       private:
 
         friend Key tag_invoke(boost::json::value_to_tag<Key>, boost::json::value const &v) {
@@ -62,6 +72,9 @@ namespace AwsMock::Dto::ApiGateway {
             r.description = Core::Json::GetStringValue(v, "description");
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.generateDistinct = Core::Json::GetBoolValue(v, "generateDistinct");
+            r.value = Core::Json::GetStringValue(v, "value");
+            r.created = Core::Json::GetDatetimeValue(v, "created");
+            r.modified = Core::Json::GetDatetimeValue(v, "modified");
             if (Core::Json::AttributeExists(v, "tags")) {
                 r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
             }
@@ -76,7 +89,10 @@ namespace AwsMock::Dto::ApiGateway {
                     {"description", obj.description},
                     {"enabled", obj.enabled},
                     {"generateDistinct", obj.generateDistinct},
+                    {"value", obj.value},
                     {"tags", boost::json::value_from(obj.tags)},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };

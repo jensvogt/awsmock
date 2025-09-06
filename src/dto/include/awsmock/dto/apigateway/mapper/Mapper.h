@@ -58,6 +58,15 @@ namespace AwsMock::Dto::ApiGateway {
          * @see AwsMock::Dto::ApiGateway::Key
          */
         static std::vector<Key> map(const std::vector<Database::Entity::ApiGateway::Key> &keyEntities);
+
+        /**
+         * @brief Maps an API gateway key DTO to a key entity
+         *
+         * @param keyDto API key DTO
+         * @return API key entity
+         * @see AwsMock::Dto::ApiGateway::Key
+         */
+        static Database::Entity::ApiGateway::Key map(const Key &keyDto);
     };
 
 }// namespace AwsMock::Dto::ApiGateway

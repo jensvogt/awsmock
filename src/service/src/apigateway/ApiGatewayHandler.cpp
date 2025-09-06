@@ -72,6 +72,30 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 
+                case Dto::Common::ApiGatewayCommandType::LIST_API_KEY_COUNTERS: {
+
+                    Dto::ApiGateway::ListApiKeyCountersRequest serviceRequest = Dto::ApiGateway::ListApiKeyCountersRequest::FromJson(clientCommand);
+                    const Dto::ApiGateway::ListApiKeyCountersResponse serviceResponse = _apiGatewayService.ListApiKeyCounters(serviceRequest);
+                    log_info << "API key counter list created, count: " << serviceResponse.total;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::GET_API_KEY_COUNTER: {
+
+                    Dto::ApiGateway::GetApiKeyCounterRequest serviceRequest = Dto::ApiGateway::GetApiKeyCounterRequest::FromJson(clientCommand);
+                    const Dto::ApiGateway::GetApiKeyCounterResponse serviceResponse = _apiGatewayService.GetApiKeyCounter(serviceRequest);
+                    log_info << "Get API key counter, id: " << serviceRequest.id;
+                    return SendResponse(request, http::status::ok, serviceResponse.ToJson());
+                }
+
+                case Dto::Common::ApiGatewayCommandType::UPDATE_API_KEY_COUNTER: {
+
+                    Dto::ApiGateway::UpdateApiKeyCounterRequest serviceRequest = Dto::ApiGateway::UpdateApiKeyCounterRequest::FromJson(clientCommand);
+                    _apiGatewayService.UpdateApiKeyCounter(serviceRequest);
+                    log_info << "Update API key counter, id: " << serviceRequest.apiKey.id;
+                    return SendResponse(request, http::status::ok);
+                }
+
                 default:
                     log_error << "Unknown action";
                     return SendResponse(request, http::status::bad_request, "Unknown action");
@@ -97,7 +121,6 @@ namespace AwsMock::Service {
         Dto::Common::ApiGatewayClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
-        Core::HttpUtils::DumpRequest(request);
         try {
             switch (clientCommand.command) {
 
