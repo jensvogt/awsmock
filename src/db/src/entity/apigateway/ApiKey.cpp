@@ -2,11 +2,11 @@
 // Created by vogje01 on 03/09/2023.
 //
 
-#include <awsmock/entity/apigateway/Key.h>
+#include <awsmock/entity/apigateway/ApiKey.h>
 
 namespace AwsMock::Database::Entity::ApiGateway {
 
-    view_or_value<view, value> Key::ToDocument() const {
+    view_or_value<view, value> ApiKey::ToDocument() const {
 
         document keyDocument;
         keyDocument.append(kvp("region", region));
@@ -31,7 +31,7 @@ namespace AwsMock::Database::Entity::ApiGateway {
         return keyDocument.extract();
     }
 
-    void Key::FromDocument(const std::optional<view> &mResult) {
+    void ApiKey::FromDocument(const std::optional<view> &mResult) {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");

@@ -67,8 +67,8 @@ namespace AwsMock::Service {
                 case Dto::Common::ApiGatewayCommandType::CREATE_REST_API: {
 
                     Dto::ApiGateway::CreateRestApiRequest serviceRequest = Dto::ApiGateway::CreateRestApiRequest::FromJson(clientCommand);
-                    const Dto::ApiGateway::CreateRestApiResponse serviceResponse = _apiGatewayService.CreateRestApio(serviceRequest);
-                    log_info << "API key created, name: " << serviceRequest.name;
+                    const Dto::ApiGateway::CreateRestApiResponse serviceResponse = _apiGatewayService.CreateRestApi(serviceRequest);
+                    log_info << "REST API created, name: " << serviceRequest.name;
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 

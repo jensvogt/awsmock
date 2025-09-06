@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_API_GATEWAY_REST_H
-#define AWSMOCK_DB_ENTITY_API_GATEWAY_REST_H
+#ifndef AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H
+#define AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -19,7 +19,7 @@ namespace AwsMock::Database::Entity::ApiGateway {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Rest final : Common::BaseEntity<Rest> {
+    struct RestApi final : Common::BaseEntity<RestApi> {
 
         /**
          * MongoDB OID
@@ -30,6 +30,11 @@ namespace AwsMock::Database::Entity::ApiGateway {
          * Aws region
          */
         std::string region;
+
+        /**
+         * ID
+         */
+        std::string id;
 
         /**
          * Application name
@@ -52,9 +57,49 @@ namespace AwsMock::Database::Entity::ApiGateway {
         std::string apiKeySource;
 
         /**
+         * Clone source
+         */
+        std::string cloneFrom;
+
+        /**
+         * Version
+         */
+        std::string version;
+
+        /**
+         * JSON policy
+         */
+        std::string policy;
+
+        /**
+         * Root resource ID
+         */
+        std::string rootResourceId;
+
+        /**
          * Tags
          */
         std::map<std::string, std::string> tags;
+
+        /**
+         * Binary media types array
+         */
+        std::vector<std::string> binaryMediaTypes;
+
+        /**
+         * Warnings
+         */
+        std::vector<std::string> warnings;
+
+        /**
+         * Disable API endpoint
+         */
+        bool disableExecuteApiEndpoint;
+
+        /**
+         * Minimal compression size
+         */
+        long minimumCompressionSize;
 
         /**
          * Creation date
@@ -83,4 +128,4 @@ namespace AwsMock::Database::Entity::ApiGateway {
 
 }// namespace AwsMock::Database::Entity::ApiGateway
 
-#endif// AWSMOCK_DB_ENTITY_API_GATEWAY_KEY_H
+#endif// AWSMOCK_DB_ENTITY_API_GATEWAY_REST_API_H

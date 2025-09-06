@@ -10,7 +10,7 @@
 
 namespace AwsMock::Dto::ApiGateway {
 
-    struct RestApi {
+    struct RestApi final : Common::BaseCounter<RestApi> {
 
         /**
          * ID
@@ -64,8 +64,8 @@ namespace AwsMock::Dto::ApiGateway {
 
       private:
 
-        friend Key tag_invoke(boost::json::value_to_tag<Key>, boost::json::value const &v) {
-            Key r;
+        friend RestApi tag_invoke(boost::json::value_to_tag<RestApi>, boost::json::value const &v) {
+            RestApi r;
             r.id = Core::Json::GetStringValue(v, "id");
             r.name = Core::Json::GetStringValue(v, "name");
             r.customerId = Core::Json::GetStringValue(v, "customerId");
@@ -81,7 +81,7 @@ namespace AwsMock::Dto::ApiGateway {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Key const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RestApi const &obj) {
             jv = {
                     {"id", obj.id},
                     {"name", obj.name},

@@ -5,8 +5,12 @@
 #include <awsmock/repository/ApiGatewayDatabase.h>
 
 namespace AwsMock::Database {
-    ApiGatewayDatabase::ApiGatewayDatabase() : _databaseName(GetDatabaseName()), _apiKeyCollectionName("apigateway_key"), _memoryDb(ApiGatewayMemoryDb::instance()) {}
 
+    ApiGatewayDatabase::ApiGatewayDatabase() : _databaseName(GetDatabaseName()), _apiKeyCollectionName("apigateway_key"), _restApiCollectionName("apigateway_rest"), _memoryDb(ApiGatewayMemoryDb::instance()) {}
+
+    // ========================================================================================================================
+    // API key
+    // ========================================================================================================================
     bool ApiGatewayDatabase::ApiKeyExists(const std::string &region, const std::string &name) const {
 
         if (HasDatabase()) {
@@ -47,7 +51,7 @@ namespace AwsMock::Database {
         return _memoryDb.ApiKeyExists(id);
     }
 
-    Entity::ApiGateway::Key ApiGatewayDatabase::CreateKey(Entity::ApiGateway::Key &key) const {
+    Entity::ApiGateway::ApiKey ApiGatewayDatabase::CreateKey(Entity::ApiGateway::ApiKey &key) const {
 
         key.created = system_clock::now();
         if (HasDatabase()) {
@@ -74,7 +78,7 @@ namespace AwsMock::Database {
         return _memoryDb.CreateKey(key);
     }
 
-    std::vector<Entity::ApiGateway::Key> ApiGatewayDatabase::GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, const long limit) const {
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayDatabase::GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, const long limit) const {
 
         if (HasDatabase()) {
 
@@ -83,7 +87,7 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
-                std::vector<Entity::ApiGateway::Key> apiKeyList;
+                std::vector<Entity::ApiGateway::ApiKey> apiKeyList;
 
                 mongocxx::options::find opts;
                 document sort = {};
@@ -104,7 +108,7 @@ namespace AwsMock::Database {
                 }
 
                 for (auto bucketCursor = apiKeyCollection.find(query.extract(), opts); const auto &bucket: bucketCursor) {
-                    Entity::ApiGateway::Key result;
+                    Entity::ApiGateway::ApiKey result;
                     result.FromDocument(bucket);
                     apiKeyList.push_back(result);
                 }
@@ -119,7 +123,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetApiKeys(nameQuery, customerId, position, limit);
     }
 
-    Entity::ApiGateway::Key ApiGatewayDatabase::GetApiKeyById(const std::string &id) const {
+    Entity::ApiGateway::ApiKey ApiGatewayDatabase::GetApiKeyById(const std::string &id) const {
 
         if (HasDatabase()) {
 
@@ -128,14 +132,14 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
-                std::vector<Entity::ApiGateway::Key> apiKeyList;
+                std::vector<Entity::ApiGateway::ApiKey> apiKeyList;
 
                 document query = {};
                 if (!id.empty()) {
                     query.append(kvp("id", id));
                 }
                 if (const auto result = apiKeyCollection.find_one(query.extract()); result.has_value()) {
-                    Entity::ApiGateway::Key apiKey;
+                    Entity::ApiGateway::ApiKey apiKey;
                     apiKey.FromDocument(*result);
                     return apiKey;
                 }
@@ -149,7 +153,7 @@ namespace AwsMock::Database {
         return _memoryDb.GetApiKeyById(id);
     }
 
-    Entity::ApiGateway::Key ApiGatewayDatabase::UpdateApiKey(Entity::ApiGateway::Key &key) const {
+    Entity::ApiGateway::ApiKey ApiGatewayDatabase::UpdateApiKey(Entity::ApiGateway::ApiKey &key) const {
 
         key.modified = system_clock::now();
         if (HasDatabase()) {
@@ -186,7 +190,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateApiKey(key);
     }
 
-    void ApiGatewayDatabase::ImportApiKey(Entity::ApiGateway::Key &key) const {
+    void ApiGatewayDatabase::ImportApiKey(Entity::ApiGateway::ApiKey &key) const {
 
         if (ApiKeyExists(key.id)) {
             key = UpdateApiKey(key);
@@ -238,7 +242,80 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteKey(id);
     }
 
-    std::vector<Entity::ApiGateway::Key> ApiGatewayDatabase::ListApiKeyCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    // ========================================================================================================================
+    // REST API
+    // ========================================================================================================================
+    bool ApiGatewayDatabase::RestApiExists(const std::string &region, const std::string &name) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+                const int64_t count = restApiCollection.count_documents(make_document(kvp("region", region), kvp("name", name)));
+                log_trace << "REST API exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.RestApiExists(region, name);
+    }
+
+    bool ApiGatewayDatabase::RestApiExists(const std::string &id) const {
+
+        if (HasDatabase()) {
+
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection restApiCollection = client->database(_databaseName)[_apiKeyCollectionName];
+                const int64_t count = restApiCollection.count_documents(make_document(kvp("id", id)));
+                log_trace << "REST API exists: " << std::boolalpha << count;
+                return count > 0;
+
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.RestApiExists(id);
+    }
+
+    Entity::ApiGateway::RestApi ApiGatewayDatabase::CreateRestApi(Entity::ApiGateway::RestApi &restApi) const {
+
+        restApi.created = system_clock::now();
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection restApiCollection = client->database(_databaseName)[_restApiCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                const auto result = restApiCollection.insert_one(restApi.ToDocument());
+                session.commit_transaction();
+                log_trace << "Key created, oid: " << result->inserted_id().get_oid().value.to_string();
+                restApi.oid = result->inserted_id().get_oid().value.to_string();
+                return restApi;
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.CreateRestApi(restApi);
+    }
+
+    // ========================================================================================================================
+    // AwsMock internal
+    // ========================================================================================================================
+    std::vector<Entity::ApiGateway::ApiKey> ApiGatewayDatabase::ListApiKeyCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
@@ -247,7 +324,7 @@ namespace AwsMock::Database {
             auto session = client->start_session();
 
             try {
-                std::vector<Entity::ApiGateway::Key> apiKeyList;
+                std::vector<Entity::ApiGateway::ApiKey> apiKeyList;
 
                 mongocxx::options::find opts;
                 if (!sortColumns.empty()) {
@@ -270,7 +347,7 @@ namespace AwsMock::Database {
                 }
 
                 for (auto lambdaCursor = apiKeyCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
-                    Entity::ApiGateway::Key result;
+                    Entity::ApiGateway::ApiKey result;
                     result.FromDocument(lambda);
                     apiKeyList.push_back(result);
                 }

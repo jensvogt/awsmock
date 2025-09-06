@@ -6,6 +6,7 @@
 #define AWSMOCK_REPOSITORY_API_GATEWAY_MEMORYDB_H
 
 // C++ standard includes
+#include <map>
 #include <string>
 
 // Boost includes
@@ -13,10 +14,8 @@
 
 // AwsMock includes
 #include <awsmock/core/Linq.h>
-#include <awsmock/core/exception/DatabaseException.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/entity/apigateway/Key.h>
-#include <awsmock/entity/apps/Application.h>
+#include <awsmock/entity/apigateway/ApiKey.h>
+#include <awsmock/entity/apigateway/RestApi.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
 
@@ -68,7 +67,7 @@ namespace AwsMock::Database {
          * @param key API gateway key to create
          * @return created api key
          */
-        Entity::ApiGateway::Key CreateKey(const Entity::ApiGateway::Key &key);
+        Entity::ApiGateway::ApiKey CreateKey(const Entity::ApiGateway::ApiKey &key);
 
         /**
          * @brief Returns a list of API keys
@@ -79,7 +78,7 @@ namespace AwsMock::Database {
          * @param limit maximal number of keys
          * @return created api key
          */
-        std::vector<Entity::ApiGateway::Key> GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit);
+        std::vector<Entity::ApiGateway::ApiKey> GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit);
 
         /**
          * @brief Returns an API key by ID
@@ -87,7 +86,7 @@ namespace AwsMock::Database {
          * @param id name query
          * @return api key
          */
-        [[nodiscard]] Entity::ApiGateway::Key GetApiKeyById(const std::string &id);
+        [[nodiscard]] Entity::ApiGateway::ApiKey GetApiKeyById(const std::string &id);
 
         /**
          * @brief Updates an existing API key
@@ -95,7 +94,7 @@ namespace AwsMock::Database {
          * @param key API key to update
          * @return updated api key
          */
-        [[nodiscard]] Entity::ApiGateway::Key UpdateApiKey(const Entity::ApiGateway::Key &key);
+        [[nodiscard]] Entity::ApiGateway::ApiKey UpdateApiKey(const Entity::ApiGateway::ApiKey &key);
 
         /**
          * @brief Import an API key
@@ -105,7 +104,7 @@ namespace AwsMock::Database {
          *
          * @param key API key to import
          */
-        void ImportApiKey(Entity::ApiGateway::Key &key);
+        void ImportApiKey(Entity::ApiGateway::ApiKey &key);
 
         /**
          * @brief Returns the total number of keys
@@ -122,6 +121,29 @@ namespace AwsMock::Database {
         void DeleteKey(const std::string &id);
 
         /**
+         * @brief Check the existence of an REST API
+         *
+         * @param id REST API ID
+         */
+        [[nodiscard]] bool RestApiExists(const std::string &id) const;
+
+        /**
+         * @brief Check the existence of an REST API
+         *
+         * @param region AWS region
+         * @param name REST API name
+         */
+        [[nodiscard]] bool RestApiExists(const std::string &region, const std::string &name) const;
+
+        /**
+         * @brief Create a new REST API
+         *
+         * @param restApi REST API entity to create
+         * @return created REST API entity
+         */
+        [[nodiscard]] Entity::ApiGateway::RestApi CreateRestApi(const Entity::ApiGateway::RestApi &restApi);
+
+        /**
          * @brief Returns a list of API key counters
          *
          * @param prefix name prefix
@@ -130,19 +152,29 @@ namespace AwsMock::Database {
          * @param sortColumns sorting columns
          * @return list of API key counters
          */
-        [[nodiscard]] std::vector<Entity::ApiGateway::Key> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
+        [[nodiscard]] std::vector<Entity::ApiGateway::ApiKey> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
 
       private:
 
         /**
-         * Application map
+         * API key map
          */
-        std::map<std::string, Entity::ApiGateway::Key> _apiKeys{};
+        std::map<std::string, Entity::ApiGateway::ApiKey> _apiKeys{};
 
         /**
-         * API gateway mutex
+         * REST API map
          */
-        static boost::mutex _apiGatewayMutex;
+        std::map<std::string, Entity::ApiGateway::RestApi> _restApis{};
+
+        /**
+         * API key mutex
+         */
+        static boost::mutex _apiKeyMutex;
+
+        /**
+         * REST API mutex
+         */
+        static boost::mutex _restApiMutex;
     };
 
 }// namespace AwsMock::Database

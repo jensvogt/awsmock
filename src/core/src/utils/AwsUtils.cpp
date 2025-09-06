@@ -17,7 +17,11 @@ namespace AwsMock::Core {
         return CreateArn("lambda", region, accountId, "function:" + function);
     }
 
-    std::string AwsUtils::CreateApiGatewayKeyId() {
+    std::string AwsUtils::CreateApiKeyId() {
+        return StringUtils::GenerateRandomAlphanumericString(12);
+    }
+
+    std::string AwsUtils::CreateRestApiId() {
         return StringUtils::GenerateRandomAlphanumericString(12);
     }
 
