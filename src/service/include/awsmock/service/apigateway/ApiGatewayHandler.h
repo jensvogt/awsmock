@@ -29,6 +29,17 @@ namespace AwsMock::Service {
         explicit ApiGatewayHandler(boost::asio::io_context &ioc) : AbstractHandler("api-gateway-handler", ioc), _apiGatewayService(ioc) {}
 
         /**
+         * @brief HTTP GET request.
+         *
+         * @param request HTTP request
+         * @param region AWS region name
+         * @param user AWS user
+         * @return HTTP response
+         * @see AbstractHandler::HandleGet(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user)
+         */
+        http::response<http::dynamic_body> HandleGetRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
+        /**
          * @brief HTTP POST request.
          *
          * @param request HTTP request
@@ -38,6 +49,17 @@ namespace AwsMock::Service {
          * @see AbstractHandler::handlePost(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user)
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
+
+        /**
+         * @brief HTTP DELETE request.
+         *
+         * @param request HTTP request
+         * @param region AWS region name
+         * @param user AWS user
+         * @return HTTP response
+         * @see AbstractHandler::HandleDelete(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user)
+         */
+        http::response<http::dynamic_body> HandleDeleteRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
       private:
 

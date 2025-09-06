@@ -222,7 +222,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateParameter(parameter);
     }
 
-    Entity::SSM::Parameter SSMDatabase::UpsertParameter(Entity::SSM::Parameter &parameter) const {
+    Entity::SSM::Parameter SSMDatabase::ImportParameter(Entity::SSM::Parameter &parameter) const {
 
         if (ParameterExists(parameter.parameterName)) {
 

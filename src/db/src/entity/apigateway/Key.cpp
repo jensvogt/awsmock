@@ -10,6 +10,7 @@ namespace AwsMock::Database::Entity::ApiGateway {
 
         document keyDocument;
         keyDocument.append(kvp("region", region));
+        keyDocument.append(kvp("id", id));
         keyDocument.append(kvp("name", name));
         keyDocument.append(kvp("customerId", customerId));
         keyDocument.append(kvp("description", description));
@@ -34,6 +35,7 @@ namespace AwsMock::Database::Entity::ApiGateway {
 
         oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
         region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        id = Core::Bson::BsonUtils::GetStringValue(mResult, "id");
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         customerId = Core::Bson::BsonUtils::GetStringValue(mResult, "customerId");
         description = Core::Bson::BsonUtils::GetStringValue(mResult, "description");

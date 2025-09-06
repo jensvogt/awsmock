@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/entity/apigateway/Key.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/entity/cognito/Group.h>
 #include <awsmock/entity/cognito/User.h>
@@ -126,6 +127,11 @@ namespace AwsMock::Dto::Module {
          * @brief Applications
          */
         std::vector<Database::Entity::Apps::Application> applications;
+
+        /**
+         * @brief API gateway keys
+         */
+        std::vector<Database::Entity::ApiGateway::Key> apiKeys;
 
         /**
          * @brief Convert to a BSON object

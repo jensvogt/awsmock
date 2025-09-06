@@ -2,6 +2,9 @@
 // Created by vogje01 on 9/2/25.
 //
 
+#include "awsmock/dto/common/mapper/Mapper.h"
+
+
 #include <awsmock/service/apigateway/ApiGatewayService.h>
 
 namespace AwsMock::Service {
@@ -19,9 +22,140 @@ namespace AwsMock::Service {
 
             // Generate API key
             Database::Entity::ApiGateway::Key key = Dto::ApiGateway::Mapper::map(request);
+
+            // Set enabled
+            key.enabled = true;
+
+            // Customer ID
+            if (key.id.empty()) {
+                key.id = Core::AwsUtils::CreateApiGatewayKeyId();
+            }
+
+            // API Key
+            if (key.keyValue.empty()) {
+                key.keyValue = Core::AwsUtils::CreateApiGatewayApiKey();
+            }
+
+            // Save to the database
             key = _apiGatewayDatabase.CreateKey(key);
+
             log_trace << "Api key created, name: " + key.ToJson();
             return Dto::ApiGateway::Mapper::map(request, key);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::GetApiKeysResponse ApiGatewayService::GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_keys");
+        log_debug << "Get API keys request, region:  " << request.region;
+
+        try {
+
+            // Get the list of API keys
+            const std::vector<Database::Entity::ApiGateway::Key> keys = _apiGatewayDatabase.GetApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
+
+            log_trace << "Get API keys, count: " << keys.size();
+            Dto::ApiGateway::GetApiKeysResponse response{};
+            response.region = request.region;
+            response.user = request.user;
+            response.requestId = request.requestId;
+            response.position = keys.empty() ? "" : keys.size() > 1 ? keys.end()->id
+                                                                    : keys.begin()->id;
+            response.items = Dto::ApiGateway::Mapper::map(keys);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::DeleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "delete_api_key");
+        log_debug << "Delete API key request, region:  " << request.region << " apiKey: " << request.apiKey;
+
+        if (!_apiGatewayDatabase.ApiKeyExists(request.apiKey)) {
+            log_error << "API key does not exist, region: " << request.region << " apiKey: " << request.apiKey;
+            throw Core::ServiceException("API key does not exist, region: " + request.region + " apiKey: " + request.apiKey);
+        }
+
+        try {
+
+            // Delete it from the database
+            _apiGatewayDatabase.DeleteKey(request.apiKey);
+
+            log_trace << "Api key deleted, id: " + request.apiKey;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::ListApiKeyCountersResponse ApiGatewayService::ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_keys");
+        log_debug << "List API key counters request, region:  " << request.region;
+
+        try {
+
+            // Get the list of API keys
+            const std::vector<Database::Entity::ApiGateway::Key> keys = _apiGatewayDatabase.ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const long total = _apiGatewayDatabase.CountApiKeys();
+
+            log_trace << "Get API keys, count: " << keys.size();
+            Dto::ApiGateway::ListApiKeyCountersResponse response{};
+            response.total = total;
+            response.apiKeys = Dto::ApiGateway::Mapper::map(keys);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    Dto::ApiGateway::GetApiKeyCounterResponse ApiGatewayService::GetApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_key");
+        log_debug << "Get API key counter request, region:  " << request.region;
+
+        if (!_apiGatewayDatabase.ApiKeyExists(request.id)) {
+            log_error << "API key does not exist, region: " << request.region << ", id: " << request.id;
+            throw Core::ServiceException("API key does not exist, region: " + request.region + ", apiKey: " + request.id);
+        }
+
+        try {
+
+            // Get the API key
+            Database::Entity::ApiGateway::Key key = _apiGatewayDatabase.GetApiKeyById(request.id);
+
+            Dto::ApiGateway::GetApiKeyCounterResponse response{};
+            response.apiKey = Dto::ApiGateway::Mapper::map(key);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    void ApiGatewayService::UpdateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "update_api_key");
+        log_debug << "Update API key counter request, region:  " << request.apiKey.id;
+
+        if (!_apiGatewayDatabase.ApiKeyExists(request.apiKey.id)) {
+            log_error << "API key does not exist, region: " << request.region << " id: " << request.apiKey.id;
+            throw Core::ServiceException("API key does not exist, region: " + request.region + " id: " + request.apiKey.id);
+        }
+
+        try {
+
+            // Update the API key
+            Database::Entity::ApiGateway::Key key = Dto::ApiGateway::Mapper::map(request.apiKey);
+            key = _apiGatewayDatabase.UpdateApiKey(key);
+            log_debug << "Api key updated, id: " + key.id;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
