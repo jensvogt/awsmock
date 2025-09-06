@@ -123,6 +123,24 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] std::vector<Entity::ApiGateway::Key> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
 
+        /**
+         * @brief Returns a list of API keys
+         *
+         * @param nameQuery name query
+         * @param customerId customer ID
+         * @param position current position
+         * @param limit maximal number of keys
+         * @return created api key
+         */
+        std::vector<Entity::ApiGateway::Key> GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit) const;
+
+        /**
+         * @brief Delete an API gateway key by ID
+         *
+         * @param id API gateway key ID
+         */
+        void DeleteKey(const std::string &id) const;
+
       private:
 
         /**
