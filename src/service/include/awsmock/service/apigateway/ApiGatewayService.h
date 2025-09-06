@@ -10,12 +10,17 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/dto/apigateway/CreateRestApiResponse.h"
+
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/monitoring/MonitoringDefinition.h>
 #include <awsmock/core/monitoring/MonitoringTimer.h>
 #include <awsmock/dto/apigateway/CreateApiKeyRequest.h>
 #include <awsmock/dto/apigateway/CreateApiKeyResponse.h>
+#include <awsmock/dto/apigateway/CreateRestApiRequest.h>
+#include <awsmock/dto/apigateway/CreateRestApiResponse.h>
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysResponse.h>
@@ -25,9 +30,8 @@
 #include <awsmock/dto/apigateway/internal/ListApiKeyCountersResponse.h>
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
-#include <awsmock/entity/apigateway/Key.h>
+#include <awsmock/entity/apigateway/ApiKey.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
-#include <awsmock/repository/ApplicationDatabase.h>
 
 namespace AwsMock::Service {
 
@@ -64,7 +68,7 @@ namespace AwsMock::Service {
          * @brief Creates a new API key
          *
          * @param request Api gateway create key request
-         * @return API gateway create key response
+         * @return get API key response
          */
         [[nodiscard]] Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
 
@@ -74,6 +78,14 @@ namespace AwsMock::Service {
          * @param request delete API key request
          */
         void DeleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
+
+        /**
+         * @brief Creates a new REST API
+         *
+         * @param request create a REST API request
+         * @return create REST API response
+         */
+        [[nodiscard]] Dto::ApiGateway::CreateRestApiResponse CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const;
 
         /**
          * @brief Creates a new API key

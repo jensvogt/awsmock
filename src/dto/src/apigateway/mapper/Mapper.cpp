@@ -2,12 +2,16 @@
 // Created by vogje01 on 5/10/24.
 //
 
+#include "awsmock/dto/apigateway/CreateRestApiRequest.h"
+#include "awsmock/entity/apigateway/RestApi.h"
+
+
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 
 namespace AwsMock::Dto::ApiGateway {
 
-    Database::Entity::ApiGateway::Key Mapper::map(const CreateApiKeyRequest &request) {
-        Database::Entity::ApiGateway::Key keyEntity;
+    Database::Entity::ApiGateway::ApiKey Mapper::map(const CreateApiKeyRequest &request) {
+        Database::Entity::ApiGateway::ApiKey keyEntity;
         keyEntity.region = request.region;
         keyEntity.name = request.name;
         keyEntity.keyValue = request.value;
@@ -19,7 +23,7 @@ namespace AwsMock::Dto::ApiGateway {
         return keyEntity;
     }
 
-    CreateApiKeyResponse Mapper::map(const CreateApiKeyRequest &request, const Database::Entity::ApiGateway::Key &keyEntity) {
+    CreateApiKeyResponse Mapper::map(const CreateApiKeyRequest &request, const Database::Entity::ApiGateway::ApiKey &keyEntity) {
         CreateApiKeyResponse response{};
         response.region = request.region;
         response.user = request.user;
@@ -36,7 +40,7 @@ namespace AwsMock::Dto::ApiGateway {
         return response;
     }
 
-    Key Mapper::map(const Database::Entity::ApiGateway::Key &keyEntity) {
+    Key Mapper::map(const Database::Entity::ApiGateway::ApiKey &keyEntity) {
         Key key{};
         key.id = keyEntity.id;
         key.name = keyEntity.name;
@@ -50,7 +54,7 @@ namespace AwsMock::Dto::ApiGateway {
         return key;
     }
 
-    std::vector<Key> Mapper::map(const std::vector<Database::Entity::ApiGateway::Key> &keyEntities) {
+    std::vector<Key> Mapper::map(const std::vector<Database::Entity::ApiGateway::ApiKey> &keyEntities) {
         std::vector<Key> keyDtos;
         for (const auto &key: keyEntities) {
             keyDtos.emplace_back(map(key));
@@ -58,8 +62,8 @@ namespace AwsMock::Dto::ApiGateway {
         return keyDtos;
     }
 
-    Database::Entity::ApiGateway::Key Mapper::map(const Key &keyDto) {
-        Database::Entity::ApiGateway::Key keyEntity{};
+    Database::Entity::ApiGateway::ApiKey Mapper::map(const Key &keyDto) {
+        Database::Entity::ApiGateway::ApiKey keyEntity{};
         keyEntity.id = keyDto.id;
         keyEntity.name = keyDto.name;
         keyEntity.customerId = keyDto.customerId;
@@ -70,6 +74,42 @@ namespace AwsMock::Dto::ApiGateway {
         keyEntity.created = keyDto.created;
         keyEntity.modified = keyDto.modified;
         return keyEntity;
+    }
+
+    // ========================================================================================================================
+    // REST API
+    // ========================================================================================================================
+    Database::Entity::ApiGateway::RestApi Mapper::map(const CreateRestApiRequest &request) {
+        Database::Entity::ApiGateway::RestApi restApiEntity;
+        restApiEntity.region = request.region;
+        restApiEntity.name = request.name;
+        restApiEntity.apiKeySource = ApiKeySourceTypeToString(request.apiKeySource);
+        restApiEntity.description = request.description;
+        restApiEntity.binaryMediaTypes = request.binaryMediaTypes;
+        restApiEntity.cloneFrom = request.cloneFrom;
+        restApiEntity.disableExecuteApiEndpoint = request.disableExecuteApiEndpoint;
+        restApiEntity.minimumCompressionSize = request.minimumCompressionSize;
+        restApiEntity.policy = request.policy;
+        restApiEntity.version = request.version;
+        restApiEntity.tags = request.tags;
+        return restApiEntity;
+    }
+
+    CreateRestApiResponse Mapper::map(const CreateRestApiRequest &request, const Database::Entity::ApiGateway::RestApi &restApiEntity) {
+        CreateRestApiResponse response{};
+        response.region = request.region;
+        response.user = request.user;
+        response.requestId = request.requestId;
+        response.name = restApiEntity.name;
+        response.apiKeySource = ApiKeySourceTypeFromString(restApiEntity.apiKeySource);
+        response.description = restApiEntity.description;
+        response.policy = restApiEntity.policy;
+        response.rootResourceId = restApiEntity.rootResourceId;
+        response.binaryMediaTypes = restApiEntity.binaryMediaTypes;
+        response.tags = restApiEntity.tags;
+        response.warnings = restApiEntity.warnings;
+        response.created = restApiEntity.created;
+        return response;
     }
 
 }// namespace AwsMock::Dto::ApiGateway

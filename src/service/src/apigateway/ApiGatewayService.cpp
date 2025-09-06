@@ -21,14 +21,14 @@ namespace AwsMock::Service {
         try {
 
             // Generate API key
-            Database::Entity::ApiGateway::Key key = Dto::ApiGateway::Mapper::map(request);
+            Database::Entity::ApiGateway::ApiKey key = Dto::ApiGateway::Mapper::map(request);
 
             // Set enabled
             key.enabled = true;
 
-            // Customer ID
+            // ID
             if (key.id.empty()) {
-                key.id = Core::AwsUtils::CreateApiGatewayKeyId();
+                key.id = Core::AwsUtils::CreateApiKeyId();
             }
 
             // API Key
@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the list of API keys
-            const std::vector<Database::Entity::ApiGateway::Key> keys = _apiGatewayDatabase.GetApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
+            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase.GetApiKeys(request.nameQuery, request.customerId, request.position, request.limit);
 
             log_trace << "Get API keys, count: " << keys.size();
             Dto::ApiGateway::GetApiKeysResponse response{};
@@ -95,6 +95,37 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::ApiGateway::CreateRestApiResponse ApiGatewayService::CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "create_rest_api");
+        log_debug << "Create REST API request, region:  " << request.region << ", name: " << request.name;
+
+        if (_apiGatewayDatabase.ApiKeyExists(request.region, request.name)) {
+            log_error << "API key exists already, region: " << request.region << " name: " << request.name;
+            throw Core::ServiceException("API key exists already, region: " + request.region + " name: " + request.name);
+        }
+
+        try {
+
+            // Get rest api entity from request
+            Database::Entity::ApiGateway::RestApi restApi = Dto::ApiGateway::Mapper::map(request);
+
+            // ID
+            if (restApi.id.empty()) {
+                restApi.id = Core::AwsUtils::CreateRestApiId();
+            }
+
+            // Save to the database
+            restApi = _apiGatewayDatabase.CreateRestApi(restApi);
+
+            log_trace << "REST API created, name: " + restApi.name;
+            return Dto::ApiGateway::Mapper::map(request, restApi);
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
     Dto::ApiGateway::ListApiKeyCountersResponse ApiGatewayService::ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const {
         Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "get_api_keys");
         log_debug << "List API key counters request, region:  " << request.region;
@@ -102,7 +133,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the list of API keys
-            const std::vector<Database::Entity::ApiGateway::Key> keys = _apiGatewayDatabase.ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const std::vector<Database::Entity::ApiGateway::ApiKey> keys = _apiGatewayDatabase.ListApiKeyCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             const long total = _apiGatewayDatabase.CountApiKeys();
 
             log_trace << "Get API keys, count: " << keys.size();
@@ -129,7 +160,7 @@ namespace AwsMock::Service {
         try {
 
             // Get the API key
-            Database::Entity::ApiGateway::Key key = _apiGatewayDatabase.GetApiKeyById(request.id);
+            Database::Entity::ApiGateway::ApiKey key = _apiGatewayDatabase.GetApiKeyById(request.id);
 
             Dto::ApiGateway::GetApiKeyCounterResponse response{};
             response.apiKey = Dto::ApiGateway::Mapper::map(key);
@@ -153,7 +184,7 @@ namespace AwsMock::Service {
         try {
 
             // Update the API key
-            Database::Entity::ApiGateway::Key key = Dto::ApiGateway::Mapper::map(request.apiKey);
+            Database::Entity::ApiGateway::ApiKey key = Dto::ApiGateway::Mapper::map(request.apiKey);
             key = _apiGatewayDatabase.UpdateApiKey(key);
             log_debug << "Api key updated, id: " + key.id;
 

@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DB_ENTITY_API_GATEWAY_KEY_H
-#define AWSMOCK_DB_ENTITY_API_GATEWAY_KEY_H
+#ifndef AWSMOCK_DB_ENTITY_API_GATEWAY_API_KEY_H
+#define AWSMOCK_DB_ENTITY_API_GATEWAY_API_KEY_H
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
@@ -16,7 +16,7 @@ namespace AwsMock::Database::Entity::ApiGateway {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Key final : Common::BaseEntity<Key> {
+    struct ApiKey final : Common::BaseEntity<ApiKey> {
 
         /**
          * MongoDB OID
@@ -95,4 +95,4 @@ namespace AwsMock::Database::Entity::ApiGateway {
 
 }// namespace AwsMock::Database::Entity::ApiGateway
 
-#endif// AWSMOCK_DB_ENTITY_API_GATEWAY_KEY_H
+#endif// AWSMOCK_DB_ENTITY_API_GATEWAY_API_KEY_H

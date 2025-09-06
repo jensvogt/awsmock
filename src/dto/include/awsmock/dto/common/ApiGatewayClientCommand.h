@@ -28,6 +28,7 @@ namespace AwsMock::Dto::Common {
         CREATE_API_KEY,
         GET_API_KEYS,
         DELETE_API_KEY,
+        CREATE_REST_API,
         // AwsMock internal
         LIST_API_KEY_COUNTERS,
         GET_API_KEY_COUNTER,
@@ -39,6 +40,8 @@ namespace AwsMock::Dto::Common {
             {ApiGatewayCommandType::CREATE_API_KEY, "create-api-key"},
             {ApiGatewayCommandType::GET_API_KEYS, "get-api-keys"},
             {ApiGatewayCommandType::DELETE_API_KEY, "delete-api-key"},
+            {ApiGatewayCommandType::CREATE_REST_API, "create-rest-api"},
+            // AwsMock internal commands
             {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
             {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},

@@ -147,11 +147,18 @@ namespace AwsMock::Core {
         static std::string CreateSQSQueueArn(const std::string &region, const std::string &accountId, const std::string &queueName);
 
         /**
-         * @brief Creates an API gateway key ID
+         * @brief Creates an API key ID
          *
-         * @return customer ID
+         * @return API key ID
          */
-        static std::string CreateApiGatewayKeyId();
+        static std::string CreateApiKeyId();
+
+        /**
+         * @brief Creates a REST API ID
+         *
+         * @return REST API ID
+         */
+        static std::string CreateRestApiId();
 
         /**
          * @brief Creates an API gateway API key
