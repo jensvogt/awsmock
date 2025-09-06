@@ -32,7 +32,7 @@ set(MODULE_SOURCES src/entity/module/Module.cpp src/repository/ModuleDatabase.cp
 set(APPS_SOURCES src/entity/apps/Application.cpp src/repository/ApplicationDatabase.cpp src/memorydb/ApplicationMemoryDb.cpp)
 set(UTIL_SOURCES src/utils/MongoUtils.cpp src/utils/ConnectionPool.cpp src/utils/SqsUtils.cpp)
 set(API_GATEWAY_SOURCES src/repository/ApiGatewayDatabase.cpp src/memorydb/ApiGatewayMemoryDb.cpp
-        src/entity/apigateway/Key.cpp)
+        src/entity/apigateway/Key.cpp src/entity/apigateway/Rest.cpp)
 set(MONITORING_SOURCES src/entity/monitoring/Counter.cpp src/repository/MonitoringDatabase.cpp)
 
 set(SOURCES src/repository/Database.cpp src/utils/TestUtils.cpp ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES}
