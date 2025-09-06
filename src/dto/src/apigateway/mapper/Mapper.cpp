@@ -44,6 +44,9 @@ namespace AwsMock::Dto::ApiGateway {
         key.description = keyEntity.description;
         key.enabled = keyEntity.enabled;
         key.tags = keyEntity.tags;
+        key.value = keyEntity.keyValue;
+        key.created = keyEntity.created;
+        key.modified = keyEntity.modified;
         return key;
     }
 
@@ -53,6 +56,20 @@ namespace AwsMock::Dto::ApiGateway {
             keyDtos.emplace_back(map(key));
         }
         return keyDtos;
+    }
+
+    Database::Entity::ApiGateway::Key Mapper::map(const Key &keyDto) {
+        Database::Entity::ApiGateway::Key keyEntity{};
+        keyEntity.id = keyDto.id;
+        keyEntity.name = keyDto.name;
+        keyEntity.customerId = keyDto.customerId;
+        keyEntity.description = keyDto.description;
+        keyEntity.enabled = keyDto.enabled;
+        keyEntity.tags = keyDto.tags;
+        keyEntity.keyValue = keyDto.value;
+        keyEntity.created = keyDto.created;
+        keyEntity.modified = keyDto.modified;
+        return keyEntity;
     }
 
 }// namespace AwsMock::Dto::ApiGateway

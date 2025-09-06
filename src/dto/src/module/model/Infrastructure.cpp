@@ -47,6 +47,9 @@ namespace AwsMock::Dto::Module {
         // Applications
         Core::Bson::ToBsonArray(document, "applications", applications);
 
+        // API gateway keys
+        Core::Bson::ToBsonArray(document, "api-gateway-keys", apiKeys);
+
         return document;
     }
 
@@ -96,6 +99,9 @@ namespace AwsMock::Dto::Module {
 
         // Application
         Core::Bson::FromBsonArray(document, "applications", &applications);
+
+        // API gateway keys
+        Core::Bson::FromBsonArray(document, "api-gateway-keys", &apiKeys);
     }
 
 }// namespace AwsMock::Dto::Module

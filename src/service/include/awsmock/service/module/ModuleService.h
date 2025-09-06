@@ -22,6 +22,7 @@
 #include <awsmock/dto/module/model/Infrastructure.h>
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/entity/module/Module.h>
+#include <awsmock/repository/ApiGatewayDatabase.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/repository/CognitoDatabase.h>
 #include <awsmock/repository/DynamoDbDatabase.h>

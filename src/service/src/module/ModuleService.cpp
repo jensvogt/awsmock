@@ -136,6 +136,11 @@ namespace AwsMock::Service {
 
                 Database::ApplicationDatabase &_applicationDatabase = Database::ApplicationDatabase::instance();
                 infrastructure.applications = _applicationDatabase.ListApplications();
+
+            } else if (module == "apigateway") {
+
+                Database::ApiGatewayDatabase &_apiGatewayDatabase = Database::ApiGatewayDatabase::instance();
+                infrastructure.apiKeys = _apiGatewayDatabase.GetApiKeys();
             }
         }
         return {.infrastructure = infrastructure, .includeObjects = request.includeObjects, .prettyPrint = request.prettyPrint};
@@ -329,7 +334,16 @@ namespace AwsMock::Service {
         if (!infrastructure.ssmParameters.empty()) {
             const Database::SSMDatabase &_ssmDatabase = Database::SSMDatabase::instance();
             for (auto &parameter: infrastructure.ssmParameters) {
-                _ssmDatabase.UpsertParameter(parameter);
+                _ssmDatabase.ImportParameter(parameter);
+            }
+            log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
+        }
+
+        // API gateway keys
+        if (!infrastructure.apiKeys.empty()) {
+            const Database::ApiGatewayDatabase &_apiGatewayDatabase = Database::ApiGatewayDatabase::instance();
+            for (auto &apiKey: infrastructure.apiKeys) {
+                _apiGatewayDatabase.ImportApiKey(apiKey);
             }
             log_info << "SSM parameters imported, count: " << infrastructure.ssmParameters.size();
         }

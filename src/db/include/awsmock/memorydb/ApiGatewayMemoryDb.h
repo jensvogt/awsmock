@@ -82,11 +82,55 @@ namespace AwsMock::Database {
         std::vector<Entity::ApiGateway::Key> GetApiKeys(const std::string &nameQuery, const std::string &customerId, const std::string &position, long limit);
 
         /**
+         * @brief Returns an API key by ID
+         *
+         * @param id name query
+         * @return api key
+         */
+        [[nodiscard]] Entity::ApiGateway::Key GetApiKeyById(const std::string &id);
+
+        /**
+         * @brief Updates an existing API key
+         *
+         * @param key API key to update
+         * @return updated api key
+         */
+        [[nodiscard]] Entity::ApiGateway::Key UpdateApiKey(const Entity::ApiGateway::Key &key);
+
+        /**
+         * @brief Import an API key
+         *
+         * @par
+         * If the provided API key exists already, it will be updated, otherwise inserted. The modified/created timestamp will be updated accordingly.
+         *
+         * @param key API key to import
+         */
+        void ImportApiKey(Entity::ApiGateway::Key &key);
+
+        /**
+         * @brief Returns the total number of keys
+         *
+         * @return API key count
+         */
+        [[nodiscard]] long CountApiKeys() const;
+
+        /**
          * @brief Delete an API gateway key by ID
          *
          * @param id API gateway key ID
          */
         void DeleteKey(const std::string &id);
+
+        /**
+         * @brief Returns a list of API key counters
+         *
+         * @param prefix name prefix
+         * @param pageSize page size customer ID
+         * @param pageIndex page index
+         * @param sortColumns sorting columns
+         * @return list of API key counters
+         */
+        [[nodiscard]] std::vector<Entity::ApiGateway::Key> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
 
       private:
 

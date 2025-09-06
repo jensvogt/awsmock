@@ -19,6 +19,11 @@
 #include <awsmock/dto/apigateway/DeleteApiKeyRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysRequest.h>
 #include <awsmock/dto/apigateway/GetApiKeysResponse.h>
+#include <awsmock/dto/apigateway/internal/GetApiKeyCounterRequest.h>
+#include <awsmock/dto/apigateway/internal/GetApiKeyCounterResponse.h>
+#include <awsmock/dto/apigateway/internal/ListApiKeyCountersRequest.h>
+#include <awsmock/dto/apigateway/internal/ListApiKeyCountersResponse.h>
+#include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/Key.h>
 #include <awsmock/repository/ApiGatewayDatabase.h>
@@ -53,7 +58,7 @@ namespace AwsMock::Service {
          * @param request Api gateway create key request
          * @return API gateway create key response
          */
-        Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
+        [[nodiscard]] Dto::ApiGateway::CreateApiKeyResponse CreateApiKey(const Dto::ApiGateway::CreateApiKeyRequest &request) const;
 
         /**
          * @brief Creates a new API key
@@ -61,7 +66,7 @@ namespace AwsMock::Service {
          * @param request Api gateway create key request
          * @return API gateway create key response
          */
-        Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
+        [[nodiscard]] Dto::ApiGateway::GetApiKeysResponse GetApiKeys(const Dto::ApiGateway::GetApiKeysRequest &request) const;
 
         /**
          * @brief Deletes an API gateway key
@@ -69,6 +74,30 @@ namespace AwsMock::Service {
          * @param request delete API key request
          */
         void DeleteApiKey(const Dto::ApiGateway::DeleteApiKeyRequest &request) const;
+
+        /**
+         * @brief Creates a new API key
+         *
+         * @param request internal API key counters request
+         * @return list of API key counters
+         */
+        [[nodiscard]] Dto::ApiGateway::ListApiKeyCountersResponse ListApiKeyCounters(const Dto::ApiGateway::ListApiKeyCountersRequest &request) const;
+
+        /**
+         * @brief Get an API key detail
+         *
+         * @param request internal API key counters request
+         * @return list of API key counters
+         */
+        [[nodiscard]] Dto::ApiGateway::GetApiKeyCounterResponse GetApiKeyCounter(const Dto::ApiGateway::GetApiKeyCounterRequest &request) const;
+
+        /**
+         * @brief Updates an API key
+         *
+         * @param request internal API key counters update request
+         * @return list of API key counters
+         */
+        void UpdateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const;
 
       private:
 

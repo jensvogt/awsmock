@@ -12,7 +12,7 @@ namespace AwsMock::Dto::Common {
     void ApiGatewayClientCommand::FromRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
 
         // From AwsMock UI
-        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "application") {
+        if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "apigateway") {
 
             this->command = ApiGatewayCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
 

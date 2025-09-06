@@ -11,8 +11,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/DatabaseException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/memorydb/SSMMemoryDb.h>
 #include <awsmock/repository/Database.h>
@@ -125,7 +125,7 @@ namespace AwsMock::Database {
          * @return inserted or updated parameter entity
          * @throws DatabaseException
          */
-        Entity::SSM::Parameter UpsertParameter(Entity::SSM::Parameter &parameter) const;
+        Entity::SSM::Parameter ImportParameter(Entity::SSM::Parameter &parameter) const;
 
         /**
          * @brief Deletes a parameter
