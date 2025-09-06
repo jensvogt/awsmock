@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.7.0](https://github.com/jensvogt/awsmock/compare/v1.6.4...v1.7.0) (2025-09-06)
+
+
+### Features
+
+* **123-windows-port:** windows port ([a48d876](https://github.com/jensvogt/awsmock/commit/a48d87647b3928def7a356c2027a7508c53b4020))
+
+
+### Bug Fixes
+
+* **1375-lambda-invocation:** add enabled flag to lambdas ([25480bb](https://github.com/jensvogt/awsmock/commit/25480bb53cbee84cc7aefa038904a6a99e91372c))
+* **1375-lambda-invocation:** add start/stop/restart/enable/disable applications from awsmokctl ([f68f16f](https://github.com/jensvogt/awsmock/commit/f68f16fc4f60c2844686a748895dfaf0f64f8621))
+* **1375-lambda-invocation:** add start/stop/restart/enable/disable applications from awsmokctl ([f3f6353](https://github.com/jensvogt/awsmock/commit/f3f63536ebcb591247ad2cf6ab6dee9a204ef6e0))
+* **1375-lambda-invocation:** add start/stop/restart/enable/disable lambda to awsmockctl ([b2d09dd](https://github.com/jensvogt/awsmock/commit/b2d09ddb849d47e56db98082e1aa7d4a96bff75d))
+* **1375-lambda-invocation:** add start/stop/restart/enable/disable lambda to awsmockctl ([eb30e26](https://github.com/jensvogt/awsmock/commit/eb30e269d0c98f718429179551fbebf07d997587))
+* **1375-lambda-invocation:** cleanup code ([80fe7e7](https://github.com/jensvogt/awsmock/commit/80fe7e7c698e42496af535ba5b84191a8bdaa322))
+* **1375-lambda-invocation:** cleanup code ([7a853ec](https://github.com/jensvogt/awsmock/commit/7a853ece974f6618d0ee1197c73538a19b0814c3))
+* **1375-lambda-invocation:** cleanup code ([4486f8a](https://github.com/jensvogt/awsmock/commit/4486f8a44b8cb9bdb33440f0df19191278ba1cc8))
+* **1375-lambda-invocation:** fix angular version ([8884bbd](https://github.com/jensvogt/awsmock/commit/8884bbd59a93748deefbc25df63c5ef4f3171639))
+* **1375-lambda-invocation:** fix lambda enabled setting ([d816f7d](https://github.com/jensvogt/awsmock/commit/d816f7dc37e84754d31ddc4b5ba1d96839e9ce25))
+* **1375-lambda-invocation:** fix lambda startup status ([b40aa8a](https://github.com/jensvogt/awsmock/commit/b40aa8aab515eecf583180c80e3ad392dc84bb20))
+* **1375-lambda-invocation:** fix memory leak ([072acc7](https://github.com/jensvogt/awsmock/commit/072acc720714a9928ab18252c2f084180990eb25))
+* **1375-lambda-invocation:** fix memory leak ([0f53122](https://github.com/jensvogt/awsmock/commit/0f531221a87aae1bc29341dd9bf469f9d4624e47))
+* **1375-lambda-invocation:** fix memory leak ([7172f2d](https://github.com/jensvogt/awsmock/commit/7172f2dc41d618245dfe2102ad8146d4b2904b5f))
+* **1375-lambda-invocation:** fix tests ([3d114d1](https://github.com/jensvogt/awsmock/commit/3d114d1881e22fdefff4f6216ea1e1d4b0712dd5))
+* **1375-lambda-invocation:** general cleanup ([0c36c1b](https://github.com/jensvogt/awsmock/commit/0c36c1bb90d437853c2500f6f89dc8564a27acfd))
+* **1375-lambda-invocation:** general cleanup ([b6466fb](https://github.com/jensvogt/awsmock/commit/b6466fb2abc70a11c30555bd7d34e176950ce68d))
+* **1375-lambda-invocation:** use boost ioc for detached threads ([a625f85](https://github.com/jensvogt/awsmock/commit/a625f85dba4492ad872cefcf62d3c8a8efacdba3))
+* **1375-lambda-invocation:** use boost ioc for detached threads ([084ed92](https://github.com/jensvogt/awsmock/commit/084ed92b0630d4d33078b5481bfd3279592c892b))
+* **1375-lambda-invocation:** use boost ioc for detached threads ([ab3471b](https://github.com/jensvogt/awsmock/commit/ab3471bf0ddf4bd9ce7ed5cac88836e91249529c))
+* **1375-new-stream-response:** fix duplicate lambda event sources ([10c613a](https://github.com/jensvogt/awsmock/commit/10c613a33b1177184a391c0b0a1c4468e5643ecb))
+* **1375-new-stream-response:** fix duplicate lambda event sources ([4caf485](https://github.com/jensvogt/awsmock/commit/4caf48542f9ecc81f3997233769efbab67f95a15))
+* **1392-monitoring-when-service-is-down:** add first api gateway REST APIs ([6edc225](https://github.com/jensvogt/awsmock/commit/6edc225a61e448432a6adf984bf966f894c95f45))
+* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([c47351d](https://github.com/jensvogt/awsmock/commit/c47351d6a980b0aca38d9950ce9046fff0bd66b5))
+* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([2ad5eec](https://github.com/jensvogt/awsmock/commit/2ad5eecc149c6c3b6418ffc207a7ccb152aae5c8))
+* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([4e4047d](https://github.com/jensvogt/awsmock/commit/4e4047db2d0f7f32cbbf6b9ceadd8efbafbfc838))
+* **1392-monitoring-when-service-is-down:** fix asynchron handler methods ([2fa77ad](https://github.com/jensvogt/awsmock/commit/2fa77ad02076ef38efba8c48f57f2de32ac9149e))
+* **1392-monitoring-when-service-is-down:** fix counter-adjustments for S2, SQS, SNS ([d98aa2f](https://github.com/jensvogt/awsmock/commit/d98aa2ff6f162a4ddb11b8dcfdab85a1e8033479))
+* **1392-monitoring-when-service-is-down:** fix monitoring when container is not existing ([8d45bb7](https://github.com/jensvogt/awsmock/commit/8d45bb705d7c40199f9a00af9ed863ee5fdaa8fb))
+* **980-macos-port:** monitoring over shm ([355f76f](https://github.com/jensvogt/awsmock/commit/355f76f7d373fd31a586a3b7ea231f55214712a2))
+* **main:** add api gateway keys, insert/update/delete ([50e2088](https://github.com/jensvogt/awsmock/commit/50e208882a5c19d8a264d4ededb5c91a6faabbe4))
+* **main:** add rest api, insert ([10762a2](https://github.com/jensvogt/awsmock/commit/10762a25d977f8cbbbee60d3a7d4ced5a40673f8))
+
 ## [1.6.4](https://github.com/jensvogt/awsmock/compare/v1.6.3...v1.6.4) (2025-08-06)
 
 
