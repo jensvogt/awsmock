@@ -32,10 +32,11 @@ services:
       - "4566-4567:4566-4567" # Manager, Frontend
       - "6000-6100:6000-6100" # FTP passive mode
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./etc/awsmock.json:/usr/local/awsmock/etc/awsmock.json
-      - ./init:/usr/local/awsmock/init
-      - ./lambda:/usr/local/awsmock/data/lambda
+      - /var/run/docker.sock:/var/run/docker.sock # connection to coker daemon
+      - ./etc/awsmock.json:/usr/local/awsmock/etc/awsmock.json # configuration
+      - ./init:/usr/local/awsmock/init # auto load
+      - ./lambda:/usr/local/awsmock/data/lambda # lambda functions
+      - ./application:/usr/local/awsmock/data/application # applications
     restart: on-failure
     healthcheck:
       test: [ "CMD", "awsmockctl", "ping" ]

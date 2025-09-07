@@ -12,6 +12,8 @@ awsmock is a high performance, persistent AWS simulation. Currently, the followi
 - [SecretsManager](docs/man/awsmocktransfer.1.md): Amazon secrets manager service
 - [KMS](docs/man/awsmocktransfer.1.md): Amazon key management service
 - [SSM](docs/man/awsmockssm.1.md): Amazon Systems management
+- [API Gateway](docs/man/awsmockapi.1.md): Amazon API gateway
+- [Application](docs/man/awsmockapps.1.md): Application management
 
 awsmock is written in C++ with an optional MongoDB persistence layer. If needed all objects can be stored in the
 database. The simulation reacts to all AWS commands sent to default port 4566. For a list of supported commands see

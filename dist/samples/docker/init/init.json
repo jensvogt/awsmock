@@ -34,6 +34,38 @@
         "modified": {
           "$date": "2025-05-09T15:50:13.127Z"
         }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "transfer-server",
+        "owner": "none",
+        "arn": "arn:aws:s3:eu-central-1:000000000000:transfer-server",
+        "size": 0,
+        "keys": 0,
+        "notifications": [],
+        "queueNotifications": [],
+        "topicNotifications": [],
+        "lambdaConfigurations": [
+          {
+            "id": "1234567890124",
+            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:file-copy-lambda",
+            "events": [
+              "ObjectCreated"
+            ],
+            "filterRules": []
+          }
+        ],
+        "encryptionConfiguration": {
+          "sseAlgorithm": "",
+          "kmsKeyId": ""
+        },
+        "versionStatus": "disabled",
+        "created": {
+          "$date": "2025-01-08T12:59:20.123Z"
+        },
+        "modified": {
+          "$date": "2025-05-09T15:50:13.127Z"
+        }
       }
     ],
     "sqs-queues": [
@@ -165,7 +197,9 @@
         "concurrency": 5,
         "codeSha256": "c3015d428f81054a0f2bf05f68dd16b9af6e9d411593389044e9358ef1093720",
         "environment": {
-          "variables": []
+          "variables": {
+            "AWS_REGION": "eu-central-1"
+          }
         },
         "code": {
           "zipFile": "s3-notification-cpp-lambda-latest.b64"
@@ -189,6 +223,53 @@
         },
         "modified": {
           "$date": "2025-05-09T16:01:44.975Z"
+        }
+      }
+    ],
+    "transfer-servers": [
+      {
+        "region": "eu-central-1",
+        "serverId": "s-c2e56d224f17524c195b",
+        "arn": "arn:aws:transfer::000000000000:manager/s-c2e56d224f17524c195b",
+        "concurrency": 16,
+        "listenAddress": "0.0.0.0",
+        "state": "ONLINE",
+        "lastStarted": {
+          "$date": 1757161978830
+        },
+        "created": {
+          "$date": 1736341595533
+        },
+        "modified": {
+          "$date": 1756983172862
+        },
+        "users": [
+          {
+            "arn": "",
+            "role": "",
+            "userName": "anonymous",
+            "password": "secret",
+            "homeDirectory": "/"
+          },
+          {
+            "arn": "arn:aws:transfer::000000000000:s-c2e56d224f17524c195b/ftpuser1",
+            "role": "",
+            "userName": "ftpuser1",
+            "password": "p>Du6KUg",
+            "homeDirectory": "ftpuser1"
+          }
+        ],
+        "protocols": [
+          "FTP",
+          "SFTP"
+        ],
+        "ports": [
+          2121,
+          2222
+        ],
+        "tags": {
+          "alias": "ftp-server",
+          "version": "1.0"
         }
       }
     ]
