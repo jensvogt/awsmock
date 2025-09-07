@@ -194,4 +194,26 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::ApiGateway::ListRestApiCountersResponse ApiGatewayService::ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const {
+        Monitoring::MonitoringTimer measure(API_GATEWAY_SERVICE_TIMER, API_GATEWAY_SERVICE_COUNTER, "action", "list_rest_apis");
+        log_debug << "List REST API counters request, region:  " << request.region;
+
+        try {
+
+            // Get the list of REST APIs
+            const std::vector<Database::Entity::ApiGateway::RestApi> restApis = _apiGatewayDatabase.ListRestApiCounters(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
+            const long total = _apiGatewayDatabase.CountApiKeys();
+
+            log_trace << "Get REST APIs, count: " << restApis.size();
+            Dto::ApiGateway::ListRestApiCountersResponse response{};
+            response.total = total;
+            response.restApis = Dto::ApiGateway::Mapper::map(restApis);
+            return response;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
 }// namespace AwsMock::Service

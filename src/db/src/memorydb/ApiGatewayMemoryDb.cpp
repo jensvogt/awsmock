@@ -179,4 +179,32 @@ namespace AwsMock::Database {
         return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
     }
 
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayMemoryDb::ListRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        boost::mutex::scoped_lock lock(_restApiMutex);
+
+        std::vector<Entity::ApiGateway::RestApi> values;
+
+        // Get values
+        for (auto &val: _restApis | std::views::values) {
+            values.push_back(val);
+        }
+
+        auto q = Core::from(values);
+        if (!sortColumns.empty()) {
+            for (const auto &[column, sortDirection]: sortColumns) {
+                if (column == "id") {
+                    q = q.order_by([](const Entity::ApiGateway::RestApi &key1, const Entity::ApiGateway::RestApi &key2) { return key1.id < key2.id; });
+                }
+                if (column == "name") {
+                    q = q.order_by([](const Entity::ApiGateway::RestApi &key1, const Entity::ApiGateway::RestApi &key2) { return key1.name < key2.name; });
+                }
+            }
+        }
+
+        if (!prefix.empty()) {
+            q.where([prefix](const Entity::ApiGateway::RestApi &item) { return Core::StringUtils::StartsWith(item.name, prefix); });
+        }
+        auto resultVector = q.to_vector();
+        return {resultVector.begin() + pageSize * pageIndex, resultVector.begin() + pageSize * (pageIndex + 1)};
+    }
 }// namespace AwsMock::Database

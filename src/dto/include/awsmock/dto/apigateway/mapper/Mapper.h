@@ -91,6 +91,24 @@ namespace AwsMock::Dto::ApiGateway {
          * @see AwsMock::Dto::ApiGateway::Key
          */
         static CreateRestApiResponse map(const CreateRestApiRequest &request, const Database::Entity::ApiGateway::RestApi &restApiEntity);
+
+        /**
+         * @brief Maps an REST API entity to a REST API DTO
+         *
+         * @param restApiEntity REST API entity
+         * @return REST API DTO
+         * @see AwsMock::Dto::ApiGateway::RestApi
+         */
+        static RestApi map(const Database::Entity::ApiGateway::RestApi &restApiEntity);
+
+        /**
+         * @brief Maps a list of REST API entities to a list of REST API DTOs
+         *
+         * @param restApiEntities list of REST API entities
+         * @return list of REST API DTOs
+         * @see AwsMock::Dto::ApiGateway::RestApi
+         */
+        static std::vector<RestApi> map(const std::vector<Database::Entity::ApiGateway::RestApi> &restApiEntities);
     };
 
 }// namespace AwsMock::Dto::ApiGateway

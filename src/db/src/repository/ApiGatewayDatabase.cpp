@@ -362,4 +362,51 @@ namespace AwsMock::Database {
         return _memoryDb.ListApiKeyCounters(prefix, pageSize, pageIndex, sortColumns);
     }
 
+    std::vector<Entity::ApiGateway::RestApi> ApiGatewayDatabase::ListRestApiCounters(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection restapiCollection = client->database(_databaseName)[_restApiCollectionName];
+            auto session = client->start_session();
+
+            try {
+                std::vector<Entity::ApiGateway::RestApi> restApiList;
+
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+                if (pageIndex > 0) {
+                    opts.skip(pageSize * pageIndex);
+                }
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
+                }
+
+                document query = {};
+                if (!prefix.empty()) {
+                    query.append(kvp("functionName", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                for (auto lambdaCursor = restapiCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
+                    Entity::ApiGateway::RestApi result;
+                    result.FromDocument(lambda);
+                    restApiList.push_back(result);
+                }
+                return restApiList;
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.ListRestApiCounters(prefix, pageSize, pageIndex, sortColumns);
+    }
+
 }// namespace AwsMock::Database

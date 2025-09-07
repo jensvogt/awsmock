@@ -112,4 +112,26 @@ namespace AwsMock::Dto::ApiGateway {
         return response;
     }
 
+    RestApi Mapper::map(const Database::Entity::ApiGateway::RestApi &restApiEntity) {
+        RestApi restApi{};
+        restApi.name = restApiEntity.name;
+        restApi.apiKeySource = ApiKeySourceTypeFromString(restApiEntity.apiKeySource);
+        restApi.description = restApiEntity.description;
+        restApi.policy = restApiEntity.policy;
+        restApi.rootResourceId = restApiEntity.rootResourceId;
+        restApi.binaryMediaTypes = restApiEntity.binaryMediaTypes;
+        restApi.tags = restApiEntity.tags;
+        restApi.warnings = restApiEntity.warnings;
+        restApi.created = restApiEntity.created;
+        return restApi;
+    }
+
+    std::vector<RestApi> Mapper::map(const std::vector<Database::Entity::ApiGateway::RestApi> &restApiEntities) {
+        std::vector<RestApi> restApiDtos;
+        for (const auto &restApi: restApiEntities) {
+            restApiDtos.emplace_back(map(restApi));
+        }
+        return restApiDtos;
+    }
+
 }// namespace AwsMock::Dto::ApiGateway
