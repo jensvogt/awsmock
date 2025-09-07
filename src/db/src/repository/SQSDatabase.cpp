@@ -1396,7 +1396,11 @@ namespace AwsMock::Database {
                                                                                  kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
                                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
                                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible")))))));
-                    log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                    log_debug << "Queue: " << Core::Bson::BsonUtils::GetStringValue(t, "_id")
+                              << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
+                              << ", visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial")
+                              << ", invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible")
+                              << ", delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();
 

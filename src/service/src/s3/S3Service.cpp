@@ -672,6 +672,9 @@ namespace AwsMock::Service {
         Database::Entity::S3::Object targetObject;
         try {
 
+            // Get account ID for ARN
+            const auto accountId = Core::Configuration::instance().GetValue<std::string>("awsmock.access.account-id");
+
             // Check the existence of the target bucket
             if (!_database.BucketExists(request.region, request.targetBucket)) {
                 log_error << "Target bucket does not exist, region: " << request.region + " bucket: " << request.targetBucket;
@@ -691,6 +694,7 @@ namespace AwsMock::Service {
             // Update database
             targetObject.region = request.region;
             targetObject.bucket = request.targetBucket;
+            targetObject.bucketArn = Core::AwsUtils::CreateS3BucketArn(request.region, accountId, request.targetBucket);
             targetObject.key = request.targetKey;
             targetObject.owner = sourceObject.owner;
             targetObject.size = sourceObject.size;

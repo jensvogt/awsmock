@@ -13,7 +13,16 @@
         "notifications": [],
         "queueNotifications": [],
         "topicNotifications": [],
-        "lambdaConfigurations": [],
+        "lambdaConfigurations": [
+          {
+            "id": "1234567890124",
+            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:file-distribution-lambda",
+            "events": [
+              "ObjectCreated"
+            ],
+            "filterRules": []
+          }
+        ],
         "encryptionConfiguration": {
           "sseAlgorithm": "",
           "kmsKeyId": ""
