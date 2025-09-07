@@ -28,6 +28,8 @@
 #include <awsmock/dto/apigateway/internal/GetApiKeyCounterResponse.h>
 #include <awsmock/dto/apigateway/internal/ListApiKeyCountersRequest.h>
 #include <awsmock/dto/apigateway/internal/ListApiKeyCountersResponse.h>
+#include <awsmock/dto/apigateway/internal/ListRestApiCountersRequest.h>
+#include <awsmock/dto/apigateway/internal/ListRestApiCountersResponse.h>
 #include <awsmock/dto/apigateway/internal/UpdateApiKeyCounterRequest.h>
 #include <awsmock/dto/apigateway/mapper/Mapper.h>
 #include <awsmock/entity/apigateway/ApiKey.h>
@@ -88,7 +90,7 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::ApiGateway::CreateRestApiResponse CreateRestApi(const Dto::ApiGateway::CreateRestApiRequest &request) const;
 
         /**
-         * @brief Creates a new API key
+         * @brief List the API key counters
          *
          * @param request internal API key counters request
          * @return list of API key counters
@@ -110,6 +112,14 @@ namespace AwsMock::Service {
          * @return list of API key counters
          */
         void UpdateApiKeyCounter(const Dto::ApiGateway::UpdateApiKeyCounterRequest &request) const;
+
+        /**
+         * @brief List REST APIs
+         *
+         * @param request internal REST API counters request
+         * @return list of REST API counters
+         */
+        [[nodiscard]] Dto::ApiGateway::ListRestApiCountersResponse ListRestApiCounters(const Dto::ApiGateway::ListRestApiCountersRequest &request) const;
 
       private:
 

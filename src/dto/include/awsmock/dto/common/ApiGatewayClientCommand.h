@@ -33,6 +33,7 @@ namespace AwsMock::Dto::Common {
         LIST_API_KEY_COUNTERS,
         GET_API_KEY_COUNTER,
         UPDATE_API_KEY_COUNTER,
+        LIST_REST_API_COUNTERS,
         UNKNOWN
     };
 
@@ -45,6 +46,7 @@ namespace AwsMock::Dto::Common {
             {ApiGatewayCommandType::LIST_API_KEY_COUNTERS, "list-api-key-counters"},
             {ApiGatewayCommandType::GET_API_KEY_COUNTER, "get-api-key-counter"},
             {ApiGatewayCommandType::UPDATE_API_KEY_COUNTER, "update-api-key-counter"},
+            {ApiGatewayCommandType::LIST_REST_API_COUNTERS, "list-rest-api-counters"},
             {ApiGatewayCommandType::UNKNOWN, "unknown"},
     };
 

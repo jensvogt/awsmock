@@ -2,8 +2,8 @@
 // Created by vogje01 on 11/25/23.
 //
 
-#ifndef AWSMOCK_DTO_API_GATEWAY_LIST_API_KEY_COUNTERS_REQUEST_H
-#define AWSMOCK_DTO_API_GATEWAY_LIST_API_KEY_COUNTERS_REQUEST_H
+#ifndef AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_REQUEST_H
+#define AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_REQUEST_H
 
 // C++ standard includes
 #include <string>
@@ -15,11 +15,11 @@
 namespace AwsMock::Dto::ApiGateway {
 
     /**
-     * @brief List API key counters request
+     * @brief List REST API counters request
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListApiKeyCountersRequest final : Common::BaseCounter<ListApiKeyCountersRequest> {
+    struct ListRestApiCountersRequest final : Common::BaseCounter<ListRestApiCountersRequest> {
 
         /**
          * Name prefix
@@ -43,8 +43,8 @@ namespace AwsMock::Dto::ApiGateway {
 
       private:
 
-        friend ListApiKeyCountersRequest tag_invoke(boost::json::value_to_tag<ListApiKeyCountersRequest>, boost::json::value const &v) {
-            ListApiKeyCountersRequest r;
+        friend ListRestApiCountersRequest tag_invoke(boost::json::value_to_tag<ListRestApiCountersRequest>, boost::json::value const &v) {
+            ListRestApiCountersRequest r;
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
@@ -54,7 +54,7 @@ namespace AwsMock::Dto::ApiGateway {
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListApiKeyCountersRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListRestApiCountersRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},
@@ -69,4 +69,4 @@ namespace AwsMock::Dto::ApiGateway {
 
 }// namespace AwsMock::Dto::ApiGateway
 
-#endif// AWSMOCK_DTO_API_GATEWAY_LIST_API_KEY_COUNTERS_REQUEST_H
+#endif// AWSMOCK_DTO_API_GATEWAY_LIST_REST_API_COUNTERS_REQUEST_H

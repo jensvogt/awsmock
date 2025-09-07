@@ -33,6 +33,11 @@ namespace AwsMock::Dto::ApiGateway {
         std::string description;
 
         /**
+         * API Key source
+         */
+        ApiKeySourceType apiKeySource;
+
+        /**
          * Enabled
          */
         bool enabled{};
@@ -43,6 +48,21 @@ namespace AwsMock::Dto::ApiGateway {
         bool generateDistinct{};
 
         /**
+         * Policy
+         */
+        std::string policy;
+
+        /**
+         * Root resource ID
+         */
+        std::string rootResourceId;
+
+        /**
+         * Binary media types
+         */
+        std::vector<std::string> binaryMediaTypes;
+
+        /**
          * Tags
          */
         std::map<std::string, std::string> tags;
@@ -51,6 +71,11 @@ namespace AwsMock::Dto::ApiGateway {
          * Value
          */
         std::string value;
+
+        /**
+         * Warnings
+         */
+        std::vector<std::string> warnings;
 
         /**
          * Created
@@ -73,10 +98,19 @@ namespace AwsMock::Dto::ApiGateway {
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
             r.generateDistinct = Core::Json::GetBoolValue(v, "generateDistinct");
             r.value = Core::Json::GetStringValue(v, "value");
+            r.policy = Core::Json::GetStringValue(v, "policy");
+            r.rootResourceId = Core::Json::GetStringValue(v, "policy");
+            r.apiKeySource = ApiKeySourceTypeFromString(Core::Json::GetStringValue(v, "value"));
             r.created = Core::Json::GetDatetimeValue(v, "created");
             r.modified = Core::Json::GetDatetimeValue(v, "modified");
+            if (Core::Json::AttributeExists(v, "binaryMediaTypes")) {
+                r.binaryMediaTypes = boost::json::value_to<std::vector<std::string>>(v.at("binaryMediaTypes"));
+            }
             if (Core::Json::AttributeExists(v, "tags")) {
                 r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("tags"));
+            }
+            if (Core::Json::AttributeExists(v, "warnings")) {
+                r.warnings = boost::json::value_to<std::vector<std::string>>(v.at("warnings"));
             }
             return r;
         }
@@ -90,7 +124,12 @@ namespace AwsMock::Dto::ApiGateway {
                     {"enabled", obj.enabled},
                     {"generateDistinct", obj.generateDistinct},
                     {"value", obj.value},
+                    {"apiKeySource", ApiKeySourceTypeToString(obj.apiKeySource)},
+                    {"policy", obj.policy},
+                    {"rootResourceId", obj.rootResourceId},
+                    {"binaryMediaTypes", boost::json::value_from(obj.binaryMediaTypes)},
                     {"tags", boost::json::value_from(obj.tags)},
+                    {"warnings", boost::json::value_from(obj.warnings)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

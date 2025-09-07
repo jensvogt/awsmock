@@ -147,6 +147,17 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] std::vector<Entity::ApiGateway::ApiKey> ListApiKeyCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
 
+        /**
+         * @brief Returns a list of REST API counters
+         *
+         * @param prefix name prefix
+         * @param pageSize page size customer ID
+         * @param pageIndex page index
+         * @param sortColumns sorting columns
+         * @return list of REST API counters
+         */
+        [[nodiscard]] std::vector<Entity::ApiGateway::RestApi> ListRestApiCounters(const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const;
+
       private:
 
         /**
