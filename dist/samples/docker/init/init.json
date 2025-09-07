@@ -5,34 +5,25 @@
     "s3-buckets": [
       {
         "region": "eu-central-1",
-        "name": "test-bucket",
+        "name": "file-delivery",
         "owner": "none",
-        "arn": "arn:aws:s3:eu-central-1:000000000000:test-bucket",
+        "arn": "arn:aws:s3:eu-central-1:000000000000:file-delivery",
         "size": 0,
         "keys": 0,
         "notifications": [],
         "queueNotifications": [],
         "topicNotifications": [],
-        "lambdaConfigurations": [
-          {
-            "id": "1234567890124",
-            "lambdaArn": "arn:aws:lambda:eu-central-1:000000000000:function:s3-notification-cpp-lambda",
-            "events": [
-              "ObjectCreated"
-            ],
-            "filterRules": []
-          }
-        ],
+        "lambdaConfigurations": [],
         "encryptionConfiguration": {
           "sseAlgorithm": "",
           "kmsKeyId": ""
         },
         "versionStatus": "disabled",
         "created": {
-          "$date": "2025-01-08T12:59:20.123Z"
+          "$date": 1757252997754
         },
         "modified": {
-          "$date": "2025-05-09T15:50:13.127Z"
+          "$date": 1757259478345
         }
       },
       {
@@ -61,20 +52,52 @@
         },
         "versionStatus": "disabled",
         "created": {
-          "$date": "2025-01-08T12:59:20.123Z"
+          "$date": 1736341160123
         },
         "modified": {
-          "$date": "2025-05-09T15:50:13.127Z"
+          "$date": 1757259478346
         }
       }
     ],
     "sqs-queues": [
       {
         "region": "eu-central-1",
-        "owner": "none",
-        "name": "test-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/test-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:test-dlqueue",
+        "name": "file-distribution-image-queue",
+        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-image-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 20,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
+            "maxReceiveCount": 3
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 0,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 0,
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue"
+        },
+        "tags": {},
+        "defaultMessageAttributes": {},
+        "size": 0,
+        "isDlq": false,
+        "created": {
+          "$date": 1757259499948
+        },
+        "modified": {
+          "$date": 1757259499948
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "file-distribution-image-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-image-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -89,25 +112,25 @@
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": ""
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue"
         },
         "tags": {},
+        "defaultMessageAttributes": {},
         "size": 0,
         "isDlq": true,
-        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:test-queue",
+        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue",
         "created": {
-          "$date": "2025-01-08T12:59:50.993Z"
+          "$date": 1757259499948
         },
         "modified": {
-          "$date": "2025-05-09T16:03:32.758Z"
+          "$date": 1757259499948
         }
       },
       {
         "region": "eu-central-1",
-        "owner": "none",
-        "name": "test-queue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/test-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:test-queue",
+        "name": "file-distribution-json-queue",
+        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-json-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -116,46 +139,142 @@
           "receiveMessageWaitTime": 20,
           "visibilityTimeout": 30,
           "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:test-dlqueue",
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
             "maxReceiveCount": 3
           },
           "redriveAllowPolicy": "",
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": ""
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue"
         },
         "tags": {},
+        "defaultMessageAttributes": {},
         "size": 0,
         "isDlq": false,
         "created": {
-          "$date": "2025-01-08T12:59:49.877Z"
+          "$date": 1757259526956
         },
         "modified": {
-          "$date": "2025-05-09T15:50:13.128Z"
+          "$date": 1757259526956
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "file-distribution-json-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-json-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 20,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "maxReceiveCount": 0
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 0,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 0,
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue"
+        },
+        "tags": {},
+        "defaultMessageAttributes": {},
+        "size": 0,
+        "isDlq": true,
+        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue",
+        "created": {
+          "$date": 1757259499948
+        },
+        "modified": {
+          "$date": 1757259499948
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "file-distribution-xml-queue",
+        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-xml-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 20,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue",
+            "maxReceiveCount": 3
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 0,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 0,
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue"
+        },
+        "tags": {},
+        "defaultMessageAttributes": {},
+        "size": 0,
+        "isDlq": false,
+        "created": {
+          "$date": 1757259508476
+        },
+        "modified": {
+          "$date": 1757259508476
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "file-distribution-xml-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-xml-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 20,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "maxReceiveCount": 0
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 0,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 0,
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue"
+        },
+        "tags": {},
+        "defaultMessageAttributes": {},
+        "size": 0,
+        "isDlq": true,
+        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
+        "created": {
+          "$date": 1757259499948
+        },
+        "modified": {
+          "$date": 1757259499948
         }
       }
     ],
     "sns-topics": [
       {
         "region": "eu-central-1",
-        "topicName": "test-topic",
-        "topicArn": "arn:aws:sns:eu-central-1:000000000000:test-topic",
-        "messages": 0,
-        "size": 6134,
+        "topicName": "protocolizing-topic",
+        "topicArn": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic",
+        "messages": 3,
+        "messagesSend": 0,
+        "messagesResend": 0,
+        "size": 6,
         "created": {
-          "$date": "2025-01-08T13:06:25.130Z"
+          "$date": 1757253089477
         },
         "modified": {
-          "$date": "2025-05-09T15:50:13.129Z"
+          "$date": 1757259478347
         },
-        "subscriptions": [
-          {
-            "protocol": "sqs",
-            "endpoint": "arn:aws:sqs:eu-central-1:000000000000:test-queue",
-            "subscriptionArn": "arn:aws:sns:eu-central-1:000000000000:test-topic:ec3bbd11-00fb-4dea-971a-4e09da5729c7"
-          }
-        ],
+        "subscriptions": [],
         "attributes": {
           "deliveryPolicy": "",
           "displayName": "",
@@ -166,10 +285,10 @@
           "kmsMasterKeyId": "",
           "archivePolicy": "",
           "beginningArchiveTime": {
-            "$date": "1970-01-01T00:00:00Z"
+            "$date": 0
           },
           "contentBasedDeduplication": false,
-          "availableMessages": 13
+          "availableMessages": 0
         },
         "tags": {}
       }
@@ -177,32 +296,36 @@
     "lambda-functions": [
       {
         "region": "eu-central-1",
-        "arn": "arn:aws:lambda:eu-central-1:000000000000:function:s3-notification-cpp-lambda",
+        "arn": "arn:aws:lambda:eu-central-1:000000000000:function:file-copy-lambda",
         "user": "none",
-        "function": "s3-notification-cpp-lambda",
-        "runtime": "provided.al2023",
-        "handler": "s3-notification-cpp-lambda",
+        "function": "file-copy-lambda",
+        "runtime": "java21",
+        "handler": "org.springframework.cloud.function.adapter.aws.FunctionInvoker",
         "imageId": "8c5dbd705cac3970dd7933c47251f28797789b139b47da2b75e22670d198f94e",
         "memorySize": 128,
-        "codeSize": 30921936,
+        "codeSize": 26,
         "imageSize": 262015092,
-        "containerSize": 0,
+        "containerSize": 467892465,
         "tags": {
-          "tag": "latest"
+          "tag": "1.1.1",
+          "version": "1.1.1"
         },
         "ephemeralStorage": {
           "size": 512
         },
-        "timeout": 3600,
+        "timeout": 900,
         "concurrency": 5,
         "codeSha256": "c3015d428f81054a0f2bf05f68dd16b9af6e9d411593389044e9358ef1093720",
         "environment": {
           "variables": {
-            "AWS_REGION": "eu-central-1"
+            "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+            "AWS_REGION": "eu-central-1",
+            "AWS_S3_DESTINATION_BUCKET": "file-delivery",
+            "AWS_SNS_PROTOCOLIZING_TOPIC_ARN": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic"
           }
         },
         "code": {
-          "zipFile": "s3-notification-cpp-lambda-latest.b64"
+          "zipFile": "file-copy-lambda-1.1.1.b64"
         },
         "state": "Active",
         "stateReason": "Activated",
@@ -210,19 +333,95 @@
         "instances": [],
         "invocations": 0,
         "averageRuntime": 0,
-        "dockerTag": "latest",
-        "eventSources": [],
+        "dockerTag": "1.1.1",
+        "enabled": true,
+        "eventSources": [
+          {
+            "type": "S3",
+            "eventSourceArn": "arn:aws:s3:eu-central-1:000000000000:transfer-server",
+            "batchSize": 10,
+            "maximumBatchingWindowInSeconds": 5,
+            "enabled": true,
+            "uuid": "2657dde5-12dd-41e5-a021-524a8b59e0d6"
+          }
+        ],
         "lastStarted": {
-          "$date": "2025-05-09T16:01:53.777Z"
+          "$date": 1757253046878
         },
         "lastInvocation": {
-          "$date": "2025-05-09T16:01:53.777Z"
+          "$date": 1746806513777
         },
         "created": {
-          "$date": "2025-05-09T16:01:44.975Z"
+          "$date": 1746806504975
         },
         "modified": {
-          "$date": "2025-05-09T16:01:44.975Z"
+          "$date": 1757259478348
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "arn": "arn:aws:lambda:eu-central-1:000000000000:function:file-distribution-lambda",
+        "user": "none",
+        "function": "file-distribution-lambda",
+        "runtime": "java21",
+        "handler": "org.springframework.cloud.function.adapter.aws.FunctionInvoker",
+        "imageId": "8c5dbd705cac3970dd7933c47251a19797789b139b47da2b75e22670d198f94e",
+        "memorySize": 128,
+        "codeSize": 26,
+        "imageSize": 262015092,
+        "containerSize": 467892465,
+        "tags": {
+          "tag": "1.1.1",
+          "version": "1.1.1"
+        },
+        "ephemeralStorage": {
+          "size": 512
+        },
+        "timeout": 900,
+        "concurrency": 5,
+        "codeSha256": "c3015d428f81054a0f2bf05f68dd16b9af6e9d411593389044e9358ef1093720",
+        "environment": {
+          "variables": {
+            "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+            "AWS_REGION": "eu-central-1",
+            "AWS_SNS_PROTOCOLIZING_TOPIC_ARN": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic",
+            "AWS_SQS_IMAGE_QUEUE_NAME": "file-distribution-image-queue",
+            "AWS_SQS_JSON_QUEUE_NAME": "file-distribution-json-queue",
+            "AWS_SQS_XML_QUEUE_NAME": "file-distribution-xml-queue"
+          }
+        },
+        "code": {
+          "zipFile": "file-distribution-lambda-1.1.1.b64"
+        },
+        "state": "Active",
+        "stateReason": "Activated",
+        "stateReasonCode": "Creating",
+        "instances": [],
+        "invocations": 0,
+        "averageRuntime": 0,
+        "dockerTag": "1.1.1",
+        "enabled": true,
+        "eventSources": [
+          {
+            "type": "S3",
+            "eventSourceArn": "arn:aws:s3:eu-central-1:000000000000:file-delivery",
+            "batchSize": 10,
+            "maximumBatchingWindowInSeconds": 5,
+            "enabled": true,
+            "uuid": "14a48c4b-36fe-4079-81fc-2e05aa325b88"
+          }
+        ],
+        "lastStarted": {
+          "$date": 1757253046878
+        },
+        "lastInvocation": {
+          "$date": 1746806513777
+        },
+        "created": {
+          "$date": 1746806504975
+        },
+        "modified": {
+          "$date": 1757259478349
         }
       }
     ],
@@ -235,13 +434,13 @@
         "listenAddress": "0.0.0.0",
         "state": "ONLINE",
         "lastStarted": {
-          "$date": 1757161978830
+          "$date": 1757253046887
         },
         "created": {
           "$date": 1736341595533
         },
         "modified": {
-          "$date": 1756983172862
+          "$date": 1757259478350
         },
         "users": [
           {
@@ -270,6 +469,565 @@
         "tags": {
           "alias": "ftp-server",
           "version": "1.0"
+        }
+      }
+    ],
+    "dynamodb-tables": [
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_compliance_record",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_compliance_record",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251801971
+        },
+        "modified": {
+          "$date": 1757259478352
+        },
+        "attributes": {
+          "composedPartitionKey": "S",
+          "createdAt": "S"
+        },
+        "keySchemas": {
+          "composedPartitionKey": "HASH",
+          "createdAt": "RANGE"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_feature_state",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_feature_state",
+        "status": "ACTIVE",
+        "size": 914,
+        "itemCount": 10,
+        "created": {
+          "$date": 1757251802023
+        },
+        "modified": {
+          "$date": 1757259478353
+        },
+        "attributes": {
+          "featureName": "S"
+        },
+        "keySchemas": {
+          "featureName": "HASH"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_inventory_feed",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_inventory_feed",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802024
+        },
+        "modified": {
+          "$date": 1757259478355
+        },
+        "attributes": {
+          "datenlieferantId": "S",
+          "ean": "S"
+        },
+        "keySchemas": {
+          "datenlieferantId": "HASH",
+          "ean": "RANGE"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_katalogdaten_aus_vorlage",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_katalogdaten_aus_vorlage",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802026
+        },
+        "modified": {
+          "$date": 1757259478356
+        },
+        "attributes": {
+          "datenlieferantId": "S",
+          "ean": "S"
+        },
+        "keySchemas": {
+          "datenlieferantId": "HASH",
+          "ean": "RANGE"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_katalogdaten_aus_vorlage_datenlieferant",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_katalogdaten_aus_vorlage_datenlieferant",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802027
+        },
+        "modified": {
+          "$date": 1757259478357
+        },
+        "attributes": {
+          "datenlieferantId": "S"
+        },
+        "keySchemas": {
+          "datenlieferantId": "HASH"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_katalogdaten_aus_vorlage_text_annotation",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_katalogdaten_aus_vorlage_text_annotation",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802029
+        },
+        "modified": {
+          "$date": 1757259478358
+        },
+        "attributes": {
+          "datenlieferantId": "S",
+          "sortKey": "S"
+        },
+        "keySchemas": {
+          "datenlieferantId": "HASH",
+          "sortKey": "RANGE"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_libri_product_export",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_libri_product_export",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802030
+        },
+        "modified": {
+          "$date": 1757259478359
+        },
+        "attributes": {
+          "exportStartTime": "S",
+          "composedSortKey": "S"
+        },
+        "keySchemas": {
+          "exportStartTime": "HASH",
+          "composedSortKey": "RANGE"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_libri_product_export_history",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_libri_product_export_history",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802031
+        },
+        "modified": {
+          "$date": 1757259478360
+        },
+        "attributes": {
+          "datenlieferantId": "S",
+          "productId": "S"
+        },
+        "keySchemas": {
+          "datenlieferantId": "HASH",
+          "productId": "RANGE"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_libri_product_export_sequence",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_libri_product_export_sequence",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802032
+        },
+        "modified": {
+          "$date": 1757259478361
+        },
+        "attributes": {
+          "partitionKey": "S"
+        },
+        "keySchemas": {
+          "partitionKey": "HASH"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_organr_zu_datenlieferant",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_organr_zu_datenlieferant",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802033
+        },
+        "modified": {
+          "$date": 1757259478373
+        },
+        "attributes": {
+          "orgaNr": "N"
+        },
+        "keySchemas": {
+          "orgaNr": "HASH"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_originaldatei_datenlieferant",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_originaldatei_datenlieferant",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802034
+        },
+        "modified": {
+          "$date": 1757259478374
+        },
+        "attributes": {
+          "datenlieferantId": "S"
+        },
+        "keySchemas": {
+          "datenlieferantId": "HASH"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "pim_local_verlagsnr_zu_datenlieferant",
+        "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_verlagsnr_zu_datenlieferant",
+        "status": "ACTIVE",
+        "size": 0,
+        "itemCount": 0,
+        "created": {
+          "$date": 1757251802035
+        },
+        "modified": {
+          "$date": 1757259478376
+        },
+        "attributes": {
+          "verlagsNr": "N"
+        },
+        "keySchemas": {
+          "verlagsNr": "HASH"
+        },
+        "provisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1,
+          "LastDecreaseDateTime": {
+            "$date": 0
+          },
+          "LastIncreaseDateTime": {
+            "$date": 0
+          },
+          "NumberOfDecreasesToday": 0
+        },
+        "streamSpecification": {
+          "streamEnabled": false,
+          "streamViewType": "UNKNOWN"
+        }
+      }
+    ],
+    "applications": [
+      {
+        "region": "eu-central-1",
+        "name": "image-processing",
+        "runtime": "JAVA21",
+        "type": "DOCKER",
+        "privatePort": 8081,
+        "publicPort": 36511,
+        "archive": "image-processing-1.1.1-SNAPSHOT.jar",
+        "version": "1.1.1",
+        "containerId": "",
+        "containerName": "",
+        "enabled": true,
+        "status": "RUNNING",
+        "imageId": "sha256:ce14876819365c8e99f3d5bd8abab2ec51ef8f502fc1217783ed2ac411b74f3f",
+        "imageSize": 431943582,
+        "imageMd5": "0b51eee5b820654df8249d13b4db39e9",
+        "description": "",
+        "lastStarted": {
+          "$date": 1757253052542
+        },
+        "created": {
+          "$date": 1757253052542
+        },
+        "modified": {
+          "$date": 1757259478377
+        },
+        "environment": {
+          "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+          "AWS_REGION": "eu-central-1",
+          "AWS_S3_ONIX_BUCKET_NAME": "file-delivery",
+          "AWS_SNS_LOGGING_TOPIC": "protocolizing-topic",
+          "AWS_SQS_IMAGE_INPUT_QUEUE": "file-delivery-image-queue",
+          "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Xms2G -Xmx4G",
+          "LC_ALL": "en_US.UTF-8",
+          "SPRING_PROFILES_ACTIVE": "awsmock"
+        },
+        "tags": {
+          "dockerTag": "1.1.1",
+          "version": "1.1.1"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "xml-processing",
+        "runtime": "JAVA21",
+        "type": "DOCKER",
+        "privatePort": 8081,
+        "publicPort": 38675,
+        "archive": "xml-processing-1.1.1-SNAPSHOT.jar",
+        "version": "1.1.1",
+        "containerId": "",
+        "containerName": "",
+        "enabled": true,
+        "status": "RUNNING",
+        "imageId": "sha256:ce14876819365c8e99f3d5bd8abab2ec51ef8f502fc1217783ed2ac411b74f3f",
+        "imageSize": 431943582,
+        "imageMd5": "0b51eee5b820654df8249d13b4db39e9",
+        "description": "",
+        "lastStarted": {
+          "$date": 1757253052455
+        },
+        "created": {
+          "$date": 1757253052455
+        },
+        "modified": {
+          "$date": 1757259478377
+        },
+        "environment": {
+          "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+          "AWS_REGION": "eu-central-1",
+          "AWS_S3_ONIX_BUCKET_NAME": "file-delivery",
+          "AWS_SNS_LOGGING_TOPIC": "protocolizing-topic",
+          "AWS_SQS_IMAGE_INPUT_QUEUE": "file-delivery-xml-queue",
+          "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Xms2G -Xmx4G",
+          "LC_ALL": "en_US.UTF-8",
+          "SPRING_PROFILES_ACTIVE": "awsmock"
+        },
+        "tags": {
+          "dockerTag": "1.1.1",
+          "version": "1.1.1"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "json-processing",
+        "runtime": "JAVA21",
+        "type": "DOCKER",
+        "privatePort": 8081,
+        "publicPort": 60803,
+        "archive": "json-processing-1.1.1-SNAPSHOT.jar",
+        "version": "1.1.1",
+        "containerId": "",
+        "containerName": "",
+        "enabled": true,
+        "status": "RUNNING",
+        "imageId": "sha256:ce14876819365c8e99f3d5bd8abab2ec51ef8f502fc1217783ed2ac411b74f3f",
+        "imageSize": 431943582,
+        "imageMd5": "0b51eee5b820654df8249d13b4db39e9",
+        "description": "",
+        "lastStarted": {
+          "$date": 1757253052592
+        },
+        "created": {
+          "$date": 1757253052592
+        },
+        "modified": {
+          "$date": 1757259478377
+        },
+        "environment": {
+          "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+          "AWS_REGION": "eu-central-1",
+          "AWS_S3_ONIX_BUCKET_NAME": "file-delivery",
+          "AWS_SNS_LOGGING_TOPIC": "protocolizing-topic",
+          "AWS_SQS_IMAGE_INPUT_QUEUE": "file-delivery-json-queue",
+          "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Xms2G -Xmx4G",
+          "LC_ALL": "en_US.UTF-8",
+          "SPRING_PROFILES_ACTIVE": "awsmock"
+        },
+        "tags": {
+          "dockerTag": "1.1.1",
+          "version": "1.1.1"
         }
       }
     ]

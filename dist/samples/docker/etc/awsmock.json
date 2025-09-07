@@ -48,7 +48,7 @@
           "count": 5
         },
         "data-dir": "/usr/local/awsmock/data/s3",
-        "counter-period": 60,
+        "counter-period": 10,
         "sync-period": 3600
       },
       "sqs": {
@@ -307,7 +307,7 @@
     "logging": {
       "file-active": false,
       "console-active": true,
-      "level": "info",
+      "level": "debug",
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",
       "file-size": 10485760,
