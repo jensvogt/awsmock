@@ -6,7 +6,7 @@
 
 namespace AwsMock::Service {
 
-    Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) {
+    Database::Entity::Lambda::Lambda LambdaCreator::CreateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId) const {
         log_debug << "Start creating lambda function, instanceId: " << instanceId;
 
         // Create a new instance
@@ -25,7 +25,7 @@ namespace AwsMock::Service {
         return lambda;
     }
 
-    std::string LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) {
+    std::string LambdaCreator::CreateInstance(const std::string &instanceId, Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode) const {
 
         const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
 
@@ -78,7 +78,7 @@ namespace AwsMock::Service {
         return inspectContainerResponse.id;
     }
 
-    void LambdaCreator::UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) {
+    void LambdaCreator::UpdateLambda(Database::Entity::Lambda::Lambda &lambda, const std::string &functionCode, const std::string &newVersion) const {
 
         const auto privatePort = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.private-port");
         const auto dockerized = Core::Configuration::instance().GetValue<bool>("awsmock.dockerized");
@@ -155,7 +155,7 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_debug << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
+        log_info << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
     }
 
     void LambdaCreator::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
