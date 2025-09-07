@@ -82,6 +82,7 @@ namespace AwsMock::Service {
         long totalKeys = 0;
         long totalSize = 0;
 
+        // Reload the counters first
         _s3Database.AdjustObjectCounters();
 
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();

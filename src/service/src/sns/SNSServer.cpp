@@ -9,9 +9,9 @@ namespace AwsMock::Service {
     SNSServer::SNSServer(Core::Scheduler &scheduler) : AbstractServer("sns"), _monitoringCollector(Core::MonitoringCollector::instance()) {
 
         // Configuration
-        _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete.period");
-        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.counter.period");
-        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.monitoring.period");
+        _deletePeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.delete-period");
+        _counterPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.counter-period");
+        _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.sns.monitoring-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.sns.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.sns.backup.cron");
 

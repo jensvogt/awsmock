@@ -72,15 +72,9 @@
           "count": 5
         },
         "timeout": 14,
-        "monitoring": {
-          "period": 300
-        },
-        "delete": {
-          "period": 300
-        },
-        "counter": {
-          "period": 10
-        }
+        "monitoring-period": 300,
+        "delete-period": 300,
+        "counter-period": 10
       },
       "lambda": {
         "active": true,

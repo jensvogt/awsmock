@@ -966,7 +966,11 @@ namespace AwsMock::Database {
                                                                                  kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
                                                                                  kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
                                                                                  kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend")))))));
-                    log_debug << Core::Bson::BsonUtils::GetStringValue(t, "_id") << " size: " << Core::Bson::BsonUtils::GetLongValue(t, "size") << " visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial") << " invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible") << " delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                    log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "_id")
+                              << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
+                              << ", visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial")
+                              << ", invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible")
+                              << ", delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
                 }
                 session.commit_transaction();
 
