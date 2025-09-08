@@ -28,7 +28,6 @@
 #include <libssh/sftp.h>
 
 #include <csignal>
-#include <cstdbool>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
@@ -297,8 +296,8 @@ int _ssh_buffer_unpack(ssh_buffer_struct *buffer, const char *format, size_t arg
 }
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/sftpserver/SftpUser.h>
 #include <boost/log/trivial.hpp>
 #define DEF_STR_SIZE 1024

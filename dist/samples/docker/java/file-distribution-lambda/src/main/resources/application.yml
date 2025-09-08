@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: ${SERVICE_NAME:file-copy-lambda}
+  main:
+    banner-mode: off
+  task:
+    execution:
+      pool:
+        max-size: 10
+
+aws:
+  sns-protokollierung-topic-arn: notused
+  s3-destination-bucket: notused
+  localstack-endpoint: notused
+
+environment: awsmock

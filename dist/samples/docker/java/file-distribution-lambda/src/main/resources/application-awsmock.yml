@@ -1,0 +1,13 @@
+logging:
+  level:
+    root: INFO
+    de.awsmock.lambda.filedistribution: DEBUG
+
+aws:
+  sns:
+    protocolizing-topic-arn: arn:aws:sns:eu-central-1:000000000000:protocolizing-topic
+  sqs:
+    image-queue-name: file-distribution-image-queue
+    xml-queue-name: file-distribution-xml-queue
+    json-queue-name: file-distribution-json-queue
+  localstack-endpoint: http://awsmock:4566
