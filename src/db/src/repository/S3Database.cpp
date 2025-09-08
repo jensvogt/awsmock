@@ -912,9 +912,8 @@ namespace AwsMock::Database {
             _memoryDb.DeleteObject(object);
         }
 
-        // Update counter
-        //(*_s3CounterMap)[object.bucketArn].keys--;
-        //(*_s3CounterMap)[object.bucketArn].size -= object.size;
+        // Update monitoring counters
+        AdjustObjectCounters();
     }
 
     void S3Database::DeleteObjects(const std::string &region, const std::string &bucketName, const std::vector<std::string> &keys) const {
@@ -959,10 +958,8 @@ namespace AwsMock::Database {
             _memoryDb.DeleteObjects(bucketName, keys);
         }
 
-        // Update counter
-        const Entity::S3::Bucket bucket = GetBucketByRegionName(region, bucketName);
-        //(*_s3CounterMap)[bucket.arn].keys = GetBucketObjectCount(region, bucketName);
-        //(*_s3CounterMap)[bucket.arn].size = GetBucketSize(region, bucketName);
+        // Update monitoring counters
+        AdjustObjectCounters();
     }
 
     long S3Database::DeleteAllObjects() const {
@@ -979,8 +976,8 @@ namespace AwsMock::Database {
                 session.start_transaction();
                 const auto result = _objectCollection.delete_many({});
                 session.commit_transaction();
-                log_debug << "All objects deleted, count: " << result->deleted_count();
 
+                log_debug << "All objects deleted, count: " << result->deleted_count();
                 deleted = result->deleted_count();
 
             } catch (const mongocxx::exception &exc) {
@@ -991,6 +988,10 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteAllObjects();
         }
+
+        // Update monitoring counters
+        AdjustObjectCounters();
+
         return deleted;
     }
 

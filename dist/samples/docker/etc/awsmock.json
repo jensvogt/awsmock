@@ -301,7 +301,7 @@
     "logging": {
       "file-active": false,
       "console-active": true,
-      "level": "debug",
+      "level": "info",
       "dir": "/usr/local/awsmock/log",
       "prefix": "awsmock",
       "file-size": 10485760,

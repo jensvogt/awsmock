@@ -431,16 +431,6 @@ namespace AwsMock::Database {
          * SNS in-memory database
          */
         SNSMemoryDb &_memoryDb;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        SnsCounterMapType *_snsCounterMap;
     };
 
 }// namespace AwsMock::Database

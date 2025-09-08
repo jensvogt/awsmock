@@ -1295,6 +1295,10 @@ namespace AwsMock::Database {
         } else {
             deleted = _memoryDb.DeleteMessage(message);
         }
+
+        // Update monitoring counters
+        AdjustMessageCounters();
+
         return deleted;
     }
 
@@ -1350,7 +1354,9 @@ namespace AwsMock::Database {
             deleted = _memoryDb.DeleteAllMessages();
         }
 
-        // Update the counter-map
+        // Update monitoring counters
+        AdjustMessageCounters();
+
         return deleted;
     }
 

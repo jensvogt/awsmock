@@ -9,26 +9,8 @@
 #include <awsmock/repository/SNSDatabase.h>
 
 namespace AwsMock::Database {
-    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {
 
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _snsCounterMap = _segment.find<SnsCounterMapType>(SNS_COUNTER_MAP_NAME).first;
-        if (!_snsCounterMap) {
-            _snsCounterMap = _segment.construct<SnsCounterMapType>(SNS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
-        }
-
-        // Initialize the counters
-        for (const auto &topic: ListTopics()) {
-            TopicMonitoringCounter counter;
-            counter.initial = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::INITIAL);
-            counter.resend = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::RESEND);
-            counter.send = CountMessagesByStatus(topic.topicArn, Entity::SNS::MessageStatus::SEND);
-            counter.messages = CountMessages(topic.topicArn);
-            counter.size = GetTopicSize(topic.topicArn);
-            _snsCounterMap->insert_or_assign(topic.topicArn, counter);
-        }
-        log_debug << "SNS queues counters initialized, size: " << _snsCounterMap->size();
-    }
+    SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {}
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {
         if (HasDatabase()) {
@@ -809,16 +791,8 @@ namespace AwsMock::Database {
             _memoryDb.DeleteMessage(message.messageId);
         }
 
-        // Update counter-map
-        (*_snsCounterMap)[message.topicArn].size -= message.size;
-        (*_snsCounterMap)[message.topicArn].messages--;
-        if (message.status == Entity::SNS::MessageStatus::INITIAL) {
-            (*_snsCounterMap)[message.topicArn].initial--;
-        } else if (message.status == Entity::SNS::MessageStatus::SEND) {
-            (*_snsCounterMap)[message.topicArn].send--;
-        } else if (message.status == Entity::SNS::MessageStatus::RESEND) {
-            (*_snsCounterMap)[message.topicArn].resend--;
-        }
+        // Update monitoring counters
+        AdjustMessageCounters();
     }
 
     void SNSDatabase::DeleteMessage(const std::string &messageId) const {
@@ -840,6 +814,9 @@ namespace AwsMock::Database {
         } else {
             _memoryDb.DeleteMessage(messageId);
         }
+
+        // Update monitoring counters
+        AdjustMessageCounters();
     }
 
     void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const {
@@ -868,6 +845,9 @@ namespace AwsMock::Database {
         } else {
             _memoryDb.DeleteMessages(region, topicArn, messageIds);
         }
+
+        // Update monitoring counters
+        AdjustMessageCounters();
     }
 
     void SNSDatabase::DeleteOldMessages(const long timeout) const {
@@ -895,6 +875,9 @@ namespace AwsMock::Database {
         } else {
             _memoryDb.DeleteOldMessages(timeout);
         }
+
+        // Update monitoring counters
+        AdjustMessageCounters();
     }
 
     long SNSDatabase::DeleteAllMessages() const {
@@ -916,12 +899,9 @@ namespace AwsMock::Database {
             deleted = _memoryDb.DeleteAllMessages();
         }
 
-        // Update the counter-map
-        (*_snsCounterMap)[_messageCollectionName].size = 0;
-        (*_snsCounterMap)[_messageCollectionName].messages = 0;
-        (*_snsCounterMap)[_messageCollectionName].initial = 0;
-        (*_snsCounterMap)[_messageCollectionName].send = 0;
-        (*_snsCounterMap)[_messageCollectionName].resend = 0;
+        // Update monitoring counters
+        AdjustMessageCounters();
+
         return deleted;
     }
 
