@@ -50,6 +50,8 @@ cd lambda/file-distribution-lambda
 mvn clean package 
 ```
 
+You need to install maven and a JDK (at least java21).
+
 ## Load the lambda function
 
 During startup the lambda function will be created, but the necessary function code will not be loaded into the docker
@@ -63,6 +65,9 @@ lambda directory. Do the same for the ```file-delivery-lambda-1.1.1-aws.jar```. 
 available. They will start automatically when the docker container is started. The lambda lifetime is set to 90 min,
 which means the lambda functions container will be stopped after 90 min.
 
+This is only necessary for the first start of the docker container. After the first start, the lambda functions will
+be available.
+
 ## Load the applications
 
 During startup the applications will be created, but the necessary Java code will not be loaded into the docker daemon.
@@ -73,5 +78,19 @@ module.
 
 Click on the ```Upload application code``` menu entry and select the ```process-xml-1.1.1-aws.jar``` file, located in
 the application directory. Do the same for the ```process-json-1.1.1-aws.jar``` and ```process-image-1.1.1-aws.jar```.
-Now the applications are available. They will start automatically when the docker container is started. 
+Now the applications are available. They will start automatically when the docker container is started.
 
+This is only necessary for the first start of the docker container. After the first start, the lambda functions will
+be available.
+
+## Start the protocolizing application
+
+The protocolizing is a simple python script, which is used to receive log messages from the SNS topic. To start the
+protocolizing application, run the following command:
+
+```
+cd python
+python protocolizer.py
+```
+
+You need to install python and the boto3 packages. The AWS python SDK 'boto3' package should be at least v1.40.
