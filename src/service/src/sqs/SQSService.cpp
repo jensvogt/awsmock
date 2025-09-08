@@ -432,13 +432,13 @@ namespace AwsMock::Service {
 
         try {
             // Update messages
-            Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
-            Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
+            const Database::Entity::SQS::Queue originalQueue = _sqsDatabase.GetQueueByDlq(request.queueArn);
+            const Database::Entity::SQS::Queue dqlQueue = _sqsDatabase.GetQueueByArn(request.queueArn);
             const long count = _sqsDatabase.RedriveMessages(originalQueue, dqlQueue);
+            log_debug << "SQS redrive messages, queueArn: " << request.queueArn << " count: " << count;
 
-            // Adjust queue attributes
-            originalQueue.attributes.approximateNumberOfMessages += count;
-            dqlQueue.attributes.approximateNumberOfMessages -= count;
+            // Update monitoring counter
+            _sqsDatabase.AdjustMessageCounters();
 
             return count;
 

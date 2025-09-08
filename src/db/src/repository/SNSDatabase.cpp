@@ -204,8 +204,6 @@ namespace AwsMock::Database {
                 for (auto queueCursor = _topicCollection.find(query.extract()); const auto topic: queueCursor) {
                     Entity::SNS::Topic result;
                     result.FromDocument(topic);
-                    result.messages = (*_snsCounterMap)[result.topicArn].messages;
-                    result.size = (*_snsCounterMap)[result.topicArn].size;
                     topicList.push_back(result);
                 }
             } catch (const mongocxx::exception &exc) {
@@ -441,12 +439,8 @@ namespace AwsMock::Database {
             purged = _memoryDb.PurgeTopic(topic);
         }
 
-        // Update the counter-map
-        (*_snsCounterMap)[topic.topicArn].size = 0;
-        (*_snsCounterMap)[topic.topicArn].messages = 0;
-        (*_snsCounterMap)[topic.topicArn].initial = 0;
-        (*_snsCounterMap)[topic.topicArn].send = 0;
-        (*_snsCounterMap)[topic.topicArn].resend = 0;
+        // Update monitoring counters
+        AdjustMessageCounters();
 
         return purged;
     }
@@ -494,8 +488,8 @@ namespace AwsMock::Database {
             _memoryDb.DeleteTopic(topic);
         }
 
-        // Update counter-map
-        _snsCounterMap->erase(topic.topicArn);
+        // Update monitoring counters
+        AdjustMessageCounters();
     }
 
     long SNSDatabase::DeleteAllTopics() const {
@@ -522,8 +516,9 @@ namespace AwsMock::Database {
             deleted = _memoryDb.DeleteAllTopics();
         }
 
-        // Update the counter-map
-        _snsCounterMap->clear();
+        // Update monitoring counters
+        AdjustMessageCounters();
+
         return deleted;
     }
 
@@ -567,10 +562,9 @@ namespace AwsMock::Database {
             message = _memoryDb.CreateMessage(message);
         }
 
-        // Update counter map
-        (*_snsCounterMap)[message.topicArn].size += message.size;
-        (*_snsCounterMap)[message.topicArn].messages++;
-        (*_snsCounterMap)[message.topicArn].initial++;
+        // Update monitoring counters
+        AdjustMessageCounters();
+
         return message;
     }
 
@@ -937,20 +931,41 @@ namespace AwsMock::Database {
                                        kvp("send", 1),
                                        kvp("resend", 1),
                                        kvp("size", 1));
+                p.project(projectDocument.extract());
 
                 session.start_transaction();
+
+                // Initialize all topics with zero message counts
+                topicCollection.update_many({}, make_document(kvp("$set", make_document(
+                                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                                  kvp("messages", bsoncxx::types::b_int64()),
+                                                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                                                  kvp("messagesResend", bsoncxx::types::b_int64())))));
+
+                auto bulk = topicCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
-                    topicCollection.update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
-                                               make_document(kvp("$set", make_document(
-                                                                                 kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                 kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
-                                                                                 kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
-                                                                                 kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend")))))));
-                    log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "_id")
+                    bulk.append(mongocxx::model::update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "topicArn"))),
+                                                            make_document(kvp("$set", make_document(
+                                                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                                                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
+                    log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "topicArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial")
                               << ", invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible")
                               << ", delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                }
+
+                // Bul updates
+                if (!bulk.empty()) {
+                    try {
+                        auto result = bulk.execute();
+                        log_debug << "Bulk write result: " << result->modified_count();
+                    } catch (const mongocxx::exception &exc) {
+                        log_error << "Bulk write failed: " << exc.what();
+                        throw Core::DatabaseException(exc.what());
+                    }
                 }
                 session.commit_transaction();
 

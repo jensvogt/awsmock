@@ -1393,20 +1393,43 @@ namespace AwsMock::Database {
                                        kvp("invisible", 1),
                                        kvp("delayed", 1),
                                        kvp("size", 1));
+                p.project(projectDocument.extract());
 
                 session.start_transaction();
+
+                // Initialize all queues with zero message counts
+                queueCollection.update_many({}, make_document(kvp("$set", make_document(
+                                                                                  kvp("size", bsoncxx::types::b_int64()),
+                                                                                  kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64()),
+                                                                                  kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64()),
+                                                                                  kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64())))));
+
+                // Create a bulk write operation for queues with messages
+                auto bulk = queueCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
-                    queueCollection.update_one(make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "_id"))),
-                                               make_document(kvp("$set", make_document(
-                                                                                 kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                 kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
-                                                                                 kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
-                                                                                 kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible")))))));
-                    log_debug << "Queue: " << Core::Bson::BsonUtils::GetStringValue(t, "_id")
+                    bulk.append(mongocxx::model::update_one(
+                            make_document(kvp("queueArn", Core::Bson::BsonUtils::GetStringValue(t, "queueArn"))),
+                            make_document(kvp("$set", make_document(
+                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                              kvp("attributes.approximateNumberOfMessages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                              kvp("attributes.approximateNumberOfMessagesDelayed", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "delayed"))),
+                                                              kvp("attributes.approximateNumberOfMessagesNotVisible", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "invisible"))))))));
+
+                    log_debug << "Queue: " << Core::Bson::BsonUtils::GetStringValue(t, "queueArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial")
                               << ", invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible")
                               << ", delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                }
+
+                if (!bulk.empty()) {
+                    try {
+                        auto result = bulk.execute();
+                        log_debug << "Bulk write result: " << result->modified_count();
+                    } catch (const mongocxx::exception &exc) {
+                        log_error << "Bulk write failed: " << exc.what();
+                        throw Core::DatabaseException(exc.what());
+                    }
                 }
                 session.commit_transaction();
 

@@ -1,4 +1,4 @@
-FROM gcc:13.2.0-bookworm
+FROM gcc:15.2.0-trixie
 
 RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip libtool linux-libc-dev  \
     pandoc wget libarchive-dev libmagic-dev libssh-dev automake autoconf libtool
