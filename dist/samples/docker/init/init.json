@@ -266,6 +266,89 @@
         "modified": {
           "$date": 1757259499948
         }
+      },
+      {
+        "region": "eu-central-1",
+        "owner": "none",
+        "name": "protocolizing-queue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protokollierung-queue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 10,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-dlqueue",
+            "maxReceiveCount": 3
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 4,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 14643,
+          "queueArn": ""
+        },
+        "tags": {},
+        "defaultMessageAttributes": {
+          "file_origin": {
+            "stringValue": "FTP_UPLOAD",
+            "dataType": "String"
+          },
+          "file_type": {
+            "stringValue": "XML",
+            "dataType": "String"
+          }
+        },
+        "size": 17656,
+        "isDlq": false,
+        "created": {
+          "$date": 1736341533071
+        },
+        "modified": {
+          "$date": 1757162054840
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "owner": "none",
+        "name": "protocolizing-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protokollierung-dlqueue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 10,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {},
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 4,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 14643,
+          "queueArn": ""
+        },
+        "tags": {},
+        "defaultMessageAttributes": {
+          "file_origin": {
+            "stringValue": "FTP_UPLOAD",
+            "dataType": "String"
+          },
+          "file_type": {
+            "stringValue": "XML",
+            "dataType": "String"
+          }
+        },
+        "size": 17656,
+        "isDlq": false,
+        "created": {
+          "$date": 1736341533071
+        },
+        "modified": {
+          "$date": 1757162054840
+        }
       }
     ],
     "sns-topics": [
@@ -283,7 +366,13 @@
         "modified": {
           "$date": 1757259478347
         },
-        "subscriptions": [],
+        "subscriptions": [
+          {
+            "protocol": "sqs",
+            "endpoint": "arn:aws:sqs:eu-central-1:000000000000:protokollierung-queue",
+            "subscriptionArn": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic:ec3bbd11-00fb-4dea-971a-4e09da5729c7"
+          }
+        ],
         "attributes": {
           "deliveryPolicy": "",
           "displayName": "",
