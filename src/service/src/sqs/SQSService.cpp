@@ -33,36 +33,39 @@ namespace AwsMock::Service {
             const std::string queueUrl = Core::CreateSQSQueueUrl(request.queueName);
 
             Database::Entity::SQS::QueueAttribute attributes;
-            for (const auto &attribute: request.attributes) {
-                if (attribute.attributeName == "DelaySeconds") {
-                    attributes.delaySeconds = std::stoi(attribute.attributeValue);
-                }
-                if (attribute.attributeName == "MaxMessageSize") {
-                    attributes.maxMessageSize = std::stoi(attribute.attributeValue);
-                }
-                if (attribute.attributeName == "MessageRetentionPeriod") {
-                    attributes.messageRetentionPeriod = std::stoi(attribute.attributeValue);
-                }
-                if (attribute.attributeName == "VisibilityTimeout") {
-                    attributes.visibilityTimeout = std::stoi(attribute.attributeValue);
-                }
-                if (attribute.attributeName == "Policy") {
-                    attributes.policy = attribute.attributeValue;
-                }
-                if (attribute.attributeName == "RedrivePolicy") {
-                    attributes.redrivePolicy.FromJson(attribute.attributeValue);
-                }
-                if (attribute.attributeName == "RedriveAllowPolicy") {
-                    attributes.redriveAllowPolicy = attribute.attributeValue;
-                }
-                if (attribute.attributeName == "ReceiveMessageWaitTime") {
-                    attributes.receiveMessageWaitTime = std::stoi(attribute.attributeValue);
-                }
-                if (attribute.attributeName == "QueueArn") {
-                    attributes.queueArn = attribute.attributeValue;
-                }
+            attributes.approximateNumberOfMessages = 0;
+            if (request.attributes.contains("DelaySeconds")) {
+                attributes.delaySeconds = std::stoi(request.attributes.at("DelaySeconds"));
             }
-            attributes.queueArn = queueArn;
+            if (request.attributes.contains("MaximumMessageSize")) {
+                attributes.maxMessageSize = std::stoi(request.attributes.at("MaximumMessageSize"));
+            }
+            if (request.attributes.contains("MessageRetentionPeriod")) {
+                attributes.messageRetentionPeriod = std::stoi(request.attributes.at("MessageRetentionPeriod"));
+            }
+            if (request.attributes.contains("VisibilityTimeout")) {
+                attributes.visibilityTimeout = std::stoi(request.attributes.at("VisibilityTimeout"));
+            }
+            if (request.attributes.contains("ReceiveMessageWaitTimeSeconds")) {
+                attributes.receiveMessageWaitTime = std::stoi(request.attributes.at("ReceiveMessageWaitTimeSeconds"));
+            }
+            if (request.attributes.contains("Policy")) {
+                attributes.policy = request.attributes.at("Policy");
+            }
+            // TODO: deserialize redrive policy
+            if (request.attributes.contains("RedrivePolicy")) {
+                //attributes.redrivePolicy = boost::json::value_to<Database::Dto::SQS::RedriveMessagesRequest>(request.attributes.at("RedrivePolicy"));
+            }
+            if (request.attributes.contains("RedriveAllowPolicy")) {
+                attributes.redriveAllowPolicy = request.attributes.at("RedriveAllowPolicy");
+            }
+            if (request.attributes.contains("RedriveAllowPolicy")) {
+                attributes.redriveAllowPolicy = request.attributes.at("RedriveAllowPolicy");
+            }
+
+            if (request.attributes.contains("QueueArn")) {
+                attributes.queueArn = request.attributes.at("QueueArn");
+            }
 
             // TODO:: Use mapper
             // Update database

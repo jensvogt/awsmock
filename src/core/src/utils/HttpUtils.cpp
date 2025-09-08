@@ -89,11 +89,22 @@ namespace AwsMock::Core {
 
     std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
 
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-
+        std::string localUri = uri;
+        if (!StringUtils::StartsWith(uri, "?")) {
+            localUri = "http://localhost:4566?" + uri;
+        }
+        boost::system::result<boost::urls::url_view> r = boost::urls::parse_uri(localUri);
+        if (!r) {
+            std::cerr << "Invalid URI\n";
+            return {};
+        }
         std::map<std::string, std::string> queryParameters;
-        for (const auto &param: r->params()) {
-            queryParameters[param.key] = param.value;
+        for (auto qp: r.value().params()) {
+            if (qp.has_value) {
+                queryParameters[qp.key] = qp.value;
+            } else {
+                queryParameters[qp.key] = "";
+            }
         }
         return queryParameters;
     }
@@ -111,44 +122,40 @@ namespace AwsMock::Core {
 
     int HttpUtils::GetIntParameter(const std::string &uri, const std::string &name, const int min, const int max, const int def) {
         int value = def;
-        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().contains(name)) {
-            if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
-                value = std::stoi(p->value.decode());
-            }
+        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
+            log_debug << "Query parameter found, name: " << name << " value: " << value;
+            value = std::stoi(parameters[name]);
+            value = value > min && value < max ? value : def;
         }
         return value;
     }
 
     long HttpUtils::GetLongParameter(const std::string &uri, const std::string &name, const long min, const long max, const long def) {
+
         long value = def;
-        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
-            if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
-                value = std::stol(p->value.decode());
-                value = value > min && value < max ? value : def;
-            }
+        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
+            log_debug << "Query parameter found, name: " << name << " value: " << value;
+            value = std::stol(parameters[name]);
+            value = value > min && value < max ? value : def;
         }
         return value;
     }
 
     std::string HttpUtils::GetStringParameter(const std::string &uri, const std::string &name, const std::string &def) {
         std::string value = def;
-        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().find(name) != r->params().end()) {
-            if (const boost::urls::params_encoded_view::iterator p = r->encoded_params().find(name); p != r->encoded_params().end()) {
-                boost::urls::encoding_opts opts;
-                opts.space_as_plus = true;
-                value = p->value.decode(opts);
-                log_debug << "Query parameter found, name: " << name << " value: " << value;
-            }
+        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
+            value = parameters[name];
+            log_debug << "Query parameter found, name: " << name << " value: " << value;
         }
         return value;
     }
 
     bool HttpUtils::GetBoolParameter(const std::string &uri, const std::string &name, const bool &def) {
         bool value = def;
-        if (boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri); r->params().contains(name)) {
+        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
+            log_debug << "Query parameter found, name: " << name << " value: " << value;
             value = true;
         }
-        log_trace << "Query parameter found, name: " << name << " value: " << value;
         return value;
     }
 

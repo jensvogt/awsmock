@@ -39,6 +39,17 @@ that displays the log messages to stdout.
 All applications and lambdas are written in Java using the AWS Java SDK. Each SQS queue has a corresponding
 dead-letter-queue
 
+## Compile the lambda functions
+
+To compile the lambda function code, run the following command inside the ```lambda/<lambda-function>``` directory:``
+
+```
+cd lambda/file-copy-lambda
+mvn clean package 
+cd lambda/file-distribution-lambda
+mvn clean package 
+```
+
 ## Load the lambda function
 
 During startup the lambda function will be created, but the necessary function code will not be loaded into the docker
@@ -47,8 +58,10 @@ lambda module.
 
 ![lambda module](./img/lambda_module.png "Lambda Module")
 
-Click on the ```Upload function code``` button and select the ```file-copy-lambda.zip``` file, located in the lambda
-directory. Do the same for the ```file-delivery-lambda.zip```.
+Click on the ```Upload function code``` button and select the ```file-copy-lambda-1.1.1-aws.jar``` file, located in the
+lambda directory. Do the same for the ```file-delivery-lambda-1.1.1-aws.jar```. Now the lambda functions are
+available. They will start automatically when the docker container is started. The lambda lifetime is set to 90 min,
+which means the lambda functions container will be stopped after 90 min.
 
 ## Load the applications
 
@@ -58,5 +71,7 @@ module.
 
 ![application module](./img/application_module.png "Application Module")
 
-Click on the ```Upload function code``` button and select the ```file-copy-lambda.zip``` file, located in the lambda
-directory. Do the same for the ```file-delivery-lambda.zip```.
+Click on the ```Upload application code``` menu entry and select the ```process-xml-1.1.1-aws.jar``` file, located in
+the application directory. Do the same for the ```process-json-1.1.1-aws.jar``` and ```process-image-1.1.1-aws.jar```.
+Now the applications are available. They will start automatically when the docker container is started. 
+

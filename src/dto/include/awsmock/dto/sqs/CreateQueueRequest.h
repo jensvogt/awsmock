@@ -29,6 +29,11 @@ namespace AwsMock::Dto::SQS {
         std::string queueUrl;
 
         /**
+         * Queue ARN
+         */
+        std::string queueArn;
+
+        /**
          * Owner
          */
         std::string owner;
@@ -36,7 +41,7 @@ namespace AwsMock::Dto::SQS {
         /**
          * Attributes
          */
-        std::vector<QueueAttribute> attributes;
+        std::map<std::string, std::string> attributes;
 
         /**
          * Tags
@@ -49,9 +54,10 @@ namespace AwsMock::Dto::SQS {
             CreateQueueRequest r;
             r.queueName = Core::Json::GetStringValue(v, "QueueName");
             r.queueUrl = Core::CreateSQSQueueUrl(Core::Json::GetStringValue(v, "QueueName"));
+            r.queueArn = Core::CreateSQSQueueArn(Core::Json::GetStringValue(v, "QueueName"));
             r.owner = Core::Json::GetStringValue(v, "Owner");
             if (Core::Json::AttributeExists(v, "Attributes")) {
-                r.attributes = boost::json::value_to<std::vector<QueueAttribute>>(v.at("Attributes"));
+                r.attributes = boost::json::value_to<std::map<std::string, std::string>>(v.at("Attributes"));
             }
             if (Core::Json::AttributeExists(v, "Tags")) {
                 r.tags = boost::json::value_to<std::map<std::string, std::string>>(v.at("Tags"));
@@ -66,6 +72,7 @@ namespace AwsMock::Dto::SQS {
                     {"RequestId", obj.requestId},
                     {"QueueName", obj.queueName},
                     {"QueueUrl", obj.queueUrl},
+                    {"QueueArn", obj.queueArn},
                     {"Attributes", boost::json::value_from(obj.attributes)},
                     {"Tags", boost::json::value_from(obj.tags)},
             };

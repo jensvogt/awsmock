@@ -37,36 +37,50 @@ To create a new API key:
 ```
 awslocal apigateway create-api-key --name test-key --description test-description
 {
-    "Version": 1
+    "id": "ngjrx4w5nmye",
+    "name": "test-key",
+    "customerId": "",
+    "description": "test-description",
+    "enabled": true,
+    "createdDate": "2025-09-08T11:02:44.421160+00:00",
+    "lastUpdatedDate": "2025-09-08T11:02:44.418889+00:00",
+    "stageKeys": [],
+    "tags": {}
 }
 ```
 
 To get a list of all currently available parameters:
 
 ```
-awslocal ssm describe-parameters
+awslocal api-gateway get-api-keys
 {
-    "Version": 1
-}
-{
-    "Parameters": [
+    "items": [
         {
-            "ARN": "arn:aws:ssm:eu-central-1:000000000000:",
-            "Type": "String"
+            "id": "2gscwmeicszl",
+            "value": "vmJ6Wq2ZgSqwqbKwaaNdKpkGlu6aFjlhzvTgt7v5E1",
+            "name": "test-key",
+            "customerId": "",
+            "description": "test-description",
+            "enabled": true,
+            "tags": {}
         },
         {
-            "Name": "test-name",
-            "ARN": "arn:aws:ssm:eu-central-1:000000000000:test-name",
-            "Type": "String"
+            "id": "ngjrx4w5nmye",
+            "value": "KXKFmbattGSCjOmmaer66d99K08NvreOnmaD8lVGYY",
+            "name": "example-key",
+            "customerId": "",
+            "description": "example-description",
+            "enabled": true,
+            "tags": {}
         }
     ]
 }
 ```
 
-To delete a parameter:
+To delete an API key:
 
 ```
-awslocal ssm delete-parameter --name test-name
+awslocal apigateway delete-api-key --api-key 2gscwmeicszl
 ```
 
 ## AUTHOR
@@ -84,6 +98,5 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 ## SEE ALSO
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```,
-```awsmocklambda(1)```,
-```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```, ```awsmocksecretsmanager(1)```,
-```awsmocksqs(1)```
+```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocktransfer(1)```,
+```awsmocksecretsmanager(1)```, ```awsmocksqs(1)```
