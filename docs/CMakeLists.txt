@@ -2,7 +2,8 @@ if (NOT WIN32)
     find_program(PANDOC_EXECUTABLE NAMES pandoc)
 
     set(MAN_NAMES awsmockmgr.1 awsmockctl.1 awsmockcfg.1 awslocal.1 awsmocksqs.1 awsmocks3.1 awsmocksns.1 awsmocklambda.1
-            awsmockdynamodb.1 awsmockcognito.1 awsmocktransfer.1 awsmocksecretsmanager.1 awsmockkms.1 awsmockssm.1)
+            awsmockdynamodb.1 awsmockcognito.1 awsmocktransfer.1 awsmocksecretsmanager.1 awsmockkms.1 awsmockssm.1
+            awsmockapi.1)
     set(MAN_FILES)
 
     if (BUILD_DOCUMENTATION)
@@ -45,4 +46,5 @@ if (NOT WIN32)
     install(FILES man/awsmocksecretsmanager.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
     install(FILES man/awsmockkms.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
     install(FILES man/awsmockssm.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
+    install(FILES man/awsmockapi.1 DESTINATION /usr/local/share/man/man1 PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
 endif ()

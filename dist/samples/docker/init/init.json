@@ -272,7 +272,7 @@
         "owner": "none",
         "name": "protocolizing-queue",
         "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protokollierung-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-queue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -315,7 +315,7 @@
         "owner": "none",
         "name": "protocolizing-dlqueue",
         "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protokollierung-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-dlqueue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,

@@ -135,4 +135,4 @@ Bugs and enhancement requests can be reported and filed at https://github.com/je
 
 ```awsmockctl(1)```, ```awsmockmgr(1)```, ```awslocal(1)```, ```awsmocks3(1)```, ```awsmocksns(1)```,
 ```awsmocklambda(1)```, ```awsmockdynamodb(1)```, ```awsmockcognito(1)```, ```awsmocksecretsmanager(1)```,
-```awsmocksqs(1)```, ```awsmockkms(1)```
+```awsmocksqs(1)```, ```awsmockkms(1)```, ```awsmockapi(1)```
