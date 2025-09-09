@@ -480,14 +480,22 @@ namespace AwsMock::Service {
         /**
          * @brief Write the application docker file.
          *
+         * @par
+         * For Java application the JVM is started by the docker CMD 'java -jar <archive-file-name>'.
+         *
+         * @par
+         * For Python applications the file containing the main routine must be called '<application-name>.py'.
+         * The application is then started using the docker CMD 'python -u <application-name>.py'.
+         *
          * @param codeDir code directory
+         * @param mainFile file containing the main method
          * @param archive application archive
          * @param privatePort docker container internal port
          * @param runtime docker image runtime
          * @param environment runtime environment
          * @return return docker file path
          */
-        static std::string WriteApplicationDockerFile(const std::string &codeDir, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment);
+        static std::string WriteApplicationDockerFile(const std::string &codeDir, const std::string &mainFile, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment);
 
         /**
          * @brief Write the compressed docker image file.

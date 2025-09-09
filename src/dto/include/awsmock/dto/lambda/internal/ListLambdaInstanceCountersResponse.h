@@ -22,7 +22,7 @@ namespace AwsMock::Dto::Lambda {
     struct ListLambdaInstanceCountersResponse final : Common::BaseCounter<ListLambdaInstanceCountersResponse> {
 
         /**
-         * List of tag counters
+         * List of instance counters
          */
         std::vector<InstanceCounter> instanceCounters;
 

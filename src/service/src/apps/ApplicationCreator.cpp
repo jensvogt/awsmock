@@ -76,6 +76,13 @@ namespace AwsMock::Service {
         Core::Crypto::Base64Decode(applicationCode, codeDir + Core::FileUtils::separator() + applicationEntity.archive);
         log_debug << "Created Base64 string, length: " << applicationCode.size();
 
+        // Unzip if necessary
+        if (applicationEntity.runtime.find("python") != std::string::npos) {
+            Core::TarUtils::Unzip(codeDir + Core::FileUtils::separator() + applicationEntity.archive, codeDir);
+            Core::FileUtils::DeleteFile(codeDir + Core::FileUtils::separator() + applicationEntity.archive);
+            log_debug << "Unzipped Python code, dir: " << codeDir;
+        }
+
         // Build the docker image using the docker module
         const std::string imageFile = ContainerService::instance().BuildApplicationImage(codeDir, applicationEntity.name, dockerTag, applicationEntity.runtime, applicationEntity.archive, applicationEntity.privatePort, applicationEntity.environment);
 

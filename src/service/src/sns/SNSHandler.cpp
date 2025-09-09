@@ -15,7 +15,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::CREATE_TOPIC: {
 
-                    std::string name = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Name");
+                    std::string name = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Name");
                     log_debug << "Topic name: " << name;
 
                     Dto::SNS::CreateTopicRequest snsRequest;
@@ -44,7 +44,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::GET_TOPIC_ATTRIBUTES: {
 
-                    std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
+                    std::string topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
 
                     Dto::SNS::GetTopicAttributesRequest snsRequest;
                     snsRequest.region = clientCommand.region;
@@ -70,9 +70,9 @@ namespace AwsMock::Service {
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
                     snsRequest.contentType = clientCommand.contentType;
-                    snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
-                    snsRequest.targetArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TargetArn");
-                    snsRequest.message = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Message");
+                    snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
+                    snsRequest.targetArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TargetArn");
+                    snsRequest.message = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Message");
                     snsRequest.messageAttributes = GetMessageAttributes(clientCommand.payload);
                     snsRequest.requestId = clientCommand.requestId;
                     Dto::SNS::PublishResponse snsResponse = _snsService.Publish(snsRequest);
@@ -92,9 +92,9 @@ namespace AwsMock::Service {
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
                     snsRequest.requestId = clientCommand.requestId;
-                    snsRequest.topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
-                    snsRequest.protocol = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Protocol");
-                    snsRequest.endpoint = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Endpoint");
+                    snsRequest.topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
+                    snsRequest.protocol = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Protocol");
+                    snsRequest.endpoint = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Endpoint");
                     Dto::SNS::SubscribeResponse snsResponse = _snsService.Subscribe(snsRequest);
 
                     log_info << "Subscribed to topic, topicArn: " << snsRequest.topicArn;
@@ -112,7 +112,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::UNSUBSCRIBE: {
 
-                    std::string subscriptionArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "SubscriptionArn");
+                    std::string subscriptionArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "SubscriptionArn");
                     Dto::SNS::UnsubscribeRequest snsRequest;
                     snsRequest.region = clientCommand.region;
                     snsRequest.user = clientCommand.user;
@@ -125,7 +125,7 @@ namespace AwsMock::Service {
                 }
 
                 case Dto::Common::SNSCommandType::LIST_SUBSCRIPTIONS_BY_TOPIC: {
-                    std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
+                    std::string topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
 
                     Dto::SNS::ListSubscriptionsByTopicRequest snsRequest;
                     snsRequest.region = clientCommand.region;
@@ -140,7 +140,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::TAG_RESOURCE: {
 
-                    std::string resourceArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "ResourceArn");
+                    std::string resourceArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "ResourceArn");
                     log_debug << "Resource ARN: " << resourceArn;
 
                     int count = Core::HttpUtils::CountQueryParametersByPrefix("/?" + clientCommand.payload, "Tags.member") / 2;
@@ -148,8 +148,8 @@ namespace AwsMock::Service {
 
                     std::map<std::string, std::string> tags;
                     for (int i = 1; i <= count; i++) {
-                        std::string tagKey = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Tags.member." + std::to_string(i) + ".Key");
-                        std::string tagValue = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "Tags.member." + std::to_string(i) + ".Value");
+                        std::string tagKey = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Tags.member." + std::to_string(i) + ".Key");
+                        std::string tagValue = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Tags.member." + std::to_string(i) + ".Value");
                         tags[tagKey] = tagValue;
                     }
                     Dto::SNS::TagResourceRequest snsRequest;
@@ -164,7 +164,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::UNTAG_RESOURCE: {
 
-                    std::string resourceArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "ResourceArn");
+                    std::string resourceArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "ResourceArn");
                     log_debug << "Resource ARN: " << resourceArn;
 
                     int count = Core::HttpUtils::CountQueryParametersByPrefix("/?" + clientCommand.payload, "TagKeys.TagKey");
@@ -172,7 +172,7 @@ namespace AwsMock::Service {
 
                     std::vector<std::string> tags;
                     for (int i = 1; i <= count; i++) {
-                        std::string tagKey = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TagKeys.TagKey." + std::to_string(i));
+                        std::string tagKey = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TagKeys.TagKey." + std::to_string(i));
                         tags.emplace_back(tagKey);
                     }
                     Dto::SNS::UntagResourceRequest snsRequest;
@@ -204,7 +204,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
 
-                    std::string topicArn = Core::HttpUtils::GetStringParameterFromPayload(clientCommand.payload, "TopicArn");
+                    std::string topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
                     log_debug << "Topic ARN: " << topicArn;
 
                     Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(clientCommand.region, topicArn);
@@ -301,18 +301,14 @@ namespace AwsMock::Service {
         log_debug << "Got message attribute count: " << attributeCount;
 
         std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
-        for (int i = 1; i <= attributeCount / 3; i++) {
+        for (int i = 1; i <= attributeCount / 2; i++) {
 
-            std::string attributeName = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
-            std::string attributeType = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.DataType");
+            const std::string attributeName = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
+            const std::string attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
 
-            std::string attributeValue;
-            if (Core::StringUtils::StartsWith(attributeType, "String") || Core::StringUtils::StartsWith(attributeType, "Number")) {
-                attributeValue = Core::HttpUtils::GetStringParameterFromPayload(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
-            }
             Dto::SNS::MessageAttribute attribute;
             attribute.stringValue = attributeValue;
-            attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString(attributeType);
+            attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString("String");
             messageAttributes[attributeName] = attribute;
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();

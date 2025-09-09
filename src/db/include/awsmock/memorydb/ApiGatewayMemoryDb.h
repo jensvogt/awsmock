@@ -121,6 +121,14 @@ namespace AwsMock::Database {
         void DeleteKey(const std::string &id);
 
         /**
+         * @brief Delete all keys
+         *
+         * @return number of entities deleted
+         * @throws DatabaseException
+         */
+        long DeleteAllKeys();
+
+        /**
          * @brief Check the existence of an REST API
          *
          * @param id REST API ID

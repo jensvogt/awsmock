@@ -1083,6 +1083,7 @@ namespace AwsMock::Database {
                                        kvp("bucketArn", "$_id"),
                                        kvp("size", 1),
                                        kvp("keys", 1));
+                p.project(projectDocument.extract());
 
                 session.start_transaction();
 

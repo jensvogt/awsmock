@@ -242,6 +242,30 @@ namespace AwsMock::Database {
         return _memoryDb.DeleteKey(id);
     }
 
+    long ApiGatewayDatabase::DeleteAllKeys() const {
+
+        if (HasDatabase()) {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection apiKeyCollection = client->database(_databaseName)[_apiKeyCollectionName];
+            auto session = client->start_session();
+
+            try {
+
+                session.start_transaction();
+                const auto result = apiKeyCollection.delete_many({});
+                session.commit_transaction();
+                log_trace << "Key deleted, count: " << result->deleted_count();
+
+            } catch (const mongocxx::exception &exc) {
+                session.abort_transaction();
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.DeleteAllKeys();
+    }
+
     // ========================================================================================================================
     // REST API
     // ========================================================================================================================

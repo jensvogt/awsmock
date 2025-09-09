@@ -34,17 +34,27 @@ namespace AwsMock::Dto::SNS {
         /**
          * Retention period
          */
-        long retentionPeriod = 0;
+        long retentionPeriod{};
 
         /**
          * Maximal message size
          */
-        long maxMessageSize = 0;
+        long maxMessageSize{};
 
         /**
          * Total number of available messages
          */
-        long availableMessages = 0;
+        long messages{};
+
+        /**
+         * Total number of sent available messages
+         */
+        long messagesSend{};
+
+        /**
+         * Total number of resent available messages
+         */
+        long messagesResend{};
 
         /**
          * Total size of all messages in the topic
@@ -72,12 +82,14 @@ namespace AwsMock::Dto::SNS {
 
         friend TopicCounter tag_invoke(boost::json::value_to_tag<TopicCounter>, boost::json::value const &v) {
             TopicCounter r;
-            r.topicArn = v.at("topicArn").as_string();
-            r.topicName = v.at("topicName").as_string();
-            r.retentionPeriod = v.at("retentionPeriod").as_int64();
-            r.maxMessageSize = v.at("maxMessageSize").as_int64();
-            r.availableMessages = v.at("availableMessages").as_int64();
-            r.size = v.at("size").as_int64();
+            r.topicArn = Core::Json::GetStringValue(v, "topicArn");
+            r.topicName = Core::Json::GetStringValue(v, "topicName");
+            r.retentionPeriod = Core::Json::GetLongValue(v, "retentionPeriod");
+            r.maxMessageSize = Core::Json::GetLongValue(v, "maxMessageSize");
+            r.messages = Core::Json::GetLongValue(v, "messages");
+            r.messagesSend = Core::Json::GetLongValue(v, "messagesSend");
+            r.messagesResend = Core::Json::GetLongValue(v, "messagesResend");
+            r.size = Core::Json::GetLongValue(v, "size");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             return r;
@@ -89,7 +101,9 @@ namespace AwsMock::Dto::SNS {
                     {"topicName", obj.topicName},
                     {"retentionPeriod", obj.retentionPeriod},
                     {"maxMessageSize", obj.maxMessageSize},
-                    {"availableMessages", obj.availableMessages},
+                    {"messages", obj.messages},
+                    {"messagesSend", obj.messagesSend},
+                    {"messagesResend", obj.messagesResend},
                     {"size", obj.size},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},

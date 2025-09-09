@@ -32,7 +32,7 @@
           "$date": 1757252997754
         },
         "modified": {
-          "$date": 1757259478345
+          "$date": 1757409838687
         }
       },
       {
@@ -64,48 +64,15 @@
           "$date": 1736341160123
         },
         "modified": {
-          "$date": 1757259478346
+          "$date": 1757409838688
         }
       }
     ],
     "sqs-queues": [
       {
         "region": "eu-central-1",
-        "name": "file-distribution-image-queue",
-        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-image-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue",
-        "attributes": {
-          "delaySeconds": 0,
-          "maxMessageSize": 262144,
-          "messageRetentionPeriod": 345600,
-          "policy": "",
-          "receiveMessageWaitTime": 20,
-          "visibilityTimeout": 30,
-          "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
-            "maxReceiveCount": 3
-          },
-          "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 0,
-          "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue"
-        },
-        "tags": {},
-        "defaultMessageAttributes": {},
-        "size": 0,
-        "isDlq": false,
-        "created": {
-          "$date": 1757259499948
-        },
-        "modified": {
-          "$date": 1757259499948
-        }
-      },
-      {
-        "region": "eu-central-1",
         "name": "file-distribution-image-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-image-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-image-dlqueue",
         "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
         "attributes": {
           "delaySeconds": 0,
@@ -132,14 +99,14 @@
           "$date": 1757259499948
         },
         "modified": {
-          "$date": 1757259499948
+          "$date": 1757415364043
         }
       },
       {
         "region": "eu-central-1",
-        "name": "file-distribution-json-queue",
-        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-json-queue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue",
+        "name": "file-distribution-image-queue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-image-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
@@ -148,30 +115,30 @@
           "receiveMessageWaitTime": 20,
           "visibilityTimeout": 30,
           "redrivePolicy": {
-            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-dlqueue",
             "maxReceiveCount": 3
           },
           "redriveAllowPolicy": "",
           "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue"
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-image-queue"
         },
         "tags": {},
         "defaultMessageAttributes": {},
         "size": 0,
         "isDlq": false,
         "created": {
-          "$date": 1757259526956
+          "$date": 1757259499948
         },
         "modified": {
-          "$date": 1757259526956
+          "$date": 1757415364042
         }
       },
       {
         "region": "eu-central-1",
         "name": "file-distribution-json-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-json-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-json-dlqueue",
         "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
         "attributes": {
           "delaySeconds": 0,
@@ -198,13 +165,79 @@
           "$date": 1757259499948
         },
         "modified": {
+          "$date": 1757415364043
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "file-distribution-json-queue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-json-queue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 20,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "deadLetterTargetArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-dlqueue",
+            "maxReceiveCount": 3
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 0,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 0,
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-json-queue"
+        },
+        "tags": {},
+        "defaultMessageAttributes": {},
+        "size": 0,
+        "isDlq": false,
+        "created": {
+          "$date": 1757259526956
+        },
+        "modified": {
+          "$date": 1757415364043
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "file-distribution-xml-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-xml-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue",
+        "attributes": {
+          "delaySeconds": 0,
+          "maxMessageSize": 262144,
+          "messageRetentionPeriod": 345600,
+          "policy": "",
+          "receiveMessageWaitTime": 20,
+          "visibilityTimeout": 30,
+          "redrivePolicy": {
+            "maxReceiveCount": 0
+          },
+          "redriveAllowPolicy": "",
+          "approximateNumberOfMessages": 4,
+          "approximateNumberOfMessagesDelayed": 0,
+          "approximateNumberOfMessagesNotVisible": 0,
+          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue"
+        },
+        "tags": {},
+        "defaultMessageAttributes": {},
+        "size": 60,
+        "isDlq": true,
+        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
+        "created": {
           "$date": 1757259499948
+        },
+        "modified": {
+          "$date": 1757415424043
         }
       },
       {
         "region": "eu-central-1",
         "name": "file-distribution-xml-queue",
-        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-xml-queue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/file-distribution-xml-queue",
         "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
         "attributes": {
           "delaySeconds": 0,
@@ -231,40 +264,50 @@
           "$date": 1757259508476
         },
         "modified": {
-          "$date": 1757259508476
+          "$date": 1757415364044
         }
       },
       {
         "region": "eu-central-1",
-        "name": "file-distribution-xml-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.awsmock:4566/000000000000/file-distribution-xml-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue",
+        "owner": "none",
+        "name": "protocolizing-dlqueue",
+        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-dlqueue",
+        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-dlqueue",
         "attributes": {
           "delaySeconds": 0,
           "maxMessageSize": 262144,
           "messageRetentionPeriod": 345600,
           "policy": "",
-          "receiveMessageWaitTime": 20,
+          "receiveMessageWaitTime": 10,
           "visibilityTimeout": 30,
           "redrivePolicy": {
             "maxReceiveCount": 0
           },
           "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 0,
+          "approximateNumberOfMessages": 7,
           "approximateNumberOfMessagesDelayed": 0,
           "approximateNumberOfMessagesNotVisible": 0,
-          "queueArn": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-dlqueue"
+          "queueArn": ""
         },
         "tags": {},
-        "defaultMessageAttributes": {},
-        "size": 0,
+        "defaultMessageAttributes": {
+          "file_origin": {
+            "stringValue": "FTP_UPLOAD",
+            "dataType": "String"
+          },
+          "file_type": {
+            "stringValue": "XML",
+            "dataType": "String"
+          }
+        },
+        "size": 2105,
         "isDlq": true,
-        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:file-distribution-xml-queue",
+        "mainQueue": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-queue",
         "created": {
-          "$date": 1757259499948
+          "$date": 1736341533071
         },
         "modified": {
-          "$date": 1757259499948
+          "$date": 1757415424043
         }
       },
       {
@@ -285,9 +328,9 @@
             "maxReceiveCount": 3
           },
           "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 4,
+          "approximateNumberOfMessages": 0,
           "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 14643,
+          "approximateNumberOfMessagesNotVisible": 0,
           "queueArn": ""
         },
         "tags": {},
@@ -301,53 +344,13 @@
             "dataType": "String"
           }
         },
-        "size": 17656,
+        "size": 0,
         "isDlq": false,
         "created": {
           "$date": 1736341533071
         },
         "modified": {
-          "$date": 1757162054840
-        }
-      },
-      {
-        "region": "eu-central-1",
-        "owner": "none",
-        "name": "protocolizing-dlqueue",
-        "queueUrl": "http://sqs.eu-central-1.vogje01-nuc:4566/000000000000/protocolizing-dlqueue",
-        "queueArn": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-dlqueue",
-        "attributes": {
-          "delaySeconds": 0,
-          "maxMessageSize": 262144,
-          "messageRetentionPeriod": 345600,
-          "policy": "",
-          "receiveMessageWaitTime": 10,
-          "visibilityTimeout": 30,
-          "redrivePolicy": {},
-          "redriveAllowPolicy": "",
-          "approximateNumberOfMessages": 4,
-          "approximateNumberOfMessagesDelayed": 0,
-          "approximateNumberOfMessagesNotVisible": 14643,
-          "queueArn": ""
-        },
-        "tags": {},
-        "defaultMessageAttributes": {
-          "file_origin": {
-            "stringValue": "FTP_UPLOAD",
-            "dataType": "String"
-          },
-          "file_type": {
-            "stringValue": "XML",
-            "dataType": "String"
-          }
-        },
-        "size": 17656,
-        "isDlq": false,
-        "created": {
-          "$date": 1736341533071
-        },
-        "modified": {
-          "$date": 1757162054840
+          "$date": 1757415364044
         }
       }
     ],
@@ -356,20 +359,20 @@
         "region": "eu-central-1",
         "topicName": "protocolizing-topic",
         "topicArn": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic",
-        "messages": 3,
-        "messagesSend": 0,
+        "messages": 10,
+        "messagesSend": 10,
         "messagesResend": 0,
-        "size": 6,
+        "size": 143,
         "created": {
           "$date": 1757253089477
         },
         "modified": {
-          "$date": 1757259478347
+          "$date": 1757409838691
         },
         "subscriptions": [
           {
             "protocol": "sqs",
-            "endpoint": "arn:aws:sqs:eu-central-1:000000000000:protokollierung-queue",
+            "endpoint": "arn:aws:sqs:eu-central-1:000000000000:protocolizing-queue",
             "subscriptionArn": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic:ec3bbd11-00fb-4dea-971a-4e09da5729c7"
           }
         ],
@@ -403,7 +406,7 @@
         "memorySize": 128,
         "codeSize": 26,
         "imageSize": 262015092,
-        "containerSize": 467892465,
+        "containerSize": 467896167,
         "tags": {
           "tag": "1.1.1",
           "version": "1.1.1"
@@ -419,7 +422,8 @@
             "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
             "AWS_REGION": "eu-central-1",
             "AWS_S3_DESTINATION_BUCKET": "file-delivery",
-            "AWS_SNS_PROTOCOLIZING_TOPIC_ARN": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic"
+            "AWS_SNS_PROTOCOLIZING_TOPIC_ARN": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic",
+            "SPRING_PROFILES_ACTIVE": "awsmock"
           }
         },
         "code": {
@@ -444,7 +448,7 @@
           }
         ],
         "lastStarted": {
-          "$date": 1757253046878
+          "$date": 1757415363615
         },
         "lastInvocation": {
           "$date": 1746806513777
@@ -453,7 +457,7 @@
           "$date": 1746806504975
         },
         "modified": {
-          "$date": 1757259478348
+          "$date": 1757415363615
         }
       },
       {
@@ -465,9 +469,9 @@
         "handler": "org.springframework.cloud.function.adapter.aws.FunctionInvoker",
         "imageId": "8c5dbd705cac3970dd7933c47251a19797789b139b47da2b75e22670d198f94e",
         "memorySize": 128,
-        "codeSize": 26,
+        "codeSize": 34,
         "imageSize": 262015092,
-        "containerSize": 467892465,
+        "containerSize": 467860771,
         "tags": {
           "tag": "1.1.1",
           "version": "1.1.1"
@@ -485,7 +489,8 @@
             "AWS_SNS_PROTOCOLIZING_TOPIC_ARN": "arn:aws:sns:eu-central-1:000000000000:protocolizing-topic",
             "AWS_SQS_IMAGE_QUEUE_NAME": "file-distribution-image-queue",
             "AWS_SQS_JSON_QUEUE_NAME": "file-distribution-json-queue",
-            "AWS_SQS_XML_QUEUE_NAME": "file-distribution-xml-queue"
+            "AWS_SQS_XML_QUEUE_NAME": "file-distribution-xml-queue",
+            "SPRING_PROFILES_ACTIVE": "awsmock"
           }
         },
         "code": {
@@ -510,7 +515,7 @@
           }
         ],
         "lastStarted": {
-          "$date": 1757253046878
+          "$date": 1757415363971
         },
         "lastInvocation": {
           "$date": 1746806513777
@@ -519,7 +524,7 @@
           "$date": 1746806504975
         },
         "modified": {
-          "$date": 1757259478349
+          "$date": 1757415363971
         }
       }
     ],
@@ -532,13 +537,13 @@
         "listenAddress": "0.0.0.0",
         "state": "ONLINE",
         "lastStarted": {
-          "$date": 1757253046887
+          "$date": 1757415363977
         },
         "created": {
           "$date": 1736341595533
         },
         "modified": {
-          "$date": 1757259478350
+          "$date": 1757409838693
         },
         "users": [
           {
@@ -579,10 +584,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251801971
+          "$date": 1757415146996
         },
         "modified": {
-          "$date": 1757259478352
+          "$date": 1757415146996
         },
         "attributes": {
           "composedPartitionKey": "S",
@@ -596,10 +601,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -613,13 +618,13 @@
         "name": "pim_local_feature_state",
         "arn": "arn:aws:dynamodb:ddblocal:000000000000:table/pim_local_feature_state",
         "status": "ACTIVE",
-        "size": 914,
-        "itemCount": 10,
+        "size": 0,
+        "itemCount": 0,
         "created": {
-          "$date": 1757251802023
+          "$date": 1757415146997
         },
         "modified": {
-          "$date": 1757259478353
+          "$date": 1757415146998
         },
         "attributes": {
           "featureName": "S"
@@ -631,10 +636,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -651,10 +656,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802024
+          "$date": 1757415146999
         },
         "modified": {
-          "$date": 1757259478355
+          "$date": 1757415146999
         },
         "attributes": {
           "datenlieferantId": "S",
@@ -668,10 +673,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -688,10 +693,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802026
+          "$date": 1757415147000
         },
         "modified": {
-          "$date": 1757259478356
+          "$date": 1757415147000
         },
         "attributes": {
           "datenlieferantId": "S",
@@ -705,10 +710,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -725,10 +730,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802027
+          "$date": 1757415147001
         },
         "modified": {
-          "$date": 1757259478357
+          "$date": 1757415147001
         },
         "attributes": {
           "datenlieferantId": "S"
@@ -740,10 +745,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -760,10 +765,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802029
+          "$date": 1757415147002
         },
         "modified": {
-          "$date": 1757259478358
+          "$date": 1757415147003
         },
         "attributes": {
           "datenlieferantId": "S",
@@ -777,10 +782,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -797,10 +802,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802030
+          "$date": 1757414847003
         },
         "modified": {
-          "$date": 1757259478359
+          "$date": 1757415147013
         },
         "attributes": {
           "exportStartTime": "S",
@@ -814,10 +819,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -834,10 +839,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802031
+          "$date": 1757414847004
         },
         "modified": {
-          "$date": 1757259478360
+          "$date": 1757415147014
         },
         "attributes": {
           "datenlieferantId": "S",
@@ -851,10 +856,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -871,10 +876,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802032
+          "$date": 1757414847005
         },
         "modified": {
-          "$date": 1757259478361
+          "$date": 1757415147015
         },
         "attributes": {
           "partitionKey": "S"
@@ -886,10 +891,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -906,10 +911,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802033
+          "$date": 1757414847006
         },
         "modified": {
-          "$date": 1757259478373
+          "$date": 1757415147017
         },
         "attributes": {
           "orgaNr": "N"
@@ -921,10 +926,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -941,10 +946,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802034
+          "$date": 1757414847007
         },
         "modified": {
-          "$date": 1757259478374
+          "$date": 1757415147018
         },
         "attributes": {
           "datenlieferantId": "S"
@@ -956,10 +961,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -976,10 +981,10 @@
         "size": 0,
         "itemCount": 0,
         "created": {
-          "$date": 1757251802035
+          "$date": 1757414847008
         },
         "modified": {
-          "$date": 1757259478376
+          "$date": 1757415147019
         },
         "attributes": {
           "verlagsNr": "N"
@@ -991,10 +996,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1,
           "LastDecreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "LastIncreaseDateTime": {
-            "$date": 0
+            "$date": 7200000
           },
           "NumberOfDecreasesToday": 0
         },
@@ -1008,38 +1013,34 @@
       {
         "region": "eu-central-1",
         "name": "image-processing",
-        "runtime": "JAVA21",
+        "runtime": "python3-12",
         "type": "DOCKER",
         "privatePort": 8081,
-        "publicPort": 36511,
-        "archive": "image-processing-1.1.1-SNAPSHOT.jar",
+        "publicPort": 46899,
+        "archive": "image-processing-1.1.1.jar",
         "version": "1.1.1",
-        "containerId": "",
-        "containerName": "",
+        "containerId": "bde0800578c618b7abce8bd9ddaad7968594e909d2102fc818256d1c91acb39a",
+        "containerName": "image-processing-ccb1a7bf",
         "enabled": true,
         "status": "RUNNING",
-        "imageId": "sha256:ce14876819365c8e99f3d5bd8abab2ec51ef8f502fc1217783ed2ac411b74f3f",
-        "imageSize": 431943582,
+        "imageId": "sha256:05219d9886ee1e6257ca132a689a31e1d0841d1ebb138d4e7919e9463529ecc5",
+        "imageSize": 346726609,
         "imageMd5": "0b51eee5b820654df8249d13b4db39e9",
         "description": "",
         "lastStarted": {
-          "$date": 1757253052542
+          "$date": 1757415369834
         },
         "created": {
-          "$date": 1757253052542
+          "$date": 1757415369834
         },
         "modified": {
-          "$date": 1757259478377
+          "$date": 1757415369834
         },
         "environment": {
-          "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+          "AWS_AWSMOCK_ENDPOINT": "http://awsmock:4566",
           "AWS_REGION": "eu-central-1",
-          "AWS_S3_ONIX_BUCKET_NAME": "file-delivery",
-          "AWS_SNS_LOGGING_TOPIC": "protocolizing-topic",
-          "AWS_SQS_IMAGE_INPUT_QUEUE": "file-delivery-image-queue",
-          "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Xms2G -Xmx4G",
-          "LC_ALL": "en_US.UTF-8",
-          "SPRING_PROFILES_ACTIVE": "awsmock"
+          "AWS_SQS_INPUT_QUEUE": "file-delivery-image-queue",
+          "AWS_SNS_PROTOCOLIZING_TOPIC": "protocolizing-topic"
         },
         "tags": {
           "dockerTag": "1.1.1",
@@ -1049,38 +1050,34 @@
       {
         "region": "eu-central-1",
         "name": "xml-processing",
-        "runtime": "JAVA21",
+        "runtime": "python3-12",
         "type": "DOCKER",
         "privatePort": 8081,
-        "publicPort": 38675,
-        "archive": "xml-processing-1.1.1-SNAPSHOT.jar",
+        "publicPort": 59421,
+        "archive": "xml-processing-1.1.1.jar",
         "version": "1.1.1",
-        "containerId": "",
-        "containerName": "",
+        "containerId": "56b761c775e8ac6e413c2cfe78481f43f3265c12b63426d982c2c75e9bbb087f",
+        "containerName": "xml-processing-9d029859",
         "enabled": true,
         "status": "RUNNING",
-        "imageId": "sha256:ce14876819365c8e99f3d5bd8abab2ec51ef8f502fc1217783ed2ac411b74f3f",
-        "imageSize": 431943582,
+        "imageId": "sha256:a576259615c66e47b1ae27da52e73fc861d6eeb8350abffb349f49807bf5db51",
+        "imageSize": 346726609,
         "imageMd5": "0b51eee5b820654df8249d13b4db39e9",
         "description": "",
         "lastStarted": {
-          "$date": 1757253052455
+          "$date": 1757415369805
         },
         "created": {
-          "$date": 1757253052455
+          "$date": 1757415369805
         },
         "modified": {
-          "$date": 1757259478377
+          "$date": 1757415369805
         },
         "environment": {
-          "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
+          "AWS_AWSMOCK_ENDPOINT": "http://awsmock:4566",
           "AWS_REGION": "eu-central-1",
-          "AWS_S3_ONIX_BUCKET_NAME": "file-delivery",
-          "AWS_SNS_LOGGING_TOPIC": "protocolizing-topic",
-          "AWS_SQS_IMAGE_INPUT_QUEUE": "file-delivery-xml-queue",
-          "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Xms2G -Xmx4G",
-          "LC_ALL": "en_US.UTF-8",
-          "SPRING_PROFILES_ACTIVE": "awsmock"
+          "AWS_SQS_INPUT_QUEUE": "file-delivery-xml-queue",
+          "AWS_SNS_PROTOCOLIZING_TOPIC": "protocolizing-topic"
         },
         "tags": {
           "dockerTag": "1.1.1",
@@ -1090,38 +1087,70 @@
       {
         "region": "eu-central-1",
         "name": "json-processing",
-        "runtime": "JAVA21",
+        "runtime": "python3-12",
         "type": "DOCKER",
         "privatePort": 8081,
-        "publicPort": 60803,
-        "archive": "json-processing-1.1.1-SNAPSHOT.jar",
+        "publicPort": 45731,
+        "archive": "json-processing-1.1.1.jar",
+        "version": "1.1.1",
+        "containerId": "8ae991b75c1b6214a0e9103ecaf518315ffd2316e9f39d12386d2adcb2b9b316",
+        "containerName": "json-processing-f507c116",
+        "enabled": true,
+        "status": "RUNNING",
+        "imageId": "sha256:f679de52f37e1ef7ef2a4f289cf3b342832c5185c03c0baa51a4d29d4897ee99",
+        "imageSize": 346728151,
+        "imageMd5": "324904d9f30aa9df3920a7810a1f7c93",
+        "description": "",
+        "lastStarted": {
+          "$date": 1757415369736
+        },
+        "created": {
+          "$date": 1757415369736
+        },
+        "modified": {
+          "$date": 1757415369736
+        },
+        "environment": {
+          "AWS_AWSMOCK_ENDPOINT": "http://awsmock:4566",
+          "AWS_REGION": "eu-central-1",
+          "AWS_SQS_INPUT_QUEUE": "file-delivery-json-queue",
+          "AWS_SNS_PROTOCOLIZING_TOPIC": "protocolizing-topic"
+        },
+        "tags": {
+          "dockerTag": "1.1.1",
+          "version": "1.1.1"
+        }
+      },
+      {
+        "region": "eu-central-1",
+        "name": "protocolizing",
+        "runtime": "python3-12",
+        "type": "DOCKER",
+        "privatePort": 8080,
+        "publicPort": 0,
+        "archive": "protocolizing-1.1.1.zip",
         "version": "1.1.1",
         "containerId": "",
         "containerName": "",
         "enabled": true,
         "status": "RUNNING",
-        "imageId": "sha256:ce14876819365c8e99f3d5bd8abab2ec51ef8f502fc1217783ed2ac411b74f3f",
-        "imageSize": 431943582,
-        "imageMd5": "0b51eee5b820654df8249d13b4db39e9",
-        "description": "",
+        "imageId": "",
+        "imageSize": 0,
+        "imageMd5": "af33be7187d6d92e812413598e9bb42a",
+        "description": "Protocolizing Python 3.12 application",
+        "environment": {
+          "AWS_AWSMOCK_ENDPOINT": "http://awsmock:4566",
+          "AWS_REGION": "eu-central-1",
+          "AWS_SQS_INPUT_QUEUE": "protocolizing-queue"
+        },
         "lastStarted": {
-          "$date": 1757253052592
+          "$date": 1757415415496
         },
         "created": {
-          "$date": 1757253052592
+          "$date": -2209075200000
         },
         "modified": {
-          "$date": 1757259478377
-        },
-        "environment": {
-          "AWS_LOCALSTACK_ENDPOINT": "http://awsmock:4566",
-          "AWS_REGION": "eu-central-1",
-          "AWS_S3_ONIX_BUCKET_NAME": "file-delivery",
-          "AWS_SNS_LOGGING_TOPIC": "protocolizing-topic",
-          "AWS_SQS_IMAGE_INPUT_QUEUE": "file-delivery-json-queue",
-          "JAVA_TOOL_OPTIONS": "-Duser.timezone=Europe/Berlin -Xms2G -Xmx4G",
-          "LC_ALL": "en_US.UTF-8",
-          "SPRING_PROFILES_ACTIVE": "awsmock"
+          "$date": 1757415415496
         },
         "tags": {
           "dockerTag": "1.1.1",

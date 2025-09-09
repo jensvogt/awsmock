@@ -477,6 +477,8 @@ namespace AwsMock::Service {
                 instanceCounter.instanceId = instance.instanceId;
                 instanceCounter.containerId = instance.containerId;
                 instanceCounter.status = Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status);
+                instanceCounter.hostname = instance.hostName;
+                instanceCounter.port = instance.hostPort;
                 instanceCounter.lastInvocation = instance.lastInvocation;
                 response.instanceCounters.emplace_back(instanceCounter);
             }

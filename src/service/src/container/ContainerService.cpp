@@ -88,7 +88,7 @@ namespace AwsMock::Service {
         log_debug << "Build image request, name: " << name << " tags: " << tag;
 
         // Write the docker file
-        std::string dockerFile = WriteApplicationDockerFile(codeDir, archive, privatePort, runtime, environment);
+        std::string dockerFile = WriteApplicationDockerFile(codeDir, name, archive, privatePort, runtime, environment);
         const std::string imageFile = BuildImageFile(codeDir, name);
         if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
             log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
@@ -768,7 +768,7 @@ namespace AwsMock::Service {
         return dockerFilename;
     }
 
-    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment) {
+    std::string ContainerService::WriteApplicationDockerFile(const std::string &codeDir, const std::string &mainFile, const std::string &archive, long privatePort, const std::string &runtime, const std::map<std::string, std::string> &environment) {
 
         std::string dockerFilename = codeDir + Core::FileUtils::separator() + "Dockerfile";
         std::string providedRuntime = boost::algorithm::to_lower_copy(runtime);
@@ -821,13 +821,15 @@ namespace AwsMock::Service {
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "python")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
-            ofs << "COPY requirements.txt ${LAMBDA_TASK_ROOT}" << std::endl;
-            ofs << "RUN pip install -r requirements.txt" << std::endl;
             ofs << "RUN mkdir -p /root/.aws" << std::endl;
+            ofs << "RUN mkdir -p /root/app" << std::endl;
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;
-            ofs << "COPY *.py ${LAMBDA_TASK_ROOT}/" << std::endl;
-            //ofs << "CMD [\"" + handler + "\"]" << std::endl;
+            ofs << "COPY *.py /root/app/" << std::endl;
+            ofs << "COPY requirements.txt /root/app" << std::endl;
+            ofs << "WORKDIR /root/app/" << std::endl;
+            ofs << "RUN pip install -r requirements.txt" << std::endl;
+            ofs << "CMD [\"python\", \"-u\", \"" + mainFile + ".py\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);

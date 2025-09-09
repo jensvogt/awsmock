@@ -20,6 +20,11 @@ namespace AwsMock::Dto::Apps {
         JAVA11,
         JAVA17,
         JAVA21,
+        PYTHON39,
+        PYTHON310,
+        PYTHON311,
+        PYTHON312,
+        PYTHON313,
         UNKNOWN
     };
 
@@ -27,6 +32,11 @@ namespace AwsMock::Dto::Apps {
             {AppsRuntimeType::JAVA11, "JAVA11"},
             {AppsRuntimeType::JAVA17, "JAVA17"},
             {AppsRuntimeType::JAVA21, "JAVA21"},
+            {AppsRuntimeType::PYTHON39, "python3-9"},
+            {AppsRuntimeType::PYTHON310, "python3-10"},
+            {AppsRuntimeType::PYTHON311, "python3-11"},
+            {AppsRuntimeType::PYTHON312, "python3-12"},
+            {AppsRuntimeType::PYTHON313, "python3-13"},
             {AppsRuntimeType::UNKNOWN, "UNKNOWN"},
     };
 

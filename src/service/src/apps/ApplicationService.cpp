@@ -24,6 +24,8 @@ namespace AwsMock::Service {
             // Generate application ID
             Database::Entity::Apps::Application application = Dto::Apps::Mapper::map(request.application);
             application.region = request.region;
+            application.created = system_clock::now();
+            application.modified = system_clock::now();
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
             application = _database.CreateApplication(application);
 
