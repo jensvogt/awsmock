@@ -250,9 +250,9 @@ namespace AwsMock::Database {
                     opts.sort(sort.extract());
                 }
 
-                for (auto queueCursor = _queueCollection.find(query.view(), opts); auto queue: queueCursor) {
+                for (auto topicCursor = _queueCollection.find(query.view(), opts); const auto &topic: topicCursor) {
                     Entity::SNS::Topic result;
-                    result.FromDocument(queue);
+                    result.FromDocument(topic);
                     topicList.push_back(result);
                 }
             } catch (const mongocxx::exception &exc) {
@@ -916,8 +916,6 @@ namespace AwsMock::Database {
                         kvp("_id", "$topicArn"),
                         kvp("size", make_document(kvp("$sum", "$size"))),
                         kvp("total", make_document(kvp("$sum", 1))),
-                        kvp("initial", make_document(kvp("$sum",
-                                                         make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::INITIAL)))), 1, 0)))))),
                         kvp("send", make_document(kvp("$sum",
                                                       make_document(kvp("$cond", make_array(make_document(kvp("$eq", make_array("$status", MessageStatusToString(Entity::SNS::MessageStatus::SEND)))), 1, 0)))))),
                         kvp("resend", make_document(kvp("$sum",
@@ -927,7 +925,6 @@ namespace AwsMock::Database {
                 projectDocument.append(kvp("_id", 0),
                                        kvp("topicArn", "$_id"),
                                        kvp("total", 1),
-                                       kvp("initial", 1),
                                        kvp("send", 1),
                                        kvp("resend", 1),
                                        kvp("size", 1));
@@ -947,14 +944,14 @@ namespace AwsMock::Database {
                     bulk.append(mongocxx::model::update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "topicArn"))),
                                                             make_document(kvp("$set", make_document(
                                                                                               kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "initial"))),
+                                                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
                                                                                               kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
                                                                                               kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
                     log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "topicArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
-                              << ", visible: " << Core::Bson::BsonUtils::GetLongValue(t, "initial")
-                              << ", invisible: " << Core::Bson::BsonUtils::GetLongValue(t, "invisible")
-                              << ", delayed: " << Core::Bson::BsonUtils::GetLongValue(t, "delayed");
+                              << ", messages: " << Core::Bson::BsonUtils::GetLongValue(t, "total")
+                              << ", messagesSend: " << Core::Bson::BsonUtils::GetLongValue(t, "send")
+                              << ", messagesResend: " << Core::Bson::BsonUtils::GetLongValue(t, "resend");
                 }
 
                 // Bul updates

@@ -18,9 +18,9 @@
 #include <awsmock/core/FieldAlloc.h>
 #include <awsmock/core/FileUtils.h>
 #include <awsmock/core/HttpSocketResponse.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 #include <awsmock/core/exception/ServiceException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 constexpr char SEPARATOR[] = "===============================================================================";
 
@@ -122,7 +122,7 @@ namespace AwsMock::Core {
         static std::string AddQueryParameter(const std::string &url, const std::string &name, const std::string &value);
 
         /**
-         * @brief Adds a integer query parameter to the given URL.
+         * @brief Adds an integer query parameter to the given URL.
          *
          * @param url url to add to
          * @param name parameter name
@@ -134,6 +134,10 @@ namespace AwsMock::Core {
         /**
          * @brief Returns an integer parameter
          *
+         * @par
+         * The parameter uri a full URL or a payload, as AWS send for some modules (for instance: SNS) a query string without host and port
+         * inside the payload. In this case the uri is appended by 'http://localhost:4566', otherwise boost::urls package cannot handle it.
+         *
          * @param uri HTTP uri
          * @param name parameter name
          * @param min minimum value
@@ -144,19 +148,11 @@ namespace AwsMock::Core {
         static int GetIntParameter(const std::string &uri, const std::string &name, int min, int max, int def);
 
         /**
-         * @brief Returns an integer parameter from the payload
-         *
-         * @param uri HTTP uri
-         * @param name parameter name
-         * @param min minimum value
-         * @param max maximum value
-         * @param def default value
-         * @return integer parameter
-         */
-        static int GetIntParameterFromPayload(const std::string &uri, const std::string &name, const int min, const int max, const int def) { return GetIntParameter("/?" + uri, name, min, max, def); }
-
-        /**
          * @brief Returns a long integer parameter
+         *
+         * @par
+         * The parameter uri a full URL or a payload, as AWS send for some modules (for instance: SNS) a query string without host and port
+         * inside the payload. In this case the uri is appended by 'http://localhost:4566', otherwise boost::urls package cannot handle it.
          *
          * @param uri HTTP uri
          * @param name parameter name
@@ -168,19 +164,11 @@ namespace AwsMock::Core {
         static long GetLongParameter(const std::string &uri, const std::string &name, long min, long max, long def);
 
         /**
-         * @brief Returns a long integer parameter from the payload
-         *
-         * @param uri HTTP uri
-         * @param name parameter name
-         * @param min minimum value
-         * @param max maximum value
-         * @param def default value
-         * @return integer parameter
-         */
-        static long GetLongParameterFromPayload(const std::string &uri, const std::string &name, const long min, const long max, const long def) { return GetLongParameter("/?" + uri, name, min, max, def); }
-
-        /**
          * @brief Returns a string parameter
+         *
+         * @par
+         * The parameter uri a full URL or a payload, as AWS send for some modules (for instance: SNS) a query string without host and port
+         * inside the payload. In this case the uri is appended by 'http://localhost:4566', otherwise boost::urls package cannot handle it.
          *
          * @param uri HTTP uri
          * @param name parameter name
@@ -190,17 +178,11 @@ namespace AwsMock::Core {
         static std::string GetStringParameter(const std::string &uri, const std::string &name, const std::string &def = {});
 
         /**
-         * @brief Returns a string parameter from the payload
-         *
-         * @param uri HTTP uri
-         * @param name parameter name
-         * @param def default value
-         * @return integer parameter
-         */
-        static std::string GetStringParameterFromPayload(const std::string &uri, const std::string &name, const std::string &def = {}) { return GetStringParameter("/?" + uri, name, def); }
-
-        /**
          * @brief Returns a boolean parameter
+         *
+         * @par
+         * The parameter uri a full URL or a payload, as AWS send for some modules (for instance: SNS) a query string without host and port
+         * inside the payload. In this case the uri is appended by 'http://localhost:4566', otherwise boost::urls package cannot handle it.
          *
          * @param uri HTTP uri
          * @param name parameter name
@@ -208,16 +190,6 @@ namespace AwsMock::Core {
          * @return integer parameter
          */
         static bool GetBoolParameter(const std::string &uri, const std::string &name, const bool &def = false);
-
-        /**
-         * @brief Returns a boolean parameter from the payload
-         *
-         * @param uri HTTP uri
-         * @param name parameter name
-         * @param def default value
-         * @return integer parameter
-         */
-        static bool GetBoolParameterFromPayload(const std::string &uri, const std::string &name, const bool &def = false) { return GetBoolParameter("/?" + uri, name, def); }
 
         /**
          * @brief Returns a map of all query parameters.
@@ -230,7 +202,7 @@ namespace AwsMock::Core {
         static std::map<std::string, std::string> GetQueryParameters(const std::string &uri);
 
         /**
-         * @brief Returns a vector of query parameter with the given index.
+         * @brief Returns a vector of query parameters with the given index.
          *
          * @param uri HTTP request URI
          * @param prefix HTTP parameter prefix
@@ -273,7 +245,7 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(const http::request<request_body_t, http::basic_fields<alloc_t>> &request);
 
         /**
-         * @brief Gets the body as string from a boost dynamic_body request
+         * @brief Gets the body as a string from a boost dynamic_body request
          *
          * @param request HTTP serer request
          * @return HTTP body as string
@@ -281,7 +253,7 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(const http::request<http::dynamic_body> &request);
 
         /**
-         * @brief Gets the body as string from a boost dynamic_body response
+         * @brief Gets the body as a string from a boost dynamic_body response
          *
          * @param response HTTP serer response
          * @return HTTP body as string
@@ -289,7 +261,7 @@ namespace AwsMock::Core {
         static std::string GetBodyAsString(const http::response<http::dynamic_body> &response);
 
         /**
-         * @brief Gets the body as string from a boost string_body response
+         * @brief Gets the body as a string from a boost string_body response
          *
          * @param response HTTP serer response
          * @return HTTP body as string
@@ -301,7 +273,7 @@ namespace AwsMock::Core {
          *
          * @param request HTTP request
          * @param name header key
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static bool HasHeader(const http::request<http::dynamic_body> &request, const std::string &name);
 
@@ -310,7 +282,7 @@ namespace AwsMock::Core {
          *
          * @param request HTTP request
          * @param name header key
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static bool HasHeader(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &name);
 
@@ -319,19 +291,9 @@ namespace AwsMock::Core {
          *
          * @param request HTTP request
          * @param key header key
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static bool HasHeader(const http::request<http::string_body> &request, const std::string &key);
-
-        /**
-         * @brief Checks whether a header exists.
-         *
-         * @param request HTTP request
-         * @param name header key
-         * @param index index
-         * @return header value of empty string.
-         */
-        static bool HasHeader(const http::request<http::string_body> &request, const std::string &name, int index);
 
         /**
          * @brief Checks whether a header exists and has a given value.
@@ -339,7 +301,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @param name header key
          * @param value header value
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static bool HasHeaderValue(const http::request<http::dynamic_body> &request, const std::string &name, const std::string &value);
 
@@ -353,7 +315,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @param key header key
          * @param defaultValue returned when the key was not found
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static std::string GetHeaderValue(const http::request<http::dynamic_body> &request, const std::string &key, const std::string &defaultValue = {});
 
@@ -367,7 +329,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @param key header key
          * @param defaultValue returned when the key was not found
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static std::string GetHeaderValue(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &key, const std::string &defaultValue = {});
 
@@ -381,7 +343,7 @@ namespace AwsMock::Core {
          * @param request HTTP request
          * @param key header key
          * @param defaultValue returned when the key was not found
-         * @return header value of empty string.
+         * @return header value or empty string.
          */
         static std::string GetHeaderValue(const http::request<http::string_body> &request, const std::string &key, const std::string &defaultValue = {});
 

@@ -119,6 +119,15 @@ namespace AwsMock::Database {
         log_debug << "API gateway key deleted, count: " << count;
     }
 
+    long ApiGatewayMemoryDb::DeleteAllKeys() {
+        boost::mutex::scoped_lock lock(_apiKeyMutex);
+
+        const long count = _apiKeys.size();
+        _apiKeys.clear();
+        log_debug << "API gateway keys deleted, count: " << count;
+        return count;
+    }
+
     // ========================================================================================================================
     // REST API
     // ========================================================================================================================

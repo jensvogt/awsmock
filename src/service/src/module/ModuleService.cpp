@@ -407,6 +407,8 @@ namespace AwsMock::Service {
             } else if (m == "transfer") {
                 Database::S3Database::instance().DeleteObjects("eu-central-1", "transfer-server");
                 count += Database::TransferDatabase::instance().DeleteAllTransfers();
+            } else if (m == "apigateway") {
+                count += Database::ApiGatewayDatabase::instance().DeleteAllKeys();
             }
         }
     }

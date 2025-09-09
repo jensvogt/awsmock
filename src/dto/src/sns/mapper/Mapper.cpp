@@ -34,7 +34,9 @@ namespace AwsMock::Dto::SNS {
             counter.requestId = request.requestId;
             counter.topicName = entity.topicName;
             counter.topicArn = entity.topicArn;
-            counter.availableMessages = entity.topicAttribute.availableMessages;
+            counter.messages = entity.messages;
+            counter.messagesSend = entity.messagesSend;
+            counter.messagesResend = entity.messagesResend;
             counter.size = entity.size;
             counter.created = entity.created;
             counter.modified = entity.modified;
