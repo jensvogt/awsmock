@@ -10,8 +10,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/docker/model/PortBinding.h>
 
 namespace AwsMock::Dto::Docker {
@@ -26,7 +26,19 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Config {};
+    struct Config final : Common::BaseCounter<Config> {
+
+      private:
+
+        friend Config tag_invoke(boost::json::value_to_tag<Config>, boost::json::value const &v) {
+            Config r;
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Config const &obj) {
+            jv = {};
+        }
+    };
 
     /**
      * @brief Docker log config object
@@ -40,12 +52,12 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct LogConfig {
+    struct LogConfig final : Common::BaseCounter<LogConfig> {
 
         /**
-         * Network mode
+         * Logging configuration
          */
-        std::string type = "journald";
+        std::string type = "json-file";
 
         /**
          * Network mode
@@ -55,44 +67,37 @@ namespace AwsMock::Dto::Docker {
         /**
          * Convert to a JSON string
          *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * Convert to a JSON string
-         *
          * @param document JSON object
          */
-        void FromDocument(const view_or_value<view, value> &document);
+        void FromDocument(const view_or_value<view, value> &document) {
 
-        /**
-         * Convert to a JSON object
-         *
-         * @return object JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+            try {
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+                type = Core::Bson::BsonUtils::GetStringValue(document, "Type");
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string.
-         */
-        [[nodiscard]] std::string ToString() const;
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
 
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const LogConfig &i);
+      private:
+
+        friend LogConfig tag_invoke(boost::json::value_to_tag<LogConfig>, boost::json::value const &v) {
+            LogConfig r;
+            r.type = Core::Json::GetStringValue(v, "Type");
+            if (Core::Json::AttributeExists(v, "Config")) {
+                r.config = boost::json::value_to<Config>(v.at("Config"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, LogConfig const &obj) {
+            jv = {
+                    {"Type", obj.type},
+                    {"Config", boost::json::value_from(obj.config)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

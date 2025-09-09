@@ -9,28 +9,36 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Docker platform
+     * @brief Docker platform
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Platform {
+    struct Platform final : Common::BaseCounter<Platform> {
 
         /**
          * Platform name
          */
         std::string name;
 
-        /**
-         * Deserialize from a JSON object
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
+      private:
+
+        friend Platform tag_invoke(boost::json::value_to_tag<Platform>, boost::json::value const &v) {
+            Platform r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Platform const &obj) {
+            jv = {
+                    {"Name", obj.name},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

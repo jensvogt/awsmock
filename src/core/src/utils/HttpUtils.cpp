@@ -373,6 +373,21 @@ namespace AwsMock::Core {
         return oss.str();
     }
 
+    http::status HttpUtils::StatusCodeFromString(const std::string &status) {
+        static const std::unordered_map<std::string, http::status> lookup = {
+                {"OK", http::status::ok},
+                {"Not Found", http::status::not_found},
+                {"Bad Request", http::status::bad_request},
+                {"Internal Server Error", http::status::internal_server_error},
+                {"No Content", http::status::no_content},
+                // add more as needed
+        };
+
+        if (const auto it = lookup.find(status); it != lookup.end())
+            return it->second;
+        throw std::invalid_argument("Unknown HTTP status string: " + status);
+    }
+
     http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
 
         http::response<http::dynamic_body> response{http::status::ok, request.version()};

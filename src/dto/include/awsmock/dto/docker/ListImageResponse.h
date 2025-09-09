@@ -11,8 +11,8 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/docker/model/Image.h>
 
 namespace AwsMock::Dto::Docker {
@@ -40,40 +40,26 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListImageResponse {
+    struct ListImageResponse final : Common::BaseCounter<ListImageResponse> {
 
         /**
          * Image list
          */
         std::vector<Image> imageList;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return object JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListImageResponse tag_invoke(boost::json::value_to_tag<ListImageResponse>, boost::json::value const &v) {
+            ListImageResponse r;
+            r.imageList = boost::json::value_to<std::vector<Image>>(v);
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListImageResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListImageResponse const &obj) {
+            jv = {
+                    {boost::json::value_from(obj.imageList)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

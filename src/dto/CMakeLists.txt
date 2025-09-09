@@ -11,12 +11,8 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
 set(SQS_SOURCES src/sqs/mapper/Mapper.cpp)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/mapper/Mapper.cpp)
-set(DOCKER_SOURCES src/docker/model/Port.cpp src/docker/model/Container.cpp src/docker/model/Image.cpp
-        src/docker/ListContainerResponse.cpp src/docker/ListImageResponse.cpp src/docker/model/LogConfig.cpp
-        src/docker/CreateContainerRequest.cpp src/docker/model/Filters.cpp src/docker/CreateContainerResponse.cpp
-        src/docker/CreateNetworkRequest.cpp src/docker/CreateNetworkResponse.cpp src/docker/model/Network.cpp
-        src/docker/ListNetworkResponse.cpp src/docker/PruneContainerResponse.cpp src/docker/model/Platform.cpp
-        src/docker/model/State.cpp src/docker/InspectContainerResponse.cpp src/docker/model/HostConfig.cpp)
+set(DOCKER_SOURCES src/docker/CreateContainerRequest.cpp src/docker/CreateContainerResponse.cpp
+        src/docker/CreateNetworkRequest.cpp src/docker/CreateNetworkResponse.cpp)
 set(LAMBDA_SOURCES
         src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
         src/lambda/GetFunctionResponse.cpp src/lambda/mapper/Mapper.cpp src/lambda/ListEventSourceMappingsRequest.cpp
@@ -53,8 +49,7 @@ include_directories(include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
 else ()
-    add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/dto/apigateway/model/Key.h)
+    add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

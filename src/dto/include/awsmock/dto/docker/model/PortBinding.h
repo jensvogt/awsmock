@@ -9,8 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/docker/model/Port.h>
 
 namespace AwsMock::Dto::Docker {
@@ -20,7 +18,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PortBinding {
+    struct PortBinding final : Common::BaseCounter<PortBinding> {
 
         /**
          * Port map
@@ -45,7 +43,25 @@ namespace AwsMock::Dto::Docker {
                 return it->hostPort;
             }
             return -1;
-        };
+        }
+
+      private:
+
+        friend PortBinding tag_invoke(boost::json::value_to_tag<PortBinding>, boost::json::value const &v) {
+            PortBinding r;
+            if (Core::Json::AttributeExists(v, "PortMap")) {
+                r.portMap = boost::json::value_to<std::map<std::string, std::vector<Port>>>(v.at("PortMap"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PortBinding const &obj) {
+            jv = {
+                    {"PortMap", boost::json::value_from(obj.portMap)},
+            };
+        }
     };
+
 }// namespace AwsMock::Dto::Docker
+
 #endif// AWSMOCK_DTO_DOCKER_PORT_BINDING_H

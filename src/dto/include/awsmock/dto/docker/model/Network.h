@@ -12,6 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -22,7 +23,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Network {
+    struct Network final : Common::BaseCounter<Network> {
 
         /**
          * Image ID
@@ -45,56 +46,45 @@ namespace AwsMock::Dto::Docker {
         std::string scope;
 
         /**
+         * IPv4 enabled
+         */
+        bool enableIPv4{};
+
+        /**
          * IPv6 enabled
          */
-        bool ipv6Enabled;
+        bool enableIPv6{};
 
         /**
          * Created date time
          */
         system_clock::time_point created;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
+        friend Network tag_invoke(boost::json::value_to_tag<Network>, boost::json::value const &v) {
+            Network r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.driver = Core::Json::GetStringValue(v, "Driver");
+            r.scope = Core::Json::GetStringValue(v, "Scope");
+            r.enableIPv4 = Core::Json::GetBoolValue(v, "EnableIPv4");
+            r.enableIPv6 = Core::Json::GetBoolValue(v, "EnableIPv6");
+            r.created = Core::Json::GetDatetimeValue(v, "Created");
+            return r;
+        }
 
-        /**
-         * Convert to a JSON object
-         *
-         * @return object JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string.
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Network &i);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Network const &obj) {
+            jv = {
+                    {"id", obj.id},
+                    {"name", obj.name},
+                    {"driver", obj.driver},
+                    {"scope", obj.scope},
+                    {"EnableIPv4", obj.enableIPv4},
+                    {"EnableIPv6", obj.enableIPv6},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

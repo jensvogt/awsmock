@@ -42,7 +42,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct HostConfig {
+    struct HostConfig final : Common::BaseCounter<HostConfig> {
 
         /**
          * Network mode
@@ -59,47 +59,27 @@ namespace AwsMock::Dto::Docker {
          */
         LogConfig logConfig;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
+        friend HostConfig tag_invoke(boost::json::value_to_tag<HostConfig>, boost::json::value const &v) {
+            HostConfig r;
+            r.networkMode = Core::Json::GetStringValue(v, "NetworkMode");
+            if (Core::Json::AttributeExists(v, "PortBindings")) {
+                r.portBindings = boost::json::value_to<PortBinding>(v.at("PortBindings"));
+            }
+            if (Core::Json::AttributeExists(v, "LogConfig")) {
+                r.logConfig = boost::json::value_to<LogConfig>(v.at("LogConfig"));
+            }
+            return r;
+        }
 
-        /**
-         * Convert to a JSON object
-         *
-         * @return object JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string.
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const HostConfig &i);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, HostConfig const &obj) {
+            jv = {
+                    {"NetworkMode", obj.networkMode},
+                    {"PortBindings", boost::json::value_from(obj.portBindings)},
+                    {"LogConfig", boost::json::value_from(obj.logConfig)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker
