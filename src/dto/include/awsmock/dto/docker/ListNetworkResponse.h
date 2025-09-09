@@ -11,6 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 #include <awsmock/dto/docker/model/Network.h>
 
 namespace AwsMock::Dto::Docker {
@@ -20,40 +21,26 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListNetworkResponse {
+    struct ListNetworkResponse final : Common::BaseCounter<ListNetworkResponse> {
 
         /**
          * Network list
          */
-        std::vector<Network> networkList;
+        std::vector<Network> networks;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return object JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend ListNetworkResponse tag_invoke(boost::json::value_to_tag<ListNetworkResponse>, boost::json::value const &v) {
+            ListNetworkResponse r;
+            r.networks = boost::json::value_to<std::vector<Network>>(v);
+            return r;
+        }
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListNetworkResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListNetworkResponse const &obj) {
+            jv = {
+                    {boost::json::value_from(obj.networks)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

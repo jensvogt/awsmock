@@ -16,11 +16,11 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Docker details
+     * @brief Docker details
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Details {
+    struct Details final : Common::BaseCounter<Details> {
 
         /**
          * API version
@@ -47,33 +47,35 @@ namespace AwsMock::Dto::Docker {
          */
         std::string gitCommit;
 
-        /**
-         * @brief Deserialize from a JSON object
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
+      private:
 
-            try {
-                apiVersion = Core::Bson::BsonUtils::GetStringValue(document, "ApiVersion");
-                architecture = Core::Bson::BsonUtils::GetStringValue(document, "Arch");
-                buildTime = Core::Bson::BsonUtils::GetDateValue(document, "BuildTime");
-                experimental = Core::Bson::BsonUtils::GetBoolValue(document, "Experimental");
-                gitCommit = Core::Bson::BsonUtils::GetStringValue(document, "GitCommit");
+        friend Details tag_invoke(boost::json::value_to_tag<Details>, boost::json::value const &v) {
+            Details r;
+            r.apiVersion = Core::Json::GetStringValue(v, "ApiVersion");
+            r.architecture = Core::Json::GetStringValue(v, "Architecture");
+            r.gitCommit = Core::Json::GetStringValue(v, "GitCommit");
+            r.buildTime = Core::Json::GetDatetimeValue(v, "BuildTime");
+            r.experimental = Core::Json::GetBoolValue(v, "Experimental");
+            return r;
+        }
 
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::ServiceException(exc.what());
-            }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Details const &obj) {
+            jv = {
+                    {"ApiVersion", obj.apiVersion},
+                    {"Architecture", obj.architecture},
+                    {"GitCommit", obj.gitCommit},
+                    {"BuildTime", Core::DateTimeUtils::ToISO8601(obj.buildTime)},
+                    {"Experimental", obj.experimental},
+            };
         }
     };
 
     /**
-     * Docker component
+     * @brief Docker component
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Component {
+    struct Component final : Common::BaseCounter<Component> {
 
         /**
          * Platform name
@@ -90,35 +92,31 @@ namespace AwsMock::Dto::Docker {
          */
         Details details;
 
-        /**
-         * @brief Deserialize from a JSON object
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document) {
+      private:
 
-            try {
+        friend Component tag_invoke(boost::json::value_to_tag<Component>, boost::json::value const &v) {
+            Component r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.version = Core::Json::GetStringValue(v, "Version");
+            r.details = boost::json::value_to<Details>(v.at("Details"));
+            return r;
+        }
 
-                name = Core::Bson::BsonUtils::GetStringValue(document, "Name");
-                version = Core::Bson::BsonUtils::GetStringValue(document, "Version");
-
-                if (document.view().find("Details") != document.view().end()) {
-                    details.FromDocument(document.view()["Details"].get_document().value);
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
-            }
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Component const &obj) {
+            jv = {
+                    {"Name", obj.name},
+                    {"Version", obj.version},
+                    {"Details", boost::json::value_from(obj.details)},
+            };
         }
     };
 
     /**
-     * Docker version
+     * @brief Docker version
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct DockerVersion {
+    struct DockerVersion final : Common::BaseCounter<DockerVersion> {
 
         /**
          * Platform object
@@ -130,35 +128,24 @@ namespace AwsMock::Dto::Docker {
          */
         std::vector<Component> components;
 
-        /**
-         * Deserialize from a JSON object
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString) {
+      private:
 
-            try {
-
-                const value document = bsoncxx::from_json(jsonString);
-
-                // Platform
-                if (document.view().find("Platform") != document.view().end()) {
-                    platform.FromDocument(document.view()["Platform"].get_document().value);
-                }
-
-                // Components
-                if (document.view().find("Components") != document.view().end()) {
-                    for (const bsoncxx::array::view jsonArray = document.view()["Components"].get_array().value; const auto &jsonComponent: jsonArray) {
-                        Component component;
-                        component.FromDocument(jsonComponent.get_document().value);
-                        components.push_back(component);
-                    }
-                }
-
-            } catch (bsoncxx::exception &exc) {
-                log_error << exc.what();
-                throw Core::JsonException(exc.what());
+        friend DockerVersion tag_invoke(boost::json::value_to_tag<DockerVersion>, boost::json::value const &v) {
+            DockerVersion r = {};
+            if (Core::Json::AttributeExists(v, "Platform")) {
+                r.platform = boost::json::value_to<Platform>(v.at("Platform"));
             }
+            if (Core::Json::AttributeExists(v, "Components")) {
+                r.components = boost::json::value_to<std::vector<Component>>(v.at("Components"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, DockerVersion const &obj) {
+            jv = {
+                    {"Platform", boost::json::value_from(obj.platform)},
+                    {"Components", boost::json::value_from(obj.components)},
+            };
         }
     };
 

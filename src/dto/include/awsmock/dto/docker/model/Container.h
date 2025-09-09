@@ -11,7 +11,6 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/docker/model/Port.h>
 
@@ -20,12 +19,11 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Docker container
+     * @brief Docker container
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Container {
-
+    struct Container final : Common::BaseCounter<Container> {
         /**
          * Image ID
          */
@@ -76,54 +74,39 @@ namespace AwsMock::Dto::Docker {
          */
         long sizeRootFs = 0;
 
-        /**
-         * @brief Returns the lambda host port. The lambda host port is the public port for which the private port is 8080.
-         *
-         * @return lambda public port, or -1 if port does not exist.
-         */
-        int GetLambdaPort();
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
+        friend Container tag_invoke(boost::json::value_to_tag<Container>, boost::json::value const &v) {
+            Container r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.image = Core::Json::GetStringValue(v, "Image");
+            r.imageId = Core::Json::GetStringValue(v, "ImageId");
+            r.state = Core::Json::GetStringValue(v, "State");
+            r.status = Core::Json::GetStringValue(v, "Status");
+            r.sizeRw = Core::Json::GetLongValue(v, "SizeRw");
+            r.sizeRootFs = Core::Json::GetLongValue(v, "SizeRootFs");
+            if (Core::Json::AttributeExists(v, "Names")) {
+                r.names = boost::json::value_to<std::vector<std::string>>(v.at("Names"));
+            }
+            if (Core::Json::AttributeExists(v, "Ports")) {
+                r.ports = boost::json::value_to<std::vector<Port>>(v.at("Ports"));
+            }
+            return r;
+        }
 
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * @brief Convert from a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Container &c);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Container const &obj) {
+            jv = {
+                    {"Id", obj.id},
+                    {"Image", obj.imageId},
+                    {"ImageId", obj.imageId},
+                    {"State", obj.state},
+                    {"Status", obj.status},
+                    {"SizeRw", obj.sizeRw},
+                    {"SizeRootFs", obj.sizeRootFs},
+                    {"Names", boost::json::value_from(obj.names)},
+                    {"Ports", boost::json::value_from(obj.ports)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

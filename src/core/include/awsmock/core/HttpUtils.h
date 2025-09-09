@@ -523,6 +523,14 @@ namespace AwsMock::Core {
          */
         static std::string StatusCodeToString(const http::status &status);
 
+        /**
+         * @brief Return a not implemented response (501)
+         *
+         * @param status HTTP status
+         * @return HTTP status as string
+         */
+        static http::status StatusCodeFromString(const std::string &status);
+
       private:
 
         /**

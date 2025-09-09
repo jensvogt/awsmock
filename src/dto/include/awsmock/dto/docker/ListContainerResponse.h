@@ -10,8 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/HttpUtils.h>
 #include <awsmock/dto/docker/model/Container.h>
 
 namespace AwsMock::Dto::Docker {
@@ -21,7 +20,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListContainerResponse {
+    struct ListContainerResponse final : Common::BaseCounter<ListContainerResponse> {
 
         /**
          * Container list
@@ -31,40 +30,23 @@ namespace AwsMock::Dto::Docker {
         /**
          * HTTP status
          */
-        boost::beast::http::status status;
+        boost::beast::http::status status = boost::beast::http::status::unknown;
 
-        /**
-         * @brief Constructor
-         */
-        explicit ListContainerResponse(const std::string &body);
+      private:
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend ListContainerResponse tag_invoke(boost::json::value_to_tag<ListContainerResponse>, boost::json::value const &v) {
+            ListContainerResponse r;
+            r.containerList = boost::json::value_to<std::vector<Container>>(v);
+            r.status = Core::HttpUtils::StatusCodeFromString(Core::Json::GetStringValue(v, "status"));
+            return r;
+        }
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return object JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const ListContainerResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListContainerResponse const &obj) {
+            jv = {
+                    {boost::json::value_from(obj.containerList)},
+                    {"status", Core::HttpUtils::StatusCodeToString(obj.status)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

@@ -10,18 +10,20 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
+    using std::chrono::system_clock;
+
     /**
-     * Docker image
+     * @brief Docker image
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Image {
+    struct Image final : Common::BaseCounter<Image> {
 
         /**
          * Image ID
@@ -46,17 +48,17 @@ namespace AwsMock::Dto::Docker {
         /**
          * Shared size
          */
-        long sharedSize = 0;
+        long sharedSize{};
 
         /**
          * Size
          */
-        long size = 0;
+        long size{};
 
         /**
          * Size
          */
-        long virtualSize = 0;
+        long virtualSize{};
 
         /**
          * Created date time
@@ -71,49 +73,43 @@ namespace AwsMock::Dto::Docker {
         /**
          * Number of containers using this image
          */
-        int containers = 0;
+        int containers{};
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
+        friend Image tag_invoke(boost::json::value_to_tag<Image>, boost::json::value const &v) {
+            Image r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.parentId = Core::Json::GetStringValue(v, "ParentId");
+            r.repoDigest = Core::Json::GetStringValue(v, "RepoDigest");
+            r.sharedSize = Core::Json::GetLongValue(v, "SharedSize");
+            r.size = Core::Json::GetLongValue(v, "Size");
+            r.virtualSize = Core::Json::GetLongValue(v, "VirtualSize");
+            r.containers = Core::Json::GetIntValue(v, "Containers");
+            r.created = Core::Json::GetDatetimeValue(v, "Created");
+            if (Core::Json::AttributeExists(v, "RepoTags")) {
+                r.repoTags = boost::json::value_to<std::vector<std::string>>(v.at("RepoTags"));
+            }
+            if (Core::Json::AttributeExists(v, "Labels")) {
+                r.labels = boost::json::value_to<std::vector<std::string>>(v.at("Labels"));
+            }
+            return r;
+        }
 
-        /**
-         * Convert to a JSON object
-         *
-         * @return object JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
-
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string.
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Image &i);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Image const &obj) {
+            jv = {
+                    {"Id", obj.id},
+                    {"ParentId", obj.parentId},
+                    {"RepoDigest", obj.repoDigest},
+                    {"SharedSize", obj.sharedSize},
+                    {"Size", obj.size},
+                    {"VirtualSize", obj.virtualSize},
+                    {"Containers", obj.containers},
+                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"RepoTags", boost::json::value_from(obj.repoTags)},
+                    {"Labels", boost::json::value_from(obj.labels)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

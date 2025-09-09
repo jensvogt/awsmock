@@ -10,7 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
+#include <awsmock/core/JsonUtils.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -19,7 +20,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct PruneContainerResponse {
+    struct PruneContainerResponse final : Common::BaseCounter<PruneContainerResponse> {
 
         /**
          * Image ID
@@ -31,33 +32,23 @@ namespace AwsMock::Dto::Docker {
          */
         long spaceReclaimed;
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+        friend PruneContainerResponse tag_invoke(boost::json::value_to_tag<PruneContainerResponse>, boost::json::value const &v) {
+            PruneContainerResponse r;
+            if (Core::Json::AttributeExists(v, "ContainersDeleted")) {
+                r.containersDeleted = boost::json::value_to<std::vector<std::string>>(v);
+            }
+            r.spaceReclaimed = Core::Json::GetLongValue(v, "SpaceReclaimed");
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const PruneContainerResponse &i);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PruneContainerResponse const &obj) {
+            jv = {
+                    {"ContainersDeleted", boost::json::value_from(obj.containersDeleted)},
+                    {"SpaceReclaimed", obj.spaceReclaimed},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

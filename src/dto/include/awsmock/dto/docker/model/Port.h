@@ -12,6 +12,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -20,7 +21,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct Port {
+    struct Port final : Common::BaseCounter<Port> {
 
         /**
          * Host IP address
@@ -30,35 +31,41 @@ namespace AwsMock::Dto::Docker {
         /**
          * Public port means port inside the container
          */
-        int hostPort{};
+        long hostPort{};
 
         /**
          * @brief Convert to a JSON string
          *
          * @param object JSON object
          */
-        void FromDocument(const view_or_value<view, value> &object);
+        void FromDocument(const view_or_value<view, value> &object) {
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return object JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+            try {
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+                hostIp = Core::Bson::BsonUtils::GetStringValue(object, "HostIp");
+                hostPort = Core::Bson::BsonUtils::GetIntValue(object, "HostPort");
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const Port &c);
+            } catch (bsoncxx::exception &exc) {
+                log_error << exc.what();
+                throw Core::JsonException(exc.what());
+            }
+        }
+
+      private:
+
+        friend Port tag_invoke(boost::json::value_to_tag<Port>, boost::json::value const &v) {
+            Port r;
+            r.hostIp = Core::Json::GetStringValue(v, "HostIp");
+            r.hostPort = Core::Json::GetLongValue(v, "HostPort");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Port const &obj) {
+            jv = {
+                    {"HostIp", obj.hostIp},
+                    {"HostPort", obj.hostPort},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

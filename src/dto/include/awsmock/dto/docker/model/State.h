@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 #define LAMBDA_INTERNAL_PORT 8080
 
@@ -21,7 +22,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct State {
+    struct State final : Common::BaseCounter<State> {
 
         /**
          * Error
@@ -31,84 +32,72 @@ namespace AwsMock::Dto::Docker {
         /**
          * Error code
          */
-        int errorCode;
+        int errorCode{};
 
         /**
          * PID
          */
-        int pid;
+        int pid{};
 
         /**
          * Running state
          */
-        bool running;
+        bool running{};
 
         /**
          * Dead state
          */
-        bool dead;
+        bool dead{};
 
         /**
          * Paused state
          */
-        bool paused;
+        bool paused{};
 
         /**
          * Restarting state
          */
-        bool restarting;
+        bool restarting{};
 
         /**
          * OOM killed state
          */
-        bool oomKilled;
+        bool oomKilled{};
 
         /**
          * Status
          */
         std::string status;
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @param document JSON object
-         */
-        void FromDocument(const view_or_value<view, value> &document);
+      private:
 
-        /**
-         * @brief Convert to a JSON object
-         *
-         * @return JSON object
-         */
-        [[nodiscard]] view_or_value<view, value> ToDocument() const;
+        friend State tag_invoke(boost::json::value_to_tag<State>, boost::json::value const &v) {
+            State r;
+            r.status = Core::Json::GetStringValue(v, "Status");
+            r.error = Core::Json::GetStringValue(v, "Error");
+            r.errorCode = Core::Json::GetIntValue(v, "ErrorCode");
+            r.pid = Core::Json::GetIntValue(v, "Pid");
+            r.running = Core::Json::GetBoolValue(v, "Running");
+            r.dead = Core::Json::GetBoolValue(v, "Dead");
+            r.paused = Core::Json::GetBoolValue(v, "Paused");
+            r.restarting = Core::Json::GetBoolValue(v, "Restarting");
+            r.oomKilled = Core::Json::GetBoolValue(v, "OOMKilled");
+            return r;
+        }
 
-        /**
-         * @brief Convert from a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
-
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
-
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const State &c);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, State const &obj) {
+            jv = {
+                    {"Status", obj.status},
+                    {"Error", obj.error},
+                    {"ErrorCode", obj.errorCode},
+                    {"Pid", obj.pid},
+                    {"Running", obj.running},
+                    {"Dead", obj.dead},
+                    {"Paused", obj.paused},
+                    {"Restarting", obj.restarting},
+                    {"OOMKilled", obj.oomKilled},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker
