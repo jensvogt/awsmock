@@ -179,29 +179,12 @@ namespace AwsMock::Service {
         void DeleteImage(const std::string &id) const;
 
         /**
-         * @brief Checks whether a container exists.
-         *
-         * @param name container name
-         * @param tag container tags
-         * @return true if the container exists, otherwise false
-         */
-        [[nodiscard]] bool ContainerExists(const std::string &name, const std::string &tag) const;
-
-        /**
-         * @brief Checks whether a container exists by ID.
-         *
-         * @param containerId container ID
-         * @return true if the container exists, otherwise false
-         */
-        [[nodiscard]] bool ContainerExists(const std::string &containerId) const;
-
-        /**
          * @brief Checks whether a container exists by name.
          *
-         * @param containerName container name
+         * @param containerName container name (container name or container ID)
          * @return true if the container exists, otherwise false
          */
-        [[nodiscard]] bool ContainerExistsByName(const std::string &containerName) const;
+        [[nodiscard]] bool ContainerExists(const std::string &containerName) const;
 
         /**
          * @brief Checks whether a container exists by image name.

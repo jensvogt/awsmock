@@ -60,8 +60,8 @@ namespace AwsMock::Service {
             request.name = "local";
             request.driver = "bridge";
 
-            auto [id, warning] = _containerService.CreateNetwork(request);
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << id;
+            Dto::Docker::CreateNetworkResponse response = _containerService.CreateNetwork(request);
+            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << response.id;
         } else {
             log_debug << "Docker network exists already, name: local";
         }
@@ -84,7 +84,7 @@ namespace AwsMock::Service {
         }
 
         // Start the docker container, in case it is not already running.
-        if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); container.state != "running") {
+        if (const Dto::Docker::Container container = _containerService.GetContainerByName(_containerName); !container.state.running) {
             _containerService.StartDockerContainer(container.id, _containerName);
             _containerService.WaitForContainer(container.id);
             log_info << "Docker containers for DynamoDB started";
@@ -103,14 +103,13 @@ namespace AwsMock::Service {
         }
 
         // Check container image
-        if (!_containerService.ContainerExistsByName(_containerName)) {
+        if (!_containerService.ContainerExists(_containerName)) {
             log_error << "Container " << _imageName << " does not exist";
             throw Core::ServiceException("Container does not exist");
         }
 
         // Stop the docker container, in case it is running.
-        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(_imageName, _imageTag);
-            container.state == "running") {
+        if (const Dto::Docker::Container container = _containerService.GetFirstContainerByImageName(_imageName, _imageTag); container.state.running) {
             _containerService.StopContainer(container);
             log_info << "Docker containers for DynamoDB stopped";
         } else {

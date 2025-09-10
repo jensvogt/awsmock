@@ -308,7 +308,7 @@ namespace AwsMock::Service {
                 ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             }
 
-            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+            const Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
             inspectContainerResponse = ContainerService::instance().InspectContainer(container.id);
             if (inspectContainerResponse.status == http::status::ok) {
                 application.imageId = inspectContainerResponse.image;
@@ -357,7 +357,7 @@ namespace AwsMock::Service {
         application = _database.UpdateApplication(application);
 
         // Stop the application
-        if (!ContainerService::instance().ContainerExistsByName(application.containerName)) {
+        if (!ContainerService::instance().ContainerExists(application.containerName)) {
             log_warning << "Container does not exist, name: " << request.application.name;
             return;
         }
@@ -471,7 +471,7 @@ namespace AwsMock::Service {
         try {
             Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
 
-            if (application.containerName.empty() || !ContainerService::instance().ContainerExistsByName(application.containerName)) {
+            if (application.containerName.empty() || !ContainerService::instance().ContainerExists(application.containerName)) {
                 log_warning << "Container does not exist, name: " << request.application.name;
                 return;
             }
@@ -582,7 +582,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationService::DeleteImage(const Database::Entity::Apps::Application &application) {
-        if (ContainerService::instance().ContainerExistsByName(application.containerName)) {
+        if (ContainerService::instance().ContainerExists(application.containerName)) {
             ContainerService::instance().StopContainer(application.containerName);
             ContainerService::instance().DeleteContainer(application.containerName);
             log_info << "Container stopped, name: " << application.containerName;

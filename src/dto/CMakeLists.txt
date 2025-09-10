@@ -11,8 +11,6 @@ set(COMMON_SOURCES src/common/UserAgent.cpp src/common/S3ClientCommand.cpp src/c
 set(SQS_SOURCES src/sqs/mapper/Mapper.cpp)
 set(SNS_SOURCES src/sns/mapper/Mapper.cpp)
 set(S3_SOURCES src/s3/mapper/Mapper.cpp)
-set(DOCKER_SOURCES src/docker/CreateContainerRequest.cpp src/docker/CreateContainerResponse.cpp
-        src/docker/CreateNetworkRequest.cpp src/docker/CreateNetworkResponse.cpp)
 set(LAMBDA_SOURCES
         src/lambda/CreateTagRequest.cpp src/lambda/CreateFunctionRequest.cpp src/lambda/CreateFunctionResponse.cpp
         src/lambda/GetFunctionResponse.cpp src/lambda/mapper/Mapper.cpp src/lambda/ListEventSourceMappingsRequest.cpp
@@ -33,8 +31,8 @@ set(MODULE_SOURCES src/module/model/Module.cpp src/module/model/GatewayConfig.cp
         src/module/ImportInfrastructureRequest.cpp)
 set(MONITORING_SOURCES src/monitoring/mapper/Mapper.cpp)
 
-set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${DOCKER_SOURCES} ${LAMBDA_SOURCES}
-        ${COGNITO_SOURCES} ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
+set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES}
+        ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${MONITORING_SOURCES})
 
 # Test directory

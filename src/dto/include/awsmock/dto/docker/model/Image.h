@@ -61,14 +61,9 @@ namespace AwsMock::Dto::Docker {
         long virtualSize{};
 
         /**
-         * Created date time
-         */
-        system_clock::time_point created;
-
-        /**
          * Repo tags
          */
-        std::vector<std::string> labels;
+        std::map<std::string, std::string> labels;
 
         /**
          * Number of containers using this image
@@ -86,12 +81,11 @@ namespace AwsMock::Dto::Docker {
             r.size = Core::Json::GetLongValue(v, "Size");
             r.virtualSize = Core::Json::GetLongValue(v, "VirtualSize");
             r.containers = Core::Json::GetIntValue(v, "Containers");
-            r.created = Core::Json::GetDatetimeValue(v, "Created");
             if (Core::Json::AttributeExists(v, "RepoTags")) {
                 r.repoTags = boost::json::value_to<std::vector<std::string>>(v.at("RepoTags"));
             }
             if (Core::Json::AttributeExists(v, "Labels")) {
-                r.labels = boost::json::value_to<std::vector<std::string>>(v.at("Labels"));
+                r.labels = boost::json::value_to<std::map<std::string, std::string>>(v.at("Labels"));
             }
             return r;
         }
@@ -105,7 +99,6 @@ namespace AwsMock::Dto::Docker {
                     {"Size", obj.size},
                     {"VirtualSize", obj.virtualSize},
                     {"Containers", obj.containers},
-                    {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"RepoTags", boost::json::value_from(obj.repoTags)},
                     {"Labels", boost::json::value_from(obj.labels)},
             };

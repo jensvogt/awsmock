@@ -5,19 +5,20 @@ Purpose:
 Demonstrate processing of a SQS message.
 """
 
-import boto3
 import json
 import logging
 import os
+
+import boto3
 from botocore.exceptions import ClientError
 
 # Logging
 logger = logging.getLogger(__name__)
 
 # Default context
-endpoint_url = "http://awsmock:4566"
-input_queue = "file-distribution-json-queue"
-protocolizing_topic = "protocolizing-topic"
+endpoint_url = os.environ.get('AWS_AWSMOCK_ENDPOINT')
+input_queue = os.environ.get('AWS_SQS_INPUT_QUEUE')
+protocolizing_topic = os.environ.get('AWS_SNS_PROTOCOLIZING_TOPIC')
 
 # Default AWS clients
 sqs = boto3.client("sqs", endpoint_url=endpoint_url)
@@ -26,16 +27,10 @@ sns = boto3.client("sns", endpoint_url=endpoint_url)
 
 def initialize():
     """
-    Set some values from environment variables
+    Print some values from the environment variables
     """
-    global endpoint_url, sqs, sns, input_queue, protocolizing_topic
-    endpoint_url = os.environ.get('AWS_AWSMOCK_ENDPOINT')
-    sqs = boto3.client("sqs", endpoint_url=endpoint_url)
-    sns = boto3.client("sns", endpoint_url=endpoint_url)
     print("AwsMock endpoint: ", endpoint_url)
-    input_queue = os.environ.get('AWS_SQS_INPUT_QUEUE')
     print("InputQueue: ", input_queue)
-    protocolizing_topic = os.environ.get('AWS_SNS_PROTOCOLIZING_TOPIC')
     print("ProtocolizingTopic: ", input_queue)
 
 
@@ -88,6 +83,18 @@ def publish_message(topic, message, attributes):
 def receive_messages():
     """
     Receive messages from the JSON processing queue
+    Example:
+    xml_string =
+    <library>
+        <book id="1">
+            <title>Clean Code</title>
+            <author>Robert C. Martin</author>
+        </book>
+        <book id="2">
+            <title>Effective Python</title>
+            <author>Brett Slatkin</author>
+        </book>
+    </library>
     """
     print("Start receiving messages from the file-distribution-json queue")
 
@@ -115,13 +122,14 @@ def receive_messages():
 
         for msg in messages:
             print("-" * 40)
-            print("MessageId:", msg["MessageId"])
-            print("Body:", msg["Body"])
+            print("MessageId: ", msg["MessageId"])
+            print("Body: ", msg["Body"])
 
             # If the body is JSON, parse it
             try:
-                body_data = json.loads(msg["Body"])
-                print("Parsed JSON:", body_data)
+                root = ET.fromstring(msg["Body"])
+                for book in root.findall("book"):
+                    print("Parsed XML: ", book.find("title").text)
 
             except json.JSONDecodeError:
                 pass
@@ -131,7 +139,6 @@ def receive_messages():
             # Delete SQS message
             sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=msg["ReceiptHandle"])
             print("Message deleted:", msg["MessageId"])
-
             print("-" * 40)
 
 

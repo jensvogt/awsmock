@@ -6,19 +6,31 @@ Purpose
 Demonstrate processing of a SQS message.
 """
 
-import boto3
 import json
-# snippet-start:[python.example_code.sqs.queue_wrapper_imports]
 import logging
+import os
+
+import boto3
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
-endpoint_url = "http://localhost:4566"
+
+endpoint_url = os.environ.get('AWS_AWSMOCK_ENDPOINT')
+input_queue = os.environ.get('AWS_SQS_INPUT_QUEUE')
+protocolizing_topic = os.environ.get('AWS_SNS_PROTOCOLIZING_TOPIC')
+
 sqs = boto3.client("sqs", endpoint_url=endpoint_url)
 sns = boto3.client("sns", endpoint_url=endpoint_url)
 
 
-# snippet-start:[python.example_code.sqs.GetQueueUrl]
+def initialize():
+    """
+    Print some values from the environment variables
+    """
+    print("AwsMock endpoint: ", endpoint_url)
+    print("InputQueue: ", input_queue)
+    print("ProtocolizingTopic: ", input_queue)
+
 
 def get_queue(name):
     """
@@ -36,8 +48,6 @@ def get_queue(name):
     else:
         return response["QueueUrl"]
 
-
-# snippet-end:[python.example_code.sqs.GetQueueUrl]
 
 @staticmethod
 def publish_message(topic, message, attributes):
@@ -69,21 +79,19 @@ def publish_message(topic, message, attributes):
         return message_id
 
 
-# snippet-start:[python.example_code.sqs.Scenario_ManageQueues]
 def receive_messages():
     """
     Receive messages from the xml-processing queue
     """
     print("Start receiving messages from the file-distribution-xml queue")
-    queueUrl = get_queue("file-distribution-xml-queue")
-    print("Queue: ", queueUrl)
-    topic_name = "protocolizing-topic"
-    topic = sns.create_topic(Name=topic_name)
+    queue_url = get_queue(input_queue)
+    print("Queue: ", queue_url)
+    topic = sns.create_topic(Name=protocolizing_topic)
     print("Topic: ", topic["TopicArn"])
 
     while True:
         response = sqs.receive_message(
-            QueueUrl=queueUrl,
+            QueueUrl=queue_url,
             MaxNumberOfMessages=10,
             WaitTimeSeconds=20,
             MessageAttributeNames=["All"],
@@ -96,6 +104,7 @@ def receive_messages():
             continue
 
         for msg in messages:
+            print("-" * 40)
             print("MessageId:", msg["MessageId"])
             print("Body:", msg["Body"])
 
@@ -103,19 +112,18 @@ def receive_messages():
             try:
                 body_data = json.loads(msg["Body"])
                 print("Parsed JSON:", body_data)
-                # Send to SNS topic
-                publish_message(topic, "XML file processed.", {"file_origin": "FTP_UPLOAD"})
-                # Delete SQS message
-                sqs.delete_message(QueueUrl=queueUrl, ReceiptHandle=msg["ReceiptHandle"])
-                print("Message deleted:", msg["MessageId"])
+
             except json.JSONDecodeError:
                 pass
 
+            # Send to SNS topic
+            publish_message(topic, "XML file processed.", {"file_origin": "FTP_UPLOAD"})
+            # Delete SQS message
+            sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=msg["ReceiptHandle"])
+            print("Message deleted:", msg["MessageId"])
             print("-" * 40)
 
 
-# snippet-end:[python.example_code.sqs.Scenario_ManageQueues]
-
-
 if __name__ == "__main__":
+    initialize()
     receive_messages()

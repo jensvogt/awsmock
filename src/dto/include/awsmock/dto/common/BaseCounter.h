@@ -81,6 +81,9 @@ namespace AwsMock::Dto::Common {
             }
             const boost::json::value jv = boost::json::parse(jsonString);
             T t = boost::json::value_to<T>(jv);
+            if (jv.is_array()) {
+                return t;
+            }
             if (Core::Json::AttributeExists(jv, "region")) {
                 t.region = Core::Json::GetStringValue(jv, "region");
             }

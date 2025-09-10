@@ -14,8 +14,8 @@
 
 // AwsMock includes
 #include <awsmock/core/DateTimeUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/exception/JsonException.h>
+#include <awsmock/core/logging/LogStream.h>
 
 
 namespace AwsMock::Core::Json {
@@ -32,7 +32,7 @@ namespace AwsMock::Core::Json {
     }
 
     inline bool AttributeExists(const boost::json::value &value, const std::string &name) {
-        return value.as_object().if_contains(name);
+        return value.as_object().if_contains(name) && !value.at(name).is_null();
     }
 
     inline std::string GetStringValue(const boost::json::value &value, const std::string &name) {
@@ -90,7 +90,7 @@ namespace AwsMock::Core::Json {
 
     inline system_clock::time_point GetUnixTimestampValue(const boost::json::value &value, const std::string &name, const system_clock::time_point &defaultValue = {}) {
         if (AttributeExists(value, name)) {
-            return DateTimeUtils::FromUnixTimestamp(value.as_int64());
+            return DateTimeUtils::FromUnixTimestamp(value.at(name).get_int64());
         }
         return {defaultValue};
     }
