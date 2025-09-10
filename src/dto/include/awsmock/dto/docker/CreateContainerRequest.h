@@ -10,8 +10,8 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/common/BaseCounter.h>
+#include <awsmock/dto/docker/model/HostConfig.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -23,17 +23,18 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ExposedPort {
+    struct ExposedPort final : Common::BaseCounter<ExposedPort> {
 
-        /**
-         * Internal port
-         */
-        std::string internalPort;
+      private:
 
-        /**
-         * Internal protocol
-         */
-        std::string protocol;
+        friend ExposedPort tag_invoke(boost::json::value_to_tag<ExposedPort>, boost::json::value const &v) {
+            ExposedPort r;
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ExposedPort const &obj) {
+            jv = {};
+        }
     };
 
     /**
@@ -45,7 +46,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateContainerRequest {
+    struct CreateContainerRequest final : Common::BaseCounter<CreateContainerRequest> {
 
         /**
          * Hostname
@@ -70,12 +71,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * Network mode
          */
-        std::string networkMode = "bridge";
-
-        /**
-         * Environment
-         */
-        std::vector<std::string> environment;
+        std::string networkMode = "local";
 
         /**
          * Container ports
@@ -88,30 +84,64 @@ namespace AwsMock::Dto::Docker {
         std::string hostPort;
 
         /**
+         * Host config
+         */
+        HostConfig hostConfig;
+
+        /**
+         * Exposed ports
+         */
+        std::map<std::string, ExposedPort> exposedPorts;
+
+        /**
          * TTy settings
          */
         bool tty = true;
 
         /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
+         * Environment
          */
-        [[nodiscard]] std::string ToJson() const;
+        std::vector<std::string> environment;
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+      private:
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateContainerRequest &r);
+        friend CreateContainerRequest tag_invoke(boost::json::value_to_tag<CreateContainerRequest>, boost::json::value const &v) {
+            CreateContainerRequest r;
+            r.hostName = Core::Json::GetStringValue(v, "HostName");
+            r.domainName = Core::Json::GetStringValue(v, "DomainName");
+            r.user = Core::Json::GetStringValue(v, "User");
+            r.image = Core::Json::GetStringValue(v, "Image");
+            r.networkMode = Core::Json::GetStringValue(v, "NetworkMode");
+            r.containerPort = Core::Json::GetStringValue(v, "ContainerPort");
+            r.hostPort = Core::Json::GetStringValue(v, "HostPort");
+            r.tty = Core::Json::GetBoolValue(v, "Tty");
+            if (Core::Json::AttributeExists(v, "HostConfig")) {
+                r.hostConfig = boost::json::value_to<HostConfig>(v.at("HostConfig"));
+            }
+            if (Core::Json::AttributeExists(v, "ExposedPorts")) {
+                r.exposedPorts = boost::json::value_to<std::map<std::string, ExposedPort>>(v.at("ExposedPorts"));
+            }
+            if (Core::Json::AttributeExists(v, "Env")) {
+                r.environment = boost::json::value_to<std::vector<std::string>>(v.at("Env"));
+            }
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateContainerRequest const &obj) {
+            jv = {
+                    {"HostName", obj.hostName},
+                    {"DomainName", obj.domainName},
+                    {"User", obj.user},
+                    {"Image", obj.image},
+                    {"NetworkMode", obj.networkMode},
+                    {"ContainerPort", obj.containerPort},
+                    {"HostPort", obj.hostPort},
+                    {"Tty", obj.tty},
+                    {"HostConfig", boost::json::value_from(obj.hostConfig)},
+                    {"ExposedPorts", boost::json::value_from(obj.exposedPorts)},
+                    {"Env", boost::json::value_from(obj.environment)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

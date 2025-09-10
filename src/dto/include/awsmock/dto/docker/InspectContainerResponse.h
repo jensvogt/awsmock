@@ -7,16 +7,9 @@
 
 // C++ includes
 #include <string>
-#include <vector>
 
 // AwsMock includes
-#include "model/HostConfig.h"
-#include "model/PortBinding.h"
-
-
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/logging/LogStream.h>
+#include <awsmock/dto/docker/model/HostConfig.h>
 #include <awsmock/dto/docker/model/State.h>
 
 namespace AwsMock::Dto::Docker {
@@ -71,7 +64,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * Status of the HTTP call
          */
-        boost::beast::http::status status;
+        boost::beast::http::status status = boost::beast::http::status::unknown;
 
       private:
 
@@ -85,7 +78,6 @@ namespace AwsMock::Dto::Docker {
             r.hostConfig = boost::json::value_to<HostConfig>(v.at("HostConfig"));
             r.sizeRw = Core::Json::GetLongValue(v, "SizeRw");
             r.sizeRootFs = Core::Json::GetLongValue(v, "SizeRootFs");
-            r.status = Core::HttpUtils::StatusCodeFromString(Core::Json::GetStringValue(v, "Status"));
             return r;
         }
 
@@ -99,7 +91,6 @@ namespace AwsMock::Dto::Docker {
                     {"HostConfig", boost::json::value_from(obj.hostConfig)},
                     {"SizeRw", obj.sizeRw},
                     {"SizeRootFs", obj.sizeRootFs},
-                    {"Status", Core::HttpUtils::StatusCodeToString(obj.status)},
             };
         }
     };

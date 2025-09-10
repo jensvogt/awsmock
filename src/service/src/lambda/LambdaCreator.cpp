@@ -45,7 +45,7 @@ namespace AwsMock::Service {
         // Create the container, if not existing. If existing, get the current port from the docker container
         const int hostPort = CreateRandomHostPort();
         const std::string containerName = lambda.function + "-" + instanceId;
-        if (!ContainerService::instance().ContainerExistsByName(containerName)) {
+        if (!ContainerService::instance().ContainerExists(containerName)) {
             CreateDockerContainer(lambda, instanceId, hostPort, lambda.dockerTag);
         }
 

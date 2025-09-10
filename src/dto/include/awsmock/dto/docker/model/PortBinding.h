@@ -12,7 +12,6 @@
 #include <awsmock/dto/docker/model/Port.h>
 
 namespace AwsMock::Dto::Docker {
-
     /**
      * @brief Docker port binding object
      *
@@ -56,12 +55,12 @@ namespace AwsMock::Dto::Docker {
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PortBinding const &obj) {
-            jv = {
-                    {"PortMap", boost::json::value_from(obj.portMap)},
-            };
+            jv = {};
+            for (const auto &p: obj.portMap) {
+                jv.as_object().emplace(p.first, boost::json::value_from(p.second));
+            }
         }
     };
-
-}// namespace AwsMock::Dto::Docker
+};// namespace AwsMock::Dto::Docker
 
 #endif// AWSMOCK_DTO_DOCKER_PORT_BINDING_H

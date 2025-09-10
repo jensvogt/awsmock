@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Prune docker response
+     * @brief Prune docker response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
@@ -30,14 +30,14 @@ namespace AwsMock::Dto::Docker {
         /**
          * Space reclaimed
          */
-        long spaceReclaimed;
+        long spaceReclaimed{};
 
       private:
 
         friend PruneContainerResponse tag_invoke(boost::json::value_to_tag<PruneContainerResponse>, boost::json::value const &v) {
             PruneContainerResponse r;
             if (Core::Json::AttributeExists(v, "ContainersDeleted")) {
-                r.containersDeleted = boost::json::value_to<std::vector<std::string>>(v);
+                r.containersDeleted = boost::json::value_to<std::vector<std::string>>(v.at("ContainersDeleted"));
             }
             r.spaceReclaimed = Core::Json::GetLongValue(v, "SpaceReclaimed");
             return r;

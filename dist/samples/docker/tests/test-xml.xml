@@ -1,0 +1,10 @@
+<library>
+    <book id="1">
+        <title>Clean Code</title>
+        <author>Robert C. Martin</author>
+    </book>
+    <book id="2">
+        <title>Effective Python</title>
+        <author>Brett Slatkin</author>
+    </book>
+</library>

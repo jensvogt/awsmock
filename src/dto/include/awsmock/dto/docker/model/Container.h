@@ -52,7 +52,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * The state of this container (e.g. Exited)
          */
-        std::string state;
+        State state;
 
         /**
          * Additional human-readable status of this container (e.g. Exit 0)
@@ -81,10 +81,16 @@ namespace AwsMock::Dto::Docker {
             r.id = Core::Json::GetStringValue(v, "Id");
             r.image = Core::Json::GetStringValue(v, "Image");
             r.imageId = Core::Json::GetStringValue(v, "ImageId");
-            r.state = Core::Json::GetStringValue(v, "State");
             r.status = Core::Json::GetStringValue(v, "Status");
             r.sizeRw = Core::Json::GetLongValue(v, "SizeRw");
             r.sizeRootFs = Core::Json::GetLongValue(v, "SizeRootFs");
+            if (Core::Json::AttributeExists(v, "State") && v.at("State").is_object()) {
+                r.state = boost::json::value_to<State>(v.at("State"));
+            } else if (Core::Json::AttributeExists(v, "State") && v.at("State").is_string()) {
+                if (const std::string stateString = Core::Json::GetStringValue(v, "State"); stateString == "running") {
+                    r.state.running = true;
+                }
+            }
             if (Core::Json::AttributeExists(v, "Names")) {
                 r.names = boost::json::value_to<std::vector<std::string>>(v.at("Names"));
             }
@@ -99,7 +105,7 @@ namespace AwsMock::Dto::Docker {
                     {"Id", obj.id},
                     {"Image", obj.imageId},
                     {"ImageId", obj.imageId},
-                    {"State", obj.state},
+                    {"State", boost::json::value_from(obj.state)},
                     {"Status", obj.status},
                     {"SizeRw", obj.sizeRw},
                     {"SizeRootFs", obj.sizeRootFs},

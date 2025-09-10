@@ -9,9 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
@@ -24,7 +22,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateNetworkRequest {
+    struct CreateNetworkRequest final : Common::BaseCounter<CreateNetworkRequest> {
 
         /**
          * Network name
@@ -36,26 +34,21 @@ namespace AwsMock::Dto::Docker {
          */
         std::string driver = "bridge";
 
-        /**
-         * @brief Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+      private:
 
-        /**
-         * @brief Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
+        friend CreateNetworkRequest tag_invoke(boost::json::value_to_tag<CreateNetworkRequest>, boost::json::value const &v) {
+            CreateNetworkRequest r;
+            r.name = Core::Json::GetStringValue(v, "Name");
+            r.driver = Core::Json::GetStringValue(v, "Driver");
+            return r;
+        }
 
-        /**
-         * @brief Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateNetworkRequest &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateNetworkRequest const &obj) {
+            jv = {
+                    {"Name", obj.name},
+                    {"Driver", obj.driver},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

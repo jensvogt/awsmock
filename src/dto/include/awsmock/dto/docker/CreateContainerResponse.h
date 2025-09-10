@@ -10,18 +10,16 @@
 #include <vector>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
+#include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
 
     /**
-     * Create container response
+     * @brief Create container response
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CreateContainerResponse {
+    struct CreateContainerResponse final : Common::BaseCounter<CreateContainerResponse> {
 
         /**
          * ID
@@ -36,35 +34,27 @@ namespace AwsMock::Dto::Docker {
         /**
          * Assigned random port
          */
-        int hostPort;
+        int hostPort{};
 
-        /**
-         * Convert to a JSON string
-         *
-         * @param jsonString JSON string
-         */
-        void FromJson(const std::string &jsonString);
+      private:
 
-        /**
-         * Convert to a JSON string
-         *
-         * @return JSON string
-         */
-        [[nodiscard]] std::string ToJson() const;
+        friend CreateContainerResponse tag_invoke(boost::json::value_to_tag<CreateContainerResponse>, boost::json::value const &v) {
+            CreateContainerResponse r;
+            r.id = Core::Json::GetStringValue(v, "Id");
+            r.hostPort = Core::Json::GetIntValue(v, "hostPort");
+            if (Core::Json::AttributeExists(v, "Warnings")) {
+                r.warnings = boost::json::value_to<std::vector<std::string>>(v.at("Warnings"));
+            }
+            return r;
+        }
 
-        /**
-         * Converts the DTO to a string representation.
-         *
-         * @return DTO as string
-         */
-        [[nodiscard]] std::string ToString() const;
-
-        /**
-         * Stream provider.
-         *
-         * @return output stream
-         */
-        friend std::ostream &operator<<(std::ostream &os, const CreateContainerResponse &r);
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, CreateContainerResponse const &obj) {
+            jv = {
+                    {"Id", obj.id},
+                    {"HostPort", obj.hostPort},
+                    {"Warnings", boost::json::value_from(obj.warnings)},
+            };
+        }
     };
 
 }// namespace AwsMock::Dto::Docker

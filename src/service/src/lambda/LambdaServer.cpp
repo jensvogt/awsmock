@@ -109,8 +109,8 @@ namespace AwsMock::Service {
             request.name = "local";
             request.driver = "bridge";
 
-            auto [id, warning] = _dockerService.CreateNetwork(request);
-            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << id;
+            Dto::Docker::CreateNetworkResponse response = _dockerService.CreateNetwork(request);
+            log_debug << "Docker network created, name: " << request.name << " driver: " << request.driver << " id: " << response.id;
         } else {
             log_debug << "Docker network exists already, name: local";
         }

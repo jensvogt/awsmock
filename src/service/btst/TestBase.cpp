@@ -122,7 +122,7 @@ namespace AwsMock::Service {
         }
 
         // Check container
-        if (!containerService.ContainerExists(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION)) {
+        if (!containerService.ContainerExistsByImageName(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION)) {
             Dto::Docker::CreateContainerResponse response = containerService.CreateContainer(TEST_IMAGE_NAME, TEST_CONTAINER_VERSION, TEST_CONTAINER_NAME, 10100, 10100);
         }
 

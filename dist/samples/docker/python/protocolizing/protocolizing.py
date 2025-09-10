@@ -6,18 +6,19 @@ Purpose
 Demonstrate basic topic operations using AwsMock.
 """
 
-import boto3
 import json
 import logging
 import os
+
+import boto3
 from botocore.exceptions import ClientError
 
 # Logging
 logger = logging.getLogger(__name__)
 
 # Default context
-input_queue = "protocolizing-queue"
-endpoint_url = "http://awsmock:4566"
+input_queue = os.environ.get("AWS_SQS_INPUT_QUEUE")
+endpoint_url = os.environ.get("AWS_AWSMOCK_ENDPOINT")
 
 # Default AWS clients
 sqs = boto3.client("sqs", endpoint_url=endpoint_url)
@@ -25,13 +26,9 @@ sqs = boto3.client("sqs", endpoint_url=endpoint_url)
 
 def initialize():
     """
-    Set some values from environment variables
+    Print some values from the environment variables
     """
-    global input_queue, endpoint_url, sqs
-    input_queue = os.environ.get("AWS_SQS_INPUT_QUEUE")
     print("InputQueue: ", input_queue)
-    endpoint_url = os.environ.get("AWS_AWSMOCK_ENDPOINT")
-    sqs = boto3.client("sqs", endpoint_url=endpoint_url)
     print("AwsMock endpoint: ", endpoint_url)
 
 
@@ -43,6 +40,7 @@ def get_queue(name):
     :return: A Queue object.
     """
     try:
+        print("Queue Endpoint: ", endpoint_url)
         response = sqs.get_queue_url(QueueName=name)
         logger.info("Got queue '%s' with URL=%s", name, response["QueueUrl"])
     except ClientError as error:
