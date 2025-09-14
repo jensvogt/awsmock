@@ -43,8 +43,10 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ../db/include ../dto/include ${EXTERNAL_INCLUDE_DIR} ${BSONCXX_INCLUDE_DIR}
-        ${MONGOCXX_INCLUDE_DIR})
+include_directories(./include ../core/include ../db/include ../dto/include ${LIBRARY_STATIC} PUBLIC ./include
+        ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR}
+        ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR} ${LIBSSL_INCLUDE_DIR} ${LIBPROMETHEUS_INCLUDE_DIR}
+        ${LIBSSH_INCLUDE_DIR})
 
 # Library
 if (WIN32)
