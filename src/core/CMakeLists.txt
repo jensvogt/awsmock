@@ -27,7 +27,8 @@ endif ()
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
     target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
-            ${EXTERNAL_INCLUDE_DIR})
+            ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR} ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR}
+            ${LIBSSL_INCLUDE_DIR})
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES}
             include/awsmock/core/Semaphore.h

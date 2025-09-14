@@ -127,7 +127,8 @@ namespace AwsMock::Core {
     }
 
     void MonitoringCollector::Clear(const std::string &name, const std::string &labelName, const std::string &labelValue) const {
-        _counterMap->erase(GetId(name, labelName, labelValue));
+        const ShmAllocator<char> char_alloc(_segment.get_segment_manager());
+        _counterMap->erase(ShmString(GetId(name, labelName, labelValue).data(), char_alloc));
     }
 
     void MonitoringCollector::Clear() const {
