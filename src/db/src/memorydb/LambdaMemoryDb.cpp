@@ -76,6 +76,40 @@ namespace AwsMock::Database {
         return lambdaList;
     }
 
+    std::vector<Entity::Lambda::Lambda> LambdaMemoryDb::ListLambdaCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
+        Entity::Lambda::LambdaList result;
+
+        // Get values
+        for (auto &val: _lambdas | std::views::values) {
+            result.push_back(val);
+        }
+
+        auto q = Core::from(result);
+        q = q.order_by([](const Entity::Lambda::Lambda &key1, const Entity::Lambda::Lambda &key2) { return key1.oid < key2.oid; });
+
+        for (const auto &[column, sortDirection]: sortColumns) {
+            if (column == "name") {
+                q = q.order_by([](const Entity::Lambda::Lambda &key1, const Entity::Lambda::Lambda &key2) { return key1.function < key2.function; });
+            }
+        }
+
+        if (!region.empty()) {
+            q.where([region](const Entity::Lambda::Lambda &item) { return item.region == region; });
+        }
+        if (!prefix.empty()) {
+            q.where([prefix](const Entity::Lambda::Lambda &item) { return Core::StringUtils::StartsWith(item.function, prefix); });
+        }
+        result = q.to_vector();
+
+        // Create page iterators
+        if (pageSize > 0) {
+            auto start = result.begin() + pageIndex * pageSize;
+            auto end = (pageIndex + 1) * pageSize < result.size() ? result.begin() + (pageIndex + 1) * pageSize : result.end();
+            return {start, end};
+        }
+        return result;
+    }
+
     Entity::Lambda::Lambda LambdaMemoryDb::CreateLambda(const Entity::Lambda::Lambda &lambda) {
         boost::mutex::scoped_lock lock(_lambdaMutex);
 

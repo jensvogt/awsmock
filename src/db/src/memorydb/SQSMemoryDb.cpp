@@ -9,27 +9,6 @@ namespace AwsMock::Database {
     boost::mutex SQSMemoryDb::_sqsQueueMutex;
     boost::mutex SQSMemoryDb::_sqsMessageMutex;
 
-    SQSMemoryDb::SQSMemoryDb() {
-
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _sqsCounterMap = _segment.find<SqsCounterMapType>(SQS_COUNTER_MAP_NAME).first;
-        if (!_sqsCounterMap) {
-            _sqsCounterMap = _segment.construct<SqsCounterMapType>(SQS_COUNTER_MAP_NAME)(std::less<std::string>(), _segment.get_segment_manager());
-        }
-
-        // Initialize the counters
-        for (const auto &queue: ListQueues()) {
-            QueueMonitoringCounter counter;
-            counter.initial = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INITIAL);
-            counter.invisible = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::INVISIBLE);
-            counter.delayed = CountMessagesByStatus(queue.queueArn, Entity::SQS::MessageStatus::DELAYED);
-            counter.messages = CountMessages(queue.queueArn);
-            counter.size = GetQueueSize(queue.queueArn);
-            _sqsCounterMap->insert_or_assign(queue.queueArn, counter);
-        }
-        log_debug << "SQS queues counters initialized, count: " << _sqsCounterMap->size();
-    }
-
     bool SQSMemoryDb::QueueExists(const std::string &region, const std::string &name) {
 
         return std::ranges::find_if(_queues,
@@ -138,19 +117,23 @@ namespace AwsMock::Database {
 
     Entity::SQS::QueueList SQSMemoryDb::ListQueues(const std::string &region) {
 
-        Entity::SQS::QueueList queueList;
-        for (auto &queue: _queues | std::views::values) {
+        const Entity::SQS::QueueList queueList;
 
-            queue.size = (*_sqsCounterMap)[queue.queueArn].size;
-            queue.attributes.approximateNumberOfMessages = (*_sqsCounterMap)[queue.queueArn].messages;
-            queue.attributes.approximateNumberOfMessagesNotVisible = (*_sqsCounterMap)[queue.queueArn].invisible;
-            queue.attributes.approximateNumberOfMessagesDelayed = (*_sqsCounterMap)[queue.queueArn].delayed;
+        std::vector<Entity::SQS::Queue> result;
 
-            queueList.emplace_back(queue);
+        // Get values
+        for (auto &val: _queues | std::views::values) {
+            result.push_back(val);
         }
 
+        auto q = Core::from(result);
+        q = q.order_by([](const Entity::SQS::Queue &key1, const Entity::SQS::Queue &key2) { return key1.name < key2.name; });
+
+        if (!region.empty()) {
+            q.where([region](const Entity::SQS::Queue &item) { return item.region == region; });
+        }
         log_trace << "Got queue list, size: " << queueList.size();
-        return queueList;
+        return q.to_vector();
     }
 
     Entity::SQS::QueueList SQSMemoryDb::ExportQueues(const std::vector<SortColumn> &sortColumns) {

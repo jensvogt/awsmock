@@ -17,7 +17,6 @@ namespace AwsMock::Database {
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _monitoringCollection = (*client)[_databaseName][_monitoringCollectionName];
-            auto session = client->start_session();
 
             try {
                 std::vector<std::string> labels;
@@ -39,7 +38,7 @@ namespace AwsMock::Database {
                 } else {
 
                     for (auto cursor = _monitoringCollection.distinct("labelValue", query.extract()); view doc: cursor) {
-                        for (const view eventsView = doc["values"].get_array().value; bsoncxx::document::element element: eventsView) {
+                        for (const view eventsView = doc["values"].get_array().value; const bsoncxx::document::element& element: eventsView) {
                             labels.emplace_back(element.get_string().value);
                         }
                     }
@@ -134,7 +133,6 @@ namespace AwsMock::Database {
         }
     }
 
-    typedef boost::date_time::local_adjustor<boost::posix_time::ptime, +2, boost::posix_time::no_dst> eu_central;
     std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
         using namespace std::literals;

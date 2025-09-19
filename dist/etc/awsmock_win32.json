@@ -8,8 +8,8 @@
       "client-id": "00000000",
       "secret-access-key": "none"
     },
-    "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\",
-    "temp-dir": "C:\\Program Files (x86)\\awsmock\\tmp\\",
+    "data-dir": "C:\\Program Files (x86)\\awsmock\\data",
+    "temp-dir": "C:\\Program Files (x86)\\awsmock\\data\\tmp",
     "backup-dir": "C:\\Program Files (x86)\\awsmock\\data\\backup",
     "shm-size": 1048576,
     "json": {
@@ -295,8 +295,8 @@
       "doc-root": "C:\\Program Files (x86)\\awsmock\\frontend"
     },
     "logging": {
-      "file-active": false,
-      "console-active": true,
+      "file-active": true,
+      "console-active": false,
       "level": "info",
       "dir": "C:\\Program Files (x86)\\awsmock\\log",
       "prefix": "awsmock",

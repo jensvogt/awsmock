@@ -109,7 +109,7 @@ namespace AwsMock::Core {
             return PrepareResult(response);
 
         } catch (const boost::exception &e) {
-            log_error << "Send authorized message failed, host:" << host << ", port: " << port << ", error: " << diagnostic_information(e);
+            log_error << "Send authorized message failed, host: " << host << ", port: " << port << ", error: " << diagnostic_information(e);
         }
         return {.statusCode = http::status::internal_server_error};
     }
@@ -148,7 +148,7 @@ namespace AwsMock::Core {
             return PrepareResult(response);
 
         } catch (const boost::exception &e) {
-            log_error << "Send binary message failed, host:" << host << ", port: " << port << ", error: " << diagnostic_information(e);
+            log_error << "Send binary message failed, host: " << host << ", port: " << port << ", error: " << diagnostic_information(e);
         }
         return {.statusCode = http::status::internal_server_error};
     }

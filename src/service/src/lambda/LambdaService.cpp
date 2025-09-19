@@ -110,7 +110,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda results cleared, arn: " << lambda.arn << " count: " << count;
 
         // Update the lambda function
-        LambdaCreator lambdaCreator;
+        const LambdaCreator lambdaCreator;
         lambdaCreator.UpdateLambda(lambda, request.functionCode, request.version);
 
         log_debug << "Lambda function code updated, function: " << lambda.function;

@@ -18,6 +18,8 @@
 #include <boost/thread/mutex.hpp>
 
 // AwsMock includes
+#include <awsmock/utils/SortColumn.h>
+#include <awsmock/core/Linq.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/entity/ssm/Parameter.h>
 #include <awsmock/repository/Database.h>
@@ -84,7 +86,19 @@ namespace AwsMock::Database {
          * @param region AWS region
          * @return ParameterList
          */
-        Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
+        [[nodiscard]] Entity::SSM::ParameterList ListParameters(const std::string &region = {}) const;
+
+        /**
+         * @brief List all parameters
+         *
+         * @param region AWS region
+         * @param prefix name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns sort columns list
+         * @return ParameterList
+         */
+        [[nodiscard]] Entity::SSM::ParameterList ListParameterCounters(const std::string &region = {}, const std::string &prefix = {}, long pageSize = -1, long pageIndex = -1, const std::vector<SortColumn> &sortColumns = {});
 
         /**
          * @brief Returns the total number of parameters
@@ -92,7 +106,7 @@ namespace AwsMock::Database {
          * @return total number of parameters
          * @throws DatabaseException
          */
-        long CountParameters() const;
+        [[nodiscard]] long CountParameters() const;
 
         /**
          * @brief Create a new parameter in the ssm parameter table
