@@ -112,39 +112,38 @@ namespace AwsMock::Database {
                 const auto result = _lambdaCollection.insert_one(lambda.ToDocument());
                 log_trace << "Lambda created, oid: " << result->inserted_id().get_oid().value.to_string();
                 lambda.oid = result->inserted_id().get_oid().value.to_string();
+                return lambda;
+            } catch (const mongocxx::exception &exc) {
+                log_error << "Database exception " << exc.what();
+                throw Core::DatabaseException("Database exception " + std::string(exc.what()));
+            }
+        }
+        return _memoryDb.CreateLambda(lambda);
+    }
+
+    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) const {
+
+        if (HasDatabase()) {
+            try {
+
+                const auto client = ConnectionPool::instance().GetConnection();
+                mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
+                const auto mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
+                if (!mResult) {
+                    log_error << "Database exception: Lambda not found ";
+                    throw Core::DatabaseException("Database exception, Lambda not found ");
+                }
+
+                Entity::Lambda::Lambda result;
+                result.FromDocument(mResult.value());
+                return result;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-
-        } else {
-
-            lambda = _memoryDb.CreateLambda(lambda);
         }
-        return lambda;
-    }
-
-    Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(bsoncxx::oid oid) const {
-
-        try {
-
-            const auto client = ConnectionPool::instance().GetConnection();
-            mongocxx::collection _lambdaCollection = (*client)[_databaseName][_lambdaCollectionName];
-            const auto mResult = _lambdaCollection.find_one(make_document(kvp("_id", oid)));
-            if (!mResult) {
-                log_error << "Database exception: Lambda not found ";
-                throw Core::DatabaseException("Database exception, Lambda not found ");
-            }
-
-            Entity::Lambda::Lambda result;
-            result.FromDocument(mResult.value());
-            return result;
-
-        } catch (const mongocxx::exception &exc) {
-            log_error << "Database exception " << exc.what();
-            throw Core::DatabaseException("Database exception " + std::string(exc.what()));
-        }
+        return _memoryDb.GetLambdaById(oid.to_string());
     }
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaById(const std::string &oid) const {
@@ -178,11 +177,8 @@ namespace AwsMock::Database {
                 log_error << "Get lambda by ARN failed, error: " << e.what();
             }
 
-        } else {
-
-            return _memoryDb.GetLambdaByArn(arn);
         }
-        return {};
+        return _memoryDb.GetLambdaByArn(arn);
     }
 
     Entity::Lambda::Lambda LambdaDatabase::GetLambdaByName(const std::string &region, const std::string &name) const {
@@ -359,9 +355,8 @@ namespace AwsMock::Database {
         return lambdas;
     }
 
-    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
+    std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdaCounters(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
-        std::vector<Entity::Lambda::Lambda> lambdas;
         if (HasDatabase()) {
 
             try {
@@ -377,11 +372,11 @@ namespace AwsMock::Database {
                     }
                     opts.sort(sort.extract());
                 }
-                if (skip > 0) {
-                    opts.skip(skip);
+                if (pageIndex > 0) {
+                    opts.skip(pageIndex);
                 }
-                if (maxResults > 0) {
-                    opts.limit(maxResults);
+                if (pageSize > 0) {
+                    opts.limit(pageSize);
                 }
 
                 document query = {};
@@ -392,20 +387,22 @@ namespace AwsMock::Database {
                     query.append(kvp("functionName", make_document(kvp("$regex", "^" + prefix))));
                 }
 
+                std::vector<Entity::Lambda::Lambda> lambdas;
                 for (auto lambdaCursor = _lambdaCollection.find(query.extract(), opts); auto lambda: lambdaCursor) {
                     Entity::Lambda::Lambda result;
                     result.FromDocument(lambda);
                     lambdas.push_back(result);
                 }
+                log_trace << "Got lambda counter list, size:" << lambdas.size();
+                return lambdas;
 
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
             }
-        }
 
-        log_trace << "Got lambda counter list, size:" << lambdas.size();
-        return lambdas;
+        }
+        return _memoryDb.ListLambdaCounters(region, prefix, pageSize, pageIndex, sortColumns);
     }
 
     std::vector<Entity::Lambda::Lambda> LambdaDatabase::ListLambdasWithEventSource(const std::string &eventSourceArn) const {

@@ -126,7 +126,7 @@ namespace AwsMock::Database {
             log_info << "Got parameter list, size:" << parameterList.size();
             return parameterList;
         }
-        return _memoryDb.ListParameters(region);
+        return _memoryDb.ListParameterCounters(region);
     }
 
     long SSMDatabase::CountParameters(const std::string &region, const std::string &prefix) const {

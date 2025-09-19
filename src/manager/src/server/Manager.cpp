@@ -138,14 +138,14 @@ namespace AwsMock::Manager {
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
 
+        // Load available modules from configuration file
+        LoadModulesFromConfiguration();
+        log_info << "Module configuration loaded";
+
         // Initialize monitoring
         Core::Scheduler scheduler(_ioc);
         const auto monitoringServer = std::make_shared<Service::MonitoringServer>(scheduler);
         log_info << "Monitoring server started";
-
-        // Load available modules from configuration file
-        LoadModulesFromConfiguration();
-        log_info << "Module configuration loaded";
 
         // Autoload the init file before modules start
         AutoLoad();

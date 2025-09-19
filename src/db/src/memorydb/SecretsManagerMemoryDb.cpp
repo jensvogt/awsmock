@@ -116,8 +116,11 @@ namespace AwsMock::Database {
                                              [secretId](const std::pair<std::string, Entity::SecretsManager::Secret> &secret) {
                                                  return secret.second.secretId == secretId;
                                              });
-        _secrets[it->first] = secret;
-        return _secrets[it->first];
+        if (it != _secrets.end()) {
+          _secrets[it->first] = secret;
+            return _secrets[it->first];
+        }
+        return {};
     }
 
     Entity::SecretsManager::SecretList SecretsManagerMemoryDb::ListSecrets() const {

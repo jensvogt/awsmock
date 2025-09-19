@@ -192,12 +192,12 @@ namespace AwsMock::Database {
          *
          * @param region AWS region
          * @param prefix name prefix
-         * @param maxResults maximal number of results
-         * @param skip number of records to skip
+         * @param pageSize maximal number of results
+         * @param pageIndex number of records to skip
          * @param sortColumns sorting columns
          * @return list of lambda function counters
          */
-        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long maxResults = 0, long skip = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] std::vector<Entity::Lambda::Lambda> ListLambdaCounters(const std::string &region = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Export a list of lambdas

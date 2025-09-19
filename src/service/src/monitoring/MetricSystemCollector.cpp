@@ -278,29 +278,29 @@ namespace AwsMock::Monitoring {
 
 #elif _WIN32
 
-    void MetricSystemCollector::GetCpuInfoWin32() {
-        MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", GetPerformanceValue("\\Processor Information(_Total)\\% Processor Time") / _numProcessors);
-        MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system", GetPerformanceValue("\\Processor(_Total)\\% Privileged Time") / _numProcessors);
-        MetricService::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user", GetPerformanceValue("\\Processor(_Total)\\% User Time") / _numProcessors);
+    void MetricSystemCollector::GetCpuInfoWin32() const {
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", static_cast<double>(GetPerformanceValue("\\Processor Information(_Total)\\% Processor Time")) / static_cast<double>(_numProcessors));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system",  static_cast<double>(GetPerformanceValue("\\Processor(_Total)\\% Privileged Time")) / static_cast<double>(_numProcessors));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user",  static_cast<double>(GetPerformanceValue("\\Processor(_Total)\\% User Time")) / static_cast<double>(_numProcessors));
     }
 
-    void MetricSystemCollector::GetCpuInfoAwsmockWin32() {
-        MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time") / _numProcessors);
-        MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time") / _numProcessors);
-        MetricService::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", GetPerformanceValue("\\Process(awsmockmgr)\\% User Time") / _numProcessors);
+    void MetricSystemCollector::GetCpuInfoAwsmockWin32() const {
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time")) /  static_cast<double>(_numProcessors));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time")) /  static_cast<double>(_numProcessors));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\% User Time")) /  static_cast<double>(_numProcessors));
     }
 
-    void MetricSystemCollector::GetMemoryInfoWin32() {
-        MetricService::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", GetPerformanceValue("\\Memory\\% Committed Bytes In Use"));
+    void MetricSystemCollector::GetMemoryInfoWin32()  {
+        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_TOTAL, "mem_type", "used", static_cast<double>(GetPerformanceValue("\\Memory\\% Committed Bytes In Use")));
     }
 
     void MetricSystemCollector::GetMemoryInfoAwsmockWin32() {
-        MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", GetPerformanceValue("\\Process(awsmockmgr)\\Virtual Bytes"));
-        MetricService::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", GetPerformanceValue("\\Process(awsmockmgr)\\Working Set"));
+        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Virtual Bytes")));
+        Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Working Set")));
     }
 
     void MetricSystemCollector::GetThreadInfoWin32() {
-        MetricService::instance().SetGauge(TOTAL_THREADS, {}, {}, GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count"));
+        Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, {}, {}, static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count")));
     }
 
     long long MetricSystemCollector::GetPerformanceValue(const std::string &counter) {

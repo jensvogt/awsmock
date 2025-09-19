@@ -152,27 +152,27 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get total CPU utilization on Windows
          */
-        void GetCpuInfoWin32();
+        void GetCpuInfoWin32() const;
 
         /**
          * @brief Get CPU utilization on Windows
          */
-        void GetCpuInfoAwsmockWin32();
+        void GetCpuInfoAwsmockWin32() const;
 
         /**
          * @brief Get total memory utilization on Win32
          */
-        void GetMemoryInfoWin32();
+        static void GetMemoryInfoWin32() ;
 
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetMemoryInfoAwsmockWin32();
+        static void GetMemoryInfoAwsmockWin32();
 
         /**
          * @brief Get memory utilization on Win32
          */
-        void GetThreadInfoWin32();
+        static void GetThreadInfoWin32();
 
 #endif
 
