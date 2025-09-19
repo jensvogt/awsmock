@@ -130,6 +130,31 @@ namespace AwsMock::Dto::SQS {
         return listMessageCountersResponse;
     }
 
+    ListQueueCountersResponse Mapper::map(const Database::Entity::SQS::QueueList &queues, const long total) {
+
+        ListQueueCountersResponse listQueueCountersResponse;
+        listQueueCountersResponse.total = total;
+
+        for (const auto &queue: queues) {
+            QueueCounter counter;
+            counter.queueName = queue.name;
+            counter.queueArn = queue.queueArn;
+            counter.queueUrl = queue.queueUrl;
+            counter.available = queue.attributes.approximateNumberOfMessages;
+            counter.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
+            counter.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
+            counter.visibilityTimeout = queue.attributes.visibilityTimeout;
+            counter.maxMessageSize = queue.attributes.maxMessageSize;
+            counter.retentionPeriod = queue.attributes.messageRetentionPeriod;
+            counter.size = queue.size;
+            counter.isDlq = queue.isDlq;
+            counter.created = queue.created;
+            counter.modified = queue.modified;
+            listQueueCountersResponse.queueCounters.emplace_back(counter);
+        }
+        return listQueueCountersResponse;
+    }
+
     Message Mapper::map(const Database::Entity::SQS::Message &messageEntity) {
 
         Message messageDto;

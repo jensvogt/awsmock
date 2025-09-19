@@ -10,6 +10,7 @@ namespace AwsMock::Database {
     SQSDatabase::SQSDatabase() : _databaseName(GetDatabaseName()), _queueCollectionName("sqs_queue"), _messageCollectionName("sqs_message"), _memoryDb(SQSMemoryDb::instance()) {}
 
     bool SQSDatabase::QueueExists(const std::string &region, const std::string &name) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "queue_exists");
 
         if (HasDatabase()) {
 
@@ -24,6 +25,7 @@ namespace AwsMock::Database {
     }
 
     bool SQSDatabase::QueueUrlExists(const std::string &region, const std::string &queueUrl) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "queue_exists");
 
         if (HasDatabase()) {
 
@@ -46,6 +48,7 @@ namespace AwsMock::Database {
     }
 
     bool SQSDatabase::QueueArnExists(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "queue_exists");
 
         if (HasDatabase()) {
 
@@ -60,6 +63,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::CreateQueue(Entity::SQS::Queue &queue) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "create_exists");
 
         if (HasDatabase()) {
 
@@ -87,6 +91,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueById(bsoncxx::oid oid) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _queueCollection = client->database(_databaseName)[_queueCollectionName];
@@ -112,6 +117,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByArn(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         Entity::SQS::Queue queue;
         if (HasDatabase()) {
@@ -134,6 +140,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByDlq(const std::string &dlqQueueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         if (HasDatabase()) {
             Entity::SQS::Queue result;
@@ -153,6 +160,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByUrl(const std::string &region, const std::string &queueUrl) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         if (HasDatabase()) {
 
@@ -178,6 +186,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::GetQueueByName(const std::string &region, const std::string &queueName) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_queue");
 
         if (HasDatabase()) {
 
@@ -207,6 +216,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_queues");
 
         if (HasDatabase()) {
 
@@ -253,6 +263,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::QueueList SQSDatabase::ExportQueues(const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "export_queues");
 
         if (HasDatabase()) {
 
@@ -286,6 +297,7 @@ namespace AwsMock::Database {
     }
 
     void SQSDatabase::ImportQueue(Entity::SQS::Queue &queue) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "import_queues");
 
         queue.queueUrl = Core::CreateSQSQueueUrl(queue.name);
         queue.modified = system_clock::now();
@@ -297,6 +309,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::QueueList SQSDatabase::ListQueues(const std::string &region) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_queues");
 
         if (HasDatabase()) {
 
@@ -322,6 +335,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::PurgeQueue(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "purge_queue");
 
         long purged = 0;
         if (HasDatabase()) {
@@ -351,6 +365,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Queue SQSDatabase::UpdateQueue(Entity::SQS::Queue &queue) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "update_queue");
 
         queue.modified = system_clock::now();
         if (HasDatabase()) {
@@ -397,6 +412,7 @@ namespace AwsMock::Database {
     }
 
     void SQSDatabase::UpdateQueueCounter(const std::string &queueArn, const long messages, const long size, const long initial, const long invisible, const long delayed) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "update_queue");
 
         if (HasDatabase()) {
 
@@ -437,6 +453,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::CountQueues(const std::string &prefix, const std::string &region) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_queues");
 
         long count;
         if (HasDatabase()) {
@@ -464,6 +481,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::GetQueueSize(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_queues");
 
         if (HasDatabase()) {
 
@@ -490,6 +508,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::DeleteQueue(const Entity::SQS::Queue &queue) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_queue");
 
         long deleted = 0;
         if (HasDatabase()) {
@@ -518,6 +537,8 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::DeleteAllQueues() const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_all_queues");
+
         long deleted = 0;
         if (HasDatabase()) {
 
@@ -546,6 +567,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Message SQSDatabase::CreateMessage(Entity::SQS::Message &message) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "create_message");
 
         if (HasDatabase()) {
 
@@ -574,6 +596,7 @@ namespace AwsMock::Database {
     }
 
     bool SQSDatabase::MessageExists(const std::string &receiptHandle) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "exists_message");
 
         if (HasDatabase()) {
 
@@ -598,6 +621,7 @@ namespace AwsMock::Database {
     }
 
     bool SQSDatabase::MessageExistsByMessageId(const std::string &messageId) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "exists_message");
 
         if (HasDatabase()) {
 
@@ -618,6 +642,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageById(bsoncxx::oid oid) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_message");
 
         const auto client = ConnectionPool::instance().GetConnection();
         auto messageCollection = client->database(_databaseName)[_messageCollectionName];
@@ -630,6 +655,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageByReceiptHandle(const std::string &receiptHandle) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_message");
 
         if (HasDatabase()) {
 
@@ -647,6 +673,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Message SQSDatabase::GetMessageByMessageId(const std::string &messageId) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "get_message");
 
         if (HasDatabase()) {
 
@@ -673,6 +700,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::Message SQSDatabase::UpdateMessage(Entity::SQS::Message &message) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "update_message");
 
         if (HasDatabase()) {
 
@@ -716,6 +744,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &region) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_messages");
 
         if (HasDatabase()) {
 
@@ -741,6 +770,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::MessageList SQSDatabase::ListMessages(const std::string &queueArn, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "list_messages");
 
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
@@ -784,6 +814,7 @@ namespace AwsMock::Database {
     }
 
     void SQSDatabase::ImportMessages(const std::string &queueArn, const value &messageArray) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "import_messages");
 
         Entity::SQS::MessageList messageList;
         if (HasDatabase()) {
@@ -814,6 +845,7 @@ namespace AwsMock::Database {
     }
 
     void SQSDatabase::ReceiveMessages(const std::string &queueArn, const long visibility, const long maxResult, const std::string &dlQueueArn, const long maxRetries, Entity::SQS::MessageList &messageList) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "receive_messages");
 
         const auto reset = system_clock::now() + std::chrono::seconds(visibility);
 
@@ -919,6 +951,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::ResetMessages(const std::string &queueArn, const long visibility) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "reset_messages");
 
         long updated = 0;
         if (HasDatabase()) {
@@ -963,6 +996,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::RelocateToDlqMessages(const std::string &queueArn, const Entity::SQS::RedrivePolicy &redrivePolicy) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "relocate_messages");
 
         if (HasDatabase()) {
 
@@ -1005,6 +1039,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::ResetDelayedMessages(const std::string &queueArn, const long delay) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "reset_delayed_messages");
 
         long updated = 0;
         if (HasDatabase()) {
@@ -1045,6 +1080,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::RedriveMessages(const Entity::SQS::Queue &originalQueue, const Entity::SQS::Queue &dlqQueue) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "redrive_messages");
 
         long updated = 0;
         if (HasDatabase()) {
@@ -1090,6 +1126,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::MessageRetention(const std::string &queueArn, const long retentionPeriod) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "retention_messages");
 
         const auto reset = system_clock::now() - std::chrono::seconds{retentionPeriod};
 
@@ -1124,6 +1161,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::CountMessages(const std::string &queueArn, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_messages");
 
         if (HasDatabase()) {
 
@@ -1148,6 +1186,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::CountMessageSize(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_messages");
 
         if (HasDatabase()) {
 
@@ -1172,6 +1211,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::CountMessagesByStatus(const std::string &queueArn, const Entity::SQS::MessageStatus &status) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "count_messages");
 
         if (HasDatabase()) {
 
@@ -1193,6 +1233,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SQS::MessageWaitTime SQSDatabase::GetAverageMessageWaitingTime() const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "waiting_time_messages");
 
         if (HasDatabase()) {
 
@@ -1242,6 +1283,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::DeleteMessages(const std::string &queueArn) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_messages");
 
         long deleted = 0;
         if (HasDatabase()) {
@@ -1270,6 +1312,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::DeleteMessage(const Entity::SQS::Message &message) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_message");
 
         long deleted = 0;
         if (HasDatabase()) {
@@ -1303,6 +1346,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::DeleteMessage(const std::string &receiptHandle) const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_messages");
 
         if (HasDatabase()) {
 
@@ -1327,6 +1371,7 @@ namespace AwsMock::Database {
     }
 
     long SQSDatabase::DeleteAllMessages() const {
+        Monitoring::MonitoringTimer measure(SQS_DATABASE_TIMER, SQS_DATABASE_COUNTER, "action", "delete_messages");
 
         long deleted = 0;
         if (HasDatabase()) {
