@@ -6,19 +6,17 @@
 #define AWSMOCK_DTO_SQS_MAPPER_H
 
 // AwsMock includes
-#include "awsmock/dto/sqs/model/Queue.h"
-#include "awsmock/entity/sqs/Queue.h"
-
-
 #include <awsmock/dto/sqs/SendMessageRequest.h>
 #include <awsmock/dto/sqs/SendMessageResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
+#include <awsmock/dto/sqs/internal/ListQueueCountersResponse.h>
 #include <awsmock/dto/sqs/model/AttributeCounter.h>
 #include <awsmock/dto/sqs/model/EventMessageAttribute.h>
 #include <awsmock/dto/sqs/model/Message.h>
 #include <awsmock/dto/sqs/model/MessageEntry.h>
 #include <awsmock/dto/sqs/model/Queue.h>
 #include <awsmock/entity/sqs/Message.h>
+#include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/utils/SqsUtils.h>
 
 namespace AwsMock::Dto::SQS {
@@ -85,14 +83,22 @@ namespace AwsMock::Dto::SQS {
         /**
          * @brief Maps a SQS message entity to a SQS send message response DTO
          *
-         * Some values will be pulled over from the request.
-         *
          * @param messages message counter list
          * @param total total number of messages
          * @return ListMessageCountersResponse
          * @see ListMessageCountersResponse
          */
         static ListMessageCountersResponse map(const Database::Entity::SQS::MessageList &messages, long total);
+
+        /**
+         * @brief Maps a list of SQS queue entity to a ListQueueCounterResponse
+         *
+         * @param queues queue counter list
+         * @param total total number of queues
+         * @return ListQueueCountersResponse
+         * @see ListQueueCountersResponse
+         */
+        static ListQueueCountersResponse map(const Database::Entity::SQS::QueueList &queues, long total);
 
         /**
          * @brief Maps a SQS message entity to a SQS message DTO

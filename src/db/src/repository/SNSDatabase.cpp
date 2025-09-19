@@ -13,6 +13,8 @@ namespace AwsMock::Database {
     SNSDatabase::SNSDatabase() : _databaseName(GetDatabaseName()), _topicCollectionName("sns_topic"), _messageCollectionName("sns_message"), _memoryDb(SNSMemoryDb::instance()) {}
 
     bool SNSDatabase::TopicExists(const std::string &topicArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "exists_topic");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -29,6 +31,8 @@ namespace AwsMock::Database {
     }
 
     bool SNSDatabase::TopicExists(const std::string &region, const std::string &topicName) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "exists_topic");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -45,6 +49,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSDatabase::CreateTopic(Entity::SNS::Topic &topic) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "create_topic");
 
         if (HasDatabase()) {
 
@@ -72,6 +77,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicById(bsoncxx::oid oid) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_topic");
 
         try {
 
@@ -98,6 +104,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicByArn(const std::string &topicArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_topic");
 
         if (HasDatabase()) {
 
@@ -121,6 +128,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicByTargetArn(const std::string &targetArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_topic");
 
         if (HasDatabase()) {
 
@@ -145,6 +153,8 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSDatabase::GetTopicByName(const std::string &region, const std::string &topicName) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_topic");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -168,6 +178,8 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::TopicList SNSDatabase::GetTopicsBySubscriptionArn(const std::string &subscriptionArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_topic");
+
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -189,6 +201,8 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &region) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "list_topic");
+
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -218,6 +232,8 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::TopicList SNSDatabase::ListTopics(const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns, const std::string &region) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "list_topic");
+
         Entity::SNS::TopicList topicList;
         if (HasDatabase()) {
             try {
@@ -267,6 +283,8 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::TopicList SNSDatabase::ExportTopics(const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "export_topics");
+
         if (HasDatabase()) {
             try {
                 mongocxx::options::find opts;
@@ -303,6 +321,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Topic SNSDatabase::UpdateTopic(Entity::SNS::Topic &topic) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "update_topics");
 
         if (HasDatabase()) {
 
@@ -343,6 +362,7 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::UpdateTopicCounter(const std::string &topicArn, const long messages, const long size, const long initial, const long send, const long resend) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "update_topics");
 
         if (HasDatabase()) {
 
@@ -382,6 +402,7 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::ImportTopic(Entity::SNS::Topic &topic) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "import_topics");
 
         topic.topicAttribute.availableMessages = 0;
         CreateOrUpdateTopic(topic);
@@ -389,6 +410,8 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::CountTopics(const std::string &region, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "count_topics");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -416,6 +439,7 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::PurgeTopic(const Entity::SNS::Topic &topic) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "purge_topics");
 
         long purged = 0;
         if (HasDatabase()) {
@@ -446,6 +470,8 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::GetTopicSize(const std::string &topicArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "count_topics");
+
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _objectCollection = (*client)[_databaseName][_messageCollectionName];
@@ -469,6 +495,8 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::DeleteTopic(const Entity::SNS::Topic &topic) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_topics");
+
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _topicCollection = (*client)[_databaseName][_topicCollectionName];
@@ -493,6 +521,7 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::DeleteAllTopics() const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_topics");
 
         long deleted = 0;
         if (HasDatabase()) {
@@ -523,6 +552,8 @@ namespace AwsMock::Database {
     }
 
     bool SNSDatabase::MessageExists(const std::string &messageId) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "exists_message");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -539,6 +570,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSDatabase::CreateMessage(Entity::SNS::Message &message) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "create_message");
 
         if (HasDatabase()) {
 
@@ -569,6 +601,8 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSDatabase::GetMessageById(bsoncxx::oid oid) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_message");
+
         try {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -588,6 +622,8 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::CountMessages(const std::string &topicArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "count_messages");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -610,6 +646,7 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::CountMessagesByStatus(const std::string &topicArn, const Entity::SNS::MessageStatus status) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "count_messages");
 
         if (HasDatabase()) {
             try {
@@ -629,6 +666,8 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::CountMessagesSize(const std::string &topicArn) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "count_messages");
+
         if (HasDatabase()) {
             try {
                 const auto client = ConnectionPool::instance().GetConnection();
@@ -655,7 +694,8 @@ namespace AwsMock::Database {
         return _memoryDb.CountMessages(topicArn);
     }
 
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "list_messages");
 
         if (HasDatabase()) {
 
@@ -699,6 +739,7 @@ namespace AwsMock::Database {
     }
 
     Entity::SNS::Message SNSDatabase::UpdateMessage(Entity::SNS::Message &message) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "update_messages");
 
         if (HasDatabase()) {
             mongocxx::options::find_one_and_update opts{};
@@ -737,6 +778,7 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::SetMessageStatus(const Entity::SNS::Message &message, const Entity::SNS::MessageStatus &status) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "set_status_messages");
 
         if (HasDatabase()) {
 
@@ -790,6 +832,8 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::DeleteMessage(const std::string &messageId) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_messages");
+
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -814,6 +858,8 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::DeleteMessages(const std::string &region, const std::string &topicArn, const std::vector<std::string> &messageIds) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_messages");
+
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
@@ -845,6 +891,8 @@ namespace AwsMock::Database {
     }
 
     void SNSDatabase::DeleteOldMessages(const long timeout) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_messages");
+
         const system_clock::time_point reset = system_clock::now() - std::chrono::days{timeout};
 
         if (HasDatabase()) {
@@ -875,6 +923,7 @@ namespace AwsMock::Database {
     }
 
     long SNSDatabase::DeleteAllMessages() const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "delete_messages");
 
         long deleted = 0;
         if (HasDatabase()) {

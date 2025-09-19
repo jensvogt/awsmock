@@ -3,6 +3,7 @@
 //
 
 #include <awsmock/service/sqs/SQSService.h>
+#include <boost/container/map.hpp>
 
 namespace AwsMock::Service {
 
@@ -145,29 +146,17 @@ namespace AwsMock::Service {
         log_trace << "List all queues counters request";
 
         try {
-            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
 
-            Dto::SQS::ListQueueCountersResponse listQueueResponse;
-            listQueueResponse.total = _sqsDatabase.CountQueues(request.prefix, request.region);
-            for (const auto &queue: queueList) {
-                Dto::SQS::QueueCounter counter;
-                counter.queueName = queue.name;
-                counter.queueArn = queue.queueArn;
-                counter.queueUrl = queue.queueUrl;
-                counter.available = queue.attributes.approximateNumberOfMessages;
-                counter.invisible = queue.attributes.approximateNumberOfMessagesNotVisible;
-                counter.delayed = queue.attributes.approximateNumberOfMessagesDelayed;
-                counter.visibilityTimeout = queue.attributes.visibilityTimeout;
-                counter.maxMessageSize = queue.attributes.maxMessageSize;
-                counter.retentionPeriod = queue.attributes.messageRetentionPeriod;
-                counter.size = queue.size;
-                counter.isDlq = queue.isDlq;
-                counter.created = queue.created;
-                counter.modified = queue.modified;
-                listQueueResponse.queueCounters.emplace_back(counter);
-            }
-            log_trace << "SQS create queue counters list response: " << listQueueResponse.ToJson();
-            return listQueueResponse;
+            // Adjust SQS queue counters
+            _sqsDatabase.AdjustMessageCounters();
+
+            // Get the queue list and the total number
+            const Database::Entity::SQS::QueueList queueList = _sqsDatabase.ListQueues(request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns), request.region);
+            const long total = _sqsDatabase.CountQueues(request.prefix, request.region);
+
+            log_trace << "SQS create queue counters list, count: " << total;
+            return Dto::SQS::Mapper::map(queueList, total);
+
         } catch (Core::DatabaseException &exc) {
             log_error << exc.message();
             throw Core::ServiceException(exc.message());
