@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/repository/SQSDatabase.h>
-#include <boost/serialization/array_wrapper.hpp>
 
 namespace AwsMock::Database {
 
