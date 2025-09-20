@@ -377,7 +377,6 @@ namespace AwsMock::Service {
         request.hostConfig = hostConfig;
         log_info << "Create container request: " << request.ToJson();
 
-
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + containerName, request.ToJson());
         if (statusCode != http::status::created) {
             log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;

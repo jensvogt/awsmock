@@ -2,10 +2,7 @@
 #include <awsmock/ftpserver/FtpSession.h>
 
 namespace AwsMock::FtpServer {
-    FtpSession::FtpSession(boost::asio::io_context &awsIoc,
-                           const UserDatabase &user_database,
-                           std::string serverName,
-                           const std::function<void()> &completion_handler)
+    FtpSession::FtpSession(boost::asio::io_context &awsIoc,const UserDatabase &user_database,std::string serverName,const std::function<void()> &completion_handler)
         : _completion_handler(completion_handler), _user_database(user_database), _io_service(awsIoc),
           command_socket_(awsIoc), command_write_strand_(awsIoc), data_type_binary_(true),
           data_acceptor_(awsIoc), data_buffer_strand_(awsIoc), file_rw_strand_(awsIoc),
@@ -484,8 +481,8 @@ namespace AwsMock::FtpServer {
 
         boost::asio::ip::tcp::endpoint endpoint;
         if (Core::Configuration::instance().GetValue<bool>("awsmock.dockerized")) {
-            const int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv.min");
-            const int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv.max");
+            const int minPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-min");
+            const int maxPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.pasv-max");
             const int port = Core::RandomUtils::NextInt(minPort, maxPort);
             endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v6(), port);
         } else {
