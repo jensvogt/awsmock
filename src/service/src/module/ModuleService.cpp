@@ -327,7 +327,7 @@ namespace AwsMock::Service {
             for (auto &key: infrastructure.kmsKeys) {
                 key = _kmsDatabase.UpsertKey(key);
             }
-            log_info << "Secrets imported, count: " << infrastructure.secrets.size();
+            log_info << "KMS keys imported, count: " << infrastructure.secrets.size();
         }
 
         // SSM

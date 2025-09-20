@@ -152,7 +152,7 @@ namespace AwsMock::Service {
         application = _database.UpdateApplication(application);
 
         // Delete container and image
-        DeleteImage(application);
+        CleanupDocker(application);
 
         // Create the application asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
@@ -180,7 +180,7 @@ namespace AwsMock::Service {
         application = _database.UpdateApplication(application);
 
         // Delete container and image
-        DeleteImage(application);
+        CleanupDocker(application);
 
         // Get the base64 encoded application code
         const auto applicationDataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.data-dir");
@@ -581,13 +581,20 @@ namespace AwsMock::Service {
         return base64FullFile;
     }
 
-    void ApplicationService::DeleteImage(const Database::Entity::Apps::Application &application) {
-        if (ContainerService::instance().ContainerExists(application.containerName)) {
-            ContainerService::instance().StopContainer(application.containerName);
-            ContainerService::instance().DeleteContainer(application.containerName);
-            log_info << "Container stopped, name: " << application.containerName;
-            ContainerService::instance().DeleteImage(application.imageId);
-            log_info << "Image deleted, name: " << application.name;
+    void ApplicationService::CleanupDocker(const Database::Entity::Apps::Application &application) {
+
+        if (ContainerService::instance().ContainerExists(application.containerId)) {
+            ContainerService::instance().KillContainer(application.containerId);
+            ContainerService::instance().DeleteContainer(application.containerId);
+            log_debug << "Done cleanup application container, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
         }
+
+        // Delete image
+        if (ContainerService::instance().ImageExists(application.name, application.version)) {
+            ContainerService::instance().DeleteImage(application.name + ":" + application.version);
+            log_debug << "Done cleanup application image, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
+        }
+        log_info << "Done cleanup docker, name: " << application.name << ":" << application.version << ", containerId: " << application.containerId;
     }
+
 }// namespace AwsMock::Service

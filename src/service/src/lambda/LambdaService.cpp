@@ -1253,7 +1253,6 @@ namespace AwsMock::Service {
             ContainerService::instance().DeleteImage(lambda.function + ":" + lambda.dockerTag);
             log_debug << "Done cleanup instances, function: " << lambda.function;
         }
-
         log_info << "Done cleanup docker, function: " << lambda.function;
     }
 
