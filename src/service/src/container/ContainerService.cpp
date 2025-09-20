@@ -353,7 +353,7 @@ namespace AwsMock::Service {
         hostConfig.extraHosts.emplace_back("localstack:host-gateway");
 
         request.hostConfig = hostConfig;
-        log_info << "Create container request: " << request.ToJson();
+        log_debug << "Create container request: " << request.ToJson();
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
@@ -400,7 +400,7 @@ namespace AwsMock::Service {
         hostConfig.extraHosts.emplace_back("localstack:host-gateway");
 
         request.hostConfig = hostConfig;
-        log_info << "Create container request: " << request.ToJson();
+        log_debug << "Create container request: " << request.ToJson();
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + containerName, request.ToJson());
         if (statusCode != http::status::created) {

@@ -11,8 +11,6 @@
 
 namespace AwsMock::Database::Entity::Apps {
 
-    struct Application;
-
     /**
      * @brief Application entity
      *
