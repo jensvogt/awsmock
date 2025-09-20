@@ -280,7 +280,6 @@ namespace AwsMock::Service {
         request.domainName = "awsmock";
         request.tty = false;
         request.image = imageName + ":" + tag;
-        request.networkMode = GetNetworkName();
         request.environment = environment;
         request.containerPort = _containerPort;
         request.hostPort = std::to_string(hostPort);
@@ -297,6 +296,7 @@ namespace AwsMock::Service {
         portBindingHostPorts.push_back(portBindingHostPort);
 
         Dto::Docker::HostConfig hostConfig;
+        hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
         hostConfig.portBindings.portMap[_containerPort + "/tcp"] = portBindingHostPorts;
 
@@ -323,12 +323,37 @@ namespace AwsMock::Service {
 
         // Create the request
         Dto::Docker::CreateContainerRequest request;
-        request.hostName = instanceName;
+
+        request.hostName = imageName;
+        request.domainName = "awsmock";
+        request.tty = false;
         request.image = imageName + ":" + tag;
-        request.networkMode = GetNetworkName();
-        request.environment = environment;
         request.containerPort = std::to_string(containerPort);
         request.hostPort = std::to_string(hostPort);
+        request.environment = environment;
+
+        Dto::Docker::ExposedPort exposedPorts;
+        request.exposedPorts[std::to_string(containerPort) + "/tcp"] = exposedPorts;
+
+        Dto::Docker::LogConfig logConfig;
+        logConfig.type = "json-file";
+
+        Dto::Docker::Port portBindingHostPort;
+        portBindingHostPort.hostPort = hostPort;
+        std::vector<Dto::Docker::Port> portBindingHostPorts;
+        portBindingHostPorts.push_back(portBindingHostPort);
+
+        Dto::Docker::HostConfig hostConfig;
+        hostConfig.networkMode = GetNetworkName();
+        hostConfig.logConfig = logConfig;
+        hostConfig.portBindings.portMap[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
+
+        hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
+        hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
+        hostConfig.extraHosts.emplace_back("localstack:host-gateway");
+
+        request.hostConfig = hostConfig;
+        log_info << "Create container request: " << request.ToJson();
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
@@ -351,7 +376,6 @@ namespace AwsMock::Service {
         request.domainName = "awsmock";
         request.tty = false;
         request.image = imageName + ":" + tag;
-        request.networkMode = GetNetworkName();
         request.containerPort = std::to_string(containerPort);
         request.hostPort = std::to_string(hostPort);
 
@@ -367,6 +391,7 @@ namespace AwsMock::Service {
         portBindingHostPorts.push_back(portBindingHostPort);
 
         Dto::Docker::HostConfig hostConfig;
+        hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
         hostConfig.portBindings.portMap[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
 

@@ -45,6 +45,11 @@ namespace AwsMock::Dto::Docker {
     struct HostConfig final : Common::BaseCounter<HostConfig> {
 
         /**
+         * Network mode
+         */
+        std::string networkMode = "local";
+
+        /**
          * Port bindings
          */
         PortBinding portBindings;
@@ -63,6 +68,7 @@ namespace AwsMock::Dto::Docker {
 
         friend HostConfig tag_invoke(boost::json::value_to_tag<HostConfig>, boost::json::value const &v) {
             HostConfig r = {};
+            r.networkMode = Core::Json::GetStringValue(v, "c");
             if (Core::Json::AttributeExists(v, "PortBindings")) {
                 r.portBindings = boost::json::value_to<PortBinding>(v.at("PortBindings"));
             }
@@ -77,6 +83,7 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, HostConfig const &obj) {
             jv = {
+                    {"NetworkMode", boost::json::value_from(obj.networkMode)},
                     {"PortBindings", boost::json::value_from(obj.portBindings)},
                     {"LogConfig", boost::json::value_from(obj.logConfig)},
                     {"ExtraHosts", boost::json::value_from(obj.extraHosts)},

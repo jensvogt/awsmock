@@ -69,11 +69,6 @@ namespace AwsMock::Dto::Docker {
         std::string image;
 
         /**
-         * Network mode
-         */
-        std::string networkMode = "local";
-
-        /**
          * Container ports
          */
         std::string containerPort;
@@ -111,7 +106,6 @@ namespace AwsMock::Dto::Docker {
             r.domainName = Core::Json::GetStringValue(v, "DomainName");
             r.user = Core::Json::GetStringValue(v, "User");
             r.image = Core::Json::GetStringValue(v, "Image");
-            r.networkMode = Core::Json::GetStringValue(v, "NetworkMode");
             r.containerPort = Core::Json::GetStringValue(v, "ContainerPort");
             r.hostPort = Core::Json::GetStringValue(v, "HostPort");
             r.tty = Core::Json::GetBoolValue(v, "Tty");
@@ -133,7 +127,6 @@ namespace AwsMock::Dto::Docker {
                     {"DomainName", obj.domainName},
                     {"User", obj.user},
                     {"Image", obj.image},
-                    {"NetworkMode", obj.networkMode},
                     {"ContainerPort", obj.containerPort},
                     {"HostPort", obj.hostPort},
                     {"Tty", obj.tty},
