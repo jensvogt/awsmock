@@ -1,5 +1,7 @@
 
 #include <awsmock/core/StringUtils.h>
+#include <boost/token_functions.hpp>
+#include <boost/tokenizer.hpp>
 
 namespace AwsMock::Core {
 
@@ -88,13 +90,9 @@ namespace AwsMock::Core {
     }
 
     std::vector<std::string> StringUtils::Split(const std::string &s, const char delim) {
-        std::vector<std::string> tokens;
-        std::stringstream check1(s);
-        std::string intermediate;
-        while (getline(check1, intermediate, delim)) {
-            tokens.push_back(intermediate);
-        }
-        return tokens;
+        std::vector<std::string> result;
+        boost::split(result, s, boost::is_any_of(std::string{delim}));
+        return result;
     }
 
     std::vector<std::string> StringUtils::SplitOnNewline(const std::string &s) {
