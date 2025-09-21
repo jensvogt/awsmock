@@ -200,6 +200,18 @@ namespace AwsMock::Core {
         BOOST_CHECK_EQUAL(parameter, "testvalue");
     }
 
+    BOOST_AUTO_TEST_CASE(HasQueryParameterSingle) {
+
+        // arrange
+        const std::string uri = "/ftpuser1/testqueue?enabled";
+
+        // act
+        const bool enabled = HttpUtils::HasQueryParameter(uri, "enabled");
+
+        // assert
+        BOOST_CHECK_EQUAL(true, enabled);
+    }
+
 }// namespace AwsMock::Core
 
 #endif// AWMOCK_CORE_HTTP_UTILS_TEST_H

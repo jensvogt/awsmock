@@ -34,7 +34,7 @@ namespace AwsMock::Core {
                      try {
                         auto configuration = Configuration("FooBarBaz.json");
                      } catch (const CoreException &e) {
-                         BOOST_CHECK_EQUAL("Configuration file 'FooBarBaz.json' does not exist. Will use default.", e.message());
+                         BOOST_CHECK_EQUAL("Configuration file 'FooBarBaz.json' does not exist. Will use defaults.", e.message());
                          throw;
                      } }, CoreException);
 

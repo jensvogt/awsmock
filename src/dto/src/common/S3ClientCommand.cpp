@@ -11,7 +11,7 @@ namespace AwsMock::Dto::Common {
         UserAgent userAgent;
         userAgent.FromRequest(request);
 
-        // Core::HttpUtils::DumpHeaders(request);
+        //Core::HttpUtils::DumpHeaders(request);
 
         // Basic values
         this->region = awsRegion;
@@ -122,7 +122,7 @@ namespace AwsMock::Dto::Common {
                     break;
             }
         }
-        log_trace << "Client command: " << ToString();
+        log_info << "Client command: " << S3CommandTypeToString(command);
     }
 
     void S3ClientCommand::GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent) {

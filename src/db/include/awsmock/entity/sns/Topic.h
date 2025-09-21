@@ -78,22 +78,22 @@ namespace AwsMock::Database::Entity::SNS {
         /**
          * Total size of all messages in bytes
          */
-        long size = 0;
+        long size{};
 
         /**
          * Total number of all messages
          */
-        long messages = 0;
+        long messages{};
 
         /**
          * Total number of all messages send
          */
-        long messagesSend = 0;
+        long messagesSend{};
 
         /**
          * Total number of all messages resend
          */
-        long messagesResend = 0;
+        long messagesResend{};
 
         /**
          * Creation date

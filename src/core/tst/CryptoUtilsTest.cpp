@@ -220,6 +220,7 @@ namespace AwsMock::Core {
 
         const auto plaintext = static_cast<unsigned char *>(malloc(testText.length() * 2));
         Crypto::Aes256DecryptString(cyphertext, &len, reinterpret_cast<const unsigned char *>(key.c_str()), plaintext);
+        plaintext[len] = '\0';
 
         // assert
         BOOST_CHECK_EQUAL(reinterpret_cast<const char *>(plaintext), testText.c_str());
@@ -271,7 +272,8 @@ namespace AwsMock::Core {
         Crypto::HexDecode(encoded, decoded);
 
         // assert
-        BOOST_CHECK_EQUAL(testString.c_str(), reinterpret_cast<char *>(decoded));
+        BOOST_CHECK_EQUAL_COLLECTIONS(testString.c_str(), testString.c_str() + strlen(testString.c_str()), decoded, decoded + strlen((const char *) decoded));
+        //BOOST_CHECK_EQUAL(testString, std::string{(const char *) decoded});
     }
 }// namespace AwsMock::Core
 

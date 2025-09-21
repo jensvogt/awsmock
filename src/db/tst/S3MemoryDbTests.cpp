@@ -174,12 +174,14 @@ namespace AwsMock::Database {
         bucket.owner = OWNER;
         _s3Database.CreateBucket(bucket);
         Entity::S3::Object object1;
+        object1.region = _region;
         object1.bucket = bucket.name;
         object1.key = OBJECT;
         object1.owner = OWNER;
         object1.size = 5;
         _s3Database.CreateObject(object1);
         Entity::S3::Object object2;
+        object2.region = _region;
         object2.bucket = bucket.name;
         object2.key = "test1/" + std::string(OBJECT);
         object2.owner = OWNER;
@@ -436,7 +438,10 @@ namespace AwsMock::Database {
         object = _s3Database.CreateObject(object);
 
         // act
-        BOOST_CHECK_NO_THROW({ _s3Database.DeleteAllObjects(); });
+        BOOST_CHECK_NO_THROW({
+            long deleted = _s3Database.DeleteAllObjects();
+            log_debug << "Deleted: " << deleted;
+        });
         const bool result = _s3Database.ObjectExists(object.region, object.bucket, object.key);
 
         // assert

@@ -46,7 +46,7 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * Enabled
          */
-        bool enabled;
+        bool enabled{};
 
         /**
          * Attributes
