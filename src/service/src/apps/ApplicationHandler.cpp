@@ -43,7 +43,7 @@ namespace AwsMock::Service {
 
                     Dto::Apps::UploadApplicationCodeRequest serviceRequest = Dto::Apps::UploadApplicationCodeRequest::FromJson(clientCommand);
                     _applicationService.UploadApplicationCode(serviceRequest);
-                    log_info << "Upload application code, name: " << serviceRequest.applicationName;
+                    log_info << "Upload application code succeeded, name: " << serviceRequest.applicationName << ", version: " << serviceRequest.version;
                     return SendResponse(request, http::status::ok);
                 }
 

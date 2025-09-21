@@ -71,7 +71,7 @@ namespace AwsMock::Service {
 
         // Write a base64 encoded zip file
         std::ifstream ifs(applicationCodeFile);
-        std::string applicationCode((std::istreambuf_iterator(ifs)), std::istreambuf_iterator<char>());
+        const std::string applicationCode((std::istreambuf_iterator(ifs)), std::istreambuf_iterator<char>());
         ifs.close();
         Core::Crypto::Base64Decode(applicationCode, codeDir + Core::FileUtils::separator() + applicationEntity.archive);
         log_debug << "Created Base64 string, length: " << applicationCode.size();
