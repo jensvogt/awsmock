@@ -355,7 +355,7 @@ namespace AwsMock::Service {
                     Dto::S3::UploadPartCopyRequest s3Request;
                     s3Request.region = region;
                     s3Request.uploadId = uploadId;
-                    s3Request.partNumber = std::stoi(partNumber);
+                    s3Request.partNumber = std::stol(partNumber);
                     s3Request.targetBucket = clientCommand.bucket;
                     s3Request.targetKey = clientCommand.key;
 
