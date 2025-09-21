@@ -160,7 +160,7 @@ namespace AwsMock::Service {
         boost::asio::post(_ioc, [applicationCreator, fullBase64File, application, instanceId] {
             applicationCreator(fullBase64File, application.region, application.name, instanceId);
         });
-        log_debug << "Application code updated, name: " << request.applicationName;
+        log_debug << "Application code updated, name: " << request.applicationName << ", version: " << request.version;
     }
 
     void ApplicationService::RebuildApplication(const Dto::Apps::RebuildApplicationCodeRequest &request) const {
@@ -574,7 +574,6 @@ namespace AwsMock::Service {
                 log_debug << "Updated Base64 file written: " << base64FullFile;
 
             } else {
-
                 log_info << "Application upload: new and original are equal: " << base64FullFile;
             }
         }
