@@ -92,12 +92,12 @@ namespace AwsMock::Database::Entity::S3 {
         /**
          * Size in bytes
          */
-        long size;
+        long size{};
 
         /**
          * Number of object keys
          */
-        long keys;
+        long keys{};
 
         /**
          * Bucket notifications

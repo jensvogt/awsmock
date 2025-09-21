@@ -272,7 +272,7 @@ namespace AwsMock::Core {
         Crypto::HexDecode(encoded, decoded);
 
         // assert
-        BOOST_CHECK_EQUAL_COLLECTIONS(testString.c_str(), testString.c_str() + strlen(testString.c_str()), decoded, decoded + strlen((const char *) decoded) - 1);
+        BOOST_CHECK_EQUAL_COLLECTIONS(testString.c_str(), testString.c_str() + strlen(testString.c_str()), decoded, decoded + strlen((const char *) decoded));
         //BOOST_CHECK_EQUAL(testString, std::string{(const char *) decoded});
     }
 }// namespace AwsMock::Core

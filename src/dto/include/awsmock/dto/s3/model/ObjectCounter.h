@@ -143,11 +143,11 @@ namespace AwsMock::Dto::S3 {
 
             // Convert from map to key/value vector
             if (!obj.metadata.empty()) {
-                boost::json::array metadataArray;
+                boost::json::object metadataObject;
                 for (const auto &[fst, snd]: obj.metadata) {
-                    metadataArray.push_back(boost::json::object{{"key", fst}, {"value", snd}});
+                    metadataObject[fst] = snd;
                 }
-                jv.as_object()["metadata"] = metadataArray;
+                jv.as_object()["metadata"] = metadataObject;
             }
         }
     };
