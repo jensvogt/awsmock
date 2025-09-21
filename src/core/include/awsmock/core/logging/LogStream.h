@@ -177,12 +177,12 @@ namespace AwsMock::Core {
 }// namespace AwsMock::Core
 
 #if defined(_WIN32) || defined(CYGWIN)
-#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__); my_logger::get().flush();
-#define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__); my_logger::get().flush();
-#define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__); my_logger::get().flush();
-#define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__); my_logger::get().flush();
-#define log_debug BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__); my_logger::get().flush();
-#define log_trace BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__); my_logger::get().flush();
+#define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_warning BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::warning) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_info BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::info) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_debug BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::debug) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
+#define log_trace BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::trace) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __FUNCTION__)
 #else
 #define log_fatal BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::fatal) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
 #define log_error BOOST_LOG_SEV(my_logger::get(), boost::log::trivial::error) << boost::log::add_value("Line", __LINE__) << boost::log::add_value("File", __FILE__) << boost::log::add_value("Function", __PRETTY_FUNCTION__)
