@@ -20,7 +20,7 @@ namespace AwsMock::Database::Entity::ApiGateway {
         keyDocument.append(kvp("policy", policy));
         keyDocument.append(kvp("rootResourceId", rootResourceId));
         keyDocument.append(kvp("disableExecuteApiEndpoint", disableExecuteApiEndpoint));
-        keyDocument.append(kvp("minimumCompressionSize", minimumCompressionSize));
+        keyDocument.append(kvp("minimumCompressionSize", bsoncxx::types::b_int64(minimumCompressionSize)));
         keyDocument.append(kvp("created", bsoncxx::types::b_date(created)));
         keyDocument.append(kvp("modified", bsoncxx::types::b_date(modified)));
 

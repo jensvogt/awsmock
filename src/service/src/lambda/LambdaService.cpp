@@ -110,7 +110,7 @@ namespace AwsMock::Service {
         log_debug << "Lambda results cleared, arn: " << lambda.arn << " count: " << count;
 
         // Update the lambda function
-        LambdaCreator lambdaCreator;
+        const LambdaCreator lambdaCreator;
         lambdaCreator.UpdateLambda(lambda, request.functionCode, request.version);
 
         log_debug << "Lambda function code updated, function: " << lambda.function;
@@ -1253,7 +1253,6 @@ namespace AwsMock::Service {
             ContainerService::instance().DeleteImage(lambda.function + ":" + lambda.dockerTag);
             log_debug << "Done cleanup instances, function: " << lambda.function;
         }
-
         log_info << "Done cleanup docker, function: " << lambda.function;
     }
 

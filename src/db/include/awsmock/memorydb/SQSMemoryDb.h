@@ -24,24 +24,11 @@
 #include <awsmock/entity/sqs/Queue.h>
 #include <awsmock/repository/Database.h>
 #include <awsmock/utils/SortColumn.h>
+#include <awsmock/core/Linq.h>
 
 namespace AwsMock::Database {
 
     using std::chrono::system_clock;
-
-    struct QueueMonitoringCounter {
-        long initial{};
-        long invisible{};
-        long delayed{};
-        long messages{};
-        long size{};
-        system_clock::time_point modified = system_clock::now();
-    };
-
-    using SqsShmAllocator = boost::interprocess::allocator<std::pair<const std::string, QueueMonitoringCounter>, boost::interprocess::managed_shared_memory::segment_manager>;
-    using SqsCounterMapType = boost::container::map<std::string, QueueMonitoringCounter, std::less<std::string>, SqsShmAllocator>;
-
-    static constexpr auto SQS_COUNTER_MAP_NAME = "SqsQueueCounter";
 
     /**
      * @brief SQS in-memory database.
@@ -55,7 +42,7 @@ namespace AwsMock::Database {
         /**
          * @brief Constructor
          */
-        explicit SQSMemoryDb();
+        explicit SQSMemoryDb()= default;
 
         /**
          * @brief Singleton instance
@@ -453,16 +440,6 @@ namespace AwsMock::Database {
          * Message mutex
          */
         static boost::mutex _sqsMessageMutex;
-
-        /**
-         * Shared memory segment
-         */
-        boost::interprocess::managed_shared_memory _segment;
-
-        /**
-         * Map of monitoring counters
-         */
-        SqsCounterMapType *_sqsCounterMap;
     };
 
 }// namespace AwsMock::Database

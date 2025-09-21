@@ -17,6 +17,7 @@ namespace AwsMock::Database {
     S3Database::S3Database() : _databaseName(GetDatabaseName()), _bucketCollectionName("s3_bucket"), _objectCollectionName("s3_object"), _memoryDb(S3MemoryDb::instance()) {}
 
     bool S3Database::BucketExists(const std::string &region, const std::string &name) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_exists");
 
         if (HasDatabase()) {
 
@@ -38,6 +39,7 @@ namespace AwsMock::Database {
     }
 
     bool S3Database::BucketExists(const std::string &bucketArn) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_exists");
 
         if (HasDatabase()) {
 
@@ -63,6 +65,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3Database::CreateBucket(Entity::S3::Bucket &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "create_bucket");
 
         if (HasDatabase()) {
 
@@ -91,6 +94,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::BucketCount(const std::string &region, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "bucket_count");
 
         if (HasDatabase()) {
 
@@ -123,6 +127,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3Database::GetBucketById(bsoncxx::oid oid) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -135,6 +140,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3Database::GetBucketByArn(const std::string &bucketArn) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         const auto client = ConnectionPool::instance().GetConnection();
         mongocxx::collection _bucketCollection = (*client)[_databaseName][_bucketCollectionName];
@@ -147,6 +153,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3Database::GetBucketById(const std::string &oid) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         if (HasDatabase()) {
 
@@ -156,6 +163,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3Database::GetBucketByRegionName(const std::string &region, const std::string &name) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket");
 
         if (HasDatabase()) {
 
@@ -173,6 +181,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::BucketList S3Database::ListBuckets(const std::string &region, const std::string &prefix, const long maxResults, const long skip, const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_bucket");
 
         Entity::S3::BucketList bucketList;
         if (HasDatabase()) {
@@ -206,8 +215,6 @@ namespace AwsMock::Database {
             for (auto bucketCursor = _bucketCollection.find(query.extract(), opts); const auto &bucket: bucketCursor) {
                 Entity::S3::Bucket result;
                 result.FromDocument(bucket);
-                //result.keys = _s3CounterMap[result.arn].keys;
-                //result.size = _s3CounterMap[result.arn].size;
                 bucketList.push_back(result);
             }
 
@@ -220,6 +227,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::BucketList S3Database::ExportBuckets(const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "export_buckets");
 
         Entity::S3::BucketList bucketList;
         if (HasDatabase()) {
@@ -253,6 +261,7 @@ namespace AwsMock::Database {
     }
 
     bool S3Database::HasObjects(const Entity::S3::Bucket &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "has_objects");
 
         if (HasDatabase()) {
 
@@ -267,6 +276,7 @@ namespace AwsMock::Database {
     }
 
     std::vector<Entity::S3::Object> S3Database::GetBucketObjectList(const std::string &region, const std::string &bucket, const long maxKeys) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object_list");
 
         if (HasDatabase()) {
             std::vector<Entity::S3::Object> objectList;
@@ -291,6 +301,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::GetBucketObjectCount(const std::string &region, const std::string &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object_count");
 
         std::vector<Entity::S3::Object> objectList;
         if (HasDatabase()) {
@@ -306,6 +317,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::PurgeBucket(Entity::S3::Bucket &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "purge_count");
 
         long purged = 0;
         if (HasDatabase()) {
@@ -339,6 +351,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Bucket S3Database::UpdateBucket(Entity::S3::Bucket &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "update_bucket");
 
         if (HasDatabase()) {
 
@@ -373,6 +386,7 @@ namespace AwsMock::Database {
     }
 
     void S3Database::UpdateBucketCounter(const std::string &bucketArn, const long keys, const long size) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "update_bucket_counter");
 
         if (HasDatabase()) {
 
@@ -420,6 +434,7 @@ namespace AwsMock::Database {
 
     // TODO: Combine with Listobject
     std::vector<Entity::S3::Object> S3Database::ListBucket(const std::string &bucket, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_objects");
 
         std::vector<Entity::S3::Object> objectList;
         if (HasDatabase()) {
@@ -450,6 +465,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::GetBucketSize(const std::string &region, const std::string &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_bucket_size");
 
         if (HasDatabase()) {
 
@@ -475,6 +491,7 @@ namespace AwsMock::Database {
     }
 
     void S3Database::DeleteBucket(const Entity::S3::Bucket &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_bucket");
 
         if (HasDatabase()) {
 
@@ -503,6 +520,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::DeleteAllBuckets() const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_all_buckets");
 
         long deleted = 0;
         if (HasDatabase()) {
@@ -536,6 +554,7 @@ namespace AwsMock::Database {
     }
 
     bool S3Database::ObjectExists(const Entity::S3::Object &object) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         if (HasDatabase()) {
 
@@ -549,6 +568,7 @@ namespace AwsMock::Database {
     }
 
     bool S3Database::ObjectExists(const std::string &region, const std::string &bucket, const std::string &key) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         if (HasDatabase()) {
 
@@ -562,6 +582,7 @@ namespace AwsMock::Database {
     }
 
     bool S3Database::ObjectExists(const std::string &oid) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         if (HasDatabase()) {
 
@@ -575,6 +596,7 @@ namespace AwsMock::Database {
     }
 
     bool S3Database::ObjectExistsInternalName(const std::string &filename) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "object_exists");
 
         if (HasDatabase()) {
 
@@ -594,6 +616,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Object S3Database::CreateObject(Entity::S3::Object &object) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "create_object");
 
         if (HasDatabase()) {
 
@@ -624,6 +647,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Object S3Database::GetObjectById(bsoncxx::oid oid) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object");
 
         try {
             const auto client = ConnectionPool::instance().GetConnection();
@@ -661,6 +685,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Object S3Database::UpdateObject(Entity::S3::Object &object) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "update_object");
 
         if (HasDatabase()) {
 
@@ -695,6 +720,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Object S3Database::GetObject(const std::string &region, const std::string &bucket, const std::string &key) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object");
 
         if (HasDatabase()) {
 
@@ -724,6 +750,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Object S3Database::GetObjectMd5(const std::string &region, const std::string &bucket, const std::string &key, const std::string &md5sum) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object");
 
         if (HasDatabase()) {
 
@@ -753,6 +780,7 @@ namespace AwsMock::Database {
     }
 
     Entity::S3::Object S3Database::GetObjectVersion(const std::string &region, const std::string &bucket, const std::string &key, const std::string &version) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "get_object_version");
 
         try {
 
@@ -778,6 +806,7 @@ namespace AwsMock::Database {
     }
 
     std::vector<Entity::S3::Object> S3Database::ListObjectVersions(const std::string &region, const std::string &bucket, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_object_versions");
 
         if (HasDatabase()) {
             std::vector<Entity::S3::Object> objectList;
@@ -808,6 +837,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::ObjectCount(const std::string &region, const std::string &prefix, const std::string &bucket) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "count_objects");
 
         if (HasDatabase()) {
 
@@ -842,6 +872,7 @@ namespace AwsMock::Database {
     }
 
     std::vector<Entity::S3::Object> S3Database::ListObjects(const std::string &region, const std::string &prefix, const std::string &bucket, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "list_objects");
 
         std::vector<Entity::S3::Object> objectList;
         if (HasDatabase()) {
@@ -890,6 +921,7 @@ namespace AwsMock::Database {
     }
 
     void S3Database::DeleteObject(const Entity::S3::Object &object) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_objects");
 
         if (HasDatabase()) {
 
@@ -917,6 +949,7 @@ namespace AwsMock::Database {
     }
 
     void S3Database::DeleteObjects(const std::string &region, const std::string &bucketName, const std::vector<std::string> &keys) const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_objects");
 
         if (HasDatabase()) {
 
@@ -963,6 +996,7 @@ namespace AwsMock::Database {
     }
 
     long S3Database::DeleteAllObjects() const {
+        Monitoring::MonitoringTimer measure(S3_DATABASE_TIMER, S3_DATABASE_COUNTER, "action", "delete_all_objects");
 
         long deleted = 0;
         if (HasDatabase()) {

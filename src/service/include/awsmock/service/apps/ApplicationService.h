@@ -238,7 +238,7 @@ namespace AwsMock::Service {
          *
          * @param application application entity
          */
-        static void DeleteImage(const Database::Entity::Apps::Application &application);
+        static void CleanupDocker(const Database::Entity::Apps::Application &application);
 
         /**
          * Database connection

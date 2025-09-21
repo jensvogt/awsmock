@@ -68,6 +68,40 @@ namespace AwsMock::Database {
         return parameterList;
     }
 
+    Entity::SSM::ParameterList SSMMemoryDb::ListParameterCounters(const std::string &region, const std::string &prefix, long pageSize, long pageIndex, const std::vector<SortColumn> &sortColumns) {
+        Entity::SSM::ParameterList result;
+
+        // Get values
+        for (auto &val: _parameters | std::views::values) {
+            result.push_back(val);
+        }
+
+        auto q = Core::from(result);
+        q = q.order_by([](const Entity::SSM::Parameter &key1, const Entity::SSM::Parameter &key2) { return key1.oid < key2.oid; });
+
+        for (const auto &[column, sortDirection]: sortColumns) {
+            if (column == "name") {
+                q = q.order_by([](const Entity::SSM::Parameter &key1, const Entity::SSM::Parameter &key2) { return key1.parameterName < key2.parameterName; });
+            }
+        }
+
+        if (!region.empty()) {
+            q.where([region](const Entity::SSM::Parameter &item) { return item.region == region; });
+        }
+        if (!prefix.empty()) {
+            q.where([prefix](const Entity::SSM::Parameter &item) { return Core::StringUtils::StartsWith(item.parameterName, prefix); });
+        }
+        result = q.to_vector();
+
+        // Create page iterators
+        if (pageSize > 0) {
+          auto start = result.begin() + pageIndex * pageSize;
+          auto end = (pageIndex + 1) * pageSize < result.size() ? result.begin() + (pageIndex + 1) * pageSize : result.end();
+          return {start, end};
+        }
+        return result;
+    }
+
     long SSMMemoryDb::CountParameters() const {
 
         return static_cast<long>(_parameters.size());

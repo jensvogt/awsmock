@@ -216,7 +216,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::Container response = response.FromJson(body);
+        Dto::Docker::Container response = Dto::Docker::Container::FromJson(body);
         log_debug << "Container found, name: " << name;
         return response;
     }
@@ -231,7 +231,7 @@ namespace AwsMock::Service {
             return inspectContainerResponse;
         }
 
-        inspectContainerResponse = inspectContainerResponse.FromJson(body);
+        inspectContainerResponse = Dto::Docker::InspectContainerResponse::FromJson(body);
         log_debug << "Container found, containerId: " << containerId;
         return inspectContainerResponse;
     }
@@ -244,7 +244,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response = response.FromJson(body);
+        Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
         if (response.containerList.empty()) {
             log_info << "Docker containers not found";
             return {};
@@ -262,7 +262,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response = response.FromJson(body);
+        Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
         if (response.containerList.empty()) {
             log_info << "Docker container not found, name: " << name << ":" << tag;
             return {};
@@ -280,7 +280,6 @@ namespace AwsMock::Service {
         request.domainName = "awsmock";
         request.tty = false;
         request.image = imageName + ":" + tag;
-        request.networkMode = GetNetworkName();
         request.environment = environment;
         request.containerPort = _containerPort;
         request.hostPort = std::to_string(hostPort);
@@ -291,21 +290,22 @@ namespace AwsMock::Service {
         Dto::Docker::LogConfig logConfig;
         logConfig.type = "json-file";
 
-        Dto::Docker::Port portBindungHostPort;
-        portBindungHostPort.hostPort = hostPort;
-        std::vector<Dto::Docker::Port> portBindungHostPorts;
-        portBindungHostPorts.push_back(portBindungHostPort);
+        Dto::Docker::Port portBindingHostPort;
+        portBindingHostPort.hostPort = hostPort;
+        std::vector<Dto::Docker::Port> portBindingHostPorts;
+        portBindingHostPorts.push_back(portBindingHostPort);
 
         Dto::Docker::HostConfig hostConfig;
+        hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
-        hostConfig.portBindings.portMap[_containerPort + "/tcp"] = portBindungHostPorts;
+        hostConfig.portBindings.portMap[_containerPort + "/tcp"] = portBindingHostPorts;
 
         hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
         hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
         hostConfig.extraHosts.emplace_back("localstack:host-gateway");
 
         request.hostConfig = hostConfig;
-        log_info << "Create container request: " << request.ToJson();
+        log_debug << "Create container request: " << request.ToJson();
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
@@ -313,7 +313,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::CreateContainerResponse response = response.FromJson(body);
+        Dto::Docker::CreateContainerResponse response = Dto::Docker::CreateContainerResponse::FromJson(body);
         response.hostPort = hostPort;
         log_debug << "Docker container created, name: " << imageName << ":" << tag << " id: " << response.id;
         return response;
@@ -323,12 +323,37 @@ namespace AwsMock::Service {
 
         // Create the request
         Dto::Docker::CreateContainerRequest request;
-        request.hostName = instanceName;
+
+        request.hostName = imageName;
+        request.domainName = "awsmock";
+        request.tty = false;
         request.image = imageName + ":" + tag;
-        request.networkMode = GetNetworkName();
-        request.environment = environment;
         request.containerPort = std::to_string(containerPort);
         request.hostPort = std::to_string(hostPort);
+        request.environment = environment;
+
+        Dto::Docker::ExposedPort exposedPorts;
+        request.exposedPorts[std::to_string(containerPort) + "/tcp"] = exposedPorts;
+
+        Dto::Docker::LogConfig logConfig;
+        logConfig.type = "json-file";
+
+        Dto::Docker::Port portBindingHostPort;
+        portBindingHostPort.hostPort = hostPort;
+        std::vector<Dto::Docker::Port> portBindingHostPorts;
+        portBindingHostPorts.push_back(portBindingHostPort);
+
+        Dto::Docker::HostConfig hostConfig;
+        hostConfig.networkMode = GetNetworkName();
+        hostConfig.logConfig = logConfig;
+        hostConfig.portBindings.portMap[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
+
+        hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
+        hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
+        hostConfig.extraHosts.emplace_back("localstack:host-gateway");
+
+        request.hostConfig = hostConfig;
+        log_debug << "Create container request: " << request.ToJson();
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + instanceName, request.ToJson());
         if (statusCode != http::status::created) {
@@ -336,7 +361,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::CreateContainerResponse response = response.FromJson(body);
+        Dto::Docker::CreateContainerResponse response = Dto::Docker::CreateContainerResponse::FromJson(body);
         response.hostPort = hostPort;
         log_debug << "Docker container created, name: " << imageName << ":" << tag << " id: " << response.id;
         return response;
@@ -346,20 +371,44 @@ namespace AwsMock::Service {
 
         // Create the request
         Dto::Docker::CreateContainerRequest request;
-        request.hostName = imageName;
+
+        request.hostName = containerName;
+        request.domainName = "awsmock";
+        request.tty = false;
         request.image = imageName + ":" + tag;
-        request.networkMode = GetNetworkName();
         request.containerPort = std::to_string(containerPort);
         request.hostPort = std::to_string(hostPort);
-        const std::string jsonBody = request.ToJson();
 
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + containerName, jsonBody);
+        Dto::Docker::ExposedPort exposedPorts;
+        request.exposedPorts[std::to_string(containerPort) + "/tcp"] = exposedPorts;
+
+        Dto::Docker::LogConfig logConfig;
+        logConfig.type = "json-file";
+
+        Dto::Docker::Port portBindingHostPort;
+        portBindingHostPort.hostPort = hostPort;
+        std::vector<Dto::Docker::Port> portBindingHostPorts;
+        portBindingHostPorts.push_back(portBindingHostPort);
+
+        Dto::Docker::HostConfig hostConfig;
+        hostConfig.networkMode = GetNetworkName();
+        hostConfig.logConfig = logConfig;
+        hostConfig.portBindings.portMap[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
+
+        hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
+        hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
+        hostConfig.extraHosts.emplace_back("localstack:host-gateway");
+
+        request.hostConfig = hostConfig;
+        log_debug << "Create container request: " << request.ToJson();
+
+        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/create?name=" + containerName, request.ToJson());
         if (statusCode != http::status::created) {
             log_warning << "Create container failed, statusCode: " << statusCode << " body " << body;
             return {};
         }
 
-        Dto::Docker::CreateContainerResponse response = response.FromJson(body);
+        Dto::Docker::CreateContainerResponse response = Dto::Docker::CreateContainerResponse::FromJson(body);
         response.hostPort = hostPort;
         log_debug << "Docker container created, name: " << imageName << ":" << tag;
         return response;
