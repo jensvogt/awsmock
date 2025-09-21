@@ -76,12 +76,12 @@ namespace AwsMock::Core {
 
     std::vector<std::string> HttpUtils::GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
 
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
+        const std::map<std::string, std::string> parameters = GetQueryParameters(uri);
 
         std::vector<std::string> namedParameters;
-        for (const auto &param: r->params()) {
-            if (std::string parameterValue = param.key; !prefix.empty() && parameterValue.starts_with(prefix)) {
-                namedParameters.emplace_back(param.value);
+        for (const auto &[fst, snd]: parameters) {
+            if (const std::string &parameterName = fst; !prefix.empty() && parameterName.starts_with(prefix)) {
+                namedParameters.emplace_back(snd);
             }
         }
         return namedParameters;
@@ -89,21 +89,29 @@ namespace AwsMock::Core {
 
     std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
 
-        std::string localUri = uri;
-        if (!StringUtils::StartsWith(uri, "?")) {
-            localUri = "http://localhost:4566?" + uri;
+        std::map<std::string, std::string> queryParameters;
+        std::string localUri = StringUtils::UrlDecode(uri);
+        if (StringUtils::Contains(uri, "?")) {
+            localUri = localUri.substr(uri.find('?') + 1);
         }
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_uri(localUri);
-        if (!r) {
-            std::cerr << "Invalid URI\n";
+
+        if (!localUri.contains("&") && !localUri.contains("=")) {
+            // Special case: localUri=enabled
+            if (localUri.empty())
+                return {};
+            queryParameters[localUri] = "";
+            return queryParameters;
+        }
+        const std::vector<std::string> stringMap = StringUtils::Split(localUri, '&');
+        if (stringMap.empty()) {
             return {};
         }
-        std::map<std::string, std::string> queryParameters;
-        for (auto qp: r.value().params()) {
-            if (qp.has_value) {
-                queryParameters[qp.key] = qp.value;
+
+        for (const auto &qp: stringMap) {
+            if (auto split = StringUtils::Split(qp, '='); split.size() == 2) {
+                queryParameters[split[0]] = split[1];
             } else {
-                queryParameters[qp.key] = "";
+                queryParameters[split[0]] = "";
             }
         }
         return queryParameters;
@@ -152,7 +160,7 @@ namespace AwsMock::Core {
 
     bool HttpUtils::GetBoolParameter(const std::string &uri, const std::string &name, const bool &def) {
         bool value = def;
-        if (std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
+        if (const std::map<std::string, std::string> parameters = GetQueryParameters(uri); parameters.contains(name)) {
             log_debug << "Query parameter found, name: " << name << " value: " << value;
             value = true;
         }
@@ -160,8 +168,8 @@ namespace AwsMock::Core {
     }
 
     bool HttpUtils::HasQueryParameter(const std::string &uri, const std::string &name) {
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        return r->params().contains(name);
+        const std::map<std::string, std::string> parameters = GetQueryParameters(uri);
+        return parameters.contains(name);
     }
 
     std::string HttpUtils::AddQueryParameter(const std::string &url, const std::string &name, bool value) {

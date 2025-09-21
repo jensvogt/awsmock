@@ -547,6 +547,7 @@ namespace AwsMock::Core {
         unsigned char *hexOut = OPENSSL_hexstr2buf(hex.data(), &len);
         memcpy(out, hexOut, len);
         OPENSSL_free(hexOut);
+        out[len] = '\0';
     }
 
     EVP_PKEY *Crypto::GenerateRsaKeys(const unsigned int keyLength) {
