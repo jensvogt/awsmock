@@ -67,7 +67,7 @@ namespace AwsMock::Database {
     BOOST_FIXTURE_TEST_CASE(TopicGetByArnTest, SNSDatabaseTest) {
 
         // arrange
-        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER};
+        Entity::SNS::Topic topic = {.region = _region, .topicName = TOPIC, .owner = OWNER, .topicArn = TOPIC_ARN};
         topic = _snsDatabase.CreateTopic(topic);
 
         // act

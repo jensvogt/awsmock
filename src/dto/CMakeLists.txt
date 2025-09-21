@@ -37,7 +37,7 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMB
 
 # Test directory
 if (NOT WIN32)
-    #    add_subdirectory(tst)
+    add_subdirectory(btest)
 endif ()
 
 # Includes

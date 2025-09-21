@@ -5,6 +5,11 @@
 #ifndef AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H
 #define AWMOCK_DATABASE_COGNITO_DATABASE_TEST_H
 
+// Boost includes
+#include <boost/test/tools/old/interface.hpp>
+#include <boost/test/unit_test_log.hpp>
+#include <boost/test/unit_test_suite.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TestUtils.h>
@@ -264,7 +269,7 @@ namespace AwsMock::Database {
         userPool.region = _region;
         userPool.userPoolId = USER_POOL_ID;
         userPool.name = USER_POOL_NAME;
-        Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
+        const Entity::Cognito::UserPool createUserPoolResult = _cognitoDatabase.CreateUserPool(userPool);
         Entity::Cognito::User user;
         user.region = _region;
         user.userPoolId = createUserPoolResult.userPoolId;

@@ -42,22 +42,22 @@ namespace AwsMock::Database::Entity::Cognito {
         /**
          * Generate secret flag
          */
-        bool generateSecret;
+        bool generateSecret{};
 
         /**
          * Access token validity
          */
-        long accessTokenValidity;
+        long accessTokenValidity{};
 
         /**
          * ID token validity
          */
-        long idTokenValidity;
+        long idTokenValidity{};
 
         /**
          * Refresh token validity
          */
-        long refreshTokenValidity;
+        long refreshTokenValidity{};
 
         /**
          * Creation date
