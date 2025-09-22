@@ -43,7 +43,7 @@ namespace AwsMock::Service {
         }
 
         // Create the container, if not existing. If existing, get the current port from the docker container
-        const int hostPort = CreateRandomHostPort();
+        const int hostPort = Core::SystemUtils::GetNextFreePort();
         const std::string containerName = lambda.function + "-" + instanceId;
         if (!ContainerService::instance().ContainerExists(containerName)) {
             CreateDockerContainer(lambda, instanceId, hostPort, lambda.dockerTag);
@@ -220,10 +220,6 @@ namespace AwsMock::Service {
         environment.emplace_back("AWS_LAMBDA_FUNCTION_TIMEOUT=" + std::to_string(lambda.timeout));
         log_debug << "lambda runtime environment converted, size: " << environment.size();
         return environment;
-    }
-
-    int LambdaCreator::CreateRandomHostPort() {
-        return Core::SystemUtils::GetNextFreePort();
     }
 
     std::string LambdaCreator::GetDockerTag(const Database::Entity::Lambda::Lambda &lambda) {
