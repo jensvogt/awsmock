@@ -97,7 +97,7 @@ namespace AwsMock::Service {
 
         // Create the container, if not existing. If existing, get the current port from the docker container
         const std::string containerName = lambda.function + "-" + instanceId;
-        CreateDockerContainer(lambda, instanceId, CreateRandomHostPort(), lambda.dockerTag);
+        CreateDockerContainer(lambda, instanceId, Core::SystemUtils::GetNextFreePort(), lambda.dockerTag);
 
         // Get docker container
         Dto::Docker::InspectContainerResponse inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
