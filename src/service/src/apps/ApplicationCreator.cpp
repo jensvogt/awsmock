@@ -38,7 +38,7 @@ namespace AwsMock::Service {
 
         // Create the container, if not existing. If existing, get the current port from the docker container
         if (!ContainerService::instance().ContainerExistsByImageName(applicationEntity.name, applicationEntity.version)) {
-            CreateDockerContainer(applicationEntity, instanceId, CreateRandomHostPort(), applicationEntity.version);
+            CreateDockerContainer(applicationEntity, instanceId, Core::SystemUtils::GetNextFreePort(), applicationEntity.version);
         }
 
         // Get docker container
@@ -158,10 +158,6 @@ namespace AwsMock::Service {
         }
         log_debug << "Application runtime environment converted, size: " << environment.size();
         return environment;
-    }
-
-    int ApplicationCreator::CreateRandomHostPort() {
-        return Core::SystemUtils::GetNextFreePort();
     }
 
     template<typename Out>
