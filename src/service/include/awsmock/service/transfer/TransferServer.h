@@ -188,6 +188,7 @@ namespace AwsMock::Service {
          */
         boost::asio::io_context &_ioc;
     };
+
 }// namespace AwsMock::Service
 
 #endif// AWSMOCK_SERVICE_TRANSFER_SERVER_H
