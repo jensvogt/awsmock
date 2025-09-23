@@ -121,13 +121,6 @@ namespace AwsMock::Service {
         static std::string UnpackZipFile(const std::string &codeDir, const std::string &applicationCode, const std::string &runtime);
 
         /**
-         * @brief Returns a random host port in the range 32768-65536 for the host port of the docker container which is running the application.
-         *
-         * @return random port between 32768 and 65536
-         */
-        static int CreateRandomHostPort();
-
-        /**
          * @brief Returns the docker tag.
          *
          * <p>The method returns the docker tags in that order:

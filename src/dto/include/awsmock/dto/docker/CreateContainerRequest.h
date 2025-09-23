@@ -91,7 +91,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * TTy settings
          */
-        bool tty = true;
+        bool tty = false;
 
         /**
          * Environment

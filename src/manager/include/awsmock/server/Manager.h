@@ -7,11 +7,8 @@
 
 // Boost includes
 #include <boost/interprocess/interprocess_fwd.hpp>
-#include <boost/interprocess/mapped_region.hpp>
-#include <boost/interprocess/shared_memory_object.hpp>
 
 // AwsMock includes
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/apps/ApplicationServer.h>
 #include <awsmock/service/cognito/CognitoServer.h>
 #include <awsmock/service/dynamodb/DynamoDbServer.h>
@@ -31,17 +28,23 @@ namespace AwsMock::Manager {
     /**
      * @brief Main application class for the awsmock manager.
      *
-     * The manager is controlling the different services. Services are activated ib the configuration file or via environment variables. Only the activated
+     * @par
+     * The manager is controlling the different services. Services are activated in the configuration file or via environment variables. Only the activated
      * services are started. The general flow is:
      *   - Process command line parameters
      *   - Read the configuration file and process environment variables
+     *   - Start logging
      *   - Start the database (either MongoDB or in-memory database)
      *   - General initializations
      *   - Start the activated services are background threads
-     *   - Auto load infrastructure BSON init file
+     *   - Auto load infrastructure BSON init files
      *   - Start the API gateway on port 4566 by default (can be changed in the configuration file)
      *   - Start the frontend server on port 4567 by default (can be changed in the configuration file)
      *   - Wait for a termination signal
+     *
+     * @par
+     * Incoming REST request are handles first by the gateway service, which distributed the requests to the different modules. Each request is handled by its
+     * own handler thread. In total, there are 256 handler threads available. The module handlers are calling the different service methods on demand.
      *
      * @author jens.vogt@opitz-consulting.com
      */
@@ -49,6 +52,11 @@ namespace AwsMock::Manager {
 
       public:
 
+        /**
+         * @brief Constructor
+         *
+         * @param ioc boost IO context
+         */
         explicit Manager(boost::asio::io_context &ioc) : _ioc(ioc) {};
 
         /**
@@ -67,12 +75,13 @@ namespace AwsMock::Manager {
         void Stop() const { _ioc.stop(); }
 
         /**
-         * @brief Automatically loading the init file
+         * @brief Automatically loading the init files in the init directory
          *
          * @par
          * If the server contains a file named /home/awsmock/init/init.json, this file will be imported during startup. If a directory
-         * named /home/awsmock/init exists, all files from that directory will be imported. If both exists, the directory gets the
-         * precedence.
+         * named /home/awsmock/init exists, all files from that directory will be imported. If both exist, the directory gets the
+         * precedence. In the case of a directory, all files will be loaded in alphabetic order. So files names 01_xy, 02_xy will be imported
+         * in that order.
          */
         static void AutoLoad();
 
@@ -123,6 +132,9 @@ namespace AwsMock::Manager {
          */
         std::unique_ptr<boost::interprocess::managed_shared_memory> _shm;
 
+        /**
+         * Boost IO context
+         */
         boost::asio::io_context &_ioc;
     };
 

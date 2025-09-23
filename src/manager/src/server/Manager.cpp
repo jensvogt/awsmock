@@ -41,14 +41,21 @@ namespace AwsMock::Manager {
             return;
         }
 
+        // Load by directory has preference over a load by file
         if (const auto autoLoadDir = Core::Configuration::instance().GetValue<std::string>("awsmock.autoload.dir"); Core::DirUtils::DirectoryExists(autoLoadDir) && !Core::DirUtils::DirectoryEmpty(autoLoadDir)) {
-            for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json")) {
+            for (const auto &file: Core::DirUtils::ListFilesByExtension(autoLoadDir, "json", true)) {
                 if (const std::string jsonString = Core::FileUtils::ReadFile(file); !jsonString.empty()) {
+
+                    // Create infrastructure object
                     Dto::Module::Infrastructure infrastructure;
                     infrastructure.FromJson(jsonString);
+
+                    // Create import request
                     Dto::Module::ImportInfrastructureRequest importRequest;
                     importRequest.cleanFirst = false;
                     importRequest.infrastructure = infrastructure;
+
+                    // Import infrastructure
                     Service::ModuleService::ImportInfrastructure(importRequest);
                     log_info << "Loaded infrastructure, filename: " << file;
                 }

@@ -138,7 +138,7 @@ namespace AwsMock::Service {
 
         if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::delete_, "/images/" + id + "?force=true"); statusCode != http::status::ok) {
             log_error << "Delete image failed, statusCode: " << statusCode << ", id: " << id;
-            throw Core::ServiceException("Delete image failed", statusCode);
+            throw Core::ServiceException("Delete image failed, id: " + id, statusCode);
         }
         log_debug << "Image deleted, id: " << id;
     }
@@ -150,17 +150,16 @@ namespace AwsMock::Service {
             log_debug << "Docker container found, name: " << containerName;
             return true;
         }
-        log_warning << "Docker container exists failed, statusCode: " << statusCode;
+        log_warning << "Docker container exists failed, name: " << containerName << ", statusCode: " << statusCode;
         return false;
     }
 
     bool ContainerService::ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const {
 
-        const std::string filters = Core::StringUtils::UrlEncode("{\"ancestor\":[\"" + imageName + ":" + tag + "\"]}");
+        const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + imageName + ":" + tag + "\"]}");
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters);
         if (statusCode == http::status::ok) {
-            const Dto::Docker::ListContainerResponse response = response.FromJson(body);
-            if (response.containerList.empty()) {
+            if (const Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);response.containerList.empty()) {
                 return false;
             }
             log_debug << "Docker container found, name: " << imageName;
@@ -194,7 +193,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response = response.FromJson(body);
+        Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
         if (response.containerList.empty()) {
             log_info << "Docker container not found, id: " << containerId;
             return {};

@@ -55,12 +55,12 @@ namespace AwsMock::Dto::Docker {
     struct LogConfig final : Common::BaseCounter<LogConfig> {
 
         /**
-         * Logging configuration
+         * Logging type
          */
         std::string type = "json-file";
 
         /**
-         * Network mode
+         * Logging configuration
          */
         Config config;
 
