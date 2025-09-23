@@ -100,7 +100,7 @@ namespace AwsMock::Core {
         return fileNames;
     }
 
-    std::vector<std::string> DirUtils::ListFilesByExtension(const std::string &dirName, const std::string &extension, bool sorting) {
+    std::vector<std::string> DirUtils::ListFilesByExtension(const std::string &dirName, const std::string &extension, const bool sorting) {
 
         std::vector<std::string> fileNames;
         for (auto &entry: boost::make_iterator_range(boost::filesystem::directory_iterator(dirName), {})) {
@@ -114,7 +114,7 @@ namespace AwsMock::Core {
         return fileNames;
     }
 
-    std::vector<std::string> DirUtils::ListFilesByPattern(const std::string &dirName, const std::string &pattern, const bool recursive, bool sorting) {
+    std::vector<std::string> DirUtils::ListFilesByPattern(const std::string &dirName, const std::string &pattern, const bool recursive, const bool sorting) {
 
         const std::regex regex(pattern);
         std::vector<std::string> fileNames;
@@ -148,7 +148,7 @@ namespace AwsMock::Core {
     void DirUtils::DeleteFilesInDirectory(const std::string &dirName) {
 
         if (DirectoryExists(dirName)) {
-            for (std::vector<std::string> files = ListFiles(dirName); auto &it: files) {
+            for (const std::vector<std::string> files = ListFiles(dirName); auto &it: files) {
                 boost::filesystem::remove_all(it);
             }
         }

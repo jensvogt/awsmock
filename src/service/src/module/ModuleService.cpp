@@ -2,6 +2,9 @@
 // Created by vogje01 on 06/06/2023.
 //
 
+#include "awsmock/dto/s3/PutObjectRequest.h"
+
+
 #include <awsmock/service/module/ModuleService.h>
 
 namespace AwsMock::Service {
@@ -171,8 +174,15 @@ namespace AwsMock::Service {
             }
             if (!infrastructure.s3Objects.empty()) {
                 for (auto &object: infrastructure.s3Objects) {
+
+                    // Create objects
                     object.modified = system_clock::now();
                     _s3Database->CreateOrUpdateObject(object);
+
+                    // Load local files
+                    if (!object.localName.empty()) {
+                        ImportLocalS3File(object);
+                    }
                 }
                 log_info << "S3 objects imported, count: " << infrastructure.s3Objects.size();
             }
@@ -410,6 +420,17 @@ namespace AwsMock::Service {
             } else if (m == "apigateway") {
                 count += Database::ApiGatewayDatabase::instance().DeleteAllKeys();
             }
+        }
+    }
+
+    void ModuleService::ImportLocalS3File(const Database::Entity::S3::Object &object) {
+        if (Core::FileUtils::FileExists(object.localName)) {
+            const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+            const std::string localFilePath = s3DataDir + "/" + object.internalName;
+            Core::FileUtils::CopyTo(object.localName, localFilePath);
+            log_info << "Local file imported, bucket: " << object.bucket << ", key: " << object.key << ", localName: " << object.localName;
+        } else {
+            log_warning << "S3 local file does not exist, path: " << object.internalName;
         }
     }
 
