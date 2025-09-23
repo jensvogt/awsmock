@@ -27,8 +27,11 @@ namespace AwsMock::Dto::S3 {
         return response;
     }
 
-    GetBucketResponse Mapper::map(const GetBucketRequest &request, Database::Entity::S3::Bucket &bucket) {
+    GetBucketResponse Mapper::map(const GetBucketRequest &request, const Database::Entity::S3::Bucket &bucket) {
         GetBucketResponse response;
+        response.region = request.region;
+        response.user = request.user;
+        response.requestId = request.requestId;
         response.id = bucket.oid;
         response.region = bucket.region;
         response.bucket = bucket.name;

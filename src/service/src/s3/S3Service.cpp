@@ -702,6 +702,7 @@ namespace AwsMock::Service {
             targetObject.sha1sum = sourceObject.sha1sum;
             targetObject.sha256sum = sourceObject.sha256sum;
             targetObject.contentType = sourceObject.contentType;
+            targetObject.localName = sourceObject.localName;
             targetObject.metadata = request.metadata;
             targetObject.internalName = targetFile;
 
@@ -775,6 +776,7 @@ namespace AwsMock::Service {
             targetObject.sha1sum = sourceObject.sha1sum;
             targetObject.sha256sum = sourceObject.sha256sum;
             targetObject.contentType = sourceObject.contentType;
+            targetObject.localName = sourceObject.localName;
             targetObject.metadata = request.metadata;
             targetObject.internalName = targetFile;
 

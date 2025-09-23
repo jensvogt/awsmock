@@ -146,6 +146,16 @@ namespace AwsMock::Service {
       private:
 
         /**
+         * @brief Import a local S3 file
+         *
+         * @par
+         * The local file name should be a absolute path.
+         *
+         * @param object S3 object to import
+         */
+        static void ImportLocalS3File(const Database::Entity::S3::Object &object);
+
+        /**
          * @brief Module database
          */
         Database::ModuleDatabase &_moduleDatabase;

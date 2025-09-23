@@ -26,6 +26,7 @@ namespace AwsMock::Database::Entity::S3 {
                 kvp("contentType", contentType),
                 kvp("metadata", metadataDoc),
                 kvp("internalName", internalName),
+                kvp("localName", localName),
                 kvp("versionId", versionId),
                 kvp("created", bsoncxx::types::b_date(created)),
                 kvp("modified", bsoncxx::types::b_date(modified)));
@@ -34,21 +35,22 @@ namespace AwsMock::Database::Entity::S3 {
     }
 
     void Object::FromDocument(const std::optional<view> &mResult) {
-        oid = Core::Bson::BsonUtils::GetOidValue(mResult.value()["_id"]);
-        region = Core::Bson::BsonUtils::GetStringValue(mResult.value()["region"]);
-        bucket = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucket"]);
-        bucketArn = Core::Bson::BsonUtils::GetStringValue(mResult.value()["bucketArn"]);
-        key = Core::Bson::BsonUtils::GetStringValue(mResult.value()["key"]);
-        owner = Core::Bson::BsonUtils::GetStringValue(mResult.value()["owner"]);
-        size = Core::Bson::BsonUtils::GetLongValue(mResult.value()["size"]);
-        md5sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["md5sum"]);
-        sha1sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sha1sum"]);
-        sha256sum = Core::Bson::BsonUtils::GetStringValue(mResult.value()["sha256sum"]);
-        contentType = Core::Bson::BsonUtils::GetStringValue(mResult.value()["contentType"]);
-        internalName = Core::Bson::BsonUtils::GetStringValue(mResult.value()["internalName"]);
-        versionId = Core::Bson::BsonUtils::GetStringValue(mResult.value()["versionId"]);
-        created = Core::Bson::BsonUtils::GetDateValue(mResult.value()["created"]);
-        modified = Core::Bson::BsonUtils::GetDateValue(mResult.value()["modified"]);
+        oid = Core::Bson::BsonUtils::GetOidValue(mResult, "_id");
+        region = Core::Bson::BsonUtils::GetStringValue(mResult, "region");
+        bucket = Core::Bson::BsonUtils::GetStringValue(mResult, "bucket");
+        bucketArn = Core::Bson::BsonUtils::GetStringValue(mResult, "bucketArn");
+        key = Core::Bson::BsonUtils::GetStringValue(mResult, "key");
+        owner = Core::Bson::BsonUtils::GetStringValue(mResult, "owner");
+        size = Core::Bson::BsonUtils::GetLongValue(mResult, "size");
+        md5sum = Core::Bson::BsonUtils::GetStringValue(mResult, "md5sum");
+        sha1sum = Core::Bson::BsonUtils::GetStringValue(mResult, "sha1sum");
+        sha256sum = Core::Bson::BsonUtils::GetStringValue(mResult, "sha256sum");
+        contentType = Core::Bson::BsonUtils::GetStringValue(mResult, "contentType");
+        internalName = Core::Bson::BsonUtils::GetStringValue(mResult, "internalName");
+        localName = Core::Bson::BsonUtils::GetStringValue(mResult, "localName");
+        versionId = Core::Bson::BsonUtils::GetStringValue(mResult, "versionId");
+        created = Core::Bson::BsonUtils::GetDateValue(mResult, "created");
+        modified = Core::Bson::BsonUtils::GetDateValue(mResult, "modified");
 
         // Get metadata
         if (mResult.value().find("metadata") != mResult.value().end()) {
