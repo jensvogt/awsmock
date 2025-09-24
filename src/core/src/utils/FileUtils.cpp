@@ -155,7 +155,7 @@ namespace AwsMock::Core {
         if (createDir) {
             create_directories(boost::filesystem::path(GetParentPath(targetFileName)));
         }
-        copy_file(boost::filesystem::path(sourceFileName), boost::filesystem::path(targetFileName), boost::filesystem::copy_options::none);
+        copy_file(boost::filesystem::path(sourceFileName), boost::filesystem::path(targetFileName), boost::filesystem::copy_options::overwrite_existing);
     }
 
     long FileUtils::AppendBinaryFiles(const std::string &outFile, const std::string &inDir, const std::vector<std::string> &files) {

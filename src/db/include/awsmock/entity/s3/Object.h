@@ -102,6 +102,11 @@ namespace AwsMock::Database::Entity::S3 {
         std::string versionId;
 
         /**
+         * Object local name for import
+         */
+        std::string localName;
+
+        /**
          * Creation date
          */
         system_clock::time_point created = system_clock::now();

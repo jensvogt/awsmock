@@ -297,7 +297,7 @@ namespace AwsMock::Service {
 
     std::map<std::string, Dto::SNS::MessageAttribute> SNSHandler::GetMessageAttributes(const std::string &payload) {
 
-        const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix("/?" + payload, "MessageAttributes");
+        const int attributeCount = Core::HttpUtils::CountQueryParametersByPrefix(payload, "MessageAttributes");
         log_debug << "Got message attribute count: " << attributeCount;
 
         std::map<std::string, Dto::SNS::MessageAttribute> messageAttributes;
@@ -306,10 +306,12 @@ namespace AwsMock::Service {
             const std::string attributeName = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
             const std::string attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
 
-            Dto::SNS::MessageAttribute attribute;
-            attribute.stringValue = attributeValue;
-            attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString("String");
-            messageAttributes[attributeName] = attribute;
+            if (!attributeName.empty() && !attributeValue.empty()) {
+                Dto::SNS::MessageAttribute attribute;
+                attribute.stringValue = attributeValue;
+                attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString("String");
+                messageAttributes[attributeName] = attribute;
+            }
         }
         log_debug << "Extracted message attribute count: " << messageAttributes.size();
         return messageAttributes;

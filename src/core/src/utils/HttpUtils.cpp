@@ -48,8 +48,8 @@ namespace AwsMock::Core {
     }
 
     int HttpUtils::CountQueryParameters(const std::string &uri) {
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        return static_cast<int>(r->params().size());
+        const std::map<std::string, std::string> parameters = GetQueryParameters(uri);
+        return static_cast<int>(parameters.size());
     }
 
     int HttpUtils::CountQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
@@ -64,23 +64,21 @@ namespace AwsMock::Core {
             return 0;
         }
 
-        boost::system::result<boost::urls::url_view> r = boost::urls::parse_origin_form(uri);
-        int count = 0;
-        for (const auto &param: r->params()) {
-            if (param.key.starts_with(prefix)) {
-                count++;
-            }
-        }
-        return count;
+        return static_cast<int>(GetQueryParametersByPrefix(uri, prefix).size());
     }
 
     std::vector<std::string> HttpUtils::GetQueryParametersByPrefix(const std::string &uri, const std::string &prefix) {
+
+        if (prefix.empty()) {
+            log_error << "Prefix missing";
+            return {};
+        }
 
         const std::map<std::string, std::string> parameters = GetQueryParameters(uri);
 
         std::vector<std::string> namedParameters;
         for (const auto &[fst, snd]: parameters) {
-            if (const std::string &parameterName = fst; !prefix.empty() && parameterName.starts_with(prefix)) {
+            if (fst.starts_with(prefix)) {
                 namedParameters.emplace_back(snd);
             }
         }
