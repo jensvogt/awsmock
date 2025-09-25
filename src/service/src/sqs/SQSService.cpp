@@ -632,12 +632,6 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
             log_trace << "Got message: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
 
-            // Check status
-            if (message.status==Database::Entity::SQS::MessageStatus::INVISIBLE) {
-                log_error << "Cannot set visibility timeout for a in-flight message, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) << ", value: " << request.visibilityTimeout;
-                throw Core::ServiceException("Cannot set visibility timeout for a in-flight message, queue: " + Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) + ", value: " + std::to_string(request.visibilityTimeout));
-            }
-
             long visibilityTimeout = request.visibilityTimeout;
             if (visibilityTimeout < 10) {
                 visibilityTimeout = 30;
