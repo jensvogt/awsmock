@@ -627,11 +627,6 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
         }
 
-        if (request.visibilityTimeout<0 || request.visibilityTimeout>43200) {
-            log_error << "Invalid visibility timeout, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) << ", value: " << request.visibilityTimeout;
-            throw Core::ServiceException("Invalid visibility timeout, queue: " + Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) + ", value: " + std::to_string(request.visibilityTimeout));
-        }
-
         try {
             // Get the message
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
@@ -643,9 +638,17 @@ namespace AwsMock::Service {
                 throw Core::ServiceException("Cannot set visibility timeout for a in-flight message, queue: " + Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) + ", value: " + std::to_string(request.visibilityTimeout));
             }
 
+            long visibilityTimeout = request.visibilityTimeout;
+            if (visibilityTimeout < 10) {
+                visibilityTimeout = 30;
+            }
+            if (request.visibilityTimeout > 43200) {
+                visibilityTimeout = 43200;
+            }
+
             // Set as attribute
-            message.attributes["VisibilityTimeout"] = std::to_string(request.visibilityTimeout);
-            message.reset = system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
+            message.attributes["VisibilityTimeout"] = std::to_string(visibilityTimeout);
+            message.reset = system_clock::now() + std::chrono::seconds(visibilityTimeout);
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
