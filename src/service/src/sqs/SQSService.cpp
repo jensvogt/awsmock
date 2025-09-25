@@ -640,14 +640,6 @@ namespace AwsMock::Service {
                 visibilityTimeout = 43200;
             }
 
-            long visibilityTimeout = request.visibilityTimeout;
-            if (visibilityTimeout < 10) {
-                visibilityTimeout = 30;
-            }
-            if (request.visibilityTimeout > 43200) {
-                visibilityTimeout = 43200;
-            }
-
             // Set as attribute
             message.attributes["VisibilityTimeout"] = std::to_string(visibilityTimeout);
             message.reset = system_clock::now() + std::chrono::seconds(visibilityTimeout);
