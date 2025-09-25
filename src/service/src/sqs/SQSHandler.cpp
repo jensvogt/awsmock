@@ -192,7 +192,7 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::CHANGE_MESSAGE_VISIBILITY: {
 
                     Dto::SQS::ChangeMessageVisibilityRequest sqsRequest = Dto::SQS::ChangeMessageVisibilityRequest::FromJson(clientCommand);
-                    _sqsService.SetVisibilityTimeout(sqsRequest);
+                    _sqsService.SetMessageVisibilityTimeout(sqsRequest);
                     log_info << "Change visibility, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " timeout: " << sqsRequest.visibilityTimeout;
                     return SendOkResponse(request);
                 }

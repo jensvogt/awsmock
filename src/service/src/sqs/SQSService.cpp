@@ -617,8 +617,8 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
-        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "set_visibility_timeout");
+    void SQSService::SetMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "set_message_visibility_timeout");
         log_trace << "Change message visibilityTimeout request, queue: " << request.queueUrl;
 
         // Check existence
@@ -627,10 +627,21 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Message does not exist, receiptHandle: " + request.receiptHandle);
         }
 
+        if (request.visibilityTimeout<0 || request.visibilityTimeout>43200) {
+            log_error << "Invalid visibility timeout, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) << ", value: " << request.visibilityTimeout;
+            throw Core::ServiceException("Invalid visibility timeout, queue: " + Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) + ", value: " + std::to_string(request.visibilityTimeout));
+        }
+
         try {
             // Get the message
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
             log_trace << "Got message: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
+
+            // Check status
+            if (message.status==Database::Entity::SQS::MessageStatus::INVISIBLE) {
+                log_error << "Cannot set visibility timeout for a in-flight message, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) << ", value: " << request.visibilityTimeout;
+                throw Core::ServiceException("Cannot set visibility timeout for a in-flight message, queue: " + Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) + ", value: " + std::to_string(request.visibilityTimeout));
+            }
 
             // Set as attribute
             message.attributes["VisibilityTimeout"] = std::to_string(request.visibilityTimeout);
@@ -638,7 +649,7 @@ namespace AwsMock::Service {
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
-            log_trace << "Message updated: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
+            log_trace << "Message updated, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) << ", receiptHandle: " << message.receiptHandle;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
