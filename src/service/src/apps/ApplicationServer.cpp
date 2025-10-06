@@ -138,8 +138,7 @@ namespace AwsMock::Service {
     void ApplicationServer::WatchdogApplications() const {
         for (auto &application: _applicationDatabase.ListApplications()) {
 
-            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
-            if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id);response.status == http::status::ok) {
+            if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.containerId); response.status == http::status::ok) {
 
                 if (application.enabled) {
 
@@ -167,6 +166,7 @@ namespace AwsMock::Service {
                         log_info << "Application stopped , name: " << application.name;
                     }
                 }
+
             } else {
                 log_error << "Could not get the status of the container, name: " << application.containerName;
             }
