@@ -154,7 +154,7 @@ namespace AwsMock::Service {
 
                     if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
                         ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
-                        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING;
+                        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
                         log_info << "Application started , name: " << application.name;
                     }
                     application = _applicationDatabase.UpdateApplication(application);
