@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
             ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
-            log_info << "Application docker container started, function: " << applicationEntity.name << ", containerId: " << inspectContainerResponse.id;
+            log_info << "Application docker container started, function: " << applicationEntity.name << ", containerId: " << Core::StringUtils::Continuation(inspectContainerResponse.id, 16);
         }
 
         // Get the public port

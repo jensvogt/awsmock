@@ -280,6 +280,15 @@ namespace AwsMock::Core {
         static void Replace(std::string &target, const std::string &pattern, const std::string &replacement);
 
         /**
+         * @brief Returns a stripped string with continuation chars (...)
+         *
+         * @param input original string
+         * @param length maximal length
+         * @return shorten string with continuation characters
+         */
+        static std::string Continuation(const std::string &input, int length);
+
+        /**
          * @brief Left trim a string.
          *
          * @param s input string

@@ -227,6 +227,10 @@ namespace AwsMock::Core {
         boost::replace_all(target, pattern, replacement);
     }
 
+    std::string StringUtils::Continuation(const std::string &input, const int length) {
+        return input.substr(0, length) + "...";
+    }
+
     std::string StringUtils::UrlDecode(const std::string &input) {
         return boost::to_string(boost::urls::decode_view(input));
     }
