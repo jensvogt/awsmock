@@ -81,6 +81,12 @@ namespace AwsMock::Service {
          * @brief Restart all application during startup.
          */
         void RestartApplications() const;
+
+        /**
+         * @brief Check application status
+         */
+        void WatchdogApplications() const;
+
         /**
          * @brief Metric service
          */
@@ -122,7 +128,12 @@ namespace AwsMock::Service {
         /**
          * Monitoring period
          */
-        int _monitoringPeriod;
+        int _monitoringPeriod = 300;
+
+        /**
+         * Application watchdoc period
+         */
+        int _watchdogPeriod = 300;
 
         /**
          * Asynchronous task scheduler
@@ -142,4 +153,4 @@ namespace AwsMock::Service {
 
 }// namespace AwsMock::Service
 
-#endif// AWSMOCK_SERVICE_COGNITO_SERVER_H
+#endif// AWSMOCK_SERVICE_APPLICATION_SERVER_H

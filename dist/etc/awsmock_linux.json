@@ -240,7 +240,8 @@
           "cron": "0 0 0 * * ?",
           "count": 5
         },
-        "monitoring-period": 300
+        "monitoring-period": 300,
+        "watchdog-period": 300
       }
     },
     "docker": {

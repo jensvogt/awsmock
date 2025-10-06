@@ -306,7 +306,7 @@ namespace AwsMock::Core {
         // Save file name
         _filename = filename;
 
-        // Parse YAML file
+        // Parse JSON file
         read_json(_filename, _treeConfiguration);
 
         // Reapply environment settings

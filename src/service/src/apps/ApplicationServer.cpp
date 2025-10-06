@@ -10,6 +10,7 @@ namespace AwsMock::Service {
 
         // Get HTTP configuration values
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.monitoring-period");
+        _watchdogPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.watchdog-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.backup.cron");
 
@@ -28,6 +29,7 @@ namespace AwsMock::Service {
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
+        _scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
@@ -57,14 +59,14 @@ namespace AwsMock::Service {
 
             if (!application.containerId.empty() && ContainerService::instance().ContainerExists(application.containerId)) {
                 const Dto::Docker::ContainerStat containerStat = ContainerService::instance().GetContainerStats(application.containerId);
-                const auto cpuDelta = (double) (containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
-                const auto systemCpuDelta = (double) (containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
-                const auto numberCpus = (double) containerStat.cpuStats.onlineCpus;
+                const auto cpuDelta = static_cast<double>(containerStat.cpuStats.cpuUsage.total - containerStat.preCpuStats.cpuUsage.total);
+                const auto systemCpuDelta = static_cast<double>(containerStat.cpuStats.cpuUsage.system - containerStat.preCpuStats.cpuUsage.system);
+                const auto numberCpus = static_cast<double>(containerStat.cpuStats.onlineCpus);
                 if (const auto cpuPercentages = cpuDelta / systemCpuDelta / numberCpus * 100; std::isfinite(cpuPercentages) && cpuPercentages >= 0 && cpuPercentages <= 100) {
                     _metricService.SetGauge(APPLICATION_CPU_USAGE, "application", application.name, cpuPercentages);
                 }
-                const auto usedMemory = (double) (containerStat.memoryStats.usage - containerStat.memoryStats.stats.cache);
-                const auto totalMemory = (double) containerStat.memoryStats.limit;
+                const auto usedMemory = static_cast<double>(containerStat.memoryStats.usage - containerStat.memoryStats.stats.cache);
+                const auto totalMemory = static_cast<double>(containerStat.memoryStats.limit);
                 if (const double memoryPercentages = usedMemory / totalMemory * 100; std::isfinite(memoryPercentages) && memoryPercentages >= 0 && memoryPercentages <= 100) {
                     _metricService.SetGauge(APPLICATION_MEMORY_USAGE, "application", application.name, memoryPercentages);
                 }
@@ -131,6 +133,44 @@ namespace AwsMock::Service {
     void ApplicationServer::RestartApplications() const {
         const long restarted = _applicationService.RestartAllApplications();
         log_info << "Applications restarted, count: " << restarted;
+    }
+
+    void ApplicationServer::WatchdogApplications() const {
+        for (auto &application: _applicationDatabase.ListApplications()) {
+
+            if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.containerId); response.status == http::status::ok) {
+
+                if (application.enabled) {
+
+                    application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                    application.containerId = response.id;
+                    application.containerName = Core::StringUtils::StartsWith(response.name, "/") ? response.name.substr(1) : response.name;
+                    application.imageId = response.image;
+                    application.imageSize = response.sizeRootFs;
+                    application.publicPort = response.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
+                    application.privatePort = response.hostConfig.portBindings.GetFirstPrivatePort(std::to_string(application.publicPort));
+                    log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
+
+                    if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
+                        ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
+                        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
+                        log_info << "Application started , name: " << application.name;
+                    }
+                    application = _applicationDatabase.UpdateApplication(application);
+
+                } else {
+
+                    if (application.status == Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
+                        ContainerService::instance().StopContainer(application.containerName);
+                        application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                        log_info << "Application stopped , name: " << application.name;
+                    }
+                }
+
+            } else {
+                log_error << "Could not get the status of the container, name: " << application.containerName << ", containerId: " << Core::StringUtils::Continuation(application.containerId, 16);
+            }
+        }
     }
 
     void ApplicationServer::Shutdown() {

@@ -267,7 +267,7 @@ namespace AwsMock::Service {
          * @param request set visibility timeout request
          * @throws ServiceException
          */
-        void SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const;
+        void SetMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const;
 
         /**
          * @brief Sets tags for a queue.

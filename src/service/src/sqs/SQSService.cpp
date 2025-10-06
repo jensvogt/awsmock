@@ -617,8 +617,8 @@ namespace AwsMock::Service {
         }
     }
 
-    void SQSService::SetVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
-        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "set_visibility_timeout");
+    void SQSService::SetMessageVisibilityTimeout(const Dto::SQS::ChangeMessageVisibilityRequest &request) const {
+        Monitoring::MonitoringTimer measure(SQS_SERVICE_TIMER, SQS_SERVICE_COUNTER, "action", "set_message_visibility_timeout");
         log_trace << "Change message visibilityTimeout request, queue: " << request.queueUrl;
 
         // Check existence
@@ -632,13 +632,21 @@ namespace AwsMock::Service {
             Database::Entity::SQS::Message message = _sqsDatabase.GetMessageByReceiptHandle(request.receiptHandle);
             log_trace << "Got message: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
 
+            long visibilityTimeout = request.visibilityTimeout;
+            if (visibilityTimeout < 10) {
+                visibilityTimeout = 30;
+            }
+            if (request.visibilityTimeout > 43200) {
+                visibilityTimeout = 43200;
+            }
+
             // Set as attribute
-            message.attributes["VisibilityTimeout"] = std::to_string(request.visibilityTimeout);
-            message.reset = system_clock::now() + std::chrono::seconds(request.visibilityTimeout);
+            message.attributes["VisibilityTimeout"] = std::to_string(visibilityTimeout);
+            message.reset = system_clock::now() + std::chrono::seconds(visibilityTimeout);
 
             // Update database
             message = _sqsDatabase.UpdateMessage(message);
-            log_trace << "Message updated: " << Core::Bson::BsonUtils::ToJsonString(message.ToDocument());
+            log_trace << "Message updated, queue: " << Core::AwsUtils::ConvertSQSQueueUrlToName(request.queueUrl) << ", receiptHandle: " << message.receiptHandle;
 
         } catch (Core::DatabaseException &ex) {
             log_error << ex.message();
