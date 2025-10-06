@@ -44,6 +44,16 @@ namespace AwsMock::Dto::Docker {
             return -1;
         }
 
+        /**
+         * @brief Returns the first private port for a given public port.
+         *
+         * @param publicPort public port
+         * @return private port
+         */
+        int GetFirstPrivatePort(const std::string &publicPort) {
+            return portMap[publicPort][0].hostPort;
+        }
+
       private:
 
         friend PortBinding tag_invoke(boost::json::value_to_tag<PortBinding>, boost::json::value const &v) {
