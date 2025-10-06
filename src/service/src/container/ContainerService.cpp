@@ -226,7 +226,7 @@ namespace AwsMock::Service {
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         inspectContainerResponse.status = statusCode;
         if (statusCode != http::status::ok) {
-            log_warning << "Inspect container failed, state: " << statusCode << ", containerId: " << containerId;
+            log_warning << "Inspect container failed, state: " << statusCode << ", containerId: " << Core::StringUtils::Continuation(containerId, 16);
             return inspectContainerResponse;
         }
 

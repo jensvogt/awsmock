@@ -168,7 +168,7 @@ namespace AwsMock::Service {
                 }
 
             } else {
-                log_error << "Could not get the status of the container, name: " << application.containerName;
+                log_error << "Could not get the status of the container, name: " << application.containerName << ", containerId: " << Core::StringUtils::Continuation(application.containerId, 16);
             }
         }
     }
