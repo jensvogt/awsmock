@@ -1,0 +1,12 @@
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/Application.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/config/AwsConfig.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/exception/FilesNotReadyException.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/exception/ProcessException.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/function/FileCopyFunction.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/protokollierung/ProcessingProtocol.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/protokollierung/ProtocolMessage.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/protokollierung/ProtokollierungService.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/service/FileCopyProcessor.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/service/FileCopyValidator.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/service/MixFileCopyProcessor.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-copy-lambda/src/main/java/de/awsmock/lambda/filecopy/service/S3FileCopyExecutor.java

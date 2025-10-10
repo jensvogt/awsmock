@@ -1,0 +1,9 @@
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/Application.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/config/AwsConfig.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/dto/FileProcessingDto.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/exception/FilesNotReadyException.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/exception/ProcessException.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/function/FileDistributionFunction.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/protokollierung/ProcessingProtocol.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/protokollierung/ProtocolMessage.java
+/home/vogje01/work/awsmock/dist/samples/docker/java/file-distribution-lambda/src/main/java/de/awsmock/lambda/filedistribution/protokollierung/ProtokollierungService.java

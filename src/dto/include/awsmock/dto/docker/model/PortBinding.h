@@ -12,6 +12,7 @@
 #include <awsmock/dto/docker/model/Port.h>
 
 namespace AwsMock::Dto::Docker {
+
     /**
      * @brief Docker port binding object
      *

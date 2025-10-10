@@ -1,0 +1,9 @@
+logging:
+  level:
+    root: INFO
+    de.awsmock.lambda.filecopy: DEBUG
+
+aws:
+  sns-protocolizing-topic-arn: arn:aws:sns:eu-central-1:000000000000:protocolizing-topic
+  s3-destination-bucket: file-delivery
+  localstack-endpoint: http://pim-awsmock:4566

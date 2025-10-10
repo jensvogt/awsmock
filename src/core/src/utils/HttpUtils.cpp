@@ -389,9 +389,10 @@ namespace AwsMock::Core {
                 // add more as needed
         };
 
-        if (const auto it = lookup.find(status); it != lookup.end())
+        if (const auto it = lookup.find(status); it != lookup.end()) {
             return it->second;
-        throw std::invalid_argument("Unknown HTTP status string: " + status);
+        }
+        return http::status::unknown;
     }
 
     http::response<http::dynamic_body> HttpUtils::Ok(const http::request<http::dynamic_body> &request) {
