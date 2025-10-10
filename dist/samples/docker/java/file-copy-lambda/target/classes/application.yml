@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ${SERVICE_NAME:file-copy-lambda}
+  main:
+    banner-mode: off
+
+aws:
+  sns-protocolizing-topic-arn: notused
+  s3-destination-bucket: notused
+  localstack-endpoint: notused

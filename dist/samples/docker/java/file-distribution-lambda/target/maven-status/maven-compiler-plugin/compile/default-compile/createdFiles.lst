@@ -1,0 +1,14 @@
+de/awsmock/lambda/filedistribution/protokollierung/ProcessingProtocol$ProcessingStep.class
+de/awsmock/lambda/filedistribution/dto/FileProcessingDto$FileProcessingDtoBuilder.class
+de/awsmock/lambda/filedistribution/protokollierung/ProtocolMessage.class
+de/awsmock/lambda/filedistribution/protokollierung/ProcessingProtocol$ProcessingProtocolBuilder.class
+de/awsmock/lambda/filedistribution/protokollierung/ProcessingProtocol$ProcessingStatus.class
+de/awsmock/lambda/filedistribution/dto/FileProcessingDto.class
+de/awsmock/lambda/filedistribution/exception/FilesNotReadyException.class
+de/awsmock/lambda/filedistribution/function/FileDistributionFunction.class
+de/awsmock/lambda/filedistribution/protokollierung/ProcessingProtocol.class
+de/awsmock/lambda/filedistribution/exception/ProcessException.class
+de/awsmock/lambda/filedistribution/config/AwsConfig.class
+de/awsmock/lambda/filedistribution/protokollierung/ProtokollierungService$ProtokollierungException.class
+de/awsmock/lambda/filedistribution/protokollierung/ProtokollierungService.class
+de/awsmock/lambda/filedistribution/Application.class
