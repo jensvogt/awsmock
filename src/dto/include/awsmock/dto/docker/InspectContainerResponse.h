@@ -75,6 +75,7 @@ namespace AwsMock::Dto::Docker {
             r.path = Core::Json::GetStringValue(v, "Path");
             r.image = Core::Json::GetStringValue(v, "Image");
             r.state = boost::json::value_to<State>(v.at("State"));
+            r.status = Core::HttpUtils::StatusCodeFromString(Core::Json::GetStringValue(v, "Status"));
             r.hostConfig = boost::json::value_to<HostConfig>(v.at("HostConfig"));
             r.sizeRw = Core::Json::GetLongValue(v, "SizeRw");
             r.sizeRootFs = Core::Json::GetLongValue(v, "SizeRootFs");
@@ -88,6 +89,7 @@ namespace AwsMock::Dto::Docker {
                     {"Path", obj.path},
                     {"Image", obj.image},
                     {"State", boost::json::value_from(obj.state)},
+                    {"Status", Core::HttpUtils::StatusCodeToString(obj.status)},
                     {"HostConfig", boost::json::value_from(obj.hostConfig)},
                     {"SizeRw", obj.sizeRw},
                     {"SizeRootFs", obj.sizeRootFs},

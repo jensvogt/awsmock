@@ -39,9 +39,6 @@ namespace AwsMock::Service {
         // Start the application
         StartApplicationLogServer();
 
-        // Start the application
-        //StartApplications();
-
         // Set running
         SetRunning();
         log_debug << "Application server started";
@@ -76,7 +73,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::UpdateApplications() const {
-        for (auto &application: _applicationDatabase.ListApplications()) {
+        /*for (auto &application: _applicationDatabase.ListApplications()) {
             if (application.enabled) {
                 Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
                 if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id); response.status == http::status::ok) {
@@ -89,7 +86,7 @@ namespace AwsMock::Service {
                     log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
                 }
             }
-        }
+        }*/
     }
 
     void ApplicationServer::StartApplications() const {
@@ -138,6 +135,15 @@ namespace AwsMock::Service {
     void ApplicationServer::WatchdogApplications() const {
         for (auto &application: _applicationDatabase.ListApplications()) {
 
+            if (application.containerId.empty() && application.enabled) {
+                ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
+                ContainerService::instance().WaitForContainer(application.containerId);
+                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
+                log_info << "Application started , name: " << application.name;
+            } else {
+                continue;
+            }
+
             if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.containerId); response.status == http::status::ok) {
 
                 if (application.enabled) {
@@ -148,7 +154,7 @@ namespace AwsMock::Service {
                     application.imageId = response.image;
                     application.imageSize = response.sizeRootFs;
                     application.publicPort = response.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
-                    application.privatePort = response.hostConfig.portBindings.GetFirstPrivatePort(std::to_string(application.publicPort));
+                    //application.privatePort = response.hostConfig.portBindings.GetFirstPrivatePort(std::to_string(application.publicPort));
                     log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
 
                     if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
@@ -167,8 +173,10 @@ namespace AwsMock::Service {
                     }
                 }
 
-            } else {
-                log_error << "Could not get the status of the container, name: " << application.containerName << ", containerId: " << Core::StringUtils::Continuation(application.containerId, 16);
+            } else if (application.enabled) {
+                ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
+                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
+                log_info << "Application started , name: " << application.name;
             }
         }
     }
