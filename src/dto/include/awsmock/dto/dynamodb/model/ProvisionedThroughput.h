@@ -28,12 +28,12 @@ namespace AwsMock::Dto::DynamoDb {
         /**
          * Read capacity units
          */
-        long readCapacityUnits = 1;
+        long readCapacityUnits{};
 
         /**
          * Write capacity units
          */
-        long writeCapacityUnits = 1;
+        long writeCapacityUnits{};
 
         /**
          * Last decrease time
@@ -46,7 +46,7 @@ namespace AwsMock::Dto::DynamoDb {
         system_clock::time_point lastIncreaseDateTime = system_clock::now();
 
         /**
-         * NUmber of decreases
+         * Number of decreases
          */
         long numberOfDecreasesToday = 0;
 

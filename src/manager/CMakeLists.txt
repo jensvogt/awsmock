@@ -1,6 +1,7 @@
 set(BINARY awsmockmgr)
 
-set(SOURCES src/server/Manager.cpp src/server/Monitoring.cpp src/main.cpp)
+set(SOURCES src/server/Manager.cpp src/server/Monitoring.cpp src/WindowsService.cpp src/main.cpp
+        include/awsmock/WindowsService.h)
 
 if (WIN32)
     add_executable(${BINARY} WIN32 ${SOURCES})

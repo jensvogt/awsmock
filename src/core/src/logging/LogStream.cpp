@@ -126,6 +126,7 @@ namespace AwsMock::Core {
         console_sink = boost::log::add_console_log(std::cout);
         console_sink->set_formatter(&LogColorFormatter);
         console_sink->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
+        console_sink->locked_backend()->auto_flush(true);
         if (!Configuration::instance().GetValue<bool>("awsmock.logging.console-active")) {
             RemoveConsoleLogs();
         }
