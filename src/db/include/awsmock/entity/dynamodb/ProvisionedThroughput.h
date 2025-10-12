@@ -25,12 +25,12 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Read capacity units
          */
-        long readCapacityUnits = 0;
+        long readCapacityUnits{};
 
         /**
          * Write capacity units
          */
-        long writeCapacityUnits = 0;
+        long writeCapacityUnits{};
 
         /**
          * Last decrease time
@@ -45,7 +45,7 @@ namespace AwsMock::Database::Entity::DynamoDb {
         /**
          * Number of decreases
          */
-        long numberOfDecreasesToday = 0;
+        long numberOfDecreasesToday{};
 
         /**
          * @brief Convert to a BSON document
