@@ -136,6 +136,11 @@ namespace AwsMock::Service {
         int _watchdogPeriod = 300;
 
         /**
+         * Application log server startup
+         */
+        bool _logServer;
+
+        /**
          * Asynchronous task scheduler
          */
         Core::Scheduler &_scheduler;

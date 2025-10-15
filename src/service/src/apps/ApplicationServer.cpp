@@ -13,6 +13,7 @@ namespace AwsMock::Service {
         _watchdogPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.watchdog-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.backup.cron");
+        _logServer = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.log-server");
 
         // Check module active
         if (!IsActive("application")) {
@@ -36,8 +37,10 @@ namespace AwsMock::Service {
             scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
         }
 
-        // Start the application
-        StartApplicationLogServer();
+        // Start the application log server (websocket)
+        if (_logServer) {
+            StartApplicationLogServer();
+        }
 
         // Set running
         SetRunning();

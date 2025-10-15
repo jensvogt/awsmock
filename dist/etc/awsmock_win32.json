@@ -237,7 +237,8 @@
           "count": 5
         },
         "monitoring-period": 300,
-        "watchdog-period": 300
+        "watchdog-period": 300,
+        "log-server": false
       }
     },
     "docker": {
