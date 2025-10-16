@@ -27,7 +27,7 @@ namespace AwsMock::Core {
     }
 
     void CronTask::Start() {
-        log_debug << "Start CronTask '" << _name << "'";
+        log_debug << "Starting CronTask '" << _name << "'";
 
         _next = CronUtils::GetNextExecutionTimeSeconds(_cronExpression);
         _timer.expires_from_now(boost::posix_time::seconds(_next));
