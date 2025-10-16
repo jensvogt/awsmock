@@ -281,7 +281,7 @@ namespace AwsMock::Service {
 
         // Get container id, if already running
         if (application.containerName.empty()) {
-            if (Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version); !container.id.empty()) {
+            if (const Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version); !container.id.empty()) {
                 std::string containerName = container.names.front();
                 containerName = Core::StringUtils::StartsWith(containerName, "/") ? containerName.substr(1) : containerName;
                 application.containerId = container.id;

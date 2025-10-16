@@ -13,6 +13,8 @@ namespace AwsMock::Service {
         _watchdogPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.watchdog-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.backup.cron");
+        _logServer = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.log-server");
+        _logServerPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.log-server-port");
 
         // Check module active
         if (!IsActive("application")) {
@@ -29,15 +31,17 @@ namespace AwsMock::Service {
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
+        //_scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
+            scheduler.AddTask("application-backup", [this] { this->BackupApplication(); }, _backupCron);
         }
 
-        // Start the application
-        StartApplicationLogServer();
+        // Start the application log server (websocket)
+        if (_logServer) {
+            StartApplicationLogServer();
+        }
 
         // Set running
         SetRunning();
@@ -73,7 +77,7 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::UpdateApplications() const {
-        /*for (auto &application: _applicationDatabase.ListApplications()) {
+        for (auto &application: _applicationDatabase.ListApplications()) {
             if (application.enabled) {
                 Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
                 if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(container.id); response.status == http::status::ok) {
@@ -86,7 +90,7 @@ namespace AwsMock::Service {
                     log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
                 }
             }
-        }*/
+        }
     }
 
     void ApplicationServer::StartApplications() const {
@@ -101,10 +105,10 @@ namespace AwsMock::Service {
         }
     }
 
-    void ApplicationServer::StartApplicationLogServer() {
+    void ApplicationServer::StartApplicationLogServer() const {
         log_info << "Starting application log server";
         ApplicationLogServer applicationLogServer;
-        boost::thread t(boost::ref(applicationLogServer), "0.0.0.0", 4568);
+        boost::thread t(boost::ref(applicationLogServer), "0.0.0.0", _logServerPort);
         t.detach();
         log_info << "Application log server started";
     }

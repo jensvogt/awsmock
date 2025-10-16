@@ -58,7 +58,7 @@ namespace AwsMock::Service {
         /**
          * @brief Backup the application objects
          */
-        static void BackupApplication();
+        void BackupApplication();
 
         /**
          * @brief Start all enabled applications
@@ -68,7 +68,7 @@ namespace AwsMock::Service {
         /**
          * @brief Start an application log server
          */
-        static void StartApplicationLogServer();
+        void StartApplicationLogServer()const;
 
         /**
          * @brief Recursively start applications and dependencies.
@@ -134,6 +134,16 @@ namespace AwsMock::Service {
          * Application watchdoc period
          */
         int _watchdogPeriod = 300;
+
+        /**
+         * Application log server startup
+         */
+        bool _logServer;
+
+        /**
+         * Application log server port
+         */
+        int _logServerPort;
 
         /**
          * Asynchronous task scheduler

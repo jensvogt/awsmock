@@ -46,107 +46,10 @@
 #define DEFAULT_LOG_PREFIX std::string("awsmock")
 #define DEFAULT_LOG_LEVEL std::string("info")
 #ifdef WIN32
-#define DEFAULT_CONFIG_FILE std::string("C:\\Program Files (x86)\\awsmock\\etc\\awsmock.json")
-#define DEFAULT_SERVICE_PATH std::string("C:\\Program Files (x86)\\awsmock\\bin\\awsmockmgr.exe")
+#include <awsmock/WindowsService.h>
 #else
 #define DEFAULT_CONFIG_FILE "/usr/local/awsmock/etc/awsmock.json"
 #define DEFAULT_LOG_FILE "/usr/local/awsmock/log/awsmock.log"
-#endif
-
-/**
- * @brief Unix foreground application
- */
-class Daemon {
-
-  public:
-
-    /**
-     * @brief Constructor
-     */
-    Daemon() = default;
-
-    /**
-     * Stop callback
-     */
-    void Stop() {
-        frontendThread.interrupt();
-        frontendThread.join();
-        awsMockManager.Stop();
-    }
-
-    /**
-     * @brief Main routine.
-     *
-     * @par
-     * Will never return. except on SIGINT or SIGTERM signals.
-     *
-     * @return
-     */
-    int Run() {
-
-        // Start HTTP frontend server
-        AwsMock::Service::Frontend::FrontendServer server;
-        frontendThread = boost::thread{boost::ref(server)};
-
-        // Start manager
-        awsMockManager.Initialize();
-        awsMockManager.Run();
-
-        return EXIT_SUCCESS;
-    }
-
-  private:
-
-    boost::asio::io_context ioc;
-    boost::thread frontendThread;
-    AwsMock::Manager::Manager awsMockManager{ioc};
-};
-
-#ifdef _WIN32
-
-class WindowsWorker {
-
-  public:
-
-    /**
-     * @brief Constructor that will receive a application context
-     *
-     * @param context Windows application context
-     */
-    explicit WindowsWorker(boost::application::context &context) : context_(context) {}
-
-    /**
-     * @brief Receives the Windows service stop signal.
-     *
-     * @return true when stopping
-     */
-    static bool Stop() {
-        log_info << "Got stop signal, shutting down";
-        worker.Stop();
-        return true;
-    }
-
-    /**
-     * @brief Define the application operator
-     */
-    int operator()() const {
-        return worker.Run();
-    }
-
-  private:
-
-    /**
-     * Static windows worker
-     */
-    static Daemon worker;
-
-    /**
-     * Application context to hold aspects
-     */
-    boost::application::context &context_;
-};
-Daemon WindowsWorker::worker;
-
 #endif
 
 /**
@@ -204,49 +107,23 @@ int main(const int argc, char *argv[]) {
     }
 
 #ifdef WIN32
+    // Install Windows service
     if (vm.contains("install")) {
-        boost::system::error_code ec;
-        boost::application::example::install_windows_service(
-                boost::application::setup_arg(vm["name"].as<std::string>()),
-                boost::application::setup_arg(vm["display"].as<std::string>()),
-                boost::application::setup_arg(vm["description"].as<std::string>()),
-                boost::application::setup_arg(vm["path"].as<std::string>()))
-                .install(ec);
-        if (ec) {
-            std::cerr << "Could not install Windows service, error: " << ec.message() << std::endl;
+        if (vm["name"].as<std::string>().empty()) {
+            std::cerr << "Service name is required" << std::endl;
             return 1;
         }
-        std::cout << "Windows service installed" << std::endl;
+        InstallService(argv[0], vm["name"].as<std::string>(), vm["display"].as<std::string>());
         return 0;
     }
 
-    if (vm.contains("check")) {
-        boost::system::error_code ec;
-        bool exist = boost::application::example::check_windows_service(boost::application::setup_arg(vm["name"].as<std::string>())).exist(ec);
-
-        if (ec) {
-            std::cerr << ec.message() << std::endl;
-            return 1;
-        }
-        if (exist)
-            std::cout << "The service " << vm["name"].as<std::string>() << " is installed!" << std::endl;
-        else
-            std::cout << "The service " << vm["name"].as<std::string>() << " is NOT installed!" << std::endl;
-        return 0;
-    }
-
+    // Uninstall Windows service
     if (vm.contains("uninstall")) {
-        boost::system::error_code ec;
-        boost::application::example::uninstall_windows_service(
-                boost::application::setup_arg(vm["name"].as<std::string>()),
-                boost::application::setup_arg(vm["path"].as<std::string>()))
-                .uninstall(ec);
-
-        if (ec) {
-            std::cerr << "Could not uninstall Windows service, error: " << ec.message() << std::endl;
+        if (vm["name"].as<std::string>().empty()) {
+            std::cerr << "Service name is required" << std::endl;
             return 1;
         }
-        std::cout << "Windows service uninstalled" << std::endl;
+        UninstallService(vm["name"].as<std::string>());
         return 0;
     }
 #endif
@@ -282,46 +159,61 @@ int main(const int argc, char *argv[]) {
 
 #ifdef WIN32
 
-    // Create a context application aspect pool
-    boost::application::context app_context;
-
-    WindowsWorker worker(app_context);
-
-    // add termination handler
-    boost::application::handler<>::callback termination_callback = boost::bind(&WindowsWorker::Stop);
-
-    app_context.insert<boost::application::termination_handler>(boost::make_shared<boost::application::termination_handler_default_behaviour>(termination_callback));
-
-    int result = 0;
-    boost::system::error_code ec;
+    // Run as a foreground process on windows
     if (vm.contains("foreground")) {
 
-        // Run as a foreground process
-        result = boost::application::launch<boost::application::common>(worker, app_context, ec);
-        if (ec) {
-            log_error << "Windows foreground process failed, error: " << ec.message() << ", code: " << ec.value();
-        }
-    } else {
-        // Run as a Windows service
-        result = boost::application::launch<boost::application::server>(worker, app_context, ec);
-        if (ec) {
-            log_error << "Windows service start failed, error: " << ec.message() << ", code: " << ec.value();
-        }
+        // Run the detached frontend server thread
+        boost::thread frontendThread;
+        AwsMock::Service::Frontend::FrontendServer server;
+        frontendThread = boost::thread{boost::ref(server)};
+        frontendThread.detach();
+        log_info << "Frontend server started.";
+
+        // Start manager
+        boost::asio::io_context ioc;
+        AwsMock::Manager::Manager awsMockManager{ioc};
+        awsMockManager.Initialize();
+        log_info << "Backend server started.";
+        awsMockManager.Run();
+
+        return 0;
     }
-    return result;
+
+    // Windows service needs a file logger
+    auto logDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.dir");
+    auto prefix = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.logging.prefix");
+    int size = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-size");
+    int count = AwsMock::Core::Configuration::instance().GetValue<int>("awsmock.logging.file-count");
+    AwsMock::Core::LogStream::AddFile(logDir, prefix, size, count);
+
+    // Windows service table entries
+    constexpr SERVICE_TABLE_ENTRY serviceTable[] = {
+        {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
+        {nullptr, nullptr}};
+
+    // Windows service start
+    if (!StartServiceCtrlDispatcher(serviceTable)) {
+        log_error << "StartServiceCtrlDispatcher failed, error: " << GetLastError();
+        return 1;
+    }
 
 #else
 
-    log_debug << "Starting manager";
+    // Run the detached frontend server thread
+    boost::thread frontendThread;
+    AwsMock::Service::Frontend::FrontendServer server;
+    frontendThread = boost::thread{boost::ref(server)};
+    frontendThread.detach();
+    log_info << "Frontend server started.";
 
-    Daemon worker;
-    return worker.Run();
+    // Start manager
+    boost::asio::io_context ioc;
+    AwsMock::Manager::Manager awsMockManager{ioc};
+    awsMockManager.Initialize();
+    log_info << "Backend server started.";
+    awsMockManager.Run();
 
-#endif
+    #endif
+
+    return 0;
 }
-
-#ifdef _WIN32
-int APIENTRY mainCRTStartup(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    return main(__argc, __argv);
-}
-#endif

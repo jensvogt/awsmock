@@ -201,6 +201,7 @@ namespace AwsMock::Core {
         DefineProperty<std::string>("awsmock.modules.application.backup.cron", "AWSMOCK_MODULES_APPLICATION_BACKUP_CRON", "0 0 0 * * ?");
         DefineProperty<int>("awsmock.modules.application.backup.count", "AWSMOCK_MODULES_APPLICATION_BACKUP_COUNT", 5);
         DefineProperty<int>("awsmock.modules.application.monitoring-period", "AWSMOCK_SERVICE_APPLICATION_MONITORING_PERIOD", 300);
+        DefineProperty<bool>("awsmock.modules.application.log-server", "AWSMOCK_SERVICE_APPLICATION_LOG_SERVER", false);
 #ifdef _WIN32
         DefineProperty<std::string>("awsmock.modules.application.data-dir", "AWSMOCK_MODULES_APPLICATION_DATADIR", "C:/Program Files (x86)/awsmock/data/application");
 #else

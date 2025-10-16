@@ -16,14 +16,14 @@ namespace AwsMock::Core {
 
         if (e != boost::asio::error::operation_aborted) {
 
-            log_debug << "Execute CronTask '" << _name << "'";
+            log_debug << "Execute OneTimeTask '" << _name << "'";
 
             _task();
         }
     }
 
     void OneTimeTask::Start() {
-        log_debug << "Start OneTimeTask '" << _name << "'";
+        log_debug << "Starting OneTimeTask '" << _name << "'";
 
         _timer.expires_from_now(boost::posix_time::seconds(_delay));
         StartWait();
