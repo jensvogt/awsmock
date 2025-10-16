@@ -24,13 +24,14 @@ namespace AwsMock::Service {
         // Run the I/O service on the requested number of threads
         std::vector<std::thread> v;
         v.reserve(threads - 1);
-        for (auto i = threads - 1; i > 0; --i)
+        for (auto i = threads - 1; i > 0; --i){
             v.emplace_back([&_ioc] { _ioc.run(); });
+        }
         _ioc.run();
     }
 
     void ApplicationLogServer::Shutdown() {
-        // _ioc.stop();
+        //_ioc.stop();
     }
 
 }// namespace AwsMock::Service

@@ -31,7 +31,7 @@ namespace AwsMock::Core {
     }
 
     void PeriodicTask::Start() {
-        log_debug << "Start PeriodicTask '" << _name << "'";
+        log_debug << "Starting PeriodicTask '" << _name << "'";
 
         if (_delay > 0) {
             // Wait for the first execution time

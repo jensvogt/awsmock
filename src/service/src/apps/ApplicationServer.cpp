@@ -14,6 +14,7 @@ namespace AwsMock::Service {
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.backup.active");
         _backupCron = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.application.backup.cron");
         _logServer = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.log-server");
+        _logServerPort = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.log-server-port");
 
         // Check module active
         if (!IsActive("application")) {
@@ -34,7 +35,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
+            scheduler.AddTask("application-backup", [this] { this->BackupApplication(); }, _backupCron);
         }
 
         // Start the application log server (websocket)
@@ -104,10 +105,10 @@ namespace AwsMock::Service {
         }
     }
 
-    void ApplicationServer::StartApplicationLogServer() {
+    void ApplicationServer::StartApplicationLogServer() const {
         log_info << "Starting application log server";
         ApplicationLogServer applicationLogServer;
-        boost::thread t(boost::ref(applicationLogServer), "0.0.0.0", 4568);
+        boost::thread t(boost::ref(applicationLogServer), "0.0.0.0", _logServerPort);
         t.detach();
         log_info << "Application log server started";
     }
