@@ -25,7 +25,7 @@ namespace AwsMock::Core {
     void OneTimeTask::Start() {
         log_debug << "Starting OneTimeTask '" << _name << "'";
 
-        _timer.expires_from_now(boost::posix_time::seconds(_delay));
+        _timer.expires_after(std::chrono::seconds(_delay));
         StartWait();
     }
 

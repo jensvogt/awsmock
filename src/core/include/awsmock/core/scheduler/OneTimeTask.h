@@ -75,7 +75,7 @@ namespace AwsMock::Core {
         /**
          * Timer
          */
-        boost::asio::deadline_timer _timer;
+        boost::asio::steady_timer _timer;
 
         /**
          * Task handler

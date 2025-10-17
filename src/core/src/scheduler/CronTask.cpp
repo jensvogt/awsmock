@@ -21,7 +21,7 @@ namespace AwsMock::Core {
             _task();
 
             _next = CronUtils::GetNextExecutionTimeSeconds(_cronExpression);
-            _timer.expires_at(_timer.expires_at() + boost::posix_time::seconds(_next));
+            _timer.expires_after(std::chrono::seconds(_next));
             StartWait();
         }
     }
@@ -30,7 +30,7 @@ namespace AwsMock::Core {
         log_debug << "Starting CronTask '" << _name << "'";
 
         _next = CronUtils::GetNextExecutionTimeSeconds(_cronExpression);
-        _timer.expires_from_now(boost::posix_time::seconds(_next));
+        _timer.expires_after(std::chrono::seconds(_next));
         StartWait();
     }
 

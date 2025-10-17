@@ -38,7 +38,7 @@ namespace AwsMock::Service {
 
         // Create the container, if not existing. If existing, get the current port from the docker container
         if (!ContainerService::instance().ContainerExistsByImageName(applicationEntity.name, applicationEntity.version)) {
-            CreateDockerContainer(applicationEntity, instanceId, Core::SystemUtils::GetNextFreePort(), applicationEntity.version);
+            CreateDockerContainer(applicationEntity, instanceId, applicationEntity.version);
         }
 
         // Get docker container
@@ -97,14 +97,16 @@ namespace AwsMock::Service {
         log_info << "Docker image created, name: " << applicationEntity.name << " size: " << applicationEntity.imageSize;
     }
 
-    void ApplicationCreator::CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
-        log_info << "Creating docker container, application: " << applicationEntity.name << " hostPort: " << hostPort << " dockerTag: " << dockerTag;
+    void ApplicationCreator::CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const std::string &dockerTag) {
+        log_info << "Creating docker container, application: " << applicationEntity.name << " hostPort: " << applicationEntity.publicPort << " dockerTag: " << dockerTag;
         try {
 
             const std::string containerName = applicationEntity.name + "-" + instanceId;
             const std::vector<std::string> environment = GetEnvironment(applicationEntity);
-            const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(applicationEntity.name, containerName, dockerTag, environment, hostPort, applicationEntity.privatePort);
-            log_debug << "Application container created, hostPort: " << hostPort << " containerId: " << containerCreateResponse.id;
+            const int publicPort = applicationEntity.publicPort < 0 ? Core::SystemUtils::GetNextFreePort() : applicationEntity.publicPort;
+            const int privatePort = applicationEntity.privatePort;
+            const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(applicationEntity.name, containerName, dockerTag, environment, publicPort, privatePort);
+            log_debug << "Application container created, publicPort: " << publicPort << " containerId: " << containerCreateResponse.id;
 
         } catch (std::exception &exc) {
             log_error << exc.what();

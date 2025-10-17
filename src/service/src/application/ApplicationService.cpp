@@ -130,11 +130,13 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "upload_application_code");
         log_debug << "Upload application code request, name: " << request.applicationName;
 
+        // Check existence
         if (!_database.ApplicationExists(request.region, request.applicationName)) {
             log_warning << "Application does not exist, name: " << request.applicationName;
             throw Core::ServiceException("Application does not exist, name: " + request.applicationName);
         }
 
+        // Check code length
         if (request.applicationCode.empty()) {
             log_warning << "Application code is empty, name: " << request.applicationName;
             throw Core::ServiceException("Lambda function code is empty, name: " + request.applicationName);
@@ -145,6 +147,7 @@ namespace AwsMock::Service {
 
         // Save the base64 encoded file
         const std::string fullBase64File = WriteBase64File(request.applicationCode, application, request.version);
+        log_debug << "Base64 application written, base64File: " << fullBase64File;
 
         // Set status and version
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
@@ -200,6 +203,7 @@ namespace AwsMock::Service {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "enable_application");
         log_debug << "Enable application request, name: " << request.application.name;
 
+        // Check existence
         if (!_database.ApplicationExists(request.region, request.application.name)) {
             log_warning << "Application does not exist, name: " << request.application.name;
             return;
