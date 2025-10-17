@@ -11,6 +11,7 @@ namespace AwsMock::Service {
         _networkName = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.network-name");
         _containerPort = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.container.port");
         _isDocker = Core::Configuration::instance().GetValue<bool>("awsmock.docker.active");
+        // Socket path
 #ifdef WIN32
         _containerSocketPath = Core::Configuration::instance().GetValue<std::string>("awsmock.docker.socket");
         _domainSocket = std::make_shared<Core::WindowsSocket>(_containerSocketPath);
@@ -295,6 +296,7 @@ namespace AwsMock::Service {
         std::vector<Dto::Docker::Port> portBindingHostPorts;
         portBindingHostPorts.push_back(portBindingHostPort);
 
+        // Host config
         Dto::Docker::HostConfig hostConfig;
         hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
