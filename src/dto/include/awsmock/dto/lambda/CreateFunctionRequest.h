@@ -109,6 +109,11 @@ namespace AwsMock::Dto::Lambda {
         std::string role;
 
         /**
+         * Version
+         */
+        std::string version;
+
+        /**
          * Role
          */
         std::string handler;

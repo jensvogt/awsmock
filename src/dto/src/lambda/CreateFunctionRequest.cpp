@@ -13,6 +13,7 @@ namespace AwsMock::Dto::Lambda {
             functionName = Core::Bson::BsonUtils::GetStringValue(document, "FunctionName");
             runtime = Core::Bson::BsonUtils::GetStringValue(document, "Runtime");
             role = Core::Bson::BsonUtils::GetStringValue(document, "Role");
+            version = Core::Bson::BsonUtils::GetStringValue(document, "Version");
             handler = Core::Bson::BsonUtils::GetStringValue(document, "Handler");
             timeout = Core::Bson::BsonUtils::GetIntValue(document, "Timeout");
             memorySize = Core::Bson::BsonUtils::GetLongValue(document, "MemorySize");
@@ -57,6 +58,7 @@ namespace AwsMock::Dto::Lambda {
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "FunctionName", functionName);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Runtime", runtime);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Role", role);
+            Core::Bson::BsonUtils::SetStringValue(rootDocument, "Version", version);
             Core::Bson::BsonUtils::SetStringValue(rootDocument, "Handler", handler);
             Core::Bson::BsonUtils::SetLongValue(rootDocument, "MemorySize", memorySize);
             Core::Bson::BsonUtils::SetIntValue(rootDocument, "Timeout", timeout);

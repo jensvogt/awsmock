@@ -211,7 +211,8 @@ namespace AwsMock::Core {
 
         for (const char c: input) {
             if (c == '"' || c == '\'' || c == '!' || c == '*' || c == '(' || c == ')' || c == ';' || c == ':' || c == '@' || c == '&' || c == '=' ||
-                c == '+' || c == '$' || c == ',' || c == '?' || c == '#' || c == '[' || c == ']' || c == ' ' || c == '\n') {
+                c == '+' || c == '$' || c == ',' || c == '?' || c == '#' || c == '[' || c == ']' || c == ' ' || c == '\n' || c == '{' || c == '}' ||
+                c == '|' || c == '*') {
                 // Any other characters are percent-encoded
                 escaped << std::uppercase;
                 escaped << '%' << std::setw(2) << static_cast<int>(static_cast<unsigned char>(c));

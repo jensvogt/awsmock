@@ -192,7 +192,9 @@ namespace AwsMock::Service {
                     Dto::Lambda::CreateFunctionRequest request;
                     request.region = _region;
                     request.functionName = lambda.function;
+                    request.version = lambda.dockerTag;
                     request.runtime = lambda.runtime;
+                    request.code.zipFile = lambda.code.zipFile;
                     Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
                     log_info << "Finished creating lambda container, function: " << lambda.function;
                 } else {
