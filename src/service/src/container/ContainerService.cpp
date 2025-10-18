@@ -73,7 +73,7 @@ namespace AwsMock::Service {
             return {};
         }
 
-        log_debug << "Build image request finished, name: " << name << " tags: " << tag << " runtime: " << runtime;
+        log_info << "Build image request finished, name: " << name << " version: " << tag << " runtime: " << runtime;
         return imageFile;
     }
 
@@ -112,10 +112,9 @@ namespace AwsMock::Service {
         return dockerFile;
     }
 
-    Dto::Docker::ListImageResponse ContainerService::ListImages(const std::string &name) const {
+    std::vector<Dto::Docker::Image> ContainerService::ListImagesByName(const std::string &name, const std::string &tag) const {
 
-        const std::string filters = Core::StringUtils::UrlEncode(R"({"reference":[")" + name + "\"]}");
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/images/json?all=true&filters=" + filters);
+        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/images/json?all=true");
         if (statusCode != http::status::ok) {
             log_error << "Get image by name failed, statusCode: " << statusCode;
             throw Core::ServiceException("Get image by name failed", statusCode);
@@ -124,15 +123,19 @@ namespace AwsMock::Service {
         Dto::Docker::ListImageResponse response = response.FromJson(body);
         if (response.imageList.empty()) {
             log_warning << "Docker image not found, name: " << name;
-            return response;
+            return {};
         }
 
-        if (response.imageList.size() > 1) {
-            log_warning << "More than one docker image found, name: " << name;
-            return response;
+        std::vector<Dto::Docker::Image> images;
+        for (const auto &image: response.imageList) {
+            if (tag.empty() && std::ranges::find(image.repoTags, name) != image.repoTags.end()) {
+                images.push_back(image);
+            } else if (std::ranges::find(image.repoTags, name + ":" + tag) != image.repoTags.end()) {
+                images.push_back(image);
+            }
         }
-        log_info << "Images found, name: " << name;
-        return response;
+        log_info << "Images found, name: " << name << ", count: " << images.size();
+        return images;
     }
 
     void ContainerService::DeleteImage(const std::string &id) const {
@@ -256,20 +259,30 @@ namespace AwsMock::Service {
 
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {
 
-        const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + name + ":" + tag + "\"]}");
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters);
+        // Send request
+        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
             log_warning << "Get docker container by name failed, state: " << statusCode << ", name: " << name << ":" << tag;
             return {};
         }
 
-        Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
+        const Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
         if (response.containerList.empty()) {
             log_info << "Docker container not found, name: " << name << ":" << tag;
             return {};
         }
-        log_debug << "Docker container found, name: " << name << ":" << tag << " count: " << response.containerList.size();
-        return response.containerList;
+
+        // Docker API does not work as expected, therefore, we filter ourselves
+        std::vector<Dto::Docker::Container> containers;
+        for (const auto &container: response.containerList) {
+            if (tag.empty() && Core::StringUtils::Contains(container.image, name)) {
+                containers.push_back(container);
+            } else if (Core::StringUtils::Contains(container.image, name + ":" + tag)) {
+                containers.push_back(container);
+            }
+        }
+        log_info << "Docker container found, name: " << name << ":" << tag << " count: " << containers.size();
+        return containers;
     }
 
     Dto::Docker::CreateContainerResponse ContainerService::CreateContainer(const std::string &imageName, const std::string &instanceName, const std::string &tag, const std::vector<std::string> &environment, const int hostPort) const {
