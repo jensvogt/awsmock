@@ -21,6 +21,10 @@ namespace AwsMock::Dto::Docker {
     /**
      * @brief Docker container port
      *
+     * @par
+     * Unfortunately, the different Docker REST Api's use different structures for the same object. For instance, the inspect-container returns
+     * a totally different JSON structure, then the list-container command. Therefore, we have to use different JSON structures here.
+     *
      * @code{json}
      * {
      *   "IP" : "0.0.0.0",
@@ -77,6 +81,10 @@ namespace AwsMock::Dto::Docker {
 
     /**
      * @brief Docker container
+     *
+     * @par
+     * Unfortunately, the different Docker REST Api's use different structures for the same object. For instance, the inspect-container returns
+     * a totally different JSON structure, then the list-container command. Therefore, we have to use different JSON structures here.
      *
      * @code{json}
      * {
