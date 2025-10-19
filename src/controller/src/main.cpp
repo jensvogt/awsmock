@@ -37,7 +37,7 @@
 // Allowed actions
 static std::list<std::string> allowedActions() {
     return {
-            "logLevel", "logs", "list", "enable", "disable", "start", "stop", "restart",
+            "logLevel", "logs", "list", "enable", "disable", "start", "stop", "restart", "status",
             "export", "import", "clean", "clean-objects", "config", "ping", "loglevel"};
 }
 
@@ -59,6 +59,7 @@ void ShowHelp(const boost::program_options::options_description &desc) {
               << std::left << std::setw(leftIndent) << "  --port" << ": use 'port' for the manager connection" << std::endl
               << std::endl
               << "Commands: " << std::endl
+              << std::left << std::setw(leftIndent) << "  status: shows the status of all available applications and lambdas." << std::endl
               << std::left << std::setw(leftIndent) << "  list [applications|lambdas]" << ": list all available applications or lambdas. If no argument is given, both are listed." << std::endl
               << std::left << std::setw(leftIndent) << "  enable [applications|lambdas|<applications...>|<lambda...>]" << ": enable the given application(s) or lambda(s). If no argument is given, enables all applications and lambdas. Several applications should be separated by spaces." << std::endl
               << std::left << std::setw(leftIndent) << "  disable [applications|lambdas|<applications...>|<lambda...>]" << ": disable the given application(s) or lambda(s). If no argument is given, disables all applications and lambdas. Several applications should be separated by spaces." << std::endl

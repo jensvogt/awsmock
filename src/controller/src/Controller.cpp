@@ -40,6 +40,22 @@ namespace AwsMock::Controller {
                 break;
             }
 
+            case CommandType::STATUS: {
+                std::cout << "Applications: " << std::endl;
+                for (const auto &application: _applications) {
+                    std::cout << "  " << std::setw(32) << std::left << application.name
+                              << std::setw(10) << std::left << (application.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Dto::Apps::AppsStatusTypeToString(application.status) << std::endl;
+                }
+                std::cout << "Lambdas: " << std::endl;
+                for (const auto &lambda: _lambdas) {
+                    std::cout << "  " << std::setw(32) << std::left << lambda.functionName
+                              << std::setw(10) << std::left << (lambda.enabled ? "ENABLED" : "DISABLED")
+                              << std::setw(10) << std::left << Core::StringUtils::ToUpper(lambda.state) << std::endl;
+                }
+                break;
+            }
+
             case CommandType::LIST: {
                 if (_commands.empty() || _commands[0] == "applications") {
                     std::cout << "Applications: " << std::endl;

@@ -318,7 +318,7 @@ namespace AwsMock::Service {
                 application.imageId = inspectContainerResponse.image;
                 application.containerId = inspectContainerResponse.id;
                 application.containerName = inspectContainerResponse.name.substr(1);
-                application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
+                application.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
                 application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application = _database.UpdateApplication(application);
                 log_info << "Application started, name: " << request.application.name << ", publicPort: " << application.publicPort;
@@ -398,7 +398,7 @@ namespace AwsMock::Service {
                 application.imageId = inspectContainerResponse.image;
                 application.containerId = inspectContainerResponse.id;
                 application.containerName = inspectContainerResponse.name.substr(1);
-                application.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
+                application.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
                 application.status = inspectContainerResponse.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application = _database.UpdateApplication(application);
                 log_info << "Application already started, name: " << request.application.name << ", publicPort: " << application.publicPort;

@@ -19,11 +19,122 @@
 namespace AwsMock::Dto::Docker {
 
     /**
+     * @brief Docker container port
+     *
+     * @code{json}
+     * {
+     *   "IP" : "0.0.0.0",
+     *   "PrivatePort" : 8085,
+     *   "PublicPort" : 8085,
+     *   "Type" : "tcp"
+     * }
+     * @endcode
+     *
+     * @author jens.vogt\@opitz-consulting.com
+     */
+    struct ContainerPort final : Common::BaseCounter<ContainerPort> {
+
+        /**
+         * IP address
+         */
+        std::string ipAddress;
+
+        /**
+         * Private port
+         */
+        int privatePort{};
+
+        /**
+         * Public port
+         */
+        int publicPort{};
+
+        /**
+         * Type
+         */
+        std::string type;
+
+      private:
+
+        friend ContainerPort tag_invoke(boost::json::value_to_tag<ContainerPort>, boost::json::value const &v) {
+            ContainerPort r;
+            r.ipAddress = Core::Json::GetStringValue(v, "IP");
+            r.privatePort = Core::Json::GetIntValue(v, "PrivatePort");
+            r.publicPort = Core::Json::GetIntValue(v, "PublicPort");
+            r.type = Core::Json::GetStringValue(v, "Type");
+            return r;
+        }
+
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ContainerPort const &obj) {
+            jv = {
+                    {"IP", obj.ipAddress},
+                    {"PrivatePort", obj.privatePort},
+                    {"PublicPort", obj.publicPort},
+                    {"Type", obj.type},
+            };
+        }
+    };
+
+    /**
      * @brief Docker container
+     *
+     * @code{json}
+     * {
+     *   "Id" : "7d4737b052b02043db8e92a1b550eec9df54ac917c6c582a421a1481e226efcd",
+     *   "Names" : [ "/ftp-file-copy-23e4638f" ],
+     *   "Image" : "ftp-file-copy:latest",
+     *   "ImageID" : "sha256:d62efc48091d2dd5c241b9c4fbc3cbc4a894e65da1f1bf4c5e524ceb82e691ff",
+     *   "Command" : "/lambda-entrypoint.sh org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest",
+     *   "Created" : 1760866109,
+     *   "Ports" : [ {
+     *     "IP" : "0.0.0.0",
+     *     "PrivatePort" : 8085,
+     *     "PublicPort" : 8085,
+     *     "Type" : "tcp"
+     *   }, {
+     *     "IP" : "::",
+     *     "PrivatePort" : 8085,
+     *     "PublicPort" : 8085,
+     *     "Type" : "tcp"
+     *   } ],
+     *   "Labels" : {
+     *     "com.amazonaws.lambda.platform.kernel" : "k510ga",
+     *     "com.amazonaws.lambda.platform.version" : "sbxv2brave"
+     *   },
+     *   "State" : "created",
+     *   "Status" : "Created",
+     *   "HostConfig" : {
+     *     "NetworkMode" : "local"
+     *   },
+     *   "NetworkSettings" : {
+     *     "Networks" : {
+     *       "local" : {
+     *         "IPAMConfig" : null,
+     *         "Links" : null,
+     *         "Aliases" : null,
+     *         "MacAddress" : "",
+     *         "DriverOpts" : null,
+     *         "GwPriority" : 0,
+     *         "NetworkID" : "",
+     *         "EndpointID" : "",
+     *         "Gateway" : "",
+     *         "IPAddress" : "",
+     *         "IPPrefixLen" : 0,
+     *         "IPv6Gateway" : "",
+     *         "GlobalIPv6Address" : "",
+     *         "GlobalIPv6PrefixLen" : 0,
+     *         "DNSNames" : null
+     *       }
+     *     }
+     *   },
+     *   "Mounts" : [ ]
+     * }
+     * @endcode
      *
      * @author jens.vogt\@opitz-consulting.com
      */
     struct Container final : Common::BaseCounter<Container> {
+
         /**
          * Image ID
          */
@@ -62,7 +173,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * The ports exposed by this container
          */
-        std::vector<Port> ports;
+        std::vector<ContainerPort> ports;
 
         /**
          * The size of files that have been created or changed by this container
@@ -94,8 +205,8 @@ namespace AwsMock::Dto::Docker {
             if (Core::Json::AttributeExists(v, "Names")) {
                 r.names = boost::json::value_to<std::vector<std::string>>(v.at("Names"));
             }
-            if (Core::Json::AttributeExists(v, "Ports")) {
-                r.ports = boost::json::value_to<std::vector<Port>>(v.at("Ports"));
+            if (Core::Json::AttributeExists(v, "Ports") && v.at("Ports").is_array()) {
+                r.ports = boost::json::value_to<std::vector<ContainerPort>>(v.at("Ports"));
             }
             return r;
         }

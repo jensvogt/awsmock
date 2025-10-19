@@ -67,8 +67,8 @@ namespace AwsMock::Dto::Docker {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PortBinding const &obj) {
             jv = {};
-            for (const auto &p: obj.portMap) {
-                jv.as_object().emplace(p.first, boost::json::value_from(p.second));
+            for (const auto &[fst, snd]: obj.portMap) {
+                jv.as_object().emplace(fst, boost::json::value_from(snd));
             }
         }
     };
