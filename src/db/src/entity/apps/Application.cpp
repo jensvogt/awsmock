@@ -13,8 +13,8 @@ namespace AwsMock::Database::Entity::Apps {
         applicationDocument.append(kvp("name", name));
         applicationDocument.append(kvp("runtime", runtime));
         applicationDocument.append(kvp("type", type));
-        applicationDocument.append(kvp("privatePort", bsoncxx::types::b_int64(privatePort)));
-        applicationDocument.append(kvp("publicPort", bsoncxx::types::b_int64(publicPort)));
+        applicationDocument.append(kvp("privatePort", bsoncxx::types::b_int32(privatePort)));
+        applicationDocument.append(kvp("publicPort", bsoncxx::types::b_int32(publicPort)));
         applicationDocument.append(kvp("archive", archive));
         applicationDocument.append(kvp("version", version));
         applicationDocument.append(kvp("containerId", containerId));
@@ -66,8 +66,8 @@ namespace AwsMock::Database::Entity::Apps {
         name = Core::Bson::BsonUtils::GetStringValue(mResult, "name");
         runtime = Core::Bson::BsonUtils::GetStringValue(mResult, "runtime");
         type = Core::Bson::BsonUtils::GetStringValue(mResult, "type");
-        privatePort = Core::Bson::BsonUtils::GetLongValue(mResult, "privatePort");
-        publicPort = Core::Bson::BsonUtils::GetLongValue(mResult, "publicPort");
+        privatePort = Core::Bson::BsonUtils::GetIntValue(mResult, "privatePort");
+        publicPort = Core::Bson::BsonUtils::GetIntValue(mResult, "publicPort");
         archive = Core::Bson::BsonUtils::GetStringValue(mResult, "archive");
         version = Core::Bson::BsonUtils::GetStringValue(mResult, "version");
         containerId = Core::Bson::BsonUtils::GetStringValue(mResult, "containerId");

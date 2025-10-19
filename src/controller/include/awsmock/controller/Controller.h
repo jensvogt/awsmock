@@ -43,6 +43,8 @@
 #include <awsmock/dto/lambda/internal/EnableAllLambdasRequest.h>
 #include <awsmock/dto/lambda/internal/EnableLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/ListFunctionCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersRequest.h>
+#include <awsmock/dto/lambda/internal/ListLambdaInstanceCountersResponse.h>
 #include <awsmock/dto/lambda/internal/StartAllLambdasRequest.h>
 #include <awsmock/dto/lambda/internal/StartLambdaRequest.h>
 #include <awsmock/dto/lambda/internal/StopAllLambdasRequest.h>
@@ -67,6 +69,7 @@ namespace AwsMock::Controller {
         CONFIG,
         LOG_LEVEL,
         LIST,
+        STATUS,
         ENABLE,
         DISABLE,
         START,
@@ -85,6 +88,7 @@ namespace AwsMock::Controller {
             {CommandType::CONFIG, "config"},
             {CommandType::LOG_LEVEL, "log-level"},
             {CommandType::LIST, "list"},
+            {CommandType::STATUS, "status"},
             {CommandType::ENABLE, "enable"},
             {CommandType::DISABLE, "disable"},
             {CommandType::START, "start"},
@@ -369,6 +373,14 @@ namespace AwsMock::Controller {
          * @return list of all modules.
          */
         [[nodiscard]] std::vector<Dto::Module::Module> GetAllModules() const;
+
+        /**
+         * @brief Returns a lits of lambda instance counters
+         *
+         * @param function lambda function
+         * @return list of instances
+         */
+        std::vector<Dto::Lambda::InstanceCounter> GetLambdaInstances(const Dto::Lambda::Function &function) const;
 
         /**
          * Commands

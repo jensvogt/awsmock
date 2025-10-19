@@ -233,9 +233,10 @@ namespace AwsMock::Service {
          * @brief List all docker images, with the given name and different tags.
          *
          * @param name name of the image
+         * @param tag images tag, optional
          * @return ListImageResponse
          */
-        [[nodiscard]] Dto::Docker::ListImageResponse ListImages(const std::string &name) const;
+        [[nodiscard]] std::vector<Dto::Docker::Image> ListImagesByName(const std::string &name, const std::string &tag = {}) const;
 
         /**
          * @brief Creates a container
@@ -329,10 +330,10 @@ namespace AwsMock::Service {
          * @brief List all containers of a given image.
          *
          * @param name image name
-         * @param tag image tag
+         * @param tag image tag, optional
          * @return list of containers
          */
-        [[nodiscard]] std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag) const;
+        [[nodiscard]] std::vector<Dto::Docker::Container> ListContainerByImageName(const std::string &name, const std::string &tag = {}) const;
 
         /**
          * @brief Checks whether a network exists.

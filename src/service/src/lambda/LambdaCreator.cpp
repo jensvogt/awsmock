@@ -95,6 +95,8 @@ namespace AwsMock::Service {
         // Create instance
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
+        // Set public port
+
         // Create the container, if not existing. If existing, get the current port from the docker container
         const std::string containerName = lambda.function + "-" + instanceId;
         CreateDockerContainer(lambda, instanceId, Core::SystemUtils::GetNextFreePort(), lambda.dockerTag);
@@ -118,7 +120,7 @@ namespace AwsMock::Service {
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostName = dockerized ? containerName : "localhost";
-            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
+            instance.hostPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(privatePort);
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
         }
@@ -129,15 +131,17 @@ namespace AwsMock::Service {
         lambda = _lambdaDatabase.UpdateLambda(lambda);
     }
 
-    void LambdaCreator::CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
+    void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
         log_info << "Creating docker image, function: " << lambdaEntity.function;
 
         std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
 
-        // Write a base64 encoded zip file
-        const std::string encodedFile = WriteBase64File(functionCode, lambdaEntity, dockerTag);
+        // Read the base64 encoded zip file
+        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
+        const std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + zipFile;
+        const std::string functionCode = Core::FileUtils::ReadFile(base64FullFile);
         log_debug << "Created Base64 string, length: " << functionCode.size();
 
         // Unzip provided zip-file into a temporary directory

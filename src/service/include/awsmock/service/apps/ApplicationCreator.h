@@ -10,8 +10,8 @@
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/ApplicationDatabase.h>
@@ -91,13 +91,15 @@ namespace AwsMock::Service {
         /**
          * @brief Creates a new docker container, in case the container does not exist inside the docker daemon.
          *
+         * @par
+         * If the public port < 0, a random free port will be used, otherwise the application.publicPort will be used.
+         *
          * @param applicationEntity application entity.
          * @param instanceId application instance ID.
-         * @param hostPort host port
          * @param dockerTag docker tag.
          * @see Database::Entity::Application::Application
          */
-        static void CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, int hostPort, const std::string &dockerTag);
+        static void CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const std::string &dockerTag);
 
         /**
          * @brief Converts the application environment to a vector of string, which is needed by the docker API

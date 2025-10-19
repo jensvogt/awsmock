@@ -58,7 +58,7 @@ namespace AwsMock::Service {
         /**
          * @brief Backup the application objects
          */
-        void BackupApplication();
+        static void BackupApplication();
 
         /**
          * @brief Start all enabled applications

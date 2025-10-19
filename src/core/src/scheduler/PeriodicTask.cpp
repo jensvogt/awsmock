@@ -25,7 +25,7 @@ namespace AwsMock::Core {
 
             _task();
 
-            _timer.expires_at(_timer.expires_at() + boost::posix_time::seconds(_interval));
+            _timer.expires_after(std::chrono::seconds(_interval));
             StartWait();
         }
     }
@@ -35,12 +35,12 @@ namespace AwsMock::Core {
 
         if (_delay > 0) {
             // Wait for the first execution time
-            _timer.expires_from_now(boost::posix_time::seconds(_delay));
+            _timer.expires_after(std::chrono::seconds(_delay));
             StartWait();
         } else if (_interval > 0) {
             // Periodic task
             _task();
-            _timer.expires_from_now(boost::posix_time::seconds(_interval));
+            _timer.expires_after(std::chrono::seconds(_interval));
             StartWait();
         } else {
             // One time task

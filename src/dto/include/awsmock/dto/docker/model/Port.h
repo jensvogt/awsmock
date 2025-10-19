@@ -9,9 +9,6 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/exception/JsonException.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
 
 namespace AwsMock::Dto::Docker {
@@ -38,7 +35,7 @@ namespace AwsMock::Dto::Docker {
         friend Port tag_invoke(boost::json::value_to_tag<Port>, boost::json::value const &v) {
             Port r;
             r.hostIp = Core::Json::GetStringValue(v, "HostIp");
-            r.hostPort = Core::Json::GetIntValue(v, "HostPort");
+            r.hostPort = Core::Json::GetStringValue(v, "HostPort").empty() ? -1 : std::stoi(Core::Json::GetStringValue(v, "HostPort"));
             return r;
         }
 

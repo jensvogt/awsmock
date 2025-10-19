@@ -91,11 +91,11 @@ namespace AwsMock::Service {
         /**
          * @brief Save the ZIP file and unpack it in a temporary folder
          *
-         * @param functionCode Base64 encoded ZIP file
+         * @param zipFile Base64 encoded ZIP file
          * @param lambdaEntity lambda entity
          * @param dockerTag docker tag to use
          */
-        static void CreateDockerImage(const std::string &functionCode, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
+        static void CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag);
 
         /**
          * @brief Creates a new docker container, in case the container does not exists inside the docker daemon.

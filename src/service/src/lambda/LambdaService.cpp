@@ -16,41 +16,17 @@ namespace AwsMock::Service {
 
         // Create an entity and set ARN
         Database::Entity::Lambda::Lambda lambda = {};
-        const std::string lambdaArn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
+        lambda.arn = Core::AwsUtils::CreateLambdaArn(request.region, accountId, request.functionName);
+        lambda.function = request.functionName;
+        lambda.runtime = request.runtime;
+        lambda.handler = request.handler;
 
         // Create mutex
         _instanceMutex[request.functionName] = std::make_shared<boost::mutex>();
 
-        std::string zippedCode;
-        if (_lambdaDatabase.LambdaExists(request.region, request.functionName, request.runtime)) {
-
-            lambda = _lambdaDatabase.GetLambdaByArn(lambdaArn);
-            const std::string fileName = GetLambdaCodePath(lambda);
-            if (!Core::FileUtils::FileExists(fileName) || Core::FileUtils::FileSize(fileName) == 0) {
-                throw Core::ServiceException("Lambda base64 encoded code does not exists, fileName: " + fileName);
-            }
-            zippedCode = Core::FileUtils::ReadFile(fileName);
-
-        } else {
-
-            Database::Entity::Lambda::Environment environment = {.variables = request.environment.variables};
-            lambda = Dto::Lambda::Mapper::map(request);
-            lambda.arn = lambdaArn;
-
-            // Remove code
-            if (!request.code.zipFile.empty()) {
-                zippedCode = std::move(request.code.zipFile);
-                lambda.code.zipFile.clear();
-            }
-            lambda.code.zipFile = GetLambdaCodePath(lambda);
-        }
-
-        // Create a response, if disabled
-        if (!lambda.enabled) {
-            Dto::Lambda::CreateFunctionResponse response = Dto::Lambda::Mapper::map(request, lambda);
-            log_info << "Function disabled, name: " << request.functionName << " enabled: " << std::boolalpha << lambda.enabled;
-            return response;
-        }
+        // Write the base64 file
+        lambda.code.zipFile = request.functionName + "-" + request.version + ".b64";
+        WriteBase64File(lambda.code.zipFile, request.code.zipFile);
 
         // Update database
         lambda.timeout = request.timeout;
@@ -109,10 +85,12 @@ namespace AwsMock::Service {
         const long count = _lambdaDatabase.DeleteResultsCounters(lambda.arn);
         log_debug << "Lambda results cleared, arn: " << lambda.arn << " count: " << count;
 
+        // Create instance
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+
         // Update the lambda function
         const LambdaCreator lambdaCreator;
-        lambdaCreator.UpdateLambda(lambda, request.functionCode, request.version);
-
+        lambdaCreator.CreateLambda(lambda, instanceId);
         log_debug << "Lambda function code updated, function: " << lambda.function;
     }
 
@@ -484,35 +462,39 @@ namespace AwsMock::Service {
             }
 
             // Sorting
-            if (request.sortColumns.at(0).column == "instanceId") {
-                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
-                    if (request.sortColumns.at(0).sortDirection == -1) {
-                        return a.instanceId <= b.instanceId;
-                    }
-                    return a.instanceId > b.instanceId;
-                });
-            } else if (request.sortColumns.at(0).column == "containerId") {
-                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
-                    if (request.sortColumns.at(0).sortDirection == -1) {
-                        return a.containerId <= b.containerId;
-                    }
-                    return a.containerId > b.containerId;
-                });
-            } else if (request.sortColumns.at(0).column == "status") {
-                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
-                    if (request.sortColumns.at(0).sortDirection == -1) {
-                        return a.status <= b.status;
-                    }
-                    return a.status > b.status;
-                });
+            if (!request.sortColumns.empty()) {
+                if (request.sortColumns.at(0).column == "instanceId") {
+                    std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                        if (request.sortColumns.at(0).sortDirection == -1) {
+                            return a.instanceId <= b.instanceId;
+                        }
+                        return a.instanceId > b.instanceId;
+                    });
+                } else if (request.sortColumns.at(0).column == "containerId") {
+                    std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                        if (request.sortColumns.at(0).sortDirection == -1) {
+                            return a.containerId <= b.containerId;
+                        }
+                        return a.containerId > b.containerId;
+                    });
+                } else if (request.sortColumns.at(0).column == "status") {
+                    std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                        if (request.sortColumns.at(0).sortDirection == -1) {
+                            return a.status <= b.status;
+                        }
+                        return a.status > b.status;
+                    });
+                }
             }
 
             // Paging
-            auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
-                endArray = response.instanceCounters.end();
+            if (request.pageSize > 0) {
+                auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
+                if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
+                    endArray = response.instanceCounters.end();
+                }
+                response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
             }
-            response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
 
             log_trace << "Lambda list instances counters, result: " << response.ToString();
             return response;
@@ -985,18 +967,15 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Load code
-        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
-        const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
-
-        // Create the lambda function asynchronously
-        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        LambdaCreator lambdaCreator;
-        lambdaCreator.CreateLambda(lambda, instanceId);
-
         // Update state
         lambda.state = Database::Entity::Lambda::Pending;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        // Create the lambda function asynchronously
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        const LambdaCreator lambdaCreator;
+        lambdaCreator.CreateLambda(lambda, instanceId);
+
         log_info << "Lambda function started, functionArn: " + lambda.arn;
     }
 
@@ -1138,7 +1117,7 @@ namespace AwsMock::Service {
         }
 
         // Delete the containers, if existing
-        Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
+        const Database::Entity::Lambda::Lambda lambda = _lambdaDatabase.GetLambdaByName(request.region, request.functionName);
         for (const auto &instance: lambda.instances) {
             if (dockerService.ContainerExists(instance.containerId)) {
                 Dto::Docker::Container container = dockerService.GetContainerById(instance.containerId);
@@ -1241,17 +1220,19 @@ namespace AwsMock::Service {
     }
 
     void LambdaService::CleanupDocker(Database::Entity::Lambda::Lambda &lambda) {
-        for (const auto &instance: lambda.instances) {
-            ContainerService::instance().KillContainer(instance.containerId);
-            ContainerService::instance().DeleteContainers(lambda.function, lambda.dockerTag);
+
+        // Delete docker containers
+        for (const auto &container: ContainerService::instance().ListContainerByImageName(lambda.function)) {
+            ContainerService::instance().KillContainer(container.id);
+            ContainerService::instance().DeleteContainer(container.id);
         }
+        log_debug << "Docker containers deleted, function: " << lambda.function << ", count: " << lambda.instances.size();
         lambda.instances.clear();
-        log_debug << "Done cleanup instances, function: " << lambda.function;
 
         // Delete image
         if (ContainerService::instance().ImageExists(lambda.function, lambda.dockerTag)) {
             ContainerService::instance().DeleteImage(lambda.function + ":" + lambda.dockerTag);
-            log_debug << "Done cleanup instances, function: " << lambda.function;
+            log_debug << "Docker images deleted, function: " << lambda.function;
         }
         log_info << "Done cleanup docker, function: " << lambda.function;
     }
