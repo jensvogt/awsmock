@@ -35,7 +35,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [this] { this->BackupApplication(); }, _backupCron);
+            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
         }
 
         // Start the application log server (websocket)
@@ -157,8 +157,8 @@ namespace AwsMock::Service {
                     application.containerName = Core::StringUtils::StartsWith(response.name, "/") ? response.name.substr(1) : response.name;
                     application.imageId = response.image;
                     application.imageSize = response.sizeRootFs;
-                    application.publicPort = response.hostConfig.portBindings.GetFirstPublicPort(std::to_string(application.privatePort));
-                    //application.privatePort = response.hostConfig.portBindings.GetFirstPrivatePort(std::to_string(application.publicPort));
+                    application.privatePort = response.hostConfig.GetFirstPrivatePort();
+                    application.publicPort = response.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
                     log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
 
                     if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {

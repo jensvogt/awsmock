@@ -52,7 +52,9 @@ namespace AwsMock::Dto::Docker {
         /**
          * Port bindings
          */
-        PortBinding portBindings;
+        // TODO: cleanup
+        std::map<std::string, std::vector<Port>> portBindings;
+        //PortBinding portBindings;
 
         /**
          * Log config
@@ -64,13 +66,49 @@ namespace AwsMock::Dto::Docker {
          */
         std::vector<std::string> extraHosts;
 
+        /**
+         * @brief Returns the first public port for a given private port.
+         *
+         * @param privatePort private port
+         * @return public port
+         */
+        int GetFirstPublicPort(const std::string &privatePort) {
+            std::vector<Port> ports = portBindings[privatePort];
+            if (ports.empty()) {
+                ports = portBindings[privatePort + "/tcp"];
+            }
+            const auto it = std::ranges::find_if(ports, [](const Port &port) {
+                return port.hostPort > 0;
+            });
+            if (it != ports.end()) {
+                return it->hostPort;
+            }
+            return -1;
+        }
+
+        /**
+         * @brief Returns the first private port for a given public port.
+         *
+         * @return first private port
+         */
+        [[nodiscard]] int GetFirstPrivatePort() const {
+            if (portBindings.empty()) {
+                return -1;
+            }
+            const std::string firstPrivatePort = portBindings.begin()->first;
+            if (Core::StringUtils::EndsWith(firstPrivatePort, "/tcp")) {
+                return stoi(firstPrivatePort.substr(firstPrivatePort.size() - 4));
+            }
+            return std::stoi(firstPrivatePort);
+        }
+
       private:
 
         friend HostConfig tag_invoke(boost::json::value_to_tag<HostConfig>, boost::json::value const &v) {
             HostConfig r = {};
-            r.networkMode = Core::Json::GetStringValue(v, "c");
+            r.networkMode = Core::Json::GetStringValue(v, "NetworkMode");
             if (Core::Json::AttributeExists(v, "PortBindings")) {
-                r.portBindings = boost::json::value_to<PortBinding>(v.at("PortBindings"));
+                r.portBindings = boost::json::value_to<std::map<std::string, std::vector<Port>>>(v.at("PortBindings"));
             }
             if (Core::Json::AttributeExists(v, "LogConfig")) {
                 r.logConfig = boost::json::value_to<LogConfig>(v.at("LogConfig"));

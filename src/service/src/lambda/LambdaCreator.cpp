@@ -120,7 +120,7 @@ namespace AwsMock::Service {
         instance.created = system_clock::now();
         if (!inspectContainerResponse.id.empty()) {
             instance.hostName = dockerized ? containerName : "localhost";
-            instance.hostPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(privatePort);
+            instance.hostPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(privatePort);
             instance.containerId = inspectContainerResponse.id;
             lambda.containerSize = inspectContainerResponse.sizeRootFs;
         }

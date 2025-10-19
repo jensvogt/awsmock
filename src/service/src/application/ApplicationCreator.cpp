@@ -55,7 +55,7 @@ namespace AwsMock::Service {
         // Get the public port
         inspectContainerResponse = ContainerService::instance().InspectContainer(containerName);
         if (!inspectContainerResponse.id.empty()) {
-            applicationEntity.publicPort = inspectContainerResponse.hostConfig.portBindings.GetFirstPublicPort(std::to_string(applicationEntity.privatePort));
+            applicationEntity.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(applicationEntity.privatePort));
             applicationEntity.containerId = inspectContainerResponse.id;
             applicationEntity.containerName = inspectContainerResponse.name.substr(1);
             applicationEntity.created = system_clock::now();

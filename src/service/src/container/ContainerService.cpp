@@ -313,7 +313,7 @@ namespace AwsMock::Service {
         Dto::Docker::HostConfig hostConfig;
         hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
-        hostConfig.portBindings.portMap[_containerPort + "/tcp"] = portBindingHostPorts;
+        hostConfig.portBindings[_containerPort + "/tcp"] = portBindingHostPorts;
 
         hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
         hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
@@ -361,7 +361,7 @@ namespace AwsMock::Service {
         Dto::Docker::HostConfig hostConfig;
         hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
-        hostConfig.portBindings.portMap[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
+        hostConfig.portBindings[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
 
         hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
         hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
@@ -408,7 +408,7 @@ namespace AwsMock::Service {
         Dto::Docker::HostConfig hostConfig;
         hostConfig.networkMode = GetNetworkName();
         hostConfig.logConfig = logConfig;
-        hostConfig.portBindings.portMap[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
+        hostConfig.portBindings[std::to_string(containerPort) + "/tcp"] = portBindingHostPorts;
 
         hostConfig.extraHosts.emplace_back("host.docker.internal:host-gateway");
         hostConfig.extraHosts.emplace_back("awsmock:host-gateway");
@@ -507,7 +507,7 @@ namespace AwsMock::Service {
 
     void ContainerService::StartDockerContainer(const std::string &containerId, const std::string &containerName) const {
         if (auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::post, "/containers/" + containerId + "/start"); statusCode != http::status::ok && statusCode != http::status::no_content) {
-            log_warning << "Start container failed, id: " << containerName << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
+            log_warning << "Start container failed, id: " << containerId << ", statusCode: " << statusCode << ", body: " << Core::StringUtils::StripLineEndings(body);
             return;
         }
         log_debug << "Docker container started, name: " << containerName << ", id: " << containerId;
