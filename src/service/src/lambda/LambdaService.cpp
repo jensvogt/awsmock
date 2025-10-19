@@ -462,35 +462,39 @@ namespace AwsMock::Service {
             }
 
             // Sorting
-            if (request.sortColumns.at(0).column == "instanceId") {
-                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
-                    if (request.sortColumns.at(0).sortDirection == -1) {
-                        return a.instanceId <= b.instanceId;
-                    }
-                    return a.instanceId > b.instanceId;
-                });
-            } else if (request.sortColumns.at(0).column == "containerId") {
-                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
-                    if (request.sortColumns.at(0).sortDirection == -1) {
-                        return a.containerId <= b.containerId;
-                    }
-                    return a.containerId > b.containerId;
-                });
-            } else if (request.sortColumns.at(0).column == "status") {
-                std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
-                    if (request.sortColumns.at(0).sortDirection == -1) {
-                        return a.status <= b.status;
-                    }
-                    return a.status > b.status;
-                });
+            if (!request.sortColumns.empty()) {
+                if (request.sortColumns.at(0).column == "instanceId") {
+                    std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                        if (request.sortColumns.at(0).sortDirection == -1) {
+                            return a.instanceId <= b.instanceId;
+                        }
+                        return a.instanceId > b.instanceId;
+                    });
+                } else if (request.sortColumns.at(0).column == "containerId") {
+                    std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                        if (request.sortColumns.at(0).sortDirection == -1) {
+                            return a.containerId <= b.containerId;
+                        }
+                        return a.containerId > b.containerId;
+                    });
+                } else if (request.sortColumns.at(0).column == "status") {
+                    std::ranges::sort(response.instanceCounters, [request](const Dto::Lambda::InstanceCounter &a, const Dto::Lambda::InstanceCounter &b) {
+                        if (request.sortColumns.at(0).sortDirection == -1) {
+                            return a.status <= b.status;
+                        }
+                        return a.status > b.status;
+                    });
+                }
             }
 
             // Paging
-            auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
-                endArray = response.instanceCounters.end();
+            if (request.pageSize > 0) {
+                auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
+                if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
+                    endArray = response.instanceCounters.end();
+                }
+                response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
             }
-            response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
 
             log_trace << "Lambda list instances counters, result: " << response.ToString();
             return response;
@@ -963,18 +967,15 @@ namespace AwsMock::Service {
             return;
         }
 
-        // Load code
-        const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
-        const std::string functionCode = Core::FileUtils::ReadFile(lambdaDir + "/" + lambda.code.zipFile);
-
-        // Create the lambda function asynchronously
-        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
-        LambdaCreator lambdaCreator;
-        lambdaCreator.CreateLambda(lambda, instanceId);
-
         // Update state
         lambda.state = Database::Entity::Lambda::Pending;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
+
+        // Create the lambda function asynchronously
+        const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
+        const LambdaCreator lambdaCreator;
+        lambdaCreator.CreateLambda(lambda, instanceId);
+
         log_info << "Lambda function started, functionArn: " + lambda.arn;
     }
 

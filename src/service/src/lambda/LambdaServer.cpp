@@ -96,6 +96,7 @@ namespace AwsMock::Service {
                 ContainerService::instance().DeleteContainer(container.id);
             }
             lambda.instances.clear();
+            lambda.state = Database::Entity::Lambda::Inactive;
             lambda = _lambdaDatabase.UpdateLambda(lambda);
         }
         log_debug << "Lambda instances cleaned up";
@@ -188,21 +189,18 @@ namespace AwsMock::Service {
             for (Database::Entity::Lambda::LambdaList lambdas = _lambdaDatabase.ListLambdas(_region); auto &lambda: lambdas) {
 
                 if (lambda.enabled) {
-                    log_info << "Start creating lambda container, function: " << lambda.function;
-                    Dto::Lambda::CreateFunctionRequest request;
+                    log_info << "Starting lambda container, function: " << lambda.function;
+                    Dto::Lambda::StartLambdaRequest request;
                     request.region = _region;
-                    request.functionName = lambda.function;
-                    request.version = lambda.dockerTag;
-                    request.runtime = lambda.runtime;
-                    request.code.zipFile = lambda.code.zipFile;
-                    Dto::Lambda::CreateFunctionResponse response = _lambdaService.CreateFunction(request);
-                    log_info << "Finished creating lambda container, function: " << lambda.function;
+                    request.functionArn = lambda.arn;
+                    _lambdaService.StartLambda(request);
+                    log_info << "Finished starting lambda container, function: " << lambda.function;
                 } else {
                     lambda.state = Database::Entity::Lambda::Inactive;
                     _lambdaDatabase.UpdateLambda(lambda);
                 }
             }
-            log_debug << "Lambda containers created";
+            log_debug << "Lambda containers started";
 
         } catch (Core::ServiceException &e) {
             log_error << e.message();
