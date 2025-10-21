@@ -440,9 +440,10 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Encode(const std::string &decodedString) {
-        const int data_len = decodedString.length();
+        if (decodedString.empty()) return {};
+        const int data_len = static_cast<int>(decodedString.length());
         const int dataB64_len = 4 * ((data_len + 2) / 3);
-        const auto dataB64 = (unsigned char *) calloc(dataB64_len + 1, 1);
+        const auto dataB64 = static_cast<unsigned char *>(calloc(dataB64_len + 1, 1));
         EVP_EncodeBlock(dataB64, reinterpret_cast<const unsigned char *>(decodedString.c_str()), data_len);
         std::string dst = {reinterpret_cast<char *>(dataB64), static_cast<std::string::size_type>(dataB64_len)};
         free(dataB64);
@@ -450,6 +451,7 @@ namespace AwsMock::Core {
     }
 
     std::string Crypto::Base64Decode(const std::string &encodedString) {
+        if (encodedString.empty()) return {};
         int dataB64_len = static_cast<int>(strlen(encodedString.c_str()));
         int data_len = 3 * dataB64_len / 4;
         const auto data = static_cast<unsigned char *>(calloc(data_len, 1));

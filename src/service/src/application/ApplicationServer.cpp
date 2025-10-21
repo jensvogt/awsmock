@@ -31,7 +31,7 @@ namespace AwsMock::Service {
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-updates", [this] { this->UpdateApplications(); }, _monitoringPeriod, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
+        //_scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
