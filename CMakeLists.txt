@@ -73,8 +73,8 @@ add_subdirectory(src/db)
 add_subdirectory(src/dto)
 add_subdirectory(src/service)
 add_subdirectory(src/manager)
-#add_subdirectory(src/controller)
-#add_subdirectory(src/awslocal)
+add_subdirectory(src/controller)
+add_subdirectory(src/awslocal)
 
 # Build documentation
 if (BUILD_DOCUMENTATION)
