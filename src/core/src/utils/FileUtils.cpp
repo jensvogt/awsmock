@@ -253,9 +253,9 @@ namespace AwsMock::Core {
         return tempFilename;
     }
 
-    bool FileUtils::FileExists(const std::string &fileName) {
+    /*bool FileUtils::FileExists(const std::string &fileName) {
         return std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName);
-    }
+    }*/
 
     std::string FileUtils::StripBasePath(const std::string &fileName) {
         return GetBasename(fileName) + "." + GetExtension(fileName);

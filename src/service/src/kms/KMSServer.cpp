@@ -33,7 +33,7 @@ namespace AwsMock::Service {
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("kms-backup", [this] { this->BackupKms(); }, _backupCron);
+            scheduler.AddTask("kms-backup", [] { BackupKms(); }, _backupCron);
         }
 
         // Set running
@@ -65,6 +65,6 @@ namespace AwsMock::Service {
     }
 
     void KMSServer::BackupKms() {
-        ModuleService::BackupModule("cognito", true);
+        ModuleService::BackupModule("kms", true);
     }
 }// namespace AwsMock::Service

@@ -175,9 +175,11 @@ namespace AwsMock::Core {
          * @brief Check whether a file exists.
          *
          * @param fileName name of the file.
-         * @return true, if file exists otherwise false.
+         * @return true, if the file exists otherwise false.
          */
-        static bool FileExists(const std::string &fileName);
+        static bool FileExists(const std::string &fileName) {
+            return std::filesystem::exists(fileName) && std::filesystem::is_regular_file(fileName);
+        }
 
         /**
          * @brief Returns the size of the given in bytes.
