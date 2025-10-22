@@ -231,12 +231,12 @@ namespace AwsMock::Service {
             totalItems += table.itemCount;
             totalSize += table.size;
 
-            _metricService.SetGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, static_cast<double>(table.itemCount));
-            _metricService.SetGauge(DYNAMODB_SIZE_BY_TABLE, "table", table.name, static_cast<double>(table.size));
+            _metricService.SetGauge(DYNAMODB_ITEMS_BY_TABLE, "table", table.name, table.itemCount);
+            _metricService.SetGauge(DYNAMODB_SIZE_BY_TABLE, "table", table.name, table.size);
         }
         _metricService.SetGauge(DYNAMODB_TABLE_COUNT, {}, {}, static_cast<double>(tables.size()));
-        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, static_cast<double>(totalItems));
-        _metricService.SetGauge(DYNAMODB_TABLE_SIZE, {}, {}, static_cast<double>(totalSize));
+        _metricService.SetGauge(DYNAMODB_ITEM_COUNT, {}, {}, totalItems);
+        _metricService.SetGauge(DYNAMODB_TABLE_SIZE, {}, {}, totalSize);
 
         log_trace << "DynamoDb monitoring finished";
     }

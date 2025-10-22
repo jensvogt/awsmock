@@ -49,7 +49,7 @@ namespace AwsMock::Service {
         /**
          * @brief Backup the KMS objects
          */
-        void BackupKms();
+        static void BackupKms();
 
         /**
          * KMS database

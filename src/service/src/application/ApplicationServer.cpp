@@ -137,11 +137,13 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::WatchdogApplications() const {
+
         for (auto &application: _applicationDatabase.ListApplications()) {
 
             if (application.containerId.empty() && application.enabled) {
-                ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
-                ContainerService::instance().WaitForContainer(application.containerId);
+                Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+                ContainerService::instance().StartDockerContainer(container.id, container.names[0]);
+                ContainerService::instance().WaitForContainer(container.id);
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
                 log_info << "Application started , name: " << application.name;
             } else {

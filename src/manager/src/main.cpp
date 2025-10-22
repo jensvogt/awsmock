@@ -31,12 +31,6 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#ifdef WIN32
-#include <boost/application.hpp>
-#include <boost/application/initializers.hpp>
-#include <boost/application/service_setup.hpp>
-#endif
-
 // AwsMock includes
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -128,9 +122,9 @@ int main(const int argc, char *argv[]) {
     }
 #endif
 
-    // Read configuration
+    // Read configuration, log to stderr, as we do not have logging yet
     if (vm.contains("config")) {
-        const auto configFilename = vm["config"].as<std::string>();
+        const auto configFilename = std::string(vm["config"].as<std::string>().data());
         if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
             std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
             exit(1);

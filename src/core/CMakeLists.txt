@@ -25,17 +25,21 @@ endif ()
 
 # Shared library
 if (WIN32)
-    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    target_include_directories(${LIBRARY_STATIC} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
             ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR} ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR}
             ${LIBSSL_INCLUDE_DIR})
+    target_link_directories(${LIBRARY} PUBLIC ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR} ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})
+    target_link_libraries(${LIBRARY} PUBLIC boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
+            boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
+            boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib)
+    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
-    add_library(${LIBRARY} SHARED ${SOURCES}
-            include/awsmock/core/Semaphore.h
-            include/awsmock/core/Linq.h)
-    target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+    add_library(${LIBRARY} SHARED ${SOURCES})
+    target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY} PUBLIC mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
-            boost_log boost_log_setup boost_process ssl crypto archive magic)
+    target_link_libraries(${LIBRARY} PUBLIC boost_filesystem boost_url boost_thread boost_locale boost_log
+            boost_log_setup boost_process ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
