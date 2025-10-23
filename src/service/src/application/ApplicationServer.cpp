@@ -98,7 +98,7 @@ namespace AwsMock::Service {
             if (application.enabled) {
                 DoAddApplication(application);
             } else {
-                application.status = "STOPPED";
+                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application = _applicationDatabase.UpdateApplication(application);
                 log_debug << "Application stopped, name: " << application.name;
             }
@@ -146,8 +146,6 @@ namespace AwsMock::Service {
                 ContainerService::instance().WaitForContainer(container.id);
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
                 log_info << "Application started , name: " << application.name;
-            } else {
-                continue;
             }
 
             if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.containerId); response.status == http::status::ok) {
@@ -165,6 +163,7 @@ namespace AwsMock::Service {
 
                     if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
                         ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
+                        ContainerService::instance().WaitForContainer(application.containerId);
                         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
                         log_info << "Application started , name: " << application.name;
                     }
@@ -181,6 +180,7 @@ namespace AwsMock::Service {
 
             } else if (application.enabled) {
                 ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
+                ContainerService::instance().WaitForContainer(application.containerId);
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
                 log_info << "Application started , name: " << application.name;
             }
