@@ -73,6 +73,9 @@ namespace AwsMock::Dto::Docker {
          * @return public port
          */
         int GetFirstPublicPort(const std::string &privatePort) {
+            if (privatePort.empty()) {
+                return -1;
+            }
             std::vector<Port> ports = portBindings[privatePort];
             if (ports.empty()) {
                 ports = portBindings[privatePort + "/tcp"];
@@ -96,8 +99,11 @@ namespace AwsMock::Dto::Docker {
                 return -1;
             }
             const std::string firstPrivatePort = portBindings.begin()->first;
+            if (firstPrivatePort.empty()) {
+                return -1;
+            }
             if (Core::StringUtils::EndsWith(firstPrivatePort, "/tcp")) {
-                return stoi(firstPrivatePort.substr(firstPrivatePort.size() - 4));
+                return stoi(firstPrivatePort.substr(0, firstPrivatePort.size() - 4));
             }
             return std::stoi(firstPrivatePort);
         }
