@@ -177,12 +177,6 @@ namespace AwsMock::Service {
                         log_info << "Application stopped , name: " << application.name;
                     }
                 }
-
-            } else if (application.enabled) {
-                ContainerService::instance().StartDockerContainer(application.containerId, application.containerName);
-                ContainerService::instance().WaitForContainer(application.containerId);
-                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING);
-                log_info << "Application started , name: " << application.name;
             }
         }
     }
