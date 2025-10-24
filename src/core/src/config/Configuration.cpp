@@ -295,10 +295,15 @@ namespace AwsMock::Core {
     }
 
     void Configuration::SetFilename(const std::string &filename) {
+        log_info<<"Set configuration filename to '" << filename << "'";
+
+        // Check file name length
         if (filename.empty()) {
             log_error << "Empty configuration filename";
             throw CoreException("Empty configuration filename");
         }
+
+        // Check file
         if (!FileUtils::FileExists(filename)) {
             log_warning << "Configuration file '" << filename << "' does not exist. Will use defaults.";
             throw CoreException("Configuration file '" + filename + "' does not exist. Will use defaults.");

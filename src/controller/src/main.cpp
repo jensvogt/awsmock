@@ -1,8 +1,9 @@
+// ===================================================================================
 //
 // Created by vogje01 on 21/12/2022.
-// Copyright 2022 - 2024 Jens Vogt
+// Copyright 2022 -2025 Dr. Jens Vogt
 //
-// This file is part of awsmock (AWS Cloud Simulation).
+// This file is part of awsmock.
 //
 // aws-mock is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +17,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with aws-mock.  If not, see <http://www.gnu.org/licenses/>.
-
+//
+// ===================================================================================
+//
 // C++ standard includes
 #include <cstdlib>
 #include <iostream>

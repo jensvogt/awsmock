@@ -19,9 +19,12 @@
 #include <awsmock/memorydb/ApplicationMemoryDb.h>
 #include <awsmock/memorydb/CognitoMemoryDb.h>
 #include <awsmock/repository/Database.h>
+#include <awsmock/core/monitoring/MonitoringDefinition.h>
+#include <awsmock/core/monitoring/MonitoringTimer.h>
 
 namespace AwsMock::Database {
 
+    /*
     struct ApplicationMonitoringCounter {
         long count{};
         system_clock::time_point modified = system_clock::now();
@@ -31,7 +34,7 @@ namespace AwsMock::Database {
     using ApplicationCounterMapType = boost::container::map<std::string, ApplicationMonitoringCounter, std::less<std::string>, ApplicationShmAllocator>;
 
     static constexpr auto APPLICATION_COUNTER_MAP_NAME = "ApplicationCounter";
-
+*/
     /**
      * @brief Application MongoDB database.
      *
@@ -158,4 +161,4 @@ namespace AwsMock::Database {
 
 }// namespace AwsMock::Database
 
-#endif// AWSMOCK_REPOSITORY_COGNITO_DATABASE_H
+#endif// AWSMOCK_REPOSITORY_APPLICATION_DATABASE_H

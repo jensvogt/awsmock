@@ -242,7 +242,7 @@ namespace AwsMock::Core {
 
         T value = defaultValue;
         if (getenv(envProperty.c_str()) != nullptr) {
-            const std::string envVariable = getenv(envProperty.c_str());
+            const std::string envVariable = std::string(getenv(envProperty.c_str()));
             AddToEnvList(key, envVariable);
             if (typeName == TYPE_NAME_INT) {
                 value = std::stoi(envVariable);
@@ -257,7 +257,7 @@ namespace AwsMock::Core {
             }
         }
         _treeConfiguration.put<T>(key, value);
-        log_trace << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
+        log_info << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
 
     template<class T>
@@ -278,7 +278,7 @@ namespace AwsMock::Core {
             array.push_back(std::make_pair("", child));
         }
         _treeConfiguration.add_child(key, array);
-        log_debug << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
+        log_info << "Defined property, key: " << key << ", property: " << envProperty << ", default: " << defaultValue;
     }
 
     template<class T>
