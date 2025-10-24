@@ -48,14 +48,6 @@ namespace AwsMock::Service {
         void UpdateCounter() const;
 
         /**
-         * @brief Update application status
-         *
-         * @par
-         * Synchronizes the container ID and name between the docker daemon and the database. Runs normally each 300sec.
-         */
-        void UpdateApplications() const;
-
-        /**
          * @brief Backup the application objects
          */
         static void BackupApplication();
@@ -75,7 +67,14 @@ namespace AwsMock::Service {
          *
          * @param application application entity
          */
-        void DoAddApplication(const Database::Entity::Apps::Application &application) const;
+        void StartApplication(const Database::Entity::Apps::Application &application) const;
+
+        /**
+         * @brief Recursively stop applications and dependencies.
+         *
+         * @param application application entity
+         */
+        void StopApplication(const Database::Entity::Apps::Application &application) const;
 
         /**
          * @brief Restart all application during startup.
