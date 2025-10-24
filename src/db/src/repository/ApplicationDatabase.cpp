@@ -9,6 +9,7 @@ namespace AwsMock::Database {
     ApplicationDatabase::ApplicationDatabase() : _databaseName(GetDatabaseName()), _applicationCollectionName("apps_application"), _memoryDb(ApplicationMemoryDb::instance()) {}
 
     bool ApplicationDatabase::ApplicationExists(const std::string &region, const std::string &name) const {
+       Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "application_exists");
 
         if (HasDatabase()) {
 
@@ -29,6 +30,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Apps::Application ApplicationDatabase::CreateApplication(Entity::Apps::Application &application) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "create_application");
 
         if (HasDatabase()) {
 
@@ -55,6 +57,8 @@ namespace AwsMock::Database {
     }
 
     Entity::Apps::Application ApplicationDatabase::ImportApplication(Entity::Apps::Application &application) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "import_application");
+
         application.containerId = "";
         application.containerName = "";
         if (ApplicationExists(application.region, application.name)) {
@@ -64,6 +68,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Apps::Application ApplicationDatabase::GetApplication(const std::string &region, const std::string &name) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "get_application");
 
         if (HasDatabase()) {
 
@@ -88,6 +93,7 @@ namespace AwsMock::Database {
     }
 
     std::vector<Entity::Apps::Application> ApplicationDatabase::ListApplications(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "list_applications");
 
         std::vector<Entity::Apps::Application> applications;
         if (HasDatabase()) {
@@ -139,6 +145,8 @@ namespace AwsMock::Database {
     }
 
     long ApplicationDatabase::CountApplications(const std::string &region, const std::string &prefix) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "count_applications");
+
         if (HasDatabase()) {
 
             try {
@@ -167,6 +175,7 @@ namespace AwsMock::Database {
     }
 
     Entity::Apps::Application ApplicationDatabase::UpdateApplication(Entity::Apps::Application &application) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "update_applications");
 
         application.modified = system_clock::now();
         if (HasDatabase()) {
@@ -201,6 +210,7 @@ namespace AwsMock::Database {
     }
 
     long ApplicationDatabase::DeleteApplication(const std::string &region, const std::string &name) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "delete_applications");
 
         if (HasDatabase()) {
 
@@ -226,6 +236,7 @@ namespace AwsMock::Database {
     }
 
     long ApplicationDatabase::DeleteAllApplications() const {
+        Monitoring::MonitoringTimer measure(APPLICATION_DATABASE_TIMER, APPLICATION_DATABASE_COUNTER, "action", "delete_applications");
 
         if (HasDatabase()) {
 

@@ -4,16 +4,16 @@
 
 #ifdef _WIN32
 
-// Aws login includes
+// AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/service/frontend/FrontendServer.h>
 #include <awsmock/server/Manager.h>
 #include <awsmock/WindowsService.h>
 
+HANDLE g_hEventSource = nullptr;
 HANDLE g_ServiceStopEvent = nullptr;
 SERVICE_STATUS_HANDLE statusHandle = nullptr;
 SERVICE_STATUS serviceStatus = {};
-HANDLE g_hEventSource = nullptr;
 
 void InstallService(const std::string &exePath, const std::string &serviceName, const std::string &displayName) {
 

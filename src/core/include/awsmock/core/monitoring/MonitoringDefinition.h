@@ -116,6 +116,8 @@
 #define APPLICATION_SERVICE_COUNTER "application_service_counter"
 #define APPLICATION_CPU_USAGE "application_cpu_usage"
 #define APPLICATION_MEMORY_USAGE "application_mem_usage"
+#define APPLICATION_DATABASE_TIMER "application_database_timer"
+#define APPLICATION_DATABASE_COUNTER "application_database_counter"
 
 // Api gateway
 #define API_GATEWAY_SERVICE_TIMER "api_gateway_service_timer"

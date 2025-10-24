@@ -10,9 +10,7 @@
 #include <vector>
 
 // AwsMock includes
-#include "awsmock/utils/SortColumn.h"
-
-
+#include <awsmock/utils/SortColumn.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/exception/DatabaseException.h>
