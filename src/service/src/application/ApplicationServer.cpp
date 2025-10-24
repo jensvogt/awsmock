@@ -8,7 +8,7 @@ namespace AwsMock::Service {
 
     ApplicationServer::ApplicationServer(Core::Scheduler &scheduler, boost::asio::io_context &ioc) : AbstractServer("application"), _applicationService(ioc), _module("application"), _scheduler(scheduler) {
 
-        // Get HTTP configuration values
+        // Get configuration values
         _monitoringPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.monitoring-period");
         _watchdogPeriod = Core::Configuration::instance().GetValue<int>("awsmock.modules.application.watchdog-period");
         _backupActive = Core::Configuration::instance().GetValue<bool>("awsmock.modules.application.backup.active");
@@ -24,8 +24,8 @@ namespace AwsMock::Service {
         log_info << "Application module starting";
 
         // Initialize shared memory
-        _segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        _applicationCounterMap = _segment.find<Database::ApplicationCounterMapType>(Database::APPLICATION_COUNTER_MAP_NAME).first;
+        //_segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
+        //_applicationCounterMap = _segment.find<Database::ApplicationCounterMapType>(Database::APPLICATION_COUNTER_MAP_NAME).first;
 
         // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
@@ -50,9 +50,8 @@ namespace AwsMock::Service {
     void ApplicationServer::UpdateCounter() const {
         log_trace << "Application Monitoring starting";
 
-        if (_applicationCounterMap) {
-            _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationCounterMap->size()));
-        }
+        // Total count
+        _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>( _applicationDatabase.CountApplications()));
 
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {

@@ -157,7 +157,7 @@ namespace AwsMock::Service {
         /**
          * Counter map in a shared memory segment
          */
-        Database::ApplicationCounterMapType *_applicationCounterMap{};
+       // Database::ApplicationCounterMapType *_applicationCounterMap{};
     };
 
 }// namespace AwsMock::Service

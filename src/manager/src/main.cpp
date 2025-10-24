@@ -3,7 +3,7 @@
 // Created by vogje01 on 21/12/2022.
 // Copyright 2022 -2025 Dr. Jens Vogt
 //
-// This file is part of aws-mock.
+// This file is part of awsmock.
 //
 // aws-mock is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,9 +23,6 @@
 // C++ standard includes
 #include <cstdlib>
 #include <iostream>
-
-#define BOOST_APPLICATION_FEATURE_NS_SELECT_BOOST
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS 1
 
 // Boost includes
 #include <boost/program_options/parsers.hpp>
@@ -54,6 +51,10 @@
  * @return system exit code.
  */
 int main(const int argc, char *argv[]) {
+
+#ifdef _WIN32
+    _CrtDumpMemoryLeaks();
+#endif
 
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
@@ -124,7 +125,7 @@ int main(const int argc, char *argv[]) {
 
     // Read configuration, log to stderr, as we do not have logging yet
     if (vm.contains("config")) {
-        const auto configFilename = std::string(vm["config"].as<std::string>().data());
+        const std::string& configFilename = vm["config"].as<std::string>();
         if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
             std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
             exit(1);

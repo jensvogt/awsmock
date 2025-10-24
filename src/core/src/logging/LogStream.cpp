@@ -146,7 +146,7 @@ namespace AwsMock::Core {
     }
 
     void LogStream::AddFile(const std::string &dir, const std::string &prefix, long size, int count) {
-#ifdef WIN32
+#ifdef _WIN32
         file_sink = add_file_log(
                 boost::log::keywords::file_name = dir + "\\" + prefix + ".log ", boost::log::keywords::rotation_size = size,
                 boost::log::keywords::target_file_name = dir + "\\" + prefix + "_ % N.log ", boost::log::keywords::format = &LogFormatter);
