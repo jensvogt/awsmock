@@ -335,11 +335,13 @@ namespace AwsMock::Service {
         // Loop over applications
         long count = 0;
         for (auto &application: _database.ListApplications()) {
-            Dto::Apps::StartApplicationRequest startRequest;
-            startRequest.application = Dto::Apps::Mapper::map(application);
-            startRequest.region = application.region;
-            StartApplication(startRequest);
-            count++;
+            if (application.enabled) {
+                Dto::Apps::StartApplicationRequest startRequest;
+                startRequest.application = Dto::Apps::Mapper::map(application);
+                startRequest.region = application.region;
+                StartApplication(startRequest);
+                count++;
+            }
         }
         return count;
     }

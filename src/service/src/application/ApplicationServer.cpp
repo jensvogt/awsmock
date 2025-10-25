@@ -23,10 +23,6 @@ namespace AwsMock::Service {
         }
         log_info << "Application module starting";
 
-        // Initialize shared memory
-        //_segment = boost::interprocess::managed_shared_memory(boost::interprocess::open_only, MONITORING_SEGMENT_NAME);
-        //_applicationCounterMap = _segment.find<Database::ApplicationCounterMapType>(Database::APPLICATION_COUNTER_MAP_NAME).first;
-
         // Start application background threads
         _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
         _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
@@ -135,11 +131,20 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::RestartApplications() const {
+
+        // Synchronize containers
+        SyncContainers();
+
         const long restarted = _applicationService.RestartAllApplications();
         log_info << "Applications restarted, count: " << restarted;
     }
 
     void ApplicationServer::WatchdogApplications() const {
+
+        // Synchronize containers
+        SyncContainers();
+
+        // Check status
         for (auto &application: _applicationDatabase.ListApplications()) {
 
             // If containerId is empty and the application is enabled, start it
@@ -156,31 +161,38 @@ namespace AwsMock::Service {
                 continue;
             }
 
-            if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.containerId); response.status == http::status::ok) {
-
-                application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application.containerId = response.id;
-                application.containerName = Core::StringUtils::StartsWith(response.name, "/") ? response.name.substr(1) : response.name;
-                application.imageId = response.image;
-                application.imageSize = response.sizeRootFs;
-                application.privatePort = response.hostConfig.GetFirstPrivatePort();
-                application.publicPort = response.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
-                log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
-
-                if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
-                    StartApplication(application);
-                    log_info << "Application started , name: " << application.name;
-                }
-
-            } else {
-
+            if (Dto::Docker::Container response = ContainerService::instance().GetContainerByName(application.containerName); response.id.empty()) {
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application.containerId = "";
                 application.containerName = "";
                 application.privatePort = -1;
                 application.publicPort = -1;
+                application = _applicationDatabase.UpdateApplication(application);
             }
-            application = _applicationDatabase.UpdateApplication(application);
+        }
+    }
+
+    void ApplicationServer::SyncContainers() const {
+
+        // Sync docker container with database
+        const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        for (const auto &container: ContainerService::instance().ListContainers()) {
+
+            std::string name = Core::StringUtils::Split(container.image, ':')[0];
+            std::string tag = Core::StringUtils::Split(container.image, ':')[1];
+            if (_applicationDatabase.ApplicationExists(region, name)) {
+                Database::Entity::Apps::Application application = _applicationDatabase.GetApplication(region, name);
+                application.region = region;
+                application.containerId = container.id;
+                application.containerName = container.GetContainerName();
+                application.publicPort = container.GetPublicPortV4();
+                application.privatePort = container.GetPrivatePortV4();
+                application.imageName = container.image;
+                application.imageId = container.imageId;
+                application.status = container.state.running ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application = _applicationDatabase.UpdateApplication(application);
+                log_debug << "Application updated, imageName: " << application.imageName;
+            }
         }
     }
 
