@@ -104,12 +104,12 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Server protocols
          */
-        std::vector<Protocol> protocols;
+        std::vector<Protocol> protocols{};
 
         /**
          * Users
          */
-        std::vector<User> users;
+        std::vector<User> users{};
 
         /**
          * State
@@ -129,7 +129,7 @@ namespace AwsMock::Database::Entity::Transfer {
         /**
          * Tags
          */
-        std::map<std::string, std::string> tags;
+        std::map<std::string, std::string> tags{};
 
         /**
          * Listener address

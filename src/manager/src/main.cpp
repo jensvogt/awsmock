@@ -125,7 +125,7 @@ int main(const int argc, char *argv[]) {
 
     // Read configuration, log to stderr, as we do not have logging yet
     if (vm.contains("config")) {
-        const std::string& configFilename = vm["config"].as<std::string>();
+        const std::string &configFilename = vm["config"].as<std::string>();
         if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
             std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
             exit(1);
@@ -183,8 +183,8 @@ int main(const int argc, char *argv[]) {
 
     // Windows service table entries
     constexpr SERVICE_TABLE_ENTRY serviceTable[] = {
-        {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
-        {nullptr, nullptr}};
+            {const_cast<LPSTR>(DEFAULT_SERVICE_NAME), static_cast<LPSERVICE_MAIN_FUNCTIONA>(ServiceMain)},
+            {nullptr, nullptr}};
 
     // Windows service start
     if (!StartServiceCtrlDispatcher(serviceTable)) {
@@ -208,7 +208,7 @@ int main(const int argc, char *argv[]) {
     log_info << "Backend server started.";
     awsMockManager.Run();
 
-    #endif
+#endif
 
     return 0;
 }

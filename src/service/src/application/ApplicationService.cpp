@@ -483,6 +483,10 @@ namespace AwsMock::Service {
             // Stop container
             ContainerService::instance().StopContainer(application.containerName);
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+            application.containerId = "";
+            application.containerName = "";
+            application.privatePort = -1;
+            application.publicPort = -1;
             application = _database.UpdateApplication(application);
             log_debug << "Application stopped, name: " << application.name;
 
