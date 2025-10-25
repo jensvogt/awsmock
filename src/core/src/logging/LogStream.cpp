@@ -1,8 +1,5 @@
 
-
-#include "awsmock/core/config/Configuration.h"
-
-
+#include <awsmock/core/config/Configuration.h>
 #include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {

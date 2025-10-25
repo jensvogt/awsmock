@@ -51,7 +51,7 @@ namespace AwsMock::Service {
         log_trace << "Application Monitoring starting";
 
         // Total count
-        _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>( _applicationDatabase.CountApplications()));
+        _metricService.SetGauge(APPLICATION_COUNT, {}, {}, static_cast<double>(_applicationDatabase.CountApplications()));
 
         // CPU / memory usage
         for (auto &application: _applicationDatabase.ListApplications()) {
@@ -140,7 +140,6 @@ namespace AwsMock::Service {
     }
 
     void ApplicationServer::WatchdogApplications() const {
-
         for (auto &application: _applicationDatabase.ListApplications()) {
 
             // If containerId is empty and the application is enabled, start it
@@ -159,21 +158,29 @@ namespace AwsMock::Service {
 
             if (Dto::Docker::InspectContainerResponse response = ContainerService::instance().InspectContainer(application.containerId); response.status == http::status::ok) {
 
-                    application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                    application.containerId = response.id;
-                    application.containerName = Core::StringUtils::StartsWith(response.name, "/") ? response.name.substr(1) : response.name;
-                    application.imageId = response.image;
-                    application.imageSize = response.sizeRootFs;
-                    application.privatePort = response.hostConfig.GetFirstPrivatePort();
-                    application.publicPort = response.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
-                    log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
+                application.status = response.state.status == "running" ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application.containerId = response.id;
+                application.containerName = Core::StringUtils::StartsWith(response.name, "/") ? response.name.substr(1) : response.name;
+                application.imageId = response.image;
+                application.imageSize = response.sizeRootFs;
+                application.privatePort = response.hostConfig.GetFirstPrivatePort();
+                application.publicPort = response.hostConfig.GetFirstPublicPort(std::to_string(application.privatePort));
+                log_debug << "Application updated, name: " << application.name << ", status: " << application.status;
 
-                    if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
-                        StartApplication(application);
-                        log_info << "Application started , name: " << application.name;
-                    }
-                    application = _applicationDatabase.UpdateApplication(application);
+                if (application.status != Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING)) {
+                    StartApplication(application);
+                    log_info << "Application started , name: " << application.name;
+                }
+
+            } else {
+
+                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+                application.containerId = "";
+                application.containerName = "";
+                application.privatePort = -1;
+                application.publicPort = -1;
             }
+            application = _applicationDatabase.UpdateApplication(application);
         }
     }
 
@@ -188,5 +195,4 @@ namespace AwsMock::Service {
             log_info << "Application stopped, name: " << application.name;
         }
     }
-
 }// namespace AwsMock::Service

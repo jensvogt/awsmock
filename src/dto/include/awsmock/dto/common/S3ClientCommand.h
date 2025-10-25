@@ -128,7 +128,7 @@ namespace AwsMock::Dto::Common {
         /**
          * Client command
          */
-        S3CommandType command;
+        S3CommandType command = S3CommandType::UNKNOWN;
 
         /**
          * Bucket

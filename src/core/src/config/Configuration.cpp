@@ -295,7 +295,7 @@ namespace AwsMock::Core {
     }
 
     void Configuration::SetFilename(const std::string &filename) {
-        log_info<<"Set configuration filename to '" << filename << "'";
+        log_debug << "Set configuration filename to '" << filename << "'";
 
         // Check file name length
         if (filename.empty()) {
