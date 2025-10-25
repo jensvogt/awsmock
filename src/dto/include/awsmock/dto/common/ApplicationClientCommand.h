@@ -95,7 +95,7 @@ namespace AwsMock::Dto::Common {
         /**
          * Client command
          */
-        ApplicationCommandType command;
+        ApplicationCommandType command = ApplicationCommandType::UNKNOWN;
 
         /**
          * Bucket

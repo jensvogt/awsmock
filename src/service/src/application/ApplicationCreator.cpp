@@ -47,9 +47,9 @@ namespace AwsMock::Service {
 
         // Start the docker container, in case it is not already running.
         if (!inspectContainerResponse.state.running && !inspectContainerResponse.id.empty()) {
-            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.name);
+            ContainerService::instance().StartDockerContainer(inspectContainerResponse.id, inspectContainerResponse.GetContainerName());
             ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
-            log_info << "Application docker container started, function: " << applicationEntity.name << ", containerId: " << Core::StringUtils::Continuation(inspectContainerResponse.id, 16);
+            log_info << "Application docker container started, name: " << applicationEntity.name << ", containerId: " << Core::StringUtils::Continuation(inspectContainerResponse.id, 16);
         }
 
         // Get the public port
@@ -57,7 +57,7 @@ namespace AwsMock::Service {
         if (!inspectContainerResponse.id.empty()) {
             applicationEntity.publicPort = inspectContainerResponse.hostConfig.GetFirstPublicPort(std::to_string(applicationEntity.privatePort));
             applicationEntity.containerId = inspectContainerResponse.id;
-            applicationEntity.containerName = inspectContainerResponse.name.substr(1);
+            applicationEntity.containerName = inspectContainerResponse.GetContainerName();
             applicationEntity.created = system_clock::now();
         }
     }

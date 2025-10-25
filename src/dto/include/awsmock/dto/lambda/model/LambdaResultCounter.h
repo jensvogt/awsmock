@@ -101,7 +101,7 @@ namespace AwsMock::Dto::Lambda {
             r.lambdaName = Core::Json::GetStringValue(v, "lambdaName");
             r.lambdaArn = Core::Json::GetStringValue(v, "lambdaArn");
             r.runtime = Core::Json::GetStringValue(v, "runtime");
-            r.requestBody = Core::Json::GetLongValue(v, "requestBody");
+            r.requestBody = Core::Json::GetStringValue(v, "requestBody");
             r.responseBody = Core::Json::GetStringValue(v, "responseBody");
             r.logMessages = Core::Json::GetStringValue(v, "logMessages");
             r.duration = Core::Json::GetLongValue(v, "duration");

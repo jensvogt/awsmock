@@ -122,7 +122,7 @@ namespace AwsMock::Dto::Common {
                     break;
             }
         }
-        log_info << "Client command: " << S3CommandTypeToString(command);
+        log_debug << "Client command: " << S3CommandTypeToString(command);
     }
 
     void S3ClientCommand::GetCommandFromUserAgent(const http::verb &httpMethod, const UserAgent &userAgent) {

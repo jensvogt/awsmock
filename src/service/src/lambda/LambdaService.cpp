@@ -971,6 +971,11 @@ namespace AwsMock::Service {
         lambda.state = Database::Entity::Lambda::Pending;
         lambda = _lambdaDatabase.UpdateLambda(lambda);
 
+        // Create mutex
+        if (!_instanceMutex.contains(lambda.function)) {
+            _instanceMutex[lambda.function] = std::make_shared<boost::mutex>();
+        }
+
         // Create the lambda function asynchronously
         const std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
         const LambdaCreator lambdaCreator;
