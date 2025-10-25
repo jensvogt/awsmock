@@ -66,6 +66,16 @@ namespace AwsMock::Dto::Docker {
          */
         boost::beast::http::status status = boost::beast::http::status::unknown;
 
+        /**
+         * Return container name
+         */
+        std::string GetContainerName() {
+            if (!name.empty() && Core::StringUtils::StartsWith(name, "/")) {
+                return name.substr(1);
+            }
+            return name;
+        }
+
       private:
 
         friend InspectContainerResponse tag_invoke(boost::json::value_to_tag<InspectContainerResponse>, boost::json::value const &v) {

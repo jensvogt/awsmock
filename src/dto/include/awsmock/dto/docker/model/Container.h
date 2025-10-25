@@ -181,7 +181,7 @@ namespace AwsMock::Dto::Docker {
         /**
          * The ports exposed by this container
          */
-        std::vector<ContainerPort> ports;
+        std::vector<ContainerPort> ports{};
 
         /**
          * The size of files that have been created or changed by this container
@@ -193,14 +193,49 @@ namespace AwsMock::Dto::Docker {
          */
         long sizeRootFs = 0;
 
+        /**
+         * @brief Return the first name
+         */
+        [[nodiscard]] std::string GetContainerName() const {
+            if (names.empty()) return "";
+            return Core::StringUtils::StartsWith(names.front(), "/") ? names.front().substr(1) : names.front();
+        }
+
+        /**
+         * @brief Return the private port, TCP version 4
+         */
+        [[nodiscard]] int GetPrivatePortV4() const {
+            if (ports.empty()) return -1;
+            for (const auto &port: ports) {
+                if (Core::StringUtils::Contains(port.ipAddress, ".")) {
+                    return port.privatePort;
+                }
+            }
+            return -1;
+        }
+
+        /**
+         * @brief Return the public port, TCP version 4
+         */
+        [[nodiscard]] int GetPublicPortV4() const {
+            if (ports.empty()) return -1;
+            for (const auto &port: ports) {
+                if (Core::StringUtils::Contains(port.ipAddress, ".")) {
+                    return port.publicPort;
+                }
+            }
+            return -1;
+        }
+
       private:
 
         friend Container tag_invoke(boost::json::value_to_tag<Container>, boost::json::value const &v) {
             Container r;
             r.id = Core::Json::GetStringValue(v, "Id");
             r.image = Core::Json::GetStringValue(v, "Image");
-            r.imageId = Core::Json::GetStringValue(v, "ImageId");
+            r.imageId = Core::Json::GetStringValue(v, "ImageID");
             r.status = Core::Json::GetStringValue(v, "Status");
+            r.command = Core::Json::GetStringValue(v, "Command");
             r.sizeRw = Core::Json::GetLongValue(v, "SizeRw");
             r.sizeRootFs = Core::Json::GetLongValue(v, "SizeRootFs");
             if (Core::Json::AttributeExists(v, "State") && v.at("State").is_object()) {
@@ -223,7 +258,8 @@ namespace AwsMock::Dto::Docker {
             jv = {
                     {"Id", obj.id},
                     {"Image", obj.imageId},
-                    {"ImageId", obj.imageId},
+                    {"ImageID", obj.imageId},
+                    {"Command", obj.command},
                     {"State", boost::json::value_from(obj.state)},
                     {"Status", obj.status},
                     {"SizeRw", obj.sizeRw},

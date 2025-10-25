@@ -114,6 +114,11 @@ namespace AwsMock::Database::Entity::Apps {
         long imageSize{};
 
         /**
+         * Full image name in format name:tag
+         */
+        std::string imageName{};
+
+        /**
          * MD5 of docker image
          */
         std::string imageMd5;

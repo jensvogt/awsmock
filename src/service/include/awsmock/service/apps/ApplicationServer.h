@@ -60,7 +60,7 @@ namespace AwsMock::Service {
         /**
          * @brief Start an application log server
          */
-        void StartApplicationLogServer()const;
+        void StartApplicationLogServer() const;
 
         /**
          * @brief Recursively start applications and dependencies.
@@ -80,6 +80,11 @@ namespace AwsMock::Service {
          * @brief Restart all application during startup.
          */
         void RestartApplications() const;
+
+        /**
+         * @brief Synchronize docker containers with database
+         */
+        void SyncContainers() const;
 
         /**
          * @brief Check application status
@@ -157,7 +162,7 @@ namespace AwsMock::Service {
         /**
          * Counter map in a shared memory segment
          */
-       // Database::ApplicationCounterMapType *_applicationCounterMap{};
+        // Database::ApplicationCounterMapType *_applicationCounterMap{};
     };
 
 }// namespace AwsMock::Service
