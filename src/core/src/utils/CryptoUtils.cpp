@@ -466,10 +466,10 @@ namespace AwsMock::Core {
     void Crypto::Base64Decode(const std::string &encodedString, const std::string &filename) {
         typedef std::basic_ofstream<unsigned char> uofstream;
         uofstream ofs(filename, std::ios::out | std::ios::binary);
-        const int size = boost::beast::detail::base64::decoded_size(encodedString.length());
+        const long size = static_cast<long>(boost::beast::detail::base64::decoded_size(encodedString.length()));
         const auto bytes = static_cast<unsigned char *>(malloc(size));
-        const std::pair<std::size_t, std::size_t> sizes = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
-        ofs.write(bytes, sizes.second);
+        const auto [fst, snd] = boost::beast::detail::base64::decode(bytes, encodedString.c_str(), encodedString.length());
+        ofs.write(bytes, static_cast<std::streamsize>(fst));
         ofs.flush();
         ofs.close();
         free(bytes);
@@ -490,7 +490,7 @@ namespace AwsMock::Core {
             const size_t pad_chars(std::count(input.end() - 4, input.end(), '='));
             std::replace(input.end() - 4, input.end(), '=', 'A');
             output.clear();
-            output.reserve(input.size() * 1.3334);
+            output.reserve(1.3334 * static_cast<double>(input.size()));
             output.assign(ItBinaryT(input.begin()), ItBinaryT(input.end()));
             output.erase(output.end() - (pad_chars < 2 ? pad_chars : 2), output.end());
         } catch (std::exception const &) {

@@ -11,8 +11,9 @@ if (WIN32)
             ${LIBSSH_INCLUDE_DIR} ${LIBSSL_LIB_DIR})
     target_link_directories(${BINARY} PUBLIC ${MONGOCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSH_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR} ${LIBPROMETHEUS_LIB_DIR})
-    target_link_libraries(${BINARY} awsmocksrv awsmockdto awsmockdb awsmockcore libssl.lib libcrypto.lib archive.lib
-            magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib bson2.lib mongoc2.lib
+    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
+            libssl.lib libcrypto.lib archive.lib magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib bson2.lib
+            mongoc2.lib
             "$<$<CONFIG:RELEASE>:bsoncxx-v_noabi-rhi-x64-v143-md.lib>"
             "$<$<CONFIG:DEBUG>:bsoncxx-v_noabi-dhi-x64-v143-mdd.lib>"
             "$<$<CONFIG:RELEASE>:mongocxx-v_noabi-rhi-x64-v143-md.lib>"

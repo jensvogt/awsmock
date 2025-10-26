@@ -16,7 +16,6 @@
 #endif
 #endif
 
-
 // C++ includes
 #include <chrono>
 #include <map>

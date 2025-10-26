@@ -7,7 +7,7 @@ namespace AwsMock::Service {
     http::response<http::dynamic_body> ApplicationHandler::HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) {
         log_debug << "Application POST request, URI: " << request.target() << " region: " << region << " user: " << user;
 
-        Dto::Common::ApplicationClientCommand clientCommand;
+       Dto::Common::ApplicationClientCommand clientCommand;
         clientCommand.FromRequest(request, region, user);
 
         try {

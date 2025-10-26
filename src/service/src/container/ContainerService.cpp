@@ -78,20 +78,21 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::BuildApplicationImage(const std::string &codeDir, const std::string &name, const std::string &tag, const std::string &runtime, const std::string &archive, const long privatePort, const std::map<std::string, std::string> &environment) const {
-        log_debug << "Build image request, name: " << name << " tags: " << tag;
+        log_debug << "Build image request, name: " << name << ", tags: " << tag;
 
         // Write the docker file
         std::string dockerFile = WriteApplicationDockerFile(codeDir, name, archive, privatePort, runtime, environment);
         const std::string imageFile = BuildImageFile(codeDir, name);
         if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
-            log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
+            log_error << "Build image failed, statusCode: " << statusCode << ", body: " << body;
+            return dockerFile;
         }
         log_info << "Build image successful, name: " << name << ": " << tag;
         return dockerFile;
     }
 
     std::string ContainerService::BuildDynamoDbImage(const std::string &name, const std::string &tag, const std::string &dockerFile) const {
-        log_debug << "Build image request, name: " << name << " tags: " << tag;
+        log_debug << "Build image request, name: " << name << ", tags: " << tag;
 
         // Write the docker file
         const std::string codeDir = Core::DirUtils::CreateTempDir();
@@ -107,7 +108,7 @@ namespace AwsMock::Service {
         const std::string imageFile = BuildImageFile(codeDir, tarFileName);
 
         if (auto [statusCode, body, contentLength] = _domainSocket->SendBinary(http::verb::post, "/build?t=" + name + ":" + tag, imageFile, {}); statusCode != http::status::ok) {
-            log_error << "Build image failed, statusCode: " << statusCode << " body: " << body;
+            log_error << "Build image failed, statusCode: " << statusCode << ", body: " << body;
         }
         return dockerFile;
     }
@@ -160,17 +161,12 @@ namespace AwsMock::Service {
 
     bool ContainerService::ContainerExistsByImageName(const std::string &imageName, const std::string &tag) const {
 
-        const std::string filters = Core::StringUtils::UrlEncode(R"({"ancestor":[")" + imageName + ":" + tag + "\"]}");
-        auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true&filters=" + filters);
-        if (statusCode == http::status::ok) {
-            if (const Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body); response.containerList.empty()) {
-                return false;
-            }
-            log_debug << "Docker container found, name: " << imageName;
-            return true;
+        if (const std::vector<Dto::Docker::Container> containers = ListContainerByImageName(imageName, tag); containers.empty()) {
+            std::string containerName = tag.empty() ? imageName : imageName + ":" + tag;
+            log_warning << "Docker container not found, name: " << containerName;
+            return false;
         }
-        log_info << "Docker container by image failed, statusCode: " << statusCode;
-        return false;
+        return true;
     }
 
     Dto::Docker::Container ContainerService::GetFirstContainerByImageName(const std::string &name, const std::string &tag) const {
@@ -274,14 +270,19 @@ namespace AwsMock::Service {
 
         // Docker API does not work as expected, therefore, we filter ourselves
         std::vector<Dto::Docker::Container> containers;
+        const std::string containerName = tag.empty()? name : name + ":" + tag;
         for (const auto &container: response.containerList) {
-            if (tag.empty() && Core::StringUtils::Contains(container.image, name)) {
-                containers.push_back(container);
-            } else if (Core::StringUtils::Contains(container.image, name + ":" + tag)) {
+            if (Core::StringUtils::Contains(container.image, containerName)) {
                 containers.push_back(container);
             }
         }
-        log_info << "Docker container found, name: " << name << ":" << tag << " count: " << containers.size();
+
+        // Check number of containers found
+        if (containers.empty()) {
+            log_warning << "Docker container not found, name: " << name << ":" << tag;
+        } else {
+            log_info << "Docker container found, name: " << name << ":" << tag;
+        }
         return containers;
     }
 
@@ -809,7 +810,13 @@ namespace AwsMock::Service {
     }
 
     std::string ContainerService::BuildImageFile(const std::string &codeDir, const std::string &name) {
-        std::string tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
+
+        std::string tarFileName;
+#ifdef _WIN32
+        tarFileName = codeDir + Core::FileUtils::separator() + name + ".tar";
+#else
+        tarFileName = codeDir + Core::FileUtils::separator() + name + ".tgz";
+#endif
         Core::TarUtils::TarDirectory(tarFileName, codeDir + Core::FileUtils::separator());
         log_debug << "Zipped TAR file written: " << tarFileName;
 

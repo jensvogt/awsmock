@@ -52,10 +52,6 @@
  */
 int main(const int argc, char *argv[]) {
 
-#ifdef _WIN32
-    _CrtDumpMemoryLeaks();
-#endif
-
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
 
@@ -125,11 +121,7 @@ int main(const int argc, char *argv[]) {
 
     // Read configuration, log to stderr, as we do not have logging yet
     if (vm.contains("config")) {
-        const std::string &configFilename = vm["config"].as<std::string>();
-        if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
-            std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
-            exit(1);
-        }
+        const std::string configFilename = vm["config"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 

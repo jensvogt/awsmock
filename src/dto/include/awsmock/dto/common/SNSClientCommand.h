@@ -108,7 +108,7 @@ namespace AwsMock::Dto::Common {
         /**
          * @brief Client command
          */
-        SNSCommandType command{};
+        SNSCommandType command = SNSCommandType::UNKNOWN;
 
         /**
          * @brief Returns the command from the HTTP header

@@ -49,6 +49,13 @@ namespace AwsMock::Core::Json {
         return defaultValue;
     }
 
+    inline long long GetLongLongValue(const boost::json::value &value, const std::string &name, const long defaultValue = 0) {
+        if (AttributeExists(value, name)) {
+            return value.at(name).as_int64();
+        }
+        return defaultValue;
+    }
+
     inline int GetIntValue(const boost::json::value &value, const std::string &name, const int defaultValue = 0) {
         return static_cast<int>(GetLongValue(value, name, defaultValue));
     }

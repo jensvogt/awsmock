@@ -150,7 +150,7 @@ namespace AwsMock::Dto::Common {
         /**
          * @brief Client command
          */
-        SqsCommandType command{};
+        SqsCommandType command = SqsCommandType::UNKNOWN;
 
         /**
          * @brief Returns the command from HTTP header

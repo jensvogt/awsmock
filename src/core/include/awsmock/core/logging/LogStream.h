@@ -146,7 +146,7 @@ namespace AwsMock::Core {
         /**
          * Severity
          */
-        static std::string _severity;
+        static boost::log::trivial::severity_level _severity;
 
         /**
          * Console appender
