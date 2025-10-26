@@ -138,9 +138,15 @@ namespace AwsMock::Service {
         std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
 
-        // Read the base64 encoded zip file
+        // Check the base64 encoded zip file
         const auto lambdaDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.lambda.data-dir");
         const std::string base64FullFile = lambdaDir + Core::FileUtils::separator() + zipFile;
+        if (!Core::FileUtils::FileExists(base64FullFile)) {
+            log_error << "Base64 file does not exist, path: " << base64FullFile;
+            return;
+        }
+
+        // Read the function code
         const std::string functionCode = Core::FileUtils::ReadFile(base64FullFile);
         log_debug << "Created Base64 string, length: " << functionCode.size();
 

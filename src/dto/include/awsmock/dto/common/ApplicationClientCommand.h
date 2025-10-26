@@ -9,16 +9,12 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/core/AwsUtils.h>
-#include <awsmock/core/BsonUtils.h>
-#include <awsmock/core/HttpUtils.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/AwsUtils.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
-
-    namespace http = boost::beast::http;
 
     /**
      * @brief Supported application client commands
@@ -69,7 +65,7 @@ namespace AwsMock::Dto::Common {
             {ApplicationCommandType::UNKNOWN, "unknown"},
     };
 
-    [[maybe_unused]] static std::string ApplicationCommandTypeToString(const ApplicationCommandType commandType) {
+    [[maybe_unused]] static std::string ApplicationCommandTypeToString(const ApplicationCommandType &commandType) {
         return ApplicationCommandTypeNames[commandType];
     }
 
@@ -96,11 +92,6 @@ namespace AwsMock::Dto::Common {
          * Client command
          */
         ApplicationCommandType command = ApplicationCommandType::UNKNOWN;
-
-        /**
-         * Bucket
-         */
-        std::string poolName;
 
         /**
          * @brief Convert to a JSON string

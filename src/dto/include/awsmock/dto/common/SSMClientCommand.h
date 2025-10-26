@@ -13,6 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
+#include <awsmock/dto/common/UserAgent.h>
 
 namespace AwsMock::Dto::Common {
 

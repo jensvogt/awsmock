@@ -73,8 +73,13 @@ namespace AwsMock::Dto::Monitoring {
             }
             r.step = Core::Json::GetLongValue(v, "step");
             r.limit = Core::Json::GetLongValue(v, "limit");
+#ifdef _WIN32
+            r.start = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongLongValue(v, "start"));
+            r.end = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongLongValue(v, "end"));
+#else
             r.start = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(v, "start"));
             r.end = Core::DateTimeUtils::FromUnixTimestamp(Core::Json::GetLongValue(v, "end"));
+#endif// _WIN32
             return r;
         }
 

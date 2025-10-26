@@ -64,12 +64,19 @@ namespace AwsMock::Service {
 
     void ApplicationCreator::CreateDockerImage(const std::string &applicationCodeFile, Database::Entity::Apps::Application &applicationEntity, const std::string &dockerTag) {
 
-        log_info << "Creating docker image, application : " << applicationEntity.name;
+        log_info << "Start creating docker image, application : " << applicationEntity.name;
 
+        // Check application code file
+        if (!Core::FileUtils::FileExists(applicationCodeFile)) {
+            log_error << "Application code file does not exist, path: " << applicationCodeFile;
+            return;
+        }
+
+        // Create the code dir
         std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
 
-        // Write a base64 encoded zip file
+        // Read the base64 encoded zip file
         std::ifstream ifs(applicationCodeFile);
         const std::string applicationCode((std::istreambuf_iterator(ifs)), std::istreambuf_iterator<char>());
         ifs.close();
@@ -94,11 +101,11 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_info << "Docker image created, name: " << applicationEntity.name << " size: " << applicationEntity.imageSize;
+        log_info << "Finished creating docker image, name: " << applicationEntity.name << " size: " << applicationEntity.imageSize;
     }
 
     void ApplicationCreator::CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const std::string &dockerTag) {
-        log_info << "Creating docker container, application: " << applicationEntity.name << " hostPort: " << applicationEntity.publicPort << " dockerTag: " << dockerTag;
+        log_info << "Start creating docker container, application: " << applicationEntity.name << ", hostPort: " << applicationEntity.publicPort << ", version: " << dockerTag;
         try {
 
             const std::string containerName = applicationEntity.name + "-" + instanceId;
@@ -111,6 +118,7 @@ namespace AwsMock::Service {
         } catch (std::exception &exc) {
             log_error << exc.what();
         }
+        log_info << "Finished creating docker container, application: " << applicationEntity.name << ", version: " << dockerTag;
     }
 
     std::string ApplicationCreator::UnpackZipFile(const std::string &codeDir, const std::string &applicationCode, const std::string &runtime) {

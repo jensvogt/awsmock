@@ -69,11 +69,19 @@ namespace AwsMock::Core {
 
     void TarUtils::TarDirectory(const std::string &tarFile, const std::string &directory) {
 
+        int err = 0;
         log_trace << "Create gzipped tarfile, tarFile: " << tarFile << ", directory: " << directory;
         archive *a = archive_write_new();
+#ifndef _WIN32
+        // Windows does not support compression
         archive_write_add_filter_gzip(a);
+#endif
         archive_write_set_format_gnutar(a);
-        archive_write_open_filename(a, tarFile.c_str());
+        err = archive_write_open_filename(a, tarFile.c_str());
+        if (err != ARCHIVE_OK) {
+            log_error << "Could not open tar file, path: " << tarFile << ", directory: " << directory << ", error: " << archive_error_string(a);
+            return;
+        }
 
         boost::filesystem::recursive_directory_iterator dir(directory);
         const boost::filesystem::recursive_directory_iterator end;
@@ -92,6 +100,7 @@ namespace AwsMock::Core {
 
     void TarUtils::WriteFile(archive *archive, std::string &fileName, const std::string &directory, const bool isDir, const bool isLink) {
 
+        int err = 0;
         std::string entryName = fileName;
         StringUtils::Replace(entryName, directory, "");
         log_trace << "Removed directory, entryName: " << entryName << ", filename: " << fileName << ", directory: " << directory;
@@ -118,13 +127,17 @@ namespace AwsMock::Core {
             archive_entry_set_gid(entry, 0);
             log_trace << "Is link";
         } else {
-            archive_entry_set_filetype(entry, S_IFREG);
-            archive_entry_set_perm(entry, 0644);
+            archive_entry_set_filetype(entry, AE_IFREG);
+            archive_entry_set_perm(entry, 0755);
             archive_entry_set_uid(entry, 0);
             archive_entry_set_gid(entry, 0);
             log_trace << "Is regular file";
         }
-        archive_write_header(archive, entry);
+        err = archive_write_header(archive, entry);
+        if (err != ARCHIVE_OK) {
+            log_error << "Could not write header, filename: " << fileName << ", error: " << archive_error_string(archive);
+            return;
+        }
         log_trace << "Wrote header";
 
 #ifdef WIN32
@@ -135,21 +148,27 @@ namespace AwsMock::Core {
             }
             if (const int rc = _sopen_s(&fd, fileName.c_str(), _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD | _S_IWRITE)) {
                 log_error << "Could not open file for reading, filename: " << fileName << ", error: " << strerror(rc);
-            } else if (fd >= 0) {
+                return;
+            }
+            if (fd >= 0) {
                 unsigned char buff[8192];
                 long len = _read(fd, buff, sizeof(buff));
                 while (len > 0) {
-                    archive_write_data(archive, buff, len);
+                    if (const long written = static_cast<long>(archive_write_data(archive, buff, len)); written != len) {
+                        log_error << "Could not write data, filename: " << fileName << ", error: " << archive_error_string(archive);
+                        break;
+                    }
                     len = _read(fd, buff, sizeof(buff));
                     log_trace << "File written to archive, name: " << entryName;
                 }
                 _close(fd);
             } else {
                 log_error << "Cannot open file: " << fileName;
+                return;
             }
         }
 #else
-        const int fd = open(fileName.c_str(), O_RDONLY);
+        const int fd = open(fileName.c_str(), O_RDONLY | O_BINARY);
         if (fd >= 0) {
             char buff[8192];
             long len = read(fd, buff, sizeof(buff));

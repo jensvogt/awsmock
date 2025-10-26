@@ -155,4 +155,4 @@ namespace AwsMock::Database::Entity::Apps {
 
 }// namespace AwsMock::Database::Entity::Apps
 
-#endif// AWSMOCK_DB_ENTITY_COGNITO_USER_H
+#endif// AWSMOCK_DB_ENTITY_APPS_APPLICATION_H
