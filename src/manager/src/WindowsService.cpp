@@ -121,9 +121,8 @@ DWORD WINAPI ServiceCtrlHandler(const DWORD CtrlCode, DWORD eventType, LPVOID ev
 DWORD WINAPI RunService(LPWORD lpParam) {
 
     // Run the detached frontend server thread
-    boost::thread frontendThread;
     AwsMock::Service::Frontend::FrontendServer server;
-    frontendThread = boost::thread{boost::ref(server)};
+    auto frontendThread = boost::thread{boost::ref(server), true};
     frontendThread.detach();
     log_info << "Frontend server started.";
 
@@ -132,8 +131,9 @@ DWORD WINAPI RunService(LPWORD lpParam) {
     AwsMock::Manager::Manager awsMockManager{ioc};
     awsMockManager.Initialize();
     log_info << "Backend server started.";
-    awsMockManager.Run();
-
+    awsMockManager.Run(true);
+    log_info << "Backend server stopped.";
+    exit(0);
     return 0;
 }
 

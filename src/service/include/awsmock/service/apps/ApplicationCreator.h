@@ -11,6 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/ZipUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/model/Status.h>
 #include <awsmock/entity/apps/Application.h>

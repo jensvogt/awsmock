@@ -5,6 +5,14 @@
 #ifndef AWSMOCK_CORE_STRING_UTILS_H
 #define AWSMOCK_CORE_STRING_UTILS_H
 
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 // C++ standard includes
 #include <iomanip>
 #include <random>
@@ -21,11 +29,11 @@
 #include <boost/url/encode.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/token_functions.hpp>
+#include <boost/tokenizer.hpp>
 
 // JWT includes
 #include <jwt-cpp/base.h>
-
-// AwsMock includes
 
 namespace AwsMock::Core {
 
@@ -402,6 +410,25 @@ namespace AwsMock::Core {
          * @return upper case string
          */
         static std::string ToUpper(const std::string &input);
+
+#ifdef _WIN32
+        /**
+         * @brief Convert from narrow string to wide string
+         *
+         * @param input narrow string input
+         * @retur wide string
+         */
+        static std::wstring ConvertToWideString(const std::string &input);
+
+        /**
+         * @brief Convert from narrow string to wide string
+         *
+         * @param input narrow string input
+         * @retur wide string
+         */
+        static std::string ConvertToNarrowString(const std::wstring &input);
+#endif
+
     };
 
     inline std::string StringUtils::ToLower(const std::string &input) {

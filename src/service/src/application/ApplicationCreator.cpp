@@ -64,7 +64,7 @@ namespace AwsMock::Service {
 
     void ApplicationCreator::CreateDockerImage(const std::string &applicationCodeFile, Database::Entity::Apps::Application &applicationEntity, const std::string &dockerTag) {
 
-        log_info << "Start creating docker image, application : " << applicationEntity.name;
+        log_info << "Start creating docker image, application: " << applicationEntity.name << ":" << dockerTag;
 
         // Check application code file
         if (!Core::FileUtils::FileExists(applicationCodeFile)) {
@@ -85,7 +85,7 @@ namespace AwsMock::Service {
 
         // Unzip if necessary
         if (applicationEntity.runtime.find("python") != std::string::npos) {
-            Core::TarUtils::Unzip(codeDir + Core::FileUtils::separator() + applicationEntity.archive, codeDir);
+            Core::ZipUtils::Unzip(codeDir + Core::FileUtils::separator() + applicationEntity.archive, codeDir);
             Core::FileUtils::DeleteFile(codeDir + Core::FileUtils::separator() + applicationEntity.archive);
             log_debug << "Unzipped Python code, dir: " << codeDir;
         }
@@ -101,7 +101,7 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_info << "Finished creating docker image, name: " << applicationEntity.name << " size: " << applicationEntity.imageSize;
+        log_info << "Finished creating docker image, name: " << applicationEntity.name <<":" << dockerTag << ", size: " << applicationEntity.imageSize;
     }
 
     void ApplicationCreator::CreateDockerContainer(const Database::Entity::Apps::Application &applicationEntity, const std::string &instanceId, const std::string &dockerTag) {
@@ -139,12 +139,12 @@ namespace AwsMock::Service {
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.
-                Core::TarUtils::Unzip(zipFile, classesDir);
+                Core::ZipUtils::Unzip(zipFile, classesDir);
 
             } else {
 
                 // Decompress the Python/C/go code
-                Core::TarUtils::Unzip(zipFile, codeDir);
+                Core::ZipUtils::Unzip(zipFile, codeDir);
             }
 
             // Cleanup

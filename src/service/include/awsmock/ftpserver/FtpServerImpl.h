@@ -99,7 +99,7 @@ namespace AwsMock::FtpServer {
         /**
          * Stop the manager
          */
-        void stop();
+        void stop()const;
 
         /**
          * Return the number of open connections

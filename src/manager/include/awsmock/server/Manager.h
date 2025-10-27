@@ -67,12 +67,16 @@ namespace AwsMock::Manager {
         /**
          * @brief Main processing loop.
          */
-        void Run();
+        void Run(bool isService);
 
         /**
          * @brief Stop processing-
          */
-        void Stop() const { _ioc.stop(); }
+        static void StopManager() {
+            /*Service::ModuleMap moduleMap = Service::ModuleMap::instance();
+            StopModules(moduleMap);
+            _ioc.stop();*/
+        }
 
         /**
          * @brief Automatically loading the init files in the init directory
@@ -87,6 +91,8 @@ namespace AwsMock::Manager {
 
         /**
          * @brief Stops all currently running modules.
+         *
+         * @param moduleMap hash map of all modules
          */
         static void StopModules(Service::ModuleMap &moduleMap);
 

@@ -44,6 +44,11 @@ namespace AwsMock::Service {
          */
         explicit GatewayServer(boost::asio::io_context &ios);
 
+        /**
+         * @brief Gracefully shutdown the server
+         */
+        void Shutdown() override;
+
       private:
 
         /**
