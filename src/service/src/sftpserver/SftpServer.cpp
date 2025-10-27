@@ -6,6 +6,10 @@
 #include <awsmock/sftpserver/SftpServer.h>
 #include <awsmock/sftpserver/SftpUser.h>
 
+#ifdef _WIN32
+extern HANDLE g_ServiceStopEvent;
+#endif
+
 namespace AwsMock::Service {
     SftpUsers SftpServer::_sftpUsers;
 }
@@ -3411,6 +3415,13 @@ namespace AwsMock::Service {
             // Since the session has been passed to a child fork, do some cleaning up at the parent process.
             ssh_disconnect(session);
             ssh_free(session);
+
+#ifdef _WIN32
+            // Wait for Windows server stop event
+            if (WaitForSingleObject(g_ServiceStopEvent, 0) == WAIT_OBJECT_0) {
+                break;
+            }
+#endif
         }
         ssh_bind_free(sshbind);
         ssh_finalize();

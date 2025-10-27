@@ -389,6 +389,20 @@ namespace AwsMock::Core {
          */
         static long StreamCopier(std::istream &istream, std::ostream &ostream, long start, long count);
 
+#ifdef _WIN32
+        /**
+         * @brief Prepends the Windows extended-length path prefix to support paths
+         * longer than MAX_PATH (260 characters).
+         *
+         * @par
+         * The resulting path starts with "\\?\". Note: This only works with wide-character (Unicode) APIs.
+         *
+         * @param path The path to normalize.
+         * @return The normalized path as a wide string.
+         */
+        static std::wstring NormalizePathForLongPaths(const std::wstring& path);
+#endif
+
         /**
          * @brief File path separator
          *

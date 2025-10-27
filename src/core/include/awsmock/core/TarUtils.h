@@ -33,6 +33,38 @@
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
 
+#ifdef _WIN32
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <filesystem>
+constexpr int TAR_BLOCKSIZE = 512;
+constexpr int TAR_NAME_MAX = 100;
+constexpr int USTAR_MAGIC_LEN = 6;
+constexpr int USTAR_VERSION_LEN = 2;
+
+// --- Standard USTAR TAR Header (512 bytes) ---
+// Note: Fields must be character arrays to match the fixed 512-byte layout.
+struct TarHeader {
+    char name[100];     // File name
+    char mode[8];       // File mode (octal)
+    char uid[8];        // Owner's user ID (octal)
+    char gid[8];        // Owner's group ID (octal)
+    char size[12];      // File size in bytes (octal)
+    char mtime[12];     // Last modification time (octal)
+    char chksum[8];     // Checksum of header (octal)
+    char typeflag;      // Type of file ('0' for file, '5' for directory, 'x' for PAX extended header)
+    char linkname[100]; // Target link name
+    char magic[USTAR_MAGIC_LEN];  // USTAR magic string "ustar"
+    char version[USTAR_VERSION_LEN]; // Version "00"
+    char uname[32];     // Owner user name
+    char gname[32];     // Owner group name
+    char devmajor[8];   // Device major number
+    char devminor[8];   // Device minor number
+    char prefix[155];   // Prefix for long filenames (up to 256 chars total path)
+    char padding[12];   // Padding to 512 bytes
+};
+#endif
+
 namespace AwsMock::Core {
 
     /**
@@ -61,15 +93,9 @@ namespace AwsMock::Core {
          */
         static void TarDirectory(const std::string &tarFile, const std::string &directory);
 
-        /**
-         * @brief Unzip file to directory
-         *
-         * @param zipFile name of the tar file
-         * @param directory directory name
-         */
-        static void Unzip(const std::string &zipFile, const std::string &directory);
-
       private:
+
+#ifndef _WIN32
 
         /**
          * @brief Writes archive single file to the Tar archive.
@@ -99,15 +125,18 @@ namespace AwsMock::Core {
          */
         static int CopyData(archive *ar, archive *aw);
 
-#ifdef _WIN32
+#else
 
         /**
-         * @brief Prepare the log file name on Windows machines
+         * @brief Creates a TAR archive using libarchive, supporting long paths (>260 chars) via wstring.
          *
-         * @param filename file name
-         * @return file with "\\?\" prepended
+         * @param output_filename_w The wide-character name of the output TAR file.
+         * @param source_path_w The wide-character path of the source file to archive.
+         * @param archive_path_w The wide-character path to use inside the archive (the long path).
+         * @return true if the archive was created successfully, false otherwise.
          */
-        static std::string PrepareFilename(std::string &filename);
+        static bool create_tar_with_long_path(const std::wstring& output_filename_w, const std::wstring& source_path_w, const std::wstring& archive_path_w);
+
 #endif
     };
 

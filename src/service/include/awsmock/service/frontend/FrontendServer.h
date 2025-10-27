@@ -36,7 +36,7 @@ namespace AwsMock::Service::Frontend {
         /**
          * @brief HTTP request worker
          */
-        void operator()();
+        void operator()(bool isService);
 
       private:
 

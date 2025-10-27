@@ -133,7 +133,7 @@ namespace AwsMock::Service {
 
     void LambdaCreator::CreateDockerImage(const std::string &zipFile, Database::Entity::Lambda::Lambda &lambdaEntity, const std::string &dockerTag) {
 
-        log_info << "Creating docker image, function: " << lambdaEntity.function;
+        log_info << "Start creating docker image, name: " << lambdaEntity.function << ":" << dockerTag;
 
         std::string codeDir = Core::DirUtils::CreateTempDir();
         log_debug << "Code directory created, codeDir: " << codeDir;
@@ -165,7 +165,7 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_info << "Docker image created, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
+        log_info << "Finished creating docker image, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize;
     }
 
     void LambdaCreator::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
@@ -200,12 +200,12 @@ namespace AwsMock::Service {
                 Core::DirUtils::EnsureDirectory(classesDir);
 
                 // Decompress, the Java JAR file to a classes' directory.
-                Core::TarUtils::Unzip(zipFile, classesDir);
+                Core::ZipUtils::Unzip(zipFile, classesDir);
 
             } else {
 
                 // Decompress the Python/C/go code
-                Core::TarUtils::Unzip(zipFile, codeDir);
+                Core::ZipUtils::Unzip(zipFile, codeDir);
             }
 
             // Cleanup

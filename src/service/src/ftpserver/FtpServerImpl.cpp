@@ -89,12 +89,9 @@ namespace AwsMock::FtpServer {
         return true;
     }
 
-    void FtpServerImpl::stop() {
-        /*      _ioService.stop();
-        for (std::thread &thread: _threadPool) {
-            thread.join();
-        }
-        _threadPool.clear();*/
+    void FtpServerImpl::stop()const {
+        _awsIoc.stop();
+        log_info << "FTP server stopped.";
     }
 
     void FtpServerImpl::acceptFtpSession(const std::shared_ptr<FtpSession> &ftp_session, boost::beast::error_code const &error) {

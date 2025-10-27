@@ -624,4 +624,34 @@ namespace AwsMock::Core {
         return copied;
     }
 
+
+#ifdef _WIN32
+    std::wstring FileUtils::NormalizePathForLongPaths(const std::wstring& path)
+    {
+        // The prefix must be applied only to absolute paths.
+        // If the path already starts with the prefix, do nothing.
+        if (path.rfind(L"\\\\?\\", 0) == 0) {
+            return path;
+        }
+
+        // Convert forward slashes to backslashes as required by the \\?\ prefix
+        std::wstring normalizedPath = path;
+        std::ranges::replace(normalizedPath, L'/', L'\\');
+
+        // Add the prefix for long path support
+        // For example: C:\Folder\file.txt becomes \\?\C:\Folder\file.txt
+        if (normalizedPath.size() > 2 && normalizedPath[1] == L':' && normalizedPath[2] == L'\\') {
+            return L"\\\\?\\" + normalizedPath;
+        }
+
+        // UNC paths (\\server\share\) become \\?\UNC\server\share
+        if (normalizedPath.size() > 2 && normalizedPath.rfind(L"\\\\", 0) == 0) {
+            return L"\\\\?\\UNC" + normalizedPath.substr(1);
+        }
+
+        // For simplicity, we only handle absolute drive paths and UNC paths here.
+        return normalizedPath;
+    }
+#endif
+
 }// namespace AwsMock::Core
