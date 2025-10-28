@@ -36,7 +36,7 @@ namespace AwsMock::Service {
             log_debug << "Objects deleted, count: " << deleted;
             deleted = _database.DeleteAllBuckets();
             log_debug << "Buckets deleted, count: " << deleted;
-            Core::FileUtils::DeleteFile(testFile);
+            Core::FileUtils::RemoveFile(testFile);
         }
 
         boost::asio::io_context _ioContext;
