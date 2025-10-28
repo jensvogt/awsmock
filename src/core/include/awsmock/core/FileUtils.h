@@ -241,7 +241,7 @@ namespace AwsMock::Core {
         /**
          * @brief Returns the file owner.
          *
-         * @param fileName name of the file to delete
+         * @param fileName name of the file to get the owner from
          */
         static std::string GetOwner(const std::string &fileName);
 
@@ -250,7 +250,7 @@ namespace AwsMock::Core {
          *
          * @param fileName name of the file to delete
          */
-        static void DeleteFile(const std::string &fileName);
+        static void RemoveFile(const std::string &fileName);
 
         /**
          * @brief Read a whole file into a string

@@ -209,7 +209,7 @@ namespace AwsMock::Service {
             }
 
             // Cleanup
-            Core::FileUtils::DeleteFile(zipFile);
+            Core::FileUtils::RemoveFile(zipFile);
 
             log_debug << "ZIP file unpacked, dir: " << codeDir;
             return codeDir;

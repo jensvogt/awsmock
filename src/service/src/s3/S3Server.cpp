@@ -42,6 +42,7 @@ namespace AwsMock::Service {
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         const auto s3DataDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
 
+        // Get the bucket list
         const Database::Entity::S3::BucketList buckets = _s3Database.ListBuckets();
         log_trace << "Object synchronization starting, bucketCount: " << buckets.size();
 
@@ -53,12 +54,16 @@ namespace AwsMock::Service {
         int filesDeleted = 0, objectsDeleted = 0;
         for (auto &bucket: buckets) {
             // Get objects and delete objects, where the file is not existing anymore, The files are identified by internal name.
-            for (std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000); const auto &object: objects) {
-                if (!Core::FileUtils::FileExists(s3DataDir + "/" + object.internalName)) {
-                    _s3Database.DeleteObject(object);
-                    log_debug << "Object deleted, internalName: " << object.internalName;
-                    objectsDeleted++;
+            std::vector objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000);
+            while (!objects.empty()) {
+                for ( const auto &object: objects) {
+                    if (!Core::FileUtils::FileExists(s3DataDir + Core::FileUtils::separator() + object.internalName)) {
+                        _s3Database.DeleteObject(object);
+                        log_debug << "Object deleted, internalName: " << object.internalName;
+                        objectsDeleted++;
+                    }
                 }
+                objects = _s3Database.GetBucketObjectList(region, bucket.name, 1000);
             }
         }
 
@@ -66,7 +71,7 @@ namespace AwsMock::Service {
         if (const path p(s3DataDir); is_directory(p)) {
             for (auto &entry: boost::make_iterator_range(directory_iterator(p), {})) {
                 if (!_s3Database.ObjectExistsInternalName(Core::FileUtils::GetBasename(entry.path().string()))) {
-                    Core::FileUtils::DeleteFile(entry.path().string());
+                    Core::FileUtils::RemoveFile(entry.path().string());
                     log_debug << "File deleted, filename: " << entry.path().string();
                     filesDeleted++;
                 }
@@ -99,8 +104,11 @@ namespace AwsMock::Service {
         log_debug << "S3 monitoring finished";
     }
 
-    void S3Server::BackupS3() {
+    void S3Server::BackupS3()  {
+
+        // Backup S3 buckets and objects
         ModuleService::BackupModule("s3", true);
+
     }
 
 }// namespace AwsMock::Service

@@ -75,7 +75,7 @@ namespace AwsMock::Core {
         const std::string fileName = FileUtils::CreateTempFile(tempDir, "gif", 100);
 
         // act
-        BOOST_CHECK_NO_THROW({ FileUtils::DeleteFile(fileName); });
+        BOOST_CHECK_NO_THROW({ FileUtils::RemoveFile(fileName); });
 
         // assert
         BOOST_CHECK_EQUAL(FileUtils::FileExists(fileName), false);
