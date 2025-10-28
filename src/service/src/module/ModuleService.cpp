@@ -468,7 +468,7 @@ namespace AwsMock::Service {
         const std::vector<std::string> backupList = Core::BackupUtils::GetBackupFiles(module, retention);
         log_info << "Cleanup backup files, module: " << module << ", count: " << backupList.size();
         for (const auto &file: backupList) {
-            Core::FileUtils::DeleteFile(file);
+            Core::FileUtils::RemoveFile(file);
         }
     }
 }// namespace AwsMock::Service

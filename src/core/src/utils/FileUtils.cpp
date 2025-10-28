@@ -128,7 +128,7 @@ namespace AwsMock::Core {
         ofs << ifs.rdbuf();
         ifs.close();
         ofs.close();
-        DeleteFile(filePath);
+        RemoveFile(filePath);
         MoveTo(tmpFile, filePath);
     }
 
@@ -357,7 +357,7 @@ namespace AwsMock::Core {
         return {};
     }
 
-    void FileUtils::DeleteFile(const std::string &fileName) {
+    void FileUtils::RemoveFile(const std::string &fileName) {
         if (fileName.empty()) {
             log_error << "Empty filename";
             return;
@@ -515,9 +515,9 @@ namespace AwsMock::Core {
         fin.close();
 
         // Required conversion for remove and rename functions
-        DeleteFile(path);
+        RemoveFile(path);
         CopyTo(tempFile, path);
-        DeleteFile(tempFile);
+        RemoveFile(tempFile);
     }
 
     bool FileUtils::IsBase64(const std::string &filePath) {
@@ -531,7 +531,7 @@ namespace AwsMock::Core {
         std::ifstream in(filePath);
         std::string line;
         in >> line;
-        DeleteFile(filePath);
+        RemoveFile(filePath);
 
         std::string decoded = Crypto::Base64Decode({line});
 

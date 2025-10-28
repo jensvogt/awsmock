@@ -86,7 +86,7 @@ namespace AwsMock::Service {
         // Unzip if necessary
         if (applicationEntity.runtime.find("python") != std::string::npos) {
             Core::ZipUtils::Unzip(codeDir + Core::FileUtils::separator() + applicationEntity.archive, codeDir);
-            Core::FileUtils::DeleteFile(codeDir + Core::FileUtils::separator() + applicationEntity.archive);
+            Core::FileUtils::RemoveFile(codeDir + Core::FileUtils::separator() + applicationEntity.archive);
             log_debug << "Unzipped Python code, dir: " << codeDir;
         }
 
@@ -148,7 +148,7 @@ namespace AwsMock::Service {
             }
 
             // Cleanup
-            Core::FileUtils::DeleteFile(zipFile);
+            Core::FileUtils::RemoveFile(zipFile);
 
             log_debug << "ZIP file unpacked, dir: " << codeDir;
             return codeDir;

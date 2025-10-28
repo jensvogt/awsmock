@@ -5,6 +5,10 @@
 #ifndef AWSMOCK_SERVICE_S3_SERVER_H
 #define AWSMOCK_SERVICE_S3_SERVER_H
 
+// C++ includes
+#include <sys/types.h>
+#include <sys/stat.h>
+
 // Boost includes
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/asio/thread_pool.hpp>
@@ -81,12 +85,28 @@ namespace AwsMock::Service {
         int _counterPeriod;
 
         /**
-         * @brief Dynamo DB backup flag.
+         * @brief Backup directory
          *
          * @par
          * If true, backup tables and items based on cron expression
          */
+        std::string _backupDir;
+
+        /**
+         * @brief S3 backup flag.
+         *
+         * @par
+         * If true, backup buckets and object based on cron expression
+         */
         bool _backupActive;
+
+        /**
+         * @brief Backup retention in days
+         *
+         * @par
+         * If positive, delete old backups with modification date < now - backupRetention days
+         */
+        int _backupRetention;
 
         /**
          * @brief Dynamo DB backup cron schedule.
