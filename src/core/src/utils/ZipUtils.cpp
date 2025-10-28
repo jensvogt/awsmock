@@ -34,7 +34,7 @@ namespace AwsMock::Core {
         // Use the wide-character open function
         int r = archive_read_open_filename_w(a, normalizedArchivePath.c_str(), BUFSIZ);
         if (r != ARCHIVE_OK) {
-            log_error <<"Libarchive Error: Cannot open file: " << archive_error_string(a);
+            log_error << "Libarchive Error: Cannot open file: " << archive_error_string(a);
             archive_read_free(a);
             archive_write_free(ext);
             return;
@@ -43,7 +43,7 @@ namespace AwsMock::Core {
         // Loop through all entries in the archive
         while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
             // Get the entry path as a wide string
-            const wchar_t* entryPath = archive_entry_pathname_w(entry);
+            const wchar_t *entryPath = archive_entry_pathname_w(entry);
 
             // Construct the full output path using wide strings
             std::wstringstream fullPathStream;
@@ -61,7 +61,7 @@ namespace AwsMock::Core {
 
             r = archive_write_header(ext, entry);
             if (r == ARCHIVE_OK) {
-                r = CopyData(a, ext); // Copy file data
+                r = CopyData(a, ext);// Copy file data
                 if (r != ARCHIVE_OK) {
                     archive_write_finish_entry(ext);
                     break;
@@ -111,12 +111,12 @@ namespace AwsMock::Core {
         while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
 
             // Prepend the output path to the entry's path
-            std::wstring fullPath = StringUtils::ConvertToWideString(directory).append(StringUtils::ConvertToWideString("/")).append(archive_entry_pathname_w(entry));
+            std::string fullPath = directory + "/" + archive_entry_pathname(entry);
             archive_entry_set_pathname(entry, fullPath.c_str());
 
             r = archive_write_header(ext, entry);
             if (r == ARCHIVE_OK) {
-                r = CopyData(a, ext); // Copy file data
+                r = CopyData(a, ext);// Copy file data
                 if (r != ARCHIVE_OK) {
                     // Error during data copy
                     archive_write_finish_entry(ext);
@@ -125,13 +125,13 @@ namespace AwsMock::Core {
                 }
             } else if (r == ARCHIVE_FATAL) {
                 // Non-recoverable error, stop extraction
-                std::cerr << "Libarchive Fatal Error writing header: " << archive_error_string(ext) << std::endl;
+                log_error << "Libarchive Fatal Error writing header: " << archive_error_string(ext);
                 break;
             }
 
             r = archive_write_finish_entry(ext);
             if (r != ARCHIVE_OK) {
-                std::cerr << "Libarchive Error finishing entry: " << archive_error_string(ext) << std::endl;
+                log_error << "Libarchive Error finishing entry: " << archive_error_string(ext);
                 break;
             }
         }
@@ -145,11 +145,11 @@ namespace AwsMock::Core {
     int ZipUtils::CopyData(archive *ar, archive *aw) {
         const void *buff;
         size_t size;
-        long long offset;
+        long offset;
 
         for (;;) {
             // Read data block from the archive
-            int r = archive_read_data_block(ar, &buff, &size, &offset);
+            long r = archive_read_data_block(ar, &buff, &size, &offset);
             if (r == ARCHIVE_EOF)
                 return ARCHIVE_OK;
             if (r != ARCHIVE_OK) {

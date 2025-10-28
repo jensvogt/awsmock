@@ -396,6 +396,26 @@ npm run build --prod
 
 ```
 
+### Installing as a macOS services
+
+AwsMock can run as a macOS service by using the supplied```.plist``` file. Copy the file from 
+```dist/macos/de.jensvogt.awsmock.plist```.
+
+```
+cp dist/macos/de.jensvogt.awsmock.plist /Library/LaunchDaemons
+sudo launchctl load -w /Library/LaunchDaemons/de.jensvogt.awsmock.plist
+sudo launchctl start /Library/LaunchDaemons/de.jensvogt.awsmock.plist
+```
+
+To see the running daemon, use:
+
+```
+sudo launchctl list | grep de.jensvogt.awsmock
+...
+72490	0	de.jensvogt.awsmock
+```
+The service is running iwth PID 72490.
+
 ## Configuration
 
 To configure your infrastructure, you use the provided web interface on ```http://localhost:4567```.

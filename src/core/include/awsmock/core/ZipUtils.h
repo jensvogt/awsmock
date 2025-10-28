@@ -10,7 +10,6 @@
 // C++ standard includes
 #include <fcntl.h>
 #include <string>
-#include <direct.h>
 
 #ifdef _WIN32
 #ifndef NOMINMAX
@@ -18,8 +17,9 @@
 #endif
 #include <io.h>
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
-#include <boost/asio.hpp>
 #include <Windows.h>
+#include <boost/asio.hpp>
+#include <direct.h>
 #endif
 
 // Boost includes
@@ -31,8 +31,8 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 
@@ -91,7 +91,6 @@ namespace AwsMock::Core {
          * @return success of -1
          */
         static int CopyData(archive *ar, archive *aw);
-
     };
 
 }// namespace AwsMock::Core

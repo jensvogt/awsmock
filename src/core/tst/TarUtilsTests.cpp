@@ -8,6 +8,7 @@
 // Local includes
 #include <awsmock/core/DirUtils.h>
 #include <awsmock/core/TarUtils.h>
+#include <awsmock/core/ZipUtils.h>
 
 #define FILE_SIZE (100 * 1024)
 
@@ -20,7 +21,7 @@ namespace AwsMock::Core {
         const std::string zipFileName = "/tmp/java-basic-1.0-SNAPSHOT.jar";
 
         // act
-        BOOST_CHECK_NO_THROW({ TarUtils::Unzip(zipFileName, tempDir); });
+        BOOST_CHECK_NO_THROW({ ZipUtils::Unzip(zipFileName, tempDir); });
         const long count = DirUtils::DirectoryCountFiles(tempDir);
 
         // assert
