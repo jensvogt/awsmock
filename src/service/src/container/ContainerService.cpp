@@ -195,15 +195,15 @@ namespace AwsMock::Service {
 
         Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
         if (response.containerList.empty()) {
-            log_info << "Docker container not found, id: " << containerId;
+            log_info << "Docker container not found, containerId: " << containerId;
             return {};
         }
 
         if (response.containerList.size() > 1) {
-            log_warning << "More than one docker container found, id: " << containerId << " count: " << response.containerList.size();
+            log_warning << "More than one docker container found, containerId: " << containerId << " count: " << response.containerList.size();
         }
 
-        log_debug << "Docker container found, id: " << containerId;
+        log_debug << "Docker container found, containerId: " << containerId;
         return response.containerList.front();
     }
 
@@ -211,7 +211,7 @@ namespace AwsMock::Service {
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + name + "/json");
         if (statusCode != http::status::ok) {
-            log_warning << "Get container by name failed, statusCode: " << statusCode;
+            log_warning << "Get container by name failed, name: " << name << ", statusCode: " << statusCode;
             return {};
         }
 
@@ -226,7 +226,7 @@ namespace AwsMock::Service {
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/" + containerId + "/json?size=true");
         if (statusCode != http::status::ok) {
             inspectContainerResponse.status = statusCode;
-            log_warning << "Inspect container failed, state: " << statusCode << ", containerId: " << Core::StringUtils::Continuation(containerId, 16);
+            log_warning << "Inspect container failed, containerId: " << Core::StringUtils::Continuation(containerId, 16) << ", statusCode: " << statusCode;
             return inspectContainerResponse;
         }
 
@@ -240,7 +240,7 @@ namespace AwsMock::Service {
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
-            log_warning << "Get docker containers failed, state: " << statusCode;
+            log_warning << "List docker containers failed, state: " << statusCode;
             return {};
         }
 
@@ -249,7 +249,7 @@ namespace AwsMock::Service {
             log_info << "Docker containers not found";
             return {};
         }
-        log_debug << "Docker containers found";
+        log_debug << "Docker containers found, count: " << response.containerList.size();
         return response.containerList;
     }
 
@@ -258,13 +258,13 @@ namespace AwsMock::Service {
         // Send request
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
-            log_warning << "Get docker container by name failed, state: " << statusCode << ", name: " << name << ":" << tag;
+            log_warning << "List docker container by image name failed, name: " << name << ":" << tag << ", statusCode: " << statusCode;
             return {};
         }
 
         const Dto::Docker::ListContainerResponse response = Dto::Docker::ListContainerResponse::FromJson(body);
         if (response.containerList.empty()) {
-            log_info << "Docker container not found, name: " << name << ":" << tag;
+            log_info << "Docker containers not found, name: " << name << ":" << tag;
             return {};
         }
 

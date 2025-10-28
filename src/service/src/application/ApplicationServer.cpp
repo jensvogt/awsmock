@@ -205,6 +205,7 @@ namespace AwsMock::Service {
         for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase.ListApplications(); auto &application: applications) {
 
             ContainerService::instance().KillContainer(application.containerId);
+            ContainerService::instance().DeleteContainer(application.containerId);
             application = _applicationDatabase.UpdateApplication(application);
             log_info << "Application stopped, name: " << application.name;
         }
