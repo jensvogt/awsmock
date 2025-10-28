@@ -23,7 +23,7 @@
     "dockerized": false,
     "magic-file": "C:\\Program Files (x86)\\awsmock\\etc\\magic.mgc",
     "autoload": {
-      "active": false,
+      "active": true,
       "file": "C:\\Program Files (x86)\\awsmock\\init\\init.json",
       "dir": "C:\\Program Files (x86)\\awsmock\\init"
     },
@@ -36,7 +36,7 @@
         "max-queue": 10,
         "max-threads": 50,
         "max-thread": 256,
-        "max-body": 104857600,
+        "max-body": 204857600,
         "timeout": 900
       }
     },
@@ -123,8 +123,8 @@
           "period": 300
         },
         "directories": [
-          "incoming",
-          "outgoing"
+          "incoming/mix",
+          "feedback"
         ],
         "ftp": {
           "pasv-min": 6000,

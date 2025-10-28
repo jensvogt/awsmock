@@ -14,7 +14,6 @@
 #include <windows.h>
 #endif
 
-
 // C++ standard includes
 #include <chrono>
 #include <string>
@@ -22,7 +21,6 @@
 // Boost includes
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/locale/date_time.hpp>
-
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>

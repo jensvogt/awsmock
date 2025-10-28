@@ -152,12 +152,12 @@ namespace AwsMock::Monitoring {
         /**
          * @brief Get total CPU utilization on Windows
          */
-        void GetCpuInfoWin32() const;
+        static void GetCpuInfoWin32() ;
 
         /**
          * @brief Get CPU utilization on Windows
          */
-        void GetCpuInfoAwsmockWin32() const;
+        static void GetCpuInfoAwsmockWin32() ;
 
         /**
          * @brief Get total memory utilization on Win32
@@ -235,7 +235,7 @@ namespace AwsMock::Monitoring {
          * @param counter name of the WMI counter
          * @return value of the WMI counter
          */
-        static long long GetPerformanceValue(const std::string &counter);
+        static double GetPerformanceValue(const std::string &counter);
 
 #endif
 

@@ -1,7 +1,5 @@
 
 #include <awsmock/core/StringUtils.h>
-#include <boost/token_functions.hpp>
-#include <boost/tokenizer.hpp>
 
 namespace AwsMock::Core {
 
@@ -289,4 +287,26 @@ namespace AwsMock::Core {
         // Return the result
         return result;
     }
+
+#ifdef _WIN32
+    std::wstring StringUtils::ConvertToWideString(const std::string &input) {
+        std::wstring wstr(input.length(), 0);
+        std::ranges::copy(input,wstr.begin());
+        return wstr;
+    }
+
+    std::string StringUtils::ConvertToNarrowString(const std::wstring &input) {
+
+        if (input.empty()) return std::string();
+
+        // Calculate the required buffer size
+        const int size_needed = WideCharToMultiByte(CP_UTF8, 0, input.c_str(), static_cast<int>(input.length()), nullptr, 0, nullptr, nullptr);
+
+        // Allocate the buffer and perform the conversion
+        std::string str(size_needed, 0);
+        WideCharToMultiByte(CP_UTF8, 0, input.c_str(), static_cast<int>(input.length()), &str[0], size_needed, nullptr, nullptr);
+        return str;
+    }
+#endif
+
 }// namespace AwsMock::Core

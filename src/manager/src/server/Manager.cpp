@@ -4,6 +4,10 @@
 
 #include <awsmock/server/Manager.h>
 
+#ifdef _WIN32
+extern HANDLE g_ServiceStopEvent;
+#endif
+
 namespace AwsMock::Manager {
 
     void Manager::Initialize() const {
@@ -77,6 +81,7 @@ namespace AwsMock::Manager {
     void Manager::StopModules(Service::ModuleMap &moduleMap) {
         log_info << "Stopping modules";
 
+        // Stop scheduler
         log_info << "Found modules, count: " << moduleMap.GetSize();
         int i = 0;
         Database::ModuleDatabase &moduleDatabase = Database::ModuleDatabase::instance();
@@ -140,7 +145,7 @@ namespace AwsMock::Manager {
         _shm = std::make_unique<boost::interprocess::managed_shared_memory>(boost::interprocess::open_or_create, MONITORING_SEGMENT_NAME, shmSize, nullptr, unrestricted_permissions);
     }
 
-    void Manager::Run() {
+    void Manager::Run(const bool isService) {
 
         // Create a shared memory segment for monitoring
         CreateSharedMemorySegment();
@@ -215,7 +220,30 @@ namespace AwsMock::Manager {
         log_info << "Manager initialized and started";
 
         // Start IO context
+#ifdef _WIN32
+        if (isService){
+
+            // Wait for Windows service signal
+            while (true) {
+
+                _ioc.run_for(std::chrono::seconds(1));
+                if (WaitForSingleObject(g_ServiceStopEvent, 0) == WAIT_OBJECT_0) {
+                    break;
+                }
+            }
+
+            // Stop io context
+            _ioc.stop();
+            log_info << "Backend stopped";
+
+        } else {
+
+            _ioc.run();
+        }
+#else
         _ioc.run();
+#endif
+
     }
 
 }// namespace AwsMock::Manager

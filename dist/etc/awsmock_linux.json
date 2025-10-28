@@ -9,7 +9,7 @@
       "secret-access-key": "none"
     },
     "data-dir": "/usr/local/awsmock/data",
-    "temp-dir": "/usr/local/awsmock/tmp",
+    "temp-dir": "/usr/local/awsmock/data/tmp",
     "backup-dir": "/usr/local/awsmock/data/backup",
     "shm-size": 1048576,
     "json": {

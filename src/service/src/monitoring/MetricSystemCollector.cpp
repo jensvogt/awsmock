@@ -278,16 +278,16 @@ namespace AwsMock::Monitoring {
 
 #elif _WIN32
 
-    void MetricSystemCollector::GetCpuInfoWin32() const {
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", static_cast<double>(GetPerformanceValue("\\Processor Information(_Total)\\% Processor Time")) / static_cast<double>(_numProcessors));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system",  static_cast<double>(GetPerformanceValue("\\Processor(_Total)\\% Privileged Time")) / static_cast<double>(_numProcessors));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user",  static_cast<double>(GetPerformanceValue("\\Processor(_Total)\\% User Time")) / static_cast<double>(_numProcessors));
+    void MetricSystemCollector::GetCpuInfoWin32()  {
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "total", GetPerformanceValue("\\Processor Information(_Total)\\% Processor Time"));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "system",  GetPerformanceValue("\\Processor Information(_Total)\\% Privileged Time"));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_TOTAL, "cpu_type", "user",  GetPerformanceValue("\\Processor Information(_Total)\\% User Time"));
     }
 
-    void MetricSystemCollector::GetCpuInfoAwsmockWin32() const {
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time")) /  static_cast<double>(_numProcessors));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time")) /  static_cast<double>(_numProcessors));
-        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\% User Time")) /  static_cast<double>(_numProcessors));
+    void MetricSystemCollector::GetCpuInfoAwsmockWin32()  {
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "total", GetPerformanceValue("\\Process(awsmockmgr)\\% Processor Time"));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "system", GetPerformanceValue("\\Process(awsmockmgr)\\% Privileged Time"));
+        Core::MonitoringCollector::instance().SetGauge(CPU_USAGE_AWSMOCK, "cpu_type", "user", GetPerformanceValue("\\Process(awsmockmgr)\\% User Time"));
     }
 
     void MetricSystemCollector::GetMemoryInfoWin32()  {
@@ -303,7 +303,7 @@ namespace AwsMock::Monitoring {
         Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, {}, {}, static_cast<double>(GetPerformanceValue("\\Process(awsmockmgr)\\Thread Count")));
     }
 
-    long long MetricSystemCollector::GetPerformanceValue(const std::string &counter) {
+    double MetricSystemCollector::GetPerformanceValue(const std::string &counter) {
         static PDH_STATUS status;
         static PDH_FMT_COUNTERVALUE value;
         static HQUERY query;
@@ -316,8 +316,18 @@ namespace AwsMock::Monitoring {
             return 0;
         }
 
-        PdhAddCounter(query, counter.c_str(), 0, &counterValue);
-        PdhCollectQueryData(query);
+        status = PdhAddCounter(query, counter.c_str(), 0, &counterValue);
+        if (status != ERROR_SUCCESS) {
+            log_error << "PdhAddCounter error: " << status;
+            return 0;
+        }
+
+        status = PdhCollectQueryData(query);
+        if (status != ERROR_SUCCESS) {
+            log_error << "PdhCollectQueryData error: " << status;
+            return 0;
+        }
+        Sleep(1000);
 
         status = PdhCollectQueryData(query);
         if (status != ERROR_SUCCESS) {
@@ -327,9 +337,12 @@ namespace AwsMock::Monitoring {
 
         status = PdhGetFormattedCounterValue(counterValue, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100, &ret, &value);
         if (status != ERROR_SUCCESS) {
-            printf("PdhGetFormattedCounterValue() ***Error: 0x%X\n", status);
+            log_error << "PdhGetFormattedCounterValue, error: " << static_cast<int>(status);
             return 0;
         }
+
+        // Clean up the query handle
+        PdhCloseQuery(query);
 
         return value.doubleValue;
     }

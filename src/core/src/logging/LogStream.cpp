@@ -8,7 +8,7 @@ namespace AwsMock::Core {
     int LogStream::logCount = DEFAULT_LOG_COUNT;
     std::string LogStream::logDir;
     std::string LogStream::logPrefix;
-    std::string LogStream::_severity;
+    boost::log::trivial::severity_level LogStream::_severity;
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend>> LogStream::console_sink;
     boost::shared_ptr<boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend>> LogStream::file_sink;
     boost::shared_ptr<boost::beast::websocket::stream<boost::beast::tcp_stream>> LogStream::_ws;
@@ -130,15 +130,13 @@ namespace AwsMock::Core {
         boost::log::add_common_attributes();
     }
 
-    void LogStream::SetSeverity(const std::string &severity) {
-        _severity = severity;
-        boost::log::trivial::severity_level lvl;
-        from_string(severity.c_str(), severity.length(), lvl);
+    void LogStream::SetSeverity(const std::string &lvl) {
+        from_string(lvl.c_str(), lvl.length(), _severity);
         if (console_sink) {
-            console_sink->set_filter(boost::log::trivial::severity >= lvl);
+            console_sink->set_filter(boost::log::trivial::severity >= _severity);
         }
         if (file_sink) {
-            file_sink->set_filter(boost::log::trivial::severity >= lvl);
+            file_sink->set_filter(boost::log::trivial::severity >= _severity);
         }
     }
 
@@ -156,9 +154,7 @@ namespace AwsMock::Core {
 #endif
 
         // Set level
-        boost::log::trivial::severity_level lvl;
-        from_string(_severity.c_str(), _severity.length(), lvl);
-        file_sink->set_filter(boost::log::trivial::severity >= lvl);
+        file_sink->set_filter(boost::log::trivial::severity >= _severity);
 
         file_sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
                 boost::log::keywords::target = dir,
@@ -166,17 +162,14 @@ namespace AwsMock::Core {
 
         file_sink->locked_backend()->scan_for_files();
 
-        log_info << "Start logging to file, dir:" << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
+        log_info << "Start logging to file, dir: " << dir << ", prefix: " << prefix << " size: " << size << " count: " << count;
     }
     void LogStream::AddWebSocket(boost::beast::websocket::stream<boost::beast::tcp_stream> &ws) {
         const boost::shared_ptr<boost::log::core> core = boost::log::core::get();
-        boost::log::trivial::severity_level lvl;
-        from_string(_severity.c_str(), _severity.length(), lvl);
-
         webSocketBackend = boost::make_shared<LogWebsocketSink>(boost::make_shared<boost::beast::websocket::stream<boost::beast::tcp_stream>>(std::move(ws)));
         webSocketSink = boost::make_shared<webSocketSink_t>(webSocketBackend);
         webSocketSink->set_formatter(&LogFormatter);
-        webSocketSink->set_filter(boost::log::trivial::severity >= lvl);
+        webSocketSink->set_filter(boost::log::trivial::severity >= _severity);
         core->add_sink(webSocketSink);
     }
 

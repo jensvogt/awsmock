@@ -90,7 +90,7 @@ namespace AwsMock::Dto::Common {
         /**
          * @brief Client command
          */
-        SecretsManagerCommandType command{};
+        SecretsManagerCommandType command = SecretsManagerCommandType::UNKNOWN;
 
         /**
          * @brief Gets the value from the user-agent string

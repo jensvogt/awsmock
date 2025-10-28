@@ -126,12 +126,12 @@ namespace AwsMock::Dto::Common {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct CognitoClientCommand : public BaseClientCommand {
+    struct CognitoClientCommand : BaseClientCommand {
 
         /**
          * Client command
          */
-        CognitoCommandType command;
+        CognitoCommandType command = CognitoCommandType::UNKNOWN;
 
         /**
          * Bucket

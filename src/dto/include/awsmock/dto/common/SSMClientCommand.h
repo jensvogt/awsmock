@@ -6,15 +6,12 @@
 #define AWSMOCK_DTO_COMMON_SSM_CLIENT_COMMAND_H
 
 // C++ includes
-#include <sstream>
 #include <string>
 
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/core/logging/LogStream.h>
-#include <awsmock/core/exception/JsonException.h>
 #include <awsmock/dto/common/BaseClientCommand.h>
 #include <awsmock/dto/common/UserAgent.h>
 
@@ -83,7 +80,7 @@ namespace AwsMock::Dto::Common {
         /**
          * Client command
          */
-        SSMCommandType command{};
+        SSMCommandType command  = SSMCommandType::UNKNOWN;
 
         /**
          * Returns the command from HTTP header

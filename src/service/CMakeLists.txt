@@ -1,4 +1,5 @@
 set(LIBRARY awsmocksrv)
+set(LIBRARY_STATIC awsmocksrv_static)
 
 set(COMMON_SOURCES src/common/AbstractHandler.cpp src/common/AbstractServer.cpp)
 set(S3_SOURCES src/s3/S3Server.cpp src/s3/S3Handler.cpp src/s3/S3Service.cpp src/s3/S3HashCreator.cpp)
@@ -48,15 +49,15 @@ include_directories(./include ../core/include ../db/include ../dto/include ${LIB
 
 # Library
 if (WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_directories(${LIBRARY} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR} ${LIBSSH_LIB_DIR} ${LIBPROMETHEUS_LIB_DIR})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb awsmockdto mongocxx-v_noabi-rhi-x64-v143-md.lib
-            bsoncxx-v_noabi-rhi-x64-v143-md.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
-            boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
-            boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib
-            prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
-    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static
+            mongocxx-v_noabi-rhi-x64-v143-md.lib bsoncxx-v_noabi-rhi-x64-v143-md.lib boost_url-vc143-mt-x64-1_89.lib
+            boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
+            boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
+            archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
+    # install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale boost_thread boost_filesystem

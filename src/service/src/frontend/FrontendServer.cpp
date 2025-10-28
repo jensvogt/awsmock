@@ -6,9 +6,13 @@
 #include <awsmock/service/frontend/FrontendServer.h>
 #include <boost/asio/signal_set.hpp>
 
+#ifdef _WIN32
+extern HANDLE g_ServiceStopEvent;
+#endif
+
 namespace AwsMock::Service::Frontend {
 
-    void FrontendServer::operator()() {
+    void FrontendServer::operator()(bool isService) {
 
         if (!Core::Configuration::instance().GetValue<bool>("awsmock.frontend.active")) {
             log_info << "Frontend server inactive";
@@ -43,8 +47,27 @@ namespace AwsMock::Service::Frontend {
             log_info << "Frontend signal handler installed";
 
             log_info << "Frontend server started, endpoint: " << address << ":" << port << " workers: " << num_workers;
-            ioc.run();
 
+#ifdef _WIN32
+            if (isService) {
+                while (true) {
+                    ioc.run_for(std::chrono::seconds(1));
+                    if (WaitForSingleObject(g_ServiceStopEvent, 0) == WAIT_OBJECT_0) {
+                        break;
+                    }
+                }
+
+                // Stop io context
+                ioc.stop();
+                log_info << "Frontend server stopped";
+
+            } else {
+                ioc.run();
+            }
+
+#else
+            ioc.run();
+#endif
         } catch (const std::exception &e) {
             log_error << "Error: " << e.what() << std::endl;
         }

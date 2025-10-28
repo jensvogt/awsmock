@@ -286,10 +286,9 @@ namespace AwsMock::Service {
         // Get container id, if already running
         if (application.containerName.empty()) {
             if (const Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version); !container.id.empty()) {
-                std::string containerName = container.names.front();
-                containerName = Core::StringUtils::StartsWith(containerName, "/") ? containerName.substr(1) : containerName;
+                application.imageName = container.image;
                 application.containerId = container.id;
-                application.containerName = containerName;
+                application.containerName = container.GetContainerName();
                 application = _database.UpdateApplication(application);
             }
         }
@@ -487,8 +486,6 @@ namespace AwsMock::Service {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application.containerId = "";
             application.containerName = "";
-            application.privatePort = -1;
-            application.publicPort = -1;
             application = _database.UpdateApplication(application);
             log_debug << "Application stopped, name: " << application.name;
 

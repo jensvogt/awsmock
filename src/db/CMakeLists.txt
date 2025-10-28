@@ -52,15 +52,15 @@ include_directories(./include ../core/include ${LIBRARY} PUBLIC ./include ${BSON
 
 # Shared library
 if (WIN32)
-    add_library(${LIBRARY} SHARED ${SOURCES})
-    target_link_directories(${LIBRARY} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
+    add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore bsoncxx-v_noabi-rhi-x64-v143-md.lib
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static bsoncxx-v_noabi-rhi-x64-v143-md.lib
             mongocxx-v_noabi-rhi-x64-v143-md.lib boost_filesystem-vc143-mt-x64-1_89.lib
             boost_url-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
             boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
             archive.lib magic.lib)
-    install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale

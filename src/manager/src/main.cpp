@@ -52,10 +52,6 @@
  */
 int main(const int argc, char *argv[]) {
 
-#ifdef _WIN32
-    _CrtDumpMemoryLeaks();
-#endif
-
     // Initialize logging
     AwsMock::Core::LogStream::Initialize();
 
@@ -125,11 +121,7 @@ int main(const int argc, char *argv[]) {
 
     // Read configuration, log to stderr, as we do not have logging yet
     if (vm.contains("config")) {
-        const std::string &configFilename = vm["config"].as<std::string>();
-        if (!AwsMock::Core::FileUtils::FileExists(configFilename)) {
-            std::cerr << "Configuration file missing, filename: " << configFilename << std::endl;
-            exit(1);
-        }
+        const std::string configFilename = vm["config"].as<std::string>();
         AwsMock::Core::Configuration::instance().SetFilename(configFilename);
     }
 
@@ -160,7 +152,7 @@ int main(const int argc, char *argv[]) {
         // Run the detached frontend server thread
         boost::thread frontendThread;
         AwsMock::Service::Frontend::FrontendServer server;
-        frontendThread = boost::thread{boost::ref(server)};
+        frontendThread = boost::thread{boost::ref(server), false};
         frontendThread.detach();
         log_info << "Frontend server started.";
 
@@ -169,7 +161,7 @@ int main(const int argc, char *argv[]) {
         AwsMock::Manager::Manager awsMockManager{ioc};
         awsMockManager.Initialize();
         log_info << "Backend server started.";
-        awsMockManager.Run();
+        awsMockManager.Run(false);
 
         return 0;
     }
@@ -197,7 +189,7 @@ int main(const int argc, char *argv[]) {
     // Run the detached frontend server thread
     boost::thread frontendThread;
     AwsMock::Service::Frontend::FrontendServer server;
-    frontendThread = boost::thread{boost::ref(server)};
+    frontendThread = boost::thread{boost::ref(server), false};
     frontendThread.detach();
     log_info << "Frontend server started.";
 
@@ -206,7 +198,7 @@ int main(const int argc, char *argv[]) {
     AwsMock::Manager::Manager awsMockManager{ioc};
     awsMockManager.Initialize();
     log_info << "Backend server started.";
-    awsMockManager.Run();
+    awsMockManager.Run(false);
 
 #endif
 

@@ -165,8 +165,6 @@ namespace AwsMock::Service {
                 application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
                 application.containerId = "";
                 application.containerName = "";
-                application.privatePort = -1;
-                application.publicPort = -1;
                 application = _applicationDatabase.UpdateApplication(application);
             }
         }
@@ -178,8 +176,13 @@ namespace AwsMock::Service {
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         for (const auto &container: ContainerService::instance().ListContainers()) {
 
-            std::string name = Core::StringUtils::Split(container.image, ':')[0];
-            std::string tag = Core::StringUtils::Split(container.image, ':')[1];
+            std::string name{}, tag{};
+            if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ':');parts.size() == 1) {
+                name = parts[0];
+            } else if (parts.size() == 2) {
+                name = parts[0];
+                tag = parts[1];
+            }
             if (_applicationDatabase.ApplicationExists(region, name)) {
                 Database::Entity::Apps::Application application = _applicationDatabase.GetApplication(region, name);
                 application.region = region;

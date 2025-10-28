@@ -1175,13 +1175,13 @@ namespace AwsMock::Service {
 
         if (!internalName.empty()) {
             std::string filename = dataS3Dir + Core::FileUtils::separator() + internalName;
-            Core::FileUtils::DeleteFile(filename);
+            Core::FileUtils::RemoveFile(filename);
             log_debug << "File system object deleted, filename: " << filename;
 
             if (bucket == transferBucket) {
                 filename = key;
                 filename = transferDir + Core::FileUtils::separator() + Core::FileUtils::SetFileSeparator(filename);
-                Core::FileUtils::DeleteFile(filename);
+                Core::FileUtils::RemoveFile(filename);
                 log_debug << "Transfer file system object deleted, filename: " << filename;
             }
         }
@@ -1385,7 +1385,7 @@ namespace AwsMock::Service {
         } else {
 
             // Delete the local file
-            Core::FileUtils::DeleteFile(filePath);
+            Core::FileUtils::RemoveFile(filePath);
         }
 
         Dto::S3::PutObjectResponse response;
