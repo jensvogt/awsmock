@@ -206,8 +206,11 @@ namespace AwsMock::Core {
                 return;
             }
             log_trace << "Wrote header";
-
+#ifdef __APPLE__
+            const int fd = open(fileName.c_str(), O_RDONLY);
+#else
             const int fd = open(fileName.c_str(), O_RDONLY | O_BINARY);
+#endif
             if (fd >= 0) {
                 char buff[8192];
                 long len = read(fd, buff, sizeof(buff));

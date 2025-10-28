@@ -10,7 +10,9 @@
 // C++ standard includes
 #include <fcntl.h>
 #include <string>
+#ifndef __APPLE__
 #include <direct.h>
+#endif
 
 #ifdef _WIN32
 #ifndef NOMINMAX

@@ -111,7 +111,7 @@ namespace AwsMock::Core {
         while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
 
             // Prepend the output path to the entry's path
-            std::wstring fullPath = StringUtils::ConvertToWideString(directory).append(StringUtils::ConvertToWideString("/")).append(archive_entry_pathname_w(entry));
+            std::string fullPath = directory + "/" + archive_entry_pathname(entry);
             archive_entry_set_pathname(entry, fullPath.c_str());
 
             r = archive_write_header(ext, entry);
@@ -125,13 +125,13 @@ namespace AwsMock::Core {
                 }
             } else if (r == ARCHIVE_FATAL) {
                 // Non-recoverable error, stop extraction
-                std::cerr << "Libarchive Fatal Error writing header: " << archive_error_string(ext) << std::endl;
+                log_error << "Libarchive Fatal Error writing header: " << archive_error_string(ext);
                 break;
             }
 
             r = archive_write_finish_entry(ext);
             if (r != ARCHIVE_OK) {
-                std::cerr << "Libarchive Error finishing entry: " << archive_error_string(ext) << std::endl;
+                log_error << "Libarchive Error finishing entry: " << archive_error_string(ext);
                 break;
             }
         }
