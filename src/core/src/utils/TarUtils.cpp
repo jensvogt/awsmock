@@ -14,7 +14,7 @@ namespace AwsMock::Core {
         const std::wstring directory_w = StringUtils::ConvertToWideString(directory);
 
         // Create a new archive write handle
-        archive * a = archive_write_new();
+        archive *a = archive_write_new();
         if (!a) {
             log_error << "Failed to create archive handle.";
             return;
@@ -47,7 +47,7 @@ namespace AwsMock::Core {
         try {
 
             // Use recursive_directory_iterator for deep traversal
-            for (const auto& entry : std::filesystem::recursive_directory_iterator(directory_w, std::filesystem::directory_options::skip_permission_denied)) {
+            for (const auto &entry: std::filesystem::recursive_directory_iterator(directory_w, std::filesystem::directory_options::skip_permission_denied)) {
 
                 // Skip tar file
                 if (StringUtils::EqualsIgnoreCase(tarFile, entry.path().string())) {
@@ -66,14 +66,14 @@ namespace AwsMock::Core {
                 // Stat the file using the wide-character stat function
                 struct _stat64 st{};
                 if (const int retStat = _wstat64(current_path_w.c_str(), &st); retStat != 0) {
-                     log_warning << "Failed to stat file: " << current_path_w << ", error: " << retStat << ". Skipping.";
-                     continue;
+                    log_warning << "Failed to stat file: " << current_path_w << ", error: " << retStat << ". Skipping.";
+                    continue;
                 }
 
                 archive_entry *tar_entry = archive_entry_new();
                 if (!tar_entry) {
-                     log_error << "Failed to create archive entry.";
-                     continue;
+                    log_error << "Failed to create archive entry.";
+                    continue;
                 }
 
                 // Set the wide path name in the entry
@@ -95,7 +95,7 @@ namespace AwsMock::Core {
 
                 // For regular files, stream the data
                 if (entry.is_regular_file()) {
-                    FILE* fd = nullptr;
+                    FILE *fd = nullptr;
 
                     if (const errno_t err = _wfopen_s(&fd, current_path_w.c_str(), L"rb"); err == 0 && fd) {
                         char buff[8192];
@@ -115,7 +115,7 @@ namespace AwsMock::Core {
                 }
                 archive_entry_free(tar_entry);
             }
-        } catch (const std::filesystem::filesystem_error& ex) {
+        } catch (const std::filesystem::filesystem_error &ex) {
             // Catch critical errors like directory access failures
             log_error << "Filesystem error during traversal: " << ex.what();
             archive_write_close(a);
@@ -131,101 +131,101 @@ namespace AwsMock::Core {
             return;
         }
         archive_write_free(a);
-        log_info<< "Successfully archived, name: " << tarFile << ", count: " << count;
+        log_info << "Successfully archived, name: " << tarFile << ", count: " << count;
     }
 
 #else
 
     void TarUtils::TarDirectory(const std::string &tarFile, const std::string &directory) {
 
-            int err = 0;
-            log_trace << "Create gzipped tarfile, tarFile: " << tarFile << ", directory: " << directory;
-            archive *a = archive_write_new();
-            // Windows does not support compression
-            archive_write_add_filter_gzip(a);
-            archive_write_set_format_gnutar(a);
-            err = archive_write_open_filename(a, tarFile.c_str());
-            if (err != ARCHIVE_OK) {
-                log_error << "Could not open tar file, path: " << tarFile << ", directory: " << directory << ", error: " << archive_error_string(a);
-                return;
-            }
-
-            boost::filesystem::recursive_directory_iterator dir(directory);
-            const boost::filesystem::recursive_directory_iterator end;
-            int count = 0;
-            while (dir != end) {
-                if (dir->path() != tarFile) {
-                    std::string filename = dir->path().string();
-                    WriteFile(a, filename, directory, dir->is_directory(), dir->is_symlink());
-                    count++;
-                }
-                ++dir;
-            }
-            archive_write_close(a);
-            archive_write_free(a);
+        int err = 0;
+        log_trace << "Create gzipped tarfile, tarFile: " << tarFile << ", directory: " << directory;
+        archive *a = archive_write_new();
+        // Windows does not support compression
+        archive_write_add_filter_gzip(a);
+        archive_write_set_format_gnutar(a);
+        err = archive_write_open_filename(a, tarFile.c_str());
+        if (err != ARCHIVE_OK) {
+            log_error << "Could not open tar file, path: " << tarFile << ", directory: " << directory << ", error: " << archive_error_string(a);
+            return;
         }
+
+        boost::filesystem::recursive_directory_iterator dir(directory);
+        const boost::filesystem::recursive_directory_iterator end;
+        int count = 0;
+        while (dir != end) {
+            if (dir->path() != tarFile) {
+                std::string filename = dir->path().string();
+                WriteFile(a, filename, directory, dir->is_directory(), dir->is_symlink());
+                count++;
+            }
+            ++dir;
+        }
+        archive_write_close(a);
+        archive_write_free(a);
+    }
 
     void TarUtils::WriteFile(archive *archive, std::string &fileName, const std::string &directory, const bool isDir, const bool isLink) {
 
-            int err = 0;
-            std::string entryName = fileName;
-            StringUtils::Replace(entryName, directory, "");
-            log_trace << "Removed directory, entryName: " << entryName << ", filename: " << fileName << ", directory: " << directory;
+        int err = 0;
+        std::string entryName = fileName;
+        StringUtils::Replace(entryName, directory, "");
+        log_trace << "Removed directory, entryName: " << entryName << ", filename: " << fileName << ", directory: " << directory;
 
-            struct stat st{};
-            stat(fileName.c_str(), &st);
-            archive_entry *entry = archive_entry_new();
-            archive_entry_set_pathname(entry, entryName.c_str());
-            archive_entry_set_size(entry, st.st_size);
-            archive_entry_copy_stat(entry, &st);
-            std::string link;
-            if (isDir) {
-                archive_entry_set_filetype(entry, S_IFDIR);
-                archive_entry_set_perm(entry, 0755);
-                archive_entry_set_uid(entry, 0);
-                archive_entry_set_gid(entry, 0);
-                log_trace << "Is directory";
-            } else if (isLink) {
-                link = Readsymlink(fileName);
-                archive_entry_set_filetype(entry, AE_IFLNK);
-                archive_entry_set_symlink(entry, link.c_str());
-                archive_entry_set_perm(entry, 0644);
-                archive_entry_set_uid(entry, 0);
-                archive_entry_set_gid(entry, 0);
-                log_trace << "Is link";
-            } else {
-                archive_entry_set_filetype(entry, AE_IFREG);
-                archive_entry_set_perm(entry, 0755);
-                archive_entry_set_uid(entry, 0);
-                archive_entry_set_gid(entry, 0);
-                log_trace << "Is regular file";
-            }
-            err = archive_write_header(archive, entry);
-            if (err != ARCHIVE_OK) {
-                log_error << "Could not write header, filename: " << fileName << ", error: " << archive_error_string(archive);
-                return;
-            }
-            log_trace << "Wrote header";
-#ifdef __APPLE__
-            const int fd = open(fileName.c_str(), O_RDONLY);
-#else
-            const int fd = open(fileName.c_str(), O_RDONLY | O_BINARY);
-#endif
-            if (fd >= 0) {
-                char buff[8192];
-                long len = read(fd, buff, sizeof(buff));
-                while (len > 0) {
-                    archive_write_data(archive, buff, len);
-                    len = read(fd, buff, sizeof(buff));
-                    log_trace << "File written to archive, name: " << entryName;
-                }
-                close(fd);
-            } else {
-                log_error << "Cannot open file: " << fileName;
-            }
-            log_trace << "Finished writing file: " << fileName;
-            archive_entry_free(entry);
+        struct stat st{};
+        stat(fileName.c_str(), &st);
+        archive_entry *entry = archive_entry_new();
+        archive_entry_set_pathname(entry, entryName.c_str());
+        archive_entry_set_size(entry, st.st_size);
+        archive_entry_copy_stat(entry, &st);
+        std::string link;
+        if (isDir) {
+            archive_entry_set_filetype(entry, S_IFDIR);
+            archive_entry_set_perm(entry, 0755);
+            archive_entry_set_uid(entry, 0);
+            archive_entry_set_gid(entry, 0);
+            log_trace << "Is directory";
+        } else if (isLink) {
+            link = Readsymlink(fileName);
+            archive_entry_set_filetype(entry, AE_IFLNK);
+            archive_entry_set_symlink(entry, link.c_str());
+            archive_entry_set_perm(entry, 0644);
+            archive_entry_set_uid(entry, 0);
+            archive_entry_set_gid(entry, 0);
+            log_trace << "Is link";
+        } else {
+            archive_entry_set_filetype(entry, AE_IFREG);
+            archive_entry_set_perm(entry, 0755);
+            archive_entry_set_uid(entry, 0);
+            archive_entry_set_gid(entry, 0);
+            log_trace << "Is regular file";
         }
+        err = archive_write_header(archive, entry);
+        if (err != ARCHIVE_OK) {
+            log_error << "Could not write header, filename: " << fileName << ", error: " << archive_error_string(archive);
+            return;
+        }
+        log_trace << "Wrote header";
+#ifdef _WIN32
+        const int fd = open(fileName.c_str(), O_RDONLY | O_BINARY);
+#else
+        const int fd = open(fileName.c_str(), O_RDONLY);
+#endif
+        if (fd >= 0) {
+            char buff[8192];
+            long len = read(fd, buff, sizeof(buff));
+            while (len > 0) {
+                archive_write_data(archive, buff, len);
+                len = read(fd, buff, sizeof(buff));
+                log_trace << "File written to archive, name: " << entryName;
+            }
+            close(fd);
+        } else {
+            log_error << "Cannot open file: " << fileName;
+        }
+        log_trace << "Finished writing file: " << fileName;
+        archive_entry_free(entry);
+    }
 
     std::string TarUtils::Readsymlink(const std::string &path) {
         size_t len;
@@ -256,4 +256,4 @@ namespace AwsMock::Core {
     }
 #endif
 
-} // namespace AwsMock::Core
+}// namespace AwsMock::Core
