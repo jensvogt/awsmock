@@ -17,9 +17,8 @@
 #endif
 #include <io.h>
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 #include <boost/asio.hpp>
-#include <direct.h>
+#include <Windows.h>
 #endif
 
 // Boost includes
@@ -31,8 +30,8 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/StringUtils.h>
 #include <awsmock/core/logging/LogStream.h>
+#include <awsmock/core/StringUtils.h>
 
 namespace AwsMock::Core {
 
@@ -40,8 +39,8 @@ namespace AwsMock::Core {
      * @brief TAR compression utilities
      *
      * @par
-     * If you have problems using long path names (Java sometimes has long path names) on Windows, set the following registry key using powershell:
-     * New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+     * If you have problems using long path names (Java sometimes has long path names) on Windows, set the following registry key using PowerShell:
+     * New-ItemProperty-Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
      *
      * @author jens.vogt\@opitz-consulting.com
      */
