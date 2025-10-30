@@ -116,12 +116,8 @@
         },
         "bucket": "transfer-server",
         "data-dir": "C:\\Program Files (x86)\\awsmock\\data\\transfer",
-        "monitoring": {
-          "period": 300
-        },
-        "worker": {
-          "period": 300
-        },
+        "user-pool-id": "eu-central-1_oGsr6fJ8F",
+        "monitoring-period": 300,
         "directories": [
           "incoming/mix",
           "feedback"

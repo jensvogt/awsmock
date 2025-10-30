@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/ZipUtils.h>
-#include <boost/numeric/ublas/fwd.hpp>
 
 namespace AwsMock::Core {
 
@@ -145,7 +144,11 @@ namespace AwsMock::Core {
     int ZipUtils::CopyData(archive *ar, archive *aw) {
         const void *buff;
         size_t size;
+#ifdef _WIN32
+        long long offset;
+#else
         long offset;
+#endif
 
         for (;;) {
             // Read data block from the archive

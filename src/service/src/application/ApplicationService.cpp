@@ -277,6 +277,7 @@ namespace AwsMock::Service {
 
         // Update status
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
+        application.enabled = true;
         application = _database.UpdateApplication(application);
 
         // Get code base64 file name
@@ -393,7 +394,7 @@ namespace AwsMock::Service {
                 ContainerService::instance().WaitForContainer(inspectContainerResponse.id);
             }
 
-            Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
+            const Dto::Docker::Container container = ContainerService::instance().GetFirstContainerByImageName(application.name, application.version);
             inspectContainerResponse = ContainerService::instance().InspectContainer(container.id);
             if (inspectContainerResponse.status == http::status::ok) {
                 application.imageId = inspectContainerResponse.image;
@@ -416,6 +417,59 @@ namespace AwsMock::Service {
         long count = StopAllApplications();
         count = StartAllApplications();
         return count;
+    }
+
+        void ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "stop_application");
+        log_debug << "Stop application request, region:  " << request.region << " name: " << request.application.name;
+
+        if (!_database.ApplicationExists(request.region, request.application.name)) {
+            log_error << "Application does not exist, region: " << request.region << " name: " << request.application.name;
+            throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.application.name);
+        }
+
+        try {
+            Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
+
+            if (application.containerName.empty() || !ContainerService::instance().ContainerExists(application.containerName)) {
+                log_warning << "Container does not exist, name: " << request.application.name;
+                return;
+            }
+
+            // Stop container
+            ContainerService::instance().KillContainer(application.containerName);
+            application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
+            application.containerId = "";
+            application.containerName = "";
+            application.enabled = false;
+            application = _database.UpdateApplication(application);
+            log_debug << "Application stopped, name: " << application.name;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
+    }
+
+    long ApplicationService::StopAllApplications() const {
+        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "stop_all_applications");
+        log_debug << "Stop application request";
+
+        try {
+            long count = 0;
+            for (auto &application: _database.ListApplications()) {
+                Dto::Apps::StopApplicationRequest stopRequest;
+                stopRequest.application = Dto::Apps::Mapper::map(application);
+                stopRequest.region = application.region;
+                StopApplication(stopRequest);
+                count++;
+            }
+            return count;
+
+        } catch (bsoncxx::exception &exc) {
+            log_error << exc.what();
+            throw Core::JsonException(exc.what());
+        }
     }
 
     Dto::Apps::ListApplicationCountersResponse ApplicationService::ListApplications(const Dto::Apps::ListApplicationCountersRequest &request) const {
@@ -457,66 +511,6 @@ namespace AwsMock::Service {
                 response.push_back(application.name);
             }
             return response;
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    void ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
-        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "stop_application");
-        log_debug << "Stop application request, region:  " << request.region << " name: " << request.application.name;
-
-        if (!_database.ApplicationExists(request.region, request.application.name)) {
-            log_error << "Application does not exist, region: " << request.region << " name: " << request.application.name;
-            throw Core::ServiceException("Application does not exist, region: " + request.region + " name: " + request.application.name);
-        }
-
-        try {
-            Database::Entity::Apps::Application application = _database.GetApplication(request.region, request.application.name);
-
-            if (application.containerName.empty() || !ContainerService::instance().ContainerExists(application.containerName)) {
-                log_warning << "Container does not exist, name: " << request.application.name;
-                return;
-            }
-
-            // Stop container
-            ContainerService::instance().StopContainer(application.containerName);
-            application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-            application.containerId = "";
-            application.containerName = "";
-            application = _database.UpdateApplication(application);
-            log_debug << "Application stopped, name: " << application.name;
-
-        } catch (bsoncxx::exception &exc) {
-            log_error << exc.what();
-            throw Core::JsonException(exc.what());
-        }
-    }
-
-    long ApplicationService::StopAllApplications() const {
-        Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "stop_all_applications");
-        log_debug << "Stop application request";
-
-        try {
-            long count = 0;
-            for (auto &application: _database.ListApplications()) {
-                if (application.containerName.empty() && application.containerId.empty()) {
-                    log_warning << "Container does not exist, name: " << application.name;
-                    continue;
-                }
-
-                // Stop container
-                ContainerService::instance().KillContainer(application.containerId);
-                application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
-                application.containerId = "";
-                application.containerName = "";
-                application = _database.UpdateApplication(application);
-                log_info << "Application stopped, name: " << application.name;
-                count++;
-            }
-            return count;
 
         } catch (bsoncxx::exception &exc) {
             log_error << exc.what();
