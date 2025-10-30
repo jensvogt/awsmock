@@ -49,7 +49,7 @@ namespace AwsMock::FtpServer {
          * use that port, make sure that your application runs as root.
          *
          * Instead of using a predefined port, the operating system can choose a
-         * free port. Use port=0, if that behaviour is desired. The chosen port
+         * free port. Use port=0 if that behavior is desired. The chosen port
          * can be determined by with getPort().
          *
          * This constructor will create an FTP Server binding to IPv4 0.0.0.0 and
@@ -58,8 +58,9 @@ namespace AwsMock::FtpServer {
          * address. Use TransferFtpServer(const std::string&, uint16_t) for that purpose.
          *
          * @param serverName: server name
-         * @param port: The port to StartServer the FTP manager on. Defaults to 21.
-         * @param address: listen address
+         * @param port: the port to StartServer the FTP manager on. Defaults to 21.
+         * @param address: listen to the address
+         * @param awsIoc boost IO context
          */
         explicit FtpServer(std::string serverName, int port, std::string address, boost::asio::io_context &awsIoc);
 

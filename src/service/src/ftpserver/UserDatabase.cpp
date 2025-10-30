@@ -1,8 +1,11 @@
 #include "awsmock/ftpserver/UserDatabase.h"
 
-#include <iostream>
-
 namespace AwsMock::FtpServer {
+
+    UserDatabase::UserDatabase() {
+        _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+        _userPoolId = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.user-pool-id");
+    }
 
     bool UserDatabase::addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions) {
         const std::lock_guard database_lock(database_mutex_);
@@ -33,19 +36,20 @@ namespace AwsMock::FtpServer {
             log_info << "Anonymous user logged in";
             return anonymous_user_;
         }
-        if (const auto user_it = database_.find(username); user_it == database_.end()) {
-            log_warning << "User not found userName: " << username;
+
+        try {
+            if (Database::Entity::Cognito::User user = Database::CognitoDatabase::instance().GetUserByUserName(_region, _userPoolId, username); user.password == password) {
+                return std::make_shared<FtpUser>(user.userName, user.password, user.userName, FtpServer::Permission::All);
+            }
+            log_warning << "User not found, userName: " << username;
             return nullptr;
-        } else {
-            if (user_it->second->password_ == password)
-                return user_it->second;
-            log_warning << "Wrong password, userName: " << username << ", password: " << password << ", expected: " << user_it->second->password_;
+        } catch (Core::DatabaseException &exc) {
+            log_warning << "User not found userName: " << username;
             return nullptr;
         }
     }
 
-    bool UserDatabase::isUsernameAnonymousUser(const std::string &username) const// NOLINT(readability-convert-member-functions-to-static) Reason: I don't want to break the API. Otherwise this is a good finding and should be accepted.
-    {
+    bool UserDatabase::isUsernameAnonymousUser(const std::string &username) {
         return (username.empty() || username == "ftp" || username == "anonymous");
     }
 

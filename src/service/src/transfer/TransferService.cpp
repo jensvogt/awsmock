@@ -82,11 +82,18 @@ namespace AwsMock::Service {
                 .password = Core::StringUtils::GenerateRandomPassword(8),
                 .homeDirectory = homeDirectory,
                 .arn = userArn};
+
+        // Set the password when provided by request
+        if (!request.password.empty()) {
+            user.password = request.password;
+        }
         transferEntity.users.emplace_back(user);
 
         // Update database
         transferEntity = _transferDatabase.UpdateTransfer(transferEntity);
         log_debug << "Updated transfer manager, serverId: " << transferEntity.serverId;
+
+        // Create user in transfer server
 
         // Create response
         Dto::Transfer::CreateUserResponse response{.region = transferEntity.region, .serverId = transferEntity.serverId, .userName = request.userName};

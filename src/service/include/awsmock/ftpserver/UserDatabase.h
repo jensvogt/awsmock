@@ -5,10 +5,12 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <iostream>
 
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/ftpserver/FtpUser.h>
+#include <awsmock/repository/CognitoDatabase.h>
 
 namespace AwsMock::FtpServer {
 
@@ -19,7 +21,7 @@ namespace AwsMock::FtpServer {
         /**
          * Constructor
          */
-        UserDatabase() = default;
+        UserDatabase();
 
         /**
          * Add a new user to the database.
@@ -51,7 +53,7 @@ namespace AwsMock::FtpServer {
          * @param username name of the user
          * @return
          */
-        bool isUsernameAnonymousUser(const std::string &username) const;
+        static bool isUsernameAnonymousUser(const std::string &username);
 
         /**
          * Server mutex
@@ -67,5 +69,15 @@ namespace AwsMock::FtpServer {
          * Anonymous user
          */
         std::shared_ptr<FtpUser> anonymous_user_;
+
+        /**
+         * AWS region
+         */
+        std::string _region;
+
+        /**
+         * Cognito user pool ID
+         */
+        std::string _userPoolId;
     };
 }// namespace AwsMock::FtpServer

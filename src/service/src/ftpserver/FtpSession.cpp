@@ -2,7 +2,7 @@
 #include <awsmock/ftpserver/FtpSession.h>
 
 namespace AwsMock::FtpServer {
-    FtpSession::FtpSession(boost::asio::io_context &awsIoc,const UserDatabase &user_database,std::string serverName,const std::function<void()> &completion_handler)
+    FtpSession::FtpSession(boost::asio::io_context &awsIoc, const UserDatabase &user_database, std::string serverName, const std::function<void()> &completion_handler)
         : _completion_handler(completion_handler), _user_database(user_database), _io_service(awsIoc),
           command_socket_(awsIoc), command_write_strand_(awsIoc), data_type_binary_(true),
           data_acceptor_(awsIoc), data_buffer_strand_(awsIoc), file_rw_strand_(awsIoc),
@@ -47,12 +47,12 @@ namespace AwsMock::FtpServer {
 
     void FtpSession::sendRawFtpMessage(const std::string &raw_message) {
         command_write_strand_.post([me = shared_from_this(), raw_message]() {
-            const bool write_in_progress = !me->command_output_queue_.empty();
-            me->command_output_queue_.push_back(raw_message);
-            if (!write_in_progress) {
-                me->startSendingMessages();
-            }
-        },
+                                       const bool write_in_progress = !me->command_output_queue_.empty();
+                                       me->command_output_queue_.push_back(raw_message);
+                                       if (!write_in_progress) {
+                                           me->startSendingMessages();
+                                       }
+                                   },
                                    nullptr);
     }
 
@@ -129,7 +129,7 @@ namespace AwsMock::FtpServer {
             parameters = command.substr(space_index + 1, std::string::npos);
         }
 
-        const std::map<std::string, std::function<void(std::string)>> command_map{
+        const std::map<std::string, std::function<void(std::string)> > command_map{
                 // Access control commands
                 {"USER", std::bind(&FtpSession::handleFtpCommandUSER, this, std::placeholders::_1)},
                 {"PASS", std::bind(&FtpSession::handleFtpCommandPASS, this, std::placeholders::_1)},
@@ -187,7 +187,9 @@ namespace AwsMock::FtpServer {
 
         if (_lastCommand == "QUIT") {
             // Close command socket
-            command_write_strand_.wrap([me = shared_from_this()]() { me->command_socket_.close(); });
+            command_write_strand_.wrap([me = shared_from_this()]() {
+                me->command_socket_.close();
+            });
         } else {
             // Wait for next command
             readFtpCommand();
@@ -216,7 +218,7 @@ namespace AwsMock::FtpServer {
         if (_lastCommand != "USER") {
             sendFtpMessage(FtpReplyCode::COMMANDS_BAD_SEQUENCE, "Please specify username first");
         } else {
-            if (const auto user = _user_database.getUser(_usernameForLogin, param)) {
+            if (const auto user = _user_database.getUser(_usernameForLogin, param); user != nullptr) {
                 _logged_in_user = user;
                 sendFtpMessage(FtpReplyCode::USER_LOGGED_IN, "Login successful");
             } else {
@@ -676,8 +678,8 @@ namespace AwsMock::FtpServer {
 #if defined(WIN32) && !defined(__GNUG__)
         // TODO fix windows porting issues
         std::ifstream file(local_path, open_mode);
-//        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
-//        std::ifstream file(wLocalPath, open_mode);
+        //        std::wstring wLocalPath = Core::Utf8ToWide(local_path.c_str());
+        //        std::ifstream file(wLocalPath, open_mode);
 #else
         std::ifstream file(local_path, open_mode);
 #endif
@@ -1163,7 +1165,7 @@ namespace AwsMock::FtpServer {
 
                 stream << (file_status.type() == FileType::Dir ? 'd' : '-') << file_status.permissionString() << "   1 ";
                 stream << std::setw(10) << file_status.ownerString() << " " << std::setw(10)
-                       << file_status.groupString() << " ";
+                        << file_status.groupString() << " ";
                 stream << std::setw(10) << file_status.fileSize() << " ";
                 stream << file_status.timeString() << " ";
                 stream << filename;
@@ -1172,13 +1174,13 @@ namespace AwsMock::FtpServer {
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
-            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char> >();
             dir_listing_rawdata->reserve(dir_listing_string.size());
             std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
         });
     }
 
@@ -1202,13 +1204,13 @@ namespace AwsMock::FtpServer {
 
             // Copy the file list into a raw char vector
             const std::string dir_listing_string = stream.str();
-            const auto dir_listing_rawdata = std::make_shared<std::vector<char>>();
+            const auto dir_listing_rawdata = std::make_shared<std::vector<char> >();
             dir_listing_rawdata->reserve(dir_listing_string.size());
             std::ranges::copy(dir_listing_string, std::back_inserter(*dir_listing_rawdata));
 
             // Send the string out
             me->addDataToBufferAndSend(dir_listing_rawdata, data_socket);
-            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(), data_socket);
+            me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(), data_socket);
             // Nullpointer indicates the end of transmission
         });
     }
@@ -1234,40 +1236,39 @@ namespace AwsMock::FtpServer {
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
                                              const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
         file_rw_strand_.post([me = shared_from_this(), file, data_socket]() {
-            if (file->file_stream_.eof())
-                return;
+                                 if (file->file_stream_.eof()) return;
 
-            const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
-            file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
-            const auto bytes_read = file->file_stream_.gcount();
-            buffer->resize(static_cast<size_t>(bytes_read));
+                                 const auto buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
+                                 file->file_stream_.read(buffer->data(), static_cast<std::streamsize>(buffer->size()));
+                                 const auto bytes_read = file->file_stream_.gcount();
+                                 buffer->resize(static_cast<size_t>(bytes_read));
 
-            if (!file->file_stream_.eof()) {
-                me->addDataToBufferAndSend(buffer,
-                                           data_socket,
-                                           [me, file, data_socket]() {
-                                               me->readDataFromFileAndSend(file, data_socket);
-                                           });
-            } else {
-                me->addDataToBufferAndSend(buffer, data_socket);
-                me->addDataToBufferAndSend(std::shared_ptr<std::vector<char>>(nullptr), data_socket);
-            }
-        },
+                                 if (!file->file_stream_.eof()) {
+                                     me->addDataToBufferAndSend(buffer,
+                                                                data_socket,
+                                                                [me, file, data_socket]() {
+                                                                    me->readDataFromFileAndSend(file, data_socket);
+                                                                });
+                                 } else {
+                                     me->addDataToBufferAndSend(buffer, data_socket);
+                                     me->addDataToBufferAndSend(std::shared_ptr<std::vector<char> >(nullptr), data_socket);
+                                 }
+                             },
                              nullptr);
     }
 
-    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char>> &data,
+    void FtpSession::addDataToBufferAndSend(const std::shared_ptr<std::vector<char> > &data,
                                             const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket,
                                             const std::function<void(void)> &fetch_more) {
         data_buffer_strand_.post([me = shared_from_this(), data, data_socket, fetch_more]() {
-            const bool write_in_progress = (!me->data_buffer_.empty());
+                                     const bool write_in_progress = (!me->data_buffer_.empty());
 
-            me->data_buffer_.push_back(data);
+                                     me->data_buffer_.push_back(data);
 
-            if (!write_in_progress) {
-                me->writeDataToSocket(data_socket, fetch_more);
-            }
-        },
+                                     if (!write_in_progress) {
+                                         me->writeDataToSocket(data_socket, fetch_more);
+                                     }
+                                 },
                                  nullptr);
     }
 
@@ -1281,8 +1282,8 @@ namespace AwsMock::FtpServer {
                                     boost::asio::buffer(*data),
                                     me->data_buffer_strand_.wrap(
                                             [me, data_socket, data, fetch_more](
-                                                    const boost::beast::error_code ec,
-                                                    std::size_t /*bytes_to_transfer*/) {
+                                            const boost::beast::error_code ec,
+                                            std::size_t /*bytes_to_transfer*/) {
                                                 me->data_buffer_.pop_front();
 
                                                 if (ec) {
@@ -1325,7 +1326,7 @@ namespace AwsMock::FtpServer {
     }
 
     void FtpSession::receiveDataFromSocketAndWriteToFile(const std::shared_ptr<IoFile> &file, const std::shared_ptr<boost::asio::ip::tcp::socket> &data_socket) {
-        const auto buffer = std::make_shared<std::vector<char>>(1024 * 1024 * 1);
+        const auto buffer = std::make_shared<std::vector<char> >(1024 * 1024 * 1);
 
         async_read(*data_socket,
                    boost::asio::buffer(*buffer),
@@ -1345,23 +1346,23 @@ namespace AwsMock::FtpServer {
                    });
     }
 
-    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char>> &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
+    void FtpSession::writeDataToFile(const std::shared_ptr<std::vector<char> > &data, const std::shared_ptr<IoFile> &file, const std::function<void()> &fetch_more) {
         file_rw_strand_.post([me = shared_from_this(), data, file, fetch_more] {
-            fetch_more();
-            file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
-        },
+                                 fetch_more();
+                                 file->file_stream_.write(data->data(), static_cast<std::streamsize>(data->size()));
+                             },
                              nullptr);
     }
 
     void FtpSession::endDataReceiving(const std::shared_ptr<IoFile> &file) {
         file_rw_strand_.post([me = shared_from_this(), file] {
-            file->file_stream_.flush();
-            file->file_stream_.close();
-            me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
+                                 file->file_stream_.flush();
+                                 file->file_stream_.close();
+                                 me->sendFtpMessage(FtpReplyCode::CLOSING_DATA_CONNECTION, "Done");
 
-            // Send to AWS S3
-            me->SendCreateObjectRequest(file->_user, file->_fileName);
-        },
+                                 // Send to AWS S3
+                                 me->SendCreateObjectRequest(file->_user, file->_fileName);
+                             },
                              nullptr);
     }
 
@@ -1407,8 +1408,7 @@ namespace AwsMock::FtpServer {
     }
 
     FtpMessage FtpSession::checkIfPathIsRenamable(const std::string &ftp_path) const {
-        if (!_logged_in_user)
-            return {FtpReplyCode::NOT_LOGGED_IN, "Not logged in"};
+        if (!_logged_in_user) return {FtpReplyCode::NOT_LOGGED_IN, "Not logged in"};
 
         if (!ftp_path.empty()) {
             // Is the given path a file or a directory?
