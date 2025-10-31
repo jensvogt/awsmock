@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/jensvogt/awsmock/compare/v1.7.0...v1.7.1) (2025-10-31)
+
+
+### Bug Fixes
+
+* **1234-Windows-port-new:** fix cognito FE pages ([c492eb1](https://github.com/jensvogt/awsmock/commit/c492eb1126dbc6fcf181d86e8442f3568ee1df84))
+
 ## [1.7.0](https://github.com/jensvogt/awsmock/compare/v1.6.4...v1.7.0) (2025-10-28)
 
 
