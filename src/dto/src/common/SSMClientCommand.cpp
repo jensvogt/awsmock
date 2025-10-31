@@ -41,7 +41,7 @@ namespace AwsMock::Dto::Common {
 
         } else {
             const std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-            cmd = Core::StringUtils::Split(headerValue, '.')[1];
+            cmd = Core::StringUtils::Split(headerValue, ".")[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);
     }

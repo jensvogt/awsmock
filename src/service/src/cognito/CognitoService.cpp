@@ -94,7 +94,7 @@ namespace AwsMock::Service {
 
         try {
             const long total = _database.CountUserPools(request.region);
-            const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region);
+            const std::vector<Database::Entity::Cognito::UserPool> userPools = _database.ListUserPools(request.region, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             log_trace << "Got user pool list counters, count: " << userPools.size();
             Dto::Cognito::ListUserPoolCountersResponse response;
             response.userPoolCounters = Dto::Cognito::Mapper::mapCounter(userPools);
@@ -315,7 +315,7 @@ namespace AwsMock::Service {
             std::string clientId = request.clientId;
             const auto it = std::ranges::find_if(userPool.userPoolClients,
                                                  [clientId](
-                                                         const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
+                                                 const Database::Entity::Cognito::UserPoolClient &userPoolClient) {
                                                      return userPoolClient.clientId == clientId;
                                                  });
 
@@ -399,6 +399,7 @@ namespace AwsMock::Service {
             user.userPoolId = request.userPoolId;
             user.userName = request.userName;
             user.enabled = true;
+            user.userStatus = Database::Entity::Cognito::UserStatus::UNCONFIRMED;
             user.password = Core::StringUtils::GenerateRandomPassword(12);
             user.confirmationCode = Core::AwsUtils::CreateCognitoConfirmationCode();
             user = _database.CreateUser(user);
@@ -414,7 +415,7 @@ namespace AwsMock::Service {
             log_error << exc.what();
             throw Core::JsonException(exc.what());
         }
-    }// namespace AwsMock::Service
+    }
 
     Dto::Cognito::AdminGetUserResponse CognitoService::AdminGetUser(const Dto::Cognito::AdminGetUserRequest &request) const {
         Monitoring::MonitoringTimer measure(COGNITO_SERVICE_TIMER, COGNITO_SERVICE_COUNTER, "action", "admin_get_user");
@@ -566,7 +567,7 @@ namespace AwsMock::Service {
 
         try {
             const long total = _database.CountUsers(request.region, request.userPoolId);
-            const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId);
+            const std::vector<Database::Entity::Cognito::User> users = _database.ListUsers(request.region, request.userPoolId, request.prefix, request.pageSize, request.pageIndex, Dto::Common::Mapper::map(request.sortColumns));
             log_trace << "Got user list counters, count: " << users.size();
             Dto::Cognito::ListUserCountersResponse response;
             response.users = Dto::Cognito::Mapper::map(users);

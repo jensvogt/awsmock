@@ -50,7 +50,7 @@ namespace AwsMock::Dto::Common {
 
             // AWS Java SDK
             const std::string headerValue = request["X-Amz-Target"];
-            cmd = Core::StringUtils::Split(headerValue, '.')[1];
+            cmd = Core::StringUtils::Split(headerValue, ".")[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);
     }

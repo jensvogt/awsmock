@@ -29,7 +29,7 @@ namespace AwsMock::Database {
      */
     class CognitoDatabase : public DatabaseBase {
 
-      public:
+    public:
 
         /**
          * @brief Constructor
@@ -137,9 +137,13 @@ namespace AwsMock::Database {
          * @brief Returns a list of cognito user pools.
          *
          * @param region AWS region name
+         * @param prefix user pool name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns columns list of sort columns
          * @return list of cognito user pools
          */
-        std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {}) const;
+        std::vector<Entity::Cognito::UserPool> ListUserPools(const std::string &region = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Exports a list of cognito user pools.
@@ -237,9 +241,13 @@ namespace AwsMock::Database {
          *
          * @param region AWS region name
          * @param userPoolId user pool ID
+         * @param prefix user pool name prefix
+         * @param pageSize page size
+         * @param pageIndex page index
+         * @param sortColumns columns list of sort columns
          * @return list of cognito users
          */
-        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}) const;
+        std::vector<Entity::Cognito::User> ListUsers(const std::string &region = {}, const std::string &userPoolId = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Exports a list of cognito users.
@@ -374,7 +382,7 @@ namespace AwsMock::Database {
          */
         [[nodiscard]] bool ClientIdExists(const std::string &region, const std::string &clientId) const;
 
-      private:
+    private:
 
         /**
          * Database name

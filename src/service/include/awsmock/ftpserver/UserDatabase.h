@@ -16,7 +16,7 @@ namespace AwsMock::FtpServer {
 
     class UserDatabase {
 
-      public:
+    public:
 
         /**
          * Constructor
@@ -45,7 +45,7 @@ namespace AwsMock::FtpServer {
          */
         std::shared_ptr<FtpUser> getUser(const std::string &username, const std::string &password) const;
 
-      private:
+    private:
 
         /**
          * Check whether the user is the anonymous user
@@ -56,6 +56,13 @@ namespace AwsMock::FtpServer {
         static bool isUsernameAnonymousUser(const std::string &username);
 
         /**
+         * @brief Create default directories for the user
+         *
+         * @param userName name of the user
+         */
+        static void CreateDirectories(const std::string &userName);
+
+        /**
          * Server mutex
          */
         mutable std::mutex database_mutex_;
@@ -63,7 +70,7 @@ namespace AwsMock::FtpServer {
         /**
          * User database
          */
-        std::map<std::string, std::shared_ptr<FtpUser>> database_;
+        std::map<std::string, std::shared_ptr<FtpUser> > database_;
 
         /**
          * Anonymous user
@@ -79,5 +86,10 @@ namespace AwsMock::FtpServer {
          * Cognito user pool ID
          */
         std::string _userPoolId;
+
+        /**
+         * FTP server base dir
+         */
+        std::string _baseDir;
     };
 }// namespace AwsMock::FtpServer

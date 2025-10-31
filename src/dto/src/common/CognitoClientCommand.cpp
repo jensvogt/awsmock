@@ -11,11 +11,11 @@ namespace AwsMock::Dto::Common {
         // From AwsMock UI
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "cognito-idp") {
 
-            this->command = CognitoCommandTypeFromString(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action"));
+            this->command = CognitoCommandTypeFromString(Core::StringUtils::ToSnakeCase(Core::HttpUtils::GetHeaderValue(request, "x-awsmock-action")));
 
         } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
 
-            const std::string rawCommand = Core::StringUtils::Split(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), '.')[1];
+            const std::string rawCommand = Core::StringUtils::Split(Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target"), ".")[1];
             this->command = CognitoCommandTypeFromString(Core::StringUtils::ToSnakeCase(rawCommand));
 
         } else {

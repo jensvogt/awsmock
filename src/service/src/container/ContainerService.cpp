@@ -55,7 +55,7 @@ namespace AwsMock::Service {
             return {};
         }
         Dto::Docker::Image response = response.FromJson(body);
-        response.id = Core::StringUtils::Split(response.id, ':')[1];
+        response.id = Core::StringUtils::Split(response.id, ":")[1];
 
         log_debug << "Image found, name: " << imageName;
         return response;
@@ -270,7 +270,7 @@ namespace AwsMock::Service {
 
         // Docker API does not work as expected, therefore, we filter ourselves
         std::vector<Dto::Docker::Container> containers;
-        const std::string containerName = tag.empty()? name : name + ":" + tag;
+        const std::string containerName = tag.empty() ? name : name + ":" + tag;
         for (const auto &container: response.containerList) {
             if (Core::StringUtils::Contains(container.image, containerName)) {
                 containers.push_back(container);

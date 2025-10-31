@@ -364,9 +364,9 @@ namespace AwsMock::Service {
 
                     if (Core::HttpUtils::HasHeader(request, "x-amz-copy-source-range")) {
                         std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "x-amz-copy-source-range");
-                        std::string parts = Core::StringUtils::Split(rangeStr, '=')[1];
-                        s3Request.min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
-                        s3Request.max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
+                        std::string parts = Core::StringUtils::Split(rangeStr, "=")[1];
+                        s3Request.min = std::stol(Core::StringUtils::Split(parts, "-")[0]);
+                        s3Request.max = std::stol(Core::StringUtils::Split(parts, "-")[1]);
                         log_debug << "Requested multipart download range: " << std::to_string(s3Request.min) << "-" << std::to_string(s3Request.max);
                     }
                     log_debug << "S3 multipart upload part copy: " << partNumber;
@@ -584,7 +584,8 @@ namespace AwsMock::Service {
                     boost::asio::post(_ioc, [this, s3Request] {
                         const S3Service service(_ioc);
                         const long deleted = service.PurgeBucket(s3Request);
-                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: " << deleted; });
+                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: " << deleted;
+                    });
                     return SendResponse(request, http::status::ok, {});
                 }
 
@@ -617,7 +618,9 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::TouchObjectRequest s3Request = Dto::S3::TouchObjectRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, s3Request] { _s3Service.TouchObject(s3Request); });
+                    boost::asio::post(_ioc, [this, s3Request] {
+                        _s3Service.TouchObject(s3Request);
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -626,7 +629,9 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::UpdateObjectRequest s3Request = Dto::S3::UpdateObjectRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, s3Request] { _s3Service.UpdateObject(s3Request); });
+                    boost::asio::post(_ioc, [this, s3Request] {
+                        _s3Service.UpdateObject(s3Request);
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -645,7 +650,8 @@ namespace AwsMock::Service {
                     Dto::S3::DeleteObjectsRequest s3Request = Dto::S3::DeleteObjectsRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, s3Request] {
                         const auto s3response = _s3Service.DeleteObjects(s3Request);
-                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size(); });
+                        log_info << "Delete all objects, region: " << s3Request.region << ", bucket: " << s3Request.bucket << ", count: " << s3response.keys.size();
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
@@ -782,16 +788,16 @@ namespace AwsMock::Service {
             return;
         }
         const std::string rangeStr = Core::HttpUtils::GetHeaderValue(request, "Range");
-        if (const std::string headerValue = Core::StringUtils::Split(rangeStr, '=')[1]; Core::StringUtils::Contains(headerValue, "/")) {
-            const std::string parts = Core::StringUtils::Split(rangeStr, '/')[0];
-            min = std::stol(Core::StringUtils::Split(parts, '-')[0]);
-            max = std::stol(Core::StringUtils::Split(parts, '-')[1]);
+        if (const std::string headerValue = Core::StringUtils::Split(rangeStr, "=")[1]; Core::StringUtils::Contains(headerValue, "/")) {
+            const std::string parts = Core::StringUtils::Split(rangeStr, "/")[0];
+            min = std::stol(Core::StringUtils::Split(parts, "-")[0]);
+            max = std::stol(Core::StringUtils::Split(parts, "-")[1]);
             size = max - min + 1;
-            const long total = std::stol(Core::StringUtils::Split(headerValue, '/')[1]);
+            const long total = std::stol(Core::StringUtils::Split(headerValue, "/")[1]);
             log_debug << "Requested range: " << std::to_string(min) << "-" << std::to_string(max) << ", size: " << size << " total: " << total;
         } else {
-            min = std::stol(Core::StringUtils::Split(headerValue, '-')[0]);
-            max = std::stol(Core::StringUtils::Split(headerValue, '-')[1]);
+            min = std::stol(Core::StringUtils::Split(headerValue, "-")[0]);
+            max = std::stol(Core::StringUtils::Split(headerValue, "-")[1]);
             size = max - min + 1;
             log_debug << "Requested range: " << std::to_string(min) << "-" << std::to_string(max) << ", size: " << size;
         }

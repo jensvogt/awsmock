@@ -58,26 +58,26 @@ namespace AwsMock::Dto::Cognito {
          */
         std::map<std::string, std::string> clientMetadata;
 
-      private:
+    private:
 
         friend AdminConfirmUserRequest tag_invoke(boost::json::value_to_tag<AdminConfirmUserRequest>, boost::json::value const &v) {
             AdminConfirmUserRequest r;
-            r.userPoolId = Core::Json::GetStringValue(v, "userPoolId");
-            r.userName = Core::Json::GetStringValue(v, "userName");
-            if (Core::Json::AttributeExists(v, "clientMetadata")) {
-                r.clientMetadata = boost::json::value_to<std::map<std::string, std::string>>(v.at("attributes"));
+            r.userPoolId = Core::Json::GetStringValue(v, "UserPoolId");
+            r.userName = Core::Json::GetStringValue(v, "Username");
+            if (Core::Json::AttributeExists(v, "ClientMetadata")) {
+                r.clientMetadata = boost::json::value_to<std::map<std::string, std::string> >(v.at("ClientMetadata"));
             }
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, AdminConfirmUserRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"userPoolId", obj.userPoolId},
-                    {"userName", obj.userName},
-                    {"clientMetadata", boost::json::value_from(obj.clientMetadata)},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"UserPoolId", obj.userPoolId},
+                    {"Username", obj.userName},
+                    {"ClientMetadata", boost::json::value_from(obj.clientMetadata)},
             };
         }
     };

@@ -32,14 +32,14 @@ namespace AwsMock::Core {
      */
     struct SubstringCompare {
 
-        char _delimiter;
+        std::string _delimiter;
 
         /**
          * @brief Constructor
          *
          * @param delimiter delimiter character
          */
-        explicit SubstringCompare(const char delimiter) : _delimiter(delimiter) {}
+        explicit SubstringCompare(const std::string &delimiter) : _delimiter(delimiter) {}
 
         /**
          * @brief Comparison
@@ -63,7 +63,7 @@ namespace AwsMock::Core {
      */
     class DirUtils {
 
-      public:
+    public:
 
         /**
          * @brief Returns a thread safe temp directory name.

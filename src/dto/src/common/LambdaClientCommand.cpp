@@ -49,7 +49,7 @@ namespace AwsMock::Dto::Common {
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
             const std::string headerValue = request["X-Amz-Target"];
-            cmd = Core::StringUtils::Split(headerValue, '.')[1];
+            cmd = Core::StringUtils::Split(headerValue, ".")[1];
 
         } else if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "lambda") {
 

@@ -72,8 +72,7 @@ namespace AwsMock::Service {
         HandleRequest(_parser->release(), _queue);
 
         // If we aren't at the queue limit, try to pipeline another request
-        if (!_queue.is_full())
-            DoRead();
+        if (!_queue.is_full()) DoRead();
 
         log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
     }
@@ -84,15 +83,14 @@ namespace AwsMock::Service {
         _response_queue.push(std::move(response));
 
         // If there was no previous work, start the write loop
-        if (_response_queue.size() == 1)
-            DoWrite();
+        if (_response_queue.size() == 1) DoWrite();
     }
 
     // Return a response for the given request.
     //
     // The concrete type of the response message (which depends on the request) is type-erased in message_generator.
     template<class Body, class Allocator, class Send>
-    void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator>> &&request, Send &&send) {
+    void GatewaySession::HandleRequest(http::request<Body, http::basic_fields<Allocator> > &&request, Send &&send) {
 
         // Make sure we can handle the method
         if (request.method() != http::verb::get && request.method() != http::verb::put &&
@@ -208,8 +206,7 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream)
-            return DoShutdown();
+        if (ec == http::error::end_of_stream) return DoShutdown();
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.
@@ -237,7 +234,7 @@ namespace AwsMock::Service {
         Core::AuthorizationHeaderKeys authKeys = {};
 
         if (const std::string authorizationHeader = request["Authorization"]; !authorizationHeader.empty()) {
-            authKeys.signingVersion = Core::StringUtils::Split(authorizationHeader, ' ')[0];
+            authKeys.signingVersion = Core::StringUtils::Split(authorizationHeader, " ")[0];
 
             try {
                 const boost::regex expr(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
