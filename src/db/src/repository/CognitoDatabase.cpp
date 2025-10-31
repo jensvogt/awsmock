@@ -214,7 +214,7 @@ namespace AwsMock::Database {
         return _memoryDb.UpdateUserPool(userPool);
     }
 
-    std::vector<Entity::Cognito::UserPool> CognitoDatabase::ListUserPools(const std::string &region) const {
+    std::vector<Entity::Cognito::UserPool> CognitoDatabase::ListUserPools(const std::string &region, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         std::vector<Entity::Cognito::UserPool> userPools;
         if (HasDatabase()) {
@@ -223,22 +223,34 @@ namespace AwsMock::Database {
 
                 const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userPoolCollection = (*client)[_databaseName][_userpoolCollectionName];
-                if (region.empty()) {
 
-                    for (auto userPoolCursor = _userPoolCollection.find(make_document()); auto userPool: userPoolCursor) {
-                        Entity::Cognito::UserPool result;
-                        result.FromDocument(userPool);
-                        userPools.push_back(result);
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
                     }
-
-                } else {
-
-                    for (auto userPoolCursor = _userPoolCollection.find(make_document(kvp("region", region))); auto userPool: userPoolCursor) {
-                        Entity::Cognito::UserPool result;
-                        result.FromDocument(userPool);
-                        userPools.push_back(result);
-                    }
+                    opts.sort(sort.extract());
                 }
+                if (pageSize > 0) {
+                    opts.skip(pageSize * pageIndex);
+                    opts.limit(pageSize);
+                }
+
+                document query = {};
+                if (!region.empty()) {
+                    query.append(kvp("region", region));
+                }
+                if (!prefix.empty()) {
+                    query.append(kvp("name", make_document(kvp("$regex", "^" + prefix))));
+                }
+
+                for (auto userPoolCursor = _userPoolCollection.find(query.extract(), opts); const auto &userPool: userPoolCursor) {
+                    Entity::Cognito::UserPool result;
+                    result.FromDocument(userPool);
+                    userPools.push_back(result);
+                }
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
@@ -523,30 +535,48 @@ namespace AwsMock::Database {
         return _memoryDb.CountUsers(region);
     }
 
-    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId) const {
+    std::vector<Entity::Cognito::User> CognitoDatabase::ListUsers(const std::string &region, const std::string &userPoolId, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
 
         if (HasDatabase()) {
 
             try {
+                std::vector<Entity::Cognito::User> users;
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
 
-                document query{};
+                mongocxx::options::find opts;
+                if (!sortColumns.empty()) {
+                    document sort = {};
+                    for (const auto &[column, sortDirection]: sortColumns) {
+                        sort.append(kvp(column, sortDirection));
+                    }
+                    opts.sort(sort.extract());
+                }
+
+                if (pageSize > 0) {
+                    opts.skip(pageSize * pageIndex);
+                    opts.limit(pageSize);
+                }
+
+                document query = {};
                 if (!region.empty()) {
                     query.append(kvp("region", region));
                 }
                 if (!userPoolId.empty()) {
                     query.append(kvp("userPoolId", userPoolId));
                 }
+                if (!prefix.empty()) {
+                    query.append(kvp("userName", make_document(kvp("$regex", "^" + prefix))));
+                }
 
-                std::vector<Entity::Cognito::User> users;
-                for (auto userCursor = _userCollection.find(query.extract()); auto user: userCursor) {
+                for (auto userCursor = _userCollection.find(query.extract(), opts); const auto &user: userCursor) {
                     Entity::Cognito::User result;
                     result.FromDocument(user);
                     users.push_back(result);
                 }
                 return users;
+
             } catch (const mongocxx::exception &exc) {
                 log_error << "Database exception " << exc.what();
                 throw Core::DatabaseException("Database exception " + std::string(exc.what()));
@@ -561,7 +591,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
                 std::vector<Entity::Cognito::User> users;
 
@@ -597,7 +627,7 @@ namespace AwsMock::Database {
 
             try {
 
-                auto client = ConnectionPool::instance().GetConnection();
+                const auto client = ConnectionPool::instance().GetConnection();
                 mongocxx::collection _userCollection = (*client)[_databaseName][_userCollectionName];
 
                 auto userCursor = _userCollection.find(make_document(kvp("region", region), kvp("userPoolId", userPoolId),

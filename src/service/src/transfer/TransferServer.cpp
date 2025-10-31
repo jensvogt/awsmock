@@ -86,7 +86,7 @@ namespace AwsMock::Service {
     void TransferServer::StartFtpServer(Database::Entity::Transfer::Transfer &server) {
 
         // Get base dir
-        const auto baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        //const auto baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.ftp.port");
         const auto address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.ftp.address");
 
@@ -95,21 +95,23 @@ namespace AwsMock::Service {
         _transferServerList[server.serverId] = _ftpServer;
 
         // Add users
-        for (const auto &user: server.users) {
-            std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
+        // for (const auto &user: server.users) {
+        //     std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
+        //
+        //     // Ensure the home directory exists
+        //     Core::DirUtils::EnsureDirectory(homeDir);
+        //     log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
+        //
+        //     // Create default directories
+        //     CreateDirectories(user.userName);
+        //
+        //     // Add to FTP manager
+        //     if (_ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All)) {
+        //         log_debug << "User created successfully";
+        //     }
+        // }
 
-            // Ensure the home directory exists
-            Core::DirUtils::EnsureDirectory(homeDir);
-            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
-
-            // Create default directories
-            CreateDirectories(user.userName);
-
-            // Add to FTP manager
-            if (_ftpServer->addUser(user.userName, user.password, homeDir, FtpServer::Permission::All)) {
-                log_debug << "User created successfully";
-            }
-        }
+        // Start server
         if (_ftpServer->start(server.concurrency)) {
             log_info << "FTP server started, id: " << server.serverId << ", endpoint: " << address << ":" << port;
         }
@@ -118,7 +120,7 @@ namespace AwsMock::Service {
     void TransferServer::StartSftpServer(Database::Entity::Transfer::Transfer &server) {
 
         // Get base dir
-        const auto baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        //const auto baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         const int port = Core::Configuration::instance().GetValue<int>("awsmock.modules.transfer.sftp.port");
         const auto address = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.address");
         const auto hostKey = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.sftp.host-key");
@@ -126,18 +128,18 @@ namespace AwsMock::Service {
         SftpServer _sftpServer;
 
         // Add users
-        for (const auto &user: server.users) {
-
-            // Create a home directory
-            std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
-            Core::DirUtils::EnsureDirectory(homeDir);
-
-            // Add user
-            SftpServer::AddUser(user.userName, user.password, homeDir);
-
-            // Ensure the home directory exists
-            log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
-        }
+        // for (const auto &user: server.users) {
+        //
+        //     // Create a home directory
+        //     std::string homeDir = baseDir + Core::FileUtils::separator() + user.homeDirectory;
+        //     Core::DirUtils::EnsureDirectory(homeDir);
+        //
+        //     // Add user
+        //     SftpServer::AddUser(user.userName, user.password, homeDir);
+        //
+        //     // Ensure the home directory exists
+        //     log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
+        // }
 
         // Start a detached thread
         boost::thread t(boost::ref(_sftpServer), std::to_string(port), hostKey, address, server.serverId);

@@ -31,7 +31,7 @@ namespace AwsMock::Core {
 
     std::string AwsUtils::ConvertSQSQueueArnToUrl(const std::string &queueArn) {
         std::string endpoint = GetEndpoint();
-        std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
+        std::vector<std::string> parts = StringUtils::Split(queueArn, ":");
         if (parts.size() < 6) {
             log_error << "Could not convert SQS arn to url, arn: " << queueArn;
             return {};
@@ -56,7 +56,7 @@ namespace AwsMock::Core {
     }
 
     std::string AwsUtils::ConvertSQSQueueArnToName(const std::string &queueArn) {
-        std::vector<std::string> parts = StringUtils::Split(queueArn, ':');
+        std::vector<std::string> parts = StringUtils::Split(queueArn, ":");
         if (parts.size() < 6) {
             log_error << "Could not convert SQS arn to name, arn: " << queueArn;
             return {};
@@ -107,6 +107,7 @@ namespace AwsMock::Core {
     std::string AwsUtils::CreateDynamoDbTableArn(const std::string &accountId, const std::string &tableName) {
         return CreateArn("dynamodb", "ddblocal", accountId, "table/" + tableName);
     }
+
     std::string AwsUtils::CreateCognitoUserPoolId(const std::string &region) {
         return region + "_" + StringUtils::GenerateRandomString(9);
     }
@@ -261,7 +262,7 @@ namespace AwsMock::Core {
         return true;
     }
 
-    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
+    bool AwsUtils::VerifySignature(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &secretAccessKey) {
 
         const AuthorizationHeaderKeys authorizationHeaderKeys = GetAuthorizationKeys(request, secretAccessKey);
 
@@ -286,7 +287,7 @@ namespace AwsMock::Core {
         return canonicalRequest.str();
     }
 
-    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+    std::string AwsUtils::GetCanonicalRequest(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalRequest;
         canonicalRequest << request.method() << '\n';
         canonicalRequest << StringUtils::UrlEncode(request.target()) << '\n';
@@ -338,7 +339,7 @@ namespace AwsMock::Core {
         std::stringstream canonicalHeaders;
 
         // Get header
-        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
+        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ";")) {
             if (HttpUtils::HasHeader(request, header)) {
                 canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(HttpUtils::GetHeaderValue(request, header)) + '\n';
             }
@@ -346,11 +347,11 @@ namespace AwsMock::Core {
         return canonicalHeaders.str();
     }
 
-    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
+    std::string AwsUtils::GetCanonicalHeaders(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const AuthorizationHeaderKeys &authorizationHeaderKeys) {
         std::stringstream canonicalHeaders;
 
         // Get header
-        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
+        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ";")) {
             if (HttpUtils::HasHeader(request, header)) {
                 canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(HttpUtils::GetHeaderValue(request, header)) + '\n';
             }
@@ -362,7 +363,7 @@ namespace AwsMock::Core {
         std::stringstream canonicalHeaders;
 
         // Get header
-        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ';')) {
+        for (const auto &header: StringUtils::Split(authorizationHeaderKeys.signedHeaders, ";")) {
             if (headers.contains(header)) {
                 canonicalHeaders << StringUtils::ToLower(header) << ":" << StringUtils::Trim(headers[header]) + '\n';
             }
@@ -379,7 +380,7 @@ namespace AwsMock::Core {
 
         // Get signing version
         AuthorizationHeaderKeys authKeys;
-        authKeys.signingVersion = StringUtils::Split(authorizationHeader, ' ')[0];
+        authKeys.signingVersion = StringUtils::Split(authorizationHeader, " ")[0];
 
         try {
             const boost::regex expr(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");
@@ -403,12 +404,12 @@ namespace AwsMock::Core {
         return {};
     }
 
-    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t>> &request, const std::string &secretAccessKey) {
+    AuthorizationHeaderKeys AwsUtils::GetAuthorizationKeys(const http::request<request_body_t, http::basic_fields<alloc_t> > &request, const std::string &secretAccessKey) {
         const std::string authorizationHeader = request["Authorization"];
 
         // Get signing version
         AuthorizationHeaderKeys authKeys;
-        authKeys.signingVersion = StringUtils::Split(authorizationHeader, ' ')[0];
+        authKeys.signingVersion = StringUtils::Split(authorizationHeader, " ")[0];
 
         try {
             const boost::regex expr(R"(Credential=([a-zA-Z0-9]+)\/([0-9]{8})\/([a-zA-Z0-9\-]+)\/([a-zA-Z0-9\-]+)\/(aws4_request),\ ?SignedHeaders=(.*),\ ?Signature=(.*)$)");

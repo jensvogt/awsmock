@@ -2,6 +2,8 @@
 // Created by vogje01 on 3/30/25.
 //
 
+#include "awsmock/repository/CognitoDatabase.h"
+
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/sftpserver/SftpServer.h>
 #include <awsmock/sftpserver/SftpUser.h>
@@ -32,8 +34,7 @@ int gettimeofday(timeval *tp, struct timezone *tzp) {
 
 size_t my_strnlen(const char *src, size_t n) {
     size_t len = 0;
-    while (len < n && src[len])
-        len++;
+    while (len < n && src[len]) len++;
     return len;
 }
 
@@ -65,6 +66,7 @@ struct sftp_handle {
     DIR *dirp;
     char *name;
 };
+
 //#endif
 
 static char *FtpFileNameToRealPath(const char *filename) {
@@ -131,8 +133,8 @@ static void clear_filexfer_attrib(struct sftp_attributes_struct *z_attr) {
 /* members that are common to ssh_session and ssh_bind */
 struct ssh_common_struct {
     error_struct error;
-    ssh_callbacks callbacks; /* Callbacks to user functions */
-    int log_verbosity;       /* verbosity of the log functions */
+    ssh_callbacks callbacks;/* Callbacks to user functions */
+    int log_verbosity;/* verbosity of the log functions */
 };
 
 static int unix_errno_to_ssh_stat(int u_errno) {
@@ -524,7 +526,7 @@ static int ssh_buffer_pack_allocate_va(ssh_buffer_struct *buffer, const char *fo
                 len = va_arg(ap, size_t);
                 needed_size += len;
                 va_arg(ap, void *);
-                count++; /* increase argument count */
+                count++;/* increase argument count */
                 break;
             case 'B':
                 va_arg(ap, bignum);
@@ -677,7 +679,7 @@ static int ssh_buffer_pack_va(ssh_buffer_struct *buffer, const char *format, siz
                 len = va_arg(ap, size_t);
 
                 o.data = va_arg(ap, void *);
-                count++; /* increase argument count */
+                count++;/* increase argument count */
 
                 rc = ssh_buffer_add_data(buffer, o.data, len);
                 o.data = nullptr;
@@ -877,14 +879,11 @@ static int process_open(sftp_client_message client_msg) {
     if ((msg_flag & static_cast<uint32_t>(SSH_FXF_READ)) == SSH_FXF_READ &&
         (msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
         file_flag = O_RDWR;// file must exist
-        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT)
-            file_flag |= O_CREAT;
+        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT) file_flag |= O_CREAT;
     } else if ((msg_flag & static_cast<uint32_t>(SSH_FXF_WRITE)) == SSH_FXF_WRITE) {
         file_flag = O_WRONLY;
-        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_APPEND)) == SSH_FXF_APPEND)
-            file_flag |= O_APPEND;
-        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT)
-            file_flag |= O_CREAT;
+        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_APPEND)) == SSH_FXF_APPEND) file_flag |= O_APPEND;
+        if ((msg_flag & static_cast<uint32_t>(SSH_FXF_CREAT)) == SSH_FXF_CREAT) file_flag |= O_CREAT;
     } else if ((msg_flag & static_cast<uint32_t>(SSH_FXF_READ)) == SSH_FXF_READ) {
         file_flag = O_RDONLY;
     } else {
@@ -1397,53 +1396,34 @@ static int readdir_long_name(char *z_file_name, struct stat *z_st, char *z_long_
     }
 
     /* user */
-    if (mode & 0400)
-        *ptr++ = 'r';
-    else
-        *ptr++ = '-';
+    if (mode & 0400) *ptr++ = 'r';
+    else *ptr++ = '-';
 
-    if (mode & 0200)
-        *ptr++ = 'w';
-    else
-        *ptr++ = '-';
+    if (mode & 0200) *ptr++ = 'w';
+    else *ptr++ = '-';
 
 #ifndef _WIN32
     if (mode & 0100) {
-        if (mode & S_ISUID)
-            *ptr++ = 's';
-        else
-            *ptr++ = 'x';
-    } else
-        *ptr++ = '-';
+        if (mode & S_ISUID) *ptr++ = 's';
+        else *ptr++ = 'x';
+    } else *ptr++ = '-';
 #endif
 
     /* group */
-    if (mode & 040)
-        *ptr++ = 'r';
-    else
-        *ptr++ = '-';
-    if (mode & 020)
-        *ptr++ = 'w';
-    else
-        *ptr++ = '-';
-    if (mode & 010)
-        *ptr++ = 'x';
-    else
-        *ptr++ = '-';
+    if (mode & 040) *ptr++ = 'r';
+    else *ptr++ = '-';
+    if (mode & 020) *ptr++ = 'w';
+    else *ptr++ = '-';
+    if (mode & 010) *ptr++ = 'x';
+    else *ptr++ = '-';
 
     /* other */
-    if (mode & 04)
-        *ptr++ = 'r';
-    else
-        *ptr++ = '-';
-    if (mode & 02)
-        *ptr++ = 'w';
-    else
-        *ptr++ = '-';
-    if (mode & 01)
-        *ptr++ = 'x';
-    else
-        *ptr++ = '-';
+    if (mode & 04) *ptr++ = 'r';
+    else *ptr++ = '-';
+    if (mode & 02) *ptr++ = 'w';
+    else *ptr++ = '-';
+    if (mode & 01) *ptr++ = 'x';
+    else *ptr++ = '-';
 
     *ptr++ = ' ';
     *ptr = '\0';
@@ -2382,7 +2362,7 @@ ssh_string_struct *awsmock_ssh_buffer_get_ssh_string(ssh_buffer_struct *buffer) 
     // verify if there is enough space in buffer to get it
     rc = awsmock_ssh_buffer_validate_length(buffer, hostlen);
     if (rc != SSH_OK) {
-        return nullptr; /* it is indeed */
+        return nullptr;/* it is indeed */
     }
     str = ssh_string_new(hostlen);
     if (str == nullptr) {
@@ -2840,8 +2820,7 @@ auto sftp_channel_default_data_callback([[maybe_unused]] ssh_session session, [[
     sftp = *sftpp;
 
     const int decode_len = sftp_decode_channel_data_to_packet(sftp, data, len);
-    if (decode_len == -1)
-        return -1;
+    if (decode_len == -1) return -1;
 
     const sftp_client_message msg = sftp_get_client_message_from_packet(sftp);
     const int rc = process_client_message(msg);
@@ -3193,34 +3172,38 @@ static int auth_password(ssh_session session, const char *user, const char *pass
     auto *sdata = static_cast<struct session_data_struct *>(userdata);
 
     (void) session;
+    const auto region = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.region");
+    const auto userPoolId = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.userPoolId");
 
-    const auto it = std::ranges::find_if(AwsMock::Service::SftpServer::_sftpUsers, [user, pass](const auto &sftpUser) {
-        return sftpUser.userName == user && sftpUser.password == pass;
-    });
-
-    if (it != AwsMock::Service::SftpServer::_sftpUsers.end()) {
+    if (AwsMock::Database::Entity::Cognito::User userEntity = AwsMock::Database::CognitoDatabase::instance().GetUserByUserName(region, userPoolId, user); userEntity.password == pass) {
+        // const auto it = std::ranges::find_if(AwsMock::Service::SftpServer::_sftpUsers, [user, pass](const auto &sftpUser) {
+        //     return sftpUser.userName == user && sftpUser.password == pass;
+        // });
+        //
+        // if (it != AwsMock::Service::SftpServer::_sftpUsers.end()) {
         sdata->authenticated = 1;
 
         // Set current user
         currentUser = static_cast<char *>(malloc(128));
-        strcpy(currentUser, it->userName.c_str());
+        strcpy(currentUser, userEntity.userName.c_str());
 
         // Set the user home directory
-        const std::string ftpBaseDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto ftpBaseDir = AwsMock::Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
         userBasePath = static_cast<char *>(malloc(1024));
         strcpy(userBasePath, ftpBaseDir.c_str());
         strcpy(userBasePath + strlen(userBasePath), AwsMock::Core::FileUtils::separator().c_str());
         strcpy(userBasePath + strlen(userBasePath), currentUser);
-        log_info << "SFTP user authenticated, userName: " << user << ", homeDir: " << userBasePath;
+        log_info << "SFTP user authenticated, userName: " << userEntity << ", homeDir: " << userBasePath;
         return SSH_AUTH_SUCCESS;
     }
+
     log_warning << "SFTP user not authenticated, userName: " << user << " password: " << pass;
 
     sdata->auth_attempts++;
     return SSH_AUTH_DENIED;
 }
 
-static int auth_publickey(ssh_session session, const char *user, ssh_key_struct *pubkey, const char signature_state, void *userdata) {
+static int auth_publickey(const ssh_session session, const char *user, ssh_key_struct *pubkey, const char signature_state, void *userdata) {
     auto *sdata = static_cast<struct session_data_struct *>(userdata);
 
     (void) session;
@@ -3237,7 +3220,7 @@ static int auth_publickey(ssh_session session, const char *user, ssh_key_struct 
     // valid so far.  Now look through authorized keys for a match
     if (authorizedkeys[0]) {
         ssh_key key = nullptr;
-        struct stat buf;
+        struct stat buf{};
 
         if (stat(authorizedkeys, &buf) == 0) {
             if (int result = ssh_pki_import_pubkey_file(authorizedkeys, &key); (result != SSH_OK) || (key == nullptr)) {
@@ -3280,8 +3263,7 @@ static void handle_session(const ssh_event &event, const ssh_session &session) {
     if (authorizedkeys[0]) {
         server_cb.auth_pubkey_function = auth_publickey;
         ssh_set_auth_methods(session, SSH_AUTH_METHOD_PASSWORD | SSH_AUTH_METHOD_PUBLICKEY);
-    } else
-        ssh_set_auth_methods(session, SSH_AUTH_METHOD_PASSWORD);
+    } else ssh_set_auth_methods(session, SSH_AUTH_METHOD_PASSWORD);
 
     ssh_callbacks_init(&server_cb);
     ssh_callbacks_init(&channel_cb);
@@ -3356,7 +3338,7 @@ namespace AwsMock::Service {
         currentServerId = serverId.c_str();
 
         // Change working directory
-        const std::string ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        const auto ftpBaseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
 #ifdef _WIN32
         int rc = _chdir(ftpBaseDir.c_str());
 #else

@@ -19,7 +19,9 @@ namespace AwsMock::Core {
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
         auto result = std::string(len, '\0');
-        std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });
+        std::generate_n(begin(result), len, [&]() {
+            return chars[dist(rng)];
+        });
         return result;
     }
 
@@ -36,7 +38,9 @@ namespace AwsMock::Core {
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
         auto result = std::string(len, '\0');
-        std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });
+        std::generate_n(begin(result), len, [&]() {
+            return chars[dist(rng)];
+        });
         return result;
     }
 
@@ -49,7 +53,9 @@ namespace AwsMock::Core {
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
         auto result = std::string(len, '\0');
-        std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });
+        std::generate_n(begin(result), len, [&]() {
+            return chars[dist(rng)];
+        });
         return result;
     }
 
@@ -62,7 +68,9 @@ namespace AwsMock::Core {
         thread_local auto rng = RandomGenerator<>();
         auto dist = std::uniform_int_distribution{{}, std::strlen(chars) - 1};
         auto result = std::string(len, '\0');
-        std::generate_n(begin(result), len, [&]() { return chars[dist(rng)]; });
+        std::generate_n(begin(result), len, [&]() {
+            return chars[dist(rng)];
+        });
         return result;
     }
 
@@ -71,7 +79,9 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::IsNumeric(const std::string &value) {
-        return !value.empty() && std::ranges::find_if(value, [](unsigned char c) { return !std::isdigit(c); }) == value.end();
+        return !value.empty() && std::ranges::find_if(value, [](unsigned char c) {
+            return !std::isdigit(c);
+        }) == value.end();
     }
 
     bool StringUtils::IsUuid(const std::string &value) {
@@ -80,16 +90,18 @@ namespace AwsMock::Core {
     }
 
     bool StringUtils::IsHexString(const std::string &value) {
-        return std::ranges::all_of(value, [](const unsigned char c) { return !std::isxdigit(c); });
+        return std::ranges::all_of(value, [](const unsigned char c) {
+            return !std::isxdigit(c);
+        });
     }
 
     std::string StringUtils::CreateRandomUuid() {
         return to_string(boost::uuids::random_generator()());
     }
 
-    std::vector<std::string> StringUtils::Split(const std::string &s, const char delim) {
+    std::vector<std::string> StringUtils::Split(const std::string &s, std::string delim) {
         std::vector<std::string> result;
-        boost::split(result, s, boost::is_any_of(std::string{delim}));
+        boost::split(result, s, boost::is_any_of(delim));
         return result;
     }
 
@@ -174,17 +186,12 @@ namespace AwsMock::Core {
 
     std::string StringUtils::SubString(const std::string &string, const int beginIndex, const int endIndex) {
         const int size = static_cast<int>(string.size());
-        if (beginIndex < 0 || beginIndex > size - 1)
-            return "-1";// Index out of bounds
-        if (endIndex < 0 || endIndex > size - 1)
-            return "-1";// Index out of bounds
-        if (beginIndex > endIndex)
-            return "-1";// Begin index should not be bigger that end.
+        if (beginIndex < 0 || beginIndex > size - 1) return "-1";// Index out of bounds
+        if (endIndex < 0 || endIndex > size - 1) return "-1";// Index out of bounds
+        if (beginIndex > endIndex) return "-1";// Begin index should not be bigger that end.
 
         std::string substr;
-        for (int i = 0; i < size; i++)
-            if (i >= beginIndex && i <= endIndex)
-                substr += (char) string[i];
+        for (int i = 0; i < size; i++) if (i >= beginIndex && i <= endIndex) substr += (char) string[i];
         return substr;
     }
 
@@ -291,7 +298,7 @@ namespace AwsMock::Core {
 #ifdef _WIN32
     std::wstring StringUtils::ConvertToWideString(const std::string &input) {
         std::wstring wstr(input.length(), 0);
-        std::ranges::copy(input,wstr.begin());
+        std::ranges::copy(input, wstr.begin());
         return wstr;
     }
 

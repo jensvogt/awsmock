@@ -48,7 +48,7 @@ namespace AwsMock::Dto::Common {
 
         } else if (Core::StringUtils::ContainsIgnoreCase(cType, "application/x-amz-json-1.0")) {
 
-            cmd = Core::StringUtils::Split(request["X-Amz-Target"], '.')[1];
+            cmd = Core::StringUtils::Split(request["X-Amz-Target"], ".")[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);
     }

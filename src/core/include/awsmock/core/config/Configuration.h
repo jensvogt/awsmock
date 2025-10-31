@@ -40,7 +40,7 @@ namespace AwsMock::Core {
      */
     class Configuration {
 
-      public:
+    public:
 
         /**
          * @brief Constructor
@@ -171,7 +171,7 @@ namespace AwsMock::Core {
          */
         void Dump() const;
 
-      private:
+    private:
 
         /**
          * @brief Initialize the base properties
@@ -272,7 +272,7 @@ namespace AwsMock::Core {
         }
 
         boost::property_tree::ptree array;
-        for (const std::vector<std::string> values = StringUtils::Split(value, ';'); auto &v: values) {
+        for (const std::vector<std::string> values = StringUtils::Split(value, ";"); auto &v: values) {
             boost::property_tree::ptree child;
             child.put("", v);
             array.push_back(std::make_pair("", child));

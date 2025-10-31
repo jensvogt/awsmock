@@ -19,7 +19,7 @@ namespace AwsMock::Dto::Common {
         // We have a user agent, so use i
         std::string userAgentHeader = request["User-Agent"];
 
-        if (const std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], ' '); parts.empty() || parts.size() < 4) {
+        if (const std::vector<std::string> parts = Core::StringUtils::Split(request["User-Agent"], " "); parts.empty() || parts.size() < 4) {
             log_error << "Could not extract user agent DTO";
             throw Core::ServiceException("Could not extract user agent DTO");
         } else {
@@ -32,9 +32,9 @@ namespace AwsMock::Dto::Common {
                 clientOs = parts[2];
                 clientExecutableType = parts[3];
                 clientPrompt = parts[4];
-                const std::string command = Core::StringUtils::Split(parts[parts.size() - 1], '#')[1];
-                clientModule = Core::StringUtils::Split(command, '.')[0];
-                clientCommand = Core::StringUtils::Split(command, '.')[1];
+                const std::string command = Core::StringUtils::Split(parts[parts.size() - 1], "#")[1];
+                clientModule = Core::StringUtils::Split(command, ".")[0];
+                clientCommand = Core::StringUtils::Split(command, ".")[1];
             }
         }
 

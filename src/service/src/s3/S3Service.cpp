@@ -482,7 +482,9 @@ namespace AwsMock::Service {
             try {
                 fileSize = Core::FileUtils::AppendBinaryFiles(outFile, uploadDir, files);
                 log_debug << "Input files appended to outfile, outFile: " << outFile << " size: " << fileSize;
-            } catch (Core::JsonException &exc) { log_error << "Append to binary file failed, error: " << exc.message(); }
+            } catch (Core::JsonException &exc) {
+                log_error << "Append to binary file failed, error: " << exc.message();
+            }
 
             // Get file size, MD5 sum
             const std::string md5sum = Core::Crypto::GetMd5FromFile(outFile);
@@ -781,7 +783,9 @@ namespace AwsMock::Service {
             targetObject.internalName = targetFile;
 
             // Create version ID
-            if (targetBucket.IsVersioned()) { targetObject.versionId = Core::AwsUtils::CreateS3VersionId(); }
+            if (targetBucket.IsVersioned()) {
+                targetObject.versionId = Core::AwsUtils::CreateS3VersionId();
+            }
 
             // Create the object
             targetObject = _database.CreateObject(targetObject);
@@ -1240,7 +1244,7 @@ namespace AwsMock::Service {
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         const auto user = Core::Configuration::instance().GetValue<std::string>("awsmock.user");
 
-        const std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ':');
+        const std::vector<std::string> parts = Core::StringUtils::Split(lambdaNotification.lambdaArn, ":");
         const std::string &functionName = parts[6];
         log_debug << "Invocation request function name: " << functionName;
 
@@ -1450,7 +1454,9 @@ namespace AwsMock::Service {
             topicNotification.topicArn = topicConfiguration.topicArn;
 
             // Get events
-            for (const auto &event: topicConfiguration.events) { topicNotification.events.emplace_back(Dto::S3::EventTypeToString(event)); }
+            for (const auto &event: topicConfiguration.events) {
+                topicNotification.events.emplace_back(Dto::S3::EventTypeToString(event));
+            }
 
             // Get filter rules
             for (const auto &filterRule: topicConfiguration.filterRules) {

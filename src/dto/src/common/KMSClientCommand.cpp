@@ -40,7 +40,7 @@ namespace AwsMock::Dto::Common {
 
         } else if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
 
-            cmd = Core::StringUtils::Split(request["X-Amz-Target"], '.')[1];
+            cmd = Core::StringUtils::Split(request["X-Amz-Target"], ".")[1];
         }
         return Core::StringUtils::ToSnakeCase(cmd);
     }

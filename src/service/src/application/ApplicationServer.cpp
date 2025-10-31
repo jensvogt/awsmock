@@ -24,13 +24,21 @@ namespace AwsMock::Service {
         log_info << "Application module starting";
 
         // Start application background threads
-        _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
-        _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
-        _scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
+        _scheduler.AddTask("application-monitoring", [this] {
+            this->UpdateCounter();
+        }, _monitoringPeriod);
+        _scheduler.AddTask("application-restart", [this] {
+            this->RestartApplications();
+        }, -1);
+        _scheduler.AddTask("application-watchdog", [this] {
+            this->WatchdogApplications();
+        }, _watchdogPeriod, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
+            scheduler.AddTask("application-backup", [] {
+                BackupApplication();
+            }, _backupCron);
         }
 
         // Start the application log server (websocket)
@@ -172,12 +180,12 @@ namespace AwsMock::Service {
 
     void ApplicationServer::SyncContainers() const {
 
-        // Sync docker container with database
+        // Sync docker container with the database
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         for (const auto &container: ContainerService::instance().ListContainers()) {
 
             std::string name{}, tag{};
-            if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ':');parts.size() == 1) {
+            if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ":"); parts.size() == 1) {
                 name = parts[0];
             } else if (parts.size() == 2) {
                 name = parts[0];

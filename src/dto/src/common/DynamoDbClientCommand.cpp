@@ -28,7 +28,7 @@ namespace AwsMock::Dto::Common {
             case http::verb::delete_:
             case http::verb::head:
                 break;
-            default:;
+            default: ;
         }
     }
 
@@ -36,7 +36,7 @@ namespace AwsMock::Dto::Common {
 
         if (Core::HttpUtils::HasHeader(request, "X-Amz-Target")) {
             const std::string headerValue = Core::HttpUtils::GetHeaderValue(request, "X-Amz-Target");
-            const std::string action = Core::StringUtils::Split(headerValue, '.')[1];
+            const std::string action = Core::StringUtils::Split(headerValue, ".")[1];
             return Core::StringUtils::ToSnakeCase(action);
         }
         if (Core::HttpUtils::HasHeader(request, "x-awsmock-target") && Core::HttpUtils::GetHeaderValue(request, "x-awsmock-target") == "dynamodb") {

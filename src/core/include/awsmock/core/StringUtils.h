@@ -44,7 +44,7 @@ namespace AwsMock::Core {
      */
     class StringUtils {
 
-      public:
+    public:
 
         /**
          * @brief Generates a random string with the given length.
@@ -121,10 +121,10 @@ namespace AwsMock::Core {
          * @brief Splits a string into pieces using the provided delimiter char.
          *
          * @param s string to split
-         * @param delim delimiter
+         * @param delim delimiters
          * @return vector os strings.
          */
-        static std::vector<std::string> Split(const std::string &s, char delim);
+        static std::vector<std::string> Split(const std::string &s, std::string delim);
 
         /**
          * @brief Splits a string into pieces using the provided delimiter char.
@@ -166,7 +166,7 @@ namespace AwsMock::Core {
          * @param s string to split
          * @return string having all line endings removed
          */
-        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char>> s);
+        static std::string StripLineEndings(std::basic_string<char, std::char_traits<char>, std::allocator<char> > s);
 
         /**
          * @brief Strip beginning of string

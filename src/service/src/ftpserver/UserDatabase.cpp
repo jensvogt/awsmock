@@ -5,6 +5,7 @@ namespace AwsMock::FtpServer {
     UserDatabase::UserDatabase() {
         _region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
         _userPoolId = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.user-pool-id");
+        _baseDir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
     }
 
     bool UserDatabase::addUser(const std::string &username, const std::string &password, const std::string &local_root_path, Permission permissions) {
@@ -39,6 +40,16 @@ namespace AwsMock::FtpServer {
 
         try {
             if (Database::Entity::Cognito::User user = Database::CognitoDatabase::instance().GetUserByUserName(_region, _userPoolId, username); user.password == password) {
+
+                std::string homeDir = _baseDir + Core::FileUtils::separator() + user.userName;
+
+                // Ensure the home directory exists
+                Core::DirUtils::EnsureDirectory(homeDir);
+                log_debug << "User created, userId: " << user.userName << " homeDir: " << homeDir;
+
+                // Create default directories
+                CreateDirectories(user.userName);
+
                 return std::make_shared<FtpUser>(user.userName, user.password, user.userName, FtpServer::Permission::All);
             }
             log_warning << "User not found, userName: " << username;
@@ -46,6 +57,16 @@ namespace AwsMock::FtpServer {
         } catch (Core::DatabaseException &exc) {
             log_warning << "User not found userName: " << username;
             return nullptr;
+        }
+    }
+
+    void UserDatabase::CreateDirectories(const std::string &userName) {
+        const auto basePath = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.transfer.data-dir");
+        for (const auto &directory: Core::Configuration::instance().GetValueArray<std::string>("awsmock.modules.transfer.directories")) {
+            if (std::string dirPath = basePath + Core::FileUtils::separator() + userName + Core::FileUtils::separator() + directory; !Core::DirUtils::DirectoryExists(dirPath)) {
+                Core::DirUtils::MakeDirectory(dirPath, true);
+                log_debug << "Created directory, path: " << dirPath;
+            }
         }
     }
 
