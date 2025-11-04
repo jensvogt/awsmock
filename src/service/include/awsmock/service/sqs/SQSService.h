@@ -10,6 +10,8 @@
 #include <thread>
 
 // AwsMock includes
+#include "awsmock/dto/sqs/internal/GetMessageCountersResponse.h"
+
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
 #include <awsmock/core/PagingUtils.h>
@@ -48,6 +50,8 @@
 #include <awsmock/dto/sqs/SetQueueAttributesRequest.h>
 #include <awsmock/dto/sqs/TagQueueRequest.h>
 #include <awsmock/dto/sqs/UntagQueueRequest.h>
+#include <awsmock/dto/sqs/internal/UpdateQueueRequest.h>
+#include <awsmock/dto/sqs/internal/GetMessageCountersRequest.h>
 #include <awsmock/dto/sqs/internal/AddDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/DeleteDefaultMessageAttributeRequest.h>
 #include <awsmock/dto/sqs/internal/ExportMessagesRequest.h>
@@ -66,7 +70,7 @@
 #include <awsmock/dto/sqs/internal/ListMessageCountersResponse.h>
 #include <awsmock/dto/sqs/internal/ListMessagesRequest.h>
 #include <awsmock/dto/sqs/internal/ListMessagesResponse.h>
-#include <awsmock/dto/sqs/internal/ListParameterCountersRequest.h>
+#include <awsmock/dto/sqs/internal/ListQueueCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueArnsResponse.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersRequest.h>
 #include <awsmock/dto/sqs/internal/ListQueueAttributeCountersResponse.h>
@@ -100,7 +104,7 @@ namespace AwsMock::Service {
      * @author jens.vogt\@opitz-consulting.com
      */
     class SQSService {
-      public:
+    public:
 
         /**
          * @brief Constructor
@@ -143,7 +147,7 @@ namespace AwsMock::Service {
          * @see ListQueueCountersRequest
          * @see ListQueueCountersResponse
          */
-        [[nodiscard]] Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListParameterCountersRequest &request) const;
+        [[nodiscard]] Dto::SQS::ListQueueCountersResponse ListQueueCounters(const Dto::SQS::ListQueueCountersRequest &request) const;
 
         /**
          * @brief Returns a list of all available queues tags
@@ -311,6 +315,14 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SQS::ListQueueTagCountersResponse ListTagCounters(const Dto::SQS::ListQueueTagCountersRequest &request) const;
 
         /**
+         * @brief Updatea queue
+         *
+         * @param request update request DTO
+         * @throws ServiceException
+         */
+        void UpdateQueue(const Dto::SQS::UpdateQueueRequest &request) const;
+
+        /**
          * @brief Delete a queue
          *
          * @param request delete request DTO
@@ -375,6 +387,15 @@ namespace AwsMock::Service {
          * @see ListMessageAttributeCountersResponse
          */
         [[nodiscard]] Dto::SQS::ListMessageAttributeCountersResponse ListMessageAttributeCounters(const Dto::SQS::ListMessageAttributeCountersRequest &request) const;
+
+        /**
+         * @brief Get message counters
+         *
+         * @param request get message counters request
+         * @return GetMessageCountersResponse
+         * @throws ServiceException
+         */
+        [[nodiscard]] Dto::SQS::GetMessageCountersResponse GetMessageCounters(const Dto::SQS::GetMessageCountersRequest &request) const;
 
         /**
          * @brief Updates a message
@@ -463,7 +484,7 @@ namespace AwsMock::Service {
          */
         void ReloadAllCounters() const;
 
-      private:
+    private:
 
         /**
          * @brief Send a lambda invocation request for a message.

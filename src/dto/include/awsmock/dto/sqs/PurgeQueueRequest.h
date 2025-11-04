@@ -27,7 +27,7 @@ namespace AwsMock::Dto::SQS {
          */
         std::string queueUrl;
 
-      private:
+    private:
 
         friend PurgeQueueRequest tag_invoke(boost::json::value_to_tag<PurgeQueueRequest>, boost::json::value const &v) {
             PurgeQueueRequest r;
@@ -37,10 +37,10 @@ namespace AwsMock::Dto::SQS {
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, PurgeQueueRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"queueUrl", obj.queueUrl},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueUrl", obj.queueUrl},
             };
         }
     };

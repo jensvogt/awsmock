@@ -10,6 +10,9 @@
 #include <memory>
 #include <string>
 
+// Boost includes
+#include <boost/asio/strand.hpp>
+
 // AwsMock includes
 #include <awsmock/core/AwsUtils.h>
 #include <awsmock/core/CryptoUtils.h>
@@ -68,7 +71,7 @@
 #include <awsmock/service/lambda/LambdaService.h>
 #include <awsmock/service/sqs/SQSService.h>
 #include <awsmock/utils/SqsUtils.h>
-#include <boost/asio/strand.hpp>
+#include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 
 #define SQS_PROTOCOL "sqs"
 #define HTTP_PROTOCOL "http"
@@ -85,7 +88,7 @@ namespace AwsMock::Service {
      */
     class SNSService /*: public std::enable_shared_from_this<SNSService>*/ {
 
-      public:
+    public:
 
         /**
          * @brief Constructor
@@ -266,12 +269,11 @@ namespace AwsMock::Service {
         /**
          * @brief Delete a topic
          *
-         * @param region AWS region name
-         * @param topicArn topic ARN
+         * @param request delete request
          * @return DeleteTopicResponse
          * @throws ServiceException
          */
-        [[nodiscard]] Dto::SNS::DeleteTopicResponse DeleteTopic(const std::string &region, const std::string &topicArn) const;
+        [[nodiscard]] Dto::SNS::DeleteTopicResponse DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const;
 
         /**
          * @brief List messages
@@ -305,7 +307,7 @@ namespace AwsMock::Service {
          */
         void DeleteMessage(const Dto::SNS::DeleteMessageRequest &request) const;
 
-      private:
+    private:
 
         /**
          * @brief Checks the subscriptions.

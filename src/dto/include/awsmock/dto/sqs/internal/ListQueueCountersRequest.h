@@ -14,7 +14,7 @@
 
 namespace AwsMock::Dto::SQS {
 
-    struct ListParameterCountersRequest final : Common::BaseCounter<ListParameterCountersRequest> {
+    struct ListQueueCountersRequest final : Common::BaseCounter<ListQueueCountersRequest> {
 
         /**
          * Prefix
@@ -36,20 +36,20 @@ namespace AwsMock::Dto::SQS {
          */
         std::vector<Common::SortColumn> sortColumns;
 
-      private:
+    private:
 
-        friend ListParameterCountersRequest tag_invoke(boost::json::value_to_tag<ListParameterCountersRequest>, boost::json::value const &v) {
-            ListParameterCountersRequest r;
+        friend ListQueueCountersRequest tag_invoke(boost::json::value_to_tag<ListQueueCountersRequest>, boost::json::value const &v) {
+            ListQueueCountersRequest r;
             r.prefix = Core::Json::GetStringValue(v, "prefix");
             r.pageSize = Core::Json::GetLongValue(v, "pageSize");
             r.pageIndex = Core::Json::GetLongValue(v, "pageIndex");
             if (Core::Json::AttributeExists(v, "sortColumns")) {
-                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn>>(v.at("sortColumns"));
+                r.sortColumns = boost::json::value_to<std::vector<Common::SortColumn> >(v.at("sortColumns"));
             }
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListParameterCountersRequest const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListQueueCountersRequest const &obj) {
             jv = {
                     {"region", obj.region},
                     {"user", obj.user},

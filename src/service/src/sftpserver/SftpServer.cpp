@@ -3394,6 +3394,7 @@ namespace AwsMock::Service {
             } else {
                 log_error << "Could not bind, error: %s", ssh_get_error(sshbind);
             }
+
             // Since the session has been passed to a child fork, do some cleaning up at the parent process.
             ssh_disconnect(session);
             ssh_free(session);

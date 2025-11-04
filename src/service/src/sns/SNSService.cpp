@@ -21,9 +21,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-            response.topicName = topic.topicName,
-            response.owner = topic.owner,
-            response.topicArn = topic.topicArn;
+                    response.topicName = topic.topicName,
+                    response.owner = topic.owner,
+                    response.topicArn = topic.topicArn;
             return response;
         }
 
@@ -37,9 +37,9 @@ namespace AwsMock::Service {
 
             Dto::SNS::CreateTopicResponse response;
             response.region = topic.region,
-            response.topicName = topic.topicName,
-            response.owner = topic.owner,
-            response.topicArn = topic.topicArn;
+                    response.topicName = topic.topicName,
+                    response.owner = topic.owner,
+                    response.topicArn = topic.topicArn;
             return response;
 
         } catch (Core::DatabaseException &exc) {
@@ -182,13 +182,13 @@ namespace AwsMock::Service {
         }
     }
 
-    Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const std::string &region, const std::string &topicArn) const {
+    Dto::SNS::DeleteTopicResponse SNSService::DeleteTopic(const Dto::SNS::DeleteTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "delete_topic");
-        log_trace << "Delete topic request, region: " << region << " topicArn: " << topicArn;
+        log_trace << "Delete topic request, region: " << request.region << " topicArn: " << request.topicArn;
 
         // Check existence
-        if (!_snsDatabase.TopicExists(topicArn)) {
-            log_warning << "Topic does not exist, arn: " << topicArn;
+        if (!_snsDatabase.TopicExists(request.topicArn)) {
+            log_warning << "Topic does not exist, arn: " << request.topicArn;
             throw Core::NotFoundException("Topic does not exist");
         }
 
@@ -196,7 +196,7 @@ namespace AwsMock::Service {
         try {
 
             // Update database
-            _snsDatabase.DeleteTopic({.region = region, .topicArn = topicArn});
+            _snsDatabase.DeleteTopic({.region = request.region, .topicArn = request.topicArn});
 
         } catch (bsoncxx::exception &ex) {
             log_error << "SNS delete topic failed, message: " << ex.what();

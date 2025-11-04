@@ -27,20 +27,20 @@ namespace AwsMock::Dto::SQS {
          */
         std::string queueArn;
 
-      private:
+    private:
 
         friend RedriveMessagesRequest tag_invoke(boost::json::value_to_tag<RedriveMessagesRequest>, boost::json::value const &v) {
             RedriveMessagesRequest r;
-            r.queueArn = Core::Json::GetStringValue(v, "queueArn");
+            r.queueArn = Core::Json::GetStringValue(v, "QueueArn");
             return r;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, RedriveMessagesRequest const &obj) {
             jv = {
-                    {"region", obj.region},
-                    {"user", obj.user},
-                    {"requestId", obj.requestId},
-                    {"queueArn", obj.queueArn},
+                    {"Region", obj.region},
+                    {"User", obj.user},
+                    {"RequestId", obj.requestId},
+                    {"QueueArn", obj.queueArn},
             };
         }
     };

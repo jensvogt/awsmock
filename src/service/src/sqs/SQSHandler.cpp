@@ -24,17 +24,15 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::PURGE_QUEUE: {
 
                     Dto::SQS::PurgeQueueRequest sqsRequest = Dto::SQS::PurgeQueueRequest::FromJson(clientCommand);
-                    boost::asio::post(_ioc, [this, sqsRequest] {
-                        const long purged = _sqsService.PurgeQueue(sqsRequest);
-                        log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged; });
+                    const long purged = _sqsService.PurgeQueue(sqsRequest);
+                    log_info << "Purge queue, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl) << " count: " << purged;
                     return SendOkResponse(request);
                 }
 
                 case Dto::Common::SqsCommandType::PURGE_ALL_QUEUES: {
 
-                    boost::asio::post(_ioc, [this] {
-                        const long purged = _sqsService.PurgeAllQueues();
-                        log_info << "Purge all queues, count: " << purged; });
+                    const long purged = _sqsService.PurgeAllQueues();
+                    log_info << "Purge all queues, count: " << purged;
                     return SendOkResponse(request);
                 }
 
@@ -51,7 +49,8 @@ namespace AwsMock::Service {
                     Dto::SQS::SetQueueAttributesRequest sqsRequest = Dto::SQS::SetQueueAttributesRequest::FromJson(clientCommand);
                     boost::asio::post(_ioc, [this, sqsRequest] {
                         _sqsService.SetQueueAttributes(sqsRequest);
-                        log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl); });
+                        log_info << "Set queue attributes, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                    });
                     return SendOkResponse(request);
                 }
 
@@ -82,7 +81,7 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SqsCommandType::LIST_QUEUE_COUNTERS: {
 
-                    Dto::SQS::ListParameterCountersRequest sqsRequest = Dto::SQS::ListParameterCountersRequest::FromJson(clientCommand);
+                    Dto::SQS::ListQueueCountersRequest sqsRequest = Dto::SQS::ListQueueCountersRequest::FromJson(clientCommand);
                     Dto::SQS::ListQueueCountersResponse sqsResponse = _sqsService.ListQueueCounters(sqsRequest);
                     log_debug << "List queue counters, count: " << sqsResponse.queueCounters.size();
                     return SendOkResponse(request, sqsResponse.ToJson());
@@ -154,6 +153,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::UPDATE_QUEUE: {
+
+                    Dto::SQS::UpdateQueueRequest sqsRequest = Dto::SQS::UpdateQueueRequest::FromJson(clientCommand);
+                    _sqsService.UpdateQueue(sqsRequest);
+                    log_info << "Update queue, queueArn: " << Core::AwsUtils::ConvertSQSQueueArnToName(sqsRequest.queueArn);
+                    return SendOkResponse(request);
+                }
+
                 case Dto::Common::SqsCommandType::DELETE_QUEUE: {
 
                     Dto::SQS::DeleteQueueRequest sqsRequest = Dto::SQS::DeleteQueueRequest::FromJson(clientCommand);
@@ -167,7 +174,6 @@ namespace AwsMock::Service {
                     Dto::SQS::SendMessageRequest sqsRequest = Dto::SQS::SendMessageRequest::FromJson(clientCommand);
                     Dto::SQS::SendMessageResponse sqsResponse = _sqsService.SendMessage(sqsRequest);
                     log_info << "Send message, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
-
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -184,8 +190,6 @@ namespace AwsMock::Service {
                     Dto::SQS::ReceiveMessageRequest sqsRequest = Dto::SQS::ReceiveMessageRequest::FromJson(clientCommand);
                     Dto::SQS::ReceiveMessageResponse sqsResponse = _sqsService.ReceiveMessages(sqsRequest);
                     log_trace << "Receive message, count: " << sqsResponse.messageList.size() << " queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
-
-                    // Send response
                     return SendOkResponse(request, sqsResponse.ToJson());
                 }
 
@@ -256,9 +260,10 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::REDRIVE_MESSAGES: {
 
                     Dto::SQS::RedriveMessagesRequest sqsRequest = Dto::SQS::RedriveMessagesRequest::FromJson(clientCommand);
-                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
-                        const long count = _sqsService.RedriveMessages(sqsRequest);
-                        log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count; }, boost::asio::detached);
+                    //                    boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
+                    const long count = _sqsService.RedriveMessages(sqsRequest);
+                    log_info << "Delete message, queueUrl: " << sqsRequest.queueArn << " count: " << count;
+                    //                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -269,7 +274,8 @@ namespace AwsMock::Service {
                     Dto::SQS::UpdateMessageRequest sqsRequest = Dto::SQS::UpdateMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.UpdateMessage(sqsRequest);
-                        log_info << "Update message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                        log_info << "Update message, messageId: " << sqsRequest.messageId;
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -280,7 +286,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ResendMessageRequest sqsRequest = Dto::SQS::ResendMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ResendMessage(sqsRequest);
-                        log_info << "Resend message, messageId: " << sqsRequest.messageId; }, boost::asio::detached);
+                        log_info << "Resend message, messageId: " << sqsRequest.messageId;
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -299,7 +306,8 @@ namespace AwsMock::Service {
                     Dto::SQS::DeleteMessageRequest sqsRequest = Dto::SQS::DeleteMessageRequest::FromJson(clientCommand);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.DeleteMessage(sqsRequest);
-                        log_info << "Delete message, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl); }, boost::asio::detached);
+                        log_info << "Delete message, queueUrl: " << Core::AwsUtils::ConvertSQSQueueUrlToName(sqsRequest.queueUrl);
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -329,6 +337,14 @@ namespace AwsMock::Service {
                     return SendOkResponse(request);
                 }
 
+                case Dto::Common::SqsCommandType::GET_MESSAGE_COUNTERS: {
+
+                    Dto::SQS::GetMessageCountersRequest sqsRequest = Dto::SQS::GetMessageCountersRequest::FromJson(clientCommand);
+                    Dto::SQS::GetMessageCountersResponse sqsResponse = _sqsService.GetMessageCounters(sqsRequest);
+                    log_info << "Get message, messageId: " << sqsRequest.messageId;
+                    return SendOkResponse(request, sqsResponse.ToJson());
+                }
+
                 case Dto::Common::SqsCommandType::EXPORT_MESSAGES: {
 
                     Dto::SQS::ExportMessagesRequest sqsRequest = Dto::SQS::ExportMessagesRequest::FromJson(clientCommand);
@@ -342,7 +358,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ImportMessagesRequest sqsRequest = Dto::SQS::ImportMessagesRequest::FromJson(clientCommand.payload);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ImportMessages(sqsRequest);
-                        log_info << "Import messages"; }, boost::asio::detached);
+                        log_info << "Import messages";
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -353,7 +370,8 @@ namespace AwsMock::Service {
                     Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
                     boost::asio::spawn(_ioc, [this, sqsRequest](boost::asio::yield_context) {
                         _sqsService.ReloadCounters(sqsRequest);
-                        log_info << "Reload counters"; }, boost::asio::detached);
+                        log_info << "Reload counters";
+                    }, boost::asio::detached);
                     _ioc.poll();
                     _ioc.restart();
                     return SendOkResponse(request);
@@ -362,7 +380,9 @@ namespace AwsMock::Service {
                 case Dto::Common::SqsCommandType::RELOAD_ALL_COUNTERS: {
 
                     Dto::SQS::ReloadCountersRequest sqsRequest = Dto::SQS::ReloadCountersRequest::FromJson(clientCommand.payload);
-                    boost::asio::post(_ioc, [this] { _sqsService.ReloadAllCounters(); });
+                    boost::asio::post(_ioc, [this] {
+                        _sqsService.ReloadAllCounters();
+                    });
                     return SendOkResponse(request);
                 }
 
@@ -395,7 +415,7 @@ namespace AwsMock::Service {
         for (int i = 1; i <= count; i++) {
             Dto::SQS::QueueAttribute attribute;
             attribute.attributeName = Core::HttpUtils::GetStringParameter(payload, "UserAttribute." + std::to_string(i) + ".Name"),
-            attribute.attributeValue = Core::HttpUtils::GetStringParameter(payload, "UserAttribute." + std::to_string(i) + ".Value");
+                    attribute.attributeValue = Core::HttpUtils::GetStringParameter(payload, "UserAttribute." + std::to_string(i) + ".Value");
             queueAttributes.emplace_back(attribute);
         }
         return queueAttributes;
