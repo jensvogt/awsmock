@@ -46,6 +46,8 @@
 #include <awsmock/dto/sns/UntagResourceResponse.h>
 #include <awsmock/dto/sns/UpdateSubscriptionRequest.h>
 #include <awsmock/dto/sns/UpdateSubscriptionResponse.h>
+#include <awsmock/dto/sns/internal/GetMessageCountersRequest.h>
+#include <awsmock/dto/sns/internal/GetMessageCountersResponse.h>
 #include <awsmock/dto/sns/internal/GetEventSourceRequest.h>
 #include <awsmock/dto/sns/internal/GetEventSourceResponse.h>
 #include <awsmock/dto/sns/internal/GetTopicDetailsRequest.h>
@@ -296,6 +298,15 @@ namespace AwsMock::Service {
         [[nodiscard]] Dto::SNS::ListMessageCountersResponse ListMessageCounters(const Dto::SNS::ListMessageCountersRequest &request) const;
 
         /**
+         * @brief Get message counters
+         *
+         * @param request get message counters request
+         * @return GetMessageCountersResponse
+         * @throws ServiceException
+         */
+        [[nodiscard]] Dto::SNS::GetMessageCountersResponse GetMessageCounters(const Dto::SNS::GetMessageCountersRequest &request) const;
+
+        /**
          * @brief Deletes a message
          *
          * @par
@@ -391,8 +402,6 @@ namespace AwsMock::Service {
          * Boost asio IO context
          */
         boost::asio::io_context &_ioc;
-
-        static boost::mutex _subscriptionMutex;
     };
 
 }// namespace AwsMock::Service

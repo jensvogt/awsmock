@@ -271,6 +271,14 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok, snsResponse.ToJson());
                 }
 
+                case Dto::Common::SNSCommandType::GET_MESSAGE_COUNTERS: {
+
+                    Dto::SNS::GetMessageCountersRequest snsRequest = Dto::SNS::GetMessageCountersRequest::FromJson(clientCommand);
+                    Dto::SNS::GetMessageCountersResponse snsResponse = _snsService.GetMessageCounters(snsRequest);
+                    log_info << "Get message, messageId: " << snsRequest.messageId << ", content: " << snsResponse.ToJson();
+                    return SendOkResponse(request, snsResponse.ToJson());
+                }
+
                 default:
                 case Dto::Common::SNSCommandType::UNKNOWN: {
                     log_error << "Unknown method";

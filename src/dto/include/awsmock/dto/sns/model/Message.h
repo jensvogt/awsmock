@@ -87,16 +87,17 @@ namespace AwsMock::Dto::SNS {
             }
         }
 
-      private:
+    private:
 
         friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
             Message r;
             r.topicArn = Core::Json::GetStringValue(v, "TopicArn");
             r.messageId = Core::Json::GetStringValue(v, "MessageId");
             r.message = Core::Json::GetStringValue(v, "Message");
+            r.contentType = Core::Json::GetStringValue(v, "ContentType");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());
-            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute>>(v.at("MessageAttributes"));
+            r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("MessageAttributes"));
             return r;
         }
 
@@ -108,6 +109,7 @@ namespace AwsMock::Dto::SNS {
                     {"TopicArn", obj.topicArn},
                     {"MessageId", obj.messageId},
                     {"Message", obj.message},
+                    {"ContentType", obj.contentType},
                     {"MessageAttributes", boost::json::value_from(obj.messageAttributes)},
                     {"Created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"Modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
