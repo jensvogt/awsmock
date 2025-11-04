@@ -59,7 +59,7 @@ namespace AwsMock::Dto::SNS {
             message.message = entity.message;
             message.size = entity.size;
             message.contentType = entity.contentType;
-            message.messageSatus = MessageStatusFromString(Database::Entity::SNS::MessageStatusToString(entity.status));
+            message.messageStatus = MessageStatusFromString(Database::Entity::SNS::MessageStatusToString(entity.status));
             message.lastSend = entity.lastSend;
             message.created = entity.created;
             message.modified = entity.modified;

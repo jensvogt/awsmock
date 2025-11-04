@@ -5,19 +5,13 @@
 #ifndef AWSMOCK_SERVER_LAMBDA_SERVER_H
 #define AWSMOCK_SERVER_LAMBDA_SERVER_H
 
-// Boost includes
-#include <boost/beast.hpp>
-
 // AwsMock includes
 #include <awsmock/dto/common/SNSClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-//#include <awsmock/service/monitoring/MetricService.h>
 #include <awsmock/service/sns/SNSService.h>
+#include <awsmock/dto/sns/model/DeleteTopicRequest.h>
 
 namespace AwsMock::Service {
-
-    namespace http = boost::beast::http;
-    namespace ip = boost::asio::ip;
 
     /**
      * @brief SNS request handler
@@ -26,7 +20,7 @@ namespace AwsMock::Service {
      */
     class SNSHandler final : public AbstractHandler, public std::enable_shared_from_this<SNSHandler> {
 
-      public:
+    public:
 
         /**
          * @brief Constructor
@@ -44,7 +38,7 @@ namespace AwsMock::Service {
          */
         http::response<http::dynamic_body> HandlePostRequest(const http::request<http::dynamic_body> &request, const std::string &region, const std::string &user) override;
 
-      private:
+    private:
 
         /**
          * Get the message attributes.

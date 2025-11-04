@@ -47,7 +47,7 @@ namespace AwsMock::Dto::SNS {
         /**
          * Size
          */
-        MessageStatus messageSatus;
+        MessageStatus messageStatus = INITIAL;
 
         /**
          * Message attributes
@@ -76,7 +76,7 @@ namespace AwsMock::Dto::SNS {
          */
         [[nodiscard]] view_or_value<view, value> ToDocument() const;
 
-      private:
+    private:
 
         friend MessageCounter tag_invoke(boost::json::value_to_tag<MessageCounter>, boost::json::value const &v) {
             MessageCounter r;
@@ -85,8 +85,8 @@ namespace AwsMock::Dto::SNS {
             r.message = Core::Json::GetStringValue(v, "message");
             r.contentType = Core::Json::GetStringValue(v, "contentType");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.messageSatus = MessageStatusFromString(v.at("messageStatus").as_string().data());
-            r.messageAttributes = boost::json::value_to<std::vector<MessageAttributeCounter>>(v.at("messageAttributes"));
+            r.messageStatus = MessageStatusFromString(v.at("messageStatus").as_string().data());
+            r.messageAttributes = boost::json::value_to<std::vector<MessageAttributeCounter> >(v.at("messageAttributes"));
             r.lastSend = Core::DateTimeUtils::FromISO8601(v.at("lastSend").as_string().data());
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
@@ -103,7 +103,7 @@ namespace AwsMock::Dto::SNS {
                     {"messageId", obj.messageId},
                     {"message", obj.message},
                     {"size", obj.size},
-                    {"messageStatus", MessageStatusToString(obj.messageSatus)},
+                    {"messageStatus", MessageStatusToString(obj.messageStatus)},
                     {"messageAttributes", boost::json::value_from(obj.messageAttributes)},
                     {"lastSend", Core::DateTimeUtils::ToISO8601(obj.lastSend)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},

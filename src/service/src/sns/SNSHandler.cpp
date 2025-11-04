@@ -15,23 +15,16 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::CREATE_TOPIC: {
 
-                    std::string name = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Name");
-                    log_debug << "Topic name: " << name;
-
-                    Dto::SNS::CreateTopicRequest snsRequest;
-                    snsRequest.region = clientCommand.region;
-                    snsRequest.topicName = name;
-                    snsRequest.owner = clientCommand.user;
+                    Dto::SNS::CreateTopicRequest snsRequest = Dto::SNS::CreateTopicRequest::FromJson(clientCommand.payload);
                     Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
-
-                    log_info << "Topic created, name: " << name;
+                    log_info << "Topic created, name: " << snsRequest.topicName;
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());
                 }
 
                 case Dto::Common::SNSCommandType::LIST_TOPICS: {
 
                     Dto::SNS::ListTopicsResponse snsResponse = _snsService.ListTopics(clientCommand.region);
-                    log_info << "List topics";
+                    log_info << "List topics, count: " << snsResponse.topics.size();
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());
                 }
 
@@ -198,18 +191,16 @@ namespace AwsMock::Service {
 
                     boost::asio::post(_ioc, [self = shared_from_this()] {
                         const long purged = self->_snsService.PurgeAllTopics();
-                        log_info << "All topic purged, count: " << purged; });
+                        log_info << "All topic purged, count: " << purged;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 
                 case Dto::Common::SNSCommandType::DELETE_TOPIC: {
 
-                    std::string topicArn = Core::HttpUtils::GetStringParameter(clientCommand.payload, "TopicArn");
-                    log_debug << "Topic ARN: " << topicArn;
-
-                    Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(clientCommand.region, topicArn);
-
-                    log_info << "Topic deleted, topicArn: " << topicArn;
+                    Dto::SNS::DeleteTopicRequest snsRequest = Dto::SNS::DeleteTopicRequest::FromJson(clientCommand.payload);
+                    Dto::SNS::DeleteTopicResponse snsResponse = _snsService.DeleteTopic(snsRequest);
+                    log_info << "Topic deleted, topicArn: " << snsRequest.topicArn;
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());
                 }
 
@@ -227,7 +218,8 @@ namespace AwsMock::Service {
                     Dto::SNS::DeleteMessageRequest snsRequest = Dto::SNS::DeleteMessageRequest::FromJson(clientCommand.payload);
                     boost::asio::post(_ioc, [snsRequest, self = shared_from_this()] {
                         self->_snsService.DeleteMessage(snsRequest);
-                        log_info << "Message deleted, messageId: " << snsRequest.messageId; });
+                        log_info << "Message deleted, messageId: " << snsRequest.messageId;
+                    });
                     return SendResponse(request, http::status::ok);
                 }
 

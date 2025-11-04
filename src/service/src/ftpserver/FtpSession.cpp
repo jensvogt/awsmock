@@ -1515,7 +1515,8 @@ namespace AwsMock::FtpServer {
     }
 
     std::string FtpSession::GetKey(const std::string &path) const {
-        std::string key = Core::StringUtils::StripBeginning(path, _transferDir);
+        //std::string key = Core::StringUtils::StripBeginning(path, _transferDir);
+        std::string key = path;
 #ifdef _WIN32
         Core::StringUtils::Replace(key, "\\", "/");
 #endif
