@@ -56,7 +56,7 @@ namespace AwsMock::Database {
      */
     class SNSDatabase : public DatabaseBase {
 
-      public:
+    public:
 
         /**
          * @brief Constructor
@@ -301,6 +301,15 @@ namespace AwsMock::Database {
         [[maybe_unused]] Entity::SNS::Message GetMessageById(const std::string &oid) const;
 
         /**
+         * @brief Returns a message by message ID.
+         *
+         * @param messageId message ID
+         * @return message entity
+         * @throws Core::DatabaseException
+         */
+        [[maybe_unused]] Entity::SNS::Message GetMessageByMessageId(const std::string &messageId) const;
+
+        /**
          * @brief Count the number of messages by ARN
          *
          * @param topicArn URL of the topic
@@ -410,7 +419,7 @@ namespace AwsMock::Database {
          */
         void AdjustMessageCounters() const;
 
-      private:
+    private:
 
         /**
          * Database name

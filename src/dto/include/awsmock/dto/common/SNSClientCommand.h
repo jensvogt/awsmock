@@ -55,6 +55,7 @@ namespace AwsMock::Dto::Common {
         LIST_TOPIC_ARNS,
         UPDATE_SUBSCRIPTION,
         GET_EVENT_SOURCE,
+        GET_MESSAGE_COUNTERS,
         UNKNOWN
     };
 
@@ -83,6 +84,7 @@ namespace AwsMock::Dto::Common {
             {SNSCommandType::LIST_MESSAGE_COUNTERS, "list-message-counters"},
             {SNSCommandType::LIST_TOPIC_ARNS, "list-topic-arns"},
             {SNSCommandType::GET_EVENT_SOURCE, "get-event-source"},
+            {SNSCommandType::GET_MESSAGE_COUNTERS, "get-message-counters"},
     };
 
     [[maybe_unused]] static std::string SNSCommandTypeToString(SNSCommandType commandType) {

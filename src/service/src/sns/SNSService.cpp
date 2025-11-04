@@ -6,8 +6,6 @@
 
 namespace AwsMock::Service {
 
-    boost::mutex SNSService::_subscriptionMutex;
-
     Dto::SNS::CreateTopicResponse SNSService::CreateTopic(const Dto::SNS::CreateTopicRequest &request) const {
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "create_topic");
         log_trace << "Create topic request: " << request.ToString();
@@ -620,8 +618,30 @@ namespace AwsMock::Service {
         }
     }
 
+    Dto::SNS::GetMessageCountersResponse SNSService::GetMessageCounters(const Dto::SNS::GetMessageCountersRequest &request) const {
+        Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "get_message");
+        log_trace << "Get message request, messageId: " << request.messageId;
+
+        if (!_snsDatabase.MessageExists(request.messageId)) {
+            log_error << "Message does not exist, messageId: " << request.messageId;
+            throw Core::ServiceException("Message does not exist, messageId: " + request.messageId);
+        }
+
+        try {
+
+            Database::Entity::SNS::Message message = _snsDatabase.GetMessageByMessageId(request.messageId);
+            log_debug << "Got message , messageId: " << request.messageId;
+            Dto::SNS::GetMessageCountersResponse response;
+            response.message = Dto::SNS::Mapper::map(message);
+            return response;
+
+        } catch (Core::DatabaseException &ex) {
+            log_error << ex.message();
+            throw Core::ServiceException(ex.message());
+        }
+    }
+
     void SNSService::CheckSubscriptions(const Dto::SNS::PublishRequest &request, const Database::Entity::SNS::Topic &topic, const Database::Entity::SNS::Message &message) const {
-        // boost::mutex::scoped_lock lock(_subscriptionMutex);
         Monitoring::MonitoringTimer measure(SNS_SERVICE_TIMER, SNS_SERVICE_COUNTER, "action", "check_subscriptions");
         log_trace << "Check subscriptions request: " << request;
 

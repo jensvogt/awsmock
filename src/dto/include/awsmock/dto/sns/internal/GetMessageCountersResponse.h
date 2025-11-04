@@ -2,18 +2,19 @@
 // Created by vogje01 on 30/05/2023.
 //
 
-#ifndef AWSMOCK_DTO_SQS_GET_MESSAGE_COUNTERS_RESPONSE_H
-#define AWSMOCK_DTO_SQS_GET_MESSAGE_COUNTERS_RESPONSE_H
+#ifndef AWSMOCK_DTO_SNS_GET_MESSAGE_COUNTERS_RESPONSE_H
+#define AWSMOCK_DTO_SNS_GET_MESSAGE_COUNTERS_RESPONSE_H
 
 // C++ standard includes
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/sqs/model/Message.h>
+#include <awsmock/dto/sns/model/Message.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/sqs/model/MessageAttribute.h>
+#include <awsmock/dto/sns/model/MessageAttribute.h>
 
-namespace AwsMock::Dto::SQS {
+namespace AwsMock::Dto::SNS {
+
     /**
      * @brief Get a message request
      *
@@ -50,4 +51,4 @@ namespace AwsMock::Dto::SQS {
     };
 }// namespace AwsMock::Dto::SQS
 
-#endif// AWSMOCK_DTO_SQS_GET_MESSAGE_COUNTERS_RESPONSE_H
+#endif// AWSMOCK_DTO_SNS_GET_MESSAGE_COUNTERS_RESPONSE_H

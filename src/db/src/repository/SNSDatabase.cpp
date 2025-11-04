@@ -604,13 +604,14 @@ namespace AwsMock::Database {
         Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_message");
 
         try {
+
             const auto client = ConnectionPool::instance().GetConnection();
             mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
             const auto mResult = _messageCollection.find_one(make_document(kvp("_id", oid)));
             Entity::SNS::Message result;
             result.FromDocument(mResult->view());
-
             return result;
+
         } catch (const mongocxx::exception &exc) {
             log_error << "SNS Database exception " << exc.what();
             throw Core::DatabaseException(exc.what());
@@ -619,6 +620,24 @@ namespace AwsMock::Database {
 
     Entity::SNS::Message SNSDatabase::GetMessageById(const std::string &oid) const {
         return GetMessageById(bsoncxx::oid(oid));
+    }
+
+    Entity::SNS::Message SNSDatabase::GetMessageByMessageId(const std::string &messageId) const {
+        Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "get_message");
+
+        try {
+
+            const auto client = ConnectionPool::instance().GetConnection();
+            mongocxx::collection _messageCollection = (*client)[_databaseName][_messageCollectionName];
+            const auto mResult = _messageCollection.find_one(make_document(kvp("messageId", messageId)));
+            Entity::SNS::Message result;
+            result.FromDocument(mResult->view());
+            return result;
+
+        } catch (const mongocxx::exception &exc) {
+            log_error << "SNS Database exception " << exc.what();
+            throw Core::DatabaseException(exc.what());
+        }
     }
 
     long SNSDatabase::CountMessages(const std::string &topicArn) const {
@@ -983,19 +1002,19 @@ namespace AwsMock::Database {
 
                 // Initialize all topics with zero message counts
                 topicCollection.update_many({}, make_document(kvp("$set", make_document(
-                                                                                  kvp("size", bsoncxx::types::b_int64()),
-                                                                                  kvp("messages", bsoncxx::types::b_int64()),
-                                                                                  kvp("messagesSend", bsoncxx::types::b_int64()),
-                                                                                  kvp("messagesResend", bsoncxx::types::b_int64())))));
+                                                                          kvp("size", bsoncxx::types::b_int64()),
+                                                                          kvp("messages", bsoncxx::types::b_int64()),
+                                                                          kvp("messagesSend", bsoncxx::types::b_int64()),
+                                                                          kvp("messagesResend", bsoncxx::types::b_int64())))));
 
                 auto bulk = topicCollection.create_bulk_write();
                 for (auto cursor = messageCollection.aggregate(p); const auto t: cursor) {
                     bulk.append(mongocxx::model::update_one(make_document(kvp("topicArn", Core::Bson::BsonUtils::GetStringValue(t, "topicArn"))),
                                                             make_document(kvp("$set", make_document(
-                                                                                              kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
-                                                                                              kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
-                                                                                              kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
-                                                                                              kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
+                                                                                      kvp("size", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "size"))),
+                                                                                      kvp("messages", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "total"))),
+                                                                                      kvp("messagesSend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "send"))),
+                                                                                      kvp("messagesResend", bsoncxx::types::b_int64(Core::Bson::BsonUtils::GetLongValue(t, "resend"))))))));
                     log_debug << "Topic: " << Core::Bson::BsonUtils::GetStringValue(t, "topicArn")
                               << ", size: " << Core::Bson::BsonUtils::GetLongValue(t, "size")
                               << ", messages: " << Core::Bson::BsonUtils::GetLongValue(t, "total")
