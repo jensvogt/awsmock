@@ -181,7 +181,7 @@ namespace AwsMock::Service {
         sendMessageRequest.queueUrl = queueResponse.queueUrl;
         sendMessageRequest.body = BODY;
         Dto::SQS::SendMessageResponse sendMessageResponse = _service.SendMessage(sendMessageRequest);
-        Dto::SQS::ListParameterCountersRequest listQueueCountersRequest;
+        Dto::SQS::ListQueueCountersRequest listQueueCountersRequest;
         listQueueCountersRequest.region = REGION;
 
         // act

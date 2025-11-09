@@ -32,8 +32,8 @@ namespace AwsMock::Core {
         const std::string value2 = "123\n456\n789";
 
         // act
-        const std::vector<std::string> result1 = StringUtils::Split(value1, ' ');
-        const std::vector<std::string> result2 = StringUtils::Split(value2, '\n');
+        const std::vector<std::string> result1 = StringUtils::Split(value1, " ");
+        const std::vector<std::string> result2 = StringUtils::Split(value2, "\n");
 
         // assert
         BOOST_CHECK_EQUAL(result1.size(), 3);
@@ -130,8 +130,8 @@ namespace AwsMock::Core {
         const std::string s2 = "   80    ";
 
         // act
-        const std::string result1 = StringUtils::Split(s1, ':')[1];
-        const std::string result2 = StringUtils::Trim(StringUtils::Split(s1, ':')[1]);
+        const std::string result1 = StringUtils::Split(s1, ":")[1];
+        const std::string result2 = StringUtils::Trim(StringUtils::Split(s1, ":")[1]);
         const std::string result3 = StringUtils::Trim(s2);
 
         // assert

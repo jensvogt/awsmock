@@ -115,6 +115,9 @@ namespace AwsMock::Dto::SQS {
             MessageCounter messageCounter;
             messageCounter.messageId = message.messageId;
             messageCounter.id = message.oid;
+            messageCounter.queueName = message.queueName;
+            messageCounter.queueArn = message.queueArn;
+            messageCounter.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(message.queueArn);
             messageCounter.body = message.body;
             messageCounter.contentType = message.contentType;
             messageCounter.receiptHandle = message.receiptHandle;
@@ -158,9 +161,14 @@ namespace AwsMock::Dto::SQS {
     Message Mapper::map(const Database::Entity::SQS::Message &messageEntity) {
 
         Message messageDto;
+        messageDto.id = messageEntity.oid;
+        messageDto.queueName = messageEntity.queueName;
+        messageDto.queueArn = messageEntity.queueArn;
+        messageDto.queueUrl = Core::AwsUtils::ConvertSQSQueueArnToUrl(messageEntity.queueArn);
         messageDto.messageId = messageEntity.messageId;
         messageDto.receiptHandle = messageEntity.receiptHandle;
         messageDto.body = messageEntity.body;
+        messageDto.size = messageEntity.size;
         messageDto.attributes = messageEntity.attributes;
         messageDto.messageAttributes = map(messageEntity.messageAttributes);
         messageDto.md5OfBody = Database::SqsUtils::CreateMd5OfMessageBody(messageEntity.body);

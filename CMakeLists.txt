@@ -83,9 +83,9 @@ add_subdirectory(src/controller)
 add_subdirectory(src/awslocal)
 
 # Build documentation
-if (BUILD_DOCUMENTATION)
-    add_subdirectory(docs)
-endif (BUILD_DOCUMENTATION)
+#if (BUILD_DOCUMENTATION)
+#    add_subdirectory(docs)
+#endif (BUILD_DOCUMENTATION)
 
 # Build samples lambdas
 if (BUILD_SAMPLES)

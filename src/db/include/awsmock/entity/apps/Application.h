@@ -46,12 +46,12 @@ namespace AwsMock::Database::Entity::Apps {
         /**
          * Private port. This is the internal port used by the application inside the docker image.
          */
-        int privatePort{};
+        long privatePort{};
 
         /**
          * Public port. This is the host port used by the application inside the docker image.
          */
-        int publicPort{};
+        long publicPort{};
 
         /**
          * Name of the container

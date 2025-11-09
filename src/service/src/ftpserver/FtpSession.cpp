@@ -518,9 +518,27 @@ namespace AwsMock::FtpServer {
                 return;
             }
         }
+        // Retrieve the address object
+        boost::asio::ip::address addr = command_socket_.local_endpoint().address();
+
+        // Check if the address is IPv6
+        std::array<unsigned char, 16> ip_bytes{};
+        if (addr.is_v6()) {
+
+            ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+
+        } else if (addr.is_v4()) {
+
+            // Handle the IPv4 case (if necessary, you might log an error or convert it)
+            const boost::asio::ip::address_v4::bytes_type ip_bytes_v4 = addr.to_v4().to_bytes();
+
+        } else {
+            log_error << "Error: Local endpoint address is neither IPv4 nor IPv6.";
+            return;
+        }
 
         // Split address and port into bytes and get the port the OS chose for us
-        const auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
+//        const auto ip_bytes = command_socket_.local_endpoint().address().to_v6().to_bytes();
         const auto port = data_acceptor_.local_endpoint().port();
 
         // Form reply string

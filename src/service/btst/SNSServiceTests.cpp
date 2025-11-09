@@ -115,7 +115,10 @@ namespace AwsMock::Service {
 
         // act
         BOOST_CHECK_NO_THROW({
-            Dto::SNS::DeleteTopicResponse response = _snsService.DeleteTopic(topicResponse.region, topicResponse.topicArn);
+            Dto::SNS::DeleteTopicRequest deleteRequest;
+            deleteRequest.region = REGION;
+            deleteRequest.topicArn = topicResponse.topicArn;
+            Dto::SNS::DeleteTopicResponse response = _snsService.DeleteTopic(deleteRequest);
             BOOST_CHECK_EQUAL(response.requestId.empty(), false);
         });
 

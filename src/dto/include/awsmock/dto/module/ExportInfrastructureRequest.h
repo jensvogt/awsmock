@@ -54,7 +54,9 @@ namespace AwsMock::Dto::Module {
             r.includeObjects = Core::Json::GetBoolValue(v, "includeObjects");
             r.prettyPrint = Core::Json::GetBoolValue(v, "prettyPrint");
             r.cleanFirst = Core::Json::GetBoolValue(v, "cleanFirst");
-            r.modules = boost::json::value_to<std::vector<std::string>>(v.at("modules"));
+            if (Core::Json::AttributeExists(v,"modules")) {
+                r.modules = boost::json::value_to<std::vector<std::string>>(v.at("modules"));
+            }
             return r;
         }
 

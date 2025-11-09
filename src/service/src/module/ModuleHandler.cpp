@@ -100,6 +100,7 @@ namespace AwsMock::Service {
                 Dto::Module::ImportInfrastructureRequest infrastructureRequest;
                 infrastructureRequest.FromJson(payload);
                 ModuleService::ImportInfrastructure(infrastructureRequest);
+                log_info << "Infrastructure imported, size: " << payload.length();
                 return SendOkResponse(request);
             }
             if (action == "set-log-level") {
@@ -131,11 +132,13 @@ namespace AwsMock::Service {
 
                 // Get modules
                 const Dto::Module::ExportInfrastructureResponse moduleResponse = ModuleService::ExportInfrastructure(moduleRequest);
-                if (moduleResponse.ToJson().length() > 100000000) {
-                    log_error << "Response > 10MB";
-                    return SendBadRequestError(request, "Size > 100 MB.");
-                }
-                return SendOkResponse(request, moduleResponse.ToJson());
+                // if (moduleResponse.ToJson().length() > 100000000) {
+                //     log_error << "Response > 10MB";
+                //     return SendBadRequestError(request, "Size > 100 MB.");
+                // }
+                std::string json = moduleResponse.ToJson();
+                log_info << "Infrastructure exported, size: " << json.length();
+                return SendOkResponse(request, json);
             }
             return SendBadRequestError(request, "Unknown action");
         } catch (Core::JsonException &exc) {

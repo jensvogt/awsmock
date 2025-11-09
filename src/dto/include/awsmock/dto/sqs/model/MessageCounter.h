@@ -27,6 +27,21 @@ namespace AwsMock::Dto::SQS {
     struct MessageCounter final : Common::BaseCounter<MessageCounter> {
 
         /**
+         * Queue name
+         */
+        std::string queueName;
+
+        /**
+         * Queue URL
+         */
+        std::string queueUrl;
+
+        /**
+         * Queue ARN
+         */
+        std::string queueArn;
+
+        /**
          * Message ID
          */
         std::string messageId;
@@ -93,6 +108,9 @@ namespace AwsMock::Dto::SQS {
             r.region = v.at("region").as_string();
             r.user = v.at("user").as_string();
             r.requestId = v.at("requestId").as_string();
+            r.queueName = v.at("queueName").as_string();
+            r.queueUrl = v.at("queueUrl").as_string();
+            r.queueArn = v.at("queueArn").as_string();
             r.messageId = v.at("messageId").as_string();
             r.id = v.at("id").as_string();
             r.receiptHandle = v.at("receiptHandle").as_string();
@@ -113,6 +131,9 @@ namespace AwsMock::Dto::SQS {
                     {"user", obj.user},
                     {"requestId", obj.requestId},
                     {"contentType", obj.contentType},
+                    {"queueName", obj.queueName},
+                    {"queueUrl", obj.queueUrl},
+                    {"queueArn", obj.queueArn},
                     {"messageId", obj.messageId},
                     {"id", obj.id},
                     {"receiptHandle", obj.receiptHandle},

@@ -144,8 +144,8 @@ namespace AwsMock::Dto::Apps {
             r.containerName = Core::Json::GetStringValue(v, "containerName");
             r.status = AppsStatusTypeFromString(Core::Json::GetStringValue(v, "status"));
             r.enabled = Core::Json::GetBoolValue(v, "enabled");
-            r.description = Core::Crypto::Base64Decode(Core::Json::GetStringValue(v, "description"));
-            r.dockerFile = Core::Crypto::Base64Decode(Core::Json::GetStringValue(v, "dockerFile"));
+            r.description = Core::Json::GetStringValue(v, "description");
+            r.dockerFile = Core::Json::GetStringValue(v, "dockerFile");
             r.environment = Core::Json::GetMapFromObject<std::string, std::string>(v, "environment");
             r.tags = Core::Json::GetMapFromObject<std::string, std::string>(v, "tags");
             r.lastStarted = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastStarted"));
@@ -174,8 +174,8 @@ namespace AwsMock::Dto::Apps {
                     {"containerName", obj.containerName},
                     {"status", AppsStatusTypeToString(obj.status)},
                     {"enabled", obj.enabled},
-                    {"description", Core::Crypto::Base64Encode(obj.description)},
-                    {"dockerFile", Core::Crypto::Base64Encode(obj.dockerFile)},
+                    {"description", obj.description},
+                    {"dockerFile", obj.dockerFile},
                     {"lastStarted", Core::DateTimeUtils::ToISO8601(obj.lastStarted)},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},

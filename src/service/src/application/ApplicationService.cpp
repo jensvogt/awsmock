@@ -152,6 +152,7 @@ namespace AwsMock::Service {
         // Set status and version
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
         application.version = request.version;
+        application.archive = request.archive;
         application = _database.UpdateApplication(application);
 
         // Delete container and image
@@ -419,7 +420,7 @@ namespace AwsMock::Service {
         return count;
     }
 
-        void ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
+    void ApplicationService::StopApplication(const Dto::Apps::StopApplicationRequest &request) const {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, APPLICATION_SERVICE_COUNTER, "action", "stop_application");
         log_debug << "Stop application request, region:  " << request.region << " name: " << request.application.name;
 

@@ -28,6 +28,21 @@ namespace AwsMock::Dto::SQS {
     struct Message final : Common::BaseCounter<Message> {
 
         /**
+         * Queue name
+         */
+        std::string queueName;
+
+        /**
+         * Queue URL
+         */
+        std::string queueUrl;
+
+        /**
+         * Queue URL
+         */
+        std::string queueArn;
+
+        /**
          * Message ID
          */
         std::string messageId;
@@ -63,6 +78,11 @@ namespace AwsMock::Dto::SQS {
         std::string md5OfBody;
 
         /**
+         * Size of the message
+         */
+        long size;
+
+        /**
          * MD5 sum of message attributes
          */
         std::string md5OfMessageAttributes;
@@ -82,8 +102,12 @@ namespace AwsMock::Dto::SQS {
         friend Message tag_invoke(boost::json::value_to_tag<Message>, boost::json::value const &v) {
             Message r;
             r.id = v.at("id").as_string();
+            r.queueName = v.at("queueName").as_string();
+            r.queueUrl = v.at("queueUrl").as_string();
+            r.queueArn = v.at("queueArn").as_string();
             r.messageId = v.at("messageId").as_string();
             r.receiptHandle = v.at("receiptHandle").as_string();
+            r.size = v.at("size").as_int64();
             r.body = v.at("body").as_string();
             r.attributes = boost::json::value_to<std::map<std::string, std::string> >(v.at("attributes"));
             r.messageAttributes = boost::json::value_to<std::map<std::string, MessageAttribute> >(v.at("messageAttributes"));
@@ -99,6 +123,10 @@ namespace AwsMock::Dto::SQS {
                     {"Region", obj.region},
                     {"User", obj.user},
                     {"RequestId", obj.requestId},
+                    {"QueueName", obj.queueName},
+                    {"QueueUrl", obj.queueUrl},
+                    {"QueueArn", obj.queueArn},
+                    {"Id", obj.id},
                     {"MessageId", obj.messageId},
                     {"ReceiptHandle", obj.receiptHandle},
                     {"Body", obj.body},

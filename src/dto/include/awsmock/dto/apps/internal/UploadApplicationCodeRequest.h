@@ -41,13 +41,19 @@ namespace AwsMock::Dto::Apps {
          */
         std::string version;
 
-      private:
+        /**
+         * Archive
+         */
+        std::string archive;
+
+    private:
 
         friend UploadApplicationCodeRequest tag_invoke(boost::json::value_to_tag<UploadApplicationCodeRequest>, boost::json::value const &v) {
             UploadApplicationCodeRequest r;
             r.applicationName = Core::Json::GetStringValue(v, "applicationName");
             r.applicationCode = Core::Json::GetStringValue(v, "applicationCode");
             r.version = Core::Json::GetStringValue(v, "version");
+            r.archive = Core::Json::GetStringValue(v, "archive");
             return r;
         }
 
@@ -56,6 +62,7 @@ namespace AwsMock::Dto::Apps {
                     {"applicationName", obj.applicationName},
                     {"applicationCode", obj.applicationCode},
                     {"version", obj.version},
+                    {"archive", obj.archive},
             };
         }
     };

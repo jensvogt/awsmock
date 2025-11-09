@@ -77,4 +77,4 @@ namespace AwsMock::Dto::Apps {
 
 }// namespace AwsMock::Dto::Apps
 
-#endif// AWSMOCK_DTO_APPS_CREATE_APPLICATION_REQUEST_H
+#endif// AWSMOCK_DTO_APPS_UPDATE_APPLICATION_REQUEST_H

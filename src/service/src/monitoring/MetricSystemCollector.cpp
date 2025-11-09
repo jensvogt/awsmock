@@ -143,7 +143,7 @@ namespace AwsMock::Monitoring {
 
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
-            const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
+            const std::vector<std::string> tokens = Core::StringUtils::Split(line, " ");
             Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "virtual", std::stod(tokens[22]));
             log_trace << "Virtual memory: " << std::stol(tokens[22]);
             Core::MonitoringCollector::instance().SetGauge(MEMORY_USAGE_AWSMOCK, "mem_type", "real", std::stod(tokens[23]) * static_cast<double>(sysconf(_SC_PAGESIZE)));
@@ -180,7 +180,7 @@ namespace AwsMock::Monitoring {
 
         std::ifstream ifs("/proc/self/stat");
         if (std::string line; std::getline(ifs, line)) {
-            const std::vector<std::string> tokens = Core::StringUtils::Split(line, ' ');
+            const std::vector<std::string> tokens = Core::StringUtils::Split(line, " ");
             Core::MonitoringCollector::instance().SetGauge(TOTAL_THREADS, Core::NumberUtils::ToDouble(tokens[19]));
             log_debug << "Total threads: " << std::stod(tokens[19]);
         }

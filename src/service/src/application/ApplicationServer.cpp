@@ -24,21 +24,13 @@ namespace AwsMock::Service {
         log_info << "Application module starting";
 
         // Start application background threads
-        _scheduler.AddTask("application-monitoring", [this] {
-            this->UpdateCounter();
-        }, _monitoringPeriod);
-        _scheduler.AddTask("application-restart", [this] {
-            this->RestartApplications();
-        }, -1);
-        _scheduler.AddTask("application-watchdog", [this] {
-            this->WatchdogApplications();
-        }, _watchdogPeriod, _watchdogPeriod);
+        _scheduler.AddTask("application-monitoring", [this] { this->UpdateCounter(); }, _monitoringPeriod);
+        _scheduler.AddTask("application-restart", [this] { this->RestartApplications(); }, -1);
+        _scheduler.AddTask("application-watchdog", [this] { this->WatchdogApplications(); }, _watchdogPeriod, _watchdogPeriod);
 
         // Start backup
         if (_backupActive) {
-            scheduler.AddTask("application-backup", [] {
-                BackupApplication();
-            }, _backupCron);
+            scheduler.AddTask("application-backup", [] { BackupApplication(); }, _backupCron);
         }
 
         // Start the application log server (websocket)
@@ -189,15 +181,12 @@ namespace AwsMock::Service {
                 name = parts[0];
             } else if (parts.size() == 2) {
                 name = parts[0];
-                tag = parts[1];
             }
             if (_applicationDatabase.ApplicationExists(region, name)) {
                 Database::Entity::Apps::Application application = _applicationDatabase.GetApplication(region, name);
                 application.region = region;
                 application.containerId = container.id;
                 application.containerName = container.GetContainerName();
-                application.publicPort = container.GetPublicPortV4();
-                application.privatePort = container.GetPrivatePortV4();
                 application.imageName = container.image;
                 application.imageId = container.imageId;
                 application.status = container.state.running ? Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::RUNNING) : Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
@@ -213,8 +202,6 @@ namespace AwsMock::Service {
         for (std::vector<Database::Entity::Apps::Application> applications = _applicationDatabase.ListApplications(); auto &application: applications) {
 
             ContainerService::instance().KillContainer(application.containerId);
-            ContainerService::instance().DeleteContainer(application.containerId);
-            application = _applicationDatabase.UpdateApplication(application);
             log_info << "Application stopped, name: " << application.name;
         }
     }

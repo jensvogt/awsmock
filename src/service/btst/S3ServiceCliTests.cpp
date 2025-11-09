@@ -136,7 +136,7 @@ namespace AwsMock::Service {
 
         // arrange
         const std::string filename = Core::FileUtils::CreateTempFile("json", 10);
-        const std::string objectName = Core::StringUtils::Split(filename, '/')[2];
+        const std::string objectName = Core::StringUtils::Split(filename, "/")[2];
         std::string output1 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "mb", TEST_BUCKET, "--endpoint", _endpoint});
         std::string output2 = Core::TestUtils::SendCliCommand(AWS_CMD, {"s3", "cp", filename, TEST_BUCKET + "/" + objectName, "--endpoint", _endpoint});
 
