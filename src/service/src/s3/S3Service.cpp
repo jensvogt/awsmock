@@ -290,7 +290,9 @@ namespace AwsMock::Service {
 
             for (const auto &bucket: bucketList) {
                 Dto::S3::BucketCounter bucketCounter;
+                bucketCounter.region = bucket.region;
                 bucketCounter.bucketName = bucket.name;
+                bucketCounter.bucketArn = bucket.arn;
                 bucketCounter.keys = bucket.keys;
                 bucketCounter.size = bucket.size;
                 bucketCounter.owner = bucket.owner;

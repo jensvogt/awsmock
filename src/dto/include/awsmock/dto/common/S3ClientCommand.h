@@ -63,6 +63,8 @@ namespace AwsMock::Dto::Common {
         GET_EVENT_SOURCE,
         TOUCH_OBJECT,
         UPDATE_OBJECT,
+        ADD_BUCKET_COUNTER,
+        DELETE_BUCKET_COUNTER,
         DELETE_ALL_OBJECTS,
         UNKNOWN
     };
@@ -94,10 +96,12 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::BUCKET_NOTIFICATION, "BucketNotification"},
             {S3CommandType::PUT_BUCKET_NOTIFICATION_CONFIGURATION, "PutBucketNotificationConfiguration"},
             {S3CommandType::PUT_BUCKET_ENCRYPTION, "PurBucketEncryption"},
-            {S3CommandType::PUT_BUCKET_VERSIONING, "PutBucketVersionint"},
+            {S3CommandType::PUT_BUCKET_VERSIONING, "PutBucketVersioning"},
             {S3CommandType::GET_OBJECT_COUNTER, "GetObjectCounter"},
             {S3CommandType::GET_EVENT_SOURCE, "GetEventSource"},
             {S3CommandType::TOUCH_OBJECT, "TouchObject"},
+            {S3CommandType::ADD_BUCKET_COUNTER, "AddBucketCounter"},
+            {S3CommandType::DELETE_BUCKET_COUNTER, "DeleteBucketCounter"},
             {S3CommandType::DELETE_ALL_OBJECTS, "DeleteAllObjects"},
             {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
     };

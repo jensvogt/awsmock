@@ -32,6 +32,11 @@ namespace AwsMock::Dto::S3 {
         std::string bucketName;
 
         /**
+         * Bucket ARN
+         */
+        std::string bucketArn;
+
+        /**
          * Number of objects keys
          */
         long keys = 0;
@@ -66,6 +71,7 @@ namespace AwsMock::Dto::S3 {
 
                 document document;
                 Core::Bson::BsonUtils::SetStringValue(document, "bucketName", bucketName);
+                Core::Bson::BsonUtils::SetStringValue(document, "bucketArn", bucketArn);
                 Core::Bson::BsonUtils::SetLongValue(document, "keys", keys);
                 Core::Bson::BsonUtils::SetLongValue(document, "size", size);
                 Core::Bson::BsonUtils::SetStringValue(document, "owner", owner);
@@ -84,6 +90,7 @@ namespace AwsMock::Dto::S3 {
         friend BucketCounter tag_invoke(boost::json::value_to_tag<BucketCounter>, boost::json::value const &v) {
             BucketCounter r;
             r.bucketName = Core::Json::GetStringValue(v, "bucketName");
+            r.bucketArn = Core::Json::GetStringValue(v, "bucketArn");
             r.keys = Core::Json::GetLongValue(v, "keys");
             r.size = Core::Json::GetLongValue(v, "size");
             r.owner = Core::Json::GetStringValue(v, "owner");
@@ -97,6 +104,7 @@ namespace AwsMock::Dto::S3 {
                     {"region", obj.region},
                     {"user", obj.user},
                     {"bucketName", obj.bucketName},
+                    {"bucketArn", obj.bucketArn},
                     {"keys", obj.keys},
                     {"owner", obj.owner},
                     {"size", obj.size},

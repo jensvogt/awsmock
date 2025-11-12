@@ -644,6 +644,24 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
+                case Dto::Common::S3CommandType::DELETE_BUCKET_COUNTER: {
+
+                    Dto::S3::DeleteBucketRequest s3Request = Dto::S3::DeleteBucketRequest::FromJson(clientCommand);
+                    _s3Service.DeleteBucket(s3Request);
+                    log_trace << "Bucket deleted, bucketName: " << s3Request.bucket;
+
+                    return SendResponse(request, http::status::ok);
+                }
+
+                case Dto::Common::S3CommandType::ADD_BUCKET_COUNTER: {
+
+                    Dto::S3::CreateBucketRequest s3Request = Dto::S3::CreateBucketRequest::FromJson(clientCommand);
+                    Dto::S3::CreateBucketResponse s3Response=_s3Service.CreateBucket(s3Request);
+                    log_trace << "Bucket added, bucketName: " << s3Request.name;
+
+                    return SendResponse(request, http::status::ok,s3Response.ToJson());
+                }
+
                 case Dto::Common::S3CommandType::DELETE_ALL_OBJECTS: {
 
                     // Build request
