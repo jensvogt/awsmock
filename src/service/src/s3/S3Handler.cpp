@@ -581,11 +581,8 @@ namespace AwsMock::Service {
 
                     // Build request
                     Dto::S3::PurgeBucketRequest s3Request = Dto::S3::PurgeBucketRequest::FromJson(Core::HttpUtils::GetBodyAsString(request));
-                    boost::asio::post(_ioc, [this, s3Request] {
-                        const S3Service service(_ioc);
-                        const long deleted = service.PurgeBucket(s3Request);
-                        log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: " << deleted;
-                    });
+                    const long deleted = _s3Service.PurgeBucket(s3Request);
+                    log_info << "Purge bucket, name: " << s3Request.bucketName << ", deleted: " << deleted;
                     return SendResponse(request, http::status::ok, {});
                 }
 
@@ -673,7 +670,16 @@ namespace AwsMock::Service {
                     return SendResponse(request, http::status::ok);
                 }
 
-                case Dto::Common::S3CommandType::UNKNOWN: {
+                case Dto::Common::S3CommandType::DELETE_OBJECT_COUNTER: {
+
+                    // Build request
+                    Dto::S3::DeleteObjectRequest s3Request = Dto::S3::DeleteObjectRequest::FromJson(clientCommand);
+                    _s3Service.DeleteObject(s3Request);
+                    log_info << "Delete object, region: " << s3Request.region << ", bucket: " << s3Request.bucket;
+                    return SendResponse(request, http::status::ok);
+                }
+
+                    case Dto::Common::S3CommandType::UNKNOWN: {
                     log_error << "Unknown method";
                     return SendResponse(request, http::status::bad_request, "Unknown method");
                 }

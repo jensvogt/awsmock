@@ -133,8 +133,9 @@ namespace AwsMock::Database {
         }
     }
 
-    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const int step, const std::string &labelName, const std::string &labelValue, const long limit) const {
+    std::vector<Entity::Monitoring::Counter> MonitoringDatabase::GetMonitoringValues(const std::string &name, const system_clock::time_point start, const system_clock::time_point end, const long step, const std::string &labelName, const std::string &labelValue, const long limit) const {
         log_trace << "Get monitoring values, name: " << name << ", start: " << start << ", end: " << end << ", step: " << step << ", labelName: " << labelName << ", labelValue: " << labelValue;
+
         using namespace std::literals;
         if (HasDatabase()) {
             const auto client = ConnectionPool::instance().GetConnection();

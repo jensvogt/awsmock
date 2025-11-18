@@ -65,6 +65,7 @@ namespace AwsMock::Dto::Common {
         UPDATE_OBJECT,
         ADD_BUCKET_COUNTER,
         DELETE_BUCKET_COUNTER,
+        DELETE_OBJECT_COUNTER,
         DELETE_ALL_OBJECTS,
         UNKNOWN
     };
@@ -102,6 +103,7 @@ namespace AwsMock::Dto::Common {
             {S3CommandType::TOUCH_OBJECT, "TouchObject"},
             {S3CommandType::ADD_BUCKET_COUNTER, "AddBucketCounter"},
             {S3CommandType::DELETE_BUCKET_COUNTER, "DeleteBucketCounter"},
+            {S3CommandType::DELETE_OBJECT_COUNTER, "DeleteObjectCounter"},
             {S3CommandType::DELETE_ALL_OBJECTS, "DeleteAllObjects"},
             {S3CommandType::UPDATE_OBJECT, "UpdateObject"},
     };
