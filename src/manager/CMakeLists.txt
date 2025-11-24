@@ -14,10 +14,10 @@ if (WIN32)
     target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
             libssl.lib libcrypto.lib archive.lib magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib bson2.lib
             mongoc2.lib zip.lib z.lib
-            "$<$<CONFIG:RELEASE>:bsoncxx-v_noabi-rhi-x64-v143-md.lib>"
-            "$<$<CONFIG:DEBUG>:bsoncxx-v_noabi-dhi-x64-v143-mdd.lib>"
-            "$<$<CONFIG:RELEASE>:mongocxx-v_noabi-rhi-x64-v143-md.lib>"
-            "$<$<CONFIG:DEBUG>:mongocxx-v_noabi-dhi-x64-v143-mdd.lib>"
+            "$<$<CONFIG:RELEASE>:bsoncxx-v_noabi-rhi-x64-v145-md.lib>"
+            "$<$<CONFIG:DEBUG>:bsoncxx-v_noabi-dhi-x64-v145-mdd.lib>"
+            "$<$<CONFIG:RELEASE>:mongocxx-v_noabi-rhi-x64-v145-md.lib>"
+            "$<$<CONFIG:DEBUG>:mongocxx-v_noabi-dhi-x64-v145-mdd.lib>"
             "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-x64-1_89.lib>"
             "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-gd-x64-1_89.lib>"
             "$<$<CONFIG:RELEASE>:libboost_url-vc143-mt-x64-1_89.lib>"

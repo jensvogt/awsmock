@@ -12,7 +12,7 @@ if (WIN32)
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR} ${LIBPROMETHEUS_LIB_DIR})
     target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
             libssl.lib libcrypto.lib archive.lib magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
-            bsoncxx-v_noabi-rhi-x64-v143-md.lib mongocxx-v_noabi-rhi-x64-v143-md.lib bson2.lib mongoc2.lib
+            bsoncxx-v_noabi-rhi-x64-v145-md.lib mongocxx-v_noabi-rhi-x64-v145-md.lib bson2.lib mongoc2.lib
             "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-x64-1_89.lib>"
             "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-gd-x64-1_89.lib>"
             "$<$<CONFIG:RELEASE>:libboost_url-vc143-mt-x64-1_89.lib>"

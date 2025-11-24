@@ -50,8 +50,8 @@ if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
     target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})
-    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static mongocxx-v_noabi-rhi-x64-v143-md.lib
-            bsoncxx-v_noabi-rhi-x64-v143-md.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
+    target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static mongocxx-v_noabi-rhi-x64-v145-md.lib
+            bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
             boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
             boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib)
     #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
