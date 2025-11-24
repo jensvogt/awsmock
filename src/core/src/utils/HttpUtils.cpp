@@ -87,6 +87,10 @@ namespace AwsMock::Core {
 
     std::map<std::string, std::string> HttpUtils::GetQueryParameters(const std::string &uri) {
 
+        if (uri == "/") {
+            return  {};
+        }
+
         std::map<std::string, std::string> queryParameters;
         std::string localUri = StringUtils::UrlDecode(uri);
         if (StringUtils::Contains(uri, "?")) {

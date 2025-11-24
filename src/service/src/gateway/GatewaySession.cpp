@@ -206,7 +206,10 @@ namespace AwsMock::Service {
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream) return DoShutdown();
+        if (ec == http::error::end_of_stream) {
+            log_warning << "End of stream, error: " << ec.message();
+            return DoShutdown();
+        }
 
         if (!keep_alive) {
             // This means we should close the connection, usually because the response indicated the "Connection: close" semantic.

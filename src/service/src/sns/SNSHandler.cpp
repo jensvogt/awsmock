@@ -15,7 +15,14 @@ namespace AwsMock::Service {
 
                 case Dto::Common::SNSCommandType::CREATE_TOPIC: {
 
-                    Dto::SNS::CreateTopicRequest snsRequest = Dto::SNS::CreateTopicRequest::FromJson(clientCommand.payload);
+                    Dto::SNS::CreateTopicRequest snsRequest;
+                    if (Core::StringUtils::Contains(clientCommand.contentType, "x-www-form-urlencoded")) {
+                        snsRequest.region = region;
+                        snsRequest.owner = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Owner");
+                        snsRequest.topicName = Core::HttpUtils::GetStringParameter(clientCommand.payload, "Name");
+                    } else {
+                        snsRequest = Dto::SNS::CreateTopicRequest::FromJson(clientCommand.payload);
+                    }
                     Dto::SNS::CreateTopicResponse snsResponse = _snsService.CreateTopic(snsRequest);
                     log_info << "Topic created, name: " << snsRequest.topicName;
                     return SendResponse(request, http::status::ok, snsResponse.ToXml());
@@ -304,9 +311,8 @@ namespace AwsMock::Service {
         for (int i = 1; i <= attributeCount / 2; i++) {
 
             const std::string attributeName = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Name");
-            const std::string attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue");
 
-            if (!attributeName.empty() && !attributeValue.empty()) {
+            if (const std::string attributeValue = Core::HttpUtils::GetStringParameter(payload, "MessageAttributes.entry." + std::to_string(i) + ".Value.StringValue"); !attributeName.empty() && !attributeValue.empty()) {
                 Dto::SNS::MessageAttribute attribute;
                 attribute.stringValue = attributeValue;
                 attribute.dataType = Dto::SNS::MessageAttributeDataTypeFromString("String");

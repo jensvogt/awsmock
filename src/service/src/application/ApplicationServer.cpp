@@ -67,7 +67,7 @@ namespace AwsMock::Service {
                 }
             }
         }
-        log_debug << "Application monitoring finished, freeShmSize: " << _segment.get_free_memory();
+        log_debug << "Application monitoring finished";
     }
 
     void ApplicationServer::StartApplications() const {

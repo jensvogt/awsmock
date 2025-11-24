@@ -336,15 +336,15 @@ namespace AwsMock::Database {
         /**
          * @brief Paged list all available messages
          *
-         * @param region AWS region
          * @param topicArn AWS topic ARN
+         * @param prefix message ID prefix
          * @param pageSize page size
          * @param pageIndex page index
          * @param sortColumns vector of sort columns
          * @return list of SNS messages
          * @throws DatabaseException
          */
-        [[nodiscard]] Entity::SNS::MessageList ListMessages(const std::string &region = {}, const std::string &topicArn = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
+        [[nodiscard]] Entity::SNS::MessageList ListMessages(const std::string &topicArn = {}, const std::string &prefix = {}, long pageSize = 0, long pageIndex = 0, const std::vector<SortColumn> &sortColumns = {}) const;
 
         /**
          * @brief Updates an existing message

@@ -278,7 +278,6 @@ namespace AwsMock::Service {
 
         // Update status
         application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::PENDING);
-        application.enabled = true;
         application = _database.UpdateApplication(application);
 
         // Get code base64 file name
@@ -442,7 +441,6 @@ namespace AwsMock::Service {
             application.status = Dto::Apps::AppsStatusTypeToString(Dto::Apps::AppsStatusType::STOPPED);
             application.containerId = "";
             application.containerName = "";
-            application.enabled = false;
             application = _database.UpdateApplication(application);
             log_debug << "Application stopped, name: " << application.name;
 

@@ -713,7 +713,7 @@ namespace AwsMock::Database {
         return _memoryDb.CountMessages(topicArn);
     }
 
-    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &region, const std::string &topicArn, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
+    Entity::SNS::MessageList SNSDatabase::ListMessages(const std::string &topicArn, const std::string &prefix, const long pageSize, const long pageIndex, const std::vector<SortColumn> &sortColumns) const {
         Monitoring::MonitoringTimer measure(SNS_DATABASE_TIMER, SNS_DATABASE_COUNTER, "action", "list_messages");
 
         if (HasDatabase()) {
@@ -731,8 +731,8 @@ namespace AwsMock::Database {
                 opts.skip(pageIndex * pageSize);
             }
             document query = {};
-            if (!region.empty()) {
-                query.append(kvp("region", region));
+            if (!prefix.empty()) {
+                query.append(kvp("messageId", make_document(kvp("$regex", "^" + prefix))));
             }
             if (!topicArn.empty()) {
                 query.append(kvp("topicArn", topicArn));
@@ -754,7 +754,7 @@ namespace AwsMock::Database {
             log_trace << "Got message list, size: " << messageList.size();
             return messageList;
         }
-        return _memoryDb.ListMessages(region, topicArn);
+        return _memoryDb.ListMessages(topicArn, prefix);
     }
 
     Entity::SNS::Message SNSDatabase::UpdateMessage(Entity::SNS::Message &message) const {

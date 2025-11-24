@@ -69,6 +69,7 @@ namespace AwsMock::Dto::SQS {
             r.md5Body = Core::Json::GetStringValue(v, "MD5Body");
             r.md5MessageAttributes = Core::Json::GetStringValue(v, "MD5MessageAttributes");
             r.md5MessageSystemAttributes = Core::Json::GetStringValue(v, "MD5MessageSystemAttributes");
+            r.sequenceNumber = Core::Json::GetStringValue(v, "SequenceNumber");
             return r;
         }
 
@@ -82,6 +83,7 @@ namespace AwsMock::Dto::SQS {
                     {"MD5OfMessageBody", obj.md5Body},
                     {"MD5OfMessageAttributes", obj.md5MessageAttributes},
                     {"MD5OfMessageSystemAttributes", obj.md5MessageSystemAttributes},
+                    {"SequenceNumber", obj.sequenceNumber},
             };
         }
     };

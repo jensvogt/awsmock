@@ -57,6 +57,11 @@ namespace AwsMock::Dto::S3 {
         std::string internalName;
 
         /**
+         * Object body
+         */
+        std::string body;
+
+        /**
          * Metadata
          */
         std::map<std::string, std::string> metadata;
@@ -120,6 +125,7 @@ namespace AwsMock::Dto::S3 {
             r.contentType = Core::Json::GetStringValue(v, "contentType");
             r.size = Core::Json::GetLongValue(v, "size");
             r.internalName = Core::Json::GetStringValue(v, "internalName");
+            r.body = Core::Json::GetStringValue(v, "body");
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
             if (Core::Json::AttributeExists(v, "metadata")) {
@@ -137,6 +143,7 @@ namespace AwsMock::Dto::S3 {
                     {"contentType", obj.contentType},
                     {"size", obj.size},
                     {"internalName", obj.internalName},
+                    {"body", obj.body},
                     {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
                     {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };

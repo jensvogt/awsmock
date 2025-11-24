@@ -110,8 +110,8 @@ namespace AwsMock::Service {
 
             const std::string containerName = applicationEntity.name + "-" + instanceId;
             const std::vector<std::string> environment = GetEnvironment(applicationEntity);
-            const int publicPort = applicationEntity.publicPort < 0 ? Core::SystemUtils::GetNextFreePort() : applicationEntity.publicPort;
-            const int privatePort = applicationEntity.privatePort;
+            const long publicPort = applicationEntity.publicPort < 0 ? Core::SystemUtils::GetNextFreePort() : applicationEntity.publicPort;
+            const long privatePort = applicationEntity.privatePort;
             const Dto::Docker::CreateContainerResponse containerCreateResponse = ContainerService::instance().CreateContainer(applicationEntity.name, containerName, dockerTag, environment, publicPort, privatePort);
             log_debug << "Application container created, publicPort: " << publicPort << " containerId: " << containerCreateResponse.id;
 

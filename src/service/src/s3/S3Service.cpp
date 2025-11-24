@@ -1153,6 +1153,8 @@ namespace AwsMock::Service {
             const Database::Entity::S3::Object object = _database.GetObjectById(request.oid);
 
             Dto::S3::GetObjectCounterResponse getObjectCounterResponse;
+            auto dataS3Dir = Core::Configuration::instance().GetValue<std::string>("awsmock.modules.s3.data-dir");
+            std::string body = Core::FileUtils::ReadFile(dataS3Dir+Core::FileUtils::separator()+object.internalName);
 
             Dto::S3::ObjectCounter objectCounter;
             objectCounter.oid = object.oid;
@@ -1162,8 +1164,10 @@ namespace AwsMock::Service {
             objectCounter.size = object.size;
             objectCounter.contentType = object.contentType;
             objectCounter.internalName = object.internalName;
+            objectCounter.body = Core::Crypto::Base64Encode(body);
             objectCounter.created = object.created;
             objectCounter.modified = object.modified;
+            objectCounter.metadata = object.metadata;
             getObjectCounterResponse.objectCounter = objectCounter;
             return getObjectCounterResponse;
         } catch (bsoncxx::exception &ex) {

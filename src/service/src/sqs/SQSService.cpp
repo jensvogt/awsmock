@@ -250,7 +250,7 @@ namespace AwsMock::Service {
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "approximateNumberOfMessagesNotVisible",
-                    attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
+            attributeCounter.attributeValue = std::to_string(queue.attributes.approximateNumberOfMessagesNotVisible);
             response.attributeCounters.emplace_back(attributeCounter);
 
             attributeCounter.attributeKey = "deadLetterTargetArn";
@@ -288,13 +288,15 @@ namespace AwsMock::Service {
             attributeCounter.attributeValue = std::to_string(queue.attributes.visibilityTimeout);
             response.attributeCounters.emplace_back(attributeCounter);
 
-            auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > total) {
-                endArray = response.attributeCounters.end();
+            if (request.pageSize > 0) {
+                auto endArray = response.attributeCounters.begin() + request.pageSize * (request.pageIndex + 1);
+                if (request.pageSize * (request.pageIndex + 1) > total) {
+                    endArray = response.attributeCounters.end();
+                }
+                response.attributeCounters = std::vector(
+                        response.attributeCounters.begin() + request.pageSize * request.pageIndex,
+                        endArray);
             }
-            response.attributeCounters = std::vector(
-                    response.attributeCounters.begin() + request.pageSize * request.pageIndex,
-                    endArray);
             return response;
         } catch (Core::DatabaseException &ex) {
             log_error << "SQS get attribute counters failed, message: " << ex.what();
@@ -1205,6 +1207,7 @@ namespace AwsMock::Service {
             log_debug << "Got message , messageId: " << request.messageId;
             Dto::SQS::GetMessageCountersResponse response;
             response.message = Dto::SQS::Mapper::map(message);
+            response.region = request.region;
             return response;
 
         } catch (Core::DatabaseException &ex) {
@@ -1441,8 +1444,8 @@ namespace AwsMock::Service {
 
     bool SQSService::CheckAttribute(const std::vector<std::string> &attributes, const std::string &value) {
         return std::ranges::find_if(attributes, [&value](const std::string &attribute) {
-            return Core::StringUtils::EqualsIgnoreCase(attribute, value);
-        }) != attributes.end();
+                   return Core::StringUtils::EqualsIgnoreCase(attribute, value);
+               }) != attributes.end();
     }
 
     void SQSService::CheckLambdaNotifications(const std::string &queueArn, const Database::Entity::SQS::Message &message) const {

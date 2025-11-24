@@ -121,7 +121,7 @@ namespace AwsMock::Service {
             throw Core::ServiceException("Get image by name failed", statusCode);
         }
 
-        Dto::Docker::ListImageResponse response = response.FromJson(body);
+        const Dto::Docker::ListImageResponse response = Dto::Docker::ListImageResponse::FromJson(body);
         if (response.imageList.empty()) {
             log_warning << "Docker image not found, name: " << name;
             return {};
@@ -759,7 +759,7 @@ namespace AwsMock::Service {
             ofs << "COPY config /root/.aws/" << std::endl;
             ofs << "COPY credentials /root/.aws/" << std::endl;
             ofs << "EXPOSE " << privatePort << std::endl;
-            ofs << "ENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]" << std::endl;
+            ofs << R"(ENTRYPOINT ["java", "-jar", "app.jar"])" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "provided")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
@@ -783,7 +783,7 @@ namespace AwsMock::Service {
             ofs << "COPY requirements.txt /root/app" << std::endl;
             ofs << "WORKDIR /root/app/" << std::endl;
             ofs << "RUN pip install -r requirements.txt" << std::endl;
-            ofs << "CMD [\"python\", \"-u\", \"" + mainFile + ".py\"]" << std::endl;
+            ofs << R"(CMD ["python", "-u", ")" + mainFile + ".py\"]" << std::endl;
         } else if (Core::StringUtils::StartsWithIgnoringCase(runtime, "nodejs22")) {
             ofs << "FROM " << supportedRuntime << std::endl;
             AddEnvironment(ofs, environment);
