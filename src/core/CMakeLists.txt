@@ -36,10 +36,10 @@ if (WIN32)
     #install(TARGETS ${LIBRARY_STATIC} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_include_directories(${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
+    target_include_directories(${LIBRARY} PRIVATE ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR})
-    target_link_directories(${LIBRARY} PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY} PUBLIC boost_filesystem boost_url boost_thread boost_locale boost_log
+    target_link_directories(${LIBRARY} PRIVATE ${EXTERNAL_LIB_DIR})
+    target_link_libraries(${LIBRARY} PRIVATE boost_filesystem boost_url boost_thread boost_locale boost_log
             boost_log_setup ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
