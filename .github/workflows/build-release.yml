@@ -176,7 +176,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -209,23 +209,6 @@ jobs:
           cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
-
-      - name: Build Boost 1.89 locally
-        run: |
-          BOOST_VERSION=1.89.0
-          BOOST_DIR=boost_${BOOST_VERSION//./_}
-          
-          # Download and extract
-          wget -nv https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_DIR}.tar.gz
-          tar xf ${BOOST_DIR}.tar.gz
-          cd ${BOOST_DIR}
-          
-          # Bootstrap with default gcc
-          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          
-          # Build and install all libraries (except MPI and Graph Parallel)
-          ./b2 --prefix=${{ github.workspace }}/extern --without-mpi --without-graph_parallel \
-              link=static runtime-link=static threading=multi -j$(nproc) install
 
       - name: Configure (Linux)
         shell: bash
