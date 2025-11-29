@@ -10,7 +10,7 @@ if (WIN32)
             ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR} ${LIBSSL_INCLUDE_DIR} ${LIBPROMETHEUS_INCLUDE_DIR}
             ${LIBSSH_INCLUDE_DIR} ${LIBSSL_LIB_DIR})
     target_link_directories(${BINARY} PUBLIC ${MONGOCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSH_LIB_DIR} ${LIBSSL_LIB_DIR}
-            ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR} ${LIBPROMETHEUS_LIB_DIR} ${LIBZIP_LIB_DIR} ${LIBZ_LIB_DIR})
+            ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR} ${LIBZIP_LIB_DIR} ${LIBZ_LIB_DIR})
     target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
             libssl.lib libcrypto.lib archive.lib magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib bson2.lib
             mongoc2.lib zip.lib z.lib
@@ -44,10 +44,10 @@ if (WIN32)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_executable(${BINARY} ${SOURCES})
-    target_include_directories(${BINARY} PUBLIC ./include ../dto/include ../db/include ../core/include ../service/include)
+    target_include_directories(${BINARY} PRIVATE ./include ../dto/include ../db/include ../core/include ../service/include
+            ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup
-            ssl crypto archive magic ssh)
+            boost_url boost_thread boost_program_options boost_log boost_log_setup ssl crypto archive magic ssh)
     if (APPLE)
         add_link_options("-rpath /usr/local/awsmock/lib")
         set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")

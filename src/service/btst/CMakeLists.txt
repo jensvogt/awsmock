@@ -1,7 +1,7 @@
 set(BINARY srv_tst)
 
 # Includes
-include_directories(../include ../../core/include ../../db/include ../../dto/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
+include_directories(../include ../../core/include ../../db/include ../../dto/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
 
 # Libraries
 set(LIBRARIES awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx boost_locale boost_program_options boost_log
