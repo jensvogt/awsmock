@@ -214,17 +214,18 @@ jobs:
         shell: bash
         run: |
           mkdir -p $BUILD_DIR
-          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release 
+          cmake \
+            -DBSONCXX_INCLUDE_DIR=/home/runner/work/awsmock/awsmock/extern/include/bsoncxx/v_noabi \
+            -DMONGOCXX_INCLUDE_DIR=/home/runner/work/awsmock/awsmock/extern/include/mongocxx/v_noabi \
+            -DEXTERNAL_INCLUDE_DIR=/home/runner/work/awsmock/awsmock/extern/include \
+            -DEXTERNAL_LIB_DIR=/home/runner/work/awsmock/awsmock/extern/lib \
+            -S . \
+            -B "$BUILD_DIR"
 
       - name: Build (Linux)
         shell: bash
         run: |
-          cmake \               
-              -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
-              -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
-              -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
-              -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib \
-              --build $BUILD_DIR -S . --parallel $(nproc)
+          cmake --build "$BUILD_DIR" --parallel $(nproc)
 
       # Step 5: Prepare the .deb package directory
       - name: Prepare package structure
