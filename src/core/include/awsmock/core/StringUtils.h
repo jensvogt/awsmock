@@ -32,9 +32,6 @@
 #include <boost/token_functions.hpp>
 #include <boost/tokenizer.hpp>
 
-// JWT includes
-#include <jwt-cpp/base.h>
-
 namespace AwsMock::Core {
 
     /**

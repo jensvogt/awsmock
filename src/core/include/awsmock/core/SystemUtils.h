@@ -20,6 +20,8 @@
 #include <boost/asio/readable_pipe.hpp>
 #include <boost/process.hpp>
 #include <boost/thread.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/deadline_timer.hpp>
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
@@ -127,7 +129,7 @@ namespace AwsMock::Core {
          * @param output output stream
          * @param error error stream
          */
-        static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error);
+       // static void RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error);
 
         /**
          * @brief Return the next free port number
