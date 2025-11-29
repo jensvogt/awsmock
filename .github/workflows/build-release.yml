@@ -193,14 +193,7 @@ jobs:
           cmake . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
-
-      - name: Install prometheus-cpp
-        run: | 
-          git clone --recursive https://github.com/jupp0r/prometheus-cpp
-          cd prometheus-cpp
-          cmake . -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
-          cmake --build . --parallel $(nproc)
-          cmake --install .
+          ls -R ${{ github.workspace }}/extern/include
 
       - name: Install mongo-cxx-driver
         run: |
@@ -214,13 +207,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p $BUILD_DIR
-          cmake \
-            -DBSONCXX_INCLUDE_DIR=/home/runner/work/awsmock/awsmock/extern/include/bsoncxx/v_noabi \
-            -DMONGOCXX_INCLUDE_DIR=/home/runner/work/awsmock/awsmock/extern/include/mongocxx/v_noabi \
-            -DEXTERNAL_INCLUDE_DIR=/home/runner/work/awsmock/awsmock/extern/include \
-            -DEXTERNAL_LIB_DIR=/home/runner/work/awsmock/awsmock/extern/lib \
-            -S . \
-            -B "$BUILD_DIR"
+          cmake -S . -B "$BUILD_DIR" \
+            -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
+            -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
+            -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
+            -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib            
 
       - name: Build (Linux)
         shell: bash
