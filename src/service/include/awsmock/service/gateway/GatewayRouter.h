@@ -23,6 +23,7 @@
 #include <awsmock/service/sqs/SQSHandler.h>
 #include <awsmock/service/ssm/SSMHandler.h>
 #include <awsmock/service/transfer/TransferHandler.h>
+#include <awsmock/service/container/ContainerHandler.h>
 
 namespace AwsMock::Service {
 

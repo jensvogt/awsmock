@@ -49,6 +49,9 @@ namespace AwsMock::Service {
         if (routingKey == "module") {
             return std::make_shared<ModuleHandler>(ioc);
         }
+        if (routingKey == "container") {
+            return std::make_shared<ContainerHandler>(ioc);
+        }
         log_error << "Routing table entry not found, routingKey: " << routingKey;
         return nullptr;
     }

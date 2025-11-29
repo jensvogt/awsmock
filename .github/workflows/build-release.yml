@@ -214,6 +214,7 @@ jobs:
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
           cmake --build . --parallel $(nproc)
+          ls -R .
 
       - name: Prepare package structure
         run: |
