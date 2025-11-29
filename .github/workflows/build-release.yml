@@ -236,10 +236,15 @@ jobs:
           cp $BUILD_DIR/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp $BUILD_DIR/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp dist/etc/awsmock-linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
+          
           # Create control file
           cat << EOF > $PACKAGE_DIR/DEBIAN/control
           Package: awsmock

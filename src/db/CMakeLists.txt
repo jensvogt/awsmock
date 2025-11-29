@@ -64,7 +64,8 @@ else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_include_directories(${LIBRARY} PRIVATE ./include ../core/include ${BSONCXX_INCLUDE_DIR}
             ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
-    target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
+    target_link_directories(${LIBRARY} PRIVATE ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
+    target_link_libraries(${LIBRARY} PRIVATE awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread
             boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
