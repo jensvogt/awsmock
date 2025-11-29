@@ -183,6 +183,7 @@ jobs:
         run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
 
       - name: Create extern directories
+        shell: bash
         run: |
           mkdir -p ${{ github.workspace }}/extern
 
@@ -191,17 +192,17 @@ jobs:
         run: |
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
-          cmake . -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/extern
+          cmake . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
-          ls -R $GITHUB_WORKSPACE/extern/include
+          ls -R ${{ github.workspace }}/extern/include
 
       - name: Install mongo-cxx-driver
         shell: bash
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/extern
+          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
@@ -209,10 +210,10 @@ jobs:
         shell: bash
         run: |
           cmake . \
-            -DBSONCXX_INCLUDE_DIR=$GITHUB_WORKSPACE/extern/include/bsoncxx/v_noabi \
-            -DMONGOCXX_INCLUDE_DIR=$GITHUB_WORKSPACE/extern/include/mongocxx/v_noabi \
-            -DEXTERNAL_INCLUDE_DIR=$GITHUB_WORKSPACE/extern/include \
-            -DEXTERNAL_LIB_DIR=$GITHUB_WORKSPACE/extern/lib
+            -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
+            -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
+            -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
+            -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
           cmake --build . --parallel $(nproc)
 
       - name: Prepare package structure
@@ -239,7 +240,6 @@ jobs:
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
-
           # Create control file
           cat << EOF > $PACKAGE_DIR/DEBIAN/control
           Package: awsmock
