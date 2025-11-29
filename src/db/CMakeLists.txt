@@ -46,13 +46,12 @@ if (NOT WIN32)
 endif ()
 
 # Includes
-include_directories(./include ../core/include ${LIBRARY} PUBLIC ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
-        ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR} ${LIBARCHIVE_INCLUDE_DIR} ${LIBJWT_INCLUDE_DIR}
-        ${LIBSSL_INCLUDE_DIR})
 
 # Shared library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
+    target_include_directories(${LIBRARY_STATIC} PRIVATE ./include ../core/include ${BSONCXX_INCLUDE_DIR}
+            ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})
     target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static bsoncxx-v_noabi-rhi-x64-v145-md.lib
@@ -63,6 +62,8 @@ if (WIN32)
     #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
+    target_include_directories(${LIBRARY} PRIVATE ./include ../core/include ${BSONCXX_INCLUDE_DIR}
+            ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_libraries(${LIBRARY} awsmockcore mongocxx bsoncxx boost_filesystem boost_url boost_thread boost_locale
             boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
