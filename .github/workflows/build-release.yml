@@ -206,14 +206,12 @@ jobs:
       - name: Build (Linux)
         shell: bash
         run: |
-          mkdir -p $BUILD_DIR
-          cmake -S . -B "$BUILD_DIR" \
+          cmake . \
             -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
             -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
-          ls -R ${{ github.workspace }}/extern/include
-          cmake --build "$BUILD_DIR" --parallel $(nproc)
+          cmake --build . --parallel $(nproc)
 
       - name: Prepare package structure
         run: |
