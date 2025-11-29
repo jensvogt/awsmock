@@ -187,19 +187,21 @@ jobs:
           mkdir -p ${{ github.workspace }}/extern
 
       - name: Install JWT-CPP
+        shell: bash
         run: |
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
-          cmake . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake . -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
-          ls -R ${{ github.workspace }}/extern/include
+          ls -R $GITHUB_WORKSPACE/extern/include
 
       - name: Install mongo-cxx-driver
+        shell: bash
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
@@ -207,10 +209,10 @@ jobs:
         shell: bash
         run: |
           cmake . \
-            -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
-            -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
-            -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
-            -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
+            -DBSONCXX_INCLUDE_DIR=$GITHUB_WORKSPACE/extern/include/bsoncxx/v_noabi \
+            -DMONGOCXX_INCLUDE_DIR=$GITHUB_WORKSPACE/extern/include/mongocxx/v_noabi \
+            -DEXTERNAL_INCLUDE_DIR=$GITHUB_WORKSPACE/extern/include \
+            -DEXTERNAL_LIB_DIR=$GITHUB_WORKSPACE/extern/lib
           cmake --build . --parallel $(nproc)
 
       - name: Prepare package structure
@@ -260,12 +262,13 @@ jobs:
           EOF
 
           # Create postrm
-          cat << EOF > $PACKAGE_DIR/DEBIAN/postinst
+          cat << EOF > $PACKAGE_DIR/DEBIAN/postrm
           #!/bin/bash
           set -e          
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
           EOF
+          chmod 755 $PACKAGE_DIR/DEBIAN/postinst $PACKAGE_DIR/DEBIAN/postrm
 
       # Step 6: Build the .deb package
       - name: Build DEB with fpm
