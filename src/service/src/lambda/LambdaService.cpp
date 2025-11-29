@@ -168,12 +168,15 @@ namespace AwsMock::Service {
             }
 
             // Paging
-            auto endArray = environments.begin() + request.pageSize * (request.pageIndex + 1);
-            if (request.pageSize * (request.pageIndex + 1) > environments.size()) {
-                endArray = environments.end();
+            if (request.pageSize > 0) {
+                auto endArray = environments.begin() + request.pageSize * (request.pageIndex + 1);
+                if (request.pageSize * (request.pageIndex + 1) > environments.size()) {
+                    endArray = environments.end();
+                }
+                response.environmentCounters = std::vector(environments.begin() + request.pageIndex * request.pageSize, endArray);
+            } else {
+                response.environmentCounters = environments;
             }
-            response.environmentCounters = std::vector(environments.begin() + request.pageIndex * request.pageSize, endArray);
-
             log_trace << "Lambda list environments counters, result: " << response.ToString();
             return response;
 

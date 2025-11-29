@@ -136,11 +136,16 @@ namespace AwsMock::Dto::Lambda {
         long instances{};
 
         /**
+         * Created timestamp
+         */
+        system_clock::time_point created;
+
+        /**
          * Last modification datetime
          */
-        system_clock::time_point lastModified;
+        system_clock::time_point modified;
 
-      private:
+    private:
 
         friend FunctionCounter tag_invoke(boost::json::value_to_tag<FunctionCounter>, boost::json::value const &v) {
             FunctionCounter r;
@@ -167,7 +172,8 @@ namespace AwsMock::Dto::Lambda {
             r.instances = Core::Json::GetLongValue(v, "instances");
             r.invocations = Core::Json::GetLongValue(v, "invocations");
             r.averageRuntime = Core::Json::GetLongValue(v, "averageRuntime");
-            r.lastModified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "lastModified"));
+            r.created = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "created"));
+            r.modified = Core::DateTimeUtils::FromISO8601(Core::Json::GetStringValue(v, "modified"));
             return r;
         }
 
@@ -196,7 +202,8 @@ namespace AwsMock::Dto::Lambda {
                     {"instances", obj.instances},
                     {"invocations", obj.invocations},
                     {"averageRuntime", obj.averageRuntime},
-                    {"lastModified", obj.averageRuntime},
+                    {"created", Core::DateTimeUtils::ToISO8601(obj.created)},
+                    {"modified", Core::DateTimeUtils::ToISO8601(obj.modified)},
             };
         }
     };

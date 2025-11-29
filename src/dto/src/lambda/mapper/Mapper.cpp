@@ -142,6 +142,7 @@ namespace AwsMock::Dto::Lambda {
         ListFunctionCountersResponse response;
         for (auto &lambdaEntity: lambdaEntities) {
             FunctionCounter counter;
+            counter.region = lambdaEntity.region;
             counter.functionName = lambdaEntity.function;
             counter.functionArn = lambdaEntity.arn;
             counter.invocations = lambdaEntity.invocations;
@@ -153,6 +154,8 @@ namespace AwsMock::Dto::Lambda {
             counter.version = lambdaEntity.dockerTag;
             counter.averageRuntime = lambdaEntity.averageRuntime;
             counter.instances = static_cast<long>(lambdaEntity.instances.size());
+            counter.created = lambdaEntity.created;
+            counter.modified = lambdaEntity.modified;
             response.functionCounters.emplace_back(counter);
         }
         return response;
