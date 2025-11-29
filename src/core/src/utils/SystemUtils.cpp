@@ -3,7 +3,6 @@
 //
 
 #include <awsmock/core/SystemUtils.h>
-#include <boost/asio/deadline_timer.hpp>
 #ifdef _WIN32
 #include <winsock2.h>
 #else
@@ -114,34 +113,29 @@ namespace AwsMock::Core {
         return !GetEnvironmentVariableValue(name).empty();
     }
 
-    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, std::string &output, std::string &error) {
+    void SystemUtils::RunShellCommand(const std::string& shellcmd,const std::vector<std::string>& args,std::string& output,std::string& error){
+        namespace bp = boost::process;
 
-        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
-        /*boost::asio::io_context ctx;
-        boost::asio::readable_pipe outPipe{ctx};
-        boost::asio::readable_pipe errPipe{ctx};
-        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{{}, outPipe, errPipe});
-        boost::system::error_code ec;
-        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        proc.wait();*/
-    }
+        boost::process::pipe outPipe;
+        boost::process::pipe errPipe;
 
-    void SystemUtils::RunShellCommand(const std::string &shellcmd, const std::vector<std::string> &args, const std::string &input, std::string &output, std::string &error) {
+        // Launch process with pipes for stdout and stderr
+        boost::process::child proc(shellcmd,boost::process::args(args),boost::process::std_in.close(),boost::process::std_out > outPipe,boost::process::std_err > errPipe);
 
-        log_debug << "Running shell command, cmd: " << shellcmd << ", args: " << StringUtils::Join(args);
-/*        boost::asio::io_context ctx;
-        boost::asio::readable_pipe inPipe{ctx};
-        boost::asio::readable_pipe outPipe{ctx};
-        boost::asio::readable_pipe errPipe{ctx};
-        boost::process::process proc(ctx, shellcmd, args, boost::process::process_stdio{inPipe, outPipe, errPipe});
-        boost::system::error_code ec;
-        boost::asio::read(outPipe, boost::asio::dynamic_buffer(output), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        boost::asio::read(errPipe, boost::asio::dynamic_buffer(error), ec);
-        assert(!ec || (ec == boost::asio::error::eof));
-        proc.wait();*/
+        // Read both streams
+        {
+            boost::process::ipstream outStream(std::move(outPipe));
+            boost::process::ipstream errStream(std::move(errPipe));
+
+            // Read stdout
+            std::string line;
+            while (std::getline(outStream, line))
+                output.append(line + "\n");
+
+            // Read stderr
+            while (std::getline(errStream, line))
+                error.append(line + "\n");
+        }
+        proc.wait();
     }
 }// namespace AwsMock::Core
