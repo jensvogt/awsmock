@@ -302,11 +302,11 @@ jobs:
 #          name: installer-macos
 #          path: artifacts/macos
 
-      #      - name: Download Linux installer
-      #        uses: actions/download-artifact@v4
-      #        with:
-      #          name: installer-linux
-      #          path: artifacts/linux
+#      - name: Download Linux installer
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: installer-linux
+#          path: artifacts/linux
 
       - name: Download Linux Debian package
         uses: actions/download-artifact@v4
@@ -353,8 +353,6 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-#          cp ./artifacts/installer-windows/*.exe public/ || true
-#          cp ./artifacts/installer-macos/*.dmg public/ || true
           cp ./artifacts/deb-package-linux/*.deb public/ || true
           cp ./artifacts/rpm-package-linux/*.rpm public/ || true
           cp .github/pages/index.html public/index.html
