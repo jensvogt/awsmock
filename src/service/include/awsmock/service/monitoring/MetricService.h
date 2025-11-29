@@ -10,9 +10,9 @@
 #include <string>
 
 // Prometheus
-#include <prometheus/counter.h>
-#include <prometheus/exposer.h>
-#include <prometheus/registry.h>
+//#include <prometheus/counter.h>
+//#include <prometheus/exposer.h>
+//#include <prometheus/registry.h>
 
 // Boost include
 #include <boost/thread/mutex.hpp>
@@ -26,9 +26,9 @@ namespace AwsMock::Monitoring {
     using std::chrono::high_resolution_clock;
     using std::chrono::time_point;
 
-    typedef std::map<std::string, prometheus::Family<prometheus::Counter> *> CounterMap;
-    typedef std::map<std::string, prometheus::Family<prometheus::Gauge> *> GaugeMap;
-    typedef std::map<std::string, prometheus::Family<prometheus::Histogram> *> HistogramMap;
+//    typedef std::map<std::string, prometheus::Family<prometheus::Counter> *> CounterMap;
+//    typedef std::map<std::string, prometheus::Family<prometheus::Gauge> *> GaugeMap;
+//    typedef std::map<std::string, prometheus::Family<prometheus::Histogram> *> HistogramMap;
 
     /**
      * @brief Monitoring server
@@ -140,7 +140,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the metric
          * @return metric if existing.
          */
-        [[nodiscard]] prometheus::Family<prometheus::Counter> *GetCounter(const std::string &name) const;
+        //[[nodiscard]] prometheus::Family<prometheus::Counter> *GetCounter(const std::string &name) const;
 
         /**
          * @brief Adds a gauge to the map.
@@ -189,32 +189,32 @@ namespace AwsMock::Monitoring {
          * @param name name of the metric
          * @return metric if existing.
          */
-        prometheus::Family<prometheus::Gauge> *GetGauge(const std::string &name);
+        //prometheus::Family<prometheus::Gauge> *GetGauge(const std::string &name);
 
         /**
          * Metric manager for Prometheus
          */
-        std::shared_ptr<prometheus::Exposer> _server;
+        //std::shared_ptr<prometheus::Exposer> _server;
 
         /**
          * Metric manager for Prometheus
          */
-        std::shared_ptr<prometheus::Registry> _registry;
+        //std::shared_ptr<prometheus::Registry> _registry;
 
         /**
          * Counter map
          */
-        CounterMap _counterMap;
+        //CounterMap _counterMap;
 
         /**
          * Counter map
          */
-        GaugeMap _gaugeMap;
+        //GaugeMap _gaugeMap;
 
         /**
          * Counter map
          */
-        HistogramMap _histogramMap;
+        //HistogramMap _histogramMap;
 
         /**
          * Port for the monitoring manager

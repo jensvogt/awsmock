@@ -214,16 +214,17 @@ jobs:
         shell: bash
         run: |
           mkdir -p $BUILD_DIR
-          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release \
-              -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
-              -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
-              -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
-              -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
+          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release 
 
       - name: Build (Linux)
         shell: bash
         run: |
-          cmake --build $BUILD_DIR --parallel $(nproc)
+          cmake \ 
+              -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
+              -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
+              -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
+              -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib \ 
+              --build $BUILD_DIR --parallel $(nproc)
 
       # Step 5: Prepare the .deb package directory
       - name: Prepare package structure
