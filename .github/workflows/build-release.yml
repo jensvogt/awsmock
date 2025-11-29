@@ -211,7 +211,8 @@ jobs:
             -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
             -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
-            -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib            
+            -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
+          ls -R ${{ github.workspace }}/extern/include
           cmake --build "$BUILD_DIR" --parallel $(nproc)
 
       - name: Prepare package structure
