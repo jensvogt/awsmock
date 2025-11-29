@@ -1,11 +1,8 @@
 set(BINARY dto_tst)
 
-# Includes
-include_directories(../include ../../core/include ../../db/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
-
 # Libraries
-set(LIBRARIES awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_locale boost_program_options boost_log
-        boost_log_setup boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
+set(LIBRARIES awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_program_options boost_log boost_log_setup
+        boost_unit_test_framework ssl crypto archive magic ssh)
 
 # S3
 add_executable(${BINARY} S3DtoTest.cpp TestBase.cpp)
