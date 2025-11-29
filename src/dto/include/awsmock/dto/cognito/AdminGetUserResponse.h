@@ -80,7 +80,7 @@ namespace AwsMock::Dto::Cognito {
             r.enabled = Core::Json::GetBoolValue(v, "Enabled");
             r.userStatus = Database::Entity::Cognito::UserStatusFromString(Core::Json::GetStringValue(v, "UserStatus"));
             if (Core::Json::AttributeExists(v, "UserAttributes")) {
-                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "UserAttributes");
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v.at("UserAttributes"));
             }
             r.created = Core::DateTimeUtils::FromISO8601(v.at("Created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("Modified").as_string().data());

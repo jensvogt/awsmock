@@ -40,6 +40,6 @@ else ()
             ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY} PUBLIC boost_filesystem boost_url boost_thread boost_locale boost_log
-            boost_log_setup boost_process ssl crypto archive magic)
+            boost_log_setup ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

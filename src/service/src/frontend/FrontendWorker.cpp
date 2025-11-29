@@ -35,26 +35,23 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-    void FrontendWorker::ReadRequest() {
-        // On each read the parser needs to be destroyed and recreated. We store it in a boost::optional to achieve that.
-        //
-        // Arguments passed to the parser constructor are forwarded to the message object. A single argument is forwarded
-        // to the body constructor.
-        //
-        // We construct the dynamic body with a 1MB limit to prevent vulnerability to buffer attacks.
-        //
-        _parser.emplace(std::piecewise_construct, std::make_tuple(), std::make_tuple(_alloc));
+void FrontendWorker::ReadRequest() {
+    http::async_read(
+        _socket,
+        _buffer,
+        *_parser,
+        [this](boost::beast::error_code ec, std::size_t bytes_transferred) {
+            boost::ignore_unused(bytes_transferred);
 
-        // No limit
-        _parser->body_limit(boost::none);
+            if (ec) {
+                Accept();  // or handle error
+                return;
+            }
 
-        async_read(_socket, _buffer, *_parser, [this](const beast::error_code &ec, std::size_t) {
-            if (ec)
-                Accept();
-            else
-                ProcessRequest(_parser->get());
-        });
-    }
+            ProcessRequest(_parser->get()); // safe
+        }
+    );
+}
 
     void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
 

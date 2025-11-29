@@ -67,8 +67,8 @@ namespace AwsMock::Dto::DynamoDb {
             r.tableName = Core::Json::GetStringValue(v, "tableName");
             r.id = Core::Json::GetStringValue(v, "id");
             r.size = Core::Json::GetLongValue(v, "size");
-            r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "attributes");
-            r.keys = boost::json::value_to<std::map<std::string, AttributeValue>>(v, "keys");
+            r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("attributes"));
+            r.keys = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("keys"));
             r.created = Core::DateTimeUtils::FromISO8601(v.at("created").as_string().data());
             r.modified = Core::DateTimeUtils::FromISO8601(v.at("modified").as_string().data());
 

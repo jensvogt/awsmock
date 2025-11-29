@@ -56,7 +56,7 @@ namespace AwsMock::Dto::Cognito {
             r.messageAction = MessageActionFromString(Core::Json::GetStringValue(v, "MessageAction"));
             r.temporaryPassword = Core::Json::GetStringValue(v, "TemporaryPassword");
             if (Core::Json::AttributeExists(v, "UserAttributes")) {
-                r.userAttributes = boost::json::value_to<std::vector<UserAttribute> >(v, "UserAttributes");
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute> >(v.at("UserAttributes"));
             }
             return r;
         }
