@@ -17,7 +17,6 @@
 #include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/ApplicationDatabase.h>
 #include <awsmock/service/container/ContainerService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 

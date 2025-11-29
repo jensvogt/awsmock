@@ -231,7 +231,7 @@ namespace AwsMock::Service {
 
     void ApplicationService::DisableApplication(const Dto::Apps::DisableApplicationRequest &request) const {
         Monitoring::MonitoringTimer measure(APPLICATION_SERVICE_TIMER, "action", "disable_application");
-        Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_application");
+        //Monitoring::MetricService::instance().IncrementCounter(LAMBDA_SERVICE_COUNTER, "action", "disable_application");
         log_debug << "Diable application request, name: " << request.application.name;
 
         if (!_database.ApplicationExists(request.region, request.application.name)) {
