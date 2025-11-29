@@ -216,7 +216,7 @@ jobs:
           tar -xzf boost_1_89_0.tar.gz
           cd boost_1_89_0
           ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          ./b2 --parallel $(nproc)
+          ./b2 --without-mpi --parallel $(nproc)
           ./b2 install
 
       - name: Configure (Linux)
