@@ -45,4 +45,3 @@ else ()
 endif ()
 
 install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-
