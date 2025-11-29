@@ -16,9 +16,9 @@ target_link_libraries(srv_kms_service PUBLIC ${LIBRARIES})
 target_link_directories(srv_kms_service PUBLIC ${LIBRARY_DIR})
 
 add_executable(srv_kms_cli KMSServiceCliTests.cpp TestBase.cpp)
-target_include_directories(srv_kms_service PUBLIC ${INCLUDE_DIR})
-target_link_directories(srv_kms_service PUBLIC ${LIBRARY_DIR})
-target_link_libraries(srv_kms_service PUBLIC ${LIBRARIES})
+target_include_directories(srv_kms_cli PUBLIC ${INCLUDE_DIR})
+target_link_directories(srv_kms_cli PUBLIC ${LIBRARY_DIR})
+target_link_libraries(srv_kms_cli PUBLIC ${LIBRARIES})
 
 add_executable(srv_kms_java KMSServiceJavaTests.cpp TestBase.cpp)
 target_include_directories(srv_kms_java PUBLIC ${INCLUDE_DIR})
