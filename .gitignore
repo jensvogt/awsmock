@@ -107,6 +107,7 @@ x86
 **/*.txt
 **/*.bin
 **/*.sqlite
+**/*.slnx
 **/CMake Overview
 
 # Tests

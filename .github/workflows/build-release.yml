@@ -179,43 +179,34 @@ jobs:
                               libtool pandoc libarchive-dev libmagic-dev libssh-dev
           sudo gem install --no-document fpm
 
-      - name: Normalize VERSION
+      - name: Normalize version
         run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
+
+      - name: Create extern directories
+        run: |
+          mkdir -p ${{ github.workspace }}/extern
 
       - name: Install JWT-CPP
         run: |
-          mkdir -p extern
-          cd extern 
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
-          cmake .
+          cmake . -DCMAKE_INSTALL_PREFIX ${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
 
       - name: Install prometheus-cpp
         run: | 
-          cd extern
           git clone --recursive https://github.com/jupp0r/prometheus-cpp
           cd prometheus-cpp
-          cmake . -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF
-          cmake --build . --parallel $(nproc)
-          cmake --install .
-
-      - name: Install mongo-c-driver
-        run: |
-          cd extern
-          git clone -b r2.0 https://github.com/mongodb/mongo-c-driver.git
-          cd mongo-c-driver
-          cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_MONGOC=ON
+          cmake . -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF -DCMAKE_INSTALL_PREFIX ${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
 
       - name: Install mongo-cxx-driver
         run: |
-          cd extern
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake . -DCMAKE_CXX_STANDARD=17
+          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX ${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
@@ -224,7 +215,7 @@ jobs:
           wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
           tar -xzf boost_1_89_0.tar.gz
           cd boost_1_89_0
-          ./bootstrap.sh --prefix=/usr/local
+          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
           ./b2 --parallel $(nproc)
           ./b2 install
 
