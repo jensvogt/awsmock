@@ -2,7 +2,7 @@ set(BINARY db_tst)
 set(STATIC_LIB awsmockdb)
 
 # Includes
-include_directories(../include ../../core/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
+include_directories(../include ../../core/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
 
 add_executable(${BINARY} main.cpp)
 

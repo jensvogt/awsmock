@@ -203,7 +203,7 @@ jobs:
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
-      - name: Configure (Linux)
+      - name: Build (Linux)
         shell: bash
         run: |
           mkdir -p $BUILD_DIR
@@ -212,13 +212,8 @@ jobs:
             -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib            
-
-      - name: Build (Linux)
-        shell: bash
-        run: |
           cmake --build "$BUILD_DIR" --parallel $(nproc)
 
-      # Step 5: Prepare the .deb package directory
       - name: Prepare package structure
         run: |
           PACKAGE_DIR=package
