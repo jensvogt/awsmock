@@ -36,13 +36,13 @@ namespace AwsMock::Service {
         lambda = _lambdaDatabase.CreateOrUpdateLambda(lambda);
 
         // Find idle instance
-        Database::Entity::Lambda::Instance instance;
+        const Database::Entity::Lambda::Instance instance;
 
         // Create instance
         std::string instanceId = Core::StringUtils::GenerateRandomHexString(8);
 
         // Create lambda
-        LambdaCreator lambdaCreator;
+        const LambdaCreator lambdaCreator;
         lambda = lambdaCreator.CreateLambda(lambda, instanceId);
         log_info << "New lambda instance created, name: " << lambda.function << ", instanceId: " << instanceId << ", status: " << Database::Entity::Lambda::LambdaInstanceStatusToString(instance.status) << ", totalSize: " << lambda.instances.size();
 
@@ -168,9 +168,11 @@ namespace AwsMock::Service {
             }
 
             // Paging
-            auto endArray = environments.begin() + request.pageSize * (request.pageIndex + 1);
+            std::vector<std::pair<std::string, std::string>>::iterator endArray;
             if (request.pageSize * (request.pageIndex + 1) > environments.size()) {
                 endArray = environments.end();
+            } else {
+                endArray = environments.begin() + request.pageSize * (request.pageIndex + 1);
             }
             response.environmentCounters = std::vector(environments.begin() + request.pageIndex * request.pageSize, endArray);
 
@@ -489,9 +491,11 @@ namespace AwsMock::Service {
 
             // Paging
             if (request.pageSize > 0) {
-                auto endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
+                std::vector<Dto::Lambda::InstanceCounter>::iterator endArray;
                 if (request.pageSize * (request.pageIndex + 1) > response.instanceCounters.size()) {
                     endArray = response.instanceCounters.end();
+                } else {
+                    endArray = response.instanceCounters.begin() + request.pageSize * (request.pageIndex + 1);
                 }
                 response.instanceCounters = std::vector(response.instanceCounters.begin() + request.pageIndex * request.pageSize, endArray);
             }
@@ -740,7 +744,7 @@ namespace AwsMock::Service {
         response.accountLimit.concurrentExecutions = 1000;
 
         // 75 GB
-        response.accountLimit.totalCodeSize = 75 * 1024 * 1024 * 1024L;
+        response.accountLimit.totalCodeSize = 75 * 1024 * 1024;
         log_debug << "List account limits: " << response.ToJson();
 
         // 75 GB
