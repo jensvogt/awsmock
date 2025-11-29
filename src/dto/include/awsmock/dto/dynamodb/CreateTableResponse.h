@@ -126,7 +126,7 @@ namespace AwsMock::Dto::DynamoDb {
                 r.itemCount = Core::Json::GetLongValue(tableObject, "ItemCount");
                 r.tableStatus = TableStatusTypeFromString(Core::Json::GetStringValue(tableObject, "TableStatus"));
                 if (Core::Json::AttributeExists(tableObject, "Tags")) {
-                    r.tags = boost::json::value_to<std::vector<std::map<std::string, std::string>>>(tableObject, "Tags");
+                    r.tags = boost::json::value_to<std::vector<std::map<std::string, std::string>>>(tableObject.at("Tags"));
                 }
                 if (Core::Json::AttributeExists(tableObject, "AttributeDefinitions")) {
                     for (boost::json::array attributeDefinitionsArray = tableObject.at("AttributeDefinitions").as_array(); const auto &a: attributeDefinitionsArray) {

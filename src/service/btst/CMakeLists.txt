@@ -5,7 +5,7 @@ include_directories(../include ../../core/include ../../db/include ../../dto/inc
 
 # Libraries
 set(LIBRARIES awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx boost_locale boost_program_options boost_log
-        boost_log_setup boost_process boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
+        boost_log_setup boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
 
 # KMS
 add_executable(srv_kms_service KMSServiceTests.cpp TestBase.cpp)

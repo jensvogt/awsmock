@@ -50,7 +50,7 @@ static std::list<std::string> allowedActions() {
 void ShowHelp(const boost::program_options::options_description &desc) {
     constexpr int leftIndent = 64;
     std::cout << std::endl
-              << "AwsMock awsmockctl v" << PROJECT_VERSION << std::endl
+              << "AwsMock awsmockctl v" << APP_VERSION << std::endl
               << std::endl
               << "Usage: " << std::endl
               << "  awsmockctl [Options] Commands" << std::endl

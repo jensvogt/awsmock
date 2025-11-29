@@ -319,11 +319,11 @@ namespace AwsMock::Core {
     }
 
     std::string Configuration::GetAppName() {
-        return PROJECT_NAME;
+        return "awsmock";
     }
 
     std::string Configuration::GetVersion() {
-        return PROJECT_VERSION;
+        return APP_VERSION;
     }
 
     std::string Configuration::ToString() const {

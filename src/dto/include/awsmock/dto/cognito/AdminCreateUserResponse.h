@@ -42,7 +42,7 @@ namespace AwsMock::Dto::Cognito {
             AdminCreateUserResponse r;
             r.userName = Core::Json::GetStringValue(v, "userName");
             if (Core::Json::AttributeExists(v, "userAttributes")) {
-                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v, "userAttributes");
+                r.userAttributes = boost::json::value_to<std::vector<UserAttribute>>(v.at("userAttributes"));
             }
             return r;
         }

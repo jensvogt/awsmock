@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.8.7](https://github.com/jensvogt/awsmock/compare/v1.8.6...v1.8.7) (2025-11-29)
+
+
+### Bug Fixes
+
+* add installer packages ([ae63dee](https://github.com/jensvogt/awsmock/commit/ae63deea50907170b91a96660be4be661d68d95a))
+
+## [1.8.6](https://github.com/jensvogt/awsmock/compare/v1.8.5...v1.8.6) (2025-11-29)
+
+
+### Bug Fixes
+
+* add installer packages ([5e08383](https://github.com/jensvogt/awsmock/commit/5e08383a3e5a7dfd38fa873ea63e20546652565c))
+
+## [1.8.5](https://github.com/jensvogt/awsmock/compare/v1.8.4...v1.8.5) (2025-11-29)
+
+
+### Bug Fixes
+
+* add installer packages ([d68f3ae](https://github.com/jensvogt/awsmock/commit/d68f3aed04eb5aaa938a856791702c3784e721f4))
+
 ## [1.8.4](https://github.com/jensvogt/awsmock/compare/v1.8.3...v1.8.4) (2025-11-29)
 
 

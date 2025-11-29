@@ -5,7 +5,7 @@ include_directories(../include ../../core/include ../../db/include ${BSONCXX_INC
 
 # Libraries
 set(LIBRARIES awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_locale boost_program_options boost_log
-        boost_log_setup boost_process boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
+        boost_log_setup boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
 
 # S3
 add_executable(dto_s3 S3DtoTest.cpp TestBase.cpp)

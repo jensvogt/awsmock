@@ -40,42 +40,39 @@ namespace AwsMock::Service {
         http::async_read(_stream, _buffer, *_parser, boost::beast::bind_front_handler(&GatewaySession::OnRead, shared_from_this()));
     }
 
-    void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
-        boost::ignore_unused(bytes_transferred);
+void GatewaySession::OnRead(const boost::beast::error_code &ec, std::size_t bytes_transferred) {
+    boost::ignore_unused(bytes_transferred);
 
-        // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
-            return DoShutdown();
-        }
-
-        if (ec) {
-            return;
-        }
-
-        // Read the header
-        boost::beast::error_code ev;
-        read_header(_stream, _buffer, *_parser, ev);
-        if (ec) {
-            log_error << "Read header failed, error: " << ec.message();
-            return;
-        }
-
-        // Handle 100-continue requests
-        if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
-            HandleContinueRequest(_stream, _parser->get());
-        }
-
-        // Read from the stream
-        read(_stream, _buffer, *_parser, ev);
-
-        // Send the response
-        HandleRequest(_parser->release(), _queue);
-
-        // If we aren't at the queue limit, try to pipeline another request
-        if (!_queue.is_full()) DoRead();
-
-        log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
+    if (ec == http::error::end_of_stream) {
+        return DoShutdown();
     }
+    if (ec) {
+        log_error << "Read error: " << ec.message();
+        return;
+    }
+
+    boost::beast::error_code ev;
+
+    // Read request into _parser
+    boost::beast::http::read(_stream, _buffer, *_parser, ev);
+    if (ev) {
+        log_error << "Read failed: " << ev.message();
+        return;
+    }
+
+    // Handle 100-continue
+    if (boost::beast::iequals(_parser->get()[http::field::expect], "100-continue")) {
+        HandleContinueRequest(_stream, _parser->get());
+    }
+
+    // Handle the request
+    HandleRequest(_parser->release(), _queue);
+
+    // Pipeline next request if possible
+    if (!_queue.is_full()) DoRead();
+
+    log_trace << "Request queue size: " << _response_queue.size() << " limit: " << _queueLimit;
+}
 
     void GatewaySession::QueueWrite(http::message_generator response) {
 
