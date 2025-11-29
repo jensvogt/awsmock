@@ -215,21 +215,17 @@ jobs:
           BOOST_VERSION=1.89.0
           BOOST_DIR=boost_${BOOST_VERSION//./_}
           
+          # Download and extract
           wget -nv https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_DIR}.tar.gz
           tar xf ${BOOST_DIR}.tar.gz
           cd ${BOOST_DIR}
           
-          ./bootstrap.sh --prefix=$GITHUB_WORKSPACE/extern
+          # Bootstrap with default gcc
+          ./bootstrap.sh --prefix=$HOME/boost-install
           
-          ./b2 \
-            --prefix=$GITHUB_WORKSPACE/extern \
-            --without-mpi \
-            --without-graph_parallel \
-            --with-filesystem \
-            --with-system \
-            --with-thread \
-            --with-date_time \
-            install -j$(nproc)
+          # Build and install all libraries (except MPI and Graph Parallel)
+          ./b2 --prefix=$HOME/boost-install --without-mpi --without-graph_parallel \
+              link=static runtime-link=static threading=multi -j$(nproc) install
 
       - name: Configure (Linux)
         shell: bash
