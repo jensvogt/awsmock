@@ -27,8 +27,6 @@ if (WIN32)
             "$<$<CONFIG:DEBUG>:libboost_log-vc143-mt-gd-x64-1_89.lib>"
             "$<$<CONFIG:RELEASE>:libboost_log_setup-vc143-mt-x64-1_89.lib>"
             "$<$<CONFIG:DEBUG>:libboost_log_setup-vc143-mt-gd-x64-1_89.lib>"
-            "$<$<CONFIG:RELEASE>:libboost_process-vc143-mt-x64-1_89.lib>"
-            "$<$<CONFIG:DEBUG>:libboost_process-vc143-mt-gd-x64-1_89.lib>"
             "$<$<CONFIG:RELEASE>:libboost_json-vc143-mt-x64-1_89.lib>"
             "$<$<CONFIG:DEBUG>:libboost_json-vc143-mt-gd-x64-1_89.lib>"
             "$<$<CONFIG:RELEASE>:libboost_coroutine-vc143-mt-x64-1_89.lib>"
@@ -39,7 +37,7 @@ if (WIN32)
 else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PUBLIC ./include ${EXTERNAL_INCLDUE_DIR})
-    target_link_libraries(${BINARY} PUBLIC awsmockcore boost_program_options boost_process)
+    target_link_libraries(${BINARY} PUBLIC awsmockcore boost_program_options)
     if (APPLE)
         add_link_options("-rpath /usr/local/awsmock/lib")
         set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")
