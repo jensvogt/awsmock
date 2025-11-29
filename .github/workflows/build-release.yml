@@ -210,14 +210,26 @@ jobs:
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
-      - name: Install boost
+      - name: Build Boost 1.89 locally
         run: |
-          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-          tar -xzf boost_1_89_0.tar.gz
-          cd boost_1_89_0
-          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          ./b2 --without-mpi --parallel $(nproc)
-          ./b2 install
+          BOOST_VERSION=1.89.0
+          BOOST_DIR=boost_${BOOST_VERSION//./_}
+          
+          wget -nv https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_DIR}.tar.gz
+          tar xf ${BOOST_DIR}.tar.gz
+          cd ${BOOST_DIR}
+          
+          ./bootstrap.sh --prefix=$GITHUB_WORKSPACE/extern
+          
+          ./b2 \
+            --prefix=$GITHUB_WORKSPACE/extern \
+            --without-mpi \
+            --without-graph_parallel \
+            --with-filesystem \
+            --with-system \
+            --with-thread \
+            --with-date_time \
+            install -j$(nproc)
 
       - name: Configure (Linux)
         shell: bash
