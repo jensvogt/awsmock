@@ -221,17 +221,21 @@ jobs:
           cd ${BOOST_DIR}
           
           # Bootstrap with default gcc
-          ./bootstrap.sh --prefix=$HOME/boost-install
+          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
           
           # Build and install all libraries (except MPI and Graph Parallel)
-          ./b2 --prefix=$HOME/boost-install --without-mpi --without-graph_parallel \
+          ./b2 --prefix=${{ github.workspace }}/extern --without-mpi --without-graph_parallel \
               link=static runtime-link=static threading=multi -j$(nproc) install
 
       - name: Configure (Linux)
         shell: bash
         run: |
           mkdir -p $BUILD_DIR
-          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release \
+              -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi
+              -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi
+              -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include
+              -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
 
       - name: Build (Linux)
         shell: bash
