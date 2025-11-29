@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.8.0](https://github.com/jensvogt/awsmock/compare/v1.7.0...v1.8.0) (2025-11-29)
+
+
+### Features
+
+* **1234-new-ui:** use the new UIDs ([dd9d2f1](https://github.com/jensvogt/awsmock/commit/dd9d2f11822628e38e52b805ae00a836cdb178e6))
+* **1234-new-ui:** use the new UIDs ([8d0ca71](https://github.com/jensvogt/awsmock/commit/8d0ca715a5d9a2c6f0004ceac2f279d2862f67af))
+* **1234-new-ui:** use the new UIDs ([a02c0c1](https://github.com/jensvogt/awsmock/commit/a02c0c1269e949b2681950ffa17b6f232d3781f5))
+* **1234-new-ui:** use the new UIDs ([73edf2d](https://github.com/jensvogt/awsmock/commit/73edf2df6ddcf2929209fcbe3e38efa113385083))
+* **1234-new-ui:** use the new UIDs ([9c26d37](https://github.com/jensvogt/awsmock/commit/9c26d37123ea0c876ae6f2e587354c3dd2185c75))
+
+
+### Bug Fixes
+
+* **1234-windows-11-port:** add new ftp client ([3b87628](https://github.com/jensvogt/awsmock/commit/3b87628baf6ee0461a581c8bce43b9f51b5d10f4))
+* **1234-Windows-port-new:** fix cognito FE pages ([c492eb1](https://github.com/jensvogt/awsmock/commit/c492eb1126dbc6fcf181d86e8442f3568ee1df84))
+* add installer packages ([9dd1076](https://github.com/jensvogt/awsmock/commit/9dd10769071f2c9489b2d485fa46cabdf70839d0))
+* add installer packages ([0d5e6cc](https://github.com/jensvogt/awsmock/commit/0d5e6cc907a2bad3c21cc01f609c74d0e4e6054f))
+* add installer packages ([16dfff6](https://github.com/jensvogt/awsmock/commit/16dfff6b041eb1aa4ad5f67ff4a6e596b5f483f0))
+* add installer packages ([aaeccf1](https://github.com/jensvogt/awsmock/commit/aaeccf16b72937dd2ff3f675313b19c644b53e61))
+* **installer packages:** add new ftp client ([57c566e](https://github.com/jensvogt/awsmock/commit/57c566e45341130a99727bb672176e922440678d))
+
 ## [1.7.0](https://github.com/jensvogt/awsmock/compare/v1.6.4...v1.7.0) (2025-10-28)
 
 
