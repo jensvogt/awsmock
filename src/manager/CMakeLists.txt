@@ -46,6 +46,7 @@ else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PRIVATE ./include ../dto/include ../db/include ../core/include ../service/include
             ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+    target_link_directories(${BINARY} PRIVATE ${BSONCXX_LIB_DIR} ${MONGOCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
     target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
             boost_url boost_thread boost_program_options boost_log boost_log_setup ssl crypto archive magic ssh)
     if (APPLE)
