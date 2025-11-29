@@ -6,10 +6,9 @@ set(SQS_SOURCES sqs/MessageAttributeTest.cpp)
 set(TRANSFER_SOURCES transfer/CreateServerRequestTest.cpp transfer/CreateServerResponseTest.cpp transfer/CreateUserRequestTest.cpp transfer/CreateServerResponseTest.cpp)
 set(MAIN_SOURCES main.cpp)
 
-# Includes
-include_directories(../include ../../core/include ../../db/include ${BSONCXX_INCLUDE_DIRS} ${MONGOCXX_INCLUDE_DIRS})
-
 add_executable(${BINARY} ${S3_SOURCES} ${SQS_SOURCES} ${TRANSFER_SOURCES} ${MAIN_SOURCES})
+target_include_directories(${BINARY} PRIVATE ../include ../../core/include ../../db/include ${BSONCXX_INCLUDE_DIR}
+        ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
 target_link_libraries(${BINARY} PUBLIC ${STATIC_LIB} awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
         boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup boost_process ssl crypto
         archive magic gtest gmock)
