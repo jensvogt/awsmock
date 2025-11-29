@@ -43,18 +43,18 @@ else ()
     if (SYSTEMD)
         # systemd available
         add_definitions(-DHAS_SYSTEMD)
-        target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
-                ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
-        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
-                boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup ssl crypto 
-		archive magic systemd)
+        target_include_directories(${BINARY} PRIVATE include ../core/include ../dto/include ../db/include
+                ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+        target_link_directories(${BINARY} PRIVATE ${BSONCXX_LIB_DIR} ${MONGOCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
+        target_link_libraries(${BINARY} PRIVATE awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
+                boost_url boost_thread boost_program_options boost_log boost_log_setup ssl crypto archive magic systemd)
     else ()
         # systemd not available
-        target_link_libraries(${BINARY} PUBLIC awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
-                boost_url boost_thread boost_locale boost_program_options boost_log boost_log_setup ssl crypto 
-		archive magic)
-        target_include_directories(${BINARY} PUBLIC include ../core/include ../dto/include ../db/include
-                ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
+        target_include_directories(${BINARY} PRIVATE include ../core/include ../dto/include ../db/include
+                ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+        target_link_directories(${BINARY} PRIVATE ${BSONCXX_LIB_DIR} ${MONGOCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
+        target_link_libraries(${BINARY} PRIVATE awsmockcore awsmockdto awsmockdb mongocxx bsoncxx boost_filesystem
+                boost_url boost_thread boost_program_options boost_log boost_log_setup ssl crypto archive magic)
     endif ()
     if (APPLE)
         add_link_options("-rpath /usr/local/awsmock/lib")
