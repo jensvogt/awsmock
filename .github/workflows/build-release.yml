@@ -234,6 +234,38 @@ jobs:
           cp $BUILD_DIR/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
           cp dist/etc/awsmock-linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
+          cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
+          cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
+          cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
+
+          # Create control file
+          cat << EOF > $PACKAGE_DIR/DEBIAN/control
+          Package: awsmock
+          Version: ${SEMVER}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Maintainer: Jens Vogt <jens.vogt@opitz-consultinh.com>
+          Description: AWSMock local AWS emulator service
+          Depends: systemd
+          EOF
+
+          # Create postinst
+          cat << EOF > $PACKAGE_DIR/DEBIAN/postinst
+          #!/bin/bash
+          set -e
+          systemctl daemon-reload
+          systemctl enable awsmock.service
+          systemctl restart awsmock.service || true
+          EOF
+
+          # Create postrm
+          cat << EOF > $PACKAGE_DIR/DEBIAN/postinst
+          #!/bin/bash
+          set -e          
+          systemctl stop awsmock.service || true
+          systemctl disable awsmock.service || true
+          EOF
 
       # Step 6: Build the .deb package
       - name: Build DEB with fpm
