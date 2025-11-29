@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.0](https://github.com/jensvogt/awsmock/compare/v1.8.10...v1.9.0) (2025-11-29)
+
+
+### Features
+
+* **1234-new-ui:** use the new UIDs ([fb52673](https://github.com/jensvogt/awsmock/commit/fb526732a9821626b128083307e714127290da07))
+* **1234-new-ui:** use the new UIDs ([f805de9](https://github.com/jensvogt/awsmock/commit/f805de9e217406ed388093bbff71abb0da108d6a))
+
 ## [1.8.10](https://github.com/jensvogt/awsmock/compare/v1.8.9...v1.8.10) (2025-11-29)
 
 
