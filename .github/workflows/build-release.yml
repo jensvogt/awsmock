@@ -195,7 +195,6 @@ jobs:
           cmake . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
-          ls -R ${{ github.workspace }}/extern/include
 
       - name: Install mongo-cxx-driver
         shell: bash
