@@ -219,12 +219,12 @@ jobs:
       - name: Build (Linux)
         shell: bash
         run: |
-          cmake \ 
+          cmake \               
               -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
               -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
               -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
-              -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib \ 
-              --build $BUILD_DIR --parallel $(nproc)
+              -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib \
+              --build $BUILD_DIR -S . --parallel $(nproc)
 
       # Step 5: Prepare the .deb package directory
       - name: Prepare package structure
