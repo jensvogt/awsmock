@@ -188,6 +188,7 @@ jobs:
           cd extern 
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
+          cmake .
           cmake --build . --parallel $(nproc)
           cmake --install .
 
