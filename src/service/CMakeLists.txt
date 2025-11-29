@@ -58,6 +58,6 @@ else ()
             ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY} PRIVATE awsmockcore awsmockdb awsmockdto boost_locale boost_thread boost_filesystem
-            boost_log boost_log_setup ssl crypto archive magic ssh)
+            boost_log boost_log_setup boost_context ssl crypto archive magic ssh)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()

@@ -16,7 +16,6 @@
 #include <awsmock/repository/SSMDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -45,11 +44,6 @@ namespace AwsMock::Service {
          * @brief Backup the SSM objects
          */
         static void BackupSsm();
-
-        /**
-         * @brief Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief Database connection

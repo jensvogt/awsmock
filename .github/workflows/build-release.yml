@@ -263,6 +263,7 @@ jobs:
           systemctl daemon-reload
           systemctl enable awsmock.service
           systemctl restart awsmock.service || true
+          ldconfig
           EOF
 
           # Create postrm
@@ -271,7 +272,15 @@ jobs:
           set -e          
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
+          rm -rf $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
+          ldconfig
           EOF
+
+          # Create ldconfig config
+          cat << EOF > $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
+          /usr/local/awsmock/lib
+          EOF
+
           chmod 755 $PACKAGE_DIR/DEBIAN/postinst $PACKAGE_DIR/DEBIAN/postrm
 
       # Step 6: Build the .deb package

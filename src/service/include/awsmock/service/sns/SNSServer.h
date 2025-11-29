@@ -16,7 +16,6 @@
 #include <awsmock/repository/SNSDatabase.h>
 #include <awsmock/service/common/AbstractServer.h>
 #include <awsmock/service/module/ModuleService.h>
-#include <awsmock/service/monitoring/MetricService.h>
 
 namespace AwsMock::Service {
 
@@ -55,11 +54,6 @@ namespace AwsMock::Service {
          * @brief Database connection
          */
         Database::SNSDatabase &_snsDatabase = Database::SNSDatabase::instance();
-
-        /**
-         * Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * @brief SNS server period

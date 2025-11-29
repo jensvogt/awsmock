@@ -42,7 +42,8 @@ namespace AwsMock::Service {
 
         // Get total counts
         const long parameters = _ssmDatabase.CountParameters();
-        _metricService.SetGauge(SSM_PARAMETER_COUNT, {}, {}, parameters);
+        // TODO: fix and use new monitoring counters
+        //_metricService.SetGauge(SSM_PARAMETER_COUNT, {}, {}, parameters);
 
         log_trace << "SSM monitoring finished";
     }

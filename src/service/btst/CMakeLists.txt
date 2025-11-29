@@ -1,11 +1,11 @@
 set(BINARY srv_tst)
 
 # Includes
-include_directories(../include ../../core/include ../../db/include ../../dto/include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR})
-
-# Libraries
-set(LIBRARIES awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx boost_locale boost_program_options boost_log
-        boost_log_setup boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
+target_include_directories(${BINARY} PRIVATE ../include ../../core/include ../../db/include ../../dto/include
+        ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+target_link_directories(${BINARY} PRIVATE ${BSONCXX_LIB_DIR} ${MONGOCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
+target_link_libraries(${BINARY} PRIVATE awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx boost_locale
+        boost_program_options boost_log boost_log_setup boost_unit_test_framework boost_context ssl crypto archive magic ssh)
 
 # KMS
 add_executable(srv_kms_service KMSServiceTests.cpp TestBase.cpp)
