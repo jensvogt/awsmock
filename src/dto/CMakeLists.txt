@@ -54,7 +54,7 @@ if (WIN32)
     #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
-    target_include_directories(${LIBRARY}} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
+    target_include_directories(${LIBRARY} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
             ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PRIVATE ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
