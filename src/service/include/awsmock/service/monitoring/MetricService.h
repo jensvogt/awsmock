@@ -122,7 +122,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the counter.
          * @return true if the counter exists.
          */
-        [[nodiscard]] bool CounterExists(const std::string &name) const;
+        //[[nodiscard]] bool CounterExists(const std::string &name) const;
 
         /**
          * @brief Check whether a counter exists
@@ -132,7 +132,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the counter
          * @return true if the counter exists.
          */
-        [[nodiscard]] bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
+        //[[nodiscard]] bool CounterExists(const std::string &name, const std::string &labelName, const std::string &labelValue) const;
 
         /**
          * @brief Get a specific metric
@@ -171,7 +171,7 @@ namespace AwsMock::Monitoring {
          * @param name name of the gauge.
          * @return true if gauge exists.
          */
-        [[nodiscard]] bool GaugeExists(const std::string &name) const;
+        //[[nodiscard]] bool GaugeExists(const std::string &name) const;
 
         /**
          * @brief Check whether a gauge exists
@@ -181,7 +181,7 @@ namespace AwsMock::Monitoring {
          * @param labelValue label value of the counter
          * @return true if gauge exists.
          */
-        bool GaugeExists(const std::string &name, const std::string &labelName, const std::string &labelValue);
+        //bool GaugeExists(const std::string &name, const std::string &labelName, const std::string &labelValue);
 
         /**
          * @brief Get a specific metric

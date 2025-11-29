@@ -17,9 +17,6 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
-#ifdef _WIN32
-//#include <boost/process/v1/windows.hpp>
-#endif
 
 // AwsMock includes
 #include <awsmock/core/SystemUtils.h>
