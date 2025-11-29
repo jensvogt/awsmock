@@ -324,8 +324,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-#            artifacts/windows/*.zip
-#            artifacts/macos/*.dmg
             artifacts/linux/*.deb
             artifacts/linux/*.rpm
           name: Release ${{ env.SEMVER }}
