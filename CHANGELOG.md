@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.17](https://github.com/jensvogt/awsmock/compare/v1.9.16...v1.9.17) (2025-11-29)
+
+
+### Bug Fixes
+
+* add linux installation scripts ([0781728](https://github.com/jensvogt/awsmock/commit/07817288af40349fdaa8d02d970460af193937b9))
+
 ## [1.9.16](https://github.com/jensvogt/awsmock/compare/v1.9.15...v1.9.16) (2025-11-29)
 
 
