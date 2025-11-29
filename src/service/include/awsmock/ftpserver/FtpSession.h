@@ -277,22 +277,12 @@ namespace AwsMock::FtpServer {
          * @param path file system path
          * @return S3 key
          */
-        std::string GetKey(const std::string &path) const;
+        static std::string GetKey(const std::string &path);
 
         ////////////////////////////////////////////////////////
         // Member variables
         ////////////////////////////////////////////////////////
       private:
-
-        /**
-         * SFTP handshake
-         */
-        void DoHandshake();
-
-        /**
-         * Metric service
-         */
-        Monitoring::MetricService &_metricService = Monitoring::MetricService::instance();
 
         /**
          * Completion handler

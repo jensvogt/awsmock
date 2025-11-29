@@ -676,7 +676,7 @@ namespace AwsMock::FtpServer {
 
         sendFtpMessage(FtpReplyCode::FILE_STATUS_OK_OPENING_DATA_CONNECTION, "Sending file");
         sendFile(file);
-        _metricService.IncrementCounter(TRANSFER_SERVER_DOWNLOAD_COUNT);
+        //_metricService.IncrementCounter(TRANSFER_SERVER_DOWNLOAD_COUNT);
     }
 
     void FtpSession::handleFtpCommandSIZE(const std::string &param) {
@@ -1248,7 +1248,7 @@ namespace AwsMock::FtpServer {
             me->readDataFromFileAndSend(file, data_socket);
             me->readDataFromFileAndSend(file, data_socket);
         });
-        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
+        //_metricService.SetGauge(TRANSFER_SERVER_FILESIZE_DOWNLOAD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(file->_fileName)));
     }
 
     void FtpSession::readDataFromFileAndSend(const std::shared_ptr<IoFile> &file,
@@ -1516,8 +1516,8 @@ namespace AwsMock::FtpServer {
         _s3Service->PutObject(request, ifs);
         ifs.close();
 
-        _metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
-        _metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(fileName)));
+        //_metricService.IncrementCounter(TRANSFER_SERVER_UPLOAD_COUNT);
+        //_metricService.SetGauge(TRANSFER_SERVER_FILESIZE_UPLAOD, {}, {}, static_cast<double>(Core::FileUtils::FileSize(fileName)));
         log_debug << "File uploaded, fileName: " << fileName;
     }
 
@@ -1532,7 +1532,7 @@ namespace AwsMock::FtpServer {
         log_debug << "Delete object request send, fileName: " << fileName;
     }
 
-    std::string FtpSession::GetKey(const std::string &path) const {
+    std::string FtpSession::GetKey(const std::string &path) {
         //std::string key = Core::StringUtils::StripBeginning(path, _transferDir);
         std::string key = path;
 #ifdef _WIN32
