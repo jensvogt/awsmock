@@ -9,6 +9,9 @@
 #include <string>
 
 // AwsMock includes
+#include "awsmock/core/CryptoUtils.h"
+
+
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/JsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
@@ -121,9 +124,9 @@ namespace AwsMock::Dto::Lambda {
                     {"lambdaName", obj.lambdaName},
                     {"lambdaArn", obj.lambdaArn},
                     {"runtime", obj.runtime},
-                    {"requestBody", obj.requestBody},
-                    {"responseBody", obj.responseBody},
-                    {"logMessages", obj.logMessages},
+                    {"requestBody", Core::Crypto::Base64Encode(obj.requestBody)},
+                    {"responseBody", Core::Crypto::Base64Encode(obj.responseBody)},
+                    {"logMessages", Core::Crypto::Base64Encode(obj.logMessages)},
                     {"duration", obj.duration},
                     {"instanceId", obj.instanceId},
                     {"containerId", obj.containerId},
