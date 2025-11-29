@@ -208,12 +208,12 @@ jobs:
       - name: Build (Linux)
         shell: bash
         run: |
-          cmake . \
+          cmake -S . -B "$BUILD_DIR" \
             -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
             -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
-          cmake --build . --parallel $(nproc)
+          cmake --build "$BUILD_DIR" --parallel $(nproc)
           ls -R .
 
       - name: Prepare package structure
@@ -233,13 +233,13 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\application
           
           # Copy your app
-          cp $BUILD_DIR/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
-          cp $BUILD_DIR/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
-          cp $BUILD_DIR/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
-          cp $BUILD_DIR/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/manager/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp $BUILD_DIR/controller/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp $BUILD_DIR/awslocal/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
+          cp $BUILD_DIR/core/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/db/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/dto/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/srv/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp dist/etc/awsmock-linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
