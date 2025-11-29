@@ -1,6 +1,19 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(awsmock)
+# Include cmake utilities
+include(cmake/ReadVersion.cmake)
+include(cmake/UpdateXmlVersion.cmake)
+include(cmake/UpdateReleaseDate.cmake)
+
+project(awsmock VERSION ${VERSION_STRING} LANGUAGES CXX)
+
+message(STATUS "Configured version: ${PROJECT_VERSION}")
+
+# Export version to source code
+configure_file(${CMAKE_SOURCE_DIR}/cmake/version.h.in ${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h)
+#update_xml_version("${CMAKE_SOURCE_DIR}/installer/config/config.xml" "${VERSION_STRING}" "Version")
+#update_xml_version("${CMAKE_SOURCE_DIR}/installer/packages/de.jensvogt.awsmockqtui/meta/package.xml" "${VERSION_STRING}" "Version")
+#update_release_date("${CMAKE_SOURCE_DIR}/installer/packages/de.jensvogt.awsmockqtui/meta/package.xml")
 
 # Defaults
 set(CMAKE_CXX_STANDARD 23)
@@ -56,13 +69,13 @@ endif ()
 option(BUILD_SAMPLES "Create and install the samples" OFF)
 
 # Current version
-file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER)
-string(STRIP "${PROJECT_VER}" PROJECT_VERSION)
-string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
-configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" @ONLY)
+#file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER)
+#string(STRIP "${PROJECT_VER}" PROJECT_VERSION)
+#string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
+#configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" @ONLY)
 
 # Build message
-message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
+#message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
 
 # Set default build type release
 if (NOT CMAKE_BUILD_TYPE)

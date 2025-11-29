@@ -7,8 +7,8 @@ on:
 
 env:
 #  QT_VERSION: "6.10.1"
-  APP_NAME: "awsmock"        # change if different
-  INSTALLER_ID: "de.jensvogt.awsmockqtui" # used for IFW package path
+  APP_NAME: "awsmock"
+  INSTALLER_ID: "de.jensvogt.awsmock" # used for IFW package path
 
 permissions:
   contents: write       # required for tagging + releasing
@@ -33,71 +33,71 @@ jobs:
           release-type: simple
           token: ${{ secrets.GH_AUTH_TOKEN }}
 
-  build-windows:
-    name: Build & Package (Windows)
-    runs-on: windows-latest
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    env:
-#      QT_DIR: "${{ github.workspace }}\\Qt"
-      BUILD_DIR: "${{ github.workspace }}\\build-windows"
-      PACKAGE_DIR: "${{ github.workspace }}\\package"
-      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Normalize SEMVER
-        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
-
-      - name: Setup MSVC environment
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
-
-      - name: Configure CMake (Windows)
-        shell: powershell
-        run: |
-          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build (Windows, parallel)
-        shell: powershell
-        run: |
-          cmake --build $env:BUILD_DIR --config Release --parallel
-
-      - name: Create package sstructure
-        shell: powershell
-        run: |
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\bin -Force | Out-Null
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\etc -Force | Out-Null
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\log -Force | Out-Null
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data -Force | Out-Null
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\s3 -Force | Out-Null
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\lambda -Force | Out-Null
-          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\application -Force | Out-Null
-
-      - name: Create ZIP archive (PowerShell)
-        shell: pwsh
-        run: |
-          $source = "$env:PACKAGE_DIR"
-          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
-          
-          if (Test-Path $zip) {
-            Remove-Item $zip -Force
-          }
-          
-          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
-          
-          Write-Host "Created ZIP: $zip"
-
-      - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: installer-windows
-          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
+#  build-windows:
+#    name: Build & Package (Windows)
+#    runs-on: windows-latest
+#    needs: release-please
+#    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+#    env:
+##      QT_DIR: "${{ github.workspace }}\\Qt"
+#      BUILD_DIR: "${{ github.workspace }}\\build-windows"
+#      PACKAGE_DIR: "${{ github.workspace }}\\package"
+#      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Normalize SEMVER
+#        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
+#
+#      - name: Setup MSVC environment
+#        uses: ilammy/msvc-dev-cmd@v1
+#        with:
+#          arch: x64
+#
+#      - name: Configure CMake (Windows)
+#        shell: powershell
+#        run: |
+#          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+#
+#      - name: Build (Windows, parallel)
+#        shell: powershell
+#        run: |
+#          cmake --build $env:BUILD_DIR --config Release --parallel
+#
+#      - name: Create package sstructure
+#        shell: powershell
+#        run: |
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\bin -Force | Out-Null
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\etc -Force | Out-Null
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\log -Force | Out-Null
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data -Force | Out-Null
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\s3 -Force | Out-Null
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\lambda -Force | Out-Null
+#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\application -Force | Out-Null
+#
+#      - name: Create ZIP archive (PowerShell)
+#        shell: pwsh
+#        run: |
+#          $source = "$env:PACKAGE_DIR"
+#          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
+#
+#          if (Test-Path $zip) {
+#            Remove-Item $zip -Force
+#          }
+#
+#          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+#          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+#
+#          Write-Host "Created ZIP: $zip"
+#
+#      - name: Upload Windows installer
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: installer-windows
+#          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
 
 #  build-macos:
 #    name: Build & Package (macOS)
@@ -182,6 +182,51 @@ jobs:
       - name: Normalize VERSION
         run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
 
+      - name: Install JWT-CPP
+        run: |
+          mkdir -p extern
+          cd extern 
+          git clone https://github.com/Thalhammer/jwt-cpp.git
+          cd jwt-cpp
+          cmake --build . --parallel $(nproc)
+          cmake --install .
+
+      - name: Install prometheus-cpp
+        run: | 
+          cd extern
+          git clone --recursive https://github.com/jupp0r/prometheus-cpp
+          cd prometheus-cpp
+          cmake . -DBUILD_SHARED_LIBS=ON -DENABLE_PUSH=OFF
+          cmake --build . --parallel $(nproc)
+          cmake --install .
+
+      - name: Install mongo-c-driver
+        run: |
+          cd extern
+          git clone -b r2.0 https://github.com/mongodb/mongo-c-driver.git
+          cd mongo-c-driver
+          cmake . -DCMAKE_BUILD_TYPE=Release -DENABLE_MONGOC=ON
+          cmake --build . --parallel $(nproc)
+          cmake --install .
+
+      - name: Install mongo-cxx-driver
+        run: |
+          cd extern
+          git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
+          cd mongo-cxx-driver
+          cmake . -DCMAKE_CXX_STANDARD=17
+          cmake --build . --config Release --parallel $(nproc)
+          cmake --install .
+
+      - name: Install boost
+        run: |
+          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+          tar -xzf boost_1_89_0.tar.gz
+          cd boost_1_89_0
+          ./bootstrap.sh --prefix=/usr/local
+          ./b2 --parallel $(nproc)
+          ./b2 install
+
       - name: Configure (Linux)
         shell: bash
         run: |
@@ -236,7 +281,7 @@ jobs:
   publish:
     name: Publish Release & Attach Installers
     runs-on: ubuntu-latest
-    needs: [ release-please, build-windows, build-linux ]
+    needs: [ release-please, build-linux ]
     env:
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     steps:
@@ -245,11 +290,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download Windows installer
-        uses: actions/download-artifact@v4
-        with:
-          name: installer-windows
-          path: artifacts/windows
+#      - name: Download Windows installer
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: installer-windows
+#          path: artifacts/windows
 
 #      - name: Download macOS installer
 #        uses: actions/download-artifact@v4
@@ -279,7 +324,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/windows/*.zip
+#            artifacts/windows/*.zip
 #            artifacts/macos/*.dmg
             artifacts/linux/*.deb
             artifacts/linux/*.rpm
@@ -310,8 +355,8 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          cp ./artifacts/installer-windows/*.exe public/ || true
-          cp ./artifacts/installer-macos/*.dmg public/ || true
+#          cp ./artifacts/installer-windows/*.exe public/ || true
+#          cp ./artifacts/installer-macos/*.dmg public/ || true
           cp ./artifacts/deb-package-linux/*.deb public/ || true
           cp ./artifacts/rpm-package-linux/*.rpm public/ || true
           cp .github/pages/index.html public/index.html
