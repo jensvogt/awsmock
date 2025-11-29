@@ -1,7 +1,7 @@
 FROM gcc:13.4.0-bookworm
 
-RUN apt update && apt-get install -y groff make cmake ccache git libmagic-dev doxygen zip unzip libtool linux-libc-dev  \
-    pandoc wget libarchive-dev libmagic-dev libssh-dev automake autoconf libtool
+RUN apt update && apt-get install -y make cmake ccache libmagic-dev doxygen zip unzip libtool  \
+    pandoc libarchive-dev libmagic-dev libssh-dev
 
 # Create build environment
 RUN mkdir -p /usr/src

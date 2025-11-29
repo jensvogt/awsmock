@@ -3,9 +3,18 @@
   "release-type": "simple",
   "include-component-in-tag": false,
   "include-v-in-tag": false,
-  "initial-version": "0.13.349",
+  "initial-version": "1.0.1",
   "changelog-path": "CHANGELOG.md",
-  "version-file": "version.txt",
+  "ignore-commit-patterns": [
+    "^Merge pull request",
+    "^chore\\(ci\\):"
+  ],
+  "version-file": [
+    {
+      "path": "version.txt",
+      "regex": "^(.*)$"
+    }
+  ],
   "changelog-sections": [
     {
       "type": "feat",
@@ -71,11 +80,16 @@
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
+      "include-v-in-tag": false,
       "release-type": "simple",
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": false,
       "draft": false,
-      "prerelease": false
+      "prerelease": false,
+      "ignore-commit-patterns": [
+        "^Merge pull request",
+        "^chore\\(ci\\):"
+      ]
     }
   }
 }

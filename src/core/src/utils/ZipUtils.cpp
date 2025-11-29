@@ -20,7 +20,7 @@ namespace AwsMock::Core {
 
         archive *a = archive_read_new();
         if (a == nullptr) {
-            log_error << "Libarchive Error: archive_read_new failed.";
+            log_error << "Libarchive Error: archive_read_new failed, error: " << archive_error_string(a);
             return;
         }
 
@@ -33,7 +33,7 @@ namespace AwsMock::Core {
         // Use the wide-character open function
         int r = archive_read_open_filename_w(a, normalizedArchivePath.c_str(), BUFSIZ);
         if (r != ARCHIVE_OK) {
-            log_error << "Libarchive Error: Cannot open file: " << archive_error_string(a);
+            log_error << "Libarchive Error: Cannot open file, error: " << archive_error_string(a);
             archive_read_free(a);
             archive_write_free(ext);
             return;
@@ -66,13 +66,13 @@ namespace AwsMock::Core {
                     break;
                 }
             } else if (r == ARCHIVE_FATAL) {
-                log_error << "Libarchive Fatal Error writing header: " << archive_error_string(ext);
+                log_error << "Libarchive Fatal Error writing header, error: " << archive_error_string(ext);
                 break;
             }
 
             r = archive_write_finish_entry(ext);
             if (r != ARCHIVE_OK) {
-                log_error << "Libarchive Error finishing entry: " << archive_error_string(ext);
+                log_error << "Libarchive Error finishing entry, error: " << archive_error_string(ext);
                 break;
             }
         }
@@ -161,7 +161,7 @@ namespace AwsMock::Core {
             }
 
             // Write data block to the disk
-            r = archive_write_data(aw, buff, size);
+            r = static_cast<long>(archive_write_data(aw, buff, size));
             if (r < 0) {
                 log_error << "Error writing data block, error: " << archive_error_string(ar);
                 return r;

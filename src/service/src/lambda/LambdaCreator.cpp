@@ -164,7 +164,7 @@ namespace AwsMock::Service {
         lambdaEntity.codeSha256 = Core::Crypto::GetSha256FromFile(imageFile);
 
         // Cleanup
-        //Core::DirUtils::DeleteDirectory(codeDir);
+        Core::DirUtils::DeleteDirectory(codeDir);
         log_info << "Finished creating docker image, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize + ", codeDir: " << codeDir;
     }
 
