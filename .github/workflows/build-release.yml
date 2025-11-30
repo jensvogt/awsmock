@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-#  QT_VERSION: "6.10.1"
+  #  QT_VERSION: "6.10.1"
   APP_NAME: "awsmock"
   INSTALLER_ID: "de.jensvogt.awsmock" # used for IFW package path
 
@@ -33,129 +33,129 @@ jobs:
           release-type: simple
           token: ${{ secrets.GH_AUTH_TOKEN }}
 
-#  build-windows:
-#    name: Build & Package (Windows)
-#    runs-on: windows-latest
-#    needs: release-please
-#    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-#    env:
-##      QT_DIR: "${{ github.workspace }}\\Qt"
-#      BUILD_DIR: "${{ github.workspace }}\\build-windows"
-#      PACKAGE_DIR: "${{ github.workspace }}\\package"
-#      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Normalize SEMVER
-#        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
-#
-#      - name: Setup MSVC environment
-#        uses: ilammy/msvc-dev-cmd@v1
-#        with:
-#          arch: x64
-#
-#      - name: Configure CMake (Windows)
-#        shell: powershell
-#        run: |
-#          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-#
-#      - name: Build (Windows, parallel)
-#        shell: powershell
-#        run: |
-#          cmake --build $env:BUILD_DIR --config Release --parallel
-#
-#      - name: Create package sstructure
-#        shell: powershell
-#        run: |
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\bin -Force | Out-Null
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\etc -Force | Out-Null
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\log -Force | Out-Null
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data -Force | Out-Null
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\s3 -Force | Out-Null
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\lambda -Force | Out-Null
-#          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\application -Force | Out-Null
-#
-#      - name: Create ZIP archive (PowerShell)
-#        shell: pwsh
-#        run: |
-#          $source = "$env:PACKAGE_DIR"
-#          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
-#
-#          if (Test-Path $zip) {
-#            Remove-Item $zip -Force
-#          }
-#
-#          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-#          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
-#
-#          Write-Host "Created ZIP: $zip"
-#
-#      - name: Upload Windows installer
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: installer-windows
-#          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
+  #  build-windows:
+  #    name: Build & Package (Windows)
+  #    runs-on: windows-latest
+  #    needs: release-please
+  #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+  #    env:
+  ##      QT_DIR: "${{ github.workspace }}\\Qt"
+  #      BUILD_DIR: "${{ github.workspace }}\\build-windows"
+  #      PACKAGE_DIR: "${{ github.workspace }}\\package"
+  #      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v4
+  #        with:
+  #          fetch-depth: 0
+  #
+  #      - name: Normalize SEMVER
+  #        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
+  #
+  #      - name: Setup MSVC environment
+  #        uses: ilammy/msvc-dev-cmd@v1
+  #        with:
+  #          arch: x64
+  #
+  #      - name: Configure CMake (Windows)
+  #        shell: powershell
+  #        run: |
+  #          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+  #
+  #      - name: Build (Windows, parallel)
+  #        shell: powershell
+  #        run: |
+  #          cmake --build $env:BUILD_DIR --config Release --parallel
+  #
+  #      - name: Create package sstructure
+  #        shell: powershell
+  #        run: |
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\bin -Force | Out-Null
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\etc -Force | Out-Null
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\log -Force | Out-Null
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data -Force | Out-Null
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\s3 -Force | Out-Null
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\lambda -Force | Out-Null
+  #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\application -Force | Out-Null
+  #
+  #      - name: Create ZIP archive (PowerShell)
+  #        shell: pwsh
+  #        run: |
+  #          $source = "$env:PACKAGE_DIR"
+  #          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
+  #
+  #          if (Test-Path $zip) {
+  #            Remove-Item $zip -Force
+  #          }
+  #
+  #          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+  #          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+  #
+  #          Write-Host "Created ZIP: $zip"
+  #
+  #      - name: Upload Windows installer
+  #        uses: actions/upload-artifact@v4
+  #        with:
+  #          name: installer-windows
+  #          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
 
-#  build-macos:
-#    name: Build & Package (macOS)
-#    runs-on: macos-latest
-#    needs: release-please
-#    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-#    env:
-#      BUILD_DIR: "${{ github.workspace }}/build-macos"
-#      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-#      INSTALLER_DIR: "${{ github.workspace }}/installer"
-#      APP_NAME: "awsmock-qt-ui"
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Install Qt via aqtinstall
-#        shell: bash
-#        run: |
-#          python3 -m venv ~/venv
-#          source ~/venv/bin/activate
-#          python3 -m pip install --upgrade pip
-#          python3 -m pip install aqtinstall
-#          ARCH="clang_64"
-#          python3 -m aqt install-qt mac desktop 6.10.1 $ARCH --outputdir "$HOME/Qt" --modules qtcharts qtimageformats
-#
-#      - name: Configure (macOS)
-#        shell: bash
-#        run: |
-#          mkdir -p $BUILD_DIR
-#          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release -DQt6_DIR="$HOME/Qt/${{ env.QT_VERSION }}/macos/lib/cmake/Qt6"
-#
-#      - name: Build (macOS)
-#        shell: bash
-#        run: |
-#          cmake --build $BUILD_DIR --config Release --parallel $(sysctl -n hw.logicalcpu)
-#
-#      - name: macdeployqt + create DMG
-#        shell: bash
-#        run: |
-#          APP_BUNDLE="$BUILD_DIR/${APP_NAME}.app"
-#          if [ ! -d "$APP_BUNDLE" ]; then
-#            echo "App bundle not found at $APP_BUNDLE"
-#            ls -R "$BUILD_DIR"
-#            exit 1
-#          fi
-#          MACDEPLOYQT="$(find ${HOME}/Qt -type f -name macdeployqt | head -n 1)"
-#          "$MACDEPLOYQT" "$APP_BUNDLE"
-#          mkdir -p dist
-#          DMG_NAME="${APP_NAME}-${SEMVER}-macos.dmg"
-#          hdiutil create "dist/$DMG_NAME" -volname "${APP_NAME}" -srcfolder "$APP_BUNDLE" -ov -format UDZO
-#
-#      - name: Upload macOS DMG
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: installer-macos
-#          path: dist/${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.dmg
+  #  build-macos:
+  #    name: Build & Package (macOS)
+  #    runs-on: macos-latest
+  #    needs: release-please
+  #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+  #    env:
+  #      BUILD_DIR: "${{ github.workspace }}/build-macos"
+  #      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+  #      INSTALLER_DIR: "${{ github.workspace }}/installer"
+  #      APP_NAME: "awsmock-qt-ui"
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v4
+  #        with:
+  #          fetch-depth: 0
+  #
+  #      - name: Install Qt via aqtinstall
+  #        shell: bash
+  #        run: |
+  #          python3 -m venv ~/venv
+  #          source ~/venv/bin/activate
+  #          python3 -m pip install --upgrade pip
+  #          python3 -m pip install aqtinstall
+  #          ARCH="clang_64"
+  #          python3 -m aqt install-qt mac desktop 6.10.1 $ARCH --outputdir "$HOME/Qt" --modules qtcharts qtimageformats
+  #
+  #      - name: Configure (macOS)
+  #        shell: bash
+  #        run: |
+  #          mkdir -p $BUILD_DIR
+  #          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release -DQt6_DIR="$HOME/Qt/${{ env.QT_VERSION }}/macos/lib/cmake/Qt6"
+  #
+  #      - name: Build (macOS)
+  #        shell: bash
+  #        run: |
+  #          cmake --build $BUILD_DIR --config Release --parallel $(sysctl -n hw.logicalcpu)
+  #
+  #      - name: macdeployqt + create DMG
+  #        shell: bash
+  #        run: |
+  #          APP_BUNDLE="$BUILD_DIR/${APP_NAME}.app"
+  #          if [ ! -d "$APP_BUNDLE" ]; then
+  #            echo "App bundle not found at $APP_BUNDLE"
+  #            ls -R "$BUILD_DIR"
+  #            exit 1
+  #          fi
+  #          MACDEPLOYQT="$(find ${HOME}/Qt -type f -name macdeployqt | head -n 1)"
+  #          "$MACDEPLOYQT" "$APP_BUNDLE"
+  #          mkdir -p dist
+  #          DMG_NAME="${APP_NAME}-${SEMVER}-macos.dmg"
+  #          hdiutil create "dist/$DMG_NAME" -volname "${APP_NAME}" -srcfolder "$APP_BUNDLE" -ov -format UDZO
+  #
+  #      - name: Upload macOS DMG
+  #        uses: actions/upload-artifact@v4
+  #        with:
+  #          name: installer-macos
+  #          path: dist/${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.dmg
 
   build-linux-deb:
     name: Build & Package (Linux DEB)
@@ -481,7 +481,7 @@ jobs:
       - name: Tag images
         run: |
           docker tag awsmock:$SEMVER ${{ secrets.DOCKER_USER }}/awsmock:$SEMVER
-          docker push ${{ secrets.DOCKER_USER }}/awsmock:$VERSION
+          docker push ${{ secrets.DOCKER_USER }}/awsmock:$SEMVER
           docker tag awsmock:$SEMVER ${{ secrets.DOCKER_USER }}/awsmock:latest
           docker push ${{ secrets.DOCKER_USER }}/awsmock:latest
 
@@ -497,23 +497,23 @@ jobs:
         with:
           fetch-depth: 0
 
-#      - name: Download Windows installer
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: installer-windows
-#          path: artifacts/windows
+      #      - name: Download Windows installer
+      #        uses: actions/download-artifact@v4
+      #        with:
+      #          name: installer-windows
+      #          path: artifacts/windows
 
-#      - name: Download macOS installer
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: installer-macos
-#          path: artifacts/macos
+      #      - name: Download macOS installer
+      #        uses: actions/download-artifact@v4
+      #        with:
+      #          name: installer-macos
+      #          path: artifacts/macos
 
-#      - name: Download Linux installer
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: installer-linux
-#          path: artifacts/linux
+      #      - name: Download Linux installer
+      #        uses: actions/download-artifact@v4
+      #        with:
+      #          name: installer-linux
+      #          path: artifacts/linux
 
       - name: Download Linux Debian package
         uses: actions/download-artifact@v4
