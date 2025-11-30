@@ -16,7 +16,7 @@ namespace AwsMock::Core {
 #ifdef WIN32
             return system_clock::from_time_t(mktime(&nextStart));
 #else
-            return system_clock::from_time_t(timelocal(&nextStart));
+            return system_clock::from_time_t(std::mktime(&nextStart));
 #endif
 
         } catch (bad_cronexpr const &ex) {

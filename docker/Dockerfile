@@ -2,8 +2,6 @@ FROM jensvogt/awsmock-base:latest AS build
 
 # Create build environment
 RUN mkdir -p /usr/src
-RUN git config --global http.postBuffer 524288000
-RUN git config --global http.version HTTP/1.1
 
 # Install aws-mock
 WORKDIR /usr/src
@@ -26,11 +24,11 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
     npm run build --prod
 
 # Stick to alpine:latest
-FROM debian:trixie-slim
+FROM alpine:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt upgrade -y && apt -y install libarchive-dev libmagic-dev libicu-dev libssh-4 libquadmath0 curl unzip groff less
+RUN apk update && apk add curl
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
@@ -58,7 +56,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 
 # Just in case, ensure it's available at /usr/local/bin/aws
 RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
-RUN rm -rf /lib/x86_64-linux-gnu/libmagic* || true
+#RUN rm -rf /lib/x86_64-linux-gnu/libmagic* || true
 
 # Install frontend
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
@@ -70,9 +68,9 @@ COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
 COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
 COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
 COPY --from=build /usr/local/lib/* /usr/local/lib
-COPY --from=build /lib/x86_64-linux-gnu/libicudata.so.72 /lib/x86_64-linux-gnu/
-COPY --from=build /lib/x86_64-linux-gnu/libicui18n.so.72 /lib/x86_64-linux-gnu/
-COPY --from=build /lib/x86_64-linux-gnu/libicuuc.so.72 /lib/x86_64-linux-gnu/
+#COPY --from=build /lib/x86_64-linux-gnu/libicudata.so.72 /lib/x86_64-linux-gnu/
+#COPY --from=build /lib/x86_64-linux-gnu/libicui18n.so.72 /lib/x86_64-linux-gnu/
+#COPY --from=build /lib/x86_64-linux-gnu/libicuuc.so.72 /lib/x86_64-linux-gnu/
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
