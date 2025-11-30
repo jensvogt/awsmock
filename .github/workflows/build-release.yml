@@ -205,22 +205,34 @@ jobs:
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
+      - name: Build (Frontend)
+        shell: bash
+        run: |
+          # Create a directory for the app
+          mkdir -p ${{ github.workspace }}/frontend
+          cd ${{ github.workspace }}/frontend
+
+          # Clone the npm application repository (or download a tarball)
+          git clone https://github.com/jensvogt/awsmock-ui
+          cd awsmock-ui
+
+          # Install dependencies
+          npm install
+
+          # Build the application (if it has a build step)
+          npm run build
+          find . 
+
       - name: Build (Linux)
         shell: bash
         run: |
           cmake -S . -B "$BUILD_DIR" \
+            -DBUILD_DOCUMENTATION=ON \
             -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
             -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
           cmake --build "$BUILD_DIR" --parallel $(nproc)
-          find . -name "libawsmockcore.so"
-          find . -name "libawsmockdto.so"
-          find . -name "libawsmockdb.so"
-          find . -name "libawsmocksrv.so"
-          find . -name "awsmockmgr"
-          find . -name "awsmockctl"
-          find . -name "awslocal"
 
       - name: Prepare package structure
         run: |
@@ -232,11 +244,13 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/etc
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/log
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/lib
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\s3
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\sqs
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\sns
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\lambda
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\application
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/frontend
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/s3
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sqs
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sns
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/lambda
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/application
+          mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
           mkdir -p $PACKAGE_DIR/etc/systemd/system
           mkdir -p $PACKAGE_DIR/etc/ld.so.conf
           mkdir -p $PACKAGE_DIR/DEBIAN
@@ -253,7 +267,9 @@ jobs:
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
-          
+          cp docs/man/*.1 $PACKAGE_DIR/usr/local/share/man/man1
+          cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/usr/local/awsmock/frontend
+
           # Create control file
           cat << EOF > $PACKAGE_DIR/DEBIAN/control
           Package: awsmock
@@ -302,7 +318,7 @@ jobs:
             --version "${SEMVER}" 
             --architecture amd64 
             --package "${APP_NAME}-${SEMVER}-amd64.deb" 
-            -C "$PACKAGE_DIR" usr/local/$APP_NAME
+            $PACKAGE_DIR/=/
 
       # Step 7: Upload .deb artifact
       - name: Upload .deb
@@ -359,22 +375,34 @@ jobs:
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
+      - name: Build (Frontend)
+        shell: bash
+        run: |
+          # Create a directory for the app
+          mkdir -p ${{ github.workspace }}/frontend
+          cd ${{ github.workspace }}/frontend
+
+          # Clone the npm application repository (or download a tarball)
+          git clone https://github.com/jensvogt/awsmock-ui
+          cd awsmock-ui
+
+          # Install dependencies
+          npm install
+
+          # Build the application (if it has a build step)
+          npm run build
+          find . 
+
       - name: Build (Linux)
         shell: bash
         run: |
           cmake -S . -B "$BUILD_DIR" \
+            -DBUILD_DOCUMENTATION=ON \
             -DBSONCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/bsoncxx/v_noabi \
             -DMONGOCXX_INCLUDE_DIR=${{ github.workspace }}/extern/include/mongocxx/v_noabi \
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
           cmake --build "$BUILD_DIR" --parallel $(nproc)
-          find . -name "libawsmockcore.so"
-          find . -name "libawsmockdto.so"
-          find . -name "libawsmockdb.so"
-          find . -name "libawsmocksrv.so"
-          find . -name "awsmockmgr"
-          find . -name "awsmockctl"
-          find . -name "awslocal"
 
       - name: Prepare package structure
         run: |
@@ -386,11 +414,13 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/etc
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/log
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/lib
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\s3
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\sqs
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\sns
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\lambda
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data\application
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/s3
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sqs
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sns
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/lambda
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/application
+          mkdir -p $PACKAGE_DIR/usr/local/awsmock/frontend
+          mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
           mkdir -p $PACKAGE_DIR/etc/systemd/system
           mkdir -p $PACKAGE_DIR/etc/ld.so.conf
           mkdir -p $PACKAGE_DIR/scripts
@@ -407,6 +437,8 @@ jobs:
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
+          cp docs/man/*.1 $PACKAGE_DIR/usr/local/share/man/man1
+          cp -R frontend/awsmock-ui/dist/awsmock-ui/browser/* $PACKAGE_DIR/usr/local/awsmock/frontend
           
           # Create postinstall
           cat << EOF > $PACKAGE_DIR/scripts/postinstall.sh
@@ -446,9 +478,9 @@ jobs:
             --vendor "AWSMock Project" \
             --license "Apache-2.0" \
             --prefix / \
-            --after-install scripts/postinstall.sh \
-            --after-remove scripts/postremove.sh \
-            -C "$PACKAGE_DIR" usr/local/$APP_NAME
+            --after-install $PACKAGE_DIR/scripts/postinstall.sh \
+            --after-remove $PACKAGE_DIR/scripts/postremove.sh \
+            $PACKAGE_DIR/=/
 
       # Step 7: Upload .deb artifact
       - name: Upload .rpm

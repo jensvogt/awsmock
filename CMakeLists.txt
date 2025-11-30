@@ -46,7 +46,7 @@ if (WIN32)
     set(LIBZ_INCLUDE_DIR "C:/Program Files (x86)/zlib/include")
     set(LIBZ_LIB_DIR "C:/Program Files (x86)/zlib/lib")
 else ()
-#    set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK")
+    #    set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK")
     set(EXTERNAL_INCLUDE_DIR "/usr/local/include" CACHE PATH "External include directory")
     set(EXTERNAL_LIB_DIR "/usr/local/lib" CACHE PATH "External library directory")
     set(BSONCXX_INCLUDE_DIR "/usr/local/include/bsoncxx/v_noabi" CACHE PATH "MongoDB BSON include directory")
@@ -68,15 +68,6 @@ else ()
 endif ()
 option(BUILD_SAMPLES "Create and install the samples" OFF)
 
-# Current version
-#file(READ "${CMAKE_SOURCE_DIR}/version.txt" PROJECT_VER)
-#string(STRIP "${PROJECT_VER}" PROJECT_VERSION)
-#string(TIMESTAMP PROJECT_BUILDDATE "%d-%m-%Y")
-#configure_file("${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h.in" "${CMAKE_SOURCE_DIR}/src/core/include/awsmock/core/Version.h" @ONLY)
-
-# Build message
-#message("-- Building ${PROJECT_NAME} v${PROJECT_VERSION} type: ${CMAKE_BUILD_TYPE}, install prefix: ${CMAKE_INSTALL_PREFIX}")
-
 # Set default build type release
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE PATH "" FORCE)
@@ -94,9 +85,9 @@ add_subdirectory(src/controller)
 add_subdirectory(src/awslocal)
 
 # Build documentation
-#if (BUILD_DOCUMENTATION)
-#    add_subdirectory(docs)
-#endif (BUILD_DOCUMENTATION)
+if (BUILD_DOCUMENTATION)
+    add_subdirectory(docs)
+endif (BUILD_DOCUMENTATION)
 
 # Build samples lambdas
 if (BUILD_SAMPLES)
