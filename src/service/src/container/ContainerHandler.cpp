@@ -20,7 +20,7 @@ namespace AwsMock::Service {
             switch (clientCommand.command) {
                 case Dto::Common::ContainerCommandType::LIST_CONTAINERS: {
 
-                    Dto::Docker::ListContainerRequest cognitoRequest = Dto::Docker::ListContainerRequest::FromJson(clientCommand);
+                    Dto::Docker::ListContainerRequest containerRequest = Dto::Docker::ListContainerRequest::FromJson(clientCommand);
                     Dto::Docker::ListContainerResponse serviceResponse = _containerService.ListContainers();
                     log_info << "List containers, count: " << serviceResponse.containerList.size();
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
@@ -28,9 +28,9 @@ namespace AwsMock::Service {
 
                 case Dto::Common::ContainerCommandType::LIST_STATS: {
 
-                    Dto::Docker::ListStatsRequest cognitoRequest = Dto::Docker::ListStatsRequest::FromJson(clientCommand);
-                    Dto::Docker::ListContainerResponse serviceResponse = _containerService.ListContainers();
-                    log_info << "List containers, count: " << serviceResponse.containerList.size();
+                    Dto::Docker::ListStatsRequest containerRequest = Dto::Docker::ListStatsRequest::FromJson(clientCommand);
+                    Dto::Docker::ListStatsResponse serviceResponse = _containerService.ListContainerStats(containerRequest);
+                    log_info << "List container stats, count: " << serviceResponse.statistics.size();
                     return SendResponse(request, http::status::ok, serviceResponse.ToJson());
                 }
 

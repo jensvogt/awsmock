@@ -16,7 +16,7 @@
 namespace AwsMock::Dto::Docker {
 
     /**
-     * @brief List container request
+     * @brief List container statistics response
      *
      * @code{.json}
      * [ {
@@ -33,7 +33,7 @@ namespace AwsMock::Dto::Docker {
      *
      * @author jens.vogt\@opitz-consulting.com
      */
-    struct ListContainerResponse final : Common::BaseCounter<ListContainerResponse> {
+    struct ListStatsResponse final : Common::BaseCounter<ListStatsResponse> {
 
         /**
          * Container list
@@ -42,13 +42,13 @@ namespace AwsMock::Dto::Docker {
 
       private:
 
-        friend ListContainerResponse tag_invoke(boost::json::value_to_tag<ListContainerResponse>, boost::json::value const &v) {
-            ListContainerResponse r;
+        friend ListStatsResponse tag_invoke(boost::json::value_to_tag<ListStatsResponse>, boost::json::value const &v) {
+            ListStatsResponse r;
             r.statistics = boost::json::value_to<std::vector<Statistic>>(v);
             return r;
         }
 
-        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListContainerResponse const &obj) {
+        friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, ListStatsResponse const &obj) {
             jv = {
                     {boost::json::value_from(obj.statistics)},
             };

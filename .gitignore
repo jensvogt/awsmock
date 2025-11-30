@@ -30,6 +30,8 @@
 *.exe
 *.out
 *.app
+**/awsmockmgr
+**/dto_s3
 
 # Python
 **/.venv

@@ -74,9 +74,15 @@ namespace AwsMock::Dto::DynamoDb {
       private:
 
         friend Item tag_invoke(boost::json::value_to_tag<Item>, boost::json::value const &v) {
-            Item r;
-            r.attributes = boost::json::value_to<std::map<std::string, AttributeValue>>(v.at("attributes"));
-            return r;
+            Item out = {};
+            const auto& obj = v.as_object();  // safer if you check type first
+
+            if (const auto it = obj.if_contains("Item")) {
+                // Convert the nested attributes
+                out.attributes = boost::json::value_to<decltype(out.attributes)>(*it);
+            }
+
+            return out;
         }
 
         friend void tag_invoke(boost::json::value_from_tag, boost::json::value &jv, Item const &obj) {
