@@ -18,7 +18,7 @@ RUN cd /usr/src && \
     git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
     cmake . -DCMAKE_CXX_STANDARD=17 && \
-    cmake --build . --config Release -j 16 && \
+    cmake --build . --config Release -j $(nproc) && \
     cmake --install . --prefix /usr/local
 
 # Install boost 1.83
@@ -27,7 +27,7 @@ RUN cd /usr/src && \
     tar -xzf boost_1_83_0.tar.gz && \
     cd boost_1_83_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
-    ./b2 install -j 16
+    ./b2 install -j $(nproc)
 
 # Install libmagic \
 RUN cd /usr/src && \

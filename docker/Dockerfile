@@ -8,7 +8,7 @@ WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
     cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock && \
-    cmake --build . --config Release -j 8 && \
+    cmake --build . --config Release --parallel $(nproc) && \
     cmake --install . --config Release
 
 FROM node:22-bookworm AS buildfrontend
@@ -26,7 +26,7 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM alpine:latest
 
-RUN apk update && apk add curl
+RUN apk update && apk add curl unzip
 
 # Make directories
 RUN mkdir -p /usr/local/awsmock/data/s3 && \
