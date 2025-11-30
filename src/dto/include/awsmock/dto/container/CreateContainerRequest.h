@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/docker/model/HostConfig.h>
+#include <awsmock/dto/container/model/HostConfig.h>
 
 namespace AwsMock::Dto::Docker {
 

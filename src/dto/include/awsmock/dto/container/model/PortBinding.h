@@ -9,7 +9,7 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/docker/model/Port.h>
+#include <awsmock/dto/container/model/Port.h>
 
 namespace AwsMock::Dto::Docker {
 

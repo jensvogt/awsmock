@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/docker/model/PortBinding.h>
+#include <awsmock/dto/container/model/PortBinding.h>
 
 namespace AwsMock::Dto::Docker {
 

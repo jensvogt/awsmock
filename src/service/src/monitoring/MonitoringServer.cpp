@@ -49,7 +49,7 @@ namespace AwsMock::Service {
     void MonitoringServer::CollectDockerCounter() {
 
         // Get the container list
-        if (const std::vector<Dto::Docker::Container> containers = ContainerService::instance().ListContainers(); !containers.empty()) {
+        if (const std::vector<Dto::Docker::Container> containers = ContainerService::instance().ListContainers().containerList; !containers.empty()) {
 
             for (const auto &container: containers) {
 

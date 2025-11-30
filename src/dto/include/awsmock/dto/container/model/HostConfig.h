@@ -12,8 +12,8 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/docker/model/LogConfig.h>
-#include <awsmock/dto/docker/model/PortBinding.h>
+#include <awsmock/dto/container/model/LogConfig.h>
+#include <awsmock/dto/container/model/PortBinding.h>
 
 namespace AwsMock::Dto::Docker {
 

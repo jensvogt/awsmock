@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/dto/docker/model/Container.h>
+#include <awsmock/dto/container/model/Container.h>
 
 namespace AwsMock::Dto::Docker {
 

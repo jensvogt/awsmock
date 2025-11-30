@@ -12,7 +12,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/docker/model/Network.h>
+#include <awsmock/dto/container/model/Network.h>
 
 namespace AwsMock::Dto::Docker {
 

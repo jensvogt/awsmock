@@ -10,10 +10,9 @@
 
 // AwsMock includes
 #include <awsmock/core/HttpUtils.h>
-#include <awsmock/dto/common/CognitoClientCommand.h>
-#include <awsmock/service/cognito/CognitoService.h>
+#include <awsmock/dto/common/ContainerClientCommand.h>
 #include <awsmock/service/common/AbstractHandler.h>
-#include <awsmock/service/monitoring/MetricService.h>
+#include <awsmock/service/container/ContainerService.h>
 
 namespace AwsMock::Service {
 

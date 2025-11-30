@@ -13,8 +13,8 @@
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/docker/model/CpuStat.h>
-#include <awsmock/dto/docker/model/MemoryStat.h>
+#include <awsmock/dto/container/model/CpuStat.h>
+#include <awsmock/dto/container/model/MemoryStat.h>
 
 namespace AwsMock::Dto::Docker {
 

@@ -11,7 +11,7 @@
 
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
-#include <awsmock/dto/docker/model/Platform.h>
+#include <awsmock/dto/container/model/Platform.h>
 
 namespace AwsMock::Dto::Docker {
 
