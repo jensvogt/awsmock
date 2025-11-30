@@ -37,9 +37,12 @@
 #include <awsmock/dto/container/ListContainerResponse.h>
 #include <awsmock/dto/container/ListImageResponse.h>
 #include <awsmock/dto/container/ListNetworkResponse.h>
+#include <awsmock/dto/container/ListStatsRequest.h>
+#include <awsmock/dto/container/ListStatsResponse.h>
 #include <awsmock/dto/container/PruneContainerResponse.h>
 #include <awsmock/dto/container/VersionResponse.h>
 #include <awsmock/dto/container/model/ContainerStat.h>
+
 
 #ifdef _WIN32
 #include <awsmock/core/WindowsSocket.h>
@@ -284,6 +287,7 @@ namespace AwsMock::Service {
          * @return CreateContainerResponse
          */
         [[nodiscard]] Dto::Docker::CreateContainerResponse CreateContainer(const std::string &imageName, const std::string &tag, const std::string &containerName, int hostPort, int containerPort) const;
+        Dto::Docker::ListStatsResponse ListContainerStats(const Dto::Docker::ListStatsRequest &request) const;
 
         /**
          * @brief Returns a container by name/tags.

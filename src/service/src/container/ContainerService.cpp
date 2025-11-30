@@ -430,6 +430,11 @@ namespace AwsMock::Service {
         return response;
     }
 
+    Dto::Docker::ListStatsResponse ContainerService::ListContainerStats(const Dto::Docker::ListStatsRequest &request) const {
+        Dto::Docker::ListStatsResponse response;
+        return response;
+    }
+
     void ContainerService::ContainerAttach(const std::string &containerId, boost::beast::websocket::stream<boost::beast::tcp_stream> &ws, long tail) const {
 
         if (containerId.empty()) {
