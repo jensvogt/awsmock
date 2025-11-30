@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.29](https://github.com/jensvogt/awsmock/compare/v1.9.28...v1.9.29) (2025-11-30)
+
+
+### Bug Fixes
+
+* add docker container stats ([895ce13](https://github.com/jensvogt/awsmock/commit/895ce13c28d3787a7d3f9d543d53f839169caa68))
+
 ## [1.9.28](https://github.com/jensvogt/awsmock/compare/v1.9.27...v1.9.28) (2025-11-30)
 
 
