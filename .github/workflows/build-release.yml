@@ -239,7 +239,7 @@ jobs:
           cp $BUILD_DIR/src/core/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp $BUILD_DIR/src/db/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp $BUILD_DIR/src/dto/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/srv/srv/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/service/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp dist/etc/awsmock-linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
