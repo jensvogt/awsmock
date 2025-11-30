@@ -458,8 +458,10 @@ jobs:
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.rpm
 
   build-docker:
+    name: "Build  Docker Image"
     runs-on: ubuntu-latest
     needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
     env:
       GH_TOKEN: ${{ github.token }}
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
@@ -480,6 +482,7 @@ jobs:
 
       - name: Tag images
         run: |
+          echo "SEMVER: ${SEMVER}"
           docker tag awsmock:$SEMVER ${{ secrets.DOCKER_USER }}/awsmock:$SEMVER
           docker push ${{ secrets.DOCKER_USER }}/awsmock:$SEMVER
           docker tag awsmock:$SEMVER ${{ secrets.DOCKER_USER }}/awsmock:latest
