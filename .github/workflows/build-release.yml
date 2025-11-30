@@ -325,8 +325,9 @@ jobs:
       - name: Upload .deb
         uses: actions/upload-artifact@v4
         with:
-          name: deb-package-linux
+          name: deb-package-linux-${{ env.SEMVER }}
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
+          overwrite: true
 
   build-linux-rpm:
     name: Build & Package (Linux RPM)
@@ -487,8 +488,9 @@ jobs:
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
-          name: deb-package-linux
+          name: rpm-package-linux-${{ env.SEMVER }}
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
+          overwrite: true
 
   build-docker:
     name: "Build  Docker Image"
@@ -554,13 +556,13 @@ jobs:
       - name: Download Linux Debian package
         uses: actions/download-artifact@v4
         with:
-          name: deb-package-linux
+          name: deb-package-linux-${{ env.SEMVER }}
           path: artifacts/linux
 
       - name: Download Linux RPM package
         uses: actions/download-artifact@v4
         with:
-          name: rpm-package-linux
+          name: rpm-package-linux-${{ env.SEMVER }}
           path: artifacts/linux
 
       - name: Create GitHub Release (attach installers)
