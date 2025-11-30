@@ -158,7 +158,7 @@ jobs:
 #          path: dist/${{ env.APP_NAME }}-${{ env.SEMVER }}-macos.dmg
 
   build-linux-deb:
-    name: Build & Package (Linux)
+    name: Build & Package (Linux DEB)
     runs-on: ubuntu-latest
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
@@ -224,7 +224,7 @@ jobs:
 
       - name: Prepare package structure
         run: |
-          PACKAGE_DIR=package
+          PACKAGE_DIR=package-deb
           echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
           
           mkdir -p $PACKAGE_DIR/DEBIAN
@@ -245,7 +245,7 @@ jobs:
           cp $BUILD_DIR/src/core/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp $BUILD_DIR/src/db/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp $BUILD_DIR/src/dto/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/srv/service/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
+          cp $BUILD_DIR/src/service/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp dist/etc/awsmock-linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
@@ -279,6 +279,7 @@ jobs:
           set -e          
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
+          rm -rf /etc/systemd/system/awsmock.service
           rm -rf $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
           ldconfig
           EOF
@@ -293,7 +294,12 @@ jobs:
       # Step 6: Build the .deb package
       - name: Build DEB with fpm
         run: |
-          fpm -s dir -t deb --name "${APP_NAME}" --version "${SEMVER}" --architecture amd64 --package "${APP_NAME}-${SEMVER}-amd64.deb" -C "$PACKAGE_DIR" usr/local/$APP_NAME
+          fpm -s dir -t deb \
+            --name "${APP_NAME}" 
+            --version "${SEMVER}" 
+            --architecture amd64 
+            --package "${APP_NAME}-${SEMVER}-amd64.deb" 
+            -C "$PACKAGE_DIR" usr/local/$APP_NAME
 
       # Step 7: Upload .deb artifact
       - name: Upload .deb
@@ -302,13 +308,8 @@ jobs:
           name: deb-package-linux
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
 
-      # Step 6: Build the .rpm package
-      - name: Build RPM with fpm
-        run: |
-          fpm -s dir -t rpm --name "${APP_NAME}" --version "${SEMVER}" --architecture amd64 --package "${APP_NAME}-${SEMVER}-amd64.rpm" -C "$PACKAGE_DIR" usr/local/$APP_NAME
-
   build-linux-rpm:
-    name: Build & Package (Linux)
+    name: Build & Package (Linux RPM)
     runs-on: ubuntu-latest
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
@@ -364,10 +365,17 @@ jobs:
             -DEXTERNAL_INCLUDE_DIR=${{ github.workspace }}/extern/include \
             -DEXTERNAL_LIB_DIR=${{ github.workspace }}/extern/lib
           cmake --build "$BUILD_DIR" --parallel $(nproc)
+          find . -name "libawsmockcore.so"
+          find . -name "libawsmockdto.so"
+          find . -name "libawsmockdb.so"
+          find . -name "libawsmocksrv.so"
+          find . -name "awsmockmgr"
+          find . -name "awsmockctl"
+          find . -name "awslocal"
 
       - name: Prepare package structure
         run: |
-          PACKAGE_DIR=package
+          PACKAGE_DIR=package-rpm
           echo "PACKAGE_DIR=$PACKAGE_DIR" >> $GITHUB_ENV
           
           mkdir -p $PACKAGE_DIR/DEBIAN
@@ -394,7 +402,7 @@ jobs:
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
           cp dist/etc/systemd/system/awsmock.service $PACKAGE_DIR/etc/systemd/system
           
-          # Create postinst
+          # Create postinstall
           cat << EOF > $PACKAGE_DIR/scripts/postinstall.sh
           #!/bin/bash
           set -e
@@ -404,23 +412,29 @@ jobs:
           ldconfig
           EOF
           
-          # Create postrm
+          # Create postremove
           cat << EOF > $PACKAGE_DIR/scripts/postremove.sh
           #!/bin/bash
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
           rm -f /etc/systemd/system/awsmock.service
           systemctl daemon-reload
+          rm -f /etc/ld.so.conf/awsmock.conf
           ldconfig
           EOF
           
           chmod +x $PACKAGE_DIR/scripts/postinstall.sh $PACKAGE_DIR/scripts/postremove.sh
 
+          # Create ldconfig config
+          cat << EOF > $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
+          /usr/local/awsmock/lib
+          EOF
+
       - name: Build RPM using FPM
         run: |
           fpm -s dir -t rpm \
             -n awsmock \
-            -v 1.0.0 \
+            -v ${SEMVER} \
             --description "AWSMock – Local AWS API mocking environment" \
             --url "https://github.com/jensvogt/awsmock" \
             --vendor "AWSMock Project" \
@@ -428,24 +442,14 @@ jobs:
             --prefix / \
             --after-install scripts/postinstall.sh \
             --after-remove scripts/postremove.sh \
-            package/=/
-
-      # Step 6: Build the .deb package
-      - name: Build DEB with fpm
-        run: |
-          fpm -s dir -t deb --name "${APP_NAME}" --version "${SEMVER}" --architecture amd64 --package "${APP_NAME}-${SEMVER}-amd64.deb" -C "$PACKAGE_DIR" usr/local/$APP_NAME
+            -C "$PACKAGE_DIR" usr/local/$APP_NAME
 
       # Step 7: Upload .deb artifact
-      - name: Upload .deb
+      - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
           name: deb-package-linux
-          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.deb
-
-      # Step 6: Build the .rpm package
-      - name: Build RPM with fpm
-        run: |
-          fpm -s dir -t rpm --name "${APP_NAME}" --version "${SEMVER}" --architecture amd64 --package "${APP_NAME}-${SEMVER}-amd64.rpm" -C "$PACKAGE_DIR" usr/local/$APP_NAME
+          path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.rpm
 
   publish:
     name: Publish Release & Attach Installers
