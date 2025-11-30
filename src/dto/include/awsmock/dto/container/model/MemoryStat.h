@@ -10,7 +10,7 @@
 
 // AwsMock includes
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/docker/model/MemoryStats.h>
+#include <awsmock/dto/container/model/MemoryStats.h>
 
 namespace AwsMock::Dto::Docker {
 

@@ -13,7 +13,7 @@
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/core/exception/JsonException.h>
 #include <awsmock/core/logging/LogStream.h>
-#include <awsmock/dto/docker/model/Image.h>
+#include <awsmock/dto/container/model/Image.h>
 
 namespace AwsMock::Dto::Docker {
 

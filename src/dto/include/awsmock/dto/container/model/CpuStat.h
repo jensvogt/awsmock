@@ -11,7 +11,7 @@
 // AwsMock includes
 #include <awsmock/core/BsonUtils.h>
 #include <awsmock/dto/common/BaseCounter.h>
-#include <awsmock/dto/docker/model/CpuUsage.h>
+#include <awsmock/dto/container/model/CpuUsage.h>
 
 namespace AwsMock::Dto::Docker {
 

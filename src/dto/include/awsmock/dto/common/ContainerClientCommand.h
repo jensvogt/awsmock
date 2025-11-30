@@ -22,11 +22,13 @@ namespace AwsMock::Dto::Common {
      * @author jens.vogt\@opitz-consulting.com
      */
     enum class ContainerCommandType {
+        LIST_CONTAINERS,
         LIST_STATS,
         UNKNOWN
     };
 
     static std::map<ContainerCommandType, std::string> ContainerCommandTypeNames{
+            {ContainerCommandType::LIST_CONTAINERS, "list-containers"},
             {ContainerCommandType::LIST_STATS, "list-stats"},
             {ContainerCommandType::UNKNOWN, "unknown"},
     };

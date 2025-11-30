@@ -236,7 +236,7 @@ namespace AwsMock::Service {
         return inspectContainerResponse;
     }
 
-    std::vector<Dto::Docker::Container> ContainerService::ListContainers() const {
+    Dto::Docker::ListContainerResponse ContainerService::ListContainers() const {
 
         auto [statusCode, body, contentLength] = _domainSocket->SendJson(http::verb::get, "/containers/json?all=true");
         if (statusCode != http::status::ok) {
@@ -250,7 +250,7 @@ namespace AwsMock::Service {
             return {};
         }
         log_debug << "Docker containers found, count: " << response.containerList.size();
-        return response.containerList;
+        return response;
     }
 
     std::vector<Dto::Docker::Container> ContainerService::ListContainerByImageName(const std::string &name, const std::string &tag) const {

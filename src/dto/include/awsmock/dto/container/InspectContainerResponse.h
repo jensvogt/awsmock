@@ -9,8 +9,8 @@
 #include <string>
 
 // AwsMock includes
-#include <awsmock/dto/docker/model/HostConfig.h>
-#include <awsmock/dto/docker/model/State.h>
+#include <awsmock/dto/container/model/HostConfig.h>
+#include <awsmock/dto/container/model/State.h>
 
 namespace AwsMock::Dto::Docker {
 

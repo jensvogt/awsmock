@@ -174,7 +174,7 @@ namespace AwsMock::Service {
 
         // Sync docker container with the database
         const auto region = Core::Configuration::instance().GetValue<std::string>("awsmock.region");
-        for (const auto &container: ContainerService::instance().ListContainers()) {
+        for (const auto &container: ContainerService::instance().ListContainers().containerList) {
 
             std::string name{}, tag{};
             if (std::vector<std::string> parts = Core::StringUtils::Split(container.image, ":"); parts.size() == 1) {

@@ -29,17 +29,17 @@
 #include <awsmock/core/exception/ServiceException.h>
 #include <awsmock/core/logging/LogStream.h>
 #include <awsmock/dto/apps/internal/WebSocketCommand.h>
-#include <awsmock/dto/docker/CreateContainerRequest.h>
-#include <awsmock/dto/docker/CreateContainerResponse.h>
-#include <awsmock/dto/docker/CreateNetworkRequest.h>
-#include <awsmock/dto/docker/CreateNetworkResponse.h>
-#include <awsmock/dto/docker/InspectContainerResponse.h>
-#include <awsmock/dto/docker/ListContainerResponse.h>
-#include <awsmock/dto/docker/ListImageResponse.h>
-#include <awsmock/dto/docker/ListNetworkResponse.h>
-#include <awsmock/dto/docker/PruneContainerResponse.h>
-#include <awsmock/dto/docker/VersionResponse.h>
-#include <awsmock/dto/docker/model/ContainerStat.h>
+#include <awsmock/dto/container/CreateContainerRequest.h>
+#include <awsmock/dto/container/CreateContainerResponse.h>
+#include <awsmock/dto/container/CreateNetworkRequest.h>
+#include <awsmock/dto/container/CreateNetworkResponse.h>
+#include <awsmock/dto/container/InspectContainerResponse.h>
+#include <awsmock/dto/container/ListContainerResponse.h>
+#include <awsmock/dto/container/ListImageResponse.h>
+#include <awsmock/dto/container/ListNetworkResponse.h>
+#include <awsmock/dto/container/PruneContainerResponse.h>
+#include <awsmock/dto/container/VersionResponse.h>
+#include <awsmock/dto/container/model/ContainerStat.h>
 
 #ifdef _WIN32
 #include <awsmock/core/WindowsSocket.h>
@@ -324,7 +324,7 @@ namespace AwsMock::Service {
          *
          * @return list of containers
          */
-        [[nodiscard]] std::vector<Dto::Docker::Container> ListContainers() const;
+        [[nodiscard]] Dto::Docker::ListContainerResponse ListContainers() const;
 
         /**
          * @brief List all containers of a given image.
