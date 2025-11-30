@@ -33,9 +33,7 @@ if (WIN32)
     target_link_libraries(${LIBRARY_STATIC} PUBLIC boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
             boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
             boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib)
-    #install(TARGETS ${LIBRARY_STATIC} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
-    message("External include dirs ${EXTERNAL_INCLUDE_DIR}")
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_include_directories(${LIBRARY} PRIVATE ./include ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR}
             ${EXTERNAL_INCLUDE_DIR})

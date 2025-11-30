@@ -26,8 +26,6 @@ RUN git clone https://github.com/jensvogt/awsmock-ui.git && \
 # Stick to alpine:latest
 FROM alpine:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 RUN apk update && apk add curl
 
 # Make directories
