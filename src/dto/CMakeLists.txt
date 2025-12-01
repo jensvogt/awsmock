@@ -43,7 +43,7 @@ endif ()
 # Shared library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    target_include_directories(${LIBRARY_STATIC}} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
+    target_include_directories(${LIBRARY_STATIC} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
             ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSL_LIB_DIR}
             ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR})

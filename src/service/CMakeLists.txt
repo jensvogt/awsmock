@@ -44,7 +44,7 @@ endif ()
 # Library
 if (WIN32)
     add_library(${LIBRARY_STATIC} STATIC ${SOURCES})
-    target_include_directories(${LIBRARY} PRIVATE include ../core/include ../db/include ../dto/include
+    target_include_directories(${LIBRARY_STATIC} PRIVATE include ../core/include ../db/include ../dto/include
             ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY_STATIC} PUBLIC ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
     target_link_libraries(${LIBRARY_STATIC} PUBLIC awsmockcore_static awsmockdb_static awsmockdto_static

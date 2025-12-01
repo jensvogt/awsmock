@@ -230,7 +230,6 @@ jobs:
 
           # Build the application (if it has a build step)
           npm run build
-          find . 
 
       - name: Build (Linux)
         shell: bash
@@ -411,7 +410,6 @@ jobs:
 
           # Build the application (if it has a build step)
           npm run build
-          find . 
 
       - name: Build (Linux)
         shell: bash
@@ -553,6 +551,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Normalize version
+        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
+
       #      - name: Download Windows installer
       #        uses: actions/download-artifact@v4
       #        with:
@@ -613,9 +614,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
-      - name: Normalize version
-        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
 
       - name: Create site folder
         run: |
