@@ -176,7 +176,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -205,14 +205,14 @@ jobs:
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
-      - name: Install Boost
-        shell: bash
-        run: |
-          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-          tar -xzf boost_1_89_0.tar.gz
-          cd boost_1_89_0
-          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          ./b2 install -j$(nproc)
+      #      - name: Install Boost
+      #        shell: bash
+      #        run: |
+      #          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+      #          tar -xzf boost_1_89_0.tar.gz
+      #          cd boost_1_89_0
+      #          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
+      #          ./b2 install -j$(nproc)
 
       - name: Build (Frontend)
         shell: bash
@@ -357,7 +357,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev 
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -386,14 +386,14 @@ jobs:
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
-      - name: Install Boost
-        shell: bash
-        run: |
-          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-          tar -xzf boost_1_89_0.tar.gz
-          cd boost_1_89_0
-          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          ./b2 install -j$(nproc)
+      #      - name: Install Boost
+      #        shell: bash
+      #        run: |
+      #          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+      #          tar -xzf boost_1_89_0.tar.gz
+      #          cd boost_1_89_0
+      #          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
+      #          ./b2 install -j$(nproc)
 
       - name: Build (Frontend)
         shell: bash
