@@ -21,10 +21,13 @@
 #include <boost/numeric/ublas/fwd.hpp>
 
 // AwsMock includes
+#include "awsmock/core/HttpUtils.h"
+
+
 #include <awsmock/core/DateTimeUtils.h>
 #include <awsmock/core/FieldAlloc.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/config/Configuration.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace beast = boost::beast;  // from <boost/beast.hpp>
 namespace http = beast::http;    // from <boost/beast/http.hpp>
@@ -33,9 +36,11 @@ using tcp = boost::asio::ip::tcp;// from <boost/asio/ip/tcp.hpp>
 
 #define DEFAULT_PAGE std::string("/index.html")
 
+using parser_type = http::request_parser<AwsMock::Core::request_body_t, AwsMock::Core::alloc_t>;
+
 namespace AwsMock::Service::Frontend {
 
-    class FrontendWorker {
+    class FrontendWorker : public boost::enable_shared_from_this<FrontendWorker> {
 
       public:
 
@@ -142,12 +147,12 @@ namespace AwsMock::Service::Frontend {
         /**
          * The parser for reading the requests
          */
-        boost::optional<http::request_parser<request_body_t, alloc_t>> _parser;
+        std::unique_ptr<parser_type> _parser;
 
         /**
          * The timer putting a time limit on requests.
          */
-        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max)()};
+        net::steady_timer _requestDeadline{_acceptor.get_executor(), (std::chrono::steady_clock::time_point::max) ()};
 
         /**
          * The string-based response message.

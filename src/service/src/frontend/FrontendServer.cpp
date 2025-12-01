@@ -30,10 +30,11 @@ namespace AwsMock::Service::Frontend {
             boost::asio::io_context ioc{num_workers};
             boost::asio::ip::tcp::acceptor acceptor{ioc, {address, port}};
 
-            std::list<FrontendWorker> workers;
+            std::list<std::shared_ptr<FrontendWorker>> workers;
             for (int i = 0; i < num_workers; ++i) {
-                workers.emplace_back(acceptor, doc_root);
-                workers.back().Start();
+                auto w = std::make_shared<FrontendWorker>(acceptor, doc_root);
+                workers.emplace_back(w);
+                workers.back()->Start();
             }
             // Capture SIGINT and SIGTERM to perform a clean shutdown
             boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);

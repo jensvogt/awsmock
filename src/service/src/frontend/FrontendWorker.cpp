@@ -35,23 +35,33 @@ namespace AwsMock::Service::Frontend {
         });
     }
 
-void FrontendWorker::ReadRequest() {
-    http::async_read(
-        _socket,
-        _buffer,
-        *_parser,
-        [this](boost::beast::error_code ec, std::size_t bytes_transferred) {
-            boost::ignore_unused(bytes_transferred);
+    void FrontendWorker::ReadRequest() {
+        auto self = shared_from_this();// MUST succeed
 
-            if (ec) {
-                Accept();  // or handle error
-                return;
-            }
+        // Create parser in unique_ptr
+        auto p = std::make_unique<parser_type>(
+                std::piecewise_construct,
+                std::make_tuple(),       // request message args
+                std::make_tuple(_alloc));// fields allocator
+        p->body_limit(boost::none);
 
-            ProcessRequest(_parser->get()); // safe
-        }
-    );
-}
+        // Keep raw pointer for async_read
+        parser_type *p_raw = p.get();
+
+        // move parser into lambda
+        http::async_read(
+                _socket,
+                _buffer,
+                *p_raw,
+                [self, p = std::move(p)](beast::error_code ec, std::size_t) mutable {
+                    if (ec) {
+                        self->Accept();
+                        return;
+                    }
+
+                    self->ProcessRequest(p->get());
+                });
+    }
 
     void FrontendWorker::ProcessRequest(http::request<request_body_t, http::basic_fields<alloc_t>> const &req) {
 

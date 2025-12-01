@@ -176,7 +176,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -204,6 +204,15 @@ jobs:
           cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
+
+      - name: Install Boost
+        shell: bash
+        run: |
+          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+          tar -xzf boost_1_89_0.tar.gz
+          cd boost_1_89_0
+          ./bootstrap.sh --prefix=/usr/local
+          ./b2 install -j$(nproc)
 
       - name: Build (Frontend)
         shell: bash
@@ -348,7 +357,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev 
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -376,6 +385,15 @@ jobs:
           cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
+
+      - name: Install Boost
+        shell: bash
+        run: |
+          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+          tar -xzf boost_1_89_0.tar.gz
+          cd boost_1_89_0
+          ./bootstrap.sh --prefix=/usr/local
+          ./b2 install -j$(nproc)
 
       - name: Build (Frontend)
         shell: bash
@@ -581,7 +599,8 @@ jobs:
     needs:
       - publish
     runs-on: ubuntu-latest
-
+    env:
+      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -594,6 +613,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Normalize version
+        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
 
       - name: Create site folder
         run: |
