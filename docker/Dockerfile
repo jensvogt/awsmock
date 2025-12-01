@@ -38,11 +38,11 @@ RUN cd /usr/src && \
     cmake --build . --config Release -j$(($(nproc)/2)) && \
     cmake --install . --prefix /usr/local
 
-# Install boost 1.83
+# Install boost 1.89
 RUN cd /usr/src && \
-    wget -nv https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz && \
-    tar -xzf boost_1_83_0.tar.gz && \
-    cd boost_1_83_0 && \
+    wget -nv https://archives.boost.io/release/1.83.0/source/boost_1_89_0.tar.gz && \
+    tar -xzf boost_1_89_0.tar.gz && \
+    cd boost_1_89_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
     ./b2 install -j$(($(nproc)/2))
 
