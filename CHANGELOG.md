@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.36](https://github.com/jensvogt/awsmock/compare/v1.9.35...v1.9.36) (2025-12-01)
+
+
+### Bug Fixes
+
+* add installer packages ([5f171c4](https://github.com/jensvogt/awsmock/commit/5f171c4723caeaf5d518b12637a7bd562da49d8a))
+* add installer packages ([30b846f](https://github.com/jensvogt/awsmock/commit/30b846f95cd5a0c6ae214d5a4b857742be17a03b))
+
 ## [1.9.35](https://github.com/jensvogt/awsmock/compare/v1.9.34...v1.9.35) (2025-12-01)
 
 
