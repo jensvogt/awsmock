@@ -40,7 +40,7 @@ RUN cd /usr/src && \
 
 # Install boost 1.89
 RUN cd /usr/src && \
-    wget -nv https://archives.boost.io/release/1.83.0/source/boost_1_89_0.tar.gz && \
+    wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz && \
     tar -xzf boost_1_89_0.tar.gz && \
     cd boost_1_89_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
