@@ -260,7 +260,7 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/application
           mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
           mkdir -p $PACKAGE_DIR/etc/systemd/system
-          mkdir -p $PACKAGE_DIR/etc/ld.so.conf
+          mkdir -p $PACKAGE_DIR/etc/ld.so.conf.d
           mkdir -p $PACKAGE_DIR/DEBIAN
 
           # Copy your app
@@ -307,12 +307,12 @@ jobs:
           systemctl stop awsmock.service || true
           systemctl disable awsmock.service || true
           rm -rf /etc/systemd/system/awsmock.service
-          rm -rf $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
+          rm -rf $PACKAGE_DIR/etc/ld.so.conf.d/awsmock.conf
           ldconfig
           EOF
 
           # Create ldconfig config
-          cat << EOF > $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
+          cat << EOF > $PACKAGE_DIR/etc/ld.so.conf.d/awsmock.conf
           /usr/local/awsmock/lib
           EOF
 
@@ -440,7 +440,7 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/frontend
           mkdir -p $PACKAGE_DIR/usr/local/share/man/man1
           mkdir -p $PACKAGE_DIR/etc/systemd/system
-          mkdir -p $PACKAGE_DIR/etc/ld.so.conf
+          mkdir -p $PACKAGE_DIR/etc/ld.so.conf.d
           mkdir -p $PACKAGE_DIR/scripts
           
           # Copy your app
@@ -475,14 +475,14 @@ jobs:
           systemctl disable awsmock.service || true
           rm -f /etc/systemd/system/awsmock.service
           systemctl daemon-reload
-          rm -f /etc/ld.so.conf/awsmock.conf
+          rm -f /etc/ld.so.conf.d/awsmock.conf
           ldconfig
           EOF
           
           chmod +x $PACKAGE_DIR/scripts/postinstall.sh $PACKAGE_DIR/scripts/postremove.sh
 
           # Create ldconfig config
-          cat << EOF > $PACKAGE_DIR/etc/ld.so.conf/awsmock.conf
+          cat << EOF > $PACKAGE_DIR/etc/ld.so.conf.d/awsmock.conf
           /usr/local/awsmock/lib
           EOF
 
