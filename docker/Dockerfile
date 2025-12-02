@@ -22,7 +22,7 @@ RUN cd /usr/src && \
 RUN cd /usr/src && \
     git clone https://github.com/mongodb/mongo-c-driver.git && \
     cd mongo-c-driver/build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+    cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
              -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
              -DCMAKE_INSTALL_PREFIX=/usr/extern && \
     cmake --build . && \
@@ -31,8 +31,8 @@ RUN cd /usr/src && \
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
     git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
-    cd mongo-cxx-driver && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+    cd mongo-cxx-driver/build && \
+    cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
              -DCMAKE_INSTALL_PREFIX=/usr/extern \
              -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=/usr/extern && \
     cmake --build . --config Release -j$(($(nproc)/2)) && \
@@ -50,11 +50,12 @@ RUN cd /usr/src && \
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    cmake -S . -B "$BUILD_DIR" -DBUILD_DOCUMENTATION=ON -DBSONCXX_INCLUDE_DIR=/usr/extern/include/bsoncxx/v_noabi \
+    mkdir build && \
+    cd build && \
+    cmake -S .. -B . -DBUILD_DOCUMENTATION=ON -DBSONCXX_INCLUDE_DIR=/usr/extern/include/bsoncxx/v_noabi \
                 -DMONGOCXX_INCLUDE_DIR=/usr/extern/include/mongocxx/v_noabi -DEXTERNAL_INCLUDE_DIR=usr/extern/include \
                 -DEXTERNAL_LIB_DIR=/usr/extern/lib && \
-    cmake --build "$BUILD_DIR" --parallel $(($(nproc)/2)) && \
-    cmake --install . --config Release
+    cmake --build . --parallel $(($(nproc)/2))
 
 FROM node:22-bookworm AS buildfrontend
 
@@ -84,7 +85,6 @@ RUN mkdir -p /usr/local/awsmock/data/s3 && \
     mkdir -p /usr/local/awsmock/data/tmp && \
     mkdir -p /usr/local/awsmock/data/application && \
     mkdir -p /usr/local/awsmock/bin && \
-    mkdir -p /usr/local/awsmock/lib && \
     mkdir -p /usr/local/awsmock/etc && \
     mkdir -p /usr/local/awsmock/init && \
     mkdir -p /usr/local/awsmock/log && \
@@ -104,12 +104,10 @@ RUN ln -s /usr/local/bin/aws /usr/bin/aws || true
 COPY --from=buildfrontend /usr/src/awsmock-ui/dist/awsmock-ui/browser/ /usr/local/awsmock/frontend/
 
 # Install aws-mock
-COPY --from=build /usr/local/awsmock/bin/awsmockmgr /usr/local/awsmock/bin
-COPY --from=build /usr/local/awsmock/bin/awsmockctl /usr/local/awsmock/bin
-COPY --from=build /usr/local/awsmock/bin/awslocal /usr/local/awsmock/bin
-COPY --from=build /usr/local/awsmock/lib/* /usr/local/awsmock/lib
-COPY --from=build /usr/local/awsmock/etc/* /usr/local/awsmock/etc
-COPY --from=build /usr/local/lib/* /usr/local/lib
+COPY --from=build /usr/src/awsmock/build/awsmockmgr /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/build/awsmockctl /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/build/awslocal /usr/local/awsmock/bin
+COPY --from=build /usr/src/awsmock/dist/etc/awsmock_linux.json /usr/local/awsmock/etc/awsmock.json
 
 # Set library search path
 ENV LD_LIBRARY_PATH=/usr/local/awsmock/lib:/usr/local/lib
