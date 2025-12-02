@@ -7,7 +7,7 @@ set(INCLUDE_DIR ../include ../../core/include ../../db/include ../../dto/include
 # Libraries
 set(LIBRARY_DIR ${BSONCXX_LIB_DIR} ${MONGOCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
 set(LIBRARIES awsmockcore awsmockdto awsmockdb awsmocksrv mongocxx bsoncxx boost_locale boost_program_options boost_log
-        boost_log_setup boost_unit_test_framework boost_coroutine boost_context ssl crypto archive magic ssh)
+        boost_thread boost_log_setup boost_process boost_unit_test_framework ssl crypto archive magic ssh)
 
 # KMS
 add_executable(srv_kms_service KMSServiceTests.cpp TestBase.cpp)
