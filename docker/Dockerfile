@@ -26,7 +26,7 @@ RUN cd /usr/src && \
              -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
              -DCMAKE_INSTALL_PREFIX=/usr/extern && \
     cmake --build . && \
-    cmake --install . && \
+    cmake --install .
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
