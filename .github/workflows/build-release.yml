@@ -108,7 +108,8 @@ jobs:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
       INSTALLER_DIR: "${{ github.workspace }}/installer"
-      APP_NAME: "awsmock-qt-ui"
+      APP_NAME: "awsmock"
+      OPENSSL_ROOT_DIR: "/opt/homebrew/opt/openssl@3"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -119,6 +120,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p ${{ github.workspace }}/extern
+
+      - name: Install system dependencies
+        shell: bash
+        run: |
+          brew install openssl@3
 
       - name: Install JWT-CPP
         shell: bash
@@ -142,16 +148,6 @@ jobs:
           cmake --build . 
           cmake --install .
 
-      - name: Install Boost
-        shell: bash
-        run: |
-          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-          tar -xzf boost_1_89_0.tar.gz
-          cd boost_1_89_0
-          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
-           variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern
-
       - name: Install mongo-cxx-driver
         shell: bash
         run: |
@@ -171,18 +167,31 @@ jobs:
           cd boost_1_89_0
           ./bootstrap.sh --prefix=${{ github.workspace }}/extern
           ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
-           variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern
-
-      - name: Configure (macOS)
-        shell: bash
-        run: |
-          mkdir -p $BUILD_DIR
-          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release
+           variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern > /dev/null
 
       - name: Build (macOS)
         shell: bash
         run: |
+          mkdir -p $BUILD_DIR
+          cmake -S . -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Release
           cmake --build $BUILD_DIR --config Release --parallel $(sysctl -n hw.logicalcpu)
+
+      - name: Build (Frontend)
+        shell: bash
+        run: |
+          # Create a directory for the app
+          mkdir -p ${{ github.workspace }}/frontend
+          cd ${{ github.workspace }}/frontend
+
+          # Clone the npm application repository (or download a tarball)
+          git clone https://github.com/jensvogt/awsmock-ui
+          cd awsmock-ui
+
+          # Install dependencies
+          npm install
+
+          # Build the application (if it has a build step)
+          npm run build
 
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4

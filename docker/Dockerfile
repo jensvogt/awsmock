@@ -6,37 +6,37 @@ RUN apt clean
 
 # Create build environment
 RUN mkdir -p /usr/src
+RUN mkdir -p /usr/extern
 
 # Install jwt-cpp
 RUN cd /usr/src && \
     git clone https://github.com/Thalhammer/jwt-cpp.git && \
     cd jwt-cpp && \
-    cmake . && \
+    mkdir build && \
+    cd build && \
+    cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=/usr/extern && \
+    cmake --build . --parallel $(nproc) && \
     cmake --install .
 
 # 1️⃣ Install Mongo C Driver first
 RUN cd /usr/src && \
     git clone https://github.com/mongodb/mongo-c-driver.git && \
-    cd mongo-c-driver && \
-    mkdir cmake-build && cd cmake-build && \
-    cmake .. \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF \
-      -DENABLE_SASL=OFF \
-      -DENABLE_STATIC=ON \
-      -DENABLE_TESTS=OFF \
-      -DENABLE_EXAMPLES=OFF && \
-    cmake . && \
-    cmake --build . -j$(($(nproc)/2)) && \
-    cmake --install .
+    cd mongo-c-driver/build && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+             -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
+             -DCMAKE_INSTALL_PREFIX=/usr/extern && \
+    cmake --build . && \
+    cmake --install . && \
 
 # Install mongo-cxx-driver
 RUN cd /usr/src && \
     git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git && \
     cd mongo-cxx-driver && \
-    cmake . -DCMAKE_CXX_STANDARD=17 && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+             -DCMAKE_INSTALL_PREFIX=/usr/extern \
+             -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=/usr/extern && \
     cmake --build . --config Release -j$(($(nproc)/2)) && \
-    cmake --install . --prefix /usr/local
+    cmake --install .
 
 # Install boost 1.83
 RUN cd /usr/src && \
@@ -46,25 +46,14 @@ RUN cd /usr/src && \
     ./bootstrap.sh --prefix=/usr/local && \
     ./b2 install -j$(($(nproc)/2))
 
-# Install libmagic \
-RUN cd /usr/src && \
-    git clone https://github.com/file/file.git && \
-    cd file && \
-    libtoolize --force && \
-    aclocal && \
-    autoheader && \
-    automake --force-missing --add-missing && \
-    autoconf && \
-    ./configure && \
-    make && \
-    make install
-
 # Install aws-mock
 WORKDIR /usr/src
 RUN git clone https://github.com/jensvogt/awsmock.git && \
     cd /usr/src/awsmock && \
-    cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/awsmock && \
-    cmake --build . --config Release -j$(($(nproc)/2)) && \
+    cmake -S . -B "$BUILD_DIR" -DBUILD_DOCUMENTATION=ON -DBSONCXX_INCLUDE_DIR=/usr/extern/include/bsoncxx/v_noabi \
+                -DMONGOCXX_INCLUDE_DIR=/usr/extern/include/mongocxx/v_noabi -DEXTERNAL_INCLUDE_DIR=usr/extern/include \
+                -DEXTERNAL_LIB_DIR=/usr/extern/lib && \
+    cmake --build "$BUILD_DIR" --parallel $(nproc)
     cmake --install . --config Release
 
 FROM node:22-bookworm AS buildfrontend
