@@ -176,7 +176,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -202,9 +202,7 @@ jobs:
         shell: bash
         run: |
           git clone https://github.com/mongodb/mongo-c-driver.git
-          cd mongo-c-driver
-          mkdir build
-          cd build
+          cd mongo-c-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
                    -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
                    -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
@@ -215,9 +213,7 @@ jobs:
         shell: bash
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
-          cd mongo-cxx-driver
-          mkdir build
-          cd build
+          cd mongo-cxx-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
                    -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
                    -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON \
@@ -372,7 +368,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake wget tar ninja-build ruby ruby-dev libmagic-dev doxygen zip unzip \
-                              libtool pandoc libarchive-dev libmagic-dev libssh-dev libboost-all-dev
+                              libtool pandoc libarchive-dev libmagic-dev libssh-dev
           sudo gem install --no-document fpm
 
       - name: Normalize version
@@ -398,9 +394,7 @@ jobs:
         shell: bash
         run: |
           git clone https://github.com/mongodb/mongo-c-driver.git
-          cd mongo-c-driver
-          mkdir build
-          cd build
+          cd mongo-c-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
                    -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
                    -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
@@ -411,9 +405,7 @@ jobs:
         shell: bash
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
-          cd mongo-cxx-driver
-          mkdir build
-          cd build
+          cd mongo-cxx-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
                    -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
                    -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON \
