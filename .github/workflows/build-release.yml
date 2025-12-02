@@ -74,6 +74,7 @@ jobs:
           cmake --build .
 
       - name: Build mongo-cxx-driver
+        shell: powershell
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
