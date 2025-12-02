@@ -67,32 +67,45 @@ jobs:
           cmake --build . --parallel $(nproc)
           cmake --install .
 
-      - name: 📦 Download and Extract Boost Source
+      - name: Build mongo-c-driver
+        run: |
+          git clone https://github.com/mongodb/mongo-c-driver
+          cd mongo-c-driver/build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+                   -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
+                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake --build .
+          cmake --install .
+
+      - name: Build mongo-cxx-driver
+        run: |
+          git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
+          cd mongo-cxx-driver/build
+          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBSONCXX_POLY_USE_REAL=ON \
+                -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON \
+                -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
+          cmake --build . --config Release --parallel $(sysctl -n hw.logicalcpu)
+          cmake --install .
+
+      - name: Build boost
         id: download
         run: |
-          $BOOST_URL="https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip"
-          # Download and extract the source code
-          Invoke-WebRequest -Uri $BOOST_URL -OutFile boost.zip
-          Expand-Archive -Path boost.zip -DestinationPath . -Force
-          # Rename the extracted folder to a simpler path
-          Rename-Item "boost_1.89" "boost_source"
+          set BOOST_URL=https://boostorg.jfrog.io/artifactory/main/release/%BOOST_VERSION%/source/boost_%BOOST_VERSION%.zip
+          mkdir boost_source
+          curl -L https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip -o boost_source\boost.zip
+          unzip boost_source\boost.zip -d boost_source > NUL
+          move boost_source\boost_%BOOST_VERSION% boost_source\boost_source_root
           .\bootstrap.bat
-
-      - name: Build and Install Static Libraries
-        run: |
-          cd boost_source
           .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc \
              --prefix=${{ github.workspace }}/extern install > NUL
 
       - name: Configure CMake (Windows)
-        shell: powershell
         run: |
-          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-
-      - name: Build (Windows, parallel)
-        shell: powershell
-        run: |
-          cmake --build $env:BUILD_DIR --config Release --parallel
+          mkdir build
+          cd build
+          cmake -S .. -B . -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release --parallel
 
       - name: Create package structure
         shell: powershell
