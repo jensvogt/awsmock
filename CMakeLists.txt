@@ -223,6 +223,37 @@ target_link_libraries(awsmockmgr PRIVATE
 target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
 
 # -------------------------------------------------------------------------
+# AWSMock Controller
+# -------------------------------------------------------------------------
+
+add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
+target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include db/include)
+target_link_libraries(awsmockctl PRIVATE
+        -Wl,--start-group
+        awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread
+        boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
+        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
+        crypto acl pthread rt resolv
+        -Wl,--end-group
+)
+target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
+
+# -------------------------------------------------------------------------
+# AWSMock awslocal
+# -------------------------------------------------------------------------
+
+add_executable(awslocal awslocal/src/AwsLocal.cpp awslocal/src/main.cpp)
+target_include_directories(awslocal PUBLIC awslocal/include core/include dto/include)
+target_link_libraries(awslocal PRIVATE
+        -Wl,--start-group
+        awsmockcore boost_log boost_log_setup boost_thread boost_chrono boost_date_time boost_exception boost_regex
+        boost_program_options boost_process boost_json boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2
+        lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread rt resolv
+        -Wl,--end-group
+)
+target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
+
+# -------------------------------------------------------------------------
 # Install
 # -------------------------------------------------------------------------
 

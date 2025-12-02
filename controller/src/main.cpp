@@ -117,6 +117,11 @@ int main(const int argc, char *argv[]) {
     store(parsed, vm);
     notify(vm);
 
+    if (vm.empty()) {
+        ShowHelp(desc);
+        return EXIT_SUCCESS;
+    }
+
     // Get commands.
     const std::vector<std::string> commands = collect_unrecognized(parsed.options, boost::program_options::include_positional);
 

@@ -30,7 +30,6 @@
 *.exe
 *.out
 *.app
-**/awsmockmgr
 **/dto_s3
 
 # Python
@@ -76,9 +75,9 @@ docs/man/**.1
 dist/samples/database-data
 
 # executables
-src/controller/awsmockctl
-src/manager/awsmockmgr
-src/awslocal/awslocal
+**/awsmockctl
+**/awsmockmgr
+**/awslocal
 
 # Examples
 **/out.json

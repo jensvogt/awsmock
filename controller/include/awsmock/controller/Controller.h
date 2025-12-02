@@ -56,6 +56,7 @@
 #include <awsmock/dto/module/model/Module.h>
 #include <awsmock/dto/transfer/model/Server.h>
 #include <awsmock/dto/transfer/model/User.h>
+#include <awsmock/entity/apps/Application.h>
 #include <awsmock/repository/ModuleDatabase.h>
 
 namespace AwsMock::Controller {

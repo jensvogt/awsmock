@@ -1,9 +1,6 @@
 // Created by vogje01 on 10/23/23.
 //
 
-#include "awsmock/entity/apps/Application.h"
-
-
 #include <awsmock/controller/Controller.h>
 
 namespace AwsMock::Controller {
