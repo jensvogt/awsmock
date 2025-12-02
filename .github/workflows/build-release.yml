@@ -70,9 +70,7 @@ jobs:
         run: |
           git clone https://github.com/mongodb/mongo-c-driver
           cd mongo-c-driver/build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF ^ 
-                   -DENABLE_PIC=ON ^
-                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build .
           cmake --install .
 
@@ -80,10 +78,7 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
-          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON ^
-                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBSONCXX_POLY_USE_REAL=ON ^
-                -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON ^
-                -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
+          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBUILD_SHARED_LIBS=OFF -DBSONCXX_POLY_USE_REAL=ON -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
           cmake --build . --config Release --parallel $(sysctl -n hw.logicalcpu)
           cmake --install .
 
@@ -171,7 +166,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc libmagic libarchive file
+          brew install doxygen pandoc libmagic libarchive file icu4c
 
       - name: Install JWT-CPP
         shell: bash
