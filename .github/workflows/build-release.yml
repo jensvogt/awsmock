@@ -647,7 +647,7 @@ jobs:
       - name: Download Linux RPM package
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.rpm
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           path: artifacts/linux
 
       - name: Create GitHub Release (attach installers)
@@ -684,6 +684,7 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
+          find ./artifacts 
           cp ./artifacts/deb-package-linux/*.deb public/ || true
           cp ./artifacts/rpm-package-linux/*.rpm public/ || true
           cp .github/pages/index.html public/index.html
