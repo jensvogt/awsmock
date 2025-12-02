@@ -144,9 +144,9 @@ set(SOURCES db/src/repository/Database.cpp db/src/utils/TestUtils.cpp ${SQS_SOUR
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${UTIL_SOURCES}
         ${MONITORING_SOURCES})
 add_library(awsmockdb STATIC ${SOURCES})
-target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-        boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
-        magic lzma bz2 lz4 z zstd icuuc icui18n icudata pthread rt)
+target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log
+        boost_log_setup boost_thread boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception
+        boost_filesystem boost_regex boost_thread ssl crypto magic lzma bz2 lz4 z zstd pthread rt)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -192,7 +192,7 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRAN
 add_library(awsmocksrv STATIC ${SOURCES})
 target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
         boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
-        boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl icuuc icui18n icudata ssh ssl crypto)
+        boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl ssh ssl crypto)
 
 target_include_directories(awsmockcore PUBLIC core/include dto/include)
 target_include_directories(awsmockdb PUBLIC core/include dto/include db/include)
@@ -217,8 +217,7 @@ target_link_libraries(awsmockmgr PRIVATE
         -Wl,--start-group
         awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup
         boost_thread boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
-        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
-        crypto acl pthread rt resolv
+        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto acl pthread rt resolv
         -Wl,--end-group
 )
 target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
@@ -233,8 +232,7 @@ target_link_libraries(awsmockctl PRIVATE
         -Wl,--start-group
         awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread
         boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
-        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
-        crypto acl pthread rt resolv
+        boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto acl pthread rt resolv
         -Wl,--end-group
 )
 target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
@@ -249,7 +247,7 @@ target_link_libraries(awslocal PRIVATE
         -Wl,--start-group
         awsmockcore boost_log boost_log_setup boost_thread boost_chrono boost_date_time boost_exception boost_regex
         boost_program_options boost_process boost_json boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2
-        lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread rt resolv
+        lz4 z zstd magic ssl crypto acl pthread rt resolv
         -Wl,--end-group
 )
 target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
