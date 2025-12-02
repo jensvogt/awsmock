@@ -12,18 +12,19 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 # -------------------------------------------------------------------------
 # External directories
 # -------------------------------------------------------------------------
+set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/external)
+set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
+set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
 if (LINUX)
-    set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/external)
-    set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
-    set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
-    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
     link_directories(${EXTERNAL_LIB_DIR})
 elseif (APPLE)
-    include_directories("/opt/homebrew/opt/openssl@3/include")
-    include_directories("/opt/homebrew/opt/libmagic/include")
-    link_directories("/opt/homebrew/opt/openssl@3/lib")
-    link_directories("/opt/homebrew/opt/libmagic/lib")
+    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
+            "/opt/homebrew/opt/libmagic/include")
+    link_directories(${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib")
 endif ()
 
 # -------------------------------------------------------------------------

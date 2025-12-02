@@ -270,7 +270,7 @@ jobs:
           cd boost_1_89_0
           ./bootstrap.sh --prefix=${{ github.workspace }}/extern
           ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
-              variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern
+              variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern > /dev/null
 
       - name: Build (Frontend)
         shell: bash
@@ -463,7 +463,7 @@ jobs:
           cd boost_1_89_0
           ./bootstrap.sh --prefix=${{ github.workspace }}/extern
           ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
-              variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern
+              variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern > /dev/null
 
       - name: Build (Frontend)
         shell: bash
