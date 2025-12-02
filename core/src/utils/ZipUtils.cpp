@@ -146,8 +146,10 @@ namespace AwsMock::Core {
         size_t size;
 #ifdef _WIN32
         long long offset;
-#else
+#elif __linux__
         long offset;
+#else
+        la_int64_t offset;
 #endif
 
         for (;;) {
