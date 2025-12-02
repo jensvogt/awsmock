@@ -32,8 +32,10 @@ endif ()
 # Global link flags
 # -------------------------------------------------------------------------
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -pthread")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -pthread")
+if (!APPLE)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -pthread")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static -pthread")
+endif ()
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -253,7 +255,8 @@ if (APPLE)
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
             boost_log_setup boost_chrono boost_exception boost_regex
             boost_program_options boost_process boost_json boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2
-            lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread rt resolv)
+            lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread resolv
+            -Wl,-rpath,/usr/local/lib)
 else ()
     target_link_libraries(awslocal PRIVATE
             -Wl,--start-group
