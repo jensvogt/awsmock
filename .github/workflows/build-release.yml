@@ -194,7 +194,7 @@ jobs:
           cd jwt-cpp
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
 
@@ -385,9 +385,10 @@ jobs:
           cd jwt-cpp
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
+          find ${{ github.workspace }}/extern
 
       - name: Install mongo-c-driver
         shell: bash
