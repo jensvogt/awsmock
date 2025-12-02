@@ -192,16 +192,22 @@ jobs:
         run: |
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
-          cmake . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
 
       - name: Install mongo-c-driver
         shell: bash
         run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
-          -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
-          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          git clone https://github.com/mongodb/mongo-c-driver.git
+          cd mongo-c-driver
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+                   -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
+                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . 
           cmake --install .
 
@@ -210,8 +216,12 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
-          -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+                   -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
+                   -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON \
+                   -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
@@ -378,16 +388,22 @@ jobs:
         run: |
           git clone https://github.com/Thalhammer/jwt-cpp.git
           cd jwt-cpp
-          cmake . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . --parallel $(nproc)
           cmake --install .
 
       - name: Install mongo-c-driver
         shell: bash
         run: |
-          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
-          -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
-          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          git clone https://github.com/mongodb/mongo-c-driver.git
+          cd mongo-c-driver
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+                   -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
+                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build . 
           cmake --install .
 
@@ -396,8 +412,12 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
-          -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+                   -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
+                   -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON \
+                   -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
