@@ -22,9 +22,8 @@ RUN cd /usr/src && \
 RUN cd /usr/src && \
     git clone https://github.com/mongodb/mongo-c-driver.git && \
     cd mongo-c-driver/build && \
-    cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
-             -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
-             -DCMAKE_INSTALL_PREFIX=/usr/extern && \
+    cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF \
+             -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=/usr/extern && \
     cmake --build . && \
     cmake --install .
 

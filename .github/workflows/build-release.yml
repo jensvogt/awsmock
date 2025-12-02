@@ -33,71 +33,98 @@ jobs:
           release-type: simple
           token: ${{ secrets.GH_AUTH_TOKEN }}
 
-    #  build-windows:
-    #    name: Build & Package (Windows)
-    #    runs-on: windows-latest
-    #    needs: release-please
-    #    if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    #    env:
-    ##      QT_DIR: "${{ github.workspace }}\\Qt"
-    #      BUILD_DIR: "${{ github.workspace }}\\build-windows"
-    #      PACKAGE_DIR: "${{ github.workspace }}\\package"
-    #      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-    #    steps:
-    #      - name: Checkout
-    #        uses: actions/checkout@v4
-    #        with:
-    #          fetch-depth: 0
-    #
-    #      - name: Normalize SEMVER
-    #        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
-    #
-    #      - name: Setup MSVC environment
-    #        uses: ilammy/msvc-dev-cmd@v1
-    #        with:
-    #          arch: x64
-    #
-    #      - name: Configure CMake (Windows)
-    #        shell: powershell
-    #        run: |
-    #          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-    #
-    #      - name: Build (Windows, parallel)
-    #        shell: powershell
-    #        run: |
-    #          cmake --build $env:BUILD_DIR --config Release --parallel
-    #
-    #      - name: Create package sstructure
-    #        shell: powershell
-    #        run: |
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\bin -Force | Out-Null
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\etc -Force | Out-Null
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\log -Force | Out-Null
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data -Force | Out-Null
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\s3 -Force | Out-Null
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\lambda -Force | Out-Null
-    #          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\application -Force | Out-Null
-    #
-    #      - name: Create ZIP archive (PowerShell)
-    #        shell: pwsh
-    #        run: |
-    #          $source = "$env:PACKAGE_DIR"
-    #          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
-    #
-    #          if (Test-Path $zip) {
-    #            Remove-Item $zip -Force
-    #          }
-    #
-    #          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-    #          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
-    #
-    #          Write-Host "Created ZIP: $zip"
-    #
-    #      - name: Upload Windows installer
-    #        uses: actions/upload-artifact@v4
-    #        with:
-    #          name: installer-windows
-    #          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
+  build-windows:
+    name: Build & Package (Windows)
+    runs-on: windows-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    env:
+      BUILD_DIR: "${{ github.workspace }}\\build-windows"
+      PACKAGE_DIR: "${{ github.workspace }}\\package"
+      SEMVER: "${{ needs.release-please.outputs.tag_name }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Normalize SEMVER
+        run: echo "SEMVER=${SEMVER#v}" >> $GITHUB_ENV
+
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install JWT-CPP
+        shell: bash
+        run: |
+          git clone https://github.com/Thalhammer/jwt-cpp.git
+          cd jwt-cpp
+          mkdir build
+          cd build
+          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake --build . --parallel $(nproc)
+          cmake --install .
+
+      - name: 📦 Download and Extract Boost Source
+        id: download
+        run: |
+          $BOOST_URL="https://boostorg.jfrog.io/artifactory/main/release/1.89/source/boost_1.89.zip"
+          # Download and extract the source code
+          Invoke-WebRequest -Uri $BOOST_URL -OutFile boost.zip
+          Expand-Archive -Path boost.zip -DestinationPath . -Force
+          # Rename the extracted folder to a simpler path
+          Rename-Item "boost_1.89" "boost_source"
+          .\bootstrap.bat
+
+      - name: Build and Install Static Libraries
+        run: |
+          cd boost_source
+          .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc \
+             --prefix=${{ github.workspace }}/extern install > NUL
+
+      - name: Configure CMake (Windows)
+        shell: powershell
+        run: |
+          cmake -S . -B $env:BUILD_DIR -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build (Windows, parallel)
+        shell: powershell
+        run: |
+          cmake --build $env:BUILD_DIR --config Release --parallel
+
+      - name: Create package structure
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\bin -Force | Out-Null
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\etc -Force | Out-Null
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\log -Force | Out-Null
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data -Force | Out-Null
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\s3 -Force | Out-Null
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\lambda -Force | Out-Null
+          New-Item -ItemType Directory -Path $env:PACKAGE_DIR\data\application -Force | Out-Null
+
+      - name: Create ZIP archive (PowerShell)
+        shell: pwsh
+        run: |
+          $source = "$env:PACKAGE_DIR"
+          $zip = "$env:APP_NAME-$env:SEMVER-amd64.zip"
+
+          if (Test-Path $zip) {
+            Remove-Item $zip -Force
+          }
+
+          Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+          [System.IO.Compression.ZipFile]::CreateFromDirectory($source, $zip)
+
+          Write-Host "Created ZIP: $zip"
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-windows
+          path: installer/${{ env.APP_NAME }}-${{ env.SEMVER }}-amd64.exe
 
   build-macos:
     name: Build & Package (macOS)
@@ -686,8 +713,8 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          cp ./artifacts/awsmock-$SEMVER-amd64.deb/awsmock-$SEMVER-amd64.deb public/ || true
-          cp ./artifacts/awsmock-$SEMVER-1.x86_64.rpm/awsmock-$SEMVER-1.x86_64.rpm public/ || true
+          cp ./artifacts/awsmock-${{ env.SEMVER }}-amd64.deb/awsmock-${{ env.SEMVER }}-amd64.deb public/ || true
+          cp ./artifacts/awsmock-${{ env.SEMVER }}-1.x86_64.rpm/awsmock-${{ env.SEMVER }}-1.x86_64.rpm public/ || true
           cp .github/pages/index.html public/index.html
 
       - name: Generate files.json
