@@ -686,9 +686,8 @@ jobs:
       - name: Create site folder
         run: |
           mkdir public
-          find ./artifacts 
-          cp ./artifacts/deb-package-linux/*.deb public/ || true
-          cp ./artifacts/rpm-package-linux/*.rpm public/ || true
+          cp ./artifacts/awsmock-$SEMVER-amd64.deb/awsmock-$SEMVER-amd64.deb public/ || true
+          cp ./artifacts/awsmock-$SEMVER-1.x86_64.rpm/awsmock-$SEMVER-1.x86_64.rpm public/ || true
           cp .github/pages/index.html public/index.html
 
       - name: Generate files.json
