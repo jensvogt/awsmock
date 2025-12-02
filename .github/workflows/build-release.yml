@@ -124,7 +124,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc libmagic
+          brew install doxygen pandoc libmagic libarchive file
 
       - name: Install JWT-CPP
         shell: bash

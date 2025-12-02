@@ -44,7 +44,7 @@ RUN cd /usr/src && \
     tar -xzf boost_1_83_0.tar.gz && \
     cd boost_1_83_0 && \
     ./bootstrap.sh --prefix=/usr/local && \
-    ./b2 install -j$(($(nproc)/2))
+    ./b2 install -j$(($(nproc)/2)) > /dev/null
 
 # Install aws-mock
 WORKDIR /usr/src
