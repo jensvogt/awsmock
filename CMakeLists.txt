@@ -8,23 +8,23 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Turn off shared libs globally
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-set(LINKER_GROUP_START "$<LINK_ONLY:-Wl,--start-group>")
-set(LINKER_GROUP_END "$<LINK_ONLY:-Wl,--end-group>")
-
-# -------------------------------------------------------------------------
-# External library root
-# -------------------------------------------------------------------------
-
-set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/external)
-set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
-set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
 # -------------------------------------------------------------------------
 # External directories
 # -------------------------------------------------------------------------
 
-include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-link_directories(${EXTERNAL_LIB_DIR})
+if (LINUX)
+    set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/external)
+    set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
+    set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
+    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    link_directories(${EXTERNAL_LIB_DIR})
+elseif (APPLE)
+    include_directories("/opt/homebrew/opt/openssl@3/include")
+    include_directories("/opt/homebrew/opt/libmagic/include")
+    link_directories("/opt/homebrew/opt/openssl@3/lib")
+    link_directories("/opt/homebrew/opt/libmagic/lib")
+endif ()
 
 # -------------------------------------------------------------------------
 # Global link flags
@@ -61,8 +61,7 @@ set(MONITORING_SOURCES core/src/monitoring/MonitoringCollector.cpp)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
 add_library(awsmockcore STATIC ${SOURCES})
 target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-        boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt
-)
+        boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt)
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
@@ -183,7 +182,8 @@ set(APPLICATION_SOURCES srv/src/application/ApplicationHandler.cpp srv/src/appli
 set(API_GATEWAY_SOURCES srv/src/apigateway/ApiGatewayService.cpp srv/src/apigateway/ApiGatewayHandler.cpp)
 set(MONITORING_SOURCES srv/src/monitoring/MetricService.cpp srv/src/monitoring/MetricSystemCollector.cpp
         srv/src/monitoring/MonitoringHandler.cpp srv/src/monitoring/MonitoringServer.cpp srv/src/monitoring/MonitoringService.cpp)
-set(FRONTEND_SOURCES srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp)
+set(FRONTEND_SOURCES srv/src/frontend/FrontendWorker.cpp srv/src/frontend/FrontendServer.cpp
+        srv/src/frontend/FrontendSession.cpp)
 set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRANSFER_SOURCES} ${FTP_SOURCES}
         ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES}
         ${CONTAINER_SOURCES} ${GATEWAY_SOURCES} ${APPLICATION_SOURCES} ${API_GATEWAY_SOURCES} ${MODULE_SOURCES}
