@@ -73,11 +73,6 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build .
 
-      - name: Wait for File Lock Release
-        shell: powershell
-        run: Start-Sleep -Seconds 3 # For PowerShell
-          cmake --install .
-
       - name: Build mongo-cxx-driver
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
