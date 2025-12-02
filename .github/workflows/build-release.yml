@@ -215,9 +215,8 @@ jobs:
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-                   -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
-                   -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON \
-                   -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
+                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern \
+                   -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
@@ -406,8 +405,8 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-                   -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern \
                    -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON \
                    -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
