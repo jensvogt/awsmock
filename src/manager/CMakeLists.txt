@@ -1,8 +1,48 @@
+
 set(BINARY awsmockmgr)
 
 set(SOURCES src/server/Manager.cpp src/server/Monitoring.cpp src/WindowsService.cpp src/main.cpp)
 
-if (WIN32)
+# Linux / macOS
+if (UNIX AND NOT APPLE)
+
+    set(EXTERNAL_LIB_DIR ${CMAKE_SOURCE_DIR}/external/lib)
+    set(EXTERNAL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/include)
+
+    add_executable(${BINARY} ${SOURCES})
+    target_include_directories(${BINARY} PRIVATE ./include ../dto/include ../db/include ../core/include ../service/include
+            ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
+
+    target_link_directories(${BINARY} PRIVATE ${EXTERNAL_LIB_DIR})
+    target_link_libraries(${BINARY} PRIVATE awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static
+            mongoc2 bson2 z ssl crypto archive magic ssh boost_filesystem boost_thread boost_program_options
+            boost_log boost_log_setup boost_process)
+
+    # Embed RPATH so the bundled libs are always found
+    set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
+
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+elseif (APPLE)
+
+    add_executable(${BINARY} ${SOURCES})
+
+    target_include_directories(${BINARY} PRIVATE ./include ../dto/include ../db/include ../core/include ../service/include
+            ${EXTERNAL_INCLUDE_DIR})
+
+    target_link_directories(${BINARY} PRIVATE ${EXTERNAL_LIB_DIR})
+
+    target_link_libraries(${BINARY} PRIVATE
+            awsmocksrv awsmockdto awsmockdb awsmockcore
+            mongocxx-static bsoncxx-static mongoc-1.0 bson-1.0 z ssl crypto
+            archive magic ssh
+            boost_filesystem boost_process boost_thread boost_program_options boost_log boost_log_setup
+    )
+
+    add_link_options("-rpath @loader_path/../lib")
+
+    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+else ()
     add_executable(${BINARY} WIN32 ${SOURCES})
     set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
     target_include_directories(${BINARY} PUBLIC ./include ../db/include ../dto/include ../service/include
@@ -42,17 +82,4 @@ if (WIN32)
             "$<$<CONFIG:DEBUG>:libboost_context-vc143-mt-gd-x64-1_89.lib>"
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
     install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-else ()
-    add_executable(${BINARY} ${SOURCES})
-    target_include_directories(${BINARY} PRIVATE ./include ../dto/include ../db/include ../core/include ../service/include
-            ${BSONCXX_INCLUDE_DIR} ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
-    target_link_directories(${BINARY} PRIVATE ${BSONCXX_LIB_DIR} ${MONGOCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${BINARY} PUBLIC awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_program_options boost_log boost_log_setup ssl crypto archive magic ssh)
-    if (APPLE)
-        add_link_options("-rpath /usr/local/awsmock/lib")
-        set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")
-    endif ()
-    install(TARGETS ${BINARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif ()
-

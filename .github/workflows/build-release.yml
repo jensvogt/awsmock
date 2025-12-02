@@ -196,23 +196,34 @@ jobs:
           cmake --build . --parallel $(nproc)
           cmake --install .
 
+      - name: Install mongo-c-driver
+        shell: bash
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+          -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake --build . 
+          cmake --install .
+
       - name: Install mongo-cxx-driver
         shell: bash
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
+          -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
-      #      - name: Install Boost
-      #        shell: bash
-      #        run: |
-      #          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-      #          tar -xzf boost_1_89_0.tar.gz
-      #          cd boost_1_89_0
-      #          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-      #          ./b2 install -j$(nproc)
+      - name: Install Boost
+        shell: bash
+        run: |
+          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+          tar -xzf boost_1_89_0.tar.gz
+          cd boost_1_89_0
+          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
+          ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
+              variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern
 
       - name: Build (Frontend)
         shell: bash
@@ -251,7 +262,6 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/bin
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/etc
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/log
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/lib
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/frontend
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/s3
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sqs
@@ -267,10 +277,6 @@ jobs:
           cp $BUILD_DIR/src/manager/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/src/controller/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/src/awslocal/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
-          cp $BUILD_DIR/src/core/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/src/db/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/src/dto/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/src/service/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp dist/etc/awsmock_linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key
@@ -376,23 +382,34 @@ jobs:
           cmake --build . --parallel $(nproc)
           cmake --install .
 
+      - name: Install mongo-c-driver
+        shell: bash
+        run: |
+          cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DENABLE_SHM_COUNTERS=OFF \
+          -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON \
+          -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake --build . 
+          cmake --install .
+
       - name: Install mongo-cxx-driver
         shell: bash
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver
-          cmake . -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+          cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/path/to/install/mongo-cxx \
+          -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
-      #      - name: Install Boost
-      #        shell: bash
-      #        run: |
-      #          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
-      #          tar -xzf boost_1_89_0.tar.gz
-      #          cd boost_1_89_0
-      #          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-      #          ./b2 install -j$(nproc)
+      - name: Install Boost
+        shell: bash
+        run: |
+          wget -nv https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+          tar -xzf boost_1_89_0.tar.gz
+          cd boost_1_89_0
+          ./bootstrap.sh --prefix=${{ github.workspace }}/extern
+          ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
+              variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern
 
       - name: Build (Frontend)
         shell: bash
@@ -431,7 +448,6 @@ jobs:
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/bin
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/etc
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/log
-          mkdir -p $PACKAGE_DIR/usr/local/awsmock/lib
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/s3
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sqs
           mkdir -p $PACKAGE_DIR/usr/local/awsmock/data/sns
@@ -447,10 +463,6 @@ jobs:
           cp $BUILD_DIR/src/manager/awsmockmgr $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/src/controller/awsmockctl $PACKAGE_DIR/usr/local/awsmock/bin/
           cp $BUILD_DIR/src/awslocal/awslocal $PACKAGE_DIR/usr/local/awsmock/bin/
-          cp $BUILD_DIR/src/core/libawsmockcore.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/src/db/libawsmockdb.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/src/dto/libawsmockdto.so $PACKAGE_DIR/usr/local/awsmock/lib/
-          cp $BUILD_DIR/src/service/libawsmocksrv.so $PACKAGE_DIR/usr/local/awsmock/lib/
           cp dist/etc/awsmock_linux.json $PACKAGE_DIR/usr/local/awsmock/etc/awsmock.json
           cp dist/etc/magic_linux.mgc $PACKAGE_DIR/usr/local/awsmock/etc/magic.mgc
           cp dist/etc/ssh_host_key $PACKAGE_DIR/usr/local/awsmock/etc/ssh_host_key

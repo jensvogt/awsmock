@@ -4,15 +4,9 @@ set(SOURCES src/AwsLocal.cpp src/main.cpp)
 if (WIN32)
     add_executable(${BINARY} WIN32 ${SOURCES})
     set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
-    target_include_directories(${BINARY} PUBLIC ./include ../core/include ../dto/include ${BSONCXX_INCLUDE_DIR}
-            ${MONGOCXX_INCLUDE_DIR} ${BOOST_INCLUDE_DIR} ${LIBMAGIC_INCLUDE_DIR} ${LIBARCHIVE_INCLUDE_DIR}
-            ${LIBJWT_INCLUDE_DIR} ${LIBSSL_INCLUDE_DIR} ${LIBPROMETHEUS_INCLUDE_DIR} ${LIBSSH_INCLUDE_DIR}
-            ${LIBSSL_LIB_DIR})
-    target_link_directories(${BINARY} PUBLIC ${MONGOCXX_LIB_DIR} ${BOOST_LIB_DIR} ${LIBSSH_LIB_DIR} ${LIBSSL_LIB_DIR}
-            ${LIBARCHIVE_LIB_DIR} ${LIBMAGIC_LIB_DIR} ${LIBPROMETHEUS_LIB_DIR})
-    target_link_libraries(${BINARY} awsmocksrv_static awsmockdto_static awsmockdb_static awsmockcore_static
-            libssl.lib libcrypto.lib archive.lib magic.lib prometheus-cpp-pull.lib prometheus-cpp-core.lib
-            bsoncxx-v_noabi-rhi-x64-v145-md.lib mongocxx-v_noabi-rhi-x64-v145-md.lib bson2.lib mongoc2.lib
+    target_include_directories(${BINARY} PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
+    target_link_directories(${BINARY} PUBLIC ${BOOST_LIB_DIR})
+    target_link_libraries(${BINARY} awsmockcore_static
             "$<$<CONFIG:RELEASE>:libboost_filesystem-vc143-mt-x64-1_89.lib>"
             "$<$<CONFIG:DEBUG>:libboost_filesystem-vc143-mt-gd-x64-1_89.lib>"
             "$<$<CONFIG:RELEASE>:libboost_url-vc143-mt-x64-1_89.lib>"
@@ -37,7 +31,7 @@ if (WIN32)
 else ()
     add_executable(${BINARY} ${SOURCES})
     target_include_directories(${BINARY} PRIVATE ./include ../core/include ${EXTERNAL_INCLDUE_DIR})
-    target_link_libraries(${BINARY} PRIVATE awsmockcore boost_program_options boost_log boost_log_setup)
+    target_link_libraries(${BINARY} PRIVATE awsmockcore boost_process boost_program_options boost_log boost_log_setup)
     if (APPLE)
         add_link_options("-rpath /usr/local/awsmock/lib")
         set_target_properties(${BINARY} PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/lib;${EXTERNAL_LIB_DIR}")

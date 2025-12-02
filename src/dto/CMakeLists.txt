@@ -51,13 +51,12 @@ if (WIN32)
             bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_url-vc143-mt-x64-1_89.lib
             boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
             boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib)
-    #install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 else ()
     add_library(${LIBRARY} SHARED ${SOURCES})
     target_include_directories(${LIBRARY} PRIVATE include ../core/include ../db/include ${BSONCXX_INCLUDE_DIR}
             ${MONGOCXX_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR})
     target_link_directories(${LIBRARY} PRIVATE ${MONGOCXX_LIB_DIR} ${BSONCXX_LIB_DIR} ${EXTERNAL_LIB_DIR})
-    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem
-            boost_url boost_thread boost_locale boost_json ssl crypto archive magic)
+    target_link_libraries(${LIBRARY} PUBLIC awsmockcore awsmockdb mongocxx bsoncxx boost_filesystem boost_locale
+            boost_json ssl crypto archive magic)
     install(TARGETS ${LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 endif ()
