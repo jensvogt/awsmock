@@ -153,9 +153,10 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern \
-                -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
+          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBSONCXX_POLY_USE_REAL=ON \
+                -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON \
+                -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
           cmake --build . --config Release --parallel $(sysctl -n hw.logicalcpu)
           cmake --install .
 
@@ -256,9 +257,10 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
-                   -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern \
-                   -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
+          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBSONCXX_POLY_USE_REAL=ON \
+                -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON \
+                -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
           cmake --build . --config Release --parallel $(nproc)
           cmake --install .
 
@@ -570,7 +572,7 @@ jobs:
       - name: Upload .rpm
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}.amd64.rpm
+          name: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           path: ${{ env.APP_NAME }}-${{ env.SEMVER }}-1.x86_64.rpm
           overwrite: true
 
