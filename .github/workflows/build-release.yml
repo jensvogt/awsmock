@@ -84,6 +84,7 @@ jobs:
             -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
 
       - name: Build mongo-cxx-driver
+        shell: cmd
         run: |
           cd mongo-cxx-driver/build
           cmake --build . --config Release --parallel  
