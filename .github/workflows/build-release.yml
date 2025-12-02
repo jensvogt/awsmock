@@ -107,9 +107,9 @@ jobs:
     env:
       BUILD_DIR: "${{ github.workspace }}/build-macos"
       SEMVER: "${{ needs.release-please.outputs.tag_name }}"
-      INSTALLER_DIR: "${{ github.workspace }}/installer"
-      APP_NAME: "awsmock"
       OPENSSL_ROOT_DIR: "/opt/homebrew/opt/openssl@3"
+      OPENSSL_LIB_DIR: "/opt/homebrew/opt/openssl@3/lib"
+      OPENSSL_INCLUDE_DIR: "/opt/homebrew/opt/openssl@3/include"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -124,7 +124,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install openssl@3
+          brew install doxygen pandoc libmagic
 
       - name: Install JWT-CPP
         shell: bash
@@ -156,7 +156,7 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
                 -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern \
                 -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern
-          cmake --build . --config Release --parallel $(nproc)
+          cmake --build . --config Release --parallel $(sysctl -n hw.logicalcpu)
           cmake --install .
 
       - name: Install Boost
@@ -166,7 +166,7 @@ jobs:
           tar -xzf boost_1_89_0.tar.gz
           cd boost_1_89_0
           ./bootstrap.sh --prefix=${{ github.workspace }}/extern
-          ./b2 install -j$(nproc) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
+          ./b2 install -j$(sysctl -n hw.logicalcpu) -DBOOST_LOG_DYN_LINK=OFF -DBOOST_ALL_DYN_LINK link=static runtime-link=static \
            variant=release threading=multi stage --stagedir=${{ github.workspace }}/extern > /dev/null
 
       - name: Build (macOS)
