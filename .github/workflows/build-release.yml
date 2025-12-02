@@ -72,7 +72,7 @@ jobs:
           cd mongo-c-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build .
-
+          
       - name: Wait for File Lock Release
         shell: powershell
         run: Start-Sleep -Seconds 3 # For PowerShell
