@@ -141,13 +141,15 @@ namespace AwsMock::Core {
     }
 #endif
 
-    int ZipUtils::CopyData(archive *ar, archive *aw) {
+    long ZipUtils::CopyData(archive *ar, archive *aw) {
         const void *buff;
         size_t size;
 #ifdef _WIN32
         long long offset;
-#else
+#elif __linux__
         long offset;
+#else
+        la_int64_t offset;
 #endif
 
         for (;;) {
