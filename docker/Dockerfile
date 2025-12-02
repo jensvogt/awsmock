@@ -53,7 +53,7 @@ RUN git clone https://github.com/jensvogt/awsmock.git && \
     cmake -S . -B "$BUILD_DIR" -DBUILD_DOCUMENTATION=ON -DBSONCXX_INCLUDE_DIR=/usr/extern/include/bsoncxx/v_noabi \
                 -DMONGOCXX_INCLUDE_DIR=/usr/extern/include/mongocxx/v_noabi -DEXTERNAL_INCLUDE_DIR=usr/extern/include \
                 -DEXTERNAL_LIB_DIR=/usr/extern/lib && \
-    cmake --build "$BUILD_DIR" --parallel $(nproc)
+    cmake --build "$BUILD_DIR" --parallel $(($(nproc)/2)) && \
     cmake --install . --config Release
 
 FROM node:22-bookworm AS buildfrontend
