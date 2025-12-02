@@ -254,9 +254,14 @@ target_link_libraries(awslocal PRIVATE
 target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
 
 # -------------------------------------------------------------------------
+# Build documentation
+# -------------------------------------------------------------------------
+add_subdirectory(docs)
+
+# -------------------------------------------------------------------------
 # Install
 # -------------------------------------------------------------------------
 
-install(TARGETS awsmockmgr DESTINATION bin)
-install(DIRECTORY ${EXTERNAL_ROOT}/lib DESTINATION .)
-install(DIRECTORY ${EXTERNAL_ROOT}/include DESTINATION .)
+#install(TARGETS awsmockmgr DESTINATION bin)
+#install(DIRECTORY ${EXTERNAL_ROOT}/lib DESTINATION .)
+#install(DIRECTORY ${EXTERNAL_ROOT}/include DESTINATION .)
