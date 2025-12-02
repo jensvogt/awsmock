@@ -17,8 +17,8 @@
 #endif
 #include <io.h>
 #define BOOST_ASIO_NO_WIN32_LEAN_AND_MEAN
-#include <boost/asio.hpp>
 #include <Windows.h>
+#include <boost/asio.hpp>
 #endif
 
 // Boost includes
@@ -30,8 +30,8 @@
 
 // AwsMock includes
 #include <awsmock/core/FileUtils.h>
-#include <awsmock/core/logging/LogStream.h>
 #include <awsmock/core/StringUtils.h>
+#include <awsmock/core/logging/LogStream.h>
 
 namespace AwsMock::Core {
 
@@ -64,32 +64,13 @@ namespace AwsMock::Core {
       private:
 
         /**
-         * @brief Writes archive single file to the Tar archive.
-         *
-         * @param archive tar archive.
-         * @param fileName name of the file to write
-         * @param directory remove name of the directory from filename
-         * @param isDir directory flag
-         * @param isLink link flag, needed to preserve links
-         */
-        static void WriteFile(archive *archive, std::string &fileName, const std::string &directory, bool isDir, bool isLink);
-
-        /**
-         * @brief Read a symbolic link.
-         *
-         * @param path path to link.
-         * @return target path.
-         */
-        static std::string ReadSymlink(const std::string &path);
-
-        /**
          * @brief Copy data from A to B
          *
          * @param ar source file name
          * @param aw destination file name
          * @return success of -1
          */
-        static int CopyData(archive *ar, archive *aw);
+        static long CopyData(archive *ar, archive *aw);
     };
 
 }// namespace AwsMock::Core

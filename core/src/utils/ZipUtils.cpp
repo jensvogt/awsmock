@@ -141,7 +141,7 @@ namespace AwsMock::Core {
     }
 #endif
 
-    int ZipUtils::CopyData(archive *ar, archive *aw) {
+    long ZipUtils::CopyData(archive *ar, archive *aw) {
         const void *buff;
         size_t size;
 #ifdef _WIN32
