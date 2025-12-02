@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.9.38](https://github.com/jensvogt/awsmock/compare/1.9.37...v1.9.38) (2025-12-02)
+
+
+### Bug Fixes
+
+* add docker container stats ([3d0a71b](https://github.com/jensvogt/awsmock/commit/3d0a71b34ffc739e14edc20097f9b11019ce85f5))
+* build static manager ([ce92bc2](https://github.com/jensvogt/awsmock/commit/ce92bc24ba44987f933650dae4d7499b8eb9ccec))
+* build static manager ([86bc80d](https://github.com/jensvogt/awsmock/commit/86bc80d48a91e46561de66be3e31d0f00df327e6))
+
 ## [1.9.37](https://github.com/jensvogt/awsmock/compare/1.9.36...v1.9.37) (2025-12-01)
 
 
