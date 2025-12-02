@@ -72,6 +72,10 @@ jobs:
           cd mongo-c-driver/build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
           cmake --build .
+
+      - name: Wait for File Lock Release
+        shell: powershell
+        run: Start-Sleep -Seconds 3 # For PowerShell
           cmake --install .
 
       - name: Build mongo-cxx-driver
@@ -80,6 +84,10 @@ jobs:
           cd mongo-cxx-driver/build
           cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern -DBUILD_SHARED_LIBS=OFF -DBSONCXX_POLY_USE_REAL=ON -DBSONCXX_POLY_USE_MNMLSTC=OFF -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/extern -DCMAKE_CXX_STANDARD=23
           cmake --build . --config Release --parallel $(sysctl -n hw.logicalcpu)
+
+      - name: Wait for File Lock Release
+        shell: powershell
+        run: Start-Sleep -Seconds 3 # For PowerShell
           cmake --install .
 
       - name: Build boost
