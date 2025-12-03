@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.63](https://github.com/jensvogt/awsmock/compare/v1.9.62...v1.9.63) (2025-12-03)
+
+
+### Bug Fixes
+
+* link statically ([9d101bc](https://github.com/jensvogt/awsmock/commit/9d101bc38ded3b1011b4ad730dd5685492e6aa7d))
+
 ## [1.9.62](https://github.com/jensvogt/awsmock/compare/v1.9.61...v1.9.62) (2025-12-03)
 
 
