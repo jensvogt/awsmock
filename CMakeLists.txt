@@ -257,6 +257,9 @@ if (APPLE)
             boost_program_options boost_process boost_json boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2
             lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread resolv
             -Wl,-rpath,/usr/local/lib)
+    target_include_directories(awslocal PRIVATE /opt/homebrew/opt/icu4c/include)
+    target_link_libraries(awslocal PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
+            /opt/homebrew/opt/icu4c/lib/libicudata.a)
 else ()
     target_link_libraries(awslocal PRIVATE
             -Wl,--start-group
