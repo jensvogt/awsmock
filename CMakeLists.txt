@@ -282,7 +282,7 @@ else ()
     target_link_directories(awsmocksrv PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
             boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
-            boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl icuuc icui18n icudata ssh ssl crypto)
+            boost_context boost_thread ssh resolv xml2 ssl crypto nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic archive acl pthread rt)
     target_compile_options(awsmocksrv PRIVATE -Wno-deprecated-declarations)
 endif ()
 
@@ -327,11 +327,11 @@ else ()
     target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/include db/include srv/include
             ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
-    target_link_libraries(awsmockmgr PRIVATE -Wl,--start-group awsmocksrv awsmockdto awsmockdb awsmockcore
+    target_link_libraries(awsmockmgr PUBLIC -Wl,--start-group awsmocksrv awsmockdto awsmockdb awsmockcore
             mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_chrono
             boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json boost_filesystem
-            boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl ssh crypto acl
-            pthread rt resolv -Wl,--end-group)
+            ssh ssl crypto archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic acl pthread rt resolv
+            ssh -Wl,--end-group)
     target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
 endif ()
 
