@@ -66,7 +66,32 @@ jobs:
           cmake --build . --parallel $(nproc)
           cmake --install .
 
-      #      - name: Build mongo-c-driver
+      - name: Build zlib
+        run: |
+          mkdir zlib_source
+          curl -L https://zlib.net/zlib131.zip -o zlib_source\zlib.zip
+          cd zlib_source
+          mkdir build
+          cd build
+          cmake -S .. -B . -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern
+          cmake --build .
+          cmake --install .
+
+      #      - name: Build openssl
+      #        run: |
+      #          git clone https://github.com/openssl/openssl.git
+      #          cd openssl
+      #          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          cmake --build .
+
+      #      - name: Build magic
+      #        run: |
+      #          git clone https://github.com/mongodb/mongo-c-driver
+      #          cd mongo-c-driver/build
+      #          cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_SHM_COUNTERS=OFF -DENABLE_STATIC=ON -DENABLE_SHARED=OFF -DENABLE_PIC=ON -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/extern
+      #          cmake --build .
+
+      #      - name: Build archive
       #        run: |
       #          git clone https://github.com/mongodb/mongo-c-driver
       #          cd mongo-c-driver/build
@@ -87,9 +112,9 @@ jobs:
         run: |
           mkdir boost_source
           curl -L https://archives.boost.io/release/1.89.0/source/boost_1_89_0.zip -o boost_source\boost.zip
-          unzip boost_source\boost.zip -d boost_source > NUL
-          move boost_source\boost_1_89_0 boost_source\boost_source_root
-          cd boost_source\boost_source_root
+          cd boost_source
+          unzip boost.zip
+          cd boost_1_89_0
           .\bootstrap.bat
           .\b2 link=static runtime-link=static variant=release address-model=64 --toolset=msvc --prefix=${{ github.workspace }}/extern install > NUL
 
