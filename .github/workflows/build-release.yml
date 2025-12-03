@@ -90,6 +90,7 @@ jobs:
         shell: powershell
         run: |
           Start-Sleep -Seconds 3
+          cd build
           cmake --install .
 
       - name: Build boost
