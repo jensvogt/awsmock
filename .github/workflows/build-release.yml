@@ -171,7 +171,7 @@ jobs:
       - name: Install system dependencies
         shell: bash
         run: |
-          brew install doxygen pandoc libmagic libarchive file icu4c
+          brew install doxygen pandoc libmagic libarchive libssh file icu4c 
 
       - name: Install JWT-CPP
         shell: bash
