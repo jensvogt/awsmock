@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.9.71](https://github.com/jensvogt/awsmock/compare/v1.9.70...v1.9.71) (2025-12-03)
+
+
+### Bug Fixes
+
+* add installer packages ([a7c2fc8](https://github.com/jensvogt/awsmock/commit/a7c2fc8b9c17c25b8a6a83c87576b6dfc7afd4aa))
+* add installer packages ([231c187](https://github.com/jensvogt/awsmock/commit/231c187b976978adf25bbce774e6b7b052cbc5bd))
+* link statically ([62759e4](https://github.com/jensvogt/awsmock/commit/62759e418abda0bb52c08b15cdd5dc820e8eab33))
+* link statically ([0222d94](https://github.com/jensvogt/awsmock/commit/0222d948e2f3f2234c6d1f0082f823ede5797469))
+* link statically ([61a37fa](https://github.com/jensvogt/awsmock/commit/61a37fa46b819dbd7fcf4dbd14081217dc9052eb))
+
 ## [1.9.70](https://github.com/jensvogt/awsmock/compare/v1.9.69...v1.9.70) (2025-12-03)
 
 
