@@ -78,20 +78,21 @@ jobs:
         run: |
           git clone -b releases/stable https://github.com/mongodb/mongo-cxx-driver.git
           cd mongo-cxx-driver/build
-          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern ^
-            -DBUILD_SHARED_LIBS=OFF -DBSONCXX_POLY_USE_REAL=ON -DBSONCXX_POLY_USE_MNMLSTC=OFF ^
-            -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON ^
-            -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
+          cmake -S .. -B . -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\extern ^ 
+                           -DBUILD_SHARED_LIBS=OFF -DBSONCXX_POLY_USE_REAL=ON -DBSONCXX_POLY_USE_MNMLSTC=OFF ^
+                           -DBSONCXX_POLY_USE_BOOST=OFF -DBSONCXX_ENABLE_STATIC=ON -DMONGOCXX_ENABLE_STATIC=ON ^
+                           -DCMAKE_PREFIX_PATH=${{ github.workspace }}\extern -DCMAKE_CXX_STANDARD=23
 
       - name: Build mongo-cxx-driver
         shell: cmd
         run: |
           cd mongo-cxx-driver/build
-          cmake --build . --config Release --parallel  
+          cmake --build . --config Release --parallel
 
       - name: Wait for File Lock Release
         shell: powershell
-        run: Start-Sleep -Seconds 3 # For PowerShell
+        run: |
+          Start-Sleep -Seconds 3
           cmake --install .
 
       - name: Build boost
