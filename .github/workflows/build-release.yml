@@ -85,7 +85,7 @@ jobs:
           cd libzip
           mkdir build
           cd build
-          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF
+          cmake -S .. -B . -DBUILD_SHARED_LIBS=OFF -DZLIB_LIBRARY=${{ github.workspace }}/extern/lib/z.lib -DZLIB_INCLUDE_DIR=${{ github.workspace }}/extern/include
           cmake --build . --config Release
           cmake --install .
 
