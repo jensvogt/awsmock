@@ -281,7 +281,7 @@ if (APPLE)
     target_link_libraries(awslocal PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
             /opt/homebrew/opt/icu4c/lib/libicudata.a)
     target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
-elseif (WINDOWS)
+elseif (WIN32)
     add_executable(${BINARY} WIN32 ${SOURCES})
     set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
     target_include_directories(${BINARY} PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
