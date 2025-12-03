@@ -67,6 +67,11 @@ add_library(awsmockcore STATIC ${SOURCES})
 if (APPLE)
     target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread)
+elseif (WIN32)
+    target_link_libraries(awsmockcore PUBLIC mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib
+            boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib
+            boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib
+            libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
     target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt)
@@ -108,10 +113,16 @@ set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMB
         ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${MONITORING_SOURCES})
 add_library(awsmockdto STATIC ${SOURCES})
 if (APPLE)
-    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+    target_link_libraries(awsmockdto PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread)
+elseif (WIN32)
+    target_link_libraries(awsmockdto PUBLIC awsmockcore
+            mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
+            boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
+            boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
+            archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
-    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
+    target_link_libraries(awsmockdto PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread rt)
 endif ()
 
@@ -160,6 +171,12 @@ if (APPLE)
     target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
             magic lzma bz2 lz4 z zstd pthread)
+elseif (WIN32)
+    target_link_libraries(awsmockdb PUBLIC awsmockcore awsmockdto
+            mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
+            boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
+            boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
+            archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
     target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
@@ -212,6 +229,12 @@ if (APPLE)
     target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
             boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
             boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp ssh ssl crypto)
+elseif (WIN32)
+    target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto
+            mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
+            boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
+            boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
+            archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
     target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
             boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
@@ -272,6 +295,7 @@ else ()
     )
     target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
 endif ()
+
 # -------------------------------------------------------------------------
 # AWSMock Controller
 # -------------------------------------------------------------------------
@@ -279,7 +303,7 @@ endif ()
 add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
 target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include db/include)
 if (APPLE)
-    target_link_libraries(awsmockctl PRIVATE awsmockcore
+    target_link_libraries(awsmockctl PRIVATE awsmockcore awsmockdto
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
