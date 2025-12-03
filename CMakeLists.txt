@@ -16,22 +16,6 @@ set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
 set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
 set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
-if (WIN32)
-    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
-            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    link_directories(${EXTERNAL_LIB_DIR})
-elseif (APPLE)
-    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
-            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
-            "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
-    link_directories(${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
-            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
-else ()
-    include_directories(${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
-            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
-    link_directories(${EXTERNAL_LIB_DIR})
-endif ()
-
 # -------------------------------------------------------------------------
 # Global link flags
 # -------------------------------------------------------------------------
@@ -67,20 +51,33 @@ set(LOGGING_SOURCES core/src/logging/LogStream.cpp core/src/logging/LogWebsocket
         core/src/logging/LogWebsocketSink.cpp)
 set(MONITORING_SOURCES core/src/monitoring/MonitoringCollector.cpp)
 set(SOURCES ${UTILS_SOURCES} ${EXCEPTION_SOURCES} ${LOGGING_SOURCES} ${MONITORING_SOURCES})
+
 add_library(awsmockcore STATIC ${SOURCES})
 if (APPLE)
+    target_include_directories(awsmockcore PUBLIC ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
+            "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
+    target_link_directories(awsmockcore PUBLIC ${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
+            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
     target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread)
+    target_compile_options(awsmockcore PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
-    target_link_libraries(awsmockcore PUBLIC mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib
-            boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib
-            boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib
-            libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
+    target_include_directories(awsmockcore PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockcore ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockcore PUBLIC boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib
+            boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
+            boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib pdh.lib)
 else ()
-    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-            boost_date_time boost_url boost_exception boost_filesystem boost_regex pthread rt)
+    target_include_directories(awsmockcore PUBLIC core/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    link_directories(awsmockcore ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockcore PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono
+            boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_process
+            pthread rt)
+    target_compile_options(awsmockcore PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awsmockcore PUBLIC core/include dto/include)
 
 # -------------------------------------------------------------------------
 # Build AWSMock DTO library
@@ -116,21 +113,34 @@ set(MONITORING_SOURCES dto/src/monitoring/mapper/Mapper.cpp)
 set(SOURCES ${COMMON_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${S3_SOURCES} ${LAMBDA_SOURCES} ${COGNITO_SOURCES}
         ${TRANSFER_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${MODULE_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${MONITORING_SOURCES})
+
 add_library(awsmockdto STATIC ${SOURCES})
 if (APPLE)
+    target_include_directories(awsmockdto PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi
+            "/opt/homebrew/opt/openssl@3/include" "/opt/homebrew/opt/libmagic/include"
+            "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
+    target_link_directories(awsmockdto PUBLIC ${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib"
+            "/opt/homebrew/opt/libmagic/lib" "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
     target_link_libraries(awsmockdto PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread)
+    target_compile_options(awsmockdto PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
-    target_link_libraries(awsmockdto PUBLIC awsmockcore
-            mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
-            boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
-            boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
-            archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
+    target_include_directories(awsmockdto PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockdto ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockdto PUBLIC awsmockcore mongocxx-v_noabi-rhi-x64-v145-md.lib
+            bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib boost_filesystem-vc143-mt-x64-1_89.lib
+            boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib boost_log_setup-vc143-mt-x64-1_89.lib
+            boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib archive.lib magic.lib ssh.lib pdh.lib)
 else ()
+    target_include_directories(awsmockdto PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockdto PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockdto PUBLIC boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread pthread rt)
+    target_compile_options(awsmockdto PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awsmockdto PUBLIC core/include db/include dto/include)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Database library
@@ -172,23 +182,37 @@ set(SOURCES db/src/repository/Database.cpp db/src/utils/TestUtils.cpp ${SQS_SOUR
         ${LAMBDA_SOURCES} ${TRANSFER_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${MODULE_SOURCES}
         ${SECRETSMANAGER_SOURCES} ${SSM_SOURCES} ${APPS_SOURCES} ${API_GATEWAY_SOURCES} ${UTIL_SOURCES}
         ${MONITORING_SOURCES})
+
 add_library(awsmockdb STATIC ${SOURCES})
 if (APPLE)
+    target_include_directories(awsmockdb PUBLIC ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
+            "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
+    target_link_directories(awsmockdb PUBLIC ${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
+            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
     target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
             boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
             magic lzma bz2 lz4 z zstd pthread)
+    target_compile_options(awsmockdb PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
+    target_include_directories(awsmockdb PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockdb ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockdb PUBLIC awsmockcore awsmockdto
             mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
             boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
             boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
             archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
-    target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_atomic boost_chrono boost_container
-            boost_date_time boost_url boost_exception boost_filesystem boost_regex boost_thread ssl crypto
-            magic lzma bz2 lz4 z zstd icuuc icui18n icudata pthread rt)
+    target_include_directories(awsmockdb PUBLIC core/include dto/include db/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockdb PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockdb PUBLIC awsmockdto awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log
+            boost_log_setup boost_thread boost_atomic boost_chrono boost_container boost_date_time boost_url
+            boost_exception boost_filesystem boost_regex boost_thread ssl crypto magic lzma bz2 lz4 z zstd icuuc icui18n
+            icudata pthread rt)
+    target_compile_options(awsmockdb PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awsmockdb PUBLIC core/include dto/include db/include)
 
 # -------------------------------------------------------------------------
 # Build AWSMock Service library
@@ -231,23 +255,36 @@ set(SOURCES ${COMMON_SOURCES} ${S3_SOURCES} ${SQS_SOURCES} ${SNS_SOURCES} ${TRAN
         ${LAMBDA_SOURCES} ${COGNITO_SOURCES} ${DYNAMODB_SOURCES} ${KMS_SOURCES} ${SSM_SOURCES} ${SECRETMANAGER_SOURCES}
         ${CONTAINER_SOURCES} ${GATEWAY_SOURCES} ${APPLICATION_SOURCES} ${API_GATEWAY_SOURCES} ${MODULE_SOURCES}
         ${MONITORING_SOURCES} ${FRONTEND_SOURCES})
+
 add_library(awsmocksrv STATIC ${SOURCES})
 if (APPLE)
+    target_include_directories(awsmocksrv PUBLIC ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
+            "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include")
+    target_link_directories(awsmocksrv PUBLIC ${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
+            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
     target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
             boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
             boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp ssh ssl crypto)
+    target_compile_options(awsmocksrv PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
+    target_include_directories(awsmocksrv PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmocksrv ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmocksrv PUBLIC awsmockcore awsmockdb awsmockdto
             mongocxx-v_noabi-rhi-x64-v145-md.lib bsoncxx-v_noabi-rhi-x64-v145-md.lib boost_url-vc143-mt-x64-1_89.lib
             boost_filesystem-vc143-mt-x64-1_89.lib boost_locale-vc143-mt-x64-1_89.lib boost_log-vc143-mt-x64-1_89.lib
             boost_log_setup-vc143-mt-x64-1_89.lib boost_process-vc143-mt-x64-1_89.lib libssl.lib libcrypto.lib
             archive.lib magic.lib ssh.lib prometheus-cpp-core.lib prometheus-cpp-pull.lib pdh.lib)
 else ()
+    target_include_directories(awsmocksrv PUBLIC core/include dto/include db/include srv/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmocksrv PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmocksrv PUBLIC awsmockdb awsmockdto awsmockcore boost_log boost_log_setup boost_thread
             boost_atomic boost_chrono boost_container boost_date_time boost_url boost_exception boost_filesystem boost_regex
             boost_context boost_thread archive xml2 lzma bz2 lz4 z zstd nettle gmp acl icuuc icui18n icudata ssh ssl crypto)
+    target_compile_options(awsmocksrv PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awsmocksrv PUBLIC core/include dto/include db/include srv/include)
 
 # -------------------------------------------------------------------------
 # AWSMock Manager (main program)
@@ -255,22 +292,29 @@ target_include_directories(awsmocksrv PUBLIC core/include dto/include db/include
 
 if (APPLE)
     add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
+    target_include_directories(awsmockmgr PUBLIC ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi "/opt/homebrew/opt/openssl@3/include"
+            "/opt/homebrew/opt/libmagic/include" "/opt/homebrew/opt/libarchive/include" "/opt/homebrew/include"
+            "/opt/homebrew/opt/icu4c/include")
+    target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR} "/opt/homebrew/opt/openssl@3/lib" "/opt/homebrew/opt/libmagic/lib"
+            "/opt/homebrew/opt/libarchive/lib" "/opt/homebrew/lib")
     target_link_libraries(awsmockmgr PRIVATE awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static
             mongoc2 bson2
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
             -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
-            boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
-            boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
-            "-framework CoreFoundation" "-framework Security" "-framework SystemConfiguration"
-            -Wl,-rpath,/usr/local/lib)
-    target_include_directories(awsmockmgr PRIVATE /opt/homebrew/opt/icu4c/include)
-    target_link_libraries(awsmockmgr PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
-            /opt/homebrew/opt/icu4c/lib/libicudata.a)
+            /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
+            /opt/homebrew/opt/icu4c/lib/libicudata.a boost_log_setup boost_chrono boost_exception boost_regex
+            boost_program_options boost_process boost_json boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd
+            magic ssl ssh crypto pthread resolv "-framework CoreFoundation" "-framework Security"
+            "-framework SystemConfiguration" -Wl,-rpath,/usr/local/lib)
     target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
 elseif (WIN32)
     add_executable(awsmockmgr WIN32 manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
     set_target_properties(awsmockmgr PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+    target_include_directories(awsmockcore PUBLIC core/include dto/include ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi
+            ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockcore ${EXTERNAL_LIB_DIR})
     target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
     target_link_libraries(awsmockmgr awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
             libboost_filesystem-vc143-mt-x64-1_89.lib libboost_url-vc143-mt-x64-1_89.lib
@@ -280,17 +324,16 @@ elseif (WIN32)
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 else ()
     add_executable(awsmockmgr manager/src/server/Manager.cpp manager/src/server/Monitoring.cpp manager/src/main.cpp)
-    target_link_libraries(awsmockmgr PRIVATE
-            -Wl,--start-group
-            awsmocksrv awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup
-            boost_thread boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
-            boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
-            crypto acl pthread rt resolv
-            -Wl,--end-group
-    )
+    target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/include db/include srv/include
+            ${EXTERNAL_INCLUDE_DIR} ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockmgr PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockmgr PRIVATE -Wl,--start-group awsmocksrv awsmockdto awsmockdb awsmockcore
+            mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_chrono
+            boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json boost_filesystem
+            boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl ssh crypto acl
+            pthread rt resolv -Wl,--end-group)
     target_compile_options(awsmockmgr PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/include db/include srv/include)
 
 # -------------------------------------------------------------------------
 # AWSMock Controller
@@ -299,12 +342,10 @@ target_include_directories(awsmockmgr PUBLIC manager/include core/include dto/in
 if (APPLE)
     add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
     target_link_libraries(awsmockctl PRIVATE awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2
-            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
-            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
-            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
-            boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
-            boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
-            -Wl,-rpath,/usr/local/lib)
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a boost_log_setup boost_chrono boost_exception
+            boost_regex boost_program_options boost_process boost_json boost_filesystem archive xml2 nettle gmp lzma
+            bz2 lz4 z zstd magic ssl crypto pthread resolv -Wl,-rpath,/usr/local/lib)
     target_include_directories(awsmockctl PRIVATE /opt/homebrew/opt/icu4c/include)
     target_link_libraries(awsmockctl PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
             /opt/homebrew/opt/icu4c/lib/libicudata.a)
@@ -321,17 +362,16 @@ elseif (WIN32)
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 else ()
     add_executable(awsmockctl controller/src/Controller.cpp controller/src/main.cpp)
-    target_link_libraries(awsmockctl PRIVATE
-            -Wl,--start-group
-            awsmockdto awsmockdb awsmockcore mongocxx-static bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread
-            boost_chrono boost_date_time boost_exception boost_regex boost_program_options boost_process boost_json
-            boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl
-            crypto acl pthread rt resolv
-            -Wl,--end-group
-    )
+    target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awsmockctl PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awsmockctl PRIVATE awsmockdto awsmockdb awsmockcore -Wl,--start-group mongocxx-static
+            bsoncxx-static mongoc2 bson2 boost_log boost_log_setup boost_thread boost_chrono boost_date_time
+            boost_exception boost_regex boost_program_options boost_process boost_json boost_filesystem boost_thread
+            archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread rt resolv
+            -Wl,--end-group)
     target_compile_options(awsmockctl PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awsmockctl PUBLIC controller/include core/include dto/include db/include)
 
 # -------------------------------------------------------------------------
 # AWSMock awslocal
@@ -339,14 +379,12 @@ target_include_directories(awsmockctl PUBLIC controller/include core/include dto
 
 if (APPLE)
     add_executable(awslocal awslocal/src/AwsLocal.cpp awslocal/src/main.cpp)
-    target_link_libraries(awslocal PRIVATE awsmockcore
-            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
-            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a
-            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
+    target_include_directories(awslocal PRIVATE awslocal/include /opt/homebrew/opt/icu4c/include)
+    target_link_libraries(awslocal PRIVATE awsmockcore -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_log.a
+            -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_date_time.a -Wl,-force_load,${EXTERNAL_LIB_DIR}/libboost_thread.a
             boost_log_setup boost_chrono boost_exception boost_regex boost_program_options boost_process boost_json
             boost_filesystem archive xml2 nettle gmp lzma bz2 lz4 z zstd magic ssl crypto pthread resolv
             -Wl,-rpath,/usr/local/lib)
-    target_include_directories(awslocal PRIVATE /opt/homebrew/opt/icu4c/include)
     target_link_libraries(awslocal PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
             /opt/homebrew/opt/icu4c/lib/libicudata.a)
     target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
@@ -362,15 +400,15 @@ elseif (WIN32)
             ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 else ()
     add_executable(awslocal awslocal/src/AwsLocal.cpp awslocal/src/main.cpp)
-    target_link_libraries(awslocal PRIVATE
-            -Wl,--start-group
-            awsmockcore boost_log boost_log_setup boost_thread boost_chrono boost_date_time boost_exception boost_regex
-            boost_program_options boost_process boost_json boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2
-            lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread rt resolv
-            -Wl,--end-group)
+    target_include_directories(awslocal PUBLIC awslocal/include core/include dto/include ${EXTERNAL_INCLUDE_DIR}
+            ${EXTERNAL_INCLUDE_DIR}/bsoncxx/v_noabi ${EXTERNAL_INCLUDE_DIR}/mongocxx/v_noabi)
+    target_link_directories(awslocal PUBLIC ${EXTERNAL_LIB_DIR})
+    target_link_libraries(awslocal PRIVATE -Wl,--start-group awsmockcore boost_log boost_log_setup boost_chrono
+            boost_date_time boost_exception boost_regex boost_process boost_program_options boost_json boost_filesystem
+            boost_thread archive xml2 nettle gmp lzma bz2 lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread
+            rt resolv -Wl,--end-group)
     target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_include_directories(awslocal PUBLIC awslocal/include core/include dto/include)
 
 # -------------------------------------------------------------------------
 # Build documentation

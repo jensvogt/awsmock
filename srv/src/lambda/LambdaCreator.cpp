@@ -165,7 +165,7 @@ namespace AwsMock::Service {
 
         // Cleanup
         Core::DirUtils::DeleteDirectory(codeDir);
-        log_info << "Finished creating docker image, name: " << lambdaEntity.function << " size: " << lambdaEntity.codeSize + ", codeDir: " << codeDir;
+        log_info << "Finished creating docker image, name: " << lambdaEntity.function << " size: " << std::to_string(lambdaEntity.codeSize) + ", codeDir: " << codeDir;
     }
 
     void LambdaCreator::CreateDockerContainer(const Database::Entity::Lambda::Lambda &lambda, const std::string &instanceId, const int hostPort, const std::string &dockerTag) {
