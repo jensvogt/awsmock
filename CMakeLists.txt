@@ -12,7 +12,7 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 # -------------------------------------------------------------------------
 # External directories
 # -------------------------------------------------------------------------
-set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/external)
+set(EXTERNAL_ROOT ${CMAKE_SOURCE_DIR}/extern)
 set(EXTERNAL_INCLUDE_DIR ${EXTERNAL_ROOT}/include)
 set(EXTERNAL_LIB_DIR ${EXTERNAL_ROOT}/lib)
 
@@ -280,6 +280,17 @@ if (APPLE)
     target_include_directories(awslocal PRIVATE /opt/homebrew/opt/icu4c/include)
     target_link_libraries(awslocal PRIVATE /opt/homebrew/opt/icu4c/lib/libicuuc.a /opt/homebrew/opt/icu4c/lib/libicui18n.a
             /opt/homebrew/opt/icu4c/lib/libicudata.a)
+    target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
+elseif (WINDOWS)
+    add_executable(${BINARY} WIN32 ${SOURCES})
+    set_target_properties(${BINARY} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+    target_include_directories(${BINARY} PUBLIC ./include ../core/include ${BOOST_INCLUDE_DIR})
+    target_link_directories(${BINARY} PUBLIC ${BOOST_LIB_DIR})
+    target_link_libraries(${BINARY} awsmockcore libboost_filesystem-vc143-mt-x64-1_89.lib
+            libboost_url-vc143-mt-x64-1_89.lib libboost_thread-vc143-mt-x64-1_89.lib libboost_locale-vc143-mt-x64-1_89.lib
+            libboost_program_options-vc143-mt-x64-1_89.lib libboost_log-vc143-mt-x64-1_89.lib
+            libboost_log_setup-vc143-mt-x64-1_89.lib libboost_json-vc143-mt-x64-1_89.lib
+            ssh.lib crypt32.lib Iphlpapi.lib pdh.lib ntdll.lib shlwapi.lib)
 else ()
     target_link_libraries(awslocal PRIVATE
             -Wl,--start-group
@@ -287,8 +298,8 @@ else ()
             boost_program_options boost_process boost_json boost_filesystem boost_thread archive xml2 nettle gmp lzma bz2
             lz4 z zstd icuuc icui18n icudata magic ssl crypto acl pthread rt resolv
             -Wl,--end-group)
+    target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
 endif ()
-target_compile_options(awslocal PRIVATE -Wno-deprecated-declarations)
 
 # -------------------------------------------------------------------------
 # Build documentation
